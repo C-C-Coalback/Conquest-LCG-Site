@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
-
+<link rel="stylesheet" href="{% static 'navi_bar.css' %}">
 <head>
+  {% include 'header.html'%}
   <meta charset="utf-8">
   <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
 </head>
