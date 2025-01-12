@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="{% static 'navi_bar.css' %}">
+<head>
+  {% include 'header.html'%}
+  <meta charset="utf-8">
+  <title>{% block title %}Conquest{% endblock %}</title>
+</head>
+
+<body>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+</body>
+
+</html>
