@@ -6,4 +6,5 @@ from . import views
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="play.html"), name="play"),
+    path("<str:room_name>/", views.room, name="room"),
 ]
