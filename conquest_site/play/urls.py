@@ -1,8 +1,8 @@
 from django.urls import path
-from django.views.generic.base import TemplateView
 
 from . import views
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="play.html"), name="play"),
+    path("", views.lobby, name="lobby"),
+    path("<str:game_id>/", views.game, name="game"),
 ]
