@@ -5,4 +5,11 @@
 {% block content %}
 <h2>Lobby</h2>
 <h1>Placeholder</h1>
+<script>
+        const playSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/play/'
+        );
+</script>
 {% endblock %}

@@ -3,6 +3,12 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
+class LobbyConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = self.scope["url_route"]["kwargs"]
+        print("got to lobby consumer")
+
+
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
