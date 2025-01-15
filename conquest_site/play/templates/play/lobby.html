@@ -65,10 +65,13 @@
                     {{ user.username }}
                 </h3>
                 <div class="box">Lobby: ` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
-                </div>
-                <button onclick="joinLobby()">
-                Join Lobby
-                </button>`;
+                </div>`;
+            if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
+                document.getElementById("add_to_me").innerHTML +=
+                    `<button onclick="joinLobby()">
+                    Join Lobby
+                    </button>`;
+            }
             if (nameOfPlayerOne === "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
                     `<button onclick="removeLobby()">
