@@ -16,7 +16,7 @@
 <h2>Lobby</h2>
 <input id="create-lobby-submit" type="button" value="Create lobby">
 <div id="add_to_me">
-    <p>Prior text</p>
+    <p></p>
 </div>
 <script>
         const lobbySocket = new WebSocket(
@@ -60,10 +60,7 @@
 
         function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
             document.getElementById("add_to_me").innerHTML +=
-                `<h3>
-                    {{ user.username }}
-                </h3>
-                <div class="box">Lobby: ` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
+                `<div class="box">Lobby: ` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
                 </div>`;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
