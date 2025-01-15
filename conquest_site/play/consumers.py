@@ -89,8 +89,31 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 game_id = ''.join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
                 print(game_id)
-
-
+                first_name = ""
+                second_name = ""
+                for i in range(len(active_lobbies[0])):
+                    if active_lobbies[0][i] == self.name:
+                        first_name = active_lobbies[0][i]
+                        second_name = active_lobbies[1][i]
+                message = "Move to game/" + game_id + "/" + first_name + "/" + second_name
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
+                i = 0
+                while i < len(active_lobbies[0]):
+                    if active_lobbies[0][i] == self.name:
+                        del active_lobbies[0][i]
+                        del active_lobbies[1][i]
+                        i += -1
+                    i += 1
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
+                for i in range(len(active_lobbies[0])):
+                    message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                    await self.channel_layer.group_send(
+                        self.room_group_name, {"type": "chat.message", "message": message}
+                    )
 
     async def chat_message(self, event):
         message = event["message"]

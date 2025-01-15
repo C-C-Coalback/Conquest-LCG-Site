@@ -35,6 +35,8 @@
                 addAlreadyLobbiedError()
             } else if (data.message === "Delete lobby") {
                 deleteLobby()
+            } else if (split_string[0] === "Move to game") {
+                moveToGame(split_string[1], split_string[2], split_string[3])
             } else {
                 addLobby(split_string[1], split_string[2])
             }
@@ -56,6 +58,13 @@
             lobbySocket.send(JSON.stringify({
                 'message': "Start game/" + clicked_id
             }));
+        }
+
+        function moveToGame(game_id, oneName, twoName) {
+            if (oneName == "{{ user.username }}" || twoName == "{{ user.username }}") {
+                target = "/play/" + game_id;
+                location.href = target;
+            }
         }
 
         function removeLobby() {
