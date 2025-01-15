@@ -5,11 +5,19 @@
 {% block content %}
 <h2>Lobby</h2>
 <h1>Placeholder</h1>
+<input id="create-lobby-submit" type="button" value="Create lobby">
 <script>
-        const playSocket = new WebSocket(
+        const lobbySocket = new WebSocket(
             'ws://'
             + window.location.host
             + '/ws/play/'
         );
+
+        document.lobbySelector('#create-lobby-submit').onclick = function(e) {
+            const message = "Create Lobby";
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+        };
 </script>
 {% endblock %}
