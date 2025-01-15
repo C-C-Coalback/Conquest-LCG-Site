@@ -40,9 +40,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             print(active_lobbies)
             length = len(active_lobbies[0])
             message += "/" + active_lobbies[0][length - 1] + "/" + active_lobbies[1][length - 1]
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat.message", "message": message}
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": message}
+            )
 
     async def chat_message(self, event):
         message = event["message"]
