@@ -24,8 +24,6 @@ from play.routing import websocket_play_urlpatterns
 
 websocket_urlpatterns = websocket_chat_urlpatterns + websocket_play_urlpatterns
 
-print(websocket_chat_urlpatterns)
-
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
