@@ -69,6 +69,20 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         if len(message) > 1:
             if message[0] == "Join lobby":
                 print("code to join lobby")
+                print(message[1])
+                for i in range(len(active_lobbies[0])):
+                    if active_lobbies[0][i] == message[1]:
+                        active_lobbies[1][i] = self.name
+            print(active_lobbies)
+            message = "Delete lobby"
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": message}
+            )
+            for i in range(len(active_lobbies[0])):
+                message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
 
     async def chat_message(self, event):
         message = event["message"]
