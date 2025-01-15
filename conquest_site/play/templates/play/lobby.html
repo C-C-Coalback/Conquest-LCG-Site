@@ -31,13 +31,14 @@
 
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
+            const split_string = data.message.split("/");
             if (data.message === "Logged out")
             {
                 addError()
             } else if (data.message === "Already in lobby") {
                 addAlreadyLobbied()
             } else {
-                addCode()
+                addCode(split_string[1], split_string[2])
             }
         };
 
@@ -53,13 +54,13 @@
             }));
         }
 
-        function addCode() {
+        function addCode(nameOfPlayerOne, nameOfPlayerTwo) {
             document.getElementById("add_to_me")
                 .innerHTML +=
                 `<h3>
                     {{ user.username }}
                 </h3>
-                <div class="box">Lobby by {{ user.username }}
+                <div class="box">Lobby: ` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
                 </div>
                 <button onclick="joinLobby()">
                 Join Lobby
