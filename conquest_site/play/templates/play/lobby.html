@@ -47,9 +47,9 @@
             }));
         };
 
-        function joinLobby() {
+        function joinLobby(clicked_id) {
             lobbySocket.send(JSON.stringify({
-                'message': "Join lobby"
+                'message': "Join lobby/" + clicked_id
             }));
         }
 
@@ -68,7 +68,7 @@
                 </div>`;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
-                    `<button onclick="joinLobby()">
+                    `<button id=` + nameOfPlayerOne + ` onclick="joinLobby(this.id)">
                     Join Lobby
                     </button>`;
             }

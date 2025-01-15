@@ -65,6 +65,10 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
+        message = message.split(sep="/")
+        if len(message) > 1:
+            if message[0] == "Join lobby":
+                print("code to join lobby")
 
     async def chat_message(self, event):
         message = event["message"]
