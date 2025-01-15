@@ -43,6 +43,15 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "chat.message", "message": message}
             )
+        if message == "Remove lobby":
+            i = 0
+            while i < len(active_lobbies[0]):
+                if active_lobbies[0][i] == self.name:
+                    del active_lobbies[0][i]
+                    del active_lobbies[1][i]
+                i += 1
+            print(active_lobbies)
+
 
     async def chat_message(self, event):
         message = event["message"]
