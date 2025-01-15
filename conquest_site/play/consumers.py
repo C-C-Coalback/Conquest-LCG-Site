@@ -3,10 +3,16 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
+active_lobbies = [[], []]
+
+
 class LobbyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = "lobby"
         self.room_group_name = "lobby"
+        self.user = self.scope["user"]
+        self.name = self.user.username
+        print(self.name)
         print("got to lobby consumer")
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -17,6 +23,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
+        if message == "Create lobby":
+            print("code to create lobby for:", self.name)
+            if self.name == "":
+                print("Must be logged in to create a lobby.")
+                await self.chat_message({"type": "chat.message", "message": "Must be logged in"})
+                return None
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat.message", "message": message}
         )
