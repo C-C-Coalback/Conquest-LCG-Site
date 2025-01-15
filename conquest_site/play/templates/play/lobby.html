@@ -6,7 +6,7 @@
 <style>
         .box {
             width: 200px;
-            height: 100px;
+            height: 32px;
             background-color: lightblue;
             border: 2px solid blue;
             padding: 10px;
@@ -57,8 +57,7 @@
                 `<h3>
                     {{ user.username }}
                 </h3>
-                <div class="box">This is a box created using a
-                &lt;div&gt; element.
+                <div class="box">Lobby by {{ user.username }}
                 </div>
                 <button onclick="joinLobby()">
                 Join Lobby
