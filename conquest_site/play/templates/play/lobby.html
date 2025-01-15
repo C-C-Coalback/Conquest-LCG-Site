@@ -3,9 +3,25 @@
 {% block title %}Lobby{% endblock %}
 
 {% block content %}
+<style>
+        .box {
+            width: 200px;
+            height: 100px;
+            background-color: lightblue;
+            border: 2px solid blue;
+            padding: 10px;
+            margin: 10px;
+        }
+</style>
 <h2>Lobby</h2>
 <h1>Placeholder</h1>
 <input id="create-lobby-submit" type="button" value="Create lobby">
+<div id="add_to_me">
+    <p>Prior text</p>
+</div>
+<button onclick="addCode()">
+        Add Stuff
+</button>
 <script>
         const lobbySocket = new WebSocket(
             'ws://'
@@ -19,5 +35,17 @@
                 'message': message
             }));
         };
+
+        function addCode() {
+            document.getElementById("add_to_me")
+                .innerHTML +=
+                `<h3>
+                    This is the text which has
+                    been inserted by JS
+                </h3>
+                <div class="box">This is a box created using a
+        &lt;div&gt; element.
+    </div>`;
+        }
 </script>
 {% endblock %}
