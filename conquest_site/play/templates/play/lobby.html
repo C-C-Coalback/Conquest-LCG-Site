@@ -13,9 +13,9 @@
             + '/ws/play/'
         );
 
-        document.lobbySelector('#create-lobby-submit').onclick = function(e) {
+        document.querySelector('#create-lobby-submit').onclick = function(e) {
             const message = "Create Lobby";
-            chatSocket.send(JSON.stringify({
+            lobbySocket.send(JSON.stringify({
                 'message': message
             }));
         };
