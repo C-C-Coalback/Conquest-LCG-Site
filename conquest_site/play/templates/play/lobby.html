@@ -35,6 +35,12 @@
             }));
         };
 
+        function joinLobby() {
+            lobbySocket.send(JSON.stringify({
+                'message': "Join lobby"
+            }));
+        }
+
         function addCode() {
             document.getElementById("add_to_me")
                 .innerHTML +=
@@ -43,9 +49,11 @@
                     been inserted by JS
                 </h3>
                 <div class="box">This is a box created using a
-        &lt;div&gt; element.
-    </div>
-    <input id="join-lobby" type="button" value="Join lobby">`;
+                &lt;div&gt; element.
+                </div>
+                <button onclick="joinLobby()">
+                Join Lobby
+                </button>`;
         }
 </script>
 {% endblock %}
