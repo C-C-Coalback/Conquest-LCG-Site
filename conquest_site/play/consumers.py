@@ -27,7 +27,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             print("code to create lobby for:", self.name)
             if self.name == "":
                 print("Must be logged in to create a lobby.")
-                await self.chat_message({"type": "chat.message", "message": "Must be logged in"})
+                await self.chat_message({"type": "chat.message", "message": "Logged out"})
                 return None
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat.message", "message": message}

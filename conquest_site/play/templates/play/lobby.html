@@ -29,6 +29,15 @@
             + '/ws/play/'
         );
 
+        lobbySocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if(data.message === "Logged out")
+            {
+                addError()
+            }
+            document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+
         document.querySelector('#create-lobby-submit').onclick = function(e) {
             lobbySocket.send(JSON.stringify({
                 'message': "Create lobby"
@@ -54,6 +63,12 @@
                 <button onclick="joinLobby()">
                 Join Lobby
                 </button>`;
+        }
+
+        function addError() {
+            document.getElementById("add_to_me")
+                .innerHTML +=
+                `<h3>Not logged in</h3>`;
         }
 </script>
 {% endblock %}
