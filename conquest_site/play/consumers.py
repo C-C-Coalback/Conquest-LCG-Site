@@ -8,6 +8,7 @@ active_lobbies = [[], []]
 
 class LobbyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        global active_lobbies
         self.room_name = "lobby"
         self.room_group_name = "lobby"
         self.user = self.scope["user"]
@@ -18,6 +19,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
+        for i in range(len(active_lobbies[0])):
+            message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+            await self.chat_message({"type": "chat.message", "message": message})
 
     async def receive(self, text_data):
         global active_lobbies
@@ -49,9 +53,18 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 if active_lobbies[0][i] == self.name:
                     del active_lobbies[0][i]
                     del active_lobbies[1][i]
+                    i += -1
                 i += 1
             print(active_lobbies)
-
+            message = "Delete lobby"
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": message}
+            )
+            for i in range(len(active_lobbies[0])):
+                message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
 
     async def chat_message(self, event):
         message = event["message"]

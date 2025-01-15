@@ -34,6 +34,8 @@
                 addAnonymousError()
             } else if (data.message === "Already in lobby") {
                 addAlreadyLobbiedError()
+            } else if (data.message === "Delete lobby") {
+                deleteLobby()
             } else {
                 addLobby(split_string[1], split_string[2])
             }
@@ -78,6 +80,12 @@
         function addAnonymousError() {
             document.getElementById("add_to_me")
                 .innerHTML +=
+                `<h3>Not logged in</h3>`;
+        }
+
+        function deleteLobby() {
+            document.getElementById("add_to_me")
+                .innerHTML =
                 `<h3>Not logged in</h3>`;
         }
 
