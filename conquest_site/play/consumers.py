@@ -1,5 +1,6 @@
 import json
-
+import random
+import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
@@ -73,16 +74,23 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 for i in range(len(active_lobbies[0])):
                     if active_lobbies[0][i] == message[1]:
                         active_lobbies[1][i] = self.name
-            print(active_lobbies)
-            message = "Delete lobby"
-            await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat.message", "message": message}
-            )
-            for i in range(len(active_lobbies[0])):
-                message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                print(active_lobbies)
+                message = "Delete lobby"
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
+                for i in range(len(active_lobbies[0])):
+                    message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                    await self.channel_layer.group_send(
+                        self.room_group_name, {"type": "chat.message", "message": message}
+                    )
+            if message[0] == "Start game":
+                print("Code to start game")
+                game_id = ''.join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+                print(game_id)
+
+
 
     async def chat_message(self, event):
         message = event["message"]
