@@ -19,9 +19,6 @@
 <div id="add_to_me">
     <p>Prior text</p>
 </div>
-<button onclick="addCode()">
-        Add Stuff
-</button>
 <script>
         const lobbySocket = new WebSocket(
             'ws://'
@@ -54,9 +51,14 @@
             }));
         }
 
+        function removeLobby() {
+            lobbySocket.send(JSON.stringify({
+                'message': "Remove lobby"
+            }));
+        }
+
         function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
-            document.getElementById("add_to_me")
-                .innerHTML +=
+            document.getElementById("add_to_me").innerHTML +=
                 `<h3>
                     {{ user.username }}
                 </h3>
@@ -65,6 +67,12 @@
                 <button onclick="joinLobby()">
                 Join Lobby
                 </button>`;
+            if (nameOfPlayerOne === "{{ user.username }}") {
+                document.getElementById("add_to_me").innerHTML +=
+                    `<button onclick="removeLobby()">
+                    Remove Lobby
+                    </button>`;
+            }
         }
 
         function addAnonymousError() {
