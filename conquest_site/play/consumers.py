@@ -20,6 +20,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def receive(self, text_data):
+        global active_lobbies
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
@@ -29,6 +30,14 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 print("Must be logged in to create a lobby.")
                 await self.chat_message({"type": "chat.message", "message": "Logged out"})
                 return None
+            for i in range(len(active_lobbies[0])):
+                if active_lobbies[0][i] == self.name or active_lobbies[1][i] == self.name:
+                    print("User is already in a lobby.")
+                    await self.chat_message({"type": "chat.message", "message": "Already in lobby"})
+                    return None
+            active_lobbies[0].append(self.name)
+            active_lobbies[1].append("")
+            print(active_lobbies)
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat.message", "message": message}
         )

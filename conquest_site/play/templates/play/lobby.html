@@ -31,9 +31,11 @@
 
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            if(data.message === "Logged out")
+            if (data.message === "Logged out")
             {
                 addError()
+            } else if (data.message === "Already in lobby") {
+                addAlreadyLobbied()
             } else {
                 addCode()
             }
@@ -68,6 +70,12 @@
             document.getElementById("add_to_me")
                 .innerHTML +=
                 `<h3>Not logged in</h3>`;
+        }
+
+        function addAlreadyLobbied() {
+            document.getElementById("add_to_me")
+                .innerHTML +=
+                `<h3>Already Lobbied</h3>`;
         }
 </script>
 {% endblock %}
