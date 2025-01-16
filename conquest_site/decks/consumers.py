@@ -21,3 +21,11 @@ class DecksConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
+        await self.send(text_data=json.dumps({"message": message}))
+
+
+    async def chat_message(self, event):
+        message = event["message"]
+        print("send:", message)
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({"message": message}))
