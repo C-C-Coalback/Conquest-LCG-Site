@@ -128,8 +128,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("got to game consumer")
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
-        self.room_group_name = f"chat_{self.room_name}"
+        self.room_group_name = f"play_{self.room_name}"
         self.user = self.scope["user"]
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)

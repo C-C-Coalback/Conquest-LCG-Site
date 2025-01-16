@@ -5,4 +5,16 @@
 {% block content %}
 <h2>Game</h2>
 <h1>Placeholder</h1>
+{{ game_id|json_script:"game-id" }}
+<script>
+    const gameID = JSON.parse(document.getElementById('game-id').textContent);
+
+    const gameSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/play/'
+            + gameID
+            + '/'
+        );
+</script>
 {% endblock %}
