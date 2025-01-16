@@ -5,4 +5,14 @@
 {% block content %}
 <h2>Decks</h2>
 <h1>Placeholder</h1>
+<textarea id="chat-log" cols="100" rows="20"></textarea><br>
+<input id="chat-message-input" type="text" size="100"><br>
+<input id="chat-message-submit" type="button" value="Send">
+<script>
+    const lobbySocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/decks/'
+        );
+</script>
 {% endblock %}

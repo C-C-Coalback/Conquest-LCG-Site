@@ -21,8 +21,9 @@ django_asgi_app = get_asgi_application()
 
 from chat.routing import websocket_chat_urlpatterns
 from play.routing import websocket_play_urlpatterns
+from decks.routing import websocket_decks_urlpatterns
 
-websocket_urlpatterns = websocket_chat_urlpatterns + websocket_play_urlpatterns
+websocket_urlpatterns = websocket_chat_urlpatterns + websocket_play_urlpatterns + websocket_decks_urlpatterns
 
 application = ProtocolTypeRouter(
     {
