@@ -49,7 +49,7 @@ def orks_cards_init():
                        CardClasses.ArmyCard("Bad Dok", "This unit gains 3 command icons while it is damaged.",
                                             "Oddboy. Nob.", 2,
                                             "Orks", "Common", 1, 4, 1, False, "Bad_Dok"),
-                       CardClasses.ArmyCard("Rokkit Boy", "Each enemy unit at this planet loses the Flying keyword.",
+                       CardClasses.ArmyCard("Rokkitboy", "Each enemy unit at this planet loses the Flying keyword.",
                                             "Warrior. Boyz.", 2, "Orks", "Common", 2, 2, 1, False,
                                             "Rokkit_Boy"),
                        CardClasses.ArmyCard("Goff Boyz", "This unit gets +3 ATK while it is at the first planet.",

@@ -8,6 +8,67 @@ cards_array = Initfunctions.init_player_cards()
 planet_cards_array = Initfunctions.init_planet_cards()
 
 
+def clean_sent_deck(deck_message):
+    print("Code to test if deck is ok")
+    deck_sections = deck_message.split(sep="------------------"
+                                           "----------------------------------------------------")
+    print(deck_sections)
+    individual_parts = []
+    for i in range(len(deck_sections)):
+        individual_parts += deck_sections[i].split(sep="\n")
+    individual_parts = [x for x in individual_parts if x]
+    return individual_parts
+
+
+def deck_validation(deck, remaining_signature_squad, factions):
+    global cards_array
+    print("Can continue")
+    current_index = 4
+    while deck[current_index] != "Army":
+        if deck[current_index] in remaining_signature_squad:
+            print("Found a match")
+            try:
+                remaining_signature_squad.remove(deck[current_index])
+            except ValueError:
+                print("How?")
+            print(remaining_signature_squad)
+        else:
+            print("No match")
+            return "Unexpected Card in Signature Squad"
+        current_index += 1
+    current_index += 1
+    skippers = ["Support", "Attachment", "Event", "Synapse"]
+    while deck[current_index] != "Planet" and current_index < len(deck):
+        if len(deck[current_index]) > 3:
+            current_name = deck[current_index][3:]
+            current_amount = deck[current_index][0]
+            if int(current_amount) > 3:
+                print("Too many copies")
+                return "Too many copies"
+            card_result = FindCard.find_card(current_name, cards_array)
+            if card_result.get_name() != current_name:
+                print("Card not found in database", current_name)
+                return "Card not found in database"
+            if card_result.get_card_type() == "Signature":
+                print("Signature card found")
+                return "Signature card found"
+            faction_check_passed = False
+            if card_result.get_faction() == factions[0]:
+                faction_check_passed = True
+            elif card_result.get_faction() == factions[1] and card_result.get_loyalty() == "Common":
+                faction_check_passed = True
+            elif card_result.get_faction() == "Neutral":
+                faction_check_passed = True
+            if not faction_check_passed:
+                print("Faction check not passed", factions[0], factions[1], card_result.get_faction())
+                return "Faction check not passed"
+        current_index += 1
+        while deck[current_index] in skippers:
+            current_index += 1
+    print("No issues")
+    return "No issues"
+
+
 class DecksConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = "decks"
@@ -75,16 +136,34 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "SEND DECK":
-                print("Code to test if deck is ok")
-                deck_sections = split_message[1].split(sep="------------------"
-                                                           "----------------------------------------------------")
-                print(deck_sections)
-                individual_parts = []
-                for i in range(len(deck_sections)):
-                    individual_parts += deck_sections[i].split(sep="\n")
-                individual_parts = [x for x in individual_parts if x]
-                print(individual_parts)
-
+                message_to_send = ""
+                deck = clean_sent_deck(split_message[1])
+                print(deck)
+                remaining_signature_squad = []
+                if len(deck) > 5:
+                    print("Size should be fine")
+                    warlord_card = FindCard.find_card(deck[1], cards_array)
+                    if warlord_card.get_card_type() != "Warlord":
+                        print("Card in Warlord position is not a warlord.")
+                    if warlord_card.get_name() == "Nazdreg":
+                        remaining_signature_squad = ['1x Cybork Body', '1x Kraktoof Hall',
+                                                     '2x Bigga Is Betta', "4x Nazdreg's Flash Gitz"]
+                    factions = deck[2].split(sep=" (")
+                    if len(factions) == 2:
+                        factions[1] = factions[1][:-1]
+                    print(factions)
+                    warlord_matches = True
+                    if factions[0] != warlord_card.get_faction():
+                        print("Faction chosen does not match the warlord.")
+                        warlord_matches = False
+                    if len(factions) == 1 and warlord_matches:
+                        message_to_send = deck_validation(deck, remaining_signature_squad, factions)
+                    if len(factions) == 2 and warlord_matches:
+                        if factions[0] == factions[1]:
+                            print("Main faction and ally faction can not be the same.")
+                        if (factions[0] == "Orks" and factions[1] == "Chaos") or (
+                                factions[0] == "Chaos" and factions[1] == factions[0]):
+                            message_to_send = deck_validation(deck, remaining_signature_squad, factions)
 
     async def chat_message(self, event):
         message = event["message"]
