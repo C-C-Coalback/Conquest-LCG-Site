@@ -41,6 +41,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/Bigga is Betta"}))
                     await self.send(text_data=json.dumps({"message": "SS/Kraktoof Hall"}))
                     await self.send(text_data=json.dumps({"message": "SS/Cybork Body"}))
+                if card_object.get_name() == "Zarathur, High Sorcerer":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Zarathur's Flamers"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Shrine of Warpflame"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Mark of Chaos"}))
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":
