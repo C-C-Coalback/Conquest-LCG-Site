@@ -150,6 +150,9 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     if warlord_card.get_name() == "Nazdreg":
                         remaining_signature_squad = ['1x Cybork Body', '1x Kraktoof Hall',
                                                      '2x Bigga Is Betta', "4x Nazdreg's Flash Gitz"]
+                    if warlord_card.get_name() == "Zarathur, High Sorcerer":
+                        remaining_signature_squad = ['1x Mark of Chaos', '1x Shrine of Warpflame',
+                                                     '2x Infernal Gateway', "4x Zarathur's Flamers"]
                     factions = deck[2].split(sep=" (")
                     if len(factions) == 2:
                         factions[1] = factions[1][:-1]
@@ -164,7 +167,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         if factions[0] == factions[1]:
                             print("Main faction and ally faction can not be the same.")
                         if (factions[0] == "Orks" and factions[1] == "Chaos") or (
-                                factions[0] == "Chaos" and factions[1] == factions[0]):
+                                factions[1] == factions[0]) or (
+                                factions[0] == "Chaos" and factions[1] == "Orks"):
                             message_to_send = deck_validation(deck, remaining_signature_squad, factions)
                 if message_to_send == "SUCCESS":
                     print("Need to save deck")
