@@ -3,6 +3,7 @@ import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .deckscode import CardClasses, Initfunctions, FindCard
+import os
 
 cards_array = Initfunctions.init_player_cards()
 planet_cards_array = Initfunctions.init_planet_cards()
@@ -66,7 +67,7 @@ def deck_validation(deck, remaining_signature_squad, factions):
         while deck[current_index] in skippers:
             current_index += 1
     print("No issues")
-    return "No issues"
+    return "SUCCESS"
 
 
 class DecksConsumer(AsyncWebsocketConsumer):
@@ -140,6 +141,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 deck = clean_sent_deck(split_message[1])
                 print(deck)
                 remaining_signature_squad = []
+                deck_name = deck[0]
                 if len(deck) > 5:
                     print("Size should be fine")
                     warlord_card = FindCard.find_card(deck[1], cards_array)
@@ -164,6 +166,15 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         if (factions[0] == "Orks" and factions[1] == "Chaos") or (
                                 factions[0] == "Chaos" and factions[1] == factions[0]):
                             message_to_send = deck_validation(deck, remaining_signature_squad, factions)
+                if message_to_send == "SUCCESS":
+                    print("Need to save deck")
+                    print(os.path.dirname(os.path.realpath(__file__)))
+                    print(os.getcwd())
+                    if not os.path.isdir("decks/DeckStorage/" + self.name):
+                        print("Path does not exist")
+                        os.mkdir("decks/DeckStorage/" + self.name)
+                    with open("decks/DeckStorage/" + self.name + "/" + deck_name, "w") as file:
+                        file.write(split_message[1])
 
     async def chat_message(self, event):
         message = event["message"]
