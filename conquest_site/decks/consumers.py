@@ -3,6 +3,7 @@ import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .deckscode import CardClasses, Initfunctions, FindCard
+
 cards_array = Initfunctions.init_player_cards()
 planet_cards_array = Initfunctions.init_planet_cards()
 
@@ -73,6 +74,17 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 print(self.main_faction, self.ally_faction)
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
+            elif split_message[0] == "SEND DECK":
+                print("Code to test if deck is ok")
+                deck_sections = split_message[1].split(sep="------------------"
+                                                           "----------------------------------------------------")
+                print(deck_sections)
+                individual_parts = []
+                for i in range(len(deck_sections)):
+                    individual_parts += deck_sections[i].split(sep="\n")
+                individual_parts = [x for x in individual_parts if x]
+                print(individual_parts)
+
 
     async def chat_message(self, event):
         message = event["message"]
