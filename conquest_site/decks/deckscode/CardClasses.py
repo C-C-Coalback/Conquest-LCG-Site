@@ -93,6 +93,9 @@ class Card:
     def exhaust_card(self):
         self.ready = False
 
+    def print_info(self):
+        print("If you are seeing this the card is the error handling card.")
+
 
 class UnitCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, card_type, attack, health, command,
