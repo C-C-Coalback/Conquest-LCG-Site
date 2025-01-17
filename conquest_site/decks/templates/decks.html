@@ -15,14 +15,19 @@
             + '/ws/decks/'
         );
 
-    document.querySelector('#chat-log').value += '\n----------------------------------------------------------------------\n\n\n----------------------------------------------------------------------\n';
-    document.querySelector('#chat-log').value += 'Signature Squad\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Army\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Support\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Synapse\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Attachment\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Event\n\n----------------------------------------------------------------------\n'
-    document.querySelector('#chat-log').value += 'Planet\n\n----------------------------------------------------------------------\n'
+    function setInitialDeck() {
+        document.querySelector('#chat-log').value = ""
+        document.querySelector('#chat-log').value += '\n----------------------------------------------------------------------\n\n\n----------------------------------------------------------------------\n';
+        document.querySelector('#chat-log').value += 'Signature Squad\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Army\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Support\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Synapse\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Attachment\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Event\n\n----------------------------------------------------------------------\n'
+        document.querySelector('#chat-log').value += 'Planet\n\n----------------------------------------------------------------------\n'
+    }
+
+    setInitialDeck()
     decksSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
@@ -30,6 +35,20 @@
             var split_chat_holder = chat_holder.split("\n");
             if (split_data[0] === "Name") {
                 split_chat_holder[0] = split_data[1];
+                chat_holder = split_chat_holder.join("\n");
+                document.querySelector('#chat-log').value = chat_holder;
+            } else if (split_data[0] === "Warlord") {
+                split_chat_holder[2] = split_data[1];
+                split_chat_holder[3] = split_data[2];
+                chat_holder = split_chat_holder.join("\n");
+                document.querySelector('#chat-log').value = chat_holder;
+            } else if (split_data[0] === "SS") {
+                var arrayLength = split_chat_holder.length;
+                for (var i = 0; i < arrayLength; i++) {
+                    if (split_chat_holder[i] === "Signature Squad") {
+                        split_chat_holder[i + 1] = ("\n" + split_data[1]);
+                    }
+                }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
             } else {

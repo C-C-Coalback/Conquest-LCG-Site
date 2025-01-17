@@ -29,7 +29,19 @@ class DecksConsumer(AsyncWebsocketConsumer):
         if len(split_message) == 1:
             card_object = FindCard.find_card(message, cards_array)
             if card_object.get_name() != "FINAL CARD":
+                card_type = card_object.get_card_type()
+                message = card_type + "/" + message
+                if card_type == "Warlord":
+                    message = message + "/" + card_object.get_faction()
                 await self.send(text_data=json.dumps({"message": message}))
+                if card_object.get_name() == "Nazdreg":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Nazdreg's Flash Gitz"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Bigga is Betta"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Bigga is Betta"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Kraktoof Hall"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Cybork Body"}))
+
         elif len(split_message) == 2:
             if split_message[0] == "Name":
                 print("Need to set name to: ", split_message[1])
