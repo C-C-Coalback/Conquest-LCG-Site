@@ -82,6 +82,30 @@
                 }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
+            } else if (split_data[0] === "Army"){
+                var arrayLength = split_chat_holder.length;
+                for (var i = 0; i < arrayLength; i++) {
+                    if (split_chat_holder[i] === "Army") {
+                        var cardAlreadyPresent = false;
+                        endIndex = findNextCutoff(i, split_chat_holder);
+                        for (var k = i; k < endIndex; k++) {
+                            var currentName = split_chat_holder[k].slice(3);
+                            if (currentName === split_data[1]) {
+                                cardAlreadyPresent = true;
+                                var amountOfCard = Number(Array.from(split_chat_holder[k])[0]);
+                                amountOfCard = amountOfCard + 1;
+                                if (amountOfCard < 4) {
+                                    split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
+                                }
+                            }
+                        }
+                        if (cardAlreadyPresent !== true) {
+                            split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
+                        }
+                    }
+                }
+                chat_holder = split_chat_holder.join("\n");
+                document.querySelector('#chat-log').value = chat_holder;
             } else {
                 document.querySelector('#chat-log').value += (data.message + '\n');
             }
