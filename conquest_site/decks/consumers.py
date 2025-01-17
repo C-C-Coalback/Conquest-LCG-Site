@@ -63,11 +63,16 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "Ally":
                 print("Trying to set ally faction to:", split_message[1])
+                changed_ally = False
                 if self.main_faction == "Chaos" and split_message[1] == "Orks":
                     self.ally_faction = "Orks"
+                    changed_ally = True
                 elif self.main_faction == "Orks" and split_message[1] == "Chaos":
                     self.ally_faction = "Chaos"
+                    changed_ally = True
                 print(self.main_faction, self.ally_faction)
+                if changed_ally:
+                    await self.send(text_data=json.dumps({"message": message}))
 
     async def chat_message(self, event):
         message = event["message"]
