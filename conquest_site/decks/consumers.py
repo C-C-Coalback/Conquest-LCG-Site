@@ -21,6 +21,39 @@ def clean_sent_deck(deck_message):
     return individual_parts
 
 
+def second_part_deck_validation(deck):
+    global cards_array
+    remaining_signature_squad = []
+    print("Size should be fine")
+    warlord_card = FindCard.find_card(deck[1], cards_array)
+    if warlord_card.get_card_type() != "Warlord":
+        print("Card in Warlord position is not a warlord")
+        return "Card in Warlord position is not a warlord"
+    if warlord_card.get_name() == "Nazdreg":
+        remaining_signature_squad = ['1x Cybork Body', '1x Kraktoof Hall',
+                                     '2x Bigga Is Betta', "4x Nazdreg's Flash Gitz"]
+    if warlord_card.get_name() == "Zarathur, High Sorcerer":
+        remaining_signature_squad = ['1x Mark of Chaos', '1x Shrine of Warpflame',
+                                     '2x Infernal Gateway', "4x Zarathur's Flamers"]
+    factions = deck[2].split(sep=" (")
+    if len(factions) == 2:
+        factions[1] = factions[1][:-1]
+    print(factions)
+    warlord_matches = True
+    if factions[0] != warlord_card.get_faction():
+        print("Faction chosen does not match the warlord")
+        return "Warlord does not match main faction"
+    if len(factions) == 1 and warlord_matches:
+        return deck_validation(deck, remaining_signature_squad, factions)
+    if len(factions) == 2 and warlord_matches:
+        if factions[0] == factions[1]:
+            print("Main faction and ally faction can not be the same")
+            return "Main faction and ally faction can not be the same"
+        if (factions[0] == "Orks" and factions[1] == "Chaos") or (factions[0] == "Chaos" and factions[1] == "Orks"):
+            return deck_validation(deck, remaining_signature_squad, factions)
+    return ""
+
+
 def deck_validation(deck, remaining_signature_squad, factions):
     global cards_array
     print("Can continue")
@@ -47,14 +80,14 @@ def deck_validation(deck, remaining_signature_squad, factions):
             card_count += int(current_amount)
             if int(current_amount) > 3:
                 print("Too many copies")
-                return "Too many copies"
+                return "Too many copies: " + current_name
             card_result = FindCard.find_card(current_name, cards_array)
             if card_result.get_name() != current_name:
                 print("Card not found in database", current_name)
-                return "Card not found in database"
+                return "Card not found in database: " + current_name
             if card_result.get_card_type() == "Signature":
                 print("Signature card found")
-                return "Signature card found"
+                return "Signature card found: " + current_name
             faction_check_passed = False
             if card_result.get_faction() == factions[0]:
                 faction_check_passed = True
@@ -64,13 +97,14 @@ def deck_validation(deck, remaining_signature_squad, factions):
                 faction_check_passed = True
             if not faction_check_passed:
                 print("Faction check not passed", factions[0], factions[1], card_result.get_faction())
-                return "Faction check not passed"
+                return "Faction check not passed (Main, Ally, Card): "\
+                       + factions[0] + factions[1] + card_result.get_faction()
         current_index += 1
         while deck[current_index] in skippers:
             current_index += 1
     if card_count < 42:
         print("Too few cards")
-        return "Too few cards"
+        return "Too few cards: " + str(card_count)
     print("No issues")
     return "SUCCESS"
 
@@ -145,36 +179,9 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 message_to_send = ""
                 deck = clean_sent_deck(split_message[1])
                 print(deck)
-                remaining_signature_squad = []
                 deck_name = deck[0]
                 if len(deck) > 5:
-                    print("Size should be fine")
-                    warlord_card = FindCard.find_card(deck[1], cards_array)
-                    if warlord_card.get_card_type() != "Warlord":
-                        print("Card in Warlord position is not a warlord.")
-                    if warlord_card.get_name() == "Nazdreg":
-                        remaining_signature_squad = ['1x Cybork Body', '1x Kraktoof Hall',
-                                                     '2x Bigga Is Betta', "4x Nazdreg's Flash Gitz"]
-                    if warlord_card.get_name() == "Zarathur, High Sorcerer":
-                        remaining_signature_squad = ['1x Mark of Chaos', '1x Shrine of Warpflame',
-                                                     '2x Infernal Gateway', "4x Zarathur's Flamers"]
-                    factions = deck[2].split(sep=" (")
-                    if len(factions) == 2:
-                        factions[1] = factions[1][:-1]
-                    print(factions)
-                    warlord_matches = True
-                    if factions[0] != warlord_card.get_faction():
-                        print("Faction chosen does not match the warlord.")
-                        warlord_matches = False
-                    if len(factions) == 1 and warlord_matches:
-                        message_to_send = deck_validation(deck, remaining_signature_squad, factions)
-                    if len(factions) == 2 and warlord_matches:
-                        if factions[0] == factions[1]:
-                            print("Main faction and ally faction can not be the same.")
-                        if (factions[0] == "Orks" and factions[1] == "Chaos") or (
-                                factions[1] == factions[0]) or (
-                                factions[0] == "Chaos" and factions[1] == "Orks"):
-                            message_to_send = deck_validation(deck, remaining_signature_squad, factions)
+                    message_to_send = second_part_deck_validation(deck)
                 if message_to_send == "SUCCESS":
                     print("Need to save deck")
                     print(os.path.dirname(os.path.realpath(__file__)))
