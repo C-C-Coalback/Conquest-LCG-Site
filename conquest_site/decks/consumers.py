@@ -13,6 +13,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
         self.room_group_name = "decks"
         self.user = self.scope["user"]
         self.name = self.user.username
+        self.main_faction = ""
+        self.ally_faction = ""
         print("got to decks consumer")
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -34,6 +36,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 message = card_type + "/" + message
                 if card_type == "Warlord":
                     message = message + "/" + card_object.get_faction()
+                    self.main_faction = card_object.get_faction()
                 if card_loyalty != "Signature" or card_type == "Warlord":
                     await self.send(text_data=json.dumps({"message": message}))
                 if card_object.get_name() == "Nazdreg":
@@ -55,6 +58,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
             if split_message[0] == "Name":
                 print("Need to set name to: ", split_message[1])
                 await self.send(text_data=json.dumps({"message": message}))
+            elif split_message[0] == "Ally":
+                print("Trying to set ally faction to:", split_message[1])
+                if self.main_faction == "Chaos" and split_message[1] == "Orks":
+                    self.ally_faction = "Orks"
+                elif self.main_faction == "Orks" and split_message[1] == "Chaos":
+                    self.ally_faction = "Chaos"
+                print(self.main_faction, self.ally_faction)
 
     async def chat_message(self, event):
         message = event["message"]
