@@ -7,7 +7,8 @@
 <h1>Placeholder</h1>
 <textarea id="chat-log" cols="100" rows="20"></textarea><br>
 <input id="chat-message-input" type="text" size="100"><br>
-<input id="chat-message-submit" type="button" value="Send">
+<input id="chat-message-submit" type="button" value="Add Card">
+<input id="deck-submit" type="button" value="Send Deck" onclick="sendDeck();">
 <script>
     const decksSocket = new WebSocket(
             'ws://'
@@ -188,6 +189,13 @@
                 document.querySelector('#chat-log').value += (data.message + '\n');
             }
         };
+
+    function sendDeck() {
+        var chat_holder = document.querySelector('#chat-log').value;
+        decksSocket.send(JSON.stringify({
+                'message': ("SEND DECK/" + chat_holder)
+        }));
+    }
 
     decksSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
