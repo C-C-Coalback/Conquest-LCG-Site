@@ -1,4 +1,4 @@
-import CardClasses
+from .. import CardClasses
 
 
 def planet_cards_init():

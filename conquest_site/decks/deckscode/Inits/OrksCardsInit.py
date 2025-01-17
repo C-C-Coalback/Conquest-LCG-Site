@@ -1,4 +1,4 @@
-import CardClasses
+from .. import CardClasses
 
 
 def orks_cards_init():

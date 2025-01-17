@@ -1,4 +1,4 @@
-import CardClasses
+from .. import CardClasses
 
 
 def neutral_cards_init():

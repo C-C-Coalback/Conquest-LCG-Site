@@ -2,6 +2,11 @@ import json
 import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .deckscode import CardClasses, Initfunctions
+cards_array = Initfunctions.init_player_cards()
+cards_array[10].print_info()
+planet_cards_array = Initfunctions.init_planet_cards()
+planet_cards_array[5].print_info()
 
 
 class DecksConsumer(AsyncWebsocketConsumer):
