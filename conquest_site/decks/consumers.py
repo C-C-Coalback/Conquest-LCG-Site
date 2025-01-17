@@ -38,11 +38,13 @@ def deck_validation(deck, remaining_signature_squad, factions):
             return "Unexpected Card in Signature Squad"
         current_index += 1
     current_index += 1
+    card_count = 0
     skippers = ["Support", "Attachment", "Event", "Synapse"]
     while deck[current_index] != "Planet" and current_index < len(deck):
         if len(deck[current_index]) > 3:
             current_name = deck[current_index][3:]
             current_amount = deck[current_index][0]
+            card_count += int(current_amount)
             if int(current_amount) > 3:
                 print("Too many copies")
                 return "Too many copies"
@@ -66,6 +68,9 @@ def deck_validation(deck, remaining_signature_squad, factions):
         current_index += 1
         while deck[current_index] in skippers:
             current_index += 1
+    if card_count < 42:
+        print("Too few cards")
+        return "Too few cards"
     print("No issues")
     return "SUCCESS"
 
