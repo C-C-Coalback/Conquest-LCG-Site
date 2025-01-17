@@ -30,10 +30,12 @@ class DecksConsumer(AsyncWebsocketConsumer):
             card_object = FindCard.find_card(message, cards_array)
             if card_object.get_name() != "FINAL CARD":
                 card_type = card_object.get_card_type()
+                card_loyalty = card_object.get_loyalty()
                 message = card_type + "/" + message
                 if card_type == "Warlord":
                     message = message + "/" + card_object.get_faction()
-                await self.send(text_data=json.dumps({"message": message}))
+                if card_loyalty != "Signature" or card_type == "Warlord":
+                    await self.send(text_data=json.dumps({"message": message}))
                 if card_object.get_name() == "Nazdreg":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Nazdreg's Flash Gitz"}))
