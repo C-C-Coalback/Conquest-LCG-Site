@@ -70,6 +70,8 @@ def deck_validation(deck, remaining_signature_squad, factions):
             print("No match")
             return "Unexpected Card in Signature Squad"
         current_index += 1
+    if len(remaining_signature_squad) > 0:
+        return "Missing something from signature squad"
     current_index += 1
     card_count = 0
     skippers = ["Support", "Attachment", "Event", "Synapse"]
