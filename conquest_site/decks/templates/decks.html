@@ -15,9 +15,26 @@
             + '/ws/decks/'
         );
 
+    document.querySelector('#chat-log').value += '\n----------------------------------------------------------------------\n\n\n----------------------------------------------------------------------\n';
+    document.querySelector('#chat-log').value += 'Signature Squad\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Army\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Support\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Synapse\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Attachment\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Event\n\n----------------------------------------------------------------------\n'
+    document.querySelector('#chat-log').value += 'Planet\n\n----------------------------------------------------------------------\n'
     decksSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            const split_data = data.message.split("/");
+            var chat_holder = document.querySelector('#chat-log').value;
+            var split_chat_holder = chat_holder.split("\n");
+            if (split_data[0] === "Name") {
+                split_chat_holder[0] = split_data[1];
+                chat_holder = split_chat_holder.join("\n");
+                document.querySelector('#chat-log').value = chat_holder;
+            } else {
+                document.querySelector('#chat-log').value += (data.message + '\n');
+            }
         };
 
     decksSocket.onclose = function(e) {

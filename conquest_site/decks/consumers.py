@@ -4,12 +4,7 @@ import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .deckscode import CardClasses, Initfunctions, FindCard
 cards_array = Initfunctions.init_player_cards()
-# cards_array[10].print_info()
 planet_cards_array = Initfunctions.init_planet_cards()
-# planet_cards_array[5].print_info()
-
-card_object = FindCard.find_card("Error", cards_array)
-card_object.print_info()
 
 
 class DecksConsumer(AsyncWebsocketConsumer):
@@ -26,11 +21,19 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print(self.name)
 
     async def receive(self, text_data):
+        global cards_array
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
-        await self.send(text_data=json.dumps({"message": message}))
-
+        split_message = message.split(sep="/")
+        if len(split_message) == 1:
+            card_object = FindCard.find_card(message, cards_array)
+            if card_object.get_name() != "FINAL CARD":
+                await self.send(text_data=json.dumps({"message": message}))
+        elif len(split_message) == 2:
+            if split_message[0] == "Name":
+                print("Need to set name to: ", split_message[1])
+                await self.send(text_data=json.dumps({"message": message}))
 
     async def chat_message(self, event):
         message = event["message"]
