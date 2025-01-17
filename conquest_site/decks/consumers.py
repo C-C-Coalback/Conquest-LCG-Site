@@ -51,7 +51,8 @@ def second_part_deck_validation(deck):
             return "Main faction and ally faction can not be the same"
         if (factions[0] == "Orks" and factions[1] == "Chaos") or (factions[0] == "Chaos" and factions[1] == "Orks"):
             return deck_validation(deck, remaining_signature_squad, factions)
-    return ""
+        return "Issue with faction matching."
+    return "Unknown issue"
 
 
 def deck_validation(deck, remaining_signature_squad, factions):
@@ -87,7 +88,7 @@ def deck_validation(deck, remaining_signature_squad, factions):
             if card_result.get_name() != current_name:
                 print("Card not found in database", current_name)
                 return "Card not found in database: " + current_name
-            if card_result.get_card_type() == "Signature":
+            if card_result.get_loyalty() == "Signature":
                 print("Signature card found")
                 return "Signature card found: " + current_name
             faction_check_passed = False
