@@ -184,6 +184,9 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         os.mkdir("decks/DeckStorage/" + self.name)
                     with open("decks/DeckStorage/" + self.name + "/" + deck_name, "w") as file:
                         file.write(split_message[1])
+                message_to_send = "Feedback/" + message_to_send
+                message = message_to_send
+                await self.send(text_data=json.dumps({"message": message}))
 
     async def chat_message(self, event):
         message = event["message"]
