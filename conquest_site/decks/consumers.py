@@ -80,10 +80,13 @@ def deck_validation(deck, remaining_signature_squad, factions):
         if len(deck[current_index]) > 3:
             current_name = deck[current_index][3:]
             current_amount = deck[current_index][0]
-            card_count += int(current_amount)
-            if int(current_amount) > 3:
-                print("Too many copies")
-                return "Too many copies: " + current_name
+            try:
+                card_count += int(current_amount)
+                if int(current_amount) > 3:
+                    print("Too many copies")
+                    return "Too many copies: " + current_name
+            except ValueError:
+                return "Number missing"
             card_result = FindCard.find_card(current_name, cards_array)
             if card_result.get_name() != current_name:
                 print("Card not found in database", current_name)
