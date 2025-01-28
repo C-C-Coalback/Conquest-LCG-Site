@@ -177,6 +177,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                 print(path_to_player_decks)
                 if os.path.exists(path_to_player_decks):
                     print("Success")
+                    with open(path_to_player_decks, 'r') as f:
+                        deck_content = f.read()
+                    print(deck_content)
 
             else:
                 message = self.name + ": " + message[1]
