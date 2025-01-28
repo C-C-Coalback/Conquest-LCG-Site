@@ -13,6 +13,9 @@
 <div id="current-warlord">
     <p></p>
 </div>
+<div id="current-deck">
+    <p></p>
+</div>
 <div id="current-alignment-wheel">
     <p><img src="/static/images/AlignmentWheel.png"  alt="Alignment wheel" height="300" width="300"/></p>
 </div>
@@ -133,16 +136,27 @@
                                 amountOfCard = amountOfCard + 1;
                                 if (amountOfCard < 4) {
                                     split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
+                                    var card_name = split_data[1];
+                                    card_name = card_name.split(' ').join('_');
+                                    var route_text = "/static/images/" + card_name + ".jpg";
+                                    document.getElementById('current-deck').innerHTML +=
+                                    `<img src=` + route_text + ` alt=` + route_text + ` />`
                                 }
                             }
                         }
                         if (cardAlreadyPresent !== true) {
                             split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
+                            var card_name = split_data[1];
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/" + card_name + ".jpg";
+                            document.getElementById('current-deck').innerHTML +=
+                            `<img src=` + route_text + ` alt=` + route_text + ` />`
                         }
                     }
                 }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
+
             } else if (split_data[0] === "Support"){
                 var arrayLength = split_chat_holder.length;
                 for (var i = 0; i < arrayLength; i++) {
