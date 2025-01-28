@@ -28,7 +28,7 @@
             + window.location.host
             + '/ws/decks/'
         );
-
+    var cardCount = 0;
     function setInitialDeck() {
         document.querySelector('#chat-log').value = ""
         document.querySelector('#chat-log').value += '\n----------------------------------------------------------------------\n\n\n----------------------------------------------------------------------\n';
@@ -89,6 +89,7 @@
                 var route_text = "/static/images/" + warlord_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML =
                 `<img src=` + route_text + ` alt=` + route_text + ` />`
+                cardCount = 0
 
 
 
@@ -141,6 +142,10 @@
                                     var route_text = "/static/images/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
                                     `<img src=` + route_text + ` alt=` + route_text + ` />`
+                                    cardCount += 1
+                                    if (cardCount === 10) {
+                                        document.getElementById('current-deck').innerHTML += `<p></p>`
+                                    }
                                 }
                             }
                         }
@@ -151,6 +156,10 @@
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
                             `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            cardCount += 1
+                            if (cardCount === 10) {
+                                document.getElementById('current-deck').innerHTML += `<p></p>`
+                            }
                         }
                     }
                 }
