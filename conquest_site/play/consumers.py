@@ -2,6 +2,7 @@ import json
 import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .gamecode import GameClass
 
 active_lobbies = [[], []]
 
