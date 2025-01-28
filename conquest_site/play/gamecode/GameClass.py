@@ -16,7 +16,8 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, player_one_name, player_two_name):
+    def __init__(self, game_id, player_one_name, player_two_name):
+        self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
         self.stored_deck_1 = None

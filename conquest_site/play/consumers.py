@@ -3,8 +3,13 @@ import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamecode import GameClass
+import os
 
 active_lobbies = [[], []]
+active_games = []
+
+
+active_games.append(GameClass.Game("1", "alex", "Example"))
 
 
 class LobbyConsumer(AsyncWebsocketConsumer):
@@ -165,13 +170,22 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         message = message.split("/")
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
-            message = self.name + ": " + message[1]
-            print("receive:", message)
-            chat_messages[0].append(self.room_name)
-            chat_messages[1].append(message)
-            print(chat_messages)
+            if (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
+                deck_name = message[2]
+                print(deck_name)
+                path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name
+                print(path_to_player_decks)
+                if os.path.exists(path_to_player_decks):
+                    print("Success")
 
-            # Send message to room group
-            await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat.message", "message": message}
-            )
+            else:
+                message = self.name + ": " + message[1]
+                print("receive:", message)
+                chat_messages[0].append(self.room_name)
+                chat_messages[1].append(message)
+                print(chat_messages)
+
+                # Send message to room group
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
