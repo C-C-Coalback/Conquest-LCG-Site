@@ -6,10 +6,25 @@
 {% load static %}
 <h2>Game</h2>
 <h1>Placeholder</h1>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
-    {{ game_id|json_script:"game-id" }}
+<textarea id="chat-log" cols="100" rows="20"></textarea><br>
+<input id="chat-message-input" type="text" size="100"><br>
+<input id="chat-message-submit" type="button" value="Send">
+<div id="current-hand-player-1">
+    <p></p>
+</div>
+<div id="current-hand-player-2">
+    <p></p>
+</div>
+<div id="current-headquarters-player-1">
+    <p></p>
+</div>
+<div id="current-headquarters-player-2">
+    <p></p>
+</div>
+<div id="planets-in-play">
+    <p></p>
+</div>
+{{ game_id|json_script:"game-id" }}
 <script>
         const roomName = JSON.parse(document.getElementById('game-id').textContent);
 
