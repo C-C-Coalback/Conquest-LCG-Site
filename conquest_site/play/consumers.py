@@ -4,12 +4,14 @@ import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamecode import GameClass
 import os
+from .gamecode import Initfunctions
+
+
+card_array = Initfunctions.init_player_cards()
+planet_array = Initfunctions.init_planet_cards()
 
 active_lobbies = [[], []]
-active_games = []
-
-
-active_games.append(GameClass.Game("1", "alex", "Example"))
+active_games = [GameClass.Game("1", "alex", "Example", card_array)]
 
 
 class LobbyConsumer(AsyncWebsocketConsumer):
@@ -165,6 +167,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": message}))
 
     async def receive(self, text_data):
+        global active_games
         global chat_messages
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
@@ -180,7 +183,15 @@ class GameConsumer(AsyncWebsocketConsumer):
                     with open(path_to_player_decks, 'r') as f:
                         deck_content = f.read()
                     print(deck_content)
-
+                    for i in range(len(active_games)):
+                        if active_games[i].game_id == self.room_name:
+                            print("In correct room")
+                            if active_games[i].name_1 == self.name:
+                                print("Need to load player one's deck")
+                                active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
+                            elif active_games[i].name_2 == self.name:
+                                print("Need to load player two's deck")
+                                active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
             else:
                 message = self.name + ": " + message[1]
                 print("receive:", message)

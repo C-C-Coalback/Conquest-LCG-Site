@@ -26,9 +26,36 @@ class Player:
         self.bonus_boxes = ""
         self.extra_text = "No advice"
 
-    def setup_player(self, deck_list, planet_array):
-        self.headquarters.append(FindCard.find_card(deck_list[1], self.card_array))
-        self.deck = deck_list[2:]
+    def clean_received_deck(self, raw_deck):
+        split_deck = raw_deck.split("----------------------------------------------------------------------")
+        split_deck = "\n".join(split_deck)
+        split_deck = split_deck.split("\n")
+        split_deck = [x for x in split_deck if x]
+        del split_deck[0]
+        del split_deck[1]
+        i = 0
+        while i < len(split_deck):
+            if split_deck[i] == "Signature Squad" or split_deck[i] == "Army" or split_deck[i] == "Event" or \
+                    split_deck[i] == "Support" or split_deck[i] == "Attachment" \
+                    or split_deck[i] == "Synapse" or split_deck[i] == "Planet":
+                del split_deck[i]
+                i = i - 1
+            i = i + 1
+        deck_as_single_cards = [split_deck[0]]
+        i = 1
+        while i < len(split_deck):
+            number_of_cards = split_deck[i][0]
+            card_name = split_deck[i][3:]
+            i = i + 1
+            for _ in range(int(number_of_cards)):
+                deck_as_single_cards.append(card_name)
+        print(deck_as_single_cards)
+        return deck_as_single_cards
+
+    def setup_player(self, raw_deck, planet_array):
+        deck_list = self.clean_received_deck(raw_deck)
+        self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
+        self.deck = deck_list[1:]
         self.shuffle_deck()
         self.cards_in_play[0] = planet_array
         self.resources = self.headquarters[0].get_starting_resources()
@@ -38,6 +65,7 @@ class Player:
         print(self.deck)
         print(self.cards_in_play)
         print(self.cards)
+        self.print_headquarters()
 
     def get_headquarters(self):
         return self.headquarters
@@ -72,6 +100,13 @@ class Player:
         else:
             return self.discard[-1]
 
+    def draw_card(self):
+        if not self.deck:
+            print("Deck is empty, you lose!")
+        else:
+            self.cards.append(self.deck[0])
+            del self.deck[0]
+
     def spend_resources(self, amount):
         if amount > self.resources:
             return False
@@ -99,6 +134,13 @@ class Player:
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.retreat_warlord()
+
+    def shuffle_deck(self):
+        shuffle(self.deck)
+
+    def print_headquarters(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].print_info()
 
     """
     def retreat_warlord(self):
@@ -416,9 +458,6 @@ class Player:
     def get_initiative(self):
         return self.has_initiative
 
-    def shuffle_deck(self):
-        shuffle(self.deck)
-
     def get_active_position(self):
         return self.position_activated
 
@@ -527,12 +566,5 @@ class Player:
             if i != len(self.cards_in_play[planet_pos]) - 1:
                 message += "/"
         return message
-
-    def draw_card(self):
-        if not self.deck:
-            print("Deck is empty, you lose!")
-        else:
-            self.cards.append(self.deck[0])
-            del self.deck[0]
 
 """

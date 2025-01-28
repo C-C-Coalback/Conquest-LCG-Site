@@ -16,15 +16,17 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, game_id, player_one_name, player_two_name):
+    def __init__(self, game_id, player_one_name, player_two_name, card_array):
+        self.card_array = card_array
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
         self.stored_deck_1 = None
         self.stored_deck_2 = None
-        self.p1 = None
-        self.p2 = None
+        self.p1 = PlayerClass.Player(player_one_name, 1, card_array)
+        self.p2 = PlayerClass.Player(player_two_name, 2, card_array)
         self.phase = ""
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
+        self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
