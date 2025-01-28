@@ -18,12 +18,12 @@ def orks_cards_init():
                                                "at the same planet.", "Location.", 2, "Orks", "Signature",
                                                False, "Kraktoof_Hall", action_in_play=True,
                                                allowed_phases_in_play="Combat"),
-                       CardClasses.EventCard("Bigga is Betta", "Interrupt: When you deploy an Orks unit, "
+                       CardClasses.EventCard("Bigga Is Betta", "Interrupt: When you deploy an Orks unit, "
                                                                "reduce its cost by 2. "
                                                                "Deal 1 damage to that unit after it enters play.",
                                              "Tactic.",
                                              0, "Orks", "Signature", 1, False,
-                                             "Bigga_is_Betta", [True, 2, True]),
+                                             "Bigga_Is_Betta", [True, 2, True]),
                        CardClasses.AttachmentCard("Cybork Body", "Attach to an army unit.\nDouble attached unit's HP.",
                                                   "Wargear. Bionics.", 1, "Orks", "Signature", 3, False,
                                                   "Cybork_Body"),

@@ -153,8 +153,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 if card_object.get_name() == "Nazdreg":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Nazdreg's Flash Gitz"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Bigga is Betta"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Bigga is Betta"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Bigga Is Betta"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Bigga Is Betta"}))
                     await self.send(text_data=json.dumps({"message": "SS/Kraktoof Hall"}))
                     await self.send(text_data=json.dumps({"message": "SS/Cybork Body"}))
                 if card_object.get_name() == "Zarathur, High Sorcerer":

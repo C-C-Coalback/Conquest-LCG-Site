@@ -10,8 +10,11 @@
 <input id="chat-message-input" type="text" size="100"><br>
 <input id="chat-message-submit" type="button" value="Add Card">
 <input id="deck-submit" type="button" value="Send Deck" onclick="sendDeck();">
-<div id="image-testing">
+<div id="current-warlord">
     <p></p>
+</div>
+<div id="current-alignment-wheel">
+    <p><img src="/static/images/AlignmentWheel.png"  alt="Alignment wheel" height="300" width="300"/></p>
 </div>
 <div id="add_to_me">
     <p></p>
@@ -81,8 +84,10 @@
                 var warlord_name = split_data[1];
                 warlord_name = warlord_name.split(' ').join('_');
                 var route_text = "/static/images/" + warlord_name + ".jpg";
-                document.getElementById('image-testing').innerHTML =
-                `<p><img src=` + route_text + ` alt=` + route_text + ` /></p>`
+                document.getElementById('current-warlord').innerHTML =
+                `<img src=` + route_text + ` alt=` + route_text + ` />`
+
+
 
             } else if (split_data[0] === "SS") {
                 var arrayLength = split_chat_holder.length;
@@ -106,6 +111,14 @@
                 }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
+                var card_name = split_data[1];
+                card_name = card_name.split(' ').join('_');
+                var route_text = "/static/images/" + card_name + ".jpg";
+                document.getElementById('current-warlord').innerHTML +=
+                `<img src=` + route_text + ` alt=` + route_text + ` />`
+
+
+
             } else if (split_data[0] === "Army"){
                 var arrayLength = split_chat_holder.length;
                 for (var i = 0; i < arrayLength; i++) {
