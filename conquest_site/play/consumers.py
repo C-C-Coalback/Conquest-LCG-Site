@@ -162,13 +162,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         global chat_messages
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        message = self.name + ": " + message
-        print("receive:", message)
-        chat_messages[0].append(self.room_name)
-        chat_messages[1].append(message)
-        print(chat_messages)
+        message = message.split("/")
+        if message[0] == "CHAT_MESSAGE" and len(message) > 1:
+            message = self.name + ": " + message[1]
+            print("receive:", message)
+            chat_messages[0].append(self.room_name)
+            chat_messages[1].append(message)
+            print(chat_messages)
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat.message", "message": message}
-        )
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": message}
+            )

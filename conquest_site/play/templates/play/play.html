@@ -3,6 +3,7 @@
 {% block title %}Game{% endblock %}
 
 {% block content %}
+{% load static %}
 <h2>Game</h2>
 <h1>Placeholder</h1>
     <textarea id="chat-log" cols="100" rows="20"></textarea><br>
@@ -40,7 +41,7 @@
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
             gameSocket.send(JSON.stringify({
-                'message': message
+                'message': 'CHAT_MESSAGE/' + message
             }));
             messageInputDom.value = '';
         };
