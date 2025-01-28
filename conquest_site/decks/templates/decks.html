@@ -3,6 +3,7 @@
 {% block title %}Decks{% endblock %}
 
 {% block content %}
+{% load static %}
 <h2>Decks</h2>
 <h1>Placeholder</h1>
 <textarea id="chat-log" cols="100" rows="20"></textarea><br>
@@ -10,7 +11,7 @@
 <input id="chat-message-submit" type="button" value="Add Card">
 <input id="deck-submit" type="button" value="Send Deck" onclick="sendDeck();">
 <div id="image-testing">
-    <p>{% load static %} <img src="{% static 'images/Nazdreg.jpg' %}" alt="image didnt load" /></p>
+    <p><img src="{% static 'images/Nazdreg.jpg' %}" alt="image didnt load" /></p>
 </div>
 <div id="add_to_me">
     <p></p>
@@ -77,6 +78,9 @@
                 }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
+                document.getElementById('image-testing').innerHTML =
+                `<p><img src="{% static 'images/Rogue_Trader.jpg' %}" alt="image didnt load" /></p>`
+
             } else if (split_data[0] === "SS") {
                 var arrayLength = split_chat_holder.length;
                 for (var i = 0; i < arrayLength; i++) {
