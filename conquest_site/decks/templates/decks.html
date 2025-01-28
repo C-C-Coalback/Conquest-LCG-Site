@@ -11,7 +11,7 @@
 <input id="chat-message-submit" type="button" value="Add Card">
 <input id="deck-submit" type="button" value="Send Deck" onclick="sendDeck();">
 <div id="image-testing">
-    <p><img src="{% static 'images/Nazdreg.jpg' %}" alt="image didnt load" /></p>
+    <p></p>
 </div>
 <div id="add_to_me">
     <p></p>
@@ -78,8 +78,9 @@
                 }
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
-                const rogue_name = "Rogue_Trader";
-                var route_text = "/static/images/" + rogue_name + ".jpg";
+                var warlord_name = split_data[1];
+                warlord_name = warlord_name.split(' ').join('_');
+                var route_text = "/static/images/" + warlord_name + ".jpg";
                 document.getElementById('image-testing').innerHTML =
                 `<p><img src=` + route_text + ` alt=` + route_text + ` /></p>`
 
