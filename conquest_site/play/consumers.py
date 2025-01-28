@@ -3,7 +3,6 @@ import random
 import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-
 active_lobbies = [[], []]
 
 
@@ -126,17 +125,50 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
 
+chat_messages = [[], []]
+
+
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print("got to game consumer")
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
         self.room_group_name = f"play_{self.room_name}"
         self.user = self.scope["user"]
+        self.name = self.user.username
+        print("username:", self.user.username, ".")
+        if self.name == "":
+            self.name = "Anonymous"
 
+        # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
+        print(self.room_name)
+        for i in range(len(chat_messages[0])):
+            if chat_messages[0][i] == self.room_name:
+                await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
 
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+    async def chat_message(self, event):
+        message = event["message"]
+        print("send:", message)
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({"message": message}))
+
+    async def receive(self, text_data):
+        global chat_messages
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+        message = self.name + ": " + message
+        print("receive:", message)
+        chat_messages[0].append(self.room_name)
+        chat_messages[1].append(message)
+        print(chat_messages)
+
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat.message", "message": message}
+        )
