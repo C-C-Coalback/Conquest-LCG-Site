@@ -188,10 +188,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                             print("In correct room")
                             if active_games[i].name_1 == self.name:
                                 print("Need to load player one's deck")
-                                active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
+                                if not active_games[i].p1.deck_loaded:
+                                    active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
                             elif active_games[i].name_2 == self.name:
                                 print("Need to load player two's deck")
-                                active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
+                                if not active_games[i].p2.deck_loaded:
+                                    active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
             else:
                 message = self.name + ": " + message[1]
                 print("receive:", message)

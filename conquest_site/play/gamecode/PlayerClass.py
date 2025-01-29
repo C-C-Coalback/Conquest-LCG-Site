@@ -3,6 +3,33 @@ from random import shuffle
 import copy
 
 
+def clean_received_deck(raw_deck):
+    split_deck = raw_deck.split("----------------------------------------------------------------------")
+    split_deck = "\n".join(split_deck)
+    split_deck = split_deck.split("\n")
+    split_deck = [x for x in split_deck if x]
+    del split_deck[0]
+    del split_deck[1]
+    i = 0
+    while i < len(split_deck):
+        if split_deck[i] == "Signature Squad" or split_deck[i] == "Army" or split_deck[i] == "Event" or \
+                split_deck[i] == "Support" or split_deck[i] == "Attachment" \
+                or split_deck[i] == "Synapse" or split_deck[i] == "Planet":
+            del split_deck[i]
+            i = i - 1
+        i = i + 1
+    deck_as_single_cards = [split_deck[0]]
+    i = 1
+    while i < len(split_deck):
+        number_of_cards = split_deck[i][0]
+        card_name = split_deck[i][3:]
+        i = i + 1
+        for _ in range(int(number_of_cards)):
+            deck_as_single_cards.append(card_name)
+    print(deck_as_single_cards)
+    return deck_as_single_cards
+
+
 class Player:
     def __init__(self, name, number, card_array):
         self.card_array = card_array
@@ -25,38 +52,14 @@ class Player:
         self.cards_in_play = [[] for _ in range(8)]
         self.bonus_boxes = ""
         self.extra_text = "No advice"
-
-    def clean_received_deck(self, raw_deck):
-        split_deck = raw_deck.split("----------------------------------------------------------------------")
-        split_deck = "\n".join(split_deck)
-        split_deck = split_deck.split("\n")
-        split_deck = [x for x in split_deck if x]
-        del split_deck[0]
-        del split_deck[1]
-        i = 0
-        while i < len(split_deck):
-            if split_deck[i] == "Signature Squad" or split_deck[i] == "Army" or split_deck[i] == "Event" or \
-                    split_deck[i] == "Support" or split_deck[i] == "Attachment" \
-                    or split_deck[i] == "Synapse" or split_deck[i] == "Planet":
-                del split_deck[i]
-                i = i - 1
-            i = i + 1
-        deck_as_single_cards = [split_deck[0]]
-        i = 1
-        while i < len(split_deck):
-            number_of_cards = split_deck[i][0]
-            card_name = split_deck[i][3:]
-            i = i + 1
-            for _ in range(int(number_of_cards)):
-                deck_as_single_cards.append(card_name)
-        print(deck_as_single_cards)
-        return deck_as_single_cards
+        self.deck_loaded = False
 
     def setup_player(self, raw_deck, planet_array):
-        deck_list = self.clean_received_deck(raw_deck)
+        deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
         self.deck = deck_list[1:]
         self.shuffle_deck()
+        self.deck_loaded = True
         self.cards_in_play[0] = planet_array
         self.resources = self.headquarters[0].get_starting_resources()
         for i in range(self.headquarters[0].get_starting_cards()):
