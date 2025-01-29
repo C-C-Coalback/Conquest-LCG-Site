@@ -2,6 +2,17 @@ h4 {
     color: blue;
 }
 
+.box {
+    position: relative;
+    height: 100vh;
+}
+
+#chat-log {
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
 #Testing-css {
     color: red;
 }
