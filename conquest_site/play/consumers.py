@@ -157,7 +157,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_id_if_exists = i
                 self.game_position = i
         if not room_already_exists:
-            active_games.append(GameClass.Game("1", "alex", "Example", card_array, self))
+            active_games.append(GameClass.Game("1", "Example", "alex", card_array, self))
             self.game_position = len(active_games) - 1
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)

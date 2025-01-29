@@ -32,6 +32,13 @@ h4 {
     width: 50%;
 }
 
+#current-hand-player-2 {
+    position:absolute;
+    bottom:0;
+    margin: auto;
+    width: 50%;
+}
+
 #Testing-css {
     color: red;
 }
