@@ -41,6 +41,33 @@
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
                 document.querySelector('#chat-log').value += ('received some data from server\n');
+                if (split_data[1] === "HAND") {
+                    if (split_data[2] === "1") {
+                        document.querySelector('#chat-log').value += ('Update P1 hand\n');
+                        document.getElementById('current-hand-player-1').innerHTML =
+                        `<p></p>`
+                        for (var i = 3; i < split_data.length; i++) {
+                            document.querySelector('#chat-log').value += (split_data[i] + '\n');
+                            var card_name = split_data[i];
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/" + card_name + ".jpg";
+                            document.getElementById('current-hand-player-1').innerHTML +=
+                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                        }
+                    } else if (split_data[2] === "2") {
+                        document.querySelector('#chat-log').value += ('Update P2 hand\n');
+                        document.getElementById('current-hand-player-2').innerHTML =
+                        `<p></p>`
+                        for (var i = 3; i < split_data.length; i++) {
+                            document.querySelector('#chat-log').value += (split_data[i] + '\n');
+                            var card_name = split_data[i];
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/" + card_name + ".jpg";
+                            document.getElementById('current-hand-player-1').innerHTML +=
+                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                        }
+                    }
+                }
             } else {
             document.querySelector('#chat-log').value += (data.message + '\n');
             }
