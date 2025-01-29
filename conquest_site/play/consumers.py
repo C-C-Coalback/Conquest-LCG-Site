@@ -149,9 +149,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.name == "":
             self.name = "Anonymous"
         room_already_exists = False
+        game_id_if_exists = -1
         for i in range(len(active_games)):
             if active_games[i].game_id == self.room_name:
                 room_already_exists = True
+                game_id_if_exists = i
         if not room_already_exists:
             active_games.append(GameClass.Game("1", "Example", "alex", card_array, self))
         # Join room group
@@ -162,6 +164,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         for i in range(len(chat_messages[0])):
             if chat_messages[0][i] == self.room_name:
                 await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
+        if room_already_exists:
+            await active_games[game_id_if_exists].joined_requests_graphics()
+
 
     async def disconnect(self, close_code):
         # Leave room group
