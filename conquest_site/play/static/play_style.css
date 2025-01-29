@@ -4,12 +4,24 @@ h4 {
 
 .box {
     position: relative;
-    height: 100vh;
+    height: 85vh;
+}
+
+#chat-message-submit {
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
+#chat-message-input {
+    position:absolute;
+    bottom:0;
+    right:40px;
 }
 
 #chat-log {
     position:absolute;
-    bottom:0;
+    bottom:30px;
     right:0;
 }
 
