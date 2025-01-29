@@ -31,7 +31,8 @@ def clean_received_deck(raw_deck):
 
 
 class Player:
-    def __init__(self, name, number, card_array):
+    def __init__(self, name, number, card_array, game):
+        self.game = game
         self.card_array = card_array
         self.number = number
         self.name_player = name
@@ -69,6 +70,7 @@ class Player:
         print(self.cards_in_play)
         print(self.cards)
         self.print_headquarters()
+        self.game.game_socket.receive_game_update("Setup player 1")
 
     def get_headquarters(self):
         return self.headquarters

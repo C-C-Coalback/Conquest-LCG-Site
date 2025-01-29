@@ -24,8 +24,8 @@ class Game:
         self.name_2 = player_two_name
         self.stored_deck_1 = None
         self.stored_deck_2 = None
-        self.p1 = PlayerClass.Player(player_one_name, 1, card_array)
-        self.p2 = PlayerClass.Player(player_two_name, 2, card_array)
+        self.p1 = PlayerClass.Player(player_one_name, 1, card_array, self)
+        self.p2 = PlayerClass.Player(player_two_name, 2, card_array, self)
         self.phase = ""
         self.round_number = 0
         self.current_board_state = ""

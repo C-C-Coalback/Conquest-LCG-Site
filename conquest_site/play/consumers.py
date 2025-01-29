@@ -173,6 +173,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
 
+    def receive_game_update(self, text_update):
+        print(text_update)
+
     async def receive(self, text_data):
         global active_games
         global chat_messages
