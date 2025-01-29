@@ -70,7 +70,13 @@ class Player:
         print(self.cards_in_play)
         print(self.cards)
         self.print_headquarters()
-        await self.game.game_socket.receive_game_update("Setup player 1")
+        await self.send_hand()
+        await self.game.game_socket.receive_game_update("Setup of " + self.name_player + " finished.")
+
+    async def send_hand(self):
+        card_string = "/".join(self.cards)
+        card_string = str(self.number) + "/" + card_string
+        await self.game.game_socket.receive_game_update(card_string)
 
     def get_headquarters(self):
         return self.headquarters
