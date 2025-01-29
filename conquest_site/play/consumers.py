@@ -11,7 +11,7 @@ card_array = Initfunctions.init_player_cards()
 planet_array = Initfunctions.init_planet_cards()
 
 active_lobbies = [[], []]
-active_games = [GameClass.Game("1", "alex", "Example", card_array)]
+active_games = []
 
 
 class LobbyConsumer(AsyncWebsocketConsumer):
@@ -138,6 +138,8 @@ chat_messages = [[], []]
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        global active_games
+
         print("got to game consumer")
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
         self.room_group_name = f"play_{self.room_name}"
@@ -146,7 +148,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("username:", self.user.username, ".")
         if self.name == "":
             self.name = "Anonymous"
-
+        room_already_exists = False
+        for i in range(len(active_games)):
+            if active_games[i].game_id == self.room_name:
+                room_already_exists = True
+        if not room_already_exists:
+            active_games.append(GameClass.Game("1", "alex", "Example", card_array, self))
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
