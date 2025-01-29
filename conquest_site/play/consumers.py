@@ -173,8 +173,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
 
-    def receive_game_update(self, text_update):
-        print(text_update)
+    async def receive_game_update(self, text_update):
+        print("game update received: ", text_update)
+        text_update = "server: " + text_update
+        await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat.message", "message": text_update}
+        )
 
     async def receive(self, text_data):
         global active_games
@@ -199,11 +203,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                             if active_games[i].name_1 == self.name:
                                 print("Need to load player one's deck")
                                 if not active_games[i].p1.deck_loaded:
-                                    active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
+                                    await active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
                             elif active_games[i].name_2 == self.name:
                                 print("Need to load player two's deck")
                                 if not active_games[i].p2.deck_loaded:
-                                    active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
+                                    await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
             else:
                 message = self.name + ": " + message[1]
                 print("receive:", message)

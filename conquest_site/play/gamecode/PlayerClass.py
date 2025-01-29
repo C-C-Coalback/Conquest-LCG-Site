@@ -55,7 +55,7 @@ class Player:
         self.extra_text = "No advice"
         self.deck_loaded = False
 
-    def setup_player(self, raw_deck, planet_array):
+    async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
         self.deck = deck_list[1:]
@@ -70,7 +70,7 @@ class Player:
         print(self.cards_in_play)
         print(self.cards)
         self.print_headquarters()
-        self.game.game_socket.receive_game_update("Setup player 1")
+        await self.game.game_socket.receive_game_update("Setup player 1")
 
     def get_headquarters(self):
         return self.headquarters
