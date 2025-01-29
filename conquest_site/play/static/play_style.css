@@ -25,6 +25,13 @@ h4 {
     right:0;
 }
 
+#current-hand-player-1 {
+    position:absolute;
+    top:0;
+    margin: auto;
+    width: 50%;
+}
+
 #Testing-css {
     color: red;
 }

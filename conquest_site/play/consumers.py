@@ -150,12 +150,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.name = "Anonymous"
         room_already_exists = False
         game_id_if_exists = -1
+        self.game_position = 0
         for i in range(len(active_games)):
             if active_games[i].game_id == self.room_name:
                 room_already_exists = True
                 game_id_if_exists = i
+                self.game_position = i
         if not room_already_exists:
-            active_games.append(GameClass.Game("1", "Example", "alex", card_array, self))
+            active_games.append(GameClass.Game("1", "alex", "Example", card_array, self))
+            self.game_position = len(active_games) - 1
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
@@ -219,6 +222,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 print("Need to load player two's deck")
                                 if not active_games[i].p2.deck_loaded:
                                     await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
+            elif message[1] == "DRAW" and len(message) > 2:
+                if message[2] == "1":
+                    active_games[self.game_position].p1.draw_card()
+                    await active_games[self.game_position].p1.send_hand()
+                elif message[2] == "2":
+                    active_games[self.game_position].p2.draw_card()
+                    await active_games[self.game_position].p2.send_hand()
             else:
                 message = self.name + ": " + message[1]
                 print("receive:", message)
