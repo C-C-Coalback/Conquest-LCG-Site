@@ -52,7 +52,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-hand-player-1').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` height=139 width=97/>`
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 hand\n');
@@ -64,7 +64,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-hand-player-2').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` height=139 width=97/>`
                         }
                     }
                 }
