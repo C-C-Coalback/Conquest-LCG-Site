@@ -38,7 +38,12 @@
 
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
+            const split_data = data.message.split("/");
+            if (split_data[0] === "GAME_INFO") {
+                document.querySelector('#chat-log').value += ('received some data from server\n');
+            } else {
             document.querySelector('#chat-log').value += (data.message + '\n');
+            }
         };
 
         gameSocket.onclose = function(e) {

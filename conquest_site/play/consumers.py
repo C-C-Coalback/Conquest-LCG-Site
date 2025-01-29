@@ -175,10 +175,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def receive_game_update(self, text_update):
         print("game update received: ", text_update)
-        text_update = "server: " + text_update
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat.message", "message": text_update}
-        )
+        split_text = text_update.split("/")
+        if split_text[0] == "GAME_INFO":
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": text_update}
+            )
+        else:
+            text_update = "server: " + text_update
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat.message", "message": text_update}
+            )
 
     async def receive(self, text_data):
         global active_games

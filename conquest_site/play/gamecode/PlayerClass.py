@@ -75,7 +75,7 @@ class Player:
 
     async def send_hand(self):
         card_string = "/".join(self.cards)
-        card_string = str(self.number) + "/" + card_string
+        card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + card_string
         await self.game.game_socket.receive_game_update(card_string)
 
     def get_headquarters(self):
