@@ -37,6 +37,9 @@
             + '/'
         );
 
+        cardHeight = 100;
+        cardWidth = 63;
+
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
@@ -66,7 +69,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('headquarters-player-1').innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 HQ\n');
@@ -79,7 +82,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('headquarters-player-2').innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                         }
                     }
                 } else if (split_data[1] === "HAND") {
@@ -95,7 +98,7 @@
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
@@ -103,7 +106,7 @@
                                 string_id = "HAND/1/" + string_id;
                                 var route_text = "/static/images/Cardback.jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                             }
                         }
                     } else if (split_data[2] === "2") {
@@ -118,7 +121,7 @@
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
@@ -126,7 +129,7 @@
                                 string_id = "HAND/2/" + string_id;
                                 var route_text = "/static/images/Cardback.jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
                             }
                         }
                     }
