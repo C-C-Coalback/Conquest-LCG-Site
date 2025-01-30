@@ -13,6 +13,18 @@ h4 {
     float:left;
 }
 
+#headquarters-player-2 {
+    position:absolute;
+    bottom:140px;
+    border: 5px solid red;
+}
+
+#headquarters-player-1 {
+    position:absolute;
+    top:170px;
+    border: 5px solid green;
+}
+
 #chat-message-submit {
     position:absolute;
     bottom:0;
@@ -35,14 +47,14 @@ h4 {
     position:absolute;
     top:0;
     margin: auto;
-    width: 50%;
+    border: 5px solid green;
 }
 
 #current-hand-player-2 {
     position:absolute;
     bottom:0;
     margin: auto;
-    width: 50%;
+    border: 5px solid red;
 }
 
 #Testing-css {
