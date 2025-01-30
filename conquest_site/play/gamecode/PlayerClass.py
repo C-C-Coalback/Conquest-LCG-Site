@@ -78,8 +78,7 @@ class Player:
         if self.cards:
             card_string = "/".join(self.cards)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + card_string
-            for i in range(len(self.game.game_sockets)):
-                await self.game.game_sockets[i].receive_game_update(card_string)
+            await self.game.game_sockets[0].receive_game_update(card_string)
 
     def get_headquarters(self):
         return self.headquarters
