@@ -73,12 +73,37 @@ class Player:
         await self.send_hand()
         for i in range(len(self.game.game_sockets)):
             await self.game.game_sockets[i].receive_game_update("Setup of " + self.name_player + " finished.")
+        await self.send_hq()
 
     async def send_hand(self):
         if self.cards:
             card_string = "/".join(self.cards)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
             await self.game.game_sockets[0].receive_game_update(card_string)
+
+    async def send_hq(self):
+        if self.headquarters:
+            card_strings = []
+            for i in range(len(self.headquarters)):
+                current_card = self.headquarters[i]
+                single_card_string = current_card.get_name()
+                single_card_string = single_card_string + "|"
+                if current_card.ready:
+                    single_card_string += "R|"
+                else:
+                    single_card_string += "E|"
+                single_card_string += str(0)
+                single_card_string += "|"
+                if current_card.get_card_type() == "Warlord":
+                    if current_card.get_bloodied():
+                        single_card_string += "B|"
+                    else:
+                        single_card_string += "H|"
+                card_strings.append(single_card_string)
+            joined_string = "/".join(card_strings)
+            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
+            print(joined_string)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
 
     def get_headquarters(self):
         return self.headquarters

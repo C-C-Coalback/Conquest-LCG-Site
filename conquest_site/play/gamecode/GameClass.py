@@ -31,11 +31,20 @@ class Game:
         self.current_board_state = ""
         self.running = True
         self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
+        self.planets_in_play_array = [True, True, True, True, True, False, False]
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
         await self.p2.send_hand()
 
     async def send_planet_array(self):
-        planet_string = "GAME_INFO/PLANETS/" + "/".join(self.planet_array)
+        # planet_string = "GAME_INFO/PLANETS/" + "/".join(self.planet_array)
+        planet_string = "GAME_INFO/PLANETS/"
+        for i in range(len(self.planet_array)):
+            if self.planets_in_play_array[i]:
+                planet_string += self.planet_array[i]
+            else:
+                planet_string += "CardbackRotated"
+            if i != 6:
+                planet_string += "/"
         await self.game_sockets[0].receive_game_update(planet_string)

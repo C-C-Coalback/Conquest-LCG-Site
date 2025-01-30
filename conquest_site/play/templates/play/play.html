@@ -9,7 +9,6 @@
 <textarea id="chat-log" cols="20" rows="20"></textarea><br>
 <input id="chat-message-input" type="text" size="15"><br>
 <input id="chat-message-submit" type="button" value="Send">
-<input type="image" src="/static/images/ConquestCardback.jpg" height="200" width="150" name="test-cardback" id="test-image-button" alt="didn't load" onclick="testImageButton(this.id);">
 <div id="current-hand-player-1">
     <p></p>
 </div>
@@ -54,6 +53,10 @@
                         var route_text = "/static/images/planet_images/" + card_name + ".jpg";
                         document.getElementById('planets-in-play').innerHTML +=
                         `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=97 width=139 onclick="testImageButton(this.id);" class="planet">`
+                    }
+                } else if (split_data[1] === "HQ") {
+                    if (split_data[2] === "1") {
+                        document.querySelector('#chat-log').value += ('Update P1 HQ\n');
                     }
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
