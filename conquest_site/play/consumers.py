@@ -202,6 +202,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         print(message)
         message = message.split("/")
+        if message[0] == "BUTTON PRESSED":
+            current_game_id = -1
+            for i in range(len(active_games)):
+                if active_games[i].game_id == self.room_name:
+                    print("Found room")
+                    current_game_id = i
+            if current_game_id != -1:
+                await active_games[current_game_id].update_game_event(self.name, message[1:])
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             if message[1] == "PLANETS":
                 print("Need to load planets")

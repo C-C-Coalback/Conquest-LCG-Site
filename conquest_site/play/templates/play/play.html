@@ -59,9 +59,7 @@
                         document.querySelector('#chat-log').value += ('Update P1 HQ\n');
                         document.getElementById('headquarters-player-1').innerHTML = ``
                         for (var i = 3; i < split_data.length; i++) {
-                            document.querySelector('#chat-log').value += (split_data[i] + "\n");
                             var card_data_split = split_data[i].split("|");
-                            document.querySelector('#chat-log').value += (card_data_split[1]);
                             var card_name = card_data_split[0];
                             var string_id = (i-3).toString();
                             string_id = "HQ/1/" + string_id;

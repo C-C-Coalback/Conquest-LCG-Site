@@ -22,11 +22,13 @@ class Game:
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
+        self.current_game_event_p1 = ""
+        self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, self)
-        self.phase = ""
+        self.phase = "SETUP"
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
@@ -40,7 +42,6 @@ class Game:
         await self.p2.send_hq()
 
     async def send_planet_array(self):
-        # planet_string = "GAME_INFO/PLANETS/" + "/".join(self.planet_array)
         planet_string = "GAME_INFO/PLANETS/"
         for i in range(len(self.planet_array)):
             if self.planets_in_play_array[i]:
@@ -50,3 +51,7 @@ class Game:
             if i != 6:
                 planet_string += "/"
         await self.game_sockets[0].receive_game_update(planet_string)
+
+    async def update_game_event(self, name, game_update_string):
+        if self.phase == "SETUP":
+            await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
