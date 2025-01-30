@@ -13,7 +13,7 @@
 <textarea id="chat-log" cols="20" rows="20"></textarea><br>
 <input id="chat-message-input" type="text" size="15"><br>
 <input id="chat-message-submit" type="button" value="Send">
-<input type="image" src="/static/images/Cardback.jpg" name="test-cardback" id="test-image-button" onclick="testImageButton(this.id);">
+<input type="image" src="/static/images/Cardback.jpg" height="200" width="150" name="test-cardback" id="test-image-button" alt="didn't load" onclick="testImageButton(this.id);">
 <div id="current-hand-player-1">
     <p></p>
 </div>
@@ -55,10 +55,12 @@
                         for (var i = 3; i < split_data.length; i++) {
                             document.querySelector('#chat-log').value += (split_data[i] + '\n');
                             var card_name = split_data[i];
+                            var string_id = (i-3).toString();
+                            string_id = "HAND/1/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-hand-player-1').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` height=139 width=97/>`
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 hand\n');
