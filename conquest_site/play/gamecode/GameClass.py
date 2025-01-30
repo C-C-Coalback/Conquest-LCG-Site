@@ -33,7 +33,7 @@ class Game:
         self.current_board_state = ""
         self.running = True
         self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
-        self.planets_in_play_array = [True, True, True, True, True, False, False]
+        self.planets_in_play_array = [True, True, True, True, True, True, True]
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()

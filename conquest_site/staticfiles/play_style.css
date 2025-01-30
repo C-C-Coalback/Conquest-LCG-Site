@@ -57,6 +57,9 @@ h4 {
     border: 5px solid red;
 }
 
-#Testing-css {
-    color: red;
+#planets-in-play {
+    position:absolute;
+    width:100%;
+    top:500px;
+    border: 5px solid blue;
 }
