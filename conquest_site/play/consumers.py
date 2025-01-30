@@ -200,6 +200,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         global chat_messages
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        print(message)
         message = message.split("/")
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             if (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:

@@ -13,6 +13,7 @@
 <textarea id="chat-log" cols="20" rows="20"></textarea><br>
 <input id="chat-message-input" type="text" size="15"><br>
 <input id="chat-message-submit" type="button" value="Send">
+<input type="image" src="/static/images/Cardback.jpg" name="test-cardback" id="test-image-button" onclick="testImageButton();">
 <div id="current-hand-player-1">
     <p></p>
 </div>
@@ -96,6 +97,12 @@
                 'message': 'CHAT_MESSAGE/' + message
             }));
             messageInputDom.value = '';
+        };
+
+        function testImageButton() {
+            gameSocket.send(JSON.stringify({
+                'message': 'BUTTON PRESSED'
+            }));
         };
     </script>
 {% endblock %}
