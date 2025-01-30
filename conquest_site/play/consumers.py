@@ -203,7 +203,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(message)
         message = message.split("/")
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
-            if (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
+            if message[1] == "PLANETS":
+                print("Need to load planets")
+                for i in range(len(active_games)):
+                    if active_games[i].game_id == self.room_name:
+                        await active_games[i].send_planet_array()
+            elif (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
                 deck_name = message[2]
                 print(deck_name)
                 path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name

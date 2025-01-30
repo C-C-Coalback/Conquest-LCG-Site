@@ -35,3 +35,7 @@ class Game:
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
         await self.p2.send_hand()
+
+    async def send_planet_array(self):
+        planet_string = "GAME_INFO/PLANETS/" + "/".join(self.planet_array)
+        await self.game_sockets[0].receive_game_update(planet_string)
