@@ -4,7 +4,8 @@ h4 {
 
 .box {
     position: relative;
-    height: 85vh;
+    height: 88vh;
+    border: 5px solid blue;
 }
 
 #chat-message-submit {
