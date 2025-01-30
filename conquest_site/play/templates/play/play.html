@@ -64,7 +64,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 document.querySelector('#chat-log').value += (split_data[i] + '\n');
                                 var card_name = split_data[i];
-                                var string_id = (i-2).toString();
+                                var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
