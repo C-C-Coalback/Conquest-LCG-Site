@@ -8,6 +8,11 @@ h4 {
     border: 5px solid blue;
 }
 
+.planet {
+    margin-left:5%;
+    float:left;
+}
+
 #chat-message-submit {
     position:absolute;
     bottom:0;
