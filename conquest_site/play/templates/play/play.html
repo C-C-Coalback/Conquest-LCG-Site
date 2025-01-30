@@ -48,8 +48,16 @@
             if (split_data[0] === "GAME_INFO") {
                 document.querySelector('#chat-log').value += ('received some data from server\n');
                 if (split_data[1] === "PLANETS") {
+                    document.getElementById('planets-in-play').innerHTML = `<p></p>`
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');
+                        var card_name = split_data[i];
+                        var string_id = (i-2).toString();
+                        string_id = "PLANETS/" + string_id;
+                        card_name = card_name.split(' ').join('_');
+                        var route_text = "/static/images/planet_images/" + card_name + ".jpg";
+                        document.getElementById('planets-in-play').innerHTML +=
+                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=139 width=97 onclick="testImageButton(this.id);">`
                     }
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
@@ -60,7 +68,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 document.querySelector('#chat-log').value += (split_data[i] + '\n');
                                 var card_name = split_data[i];
-                                var string_id = (i-3).toString();
+                                var string_id = (i-2).toString();
                                 string_id = "HAND/1/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
@@ -69,7 +77,7 @@
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
-                                var string_id = (i-3).toString();
+                                var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
                                 var route_text = "/static/images/Cardback.jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
@@ -84,7 +92,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 document.querySelector('#chat-log').value += (split_data[i] + '\n');
                                 var card_name = split_data[i];
-                                var string_id = (i-3).toString();
+                                var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
@@ -93,7 +101,7 @@
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
-                                var string_id = (i-3).toString();
+                                var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
                                 var route_text = "/static/images/Cardback.jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
