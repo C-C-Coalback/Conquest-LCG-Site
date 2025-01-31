@@ -84,6 +84,11 @@ h4 {
     top:0;
     margin: auto;
     border: 5px solid green;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
 }
 
 #current-hand-player-2 {
@@ -91,12 +96,17 @@ h4 {
     bottom:0;
     margin: auto;
     border: 5px solid red;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
 }
 
 #planets-in-play {
     position:absolute;
     width:100%;
-    top:48%;
+    top:43%;
     border: 5px solid blue;
     overflow-x:scroll;
     overflow-y:hidden;
