@@ -18,6 +18,8 @@ h4 {
     top:26%;
     border: 5px solid yellow;
     width:100%;
+    overflow-x:scroll;
+    white-space:nowrap;
 }
 
 #player-2-cards-in-play {
@@ -25,16 +27,26 @@ h4 {
     bottom:26%;
     border: 5px solid yellow;
     width:100%;
+    overflow-x:scroll;
+    white-space:nowrap;
 }
 
 .player-1-in-play {
-    margin-left:5%;
+    margin-left:5.4%;
     float:left;
+    width: 130px;
+    max-width:190px;
+    overflow-x:scroll;
+    white-space:nowrap;
 }
 
 .player-2-in-play {
-    margin-left:5%;
+    margin-left:5.4%;
     float:left;
+    width: 130px;
+    max-width:190px;
+    overflow-x:scroll;
+    white-space:nowrap;
 }
 
 #headquarters-player-2 {

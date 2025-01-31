@@ -95,6 +95,14 @@
                     document.getElementById('planets-in-play').innerHTML = ``
                     document.getElementById('player-1-cards-planet-0').innerHTML =
                     `<input type="image" src="/static/images/Nazdreg.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
+                    document.getElementById('player-1-cards-planet-0').innerHTML +=
+                    `<input type="image" src="/static/images/Nazdreg's_Flash_Gitz.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">
+                    <input type="image" src="/static/images/Nazdreg's_Flash_Gitz.jpg" alt="Failed" id="test1" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">
+                    <input type="image" src="/static/images/Nazdreg's_Flash_Gitz.jpg" alt="Failed" id="test2" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">
+                    <input type="image" src="/static/images/Nazdreg's_Flash_Gitz.jpg" alt="Failed" id="test3" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
+
+
+
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');
                         var card_name = split_data[i];
