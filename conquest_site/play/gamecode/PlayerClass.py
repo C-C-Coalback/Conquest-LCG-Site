@@ -58,6 +58,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
+        self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
@@ -74,6 +75,7 @@ class Player:
         for i in range(len(self.game.game_sockets)):
             await self.game.game_sockets[i].receive_game_update("Setup of " + self.name_player + " finished.")
         await self.send_hq()
+        await self.send_units_at_planet(0)
 
     async def send_hand(self):
         if self.cards:
@@ -104,6 +106,33 @@ class Player:
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
             print(joined_string)
             await self.game.game_sockets[0].receive_game_update(joined_string)
+
+    async def send_units_at_planet(self, planet_id):
+        if self.cards_in_play[planet_id + 1]:
+            print("Need to send units")
+            card_strings = []
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                current_card = self.cards_in_play[planet_id + 1][i]
+                single_card_string = current_card.get_name()
+                single_card_string = single_card_string + "|"
+                if current_card.ready:
+                    single_card_string += "R|"
+                else:
+                    single_card_string += "E|"
+                single_card_string += str(0)
+                single_card_string += "|"
+                if current_card.get_card_type() == "Warlord":
+                    if current_card.get_bloodied():
+                        single_card_string += "B|"
+                    else:
+                        single_card_string += "H|"
+                card_strings.append(single_card_string)
+            joined_string = "/".join(card_strings)
+            joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
+            print(joined_string)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
+        else:
+            print("Empty")
 
     def get_headquarters(self):
         return self.headquarters
