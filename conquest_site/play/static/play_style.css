@@ -98,4 +98,9 @@ h4 {
     width:100%;
     top:48%;
     border: 5px solid blue;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
 }
