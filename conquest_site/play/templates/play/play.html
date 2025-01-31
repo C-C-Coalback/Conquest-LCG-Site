@@ -93,9 +93,6 @@
                 document.querySelector('#chat-log').value += ('received some data from server\n');
                 if (split_data[1] === "PLANETS") {
                     document.getElementById('planets-in-play').innerHTML = ``
-                    document.getElementById('player-1-cards-planet-0').innerHTML =
-                    `<input type="image" src="/static/images/Nazdreg.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
-
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');
                         var card_name = split_data[i];
@@ -108,11 +105,19 @@
                     }
                 } else if (split_data[1] === "IN_PLAY") {
                     var target_planet_id = "player-" + split_data[2] + "-cards-planet-" + split_data[3];
+                    document.getElementById(target_planet_id).innerHTML = ``;
                     document.querySelector('#chat-log').value += ('Update P1 in play\n');
-                    document.querySelector('#chat-log').value += (target_planet_id + '\n');
-                    document.getElementById(target_planet_id).innerHTML +=
-                    `<input type="image" src="/static/images/Nazdreg's_Flash_Gitz.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
-
+                    for (var i = 4; i < split_data.length; i++) {
+                        var card_data_split = split_data[i].split("|");
+                        var card_name = card_data_split[0];
+                        var string_id = (i-4).toString();
+                        string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
+                        card_name = card_name.split(' ').join('_');
+                        var route_text = "/static/images/" + card_name + ".jpg";
+                        document.querySelector('#chat-log').value += (string_id + '\n');
+                        document.getElementById(target_planet_id).innerHTML +=
+                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=` + cardHeight + ` width=` + cardWidth + ` onclick="testImageButton(this.id);">`
+                    }
 
                 } else if (split_data[1] === "HQ") {
                     if (split_data[2] === "1") {

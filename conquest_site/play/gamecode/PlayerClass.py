@@ -59,6 +59,9 @@ class Player:
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
         self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
+        self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
+        self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
+        self.cards_in_play[2].append(FindCard.find_card(deck_list[1], self.card_array))
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
@@ -75,7 +78,7 @@ class Player:
         for i in range(len(self.game.game_sockets)):
             await self.game.game_sockets[i].receive_game_update("Setup of " + self.name_player + " finished.")
         await self.send_hq()
-        await self.send_units_at_planet(0)
+        await self.send_units_at_all_planets()
 
     async def send_hand(self):
         if self.cards:
@@ -133,6 +136,10 @@ class Player:
             await self.game.game_sockets[0].receive_game_update(joined_string)
         else:
             print("Empty")
+
+    async def send_units_at_all_planets(self):
+        for i in range(7):
+            await self.send_units_at_planet(i)
 
     def get_headquarters(self):
         return self.headquarters

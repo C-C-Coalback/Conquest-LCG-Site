@@ -54,5 +54,6 @@ class Game:
         await self.game_sockets[0].receive_game_update(planet_string)
 
     async def update_game_event(self, name, game_update_string):
+        print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
