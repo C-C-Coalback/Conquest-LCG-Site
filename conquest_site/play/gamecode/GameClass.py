@@ -40,6 +40,7 @@ class Game:
         await self.p2.send_hand()
         await self.p1.send_hq()
         await self.p2.send_hq()
+        await self.send_planet_array()
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
