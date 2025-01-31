@@ -24,46 +24,46 @@
 <div id="planets-in-play">
     <p>Amogus</p>
 </div>
-<div id="player-1-cards-planet-0">
+<div id="player-1-cards-planet-0" class="player-1-in-play">
     <p>P1P0</p>
 </div>
-<div id="player-1-cards-planet-1">
+<div id="player-1-cards-planet-1" class="player-1-in-play">
     <p>P1P1</p>
 </div>
-<div id="player-1-cards-planet-2">
+<div id="player-1-cards-planet-2" class="player-1-in-play">
     <p>P1P2</p>
 </div>
-<div id="player-1-cards-planet-3">
+<div id="player-1-cards-planet-3" class="player-1-in-play">
     <p>P1P3</p>
 </div>
-<div id="player-1-cards-planet-4">
+<div id="player-1-cards-planet-4" class="player-1-in-play">
     <p>P1P4</p>
 </div>
-<div id="player-1-cards-planet-5">
+<div id="player-1-cards-planet-5" class="player-1-in-play">
     <p>P1P5</p>
 </div>
-<div id="player-1-cards-planet-6">
+<div id="player-1-cards-planet-6" class="player-1-in-play">
     <p>P1P6</p>
 </div>
-<div id="player-2-cards-planet-0">
+<div id="player-2-cards-planet-0" class="player-2-in-play">
     <p>P2P0</p>
 </div>
-<div id="player-2-cards-planet-1">
+<div id="player-2-cards-planet-1" class="player-2-in-play">
     <p>P2P1</p>
 </div>
-<div id="player-2-cards-planet-2">
+<div id="player-2-cards-planet-2" class="player-2-in-play">
     <p>P2P2</p>
 </div>
-<div id="player-2-cards-planet-3">
+<div id="player-2-cards-planet-3" class="player-2-in-play">
     <p>P2P3</p>
 </div>
-<div id="player-2-cards-planet-4">
+<div id="player-2-cards-planet-4" class="player-2-in-play">
     <p>P2P4</p>
 </div>
-<div id="player-2-cards-planet-5">
+<div id="player-2-cards-planet-5" class="player-2-in-play">
     <p>P2P5</p>
 </div>
-<div id="player-2-cards-planet-6">
+<div id="player-2-cards-planet-6" class="player-2-in-play">
     <p>P2P6</p>
 </div>
 </div>
@@ -89,6 +89,8 @@
                 document.querySelector('#chat-log').value += ('received some data from server\n');
                 if (split_data[1] === "PLANETS") {
                     document.getElementById('planets-in-play').innerHTML = ``
+                    document.getElementById('player-1-cards-planet-4').innerHTML =
+                    `<input type="image" src="/static/images/Nazdreg.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');
                         var card_name = split_data[i];
