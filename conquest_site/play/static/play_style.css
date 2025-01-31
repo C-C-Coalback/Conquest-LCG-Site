@@ -60,6 +60,6 @@ h4 {
 #planets-in-play {
     position:absolute;
     width:100%;
-    top:500px;
+    top:48%;
     border: 5px solid blue;
 }
