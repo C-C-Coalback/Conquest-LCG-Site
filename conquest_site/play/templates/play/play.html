@@ -24,6 +24,7 @@
 <div id="planets-in-play">
     <p>Amogus</p>
 </div>
+<div id="player-1-cards-in-play">
 <div id="player-1-cards-planet-0" class="player-1-in-play">
     <p>P1P0</p>
 </div>
@@ -45,6 +46,8 @@
 <div id="player-1-cards-planet-6" class="player-1-in-play">
     <p>P1P6</p>
 </div>
+</div>
+<div id="player-2-cards-in-play">
 <div id="player-2-cards-planet-0" class="player-2-in-play">
     <p>P2P0</p>
 </div>
@@ -65,6 +68,7 @@
 </div>
 <div id="player-2-cards-planet-6" class="player-2-in-play">
     <p>P2P6</p>
+</div>
 </div>
 </div>
 {{ game_id|json_script:"game-id" }}
@@ -89,7 +93,7 @@
                 document.querySelector('#chat-log').value += ('received some data from server\n');
                 if (split_data[1] === "PLANETS") {
                     document.getElementById('planets-in-play').innerHTML = ``
-                    document.getElementById('player-1-cards-planet-4').innerHTML =
+                    document.getElementById('player-1-cards-planet-0').innerHTML =
                     `<input type="image" src="/static/images/Nazdreg.jpg" alt="Failed" id="Nazdreg_in_play" height=100 width=63 onclick="testImageButton(this.id);" class="card-in-play">`
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');

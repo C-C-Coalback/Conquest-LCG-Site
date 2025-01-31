@@ -13,6 +13,30 @@ h4 {
     float:left;
 }
 
+#player-1-cards-in-play {
+    position:absolute;
+    top:26%;
+    border: 5px solid yellow;
+    width:100%;
+}
+
+#player-2-cards-in-play {
+    position:absolute;
+    bottom:26%;
+    border: 5px solid yellow;
+    width:100%;
+}
+
+.player-1-in-play {
+    margin-left:5%;
+    float:left;
+}
+
+.player-2-in-play {
+    margin-left:5%;
+    float:left;
+}
+
 #headquarters-player-2 {
     position:absolute;
     bottom:13%;
