@@ -15,13 +15,13 @@ h4 {
 
 #headquarters-player-2 {
     position:absolute;
-    bottom:140px;
+    bottom:13%;
     border: 5px solid red;
 }
 
 #headquarters-player-1 {
     position:absolute;
-    top:140px;
+    top:13%;
     border: 5px solid green;
 }
 
