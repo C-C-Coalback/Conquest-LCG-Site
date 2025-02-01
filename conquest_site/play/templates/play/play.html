@@ -6,70 +6,76 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
 <div class="box">
-<textarea id="chat-log" cols="20" rows="20"></textarea><br>
-<input id="chat-message-input" type="text" size="15"><br>
-<input id="chat-message-submit" type="button" value="Send">
-<div id="current-hand-player-1">
-    <p></p>
-</div>
-<div id="current-hand-player-2">
-    <p></p>
-</div>
-<div id="headquarters-player-1">
-    <p>Test hq p1</p>
-</div>
-<div id="headquarters-player-2">
-    <p>Test hq p2</p>
-</div>
-<div id="planets-in-play">
-    <p>Amogus</p>
-</div>
-<div id="player-1-cards-in-play">
-<div id="player-1-cards-planet-0" class="player-1-in-play">
-    <p>P1P0</p>
-</div>
-<div id="player-1-cards-planet-1" class="player-1-in-play">
-    <p>P1P1</p>
-</div>
-<div id="player-1-cards-planet-2" class="player-1-in-play">
-    <p>P1P2</p>
-</div>
-<div id="player-1-cards-planet-3" class="player-1-in-play">
-    <p>P1P3</p>
-</div>
-<div id="player-1-cards-planet-4" class="player-1-in-play">
-    <p>P1P4</p>
-</div>
-<div id="player-1-cards-planet-5" class="player-1-in-play">
-    <p>P1P5</p>
-</div>
-<div id="player-1-cards-planet-6" class="player-1-in-play">
-    <p>P1P6</p>
-</div>
-</div>
-<div id="player-2-cards-in-play">
-<div id="player-2-cards-planet-0" class="player-2-in-play">
-    <p>P2P0</p>
-</div>
-<div id="player-2-cards-planet-1" class="player-2-in-play">
-    <p>P2P1</p>
-</div>
-<div id="player-2-cards-planet-2" class="player-2-in-play">
-    <p>P2P2</p>
-</div>
-<div id="player-2-cards-planet-3" class="player-2-in-play">
-    <p>P2P3</p>
-</div>
-<div id="player-2-cards-planet-4" class="player-2-in-play">
-    <p>P2P4</p>
-</div>
-<div id="player-2-cards-planet-5" class="player-2-in-play">
-    <p>P2P5</p>
-</div>
-<div id="player-2-cards-planet-6" class="player-2-in-play">
-    <p>P2P6</p>
-</div>
-</div>
+    <textarea id="chat-log" cols="20" rows="20"></textarea><br>
+    <input id="chat-message-input" type="text" size="15"><br>
+    <input id="chat-message-submit" type="button" value="Send">
+    <div id="current-hand-player-1">
+        <p></p>
+    </div>
+    <div id="current-hand-player-2">
+        <p></p>
+    </div>
+    <div id="headquarters-player-1">
+        <p>Test hq p1</p>
+    </div>
+    <div id="headquarters-player-2">
+        <p>Test hq p2</p>
+    </div>
+    <div id ="resources-player-1">
+        <p>Resources p1</p>
+    </div>
+    <div id ="resources-player-2">
+        <p>Resources p2</p>
+    </div>
+    <div id="planets-in-play">
+        <p>Amogus</p>
+    </div>
+    <div id="player-1-cards-in-play">
+        <div id="player-1-cards-planet-0" class="player-1-in-play">
+            <p>P1P0</p>
+        </div>
+        <div id="player-1-cards-planet-1" class="player-1-in-play">
+            <p>P1P1</p>
+        </div>
+        <div id="player-1-cards-planet-2" class="player-1-in-play">
+            <p>P1P2</p>
+        </div>
+        <div id="player-1-cards-planet-3" class="player-1-in-play">
+            <p>P1P3</p>
+        </div>
+        <div id="player-1-cards-planet-4" class="player-1-in-play">
+            <p>P1P4</p>
+        </div>
+        <div id="player-1-cards-planet-5" class="player-1-in-play">
+            <p>P1P5</p>
+        </div>
+        <div id="player-1-cards-planet-6" class="player-1-in-play">
+            <p>P1P6</p>
+        </div>
+    </div>
+    <div id="player-2-cards-in-play">
+        <div id="player-2-cards-planet-0" class="player-2-in-play">
+            <p>P2P0</p>
+        </div>
+        <div id="player-2-cards-planet-1" class="player-2-in-play">
+            <p>P2P1</p>
+        </div>
+        <div id="player-2-cards-planet-2" class="player-2-in-play">
+            <p>P2P2</p>
+        </div>
+        <div id="player-2-cards-planet-3" class="player-2-in-play">
+            <p>P2P3</p>
+        </div>
+        <div id="player-2-cards-planet-4" class="player-2-in-play">
+            <p>P2P4</p>
+        </div>
+        <div id="player-2-cards-planet-5" class="player-2-in-play">
+            <p>P2P5</p>
+        </div>
+        <div id="player-2-cards-planet-6" class="player-2-in-play">
+            <p>P2P6</p>
+        </div>
+    </div>
 </div>
 {{ game_id|json_script:"game-id" }}
 <script>

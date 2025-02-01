@@ -63,6 +63,7 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    left: 100px;
 }
 
 #headquarters-player-1 {
@@ -73,6 +74,17 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+}
+
+#resources-player-2 {
+    position:absolute;
+    bottom:13%;
+}
+
+#resources-player-1 {
+    position:absolute;
+    top:13%;
+    left: 100px;
 }
 
 #chat-message-submit {
