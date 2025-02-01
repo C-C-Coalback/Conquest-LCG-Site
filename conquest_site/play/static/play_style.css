@@ -11,6 +11,7 @@ h4 {
 .planet {
     margin-left:5%;
     float:left;
+    pointer-events: auto;
 }
 
 #player-1-cards-in-play {
@@ -23,6 +24,8 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    pointer-events: none;
+    background: transparent;
 }
 
 #player-2-cards-in-play {
@@ -35,6 +38,8 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    pointer-events: none;
+    background: transparent;
 }
 
 .player-1-in-play {
@@ -44,6 +49,7 @@ h4 {
     max-width:190px;
     overflow-x:scroll;
     white-space:nowrap;
+    pointer-events: auto;
 }
 
 .player-2-in-play {
@@ -53,6 +59,7 @@ h4 {
     max-width:190px;
     overflow-x:scroll;
     white-space:nowrap;
+    pointer-events: auto;
 }
 
 #headquarters-player-2 {
@@ -64,6 +71,7 @@ h4 {
     display: flex;
     flex-direction: row;
     left: 100px;
+    pointer-events: auto;
 }
 
 #headquarters-player-1 {
@@ -74,17 +82,18 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    left: 100px;
+    pointer-events: auto;
 }
 
 #resources-player-2 {
     position:absolute;
-    bottom:13%;
+    bottom:calc(13% + 20px);
 }
 
 #resources-player-1 {
     position:absolute;
-    top:13%;
-    left: 100px;
+    top:calc(13% + 10px);
 }
 
 #chat-message-submit {
@@ -115,6 +124,7 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    pointer-events: auto;
 }
 
 #current-hand-player-2 {
@@ -127,6 +137,7 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    pointer-events: auto;
 }
 
 #planets-in-play {
@@ -139,4 +150,6 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
+    pointer-events: none;
+    background: transparent;
 }
