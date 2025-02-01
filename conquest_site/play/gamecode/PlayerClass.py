@@ -75,6 +75,7 @@ class Player:
             await self.game.game_sockets[i].receive_game_update("Setup of " + self.name_player + " finished.")
         await self.send_hq()
         await self.send_units_at_all_planets()
+        await self.send_resources()
 
     async def send_hand(self):
         if self.cards:
@@ -136,6 +137,10 @@ class Player:
     async def send_units_at_all_planets(self):
         for i in range(7):
             await self.send_units_at_planet(i)
+
+    async def send_resources(self):
+        joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
+        await self.game.game_sockets[0].receive_game_update(joined_string)
 
     def get_headquarters(self):
         return self.headquarters

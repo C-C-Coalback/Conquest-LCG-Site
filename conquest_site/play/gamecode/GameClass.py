@@ -34,8 +34,8 @@ class Game:
         self.running = True
         self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
         self.planets_in_play_array = [True, True, True, True, True, False, False]
-        self.player_with_deploy_turn = self.name_2
-        self.number_with_deploy_turn = "2"
+        self.player_with_deploy_turn = self.name_1
+        self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
 
     async def joined_requests_graphics(self):
@@ -69,15 +69,17 @@ class Game:
                             print("Deploy card in hand at pos", game_update_string[2])
                             self.card_pos_to_deploy = int(game_update_string[2])
                             if self.number_with_deploy_turn == "1":
-                                played_support = self.p2.play_card_if_support(self.card_pos_to_deploy)
+                                played_support = self.p1.play_card_if_support(self.card_pos_to_deploy)
                                 if played_support == "SUCCESS/Support":
-                                    await self.p2.send_hand()
-                                    await self.p2.send_hq()
+                                    await self.p1.send_hand()
+                                    await self.p1.send_hq()
+                                    await self.p1.send_resources()
                             elif self.number_with_deploy_turn == "2":
                                 played_support = self.p2.play_card_if_support(self.card_pos_to_deploy)
                                 if played_support == "SUCCESS/Support":
                                     await self.p2.send_hand()
                                     await self.p2.send_hq()
+                                    await self.p2.send_resources()
 
             elif len(game_update_string) == 2:
                 if name == self.player_with_deploy_turn:
@@ -90,6 +92,7 @@ class Game:
                             if played_card == "SUCCESS":
                                 await self.p1.send_hand()
                                 await self.p1.send_units_at_planet(int(game_update_string[1]))
+                                await self.p1.send_resources()
                                 self.card_pos_to_deploy = -1
                         if self.number_with_deploy_turn == "2":
                             print("P2 plays card")
@@ -98,4 +101,5 @@ class Game:
                             if played_card == "SUCCESS":
                                 await self.p2.send_hand()
                                 await self.p2.send_units_at_planet(int(game_update_string[1]))
+                                await self.p2.send_resources()
                                 self.card_pos_to_deploy = -1
