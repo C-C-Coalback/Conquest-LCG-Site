@@ -6,7 +6,6 @@ from .gamecode import GameClass
 import os
 from .gamecode import Initfunctions
 
-
 card_array = Initfunctions.init_player_cards()
 planet_array = Initfunctions.init_planet_cards()
 
@@ -157,7 +156,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_id_if_exists = i
                 self.game_position = i
         if not room_already_exists:
-            active_games.append(GameClass.Game("1", "alex", "Example", card_array))
+            active_games.append(GameClass.Game("1", "Example", "alex", card_array))
             active_games[len(active_games) - 1].game_sockets.append(self)
             self.game_position = len(active_games) - 1
         # Join room group
@@ -170,7 +169,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
         if room_already_exists:
             await active_games[game_id_if_exists].joined_requests_graphics()
-
 
     async def disconnect(self, close_code):
         # Leave room group
