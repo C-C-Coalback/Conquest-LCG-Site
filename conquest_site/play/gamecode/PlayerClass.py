@@ -213,11 +213,60 @@ class Player:
     def shuffle_deck(self):
         shuffle(self.deck)
 
+    def add_to_hq(self, card_object):
+        self.headquarters.append(copy.deepcopy(card_object))
+
     def print_headquarters(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].print_info()
 
-    """
+    def play_card_if_support(self, position_hand):
+        card = FindCard.find_card(self.cards[position_hand], self.card_array)
+        if card.card_type == "Support":
+            print("Need to play support card")
+            played_card = self.play_card(-2, card)
+            return "SUCCESS/Support"
+        return "SUCCESS/Not Support"
+
+    def play_card(self, position, card):
+        if position == -2:
+            print("Play card to HQ")
+            if self.spend_resources(card.get_cost()):
+                self.add_to_hq(card)
+                self.cards.remove(card.get_name())
+                print("Played card to HQ")
+                return "SUCCESS"
+            print("Insufficient resources")
+            return "FAIL/Insufficient resources"
+        return "FAIL/Invalid card"
+"""
+    def play_card(self, position, card):
+        if position is None:
+            if self.spend_resources(card.get_cost()):
+                self.add_to_hq(card)
+                self.cards.remove(card.get_name())
+                print("Played card to HQ")
+                return "SUCCESS"
+            print("Insufficient resources")
+            self.c.notify_all()
+            self.c.release()
+            return "FAIL"
+        if not self.planets_in_play[position]:
+            self.c.notify_all()
+            self.c.release()
+            return "FAIL"
+        if self.spend_resources(card.get_cost()):
+            self.cards_in_play[position + 1].append(copy.deepcopy(card))
+            self.cards.remove(card.get_name())
+            self.c.notify_all()
+            self.c.release()
+            return "SUCCESS"
+        print("Insufficient resources")
+        self.c.notify_all()
+        self.c.release()
+        return "FAIL" """
+
+"""
     def retreat_warlord(self):
         for i in range(len(self.cards_in_play[0])):
             if not self.cards_in_play[i + 1]:
@@ -434,35 +483,6 @@ class Player:
                     print("position of planet to deploy unit:", int_planet)
                     return self.play_card(int_planet, card)
 
-    def play_card(self, position, card):
-        self.c.acquire()
-        if position is None:
-            if self.spend_resources(card.get_cost()):
-                self.add_to_hq(card)
-                self.cards.remove(card.get_name())
-                print("Played card to HQ")
-                self.c.notify_all()
-                self.c.release()
-                return "SUCCESS"
-            print("Insufficient resources")
-            self.c.notify_all()
-            self.c.release()
-            return "FAIL"
-        if not self.planets_in_play[position]:
-            self.c.notify_all()
-            self.c.release()
-            return "FAIL"
-        if self.spend_resources(card.get_cost()):
-            self.cards_in_play[position + 1].append(copy.deepcopy(card))
-            self.cards.remove(card.get_name())
-            self.c.notify_all()
-            self.c.release()
-            return "SUCCESS"
-        print("Insufficient resources")
-        self.c.notify_all()
-        self.c.release()
-        return "FAIL"
-
     def commit_warlord_step(self):
         self.position_activated = []
         self.set_turn(True)
@@ -523,9 +543,6 @@ class Player:
             if t == "STOP":
                 break
             print("Player", self.number, "active position:", self.position_activated)
-
-    def add_to_hq(self, card_object):
-        self.headquarters.append(copy.deepcopy(card_object))
 
     def toggle_initiative(self):
         self.has_initiative = not self.has_initiative

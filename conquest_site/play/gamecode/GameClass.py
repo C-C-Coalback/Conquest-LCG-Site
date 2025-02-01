@@ -34,7 +34,9 @@ class Game:
         self.running = True
         self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
         self.planets_in_play_array = [True, True, True, True, True, False, False]
-        self.p1_has_deploy_turn = True
+        self.player_with_deploy_turn = self.name_1
+        self.number_with_deploy_turn = "1"
+        self.card_pos_to_deploy = -1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -60,4 +62,22 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif self.phase == "DEPLOY":
             print("Need to run deploy turn code.")
+            if len(game_update_string) == 3:
+                if game_update_string[0] == "HAND":
+                    if name == self.player_with_deploy_turn:
+                        if game_update_string[1] == self.number_with_deploy_turn:
+                            print("Deploy card in hand at pos", game_update_string[2])
+                            self.card_pos_to_deploy = int(game_update_string[2])
+                            if self.number_with_deploy_turn == "1":
+                                played_support = self.p1.play_card_if_support(self.card_pos_to_deploy)
+                                if played_support == "SUCCESS/Support":
+                                    await self.p1.send_hand()
+                                    await self.p1.send_hq()
+
+            elif len(game_update_string) == 2:
+                if name == self.player_with_deploy_turn:
+                    if self.card_pos_to_deploy != -1:
+                        print("Deploy card at planet", game_update_string[1])
+                        if self.number_with_deploy_turn == "1":
+                            print("P1 plays card")
 
