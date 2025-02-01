@@ -28,12 +28,13 @@ class Game:
         self.stored_deck_2 = None
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, self)
-        self.phase = "SETUP"
+        self.phase = "DEPLOY"
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
         self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
-        self.planets_in_play_array = [True, True, True, True, True, True, True]
+        self.planets_in_play_array = [True, True, True, True, True, False, False]
+        self.p1_has_deploy_turn = True
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -57,3 +58,6 @@ class Game:
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
+        elif self.phase == "DEPLOY":
+            print("Need to run deploy turn code.")
+

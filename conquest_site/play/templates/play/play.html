@@ -99,7 +99,7 @@
                         var string_id = (i-2).toString();
                         string_id = "PLANETS/" + string_id;
                         card_name = card_name.split(' ').join('_');
-                        var route_text = "/static/images/planet_images/" + card_name + ".jpg";
+                        var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         document.getElementById('planets-in-play').innerHTML +=
                         `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=97 width=139 onclick="testImageButton(this.id);" class="planet">`
                     }

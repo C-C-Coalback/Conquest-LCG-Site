@@ -58,6 +58,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
+        self.headquarters.append(FindCard.find_card(deck_list[1], self.card_array))
         self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
         self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
         self.cards_in_play[1].append(FindCard.find_card(deck_list[1], self.card_array))
