@@ -80,4 +80,10 @@ class Game:
                         print("Deploy card at planet", game_update_string[1])
                         if self.number_with_deploy_turn == "1":
                             print("P1 plays card")
+                            played_card = self.p1.play_card(int(game_update_string[1]),
+                                                            position_hand=self.card_pos_to_deploy)
+                            if played_card == "SUCCESS":
+                                await self.p1.send_hand()
+                                await self.p1.send_units_at_planet(int(game_update_string[1]))
+                                self.card_pos_to_deploy = -1
 

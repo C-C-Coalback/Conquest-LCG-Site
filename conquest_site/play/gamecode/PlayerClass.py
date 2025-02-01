@@ -224,20 +224,39 @@ class Player:
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         if card.card_type == "Support":
             print("Need to play support card")
-            played_card = self.play_card(-2, card)
+            played_card = self.play_card(-2, card=card)
             return "SUCCESS/Support"
         return "SUCCESS/Not Support"
 
-    def play_card(self, position, card):
-        if position == -2:
-            print("Play card to HQ")
-            if self.spend_resources(card.get_cost()):
-                self.add_to_hq(card)
-                self.cards.remove(card.get_name())
-                print("Played card to HQ")
-                return "SUCCESS"
-            print("Insufficient resources")
-            return "FAIL/Insufficient resources"
+    def add_card_to_planet(self, card, position):
+        self.cards_in_play[position + 1].append(copy.deepcopy(card))
+
+    def play_card(self, position, card=None, position_hand=None):
+        if card is None and position_hand is None:
+            return "ERROR/play_card function called incorrectly"
+        if card is not None and position_hand is not None:
+            return "ERROR/play_card function called incorrectly"
+        if card is not None:
+            if position == -2:
+                print("Play card to HQ")
+                if self.spend_resources(card.get_cost()):
+                    self.add_to_hq(card)
+                    self.cards.remove(card.get_name())
+                    print("Played card to HQ")
+                    return "SUCCESS"
+                print("Insufficient resources")
+                return "FAIL/Insufficient resources"
+        if position_hand is not None:
+            if position_hand != -1:
+                if -1 < position < 7:
+                    card = FindCard.find_card(self.cards[position_hand], self.card_array)
+                    if self.spend_resources(card.get_cost()):
+                        self.add_card_to_planet(card, position)
+                        self.cards.remove(card.get_name())
+                        print("Played card to planet", position)
+                        return "SUCCESS"
+                    print("Insufficient resources")
+                    return "FAIL/Insufficient resources"
         return "FAIL/Invalid card"
 """
     def play_card(self, position, card):
