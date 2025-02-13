@@ -10,6 +10,16 @@ h4 {
     overflow: hidden;
 }
 
+.NazdregTest {
+    height:10vh;
+    width:5vw;
+}
+
+.Card {
+    height:10vh;
+    width:5vw;
+}
+
 .planet {
     margin-left:5%;
     float:left;
