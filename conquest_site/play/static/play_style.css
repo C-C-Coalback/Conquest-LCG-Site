@@ -21,7 +21,7 @@ h4 {
 }
 
 .planet {
-    margin-left:5%;
+    margin-left:3vw;
     float:left;
     pointer-events: auto;
     height: 10vh;
@@ -158,9 +158,11 @@ h4 {
 
 #planets-in-play {
     position:absolute;
-    width:100%;
+    width: 95vw;
+    max-width: 95vw;
     top:43%;
     border: 5px solid blue;
+    margin: auto;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
