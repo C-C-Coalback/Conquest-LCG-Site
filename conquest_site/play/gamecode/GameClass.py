@@ -155,3 +155,10 @@ class Game:
                         await self.send_planet_array()
                         await self.p1.send_units_at_all_planets()
                         await self.p2.send_units_at_all_planets()
+                        self.resolve_command_struggle()
+
+
+    def resolve_command_struggle(self):
+        for i in range(len(self.planet_array)):
+            if self.planets_in_play_array[i]:
+                print("Resolve command struggle at:", self.planet_array[i])
