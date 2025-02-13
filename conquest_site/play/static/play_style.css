@@ -164,6 +164,6 @@ h4 {
     white-space:nowrap;
     display: flex;
     flex-direction: row;
-    pointer-events: none;
+    pointer-events: auto;
     background: transparent;
 }
