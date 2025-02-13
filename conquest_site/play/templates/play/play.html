@@ -9,7 +9,7 @@
     <textarea id="chat-log" cols="20" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="15"><br>
     <input id="chat-message-submit" type="button" value="Send">
-    <input type="image" src="/static/images/Nazdreg.jpg" alt="didnt work" id="TestingId" height=97 width=139 onclick="testImageButton(this.id);" class="NazdregTest" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
+    <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
     <div id="current-hand-player-1">
         <p></p>
     </div>
@@ -242,6 +242,7 @@
 
         function changeDef(image_src) {
             console.log(image_src);
+            document.getElementById("LargeHelperCard").src=image_src;
         }
 
         function changeDefOut() {

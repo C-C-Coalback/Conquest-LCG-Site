@@ -11,6 +11,15 @@ h4 {
 }
 
 
+#LargeHelperCard {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    height:20vh;
+    width:15vw;
+}
+
+
 .Card {
     height:8vh;
     width:5vw;
