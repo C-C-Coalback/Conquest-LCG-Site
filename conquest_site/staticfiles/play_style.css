@@ -117,6 +117,16 @@ h4 {
     top:calc(13% + 10px);
 }
 
+#pass-player-1 {
+    position:absolute;
+    top:calc(13% + 0px);
+}
+
+#pass-player-2 {
+    position:absolute;
+    bottom:calc(13% + 0px);
+}
+
 #chat-message-submit {
     position:absolute;
     bottom:0;
