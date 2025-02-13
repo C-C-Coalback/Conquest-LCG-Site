@@ -44,6 +44,8 @@ class Game:
         await self.p1.send_hq()
         await self.p2.send_hq()
         await self.send_planet_array()
+        await self.p1.send_units_at_all_planets()
+        await self.p2.send_units_at_all_planets()
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"

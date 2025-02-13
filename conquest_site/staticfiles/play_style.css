@@ -5,7 +5,9 @@ h4 {
 .box {
     position: relative;
     height: 88vh;
+    width: 97vw;
     border: 5px solid blue;
+    overflow: hidden;
 }
 
 .planet {
@@ -119,6 +121,7 @@ h4 {
     top:0;
     margin: auto;
     border: 5px solid green;
+    max-width: 95vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -132,6 +135,7 @@ h4 {
     bottom:0;
     margin: auto;
     border: 5px solid red;
+    max-width: 95vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
