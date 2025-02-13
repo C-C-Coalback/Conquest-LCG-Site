@@ -138,9 +138,10 @@ h4 {
 #current-hand-player-1 {
     position:absolute;
     top:0;
+    left: 10vw;
     margin: auto;
     border: 5px solid green;
-    max-width: 95vw;
+    max-width: 85vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -149,18 +150,41 @@ h4 {
     pointer-events: auto;
 }
 
+#current-deck-player-1 {
+    position:absolute;
+    top:0;
+    left: 5vw;
+}
+
+#current-discard-player-1 {
+    position:absolute;
+    top:0;
+}
+
 #current-hand-player-2 {
     position:absolute;
     bottom:0;
+    left: 10vw;
     margin: auto;
     border: 5px solid red;
-    max-width: 95vw;
+    max-width: 85vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
     flex-direction: row;
     pointer-events: auto;
+}
+
+#current-deck-player-2 {
+    position:absolute;
+    bottom:0;
+    left: 5vw;
+}
+
+#current-discard-player-2 {
+    position:absolute;
+    bottom:0;
 }
 
 #planets-in-play {
