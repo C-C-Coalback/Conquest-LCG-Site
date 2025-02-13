@@ -273,6 +273,12 @@ class Player:
                 self.headquarters.remove(headquarters_list[i])
                 return True
 
+    def count_command_at_planet(self, planet_id):
+        counted_command = 0
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            counted_command += self.cards_in_play[planet_id + 1][i].get_command()
+        return counted_command
+
 
 """
     def play_card(self, position, card):
