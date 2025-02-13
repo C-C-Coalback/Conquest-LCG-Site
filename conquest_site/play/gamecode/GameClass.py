@@ -64,6 +64,20 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif self.phase == "DEPLOY":
             print("Need to run deploy turn code.")
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    print("Need to pass")
+                    if name == self.player_with_deploy_turn:
+                        if self.number_with_deploy_turn == "1":
+                            self.number_with_deploy_turn = "2"
+                            self.player_with_deploy_turn = self.name_2
+                            self.p1.has_passed = True
+                        else:
+                            self.number_with_deploy_turn = "1"
+                            self.player_with_deploy_turn = self.name_1
+                            self.p2.has_passed = True
+                    if self.p1.has_passed and self.p2.has_passed:
+                        print("Both passed, move to warlord movement.")
             if len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if name == self.player_with_deploy_turn:
@@ -76,16 +90,18 @@ class Game:
                                     await self.p1.send_hand()
                                     await self.p1.send_hq()
                                     await self.p1.send_resources()
-                                    self.player_with_deploy_turn = self.name_2
-                                    self.number_with_deploy_turn = "2"
+                                    if not self.p2.has_passed:
+                                        self.player_with_deploy_turn = self.name_2
+                                        self.number_with_deploy_turn = "2"
                             elif self.number_with_deploy_turn == "2":
                                 played_support = self.p2.play_card_if_support(self.card_pos_to_deploy)
                                 if played_support == "SUCCESS/Support":
                                     await self.p2.send_hand()
                                     await self.p2.send_hq()
                                     await self.p2.send_resources()
-                                    self.player_with_deploy_turn = self.name_1
-                                    self.number_with_deploy_turn = "1"
+                                    if not self.p1.has_passed:
+                                        self.player_with_deploy_turn = self.name_1
+                                        self.number_with_deploy_turn = "1"
 
             elif len(game_update_string) == 2:
                 if name == self.player_with_deploy_turn:
@@ -100,8 +116,9 @@ class Game:
                                 await self.p1.send_units_at_planet(int(game_update_string[1]))
                                 await self.p1.send_resources()
                                 self.card_pos_to_deploy = -1
-                                self.player_with_deploy_turn = self.name_2
-                                self.number_with_deploy_turn = "2"
+                                if not self.p2.has_passed:
+                                    self.player_with_deploy_turn = self.name_2
+                                    self.number_with_deploy_turn = "2"
                         if self.number_with_deploy_turn == "2":
                             print("P2 plays card")
                             played_card = self.p2.play_card(int(game_update_string[1]),
@@ -111,5 +128,6 @@ class Game:
                                 await self.p2.send_units_at_planet(int(game_update_string[1]))
                                 await self.p2.send_resources()
                                 self.card_pos_to_deploy = -1
-                                self.player_with_deploy_turn = self.name_1
-                                self.number_with_deploy_turn = "1"
+                                if not self.p1.has_passed:
+                                    self.player_with_deploy_turn = self.name_1
+                                    self.number_with_deploy_turn = "1"

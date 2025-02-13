@@ -40,6 +40,7 @@ class Player:
         self.has_initiative = True
         self.has_turn = True
         self.retreating = False
+        self.has_passed = False
         self.phase = "Deploy"
         self.round_number = 1
         self.resources = 0
