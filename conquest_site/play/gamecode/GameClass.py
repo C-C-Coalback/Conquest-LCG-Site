@@ -1,6 +1,7 @@
 from . import PlayerClass
 import random
 from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
+from . import FindCard
 
 
 def create_planets(planet_array_objects):
@@ -16,9 +17,10 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, game_id, player_one_name, player_two_name, card_array):
+    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array):
         self.game_sockets = []
         self.card_array = card_array
+        self.planet_cards_array = planet_array
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
@@ -156,18 +158,43 @@ class Game:
                         await self.p1.send_units_at_all_planets()
                         await self.p2.send_units_at_all_planets()
                         self.resolve_command_struggle()
+                        await self.p1.send_hand()
+                        await self.p2.send_hand()
+                        await self.p1.send_resources()
+                        await self.p2.send_resources()
 
     def resolve_command_struggle(self):
+        storage_command_struggle = [None, None, None, None, None, None, None]
         for i in range(len(self.planet_array)):
             if self.planets_in_play_array[i]:
                 print("Resolve command struggle at:", self.planet_array[i])
-                self.resolve_command_struggle_at_planet(i)
+                storage_command_struggle[i] = self.resolve_command_struggle_at_planet(i)
+        for i in range(len(storage_command_struggle)):
+            if storage_command_struggle[i] is not None:
+                if storage_command_struggle[i][0] == "1":
+                    self.p1.add_resources(storage_command_struggle[i][1])
+                    for _ in range(storage_command_struggle[i][2]):
+                        self.p1.draw_card()
+                else:
+                    self.p2.add_resources(storage_command_struggle[i][1])
+                    for _ in range(storage_command_struggle[i][2]):
+                        self.p2.draw_card()
 
     def resolve_command_struggle_at_planet(self, planet_id):
         command_p1 = self.p1.count_command_at_planet(planet_id)
         command_p2 = self.p2.count_command_at_planet(planet_id)
         if command_p1 > command_p2:
             print("P1 wins command")
+            chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
+            resources_won = chosen_planet.get_resources()
+            cards_won = chosen_planet.get_cards()
+            ret_val = ["1", resources_won, cards_won]
+            return ret_val
         elif command_p2 > command_p1:
             print("P2 wins command")
+            chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
+            resources_won = chosen_planet.get_resources()
+            cards_won = chosen_planet.get_cards()
+            ret_val = ["2", resources_won, cards_won]
+            return ret_val
 

@@ -138,6 +138,8 @@ chat_messages = [[], []]
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         global active_games
+        global card_array
+        global planet_array
 
         print("got to game consumer")
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
@@ -156,7 +158,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_id_if_exists = i
                 self.game_position = i
         if not room_already_exists:
-            active_games.append(GameClass.Game("1", "alex", "Example", card_array))
+            active_games.append(GameClass.Game("1", "alex", "Example", card_array, planet_array))
             active_games[len(active_games) - 1].game_sockets.append(self)
             self.game_position = len(active_games) - 1
         # Join room group
