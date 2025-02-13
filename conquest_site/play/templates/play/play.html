@@ -108,7 +108,7 @@
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         document.getElementById('planets-in-play').innerHTML +=
-                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` height=97 width=139 onclick="testImageButton(this.id);" class="planet">`
+                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet">`
                     }
                 } else if (split_data[1] === "RESOURCES") {
                     if (split_data[2] === "1") {

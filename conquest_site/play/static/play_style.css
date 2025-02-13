@@ -24,6 +24,8 @@ h4 {
     margin-left:5%;
     float:left;
     pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
 }
 
 #player-1-cards-in-play {
