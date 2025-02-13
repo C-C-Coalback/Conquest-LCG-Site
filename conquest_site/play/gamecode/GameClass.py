@@ -78,6 +78,7 @@ class Game:
                             self.p2.has_passed = True
                     if self.p1.has_passed and self.p2.has_passed:
                         print("Both passed, move to warlord movement.")
+                        self.phase = "COMMAND"
             if len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if name == self.player_with_deploy_turn:
@@ -131,3 +132,26 @@ class Game:
                                 if not self.p1.has_passed:
                                     self.player_with_deploy_turn = self.name_1
                                     self.number_with_deploy_turn = "1"
+        elif self.phase == "COMMAND":
+            print("Run warlord assignment code.")
+            if len(game_update_string) == 2:
+                if game_update_string[0] == "PLANETS":
+                    print("Save warlord to this planet")
+                    if name == self.name_1:
+                        if not self.p1.committed_warlord:
+                            self.p1.warlord_commit_location = int(game_update_string[1])
+                            self.p1.committed_warlord = True
+                    else:
+                        if not self.p2.committed_warlord:
+                            self.p2.warlord_commit_location = int(game_update_string[1])
+                            self.p2.committed_warlord = True
+                    if self.p1.committed_warlord and self.p2.committed_warlord:
+                        print("Both warlords need to be committed.")
+                        print(self.p1.warlord_commit_location, self.p2.warlord_commit_location)
+                        self.p1.commit_warlord_to_planet()
+                        self.p2.commit_warlord_to_planet()
+                        await self.p1.send_hq()
+                        await self.p2.send_hq()
+                        await self.send_planet_array()
+                        await self.p1.send_units_at_all_planets()
+                        await self.p2.send_units_at_all_planets()

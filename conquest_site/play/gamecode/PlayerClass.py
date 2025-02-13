@@ -55,6 +55,8 @@ class Player:
         self.bonus_boxes = ""
         self.extra_text = "No advice"
         self.deck_loaded = False
+        self.committed_warlord = False
+        self.warlord_commit_location = -1
 
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
@@ -259,6 +261,19 @@ class Player:
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources"
         return "FAIL/Invalid card"
+
+    def commit_warlord_to_planet(self, planet_pos=None):
+        headquarters_list = self.get_headquarters()
+        if planet_pos is None:
+            planet_pos = self.warlord_commit_location + 1
+        for i in range(len(headquarters_list)):
+            if headquarters_list[i].get_card_type() == "Warlord":
+                print(headquarters_list[i].get_name())
+                self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
+                self.headquarters.remove(headquarters_list[i])
+                return True
+
+
 """
     def play_card(self, position, card):
         if position is None:
