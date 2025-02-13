@@ -10,13 +10,9 @@ h4 {
     overflow: hidden;
 }
 
-.NazdregTest {
-    height:10vh;
-    width:5vw;
-}
 
 .Card {
-    height:10vh;
+    height:8vh;
     width:5vw;
 }
 
@@ -32,7 +28,8 @@ h4 {
     position:absolute;
     top:26%;
     border: 5px solid yellow;
-    width:100%;
+    width:95vw;
+    max-width:95vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -46,7 +43,8 @@ h4 {
     position:absolute;
     bottom:26%;
     border: 5px solid yellow;
-    width:100%;
+    width:95vw;
+    max-width:95vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -57,20 +55,20 @@ h4 {
 }
 
 .player-1-in-play {
-    margin-left:5.4%;
+    margin-left:3vw;
     float:left;
-    width: 130px;
-    max-width:190px;
+    width: 10vw;
+    max-width:10vw;
     overflow-x:scroll;
     white-space:nowrap;
     pointer-events: auto;
 }
 
 .player-2-in-play {
-    margin-left:5.4%;
+    margin-left:3vw;
     float:left;
-    width: 130px;
-    max-width:190px;
+    width: 10vw;
+    max-width:10vw;
     overflow-x:scroll;
     white-space:nowrap;
     pointer-events: auto;
@@ -78,7 +76,7 @@ h4 {
 
 #headquarters-player-2 {
     position:absolute;
-    bottom:13%;
+    bottom:11vh;
     border: 5px solid red;
     overflow-y:hidden;
     white-space:nowrap;
@@ -90,7 +88,7 @@ h4 {
 
 #headquarters-player-1 {
     position:absolute;
-    top:13%;
+    top:11vh;
     border: 5px solid green;
     overflow-y:hidden;
     white-space:nowrap;
