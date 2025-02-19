@@ -163,8 +163,9 @@
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
                             var is_ready = card_data_split[1];
+                            var damage = card_data_split[2];
                             var string_id = (i-3).toString();
-                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n";
+                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/1/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
@@ -182,8 +183,9 @@
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
                             var is_ready = card_data_split[1];
+                            var damage = card_data_split[2];
                             var string_id = (i-3).toString();
-                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n";
+                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/2/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
