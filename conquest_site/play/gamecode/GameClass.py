@@ -44,6 +44,8 @@ class Game:
         self.player_with_combat_turn = self.name_1
         self.attacker_planet = -1
         self.attacker_position = -1
+        self.defender_planet = -1
+        self.defender_position = -1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -198,7 +200,12 @@ class Game:
                                 if valid_unit:
                                     self.attacker_planet = chosen_planet
                                     self.attacker_position = chosen_unit
-                                    print(self.attacker_planet, self.attacker_position)
+                                    print("Attacker:", self.attacker_planet, self.attacker_position)
+                        elif self.defender_position == -1:
+                            if game_update_string[1] != self.number_with_combat_turn:
+                                self.defender_planet = int(game_update_string[2])
+                                self.defender_position = int(game_update_string[3])
+                                print("Defender:", self.defender_planet, self.defender_position)
 
     def resolve_command_struggle(self):
         storage_command_struggle = [None, None, None, None, None, None, None]
