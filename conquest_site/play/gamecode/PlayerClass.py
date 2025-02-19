@@ -61,6 +61,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
+        self.headquarters[0].exhaust_card()
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
@@ -305,6 +306,8 @@ class Player:
     def check_ready_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
+    def exhaust_given_pos(self, planet_id, unit_id):
+        self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
 
 """
     def play_card(self, position, card):
@@ -381,11 +384,6 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].reset_brutal()
         attack_value += self.cards_in_play[planet_id + 1][unit_id].get_extra_attack_until_end_of_battle()
         return attack_value
-
-
-
-    def exhaust_given_pos(self, planet_id, unit_id):
-        self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
 
     def ready_all_in_headquarters(self):
         for i in range(len(self.headquarters)):

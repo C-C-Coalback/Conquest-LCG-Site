@@ -201,6 +201,7 @@ class Game:
                                     self.attacker_planet = chosen_planet
                                     self.attacker_position = chosen_unit
                                     print("Attacker:", self.attacker_planet, self.attacker_position)
+                                    self.p1.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                         elif self.defender_position == -1:
                             if game_update_string[1] != self.number_with_combat_turn:
                                 self.defender_planet = int(game_update_string[2])

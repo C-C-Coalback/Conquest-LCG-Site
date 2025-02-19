@@ -157,12 +157,18 @@
                         for (var i = 3; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
+                            var is_ready = card_data_split[1];
                             var string_id = (i-3).toString();
+                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n";
                             string_id = "HQ/1/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
+                            var rotation = "";
+                            if (is_ready === "E") {
+                                rotation = " style='transform:rotate(90deg);'";
+                            }
                             document.getElementById('headquarters-player-1').innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 HQ\n');
@@ -170,12 +176,18 @@
                         for (var i = 3; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
+                            var is_ready = card_data_split[1];
                             var string_id = (i-3).toString();
+                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n";
                             string_id = "HQ/2/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
+                            var rotation = "";
+                            if (is_ready === "E") {
+                                rotation = " style='transform:rotate(90deg);'";
+                            }
                             document.getElementById('headquarters-player-2').innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     }
                 } else if (split_data[1] === "HAND") {
