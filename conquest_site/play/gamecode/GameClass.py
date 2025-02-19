@@ -39,6 +39,7 @@ class Game:
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
+        self.last_planet_checked_for_battle = -1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -162,6 +163,9 @@ class Game:
                         await self.p2.send_hand()
                         await self.p1.send_resources()
                         await self.p2.send_resources()
+                        self.phase = "COMBAT"
+                        self.check_battle(self.round_number)
+                        self.last_planet_checked_for_battle = self.round_number
 
     def resolve_command_struggle(self):
         storage_command_struggle = [None, None, None, None, None, None, None]
@@ -198,3 +202,14 @@ class Game:
             ret_val = ["2", resources_won, cards_won]
             return ret_val
 
+    def check_battle(self, planet_id):
+        if planet_id == self.round_number:
+            print("First planet: battle occurs at ", planet_id)
+            return 1
+        if self.p1.check_for_warlord(planet_id):
+            print("p1 warlord present. Battle at ", planet_id)
+            return 1
+        elif self.p2.check_for_warlord(planet_id):
+            print("p2 warlord present. Battle at ", planet_id)
+            return 1
+        return 0

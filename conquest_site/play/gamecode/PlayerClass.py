@@ -279,6 +279,22 @@ class Player:
             counted_command += self.cards_in_play[planet_id + 1][i].get_command()
         return counted_command
 
+    def check_for_warlord(self, planet_id):
+        print("Looking for warlord at:", self.cards_in_play[0][planet_id])
+        if not self.cards_in_play[planet_id + 1]:
+            pass
+        else:
+            for j in range(len(self.cards_in_play[planet_id + 1])):
+                print("Card is:", self.cards_in_play[planet_id + 1][j].get_name())
+                print("Check if card is a warlord.")
+                if self.cards_in_play[planet_id + 1][j].get_card_type() == "Warlord":
+                    print("Card is a Warlord")
+                    return 1
+                else:
+                    print("Card is not a Warlord")
+        print("Warlord is not present")
+        return 0
+
 
 """
     def play_card(self, position, card):
@@ -447,22 +463,6 @@ class Player:
             if self.victory_display[i].get_green():
                 total_icons[2] += 1
         print("Total Icons:", total_icons)
-
-    def check_for_warlord(self, planet_id):
-        print("Looking for warlord at:", self.cards_in_play[0][planet_id])
-        if not self.cards_in_play[planet_id + 1]:
-            pass
-        else:
-            for j in range(len(self.cards_in_play[planet_id + 1])):
-                print("Card is:", self.cards_in_play[planet_id + 1][j].get_name())
-                print("Check if card is a warlord.")
-                if self.cards_in_play[planet_id + 1][j].get_card_type() == "Warlord":
-                    print("Card is a Warlord")
-                    return 1
-                else:
-                    print("Card is not a Warlord")
-        print("Warlord is not present")
-        return 0
 
     def take_deploy_turn(self):
         self.position_activated = []
