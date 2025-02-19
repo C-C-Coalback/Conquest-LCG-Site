@@ -40,6 +40,10 @@ class Game:
         self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
         self.last_planet_checked_for_battle = -1
+        self.number_with_combat_turn = "1"
+        self.player_with_combat_turn = self.name_1
+        self.attacker_planet = -1
+        self.attacker_position = -1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -166,6 +170,35 @@ class Game:
                         self.phase = "COMBAT"
                         self.check_battle(self.round_number)
                         self.last_planet_checked_for_battle = self.round_number
+        elif self.phase == "COMBAT":
+            if len(game_update_string) == 4:
+                print("Unit clicked on.")
+                if game_update_string[0] == "IN_PLAY":
+                    if name == self.player_with_combat_turn:
+                        if self.attacker_position == -1:
+                            if game_update_string[1] == self.number_with_combat_turn:
+                                chosen_planet = int(game_update_string[2])
+                                chosen_unit = int(game_update_string[3])
+                                valid_unit = False
+                                if chosen_planet == self.last_planet_checked_for_battle:
+                                    if self.number_with_combat_turn == "1":
+                                        is_ready = self.p1.check_ready_pos(chosen_planet, chosen_unit)
+                                        if is_ready:
+                                            print("Unit ready, can be used")
+                                            valid_unit = True
+                                        else:
+                                            print("Unit not ready")
+                                    if self.number_with_combat_turn == "2":
+                                        is_ready = self.p2.check_ready_pos(chosen_planet, chosen_unit)
+                                        if is_ready:
+                                            print("Unit ready, can be used")
+                                            valid_unit = True
+                                        else:
+                                            print("Unit not ready")
+                                if valid_unit:
+                                    self.attacker_planet = chosen_planet
+                                    self.attacker_position = chosen_unit
+                                    print(self.attacker_planet, self.attacker_position)
 
     def resolve_command_struggle(self):
         storage_command_struggle = [None, None, None, None, None, None, None]

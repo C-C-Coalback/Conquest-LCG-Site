@@ -295,6 +295,9 @@ class Player:
         print("Warlord is not present")
         return 0
 
+    def check_ready_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_ready()
+
 
 """
     def play_card(self, position, card):
@@ -372,8 +375,7 @@ class Player:
         attack_value += self.cards_in_play[planet_id + 1][unit_id].get_extra_attack_until_end_of_battle()
         return attack_value
 
-    def check_ready_pos(self, planet_id, unit_id):
-        return self.cards_in_play[planet_id + 1][unit_id].get_ready()
+
 
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
