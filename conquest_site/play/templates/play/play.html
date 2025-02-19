@@ -174,7 +174,7 @@
                                 rotation = " style='transform:rotate(90deg);'";
                             }
                             document.getElementById('headquarters-player-1').innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()"></div>`
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 HQ\n');
