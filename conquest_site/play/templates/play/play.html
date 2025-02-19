@@ -173,8 +173,14 @@
                             if (is_ready === "E") {
                                 rotation = " style='transform:rotate(90deg);'";
                             }
-                            document.getElementById('headquarters-player-1').innerHTML +=
-                            `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()"></div>`
+                            var full_string = `<div class="Card"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            if (damage === "0") {
+                                full_string += `</div>`
+                            } else {
+                                full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
+                            }
+                            document.getElementById('headquarters-player-1').innerHTML += full_string;
+
                         }
                     } else if (split_data[2] === "2") {
                         document.querySelector('#chat-log').value += ('Update P2 HQ\n');

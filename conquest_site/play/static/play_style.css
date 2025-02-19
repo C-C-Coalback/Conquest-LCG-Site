@@ -26,6 +26,12 @@ h4 {
     width:5vw;
 }
 
+.Damage {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 .planet {
     margin-left:3vw;
     float:left;

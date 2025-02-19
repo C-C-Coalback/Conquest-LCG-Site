@@ -61,7 +61,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
-        self.headquarters[0].exhaust_card()
+        self.headquarters[0].assign_damage(3)
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
