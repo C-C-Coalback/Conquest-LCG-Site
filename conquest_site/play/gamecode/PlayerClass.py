@@ -85,6 +85,9 @@ class Player:
             card_string = "/".join(self.cards)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
             await self.game.game_sockets[0].receive_game_update(card_string)
+        else:
+            card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player
+            await self.game.game_sockets[0].receive_game_update(card_string)
 
     async def send_hq(self):
         if self.headquarters:
@@ -138,7 +141,8 @@ class Player:
             print(joined_string)
             await self.game.game_sockets[0].receive_game_update(joined_string)
         else:
-            print("Empty")
+            joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_all_planets(self):
         for i in range(7):
