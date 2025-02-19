@@ -109,6 +109,9 @@ class Player:
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
             print(joined_string)
             await self.game.game_sockets[0].receive_game_update(joined_string)
+        else:
+            joined_string = "GAME_INFO/HQ/" + str(self.number)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_planet(self, planet_id):
         if self.cards_in_play[planet_id + 1]:
