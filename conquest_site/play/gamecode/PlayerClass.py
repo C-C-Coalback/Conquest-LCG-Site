@@ -101,9 +101,13 @@ class Player:
                     single_card_string += "R|"
                 else:
                     single_card_string += "E|"
-                single_card_string += str(current_card.get_damage())
+                card_type = current_card.get_card_type()
+                if card_type == "Warlord" or card_type == "Army" or card_type == "Token":
+                    single_card_string += str(current_card.get_damage())
+                else:
+                    single_card_string += "0"
                 single_card_string += "|"
-                if current_card.get_card_type() == "Warlord":
+                if card_type == "Warlord":
                     if current_card.get_bloodied():
                         single_card_string += "B|"
                     else:
