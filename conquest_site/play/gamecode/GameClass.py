@@ -52,6 +52,7 @@ class Game:
         self.player_with_initiative = self.name_1
         self.number_reset_combat_turn = "1"
         self.player_reset_combat_turn = self.name_1
+        self.mode = "Normal"
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -196,19 +197,40 @@ class Game:
                             self.player_with_combat_turn = self.name_1
                             self.p2.has_passed = True
                         if self.p1.has_passed and self.p2.has_passed:
-                            print("Both players passed, need to run combat round end.")
-                            self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
-                            self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
-                            self.p1.has_passed = False
-                            self.p2.has_passed = False
-                            self.reset_combat_turn()
-                            await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                            await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                            if self.mode == "Normal":
+                                print("Both players passed, need to run combat round end.")
+                                self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
+                                self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
+                                self.p1.has_passed = False
+                                self.p2.has_passed = False
+                                self.reset_combat_turn()
+                                await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                                self.mode = "RETREAT"
+                            elif self.mode == "RETREAT":
+                                self.p1.has_passed = False
+                                self.p2.has_passed = False
+                                self.reset_combat_turn()
+                                self.mode = "Normal"
             if len(game_update_string) == 4:
                 print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
                     if name == self.player_with_combat_turn:
-                        if self.attacker_position == -1:
+                        if self.mode == "RETREAT":
+                            if game_update_string[1] == self.number_with_combat_turn:
+                                chosen_planet = int(game_update_string[2])
+                                chosen_unit = int(game_update_string[3])
+                                print("Retreat unit", chosen_planet, chosen_unit)
+                                if chosen_planet == self.last_planet_checked_for_battle:
+                                    if self.number_with_combat_turn == "1":
+                                        self.p1.retreat_unit(chosen_planet, chosen_unit)
+                                        await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                        await self.p1.send_hq()
+                                    elif self.number_with_combat_turn == "2":
+                                        self.p2.retreat_unit(chosen_planet, chosen_unit)
+                                        await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                                        await self.p2.send_hq()
+                        elif self.attacker_position == -1:
                             if game_update_string[1] == self.number_with_combat_turn:
                                 chosen_planet = int(game_update_string[2])
                                 chosen_unit = int(game_update_string[3])
