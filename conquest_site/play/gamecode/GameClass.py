@@ -192,10 +192,12 @@ class Game:
                             self.number_with_combat_turn = "2"
                             self.player_with_combat_turn = self.name_2
                             self.p1.has_passed = True
+                            self.reset_combat_positions()
                         else:
                             self.number_with_combat_turn = "1"
                             self.player_with_combat_turn = self.name_1
                             self.p2.has_passed = True
+                            self.reset_combat_positions()
                         if self.p1.has_passed and self.p2.has_passed:
                             if self.mode == "Normal":
                                 print("Both players passed, need to run combat round end.")
@@ -204,9 +206,24 @@ class Game:
                                 self.p1.has_passed = False
                                 self.p2.has_passed = False
                                 self.reset_combat_turn()
-                                await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                                await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
-                                self.mode = "RETREAT"
+                                p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
+                                p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
+                                if p1_has_units and p2_has_units:
+                                    self.mode = "RETREAT"
+                                    await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                    await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                                else:
+                                    if p1_has_units:
+                                        print("Player 1 wins battle")
+                                        self.p1.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                                        await self.p1.send_hq()
+                                        await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                    if p2_has_units:
+                                        print("Player 2 wins battle")
+                                        self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                                        await self.p2.send_hq()
+                                        await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+
                             elif self.mode == "RETREAT":
                                 self.p1.has_passed = False
                                 self.p2.has_passed = False

@@ -389,6 +389,18 @@ class Player:
     def ready_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].ready_card()
 
+    def check_if_units_present(self, planet_id):
+        print("Checking for cards at:", self.cards_in_play[0][planet_id])
+        if not self.cards_in_play[planet_id + 1]:
+            print("No cards present.")
+            return 0
+        print("Cards present.")
+        return 1
+
+    def retreat_all_at_planet(self, planet_id):
+        while self.cards_in_play[planet_id + 1]:
+            self.retreat_unit(planet_id, 0)
+
 """
     def play_card(self, position, card):
         if position is None:
@@ -419,13 +431,7 @@ class Player:
 """
     
 
-    def check_if_units_present(self, planet_id):
-        print("Checking for cards at:", self.cards_in_play[0][planet_id])
-        if not self.cards_in_play[planet_id + 1]:
-            print("No cards present.")
-            return 0
-        print("Cards present.")
-        return 1
+    
 
     def get_cards_in_play(self):
         return self.cards_in_play
@@ -465,10 +471,7 @@ class Player:
                                 self.retreat_unit(planet_id, pos_unit)
                                 self.position_activated = []
 
-    def retreat_all_at_planet(self, planet_id):
-        while self.cards_in_play[planet_id + 1]:
-            self.retreat_unit(planet_id, 0)
-        self.print_cards_at_planet(planet_id + 1)
+
 
     def capture_planet(self, planet_id):
         planet_name = self.cards_in_play[0][planet_id]
