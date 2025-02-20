@@ -143,9 +143,13 @@
                         var card_name = card_data_split[0];
                         var is_ready = card_data_split[1];
                         var damage = card_data_split[2];
+                        var hale = card_data_split[3];
                         var string_id = (i-4).toString();
                         string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
                         card_name = card_name.split(' ').join('_');
+                        if (hale === "B") {
+                            card_name += "_bloodied";
+                        }
                         var route_text = "/static/images/" + card_name + ".jpg";
                         document.querySelector('#chat-log').value += (string_id + '\n');
                         var rotation = "";
@@ -169,10 +173,14 @@
                             var card_name = card_data_split[0];
                             var is_ready = card_data_split[1];
                             var damage = card_data_split[2];
+                            var hale = card_data_split[3];
                             var string_id = (i-3).toString();
                             document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/1/" + string_id;
                             card_name = card_name.split(' ').join('_');
+                            if (hale === "B") {
+                                card_name += "_bloodied";
+                            }
                             var route_text = "/static/images/" + card_name + ".jpg";
                             var rotation = "";
                             if (is_ready === "E") {
@@ -194,9 +202,13 @@
                             var card_name = card_data_split[0];
                             var is_ready = card_data_split[1];
                             var damage = card_data_split[2];
+                            var hale = card_data_split[3];
                             var string_id = (i-3).toString();
                             document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/2/" + string_id;
+                            if (hale === "B") {
+                                card_name += "_bloodied";
+                            }
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             var rotation = "";

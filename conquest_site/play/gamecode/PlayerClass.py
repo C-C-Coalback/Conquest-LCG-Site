@@ -57,6 +57,7 @@ class Player:
         self.deck_loaded = False
         self.committed_warlord = False
         self.warlord_commit_location = -1
+        self.warlord_just_got_bloodied = False
 
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)
@@ -140,6 +141,8 @@ class Player:
                         single_card_string += "B|"
                     else:
                         single_card_string += "H|"
+                else:
+                    single_card_string += "H|"
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
@@ -331,7 +334,14 @@ class Player:
         return damage_too_great
 
     def destroy_card_in_play(self, planet_num, card_pos):
-        self.add_card_in_play_to_discard(planet_num, card_pos)
+        if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
+            if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
+                self.bloody_warlord_given_pos(planet_num, card_pos)
+                self.warlord_just_got_bloodied = True
+            else:
+                self.add_card_in_play_to_discard(planet_num, card_pos)
+        else:
+            self.add_card_in_play_to_discard(planet_num, card_pos)
 
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
@@ -342,6 +352,26 @@ class Player:
         card_name = self.cards_in_play[planet_num + 1][card_pos].get_name()
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
+
+    def retreat_warlord(self):
+        for i in range(len(self.cards_in_play[0])):
+            if not self.cards_in_play[i + 1]:
+                pass
+            else:
+                j = 0
+                while j < len(self.cards_in_play[i + 1]):
+                    print("TEST", self.cards_in_play[0][i], "planet", i)
+                    print(self.cards_in_play[0])
+                    print(len(self.cards_in_play[i + 1]))
+                    if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
+                        self.retreat_unit(i, j)
+                        j = j - 1
+                    j = j + 1
+
+    def retreat_unit(self, planet_id, unit_id):
+        # print("Name of card:", self.cards_in_play[planet_id + 1][unit_id].get_name())
+        self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
+        del self.cards_in_play[planet_id + 1][unit_id]
 
 """
     def play_card(self, position, card):
@@ -371,25 +401,7 @@ class Player:
         return "FAIL" """
 
 """
-    def retreat_warlord(self):
-        for i in range(len(self.cards_in_play[0])):
-            if not self.cards_in_play[i + 1]:
-                pass
-            else:
-                j = 0
-                while j < len(self.cards_in_play[i + 1]):
-                    print("TEST", self.cards_in_play[0][i], "planet", i)
-                    print(self.cards_in_play[0])
-                    print(len(self.cards_in_play[i + 1]))
-                    if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
-                        self.retreat_unit(i, j)
-                        j = j - 1
-                    j = j + 1
-
-    def retreat_unit(self, planet_id, unit_id):
-        # print("Name of card:", self.cards_in_play[planet_id + 1][unit_id].get_name())
-        self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
-        del self.cards_in_play[planet_id + 1][unit_id]
+    
 
     def check_if_units_present(self, planet_id):
         print("Checking for cards at:", self.cards_in_play[0][planet_id])
