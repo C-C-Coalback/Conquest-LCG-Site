@@ -313,6 +313,23 @@ class Player:
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
 
+    def get_attack_given_pos(self, planet_id, unit_id):
+        attack_value = self.cards_in_play[planet_id + 1][unit_id].get_attack()
+        # if self.search_card_at_planet("Nazdreg", planet_id) != -1:
+        #     if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
+        #         self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
+        # if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Goff Boyz":
+        #     attack_value = attack_value + 3
+        if self.cards_in_play[planet_id + 1][unit_id].get_brutal():
+            attack_value = attack_value + self.cards_in_play[planet_id + 1][unit_id].get_damage()
+        self.cards_in_play[planet_id + 1][unit_id].reset_brutal()
+        attack_value += self.cards_in_play[planet_id + 1][unit_id].get_extra_attack_until_end_of_battle()
+        return attack_value
+
+    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
+        damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
+        return damage_too_great
+
 """
     def play_card(self, position, card):
         if position is None:
@@ -372,22 +389,9 @@ class Player:
     def get_cards_in_play(self):
         return self.cards_in_play
 
-    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
-        damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
-        return damage_too_great
 
-    def get_attack_given_pos(self, planet_id, unit_id):
-        attack_value = self.cards_in_play[planet_id + 1][unit_id].get_attack()
-        # if self.search_card_at_planet("Nazdreg", planet_id) != -1:
-        #     if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
-        #         self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
-        # if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Goff Boyz":
-        #     attack_value = attack_value + 3
-        if self.cards_in_play[planet_id + 1][unit_id].get_brutal():
-            attack_value = attack_value + self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        self.cards_in_play[planet_id + 1][unit_id].reset_brutal()
-        attack_value += self.cards_in_play[planet_id + 1][unit_id].get_extra_attack_until_end_of_battle()
-        return attack_value
+
+    
 
     def ready_all_in_headquarters(self):
         for i in range(len(self.headquarters)):

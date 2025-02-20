@@ -203,13 +203,31 @@ class Game:
                                     self.attacker_planet = chosen_planet
                                     self.attacker_position = chosen_unit
                                     print("Attacker:", self.attacker_planet, self.attacker_position)
-                                    self.p1.exhaust_given_pos(self.attacker_planet, self.attacker_position)
-                                    await self.p1.send_units_at_planet(chosen_planet)
+                                    if self.number_with_combat_turn == "1":
+                                        self.p1.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                                        await self.p1.send_units_at_planet(chosen_planet)
+                                    elif self.number_with_combat_turn == "2":
+                                        self.p2.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                                        await self.p2.send_units_at_planet(chosen_planet)
                         elif self.defender_position == -1:
                             if game_update_string[1] != self.number_with_combat_turn:
                                 self.defender_planet = int(game_update_string[2])
                                 self.defender_position = int(game_update_string[3])
                                 print("Defender:", self.defender_planet, self.defender_position)
+                                if self.number_with_combat_turn == "1":
+                                    attack_value = self.p1.get_attack_given_pos(self.attacker_planet,
+                                                                                self.attacker_position)
+                                    unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
+                                                                             self.defender_position,
+                                                                             damage=attack_value, can_shield=False)
+                                    await self.p2.send_units_at_planet(self.defender_planet)
+                                elif self.number_with_combat_turn == "2":
+                                    attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
+                                                                                self.attacker_position)
+                                    unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
+                                                                             self.defender_position,
+                                                                             damage=attack_value, can_shield=False)
+                                    await self.p1.send_units_at_planet(self.defender_planet)
 
     def resolve_command_struggle(self):
         storage_command_struggle = [None, None, None, None, None, None, None]
