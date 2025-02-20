@@ -373,6 +373,22 @@ class Player:
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         del self.cards_in_play[planet_id + 1][unit_id]
 
+    def ready_all_in_headquarters(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].ready_card()
+
+    def ready_all_in_play(self):
+        for i in range(len(self.cards_in_play[0])):
+            self.ready_all_at_planet(i)
+        self.ready_all_in_headquarters()
+
+    def ready_all_at_planet(self, planet_id):
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            self.ready_given_pos(planet_id, i)
+
+    def ready_given_pos(self, planet_id, unit_id):
+        self.cards_in_play[planet_id + 1][unit_id].ready_card()
+
 """
     def play_card(self, position, card):
         if position is None:
@@ -418,21 +434,7 @@ class Player:
 
     
 
-    def ready_all_in_headquarters(self):
-        for i in range(len(self.headquarters)):
-            self.headquarters[i].ready_card()
-
-    def ready_all_in_play(self):
-        for i in range(len(self.cards_in_play[0])):
-            self.ready_all_at_planet(i)
-        self.ready_all_in_headquarters()
-
-    def ready_all_at_planet(self, planet_id):
-        for i in range(len(self.cards_in_play[planet_id + 1])):
-            self.ready_given_pos(planet_id, i)
-
-    def ready_given_pos(self, planet_id, unit_id):
-        self.cards_in_play[planet_id + 1][unit_id].ready_card()
+    
 
     def retreat_combat_window(self, planet_id):
         self.position_activated = []

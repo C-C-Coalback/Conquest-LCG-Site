@@ -46,6 +46,10 @@ class Game:
         self.attacker_position = -1
         self.defender_planet = -1
         self.defender_position = -1
+        self.p1_has_warlord = False
+        self.p2_has_warlord = False
+        self.number_with_initiative = "1"
+        self.player_with_initiative = self.name_1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -174,6 +178,17 @@ class Game:
                         self.phase = "COMBAT"
                         self.check_battle(self.round_number)
                         self.last_planet_checked_for_battle = self.round_number
+                        self.p1_has_warlord = self.p1.check_for_warlord(self.last_planet_checked_for_battle)
+                        self.p2_has_warlord = self.p2.check_for_warlord(self.last_planet_checked_for_battle)
+                        if self.p1_has_warlord == self.p2_has_warlord:
+                            self.number_with_combat_turn = self.number_with_initiative
+                            self.player_with_combat_turn = self.player_with_initiative
+                        elif self.p1_has_warlord:
+                            self.number_with_combat_turn = "1"
+                            self.player_with_combat_turn = self.name_1
+                        elif self.p2_has_warlord:
+                            self.number_with_combat_turn = "2"
+                            self.player_with_combat_turn = self.name_2
                         self.p1.has_passed = False
                         self.p2.has_passed = False
         elif self.phase == "COMBAT":
@@ -190,6 +205,10 @@ class Game:
                             self.p2.has_passed = True
                         if self.p1.has_passed and self.p2.has_passed:
                             print("Both players passed, need to run combat round end.")
+                            self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
+                            self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
+                            self.p1.has_passed = False
+                            self.p2.has_passed = False
             if len(game_update_string) == 4:
                 print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
