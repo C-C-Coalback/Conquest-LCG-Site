@@ -174,7 +174,22 @@ class Game:
                         self.phase = "COMBAT"
                         self.check_battle(self.round_number)
                         self.last_planet_checked_for_battle = self.round_number
+                        self.p1.has_passed = False
+                        self.p2.has_passed = False
         elif self.phase == "COMBAT":
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    if name == self.player_with_combat_turn:
+                        if self.number_with_combat_turn == "1":
+                            self.number_with_combat_turn = "2"
+                            self.player_with_combat_turn = self.name_2
+                            self.p1.has_passed = True
+                        else:
+                            self.number_with_combat_turn = "1"
+                            self.player_with_combat_turn = self.name_1
+                            self.p2.has_passed = True
+                        if self.p1.has_passed and self.p2.has_passed:
+                            print("Both players passed, need to run combat round end.")
             if len(game_update_string) == 4:
                 print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
@@ -226,6 +241,7 @@ class Game:
                                     self.player_with_combat_turn = self.name_2
                                     await self.p2.send_units_at_planet(self.defender_planet)
                                     self.reset_combat_positions()
+                                    self.p1.has_passed = False
                                 elif self.number_with_combat_turn == "2":
                                     attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
@@ -238,6 +254,7 @@ class Game:
                                     self.player_with_combat_turn = self.name_1
                                     await self.p1.send_units_at_planet(self.defender_planet)
                                     self.reset_combat_positions()
+                                    self.p2.has_passed = False
 
     def reset_combat_positions(self):
         self.defender_position = -1
