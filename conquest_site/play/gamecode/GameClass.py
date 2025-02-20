@@ -55,6 +55,8 @@ class Game:
         await self.send_planet_array()
         await self.p1.send_units_at_all_planets()
         await self.p2.send_units_at_all_planets()
+        await self.p1.send_resources()
+        await self.p2.send_resources()
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
@@ -202,6 +204,7 @@ class Game:
                                     self.attacker_position = chosen_unit
                                     print("Attacker:", self.attacker_planet, self.attacker_position)
                                     self.p1.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                                    await self.p1.send_units_at_planet(chosen_planet)
                         elif self.defender_position == -1:
                             if game_update_string[1] != self.number_with_combat_turn:
                                 self.defender_planet = int(game_update_string[2])
