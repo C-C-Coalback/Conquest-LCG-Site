@@ -218,11 +218,21 @@ class Game:
                                         self.p1.retreat_all_at_planet(self.last_planet_checked_for_battle)
                                         await self.p1.send_hq()
                                         await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                        if self.round_number == self.last_planet_checked_for_battle:
+                                            self.p1.capture_planet(self.last_planet_checked_for_battle,
+                                                                   self.planet_cards_array)
+                                            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                                            await self.send_planet_array()
                                     if p2_has_units:
                                         print("Player 2 wins battle")
                                         self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
                                         await self.p2.send_hq()
                                         await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                                        if self.round_number == self.last_planet_checked_for_battle:
+                                            self.p2.capture_planet(self.last_planet_checked_for_battle,
+                                                                   self.planet_cards_array)
+                                            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                                            await self.send_planet_array()
 
                             elif self.mode == "RETREAT":
                                 self.p1.has_passed = False

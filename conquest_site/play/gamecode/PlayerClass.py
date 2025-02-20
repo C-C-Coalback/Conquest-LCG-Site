@@ -401,6 +401,42 @@ class Player:
         while self.cards_in_play[planet_id + 1]:
             self.retreat_unit(planet_id, 0)
 
+    def capture_planet(self, planet_id, planet_cards):
+        planet_name = self.cards_in_play[0][planet_id]
+        print("Attempting to capture planet.")
+        print("Planet to capture:", planet_name)
+        i = 0
+        for letter in planet_name:
+            if letter == "_":
+                planet_name = planet_name.replace(letter, " ")
+        while planet_cards[i].get_name() != "FINAL CARD":
+            print(planet_cards[i].get_name(), planet_name)
+            if planet_cards[i].get_name() == planet_name:
+                self.victory_display.append(planet_cards[i])
+                self.print_victory_display()
+                self.print_icons_on_captured()
+                return 0
+            else:
+                i += 1
+        return -1
+
+    def print_victory_display(self):
+        print("Cards in victory display:")
+        for i in range(len(self.victory_display)):
+            print(self.victory_display[i].get_name())
+
+    def print_icons_on_captured(self):
+        total_icons = [0, 0, 0]
+        for i in range(len(self.victory_display)):
+            if self.victory_display[i].get_red():
+                total_icons[0] += 1
+            if self.victory_display[i].get_blue():
+                total_icons[1] += 1
+            if self.victory_display[i].get_green():
+                total_icons[2] += 1
+        print("Total Icons:", total_icons)
+
+
 """
     def play_card(self, position, card):
         if position is None:
@@ -435,12 +471,6 @@ class Player:
 
     def get_cards_in_play(self):
         return self.cards_in_play
-
-
-
-    
-
-    
 
     def retreat_combat_window(self, planet_id):
         self.position_activated = []
@@ -492,22 +522,6 @@ class Player:
             else:
                 i += 1
         return -1
-
-    def print_victory_display(self):
-        print("Cards in victory display:")
-        for i in range(len(self.victory_display)):
-            print(self.victory_display[i].get_name())
-
-    def print_icons_on_captured(self):
-        total_icons = [0, 0, 0]
-        for i in range(len(self.victory_display)):
-            if self.victory_display[i].get_red():
-                total_icons[0] += 1
-            if self.victory_display[i].get_blue():
-                total_icons[1] += 1
-            if self.victory_display[i].get_green():
-                total_icons[2] += 1
-        print("Total Icons:", total_icons)
 
     def take_deploy_turn(self):
         self.position_activated = []
