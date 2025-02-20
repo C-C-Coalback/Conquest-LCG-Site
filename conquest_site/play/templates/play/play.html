@@ -142,6 +142,7 @@
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var is_ready = card_data_split[1];
+                        var damage = card_data_split[2];
                         var string_id = (i-4).toString();
                         string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
                         card_name = card_name.split(' ').join('_');
@@ -151,8 +152,13 @@
                         if (is_ready === "E") {
                             rotation = " style='transform:rotate(90deg);'";
                         }
-                        document.getElementById(target_planet_id).innerHTML +=
-                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        var full_string = `<div class="Card"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        if (damage === "0") {
+                            full_string += `</div>`
+                        } else {
+                            full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
+                        }
+                        document.getElementById(target_planet_id).innerHTML += full_string;
                     }
 
                 } else if (split_data[1] === "HQ") {

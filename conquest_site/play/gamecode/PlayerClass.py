@@ -133,7 +133,7 @@ class Player:
                     single_card_string += "R|"
                 else:
                     single_card_string += "E|"
-                single_card_string += str(0)
+                single_card_string += str(current_card.get_damage())
                 single_card_string += "|"
                 if current_card.get_card_type() == "Warlord":
                     if current_card.get_bloodied():
