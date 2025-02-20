@@ -330,6 +330,19 @@ class Player:
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         return damage_too_great
 
+    def destroy_card_in_play(self, planet_num, card_pos):
+        self.add_card_in_play_to_discard(planet_num, card_pos)
+
+    def remove_card_from_play(self, planet_num, card_pos):
+        # card_object = self.cards_in_play[planet_num + 1][card_pos]
+        # self.discard_object(card_object)
+        del self.cards_in_play[planet_num + 1][card_pos]
+
+    def add_card_in_play_to_discard(self, planet_num, card_pos):
+        card_name = self.cards_in_play[planet_num + 1][card_pos].get_name()
+        self.discard.append(card_name)
+        self.remove_card_from_play(planet_num, card_pos)
+
 """
     def play_card(self, position, card):
         if position is None:
@@ -576,15 +589,7 @@ class Player:
                 command += self.cards_in_play[planet_id][i].get_command()
         return command
 
-    def remove_card_from_play(self, planet_num, card_pos):
-        # card_object = self.cards_in_play[planet_num + 1][card_pos]
-        # self.discard_object(card_object)
-        del self.cards_in_play[planet_num + 1][card_pos]
-
-    def add_card_in_play_to_discard(self, planet_num, card_pos):
-        card_name = self.cards_in_play[planet_num + 1][card_pos].get_name()
-        self.discard.append(card_name)
-        self.remove_card_from_play(planet_num, card_pos)
+    
 
     def get_planet_name_given_position(self, planet_id):
         return self.cards_in_play[0][planet_id]

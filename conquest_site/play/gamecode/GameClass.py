@@ -220,6 +220,8 @@ class Game:
                                     unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
                                                                              self.defender_position,
                                                                              damage=attack_value, can_shield=False)
+                                    if unit_dead:
+                                        self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
                                     self.number_with_combat_turn = "2"
                                     self.player_with_combat_turn = self.name_2
                                     await self.p2.send_units_at_planet(self.defender_planet)
@@ -230,6 +232,8 @@ class Game:
                                     unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
                                                                              self.defender_position,
                                                                              damage=attack_value, can_shield=False)
+                                    if unit_dead:
+                                        self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
                                     self.number_with_combat_turn = "1"
                                     self.player_with_combat_turn = self.name_1
                                     await self.p1.send_units_at_planet(self.defender_planet)
