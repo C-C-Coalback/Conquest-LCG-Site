@@ -50,6 +50,8 @@ class Game:
         self.p2_has_warlord = False
         self.number_with_initiative = "1"
         self.player_with_initiative = self.name_1
+        self.number_reset_combat_turn = "1"
+        self.player_reset_combat_turn = self.name_1
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
@@ -178,17 +180,7 @@ class Game:
                         self.phase = "COMBAT"
                         self.check_battle(self.round_number)
                         self.last_planet_checked_for_battle = self.round_number
-                        self.p1_has_warlord = self.p1.check_for_warlord(self.last_planet_checked_for_battle)
-                        self.p2_has_warlord = self.p2.check_for_warlord(self.last_planet_checked_for_battle)
-                        if self.p1_has_warlord == self.p2_has_warlord:
-                            self.number_with_combat_turn = self.number_with_initiative
-                            self.player_with_combat_turn = self.player_with_initiative
-                        elif self.p1_has_warlord:
-                            self.number_with_combat_turn = "1"
-                            self.player_with_combat_turn = self.name_1
-                        elif self.p2_has_warlord:
-                            self.number_with_combat_turn = "2"
-                            self.player_with_combat_turn = self.name_2
+                        self.set_battle_initiative()
                         self.p1.has_passed = False
                         self.p2.has_passed = False
         elif self.phase == "COMBAT":
@@ -209,6 +201,9 @@ class Game:
                             self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
                             self.p1.has_passed = False
                             self.p2.has_passed = False
+                            self.reset_combat_turn()
+                            await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                            await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
             if len(game_update_string) == 4:
                 print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
@@ -286,6 +281,29 @@ class Game:
         self.defender_planet = -1
         self.attacker_position = -1
         self.attacker_planet = -1
+
+    def reset_combat_turn(self):
+        self.player_with_combat_turn = self.player_reset_combat_turn
+        self.number_with_combat_turn = self.number_reset_combat_turn
+
+    def set_battle_initiative(self):
+        self.p1_has_warlord = self.p1.check_for_warlord(self.last_planet_checked_for_battle)
+        self.p2_has_warlord = self.p2.check_for_warlord(self.last_planet_checked_for_battle)
+        if self.p1_has_warlord == self.p2_has_warlord:
+            self.number_with_combat_turn = self.number_with_initiative
+            self.player_with_combat_turn = self.player_with_initiative
+            self.number_reset_combat_turn = self.number_with_combat_turn
+            self.player_reset_combat_turn = self.player_with_combat_turn
+        elif self.p1_has_warlord:
+            self.number_with_combat_turn = "1"
+            self.player_with_combat_turn = self.name_1
+            self.number_reset_combat_turn = self.number_with_combat_turn
+            self.player_reset_combat_turn = self.player_with_combat_turn
+        elif self.p2_has_warlord:
+            self.number_with_combat_turn = "2"
+            self.player_with_combat_turn = self.name_2
+            self.number_reset_combat_turn = self.number_with_combat_turn
+            self.player_reset_combat_turn = self.player_with_combat_turn
 
     def resolve_command_struggle(self):
         storage_command_struggle = [None, None, None, None, None, None, None]
