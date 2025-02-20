@@ -19,6 +19,11 @@ h4 {
     width:15vw;
 }
 
+.Card-div {
+    position: relative;
+    height:8vh;
+    width:5vw;
+}
 
 .Card {
     position: relative;
@@ -75,8 +80,12 @@ h4 {
     float:left;
     width: 10vw;
     max-width:10vw;
+    max-height: 8vh;
     overflow-x:scroll;
+    overflow-y:hidden;
     white-space:nowrap;
+    display:flex;
+    flex-direction:row;
     pointer-events: auto;
 }
 
@@ -85,8 +94,12 @@ h4 {
     float:left;
     width: 10vw;
     max-width:10vw;
+    max-height: 8vh;
     overflow-x:scroll;
+    overflow-y:hidden;
     white-space:nowrap;
+    display:flex;
+    flex-direction:row;
     pointer-events: auto;
 }
 
