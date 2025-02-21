@@ -21,18 +21,18 @@ h4 {
 
 #victory-display-player-1 {
     position: absolute;
-    top: 0%;
+    top: 4vh;
     right: 15vw;
-    height: 15vh;
+    height: 10vh;
     width: 10vw;
     border: 5px solid yellow;
 }
 
 #victory-display-player-2 {
     position: absolute;
-    bottom: 0%;
+    bottom: 0vh;
     right: 15vw;
-    height: 15vh;
+    height: 10vh;
     width: 10vw;
     border: 5px solid yellow;
 }
@@ -61,6 +61,24 @@ h4 {
     pointer-events: auto;
     height: 10vh;
     width: 10vw;
+}
+
+.planet-in-victory-display-1 {
+    position:relative;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+    margin: -4vh;
+    float: down;
+}
+
+.planet-in-victory-display-2 {
+    position:relative;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+    margin: -4vh;
+    float: down;
 }
 
 #player-1-cards-in-play {
