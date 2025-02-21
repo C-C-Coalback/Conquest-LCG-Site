@@ -19,6 +19,24 @@ h4 {
     width:15vw;
 }
 
+#victory-display-player-1 {
+    position: absolute;
+    top: 0%;
+    right: 15vw;
+    height: 15vh;
+    width: 10vw;
+    border: 5px solid yellow;
+}
+
+#victory-display-player-2 {
+    position: absolute;
+    bottom: 0%;
+    right: 15vw;
+    height: 15vh;
+    width: 10vw;
+    border: 5px solid yellow;
+}
+
 .Card-div {
     position: relative;
     height:8vh;
