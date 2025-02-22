@@ -208,14 +208,14 @@ class Game:
                                 self.reset_combat_turn()
                                 await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
                                 await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
-                                await self.check_combat_end()
                                 self.mode = "RETREAT"
+                                await self.check_combat_end()
                             elif self.mode == "RETREAT":
                                 self.p1.has_passed = False
                                 self.p2.has_passed = False
                                 self.reset_combat_turn()
-                                await self.check_combat_end()
                                 self.mode = "Normal"
+                                await self.check_combat_end()
             if len(game_update_string) == 4:
                 print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
@@ -316,10 +316,10 @@ class Game:
         else:
             if p1_has_units:
                 print("Player 1 wins battle")
-                self.p1.retreat_all_at_planet(self.last_planet_checked_for_battle)
-                await self.p1.send_hq()
-                await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
                 if self.round_number == self.last_planet_checked_for_battle:
+                    self.p1.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                    await self.p1.send_hq()
+                    await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
                     self.p1.capture_planet(self.last_planet_checked_for_battle,
                                            self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
@@ -327,10 +327,10 @@ class Game:
                     await self.p1.send_victory_display()
             if p2_has_units:
                 print("Player 2 wins battle")
-                self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
-                await self.p2.send_hq()
-                await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
                 if self.round_number == self.last_planet_checked_for_battle:
+                    self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                    await self.p2.send_hq()
+                    await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
                     self.p2.capture_planet(self.last_planet_checked_for_battle,
                                            self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
@@ -340,6 +340,24 @@ class Game:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                     await self.send_planet_array()
+            another_battle = self.find_next_planet_for_combat()
+            if another_battle:
+                self.set_battle_initiative()
+                self.p1.has_passed = False
+                self.p2.has_passed = False
+                self.mode = "Normal"
+
+    def find_next_planet_for_combat(self):
+        i = self.last_planet_checked_for_battle + 1
+        while i < len(self.planet_array):
+            if self.planets_in_play_array[i]:
+                p1_has_warlord = self.p1.check_for_warlord(i)
+                p2_has_warlord = self.p2.check_for_warlord(i)
+                if p1_has_warlord or p2_has_warlord:
+                    self.last_planet_checked_for_battle = i
+                    return True
+            i = i + 1
+        return False
 
     def reset_combat_turn(self):
         self.player_with_combat_turn = self.player_reset_combat_turn
