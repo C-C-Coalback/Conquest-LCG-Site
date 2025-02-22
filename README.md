@@ -3,6 +3,16 @@ Repo for the Warhammer 40k Conquest website using Python Django
 
 Needs a bunch of explaining that I am not willing to do rn.
 
+#NEWS FLASH: V0.9!
+
+(Will be V1.0.0 when multithreading is fully working)
+
+Unlike the PS5, we have games!
+
+That was a lot of work. Got delayed a lot since I was busy with uni.
+
+Going to try to get an actual website up and running.
+
 # What is this?
 
 Warhammer 40k Conquest card game. Something something board game geek, see my other repos.
@@ -11,12 +21,16 @@ Warhammer 40k Conquest card game. Something something board game geek, see my ot
 
 Currently we have: async chat rooms; login/logout; deck-building; async lobbies. Only thing really left to do is the actual game.
 
-Current game progress: displays hqs, hands (hidden to all but correct player), in play, planets. Not displaying resources.
-Cards can be clicked on, with unique ids so server can tell what was clicked on, decks can be loaded.
-Chat rooms present. Going to handle code for the game now; have to rewrite
-the entire code from the previous pygame version, since I don't know how
-to correctly wait for an input using multithreading that wouldn't either
-blow up my pc from the workload, or introduce unneeded lag.
+Current game progress: Everything, except:
+
+- shielding
+- card text (brutal is already working though)
+- action windows
+- a victory/loss screen
+- some targeting follicles so that players can see what planets/units are being targeted
+- proper god damn multithreading
+- ???
+- and more!
 
 # Dependencies?
 
