@@ -346,6 +346,65 @@ class Game:
                 self.p1.has_passed = False
                 self.p2.has_passed = False
                 self.mode = "Normal"
+            else:
+                self.phase = "HEADQUARTERS"
+                self.automated_headquarters_phase()
+                self.reset_values_for_new_round()
+                await self.p1.send_hq()
+                await self.p1.send_units_at_all_planets()
+                await self.p1.send_resources()
+                await self.p1.send_hand()
+                await self.p2.send_hq()
+                await self.p2.send_units_at_all_planets()
+                await self.p2.send_resources()
+                await self.p2.send_hand()
+                await self.send_planet_array()
+
+    def reset_values_for_new_round(self):
+        self.p1.has_passed = False
+        self.p2.has_passed = False
+        self.mode = "Normal"
+        self.p1.committed_warlord = False
+        self.p2.committed_warlord = False
+        if self.player_with_initiative == self.name_1:
+            self.player_with_deploy_turn = self.name_1
+            self.number_with_deploy_turn = "1"
+            self.player_with_combat_turn = self.name_1
+            self.number_with_combat_turn = "1"
+        else:
+            self.player_with_deploy_turn = self.name_2
+            self.number_with_deploy_turn = "2"
+            self.player_with_combat_turn = self.name_2
+            self.number_with_combat_turn = "2"
+
+
+
+    def automated_headquarters_phase(self):
+        self.p1.add_resources(4)
+        self.p2.add_resources(4)
+        self.p1.draw_card()
+        self.p1.draw_card()
+        self.p2.draw_card()
+        self.p2.draw_card()
+        self.p1.retreat_warlord()
+        self.p2.retreat_warlord()
+        self.p1.ready_all_in_play()
+        self.p2.ready_all_in_play()
+        if self.round_number == 0:
+            self.planets_in_play_array[5] = True
+        elif self.round_number == 1:
+            self.planets_in_play_array[6] = True
+        self.round_number += 1
+        self.phase = "DEPLOY"
+        self.swap_initiative()
+
+    def swap_initiative(self):
+        if self.player_with_initiative == self.name_1:
+            self.player_with_initiative = self.name_2
+            self.number_with_initiative = "2"
+        else:
+            self.player_with_initiative = self.name_1
+            self.number_with_initiative = "1"
 
     def find_next_planet_for_combat(self):
         i = self.last_planet_checked_for_battle + 1
