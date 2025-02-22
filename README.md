@@ -3,7 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django
 
 Needs a bunch of explaining that I am not willing to do rn.
 
-#NEWS FLASH: V0.9!
+# NEWS FLASH: V0.9!
 
 (Will be V1.0.0 when multithreading is fully working)
 
