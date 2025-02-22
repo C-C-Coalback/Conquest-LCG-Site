@@ -235,6 +235,11 @@ class Game:
                                             self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                                             await self.send_planet_array()
                                             await self.p2.send_victory_display()
+                                    if not p1_has_units and not p2_has_units:
+                                        if self.round_number == self.last_planet_checked_for_battle:
+                                            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                                            await self.send_planet_array()
+
                             elif self.mode == "RETREAT":
                                 self.p1.has_passed = False
                                 self.p2.has_passed = False
