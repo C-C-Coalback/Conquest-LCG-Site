@@ -223,6 +223,7 @@ class Game:
                                                                    self.planet_cards_array)
                                             self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                                             await self.send_planet_array()
+                                            await self.p1.send_victory_display()
                                     if p2_has_units:
                                         print("Player 2 wins battle")
                                         self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
@@ -233,7 +234,7 @@ class Game:
                                                                    self.planet_cards_array)
                                             self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                                             await self.send_planet_array()
-
+                                            await self.p2.send_victory_display()
                             elif self.mode == "RETREAT":
                                 self.p1.has_passed = False
                                 self.p2.has_passed = False

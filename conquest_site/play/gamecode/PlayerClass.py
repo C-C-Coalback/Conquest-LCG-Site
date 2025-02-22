@@ -160,6 +160,19 @@ class Player:
         joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
         await self.game.game_sockets[0].receive_game_update(joined_string)
 
+    async def send_victory_display(self):
+        if self.victory_display:
+            card_strings = []
+            for i in range(len(self.victory_display)):
+                card_strings.append(self.victory_display[i].get_name())
+            joined_string = "/".join(card_strings)
+            joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number) + "/" + joined_string
+            print(joined_string)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
+        else:
+            joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
+
     def get_headquarters(self):
         return self.headquarters
 

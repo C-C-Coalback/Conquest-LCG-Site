@@ -50,15 +50,10 @@
         <p>Amogus</p>
     </div>
     <div id="victory-display-player-1">
-        <input type="image" src="/static/images/PlanetImages/Barlus.jpg" alt="/static/images/PlanetImages/Barlus.jpg" id="victory-display-player-1-planet-0" onclick="testImageButton(this.id);" class="planet-in-victory-display-1"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
-        <input type="image" src="/static/images/PlanetImages/Ferrin.jpg" alt="/static/images/PlanetImages/Ferrin.jpg" id="victory-display-player-1-planet-1" onclick="testImageButton(this.id);" class="planet-in-victory-display-1"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
+        <p></p>
     </div>
     <div id="victory-display-player-2">
-        <input type="image" src="/static/images/PlanetImages/Barlus.jpg" alt="/static/images/PlanetImages/Barlus.jpg" id="victory-display-player-2-planet-0" onclick="testImageButton(this.id);" class="planet-in-victory-display-2"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
-        <input type="image" src="/static/images/PlanetImages/Ferrin.jpg" alt="/static/images/PlanetImages/Ferrin.jpg" id="victory-display-player-2-planet-1" onclick="testImageButton(this.id);" class="planet-in-victory-display-2"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
-        <input type="image" src="/static/images/PlanetImages/Ferrin.jpg" alt="/static/images/PlanetImages/Ferrin.jpg" id="victory-display-player-2-planet-2" onclick="testImageButton(this.id);" class="planet-in-victory-display-2"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
-        <input type="image" src="/static/images/PlanetImages/Ferrin.jpg" alt="/static/images/PlanetImages/Ferrin.jpg" id="victory-display-player-2-planet-3" onclick="testImageButton(this.id);" class="planet-in-victory-display-2"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
-        <input type="image" src="/static/images/PlanetImages/Ferrin.jpg" alt="/static/images/PlanetImages/Ferrin.jpg" id="victory-display-player-2-planet-4" onclick="testImageButton(this.id);" class="planet-in-victory-display-2"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">
+        <p></p>
     </div>
     <div id="player-1-cards-in-play">
         <div id="player-1-cards-planet-0" class="player-1-in-play">
@@ -138,6 +133,23 @@
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         document.getElementById('planets-in-play').innerHTML +=
                         `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                    }
+                } else if (split_data[1] === "VICTORY_DISPLAY") {
+                    var target_victory_display_id = "victory-display-player-" + split_data[2];
+                    document.getElementById(target_victory_display_id).innerHTML = ``;
+                    document.querySelector('#chat-log').value += ('Update victory display\ntest\ntest\n');
+                    for (var i = 3; i < split_data.length; i++) {
+                        var card_name = split_data[i];
+                        var string_id = (i-3).toString();
+                        string_id = "VICTORY_DISPLAY/" + split_data[2] + "/" + string_id;
+                        card_name = card_name.split(' ').join('_');
+                        var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
+                        var display_class = "planet-in-victory-display-" + split_data[2];
+                        document.querySelector('#chat-log').value += ('Before creating the string');
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class=` + display_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                        document.querySelector('#chat-log').value += ('Before adding the string');
+                        document.getElementById(target_victory_display_id).innerHTML += full_string;
+                        document.querySelector('#chat-log').value += ('After adding the string');
                     }
                 } else if (split_data[1] === "RESOURCES") {
                     if (split_data[2] === "1") {
