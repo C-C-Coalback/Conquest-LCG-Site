@@ -23,6 +23,7 @@ class Card:
         self.has_action_while_in_play = action_in_play
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
+        self.aiming_reticle_color = None
 
     def get_name(self):
         return self.name

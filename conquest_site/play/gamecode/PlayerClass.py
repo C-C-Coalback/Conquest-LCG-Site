@@ -61,6 +61,8 @@ class Player:
         self.warlord_just_got_bloodied = False
         self.condition_player_main = threading.Condition()
         self.condition_player_sub = threading.Condition()
+        self.aiming_reticle_color = None
+        self.aiming_reticle_coords_hand = None
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -90,7 +92,14 @@ class Player:
 
     async def send_hand(self):
         if self.cards:
-            card_string = "/".join(self.cards)
+            card_array = self.cards.copy()
+            if self.aiming_reticle_color is None:
+                pass
+            else:
+                for i in range(len(card_array)):
+                    if self.aiming_reticle_coords_hand == i:
+                        card_array[i] = card_array[i] + "|" + self.aiming_reticle_color
+            card_string = "/".join(card_array)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
             await self.game.game_sockets[0].receive_game_update(card_string)
         else:

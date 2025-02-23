@@ -121,6 +121,10 @@ class Game:
                                     if not self.p2.has_passed:
                                         self.player_with_deploy_turn = self.name_2
                                         self.number_with_deploy_turn = "2"
+                                else:
+                                    self.p1.aiming_reticle_color = "blue"
+                                    self.p1.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                    await self.p1.send_hand()
                             elif self.number_with_deploy_turn == "2":
                                 played_support = self.p2.play_card_if_support(self.card_pos_to_deploy)
                                 if played_support == "SUCCESS/Support":
@@ -130,6 +134,10 @@ class Game:
                                     if not self.p1.has_passed:
                                         self.player_with_deploy_turn = self.name_1
                                         self.number_with_deploy_turn = "1"
+                                else:
+                                    self.p2.aiming_reticle_color = "blue"
+                                    self.p2.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                    await self.p2.send_hand()
 
             elif len(game_update_string) == 2:
                 if name == self.player_with_deploy_turn:
@@ -143,10 +151,13 @@ class Game:
                                 await self.p1.send_hand()
                                 await self.p1.send_units_at_planet(int(game_update_string[1]))
                                 await self.p1.send_resources()
-                                self.card_pos_to_deploy = -1
                                 if not self.p2.has_passed:
                                     self.player_with_deploy_turn = self.name_2
                                     self.number_with_deploy_turn = "2"
+                            self.card_pos_to_deploy = -1
+                            self.p1.aiming_reticle_color = None
+                            self.p1.aiming_reticle_coords_hand = None
+                            await self.p1.send_hand()
                         if self.number_with_deploy_turn == "2":
                             print("P2 plays card")
                             played_card = self.p2.play_card(int(game_update_string[1]),
@@ -155,10 +166,13 @@ class Game:
                                 await self.p2.send_hand()
                                 await self.p2.send_units_at_planet(int(game_update_string[1]))
                                 await self.p2.send_resources()
-                                self.card_pos_to_deploy = -1
                                 if not self.p1.has_passed:
                                     self.player_with_deploy_turn = self.name_1
                                     self.number_with_deploy_turn = "1"
+                            self.card_pos_to_deploy = -1
+                            self.p2.aiming_reticle_color = None
+                            self.p2.aiming_reticle_coords_hand = None
+                            await self.p2.send_hand()
         elif self.phase == "COMMAND":
             print("Run warlord assignment code.")
             if len(game_update_string) == 2:

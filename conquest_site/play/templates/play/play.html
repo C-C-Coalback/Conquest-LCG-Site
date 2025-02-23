@@ -121,7 +121,6 @@
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
-                document.querySelector('#chat-log').value += ('received some data from server\n');
                 if (split_data[1] === "PLANETS") {
                     document.getElementById('planets-in-play').innerHTML = ``
                     for (var i = 2; i < split_data.length; i++) {
@@ -263,13 +262,21 @@
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
                                 document.querySelector('#chat-log').value += (split_data[i] + '\n');
-                                var card_name = split_data[i];
+                                document.querySelector('#chat-log').value += ('Testing new Hand1\n');
+                                var card_data_split = split_data[i].split("|");
+                                var card_name = card_data_split[0];
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
-                                document.getElementById('current-hand-player-1').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                                if (card_data_split.length === 1) {
+                                    full_string += `</div>`
+                                } else {
+                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
+                                }
+                                document.querySelector('#chat-log').value += ('Testing new Hand4\n');
+                                document.getElementById('current-hand-player-1').innerHTML += full_string;
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
@@ -286,13 +293,19 @@
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
                                 document.querySelector('#chat-log').value += (split_data[i] + '\n');
-                                var card_name = split_data[i];
+                                var card_data_split = split_data[i].split("|");
+                                var card_name = card_data_split[0];
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/" + card_name + ".jpg";
-                                document.getElementById('current-hand-player-2').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                                if (card_data_split.length === 1) {
+                                    full_string += `</div>`
+                                } else {
+                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
+                                }
+                                document.getElementById('current-hand-player-2').innerHTML += full_string;
                             }
                         } else {
                             for (var i = 4; i < split_data.length; i++) {
