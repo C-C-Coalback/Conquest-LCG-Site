@@ -68,6 +68,8 @@ class Game:
         await self.p2.send_units_at_all_planets()
         await self.p1.send_resources()
         await self.p2.send_resources()
+        await self.p1.send_discard()
+        await self.p2.send_discard()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -287,6 +289,7 @@ class Game:
                                         if self.p2.warlord_just_got_bloodied:
                                             self.p2.warlord_just_got_bloodied = False
                                             await self.p2.send_hq()
+                                        await self.p2.send_discard()
                                     self.number_with_combat_turn = "2"
                                     self.player_with_combat_turn = self.name_2
                                     await self.p2.send_units_at_planet(self.defender_planet)
@@ -303,6 +306,7 @@ class Game:
                                         if self.p1.warlord_just_got_bloodied:
                                             self.p1.warlord_just_got_bloodied = False
                                             await self.p1.send_hq()
+                                        await self.p1.send_discard()
                                     self.number_with_combat_turn = "1"
                                     self.player_with_combat_turn = self.name_1
                                     await self.p1.send_units_at_planet(self.defender_planet)

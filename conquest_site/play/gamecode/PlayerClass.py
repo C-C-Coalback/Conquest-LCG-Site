@@ -179,6 +179,15 @@ class Player:
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number)
             await self.game.game_sockets[0].receive_game_update(joined_string)
 
+    async def send_discard(self):
+        top_card = self.get_top_card_discard()
+        if top_card is None:
+            joined_string = "GAME_INFO/DISCARD/" + str(self.number)
+            await self.game.game_sockets[0].receive_game_update(joined_string)
+        else:
+            joined_string = "GAME_INFO/DISCARD/" + str(self.number) + "/" + top_card
+            await self.game.game_sockets[0].receive_game_update(joined_string)
+
     def get_headquarters(self):
         return self.headquarters
 

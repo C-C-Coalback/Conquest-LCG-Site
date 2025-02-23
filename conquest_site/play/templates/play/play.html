@@ -137,7 +137,7 @@
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
                     document.getElementById(target_victory_display_id).innerHTML = ``;
-                    document.querySelector('#chat-log').value += ('Update victory display\ntest\ntest\n');
+                    document.querySelector('#chat-log').value += ('Update victory display\n');
                     for (var i = 3; i < split_data.length; i++) {
                         var card_name = split_data[i];
                         var string_id = (i-3).toString();
@@ -145,11 +145,20 @@
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         var display_class = "planet-in-victory-display-" + split_data[2];
-                        document.querySelector('#chat-log').value += ('Before creating the string');
                         var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class=` + display_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
-                        document.querySelector('#chat-log').value += ('Before adding the string');
                         document.getElementById(target_victory_display_id).innerHTML += full_string;
-                        document.querySelector('#chat-log').value += ('After adding the string');
+                    }
+                } else if (split_data[1] === "DISCARD") {
+                    var target_discard_pile_id = "current-discard-player-" + split_data[2];
+                    document.getElementById(target_discard_pile_id).innerHTML = ``;
+                    document.querySelector('#chat-log').value += ('Update discard pile\n');
+                    if (split_data.length === 4) {
+                        var card_name = split_data[3];
+                        var string_id = "DISCARD_PILE/" + split_data[2];
+                        card_name = card_name.split(' ').join('_');
+                        var route_text = "/static/images/" + card_name + ".jpg";
+                        var full_string = `<img src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                        document.getElementById(target_discard_pile_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "RESOURCES") {
                     if (split_data[2] === "1") {
