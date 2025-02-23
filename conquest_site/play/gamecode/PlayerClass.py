@@ -153,11 +153,16 @@ class Player:
                 single_card_string += "|"
                 if current_card.get_card_type() == "Warlord":
                     if current_card.get_bloodied():
-                        single_card_string += "B|"
+                        single_card_string += "B"
                     else:
-                        single_card_string += "H|"
+                        single_card_string += "H"
                 else:
-                    single_card_string += "H|"
+                    single_card_string += "H"
+                if current_card.aiming_reticle_color is None:
+                    pass
+                else:
+                    single_card_string += "|"
+                    single_card_string += current_card.aiming_reticle_color
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
@@ -251,6 +256,12 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Warlord":
             return True
         return False
+
+    def set_aiming_reticle_in_play(self, planet_id, unit_id, color):
+        self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = color
+
+    def reset_aiming_reticle_in_play(self, planet_id, unit_id):
+        self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
 
     def discard_card_from_hand(self, card_pos):
         self.discard.append(self.cards[card_pos])

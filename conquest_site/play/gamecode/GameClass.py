@@ -268,6 +268,7 @@ class Game:
                                         if is_ready:
                                             print("Unit ready, can be used")
                                             valid_unit = True
+                                            self.p1.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
                                         else:
                                             print("Unit not ready")
                                     if self.number_with_combat_turn == "2":
@@ -275,6 +276,7 @@ class Game:
                                         if is_ready:
                                             print("Unit ready, can be used")
                                             valid_unit = True
+                                            self.p2.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
                                         else:
                                             print("Unit not ready")
                                 if valid_unit:
@@ -298,6 +300,8 @@ class Game:
                                     unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
                                                                              self.defender_position,
                                                                              damage=attack_value, can_shield=False)
+                                    self.p1.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                                    await self.p1.send_units_at_planet(self.attacker_planet)
                                     if unit_dead:
                                         self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
                                         if self.p2.warlord_just_got_bloodied:
@@ -315,6 +319,8 @@ class Game:
                                     unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
                                                                              self.defender_position,
                                                                              damage=attack_value, can_shield=False)
+                                    self.p2.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                                    await self.p2.send_units_at_planet(self.attacker_planet)
                                     if unit_dead:
                                         self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
                                         if self.p1.warlord_just_got_bloodied:
