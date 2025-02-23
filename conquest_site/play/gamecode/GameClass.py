@@ -56,6 +56,8 @@ class Game:
         self.mode = "Normal"
         self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
+        self.planet_aiming_reticle_active = False
+        self.planet_aiming_reticle_position = -1
 
     async def joined_requests_graphics(self):
         self.condition_main_game.acquire()
@@ -75,14 +77,26 @@ class Game:
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
-        for i in range(len(self.planet_array)):
-            if self.planets_in_play_array[i]:
-                planet_string += self.planet_array[i]
-            else:
-                planet_string += "CardbackRotated"
-            if i != 6:
-                planet_string += "/"
-        await self.game_sockets[0].receive_game_update(planet_string)
+        if not self.planet_aiming_reticle_active:
+            for i in range(len(self.planet_array)):
+                if self.planets_in_play_array[i]:
+                    planet_string += self.planet_array[i]
+                else:
+                    planet_string += "CardbackRotated"
+                if i != 6:
+                    planet_string += "/"
+            await self.game_sockets[0].receive_game_update(planet_string)
+        else:
+            for i in range(len(self.planet_array)):
+                if self.planets_in_play_array[i]:
+                    planet_string += self.planet_array[i]
+                else:
+                    planet_string += "CardbackRotated"
+                if self.planet_aiming_reticle_position == i:
+                    planet_string += "|red"
+                if i != 6:
+                    planet_string += "/"
+            await self.game_sockets[0].receive_game_update(planet_string)
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -205,6 +219,9 @@ class Game:
                         self.check_battle(self.round_number)
                         self.last_planet_checked_for_battle = self.round_number
                         self.set_battle_initiative()
+                        self.planet_aiming_reticle_active = True
+                        self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                        await self.send_planet_array()
                         self.p1.has_passed = False
                         self.p2.has_passed = False
         elif self.phase == "COMBAT":
@@ -356,7 +373,7 @@ class Game:
                     self.p1.capture_planet(self.last_planet_checked_for_battle,
                                            self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    await self.send_planet_array()
+
                     await self.p1.send_victory_display()
             if p2_has_units:
                 print("Player 2 wins battle")
@@ -367,18 +384,21 @@ class Game:
                     self.p2.capture_planet(self.last_planet_checked_for_battle,
                                            self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    await self.send_planet_array()
                     await self.p2.send_victory_display()
             if not p1_has_units and not p2_has_units:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    await self.send_planet_array()
+            self.planet_aiming_reticle_active = False
+            self.planet_aiming_reticle_position = -1
             another_battle = self.find_next_planet_for_combat()
             if another_battle:
                 self.set_battle_initiative()
                 self.p1.has_passed = False
                 self.p2.has_passed = False
                 self.mode = "Normal"
+                self.planet_aiming_reticle_active = True
+                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                await self.send_planet_array()
             else:
                 self.phase = "HEADQUARTERS"
                 self.automated_headquarters_phase()
@@ -409,8 +429,6 @@ class Game:
             self.number_with_deploy_turn = "2"
             self.player_with_combat_turn = self.name_2
             self.number_with_combat_turn = "2"
-
-
 
     def automated_headquarters_phase(self):
         self.p1.add_resources(4)

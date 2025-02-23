@@ -125,13 +125,20 @@
                     document.getElementById('planets-in-play').innerHTML = ``
                     for (var i = 2; i < split_data.length; i++) {
                         document.querySelector('#chat-log').value += (split_data[i] + '\n');
-                        var card_name = split_data[i];
+                        var card_data_split = split_data[i].split("|");
+                        var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
                         string_id = "PLANETS/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                        document.getElementById('planets-in-play').innerHTML +=
-                        `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        var full_string = `<div class="planet-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        if (card_data_split.length === 2) {
+                            document.querySelector('#chat-log').value += ('Before target draw\n');
+                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                            document.querySelector('#chat-log').value += ('After target draw\n');
+                        }
+                        full_string += `</div>`;
+                        document.getElementById('planets-in-play').innerHTML += full_string;
                     }
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
