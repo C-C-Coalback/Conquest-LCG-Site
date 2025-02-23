@@ -15,6 +15,8 @@ active_games = []
 
 condition_lobby = threading.Condition()
 
+condition_games = threading.Condition()
+
 
 class LobbyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -151,6 +153,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         global active_games
         global card_array
         global planet_array
+        global condition_games
 
         print("got to game consumer")
         self.room_name = self.scope["url_route"]["kwargs"]["game_id"]
@@ -163,6 +166,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         room_already_exists = False
         game_id_if_exists = -1
         self.game_position = 0
+        condition_games.acquire()
         for i in range(len(active_games)):
             if active_games[i].game_id == self.room_name:
                 room_already_exists = True
@@ -182,6 +186,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
         if room_already_exists:
             await active_games[game_id_if_exists].joined_requests_graphics()
+        condition_games.notify_all()
+        condition_games.release()
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -213,6 +219,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         print(message)
         message = message.split("/")
+        condition_games.acquire()
         if message[0] == "BUTTON PRESSED":
             current_game_id = -1
             for i in range(len(active_games)):
@@ -266,3 +273,5 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
+        condition_games.notify_all()
+        condition_games.release()

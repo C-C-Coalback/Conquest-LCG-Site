@@ -63,6 +63,7 @@ class Player:
         self.condition_player_sub = threading.Condition()
 
     async def setup_player(self, raw_deck, planet_array):
+        self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
         self.headquarters[0].assign_damage(3)
@@ -84,6 +85,8 @@ class Player:
         await self.send_hq()
         await self.send_units_at_all_planets()
         await self.send_resources()
+        self.condition_player_main.notify_all()
+        self.condition_player_main.release()
 
     async def send_hand(self):
         if self.cards:
@@ -205,7 +208,7 @@ class Player:
 
     def get_top_card_discard(self):
         if not self.discard:
-            return "NONE"
+            return None
         else:
             return self.discard[-1]
 

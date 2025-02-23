@@ -58,6 +58,7 @@ class Game:
         self.condition_sub_game = threading.Condition()
 
     async def joined_requests_graphics(self):
+        self.condition_main_game.acquire()
         await self.p1.send_hand()
         await self.p2.send_hand()
         await self.p1.send_hq()
@@ -67,6 +68,8 @@ class Game:
         await self.p2.send_units_at_all_planets()
         await self.p1.send_resources()
         await self.p2.send_resources()
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
@@ -80,6 +83,7 @@ class Game:
         await self.game_sockets[0].receive_game_update(planet_string)
 
     async def update_game_event(self, name, game_update_string):
+        self.condition_main_game.acquire()
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
@@ -304,6 +308,8 @@ class Game:
                                     await self.p1.send_units_at_planet(self.defender_planet)
                                     self.reset_combat_positions()
                                     self.p2.has_passed = False
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
 
     def reset_combat_positions(self):
         self.defender_position = -1
