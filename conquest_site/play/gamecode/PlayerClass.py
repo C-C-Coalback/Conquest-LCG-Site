@@ -1,6 +1,7 @@
 from . import FindCard
 from random import shuffle
 import copy
+import threading
 
 
 def clean_received_deck(raw_deck):
@@ -58,6 +59,8 @@ class Player:
         self.committed_warlord = False
         self.warlord_commit_location = -1
         self.warlord_just_got_bloodied = False
+        self.condition_player_main = threading.Condition()
+        self.condition_player_sub = threading.Condition()
 
     async def setup_player(self, raw_deck, planet_array):
         deck_list = clean_received_deck(raw_deck)

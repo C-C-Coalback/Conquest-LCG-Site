@@ -5,6 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamecode import GameClass
 import os
 from .gamecode import Initfunctions
+import threading
 
 card_array = Initfunctions.init_player_cards()
 planet_array = Initfunctions.init_planet_cards()
@@ -12,10 +13,13 @@ planet_array = Initfunctions.init_planet_cards()
 active_lobbies = [[], []]
 active_games = []
 
+condition_lobby = threading.Condition()
+
 
 class LobbyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         global active_lobbies
+        global condition_lobby
         self.room_name = "lobby"
         self.room_group_name = "lobby"
         self.user = self.scope["user"]
@@ -25,16 +29,21 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
+        condition_lobby.acquire()
+
         await self.accept()
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
             await self.chat_message({"type": "chat.message", "message": message})
+        condition_lobby.notify_all()
+        condition_lobby.release()
 
     async def receive(self, text_data):
         global active_lobbies
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
+        condition_lobby.acquire()
         if message == "Create lobby":
             print("code to create lobby for:", self.name)
             if self.name == "":
@@ -120,6 +129,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
+        condition_lobby.notify_all()
+        condition_lobby.release()
 
     async def chat_message(self, event):
         message = event["message"]

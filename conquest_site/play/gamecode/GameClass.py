@@ -2,6 +2,7 @@ from . import PlayerClass
 import random
 from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
 from . import FindCard
+import threading
 
 
 def create_planets(planet_array_objects):
@@ -53,6 +54,8 @@ class Game:
         self.number_reset_combat_turn = "1"
         self.player_reset_combat_turn = self.name_1
         self.mode = "Normal"
+        self.condition_main_game = threading.Condition()
+        self.condition_sub_game = threading.Condition()
 
     async def joined_requests_graphics(self):
         await self.p1.send_hand()
