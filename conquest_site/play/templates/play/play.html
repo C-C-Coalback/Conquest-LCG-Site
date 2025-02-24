@@ -127,7 +127,6 @@
                 if (split_data[1] === "PLANETS") {
                     document.getElementById('planets-in-play').innerHTML = ``
                     for (var i = 2; i < split_data.length; i++) {
-                        document.querySelector('#chat-log').value += (split_data[i] + '\n');
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
@@ -136,9 +135,7 @@
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         var full_string = `<div class="planet-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         if (card_data_split.length === 2) {
-                            document.querySelector('#chat-log').value += ('Before target draw\n');
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
-                            document.querySelector('#chat-log').value += ('After target draw\n');
                         }
                         full_string += `</div>`;
                         document.getElementById('planets-in-play').innerHTML += full_string;
@@ -156,7 +153,6 @@
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
                     document.getElementById(target_victory_display_id).innerHTML = ``;
-                    document.querySelector('#chat-log').value += ('Update victory display\n');
                     for (var i = 3; i < split_data.length; i++) {
                         var card_name = split_data[i];
                         var string_id = (i-3).toString();
@@ -170,7 +166,6 @@
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
                     document.getElementById(target_discard_pile_id).innerHTML = ``;
-                    document.querySelector('#chat-log').value += ('Update discard pile\n');
                     if (split_data.length === 4) {
                         var card_name = split_data[3];
                         var string_id = "DISCARD_PILE/" + split_data[2];
@@ -188,7 +183,6 @@
                 } else if (split_data[1] === "IN_PLAY") {
                     var target_planet_id = "player-" + split_data[2] + "-cards-planet-" + split_data[3];
                     document.getElementById(target_planet_id).innerHTML = ``;
-                    document.querySelector('#chat-log').value += ('Update P1 in play\n');
                     for (var i = 4; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
@@ -202,7 +196,6 @@
                             card_name += "_bloodied";
                         }
                         var route_text = "/static/images/" + card_name + ".jpg";
-                        document.querySelector('#chat-log').value += (string_id + '\n');
                         var rotation = "";
                         if (is_ready === "E") {
                             rotation = " style='transform:rotate(90deg);'";
@@ -220,7 +213,6 @@
                     }
                 } else if (split_data[1] === "HQ") {
                     if (split_data[2] === "1") {
-                        document.querySelector('#chat-log').value += ('Update P1 HQ\n');
                         document.getElementById('headquarters-player-1').innerHTML = ``
                         for (var i = 3; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
@@ -229,7 +221,6 @@
                             var damage = card_data_split[2];
                             var hale = card_data_split[3];
                             var string_id = (i-3).toString();
-                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/1/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             if (hale === "B") {
@@ -249,7 +240,6 @@
                             document.getElementById('headquarters-player-1').innerHTML += full_string;
                         }
                     } else if (split_data[2] === "2") {
-                        document.querySelector('#chat-log').value += ('Update P2 HQ\n');
                         document.getElementById('headquarters-player-2').innerHTML = ``
                         for (var i = 3; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
@@ -258,7 +248,6 @@
                             var damage = card_data_split[2];
                             var hale = card_data_split[3];
                             var string_id = (i-3).toString();
-                            document.querySelector('#chat-log').value += card_name + "\n" + is_ready + "\n" + damage + "\n";
                             string_id = "HQ/2/" + string_id;
                             if (hale === "B") {
                                 card_name += "_bloodied";
@@ -280,12 +269,9 @@
                     }
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
-                        document.querySelector('#chat-log').value += ('Update P1 hand\n');
                         document.getElementById('current-hand-player-1').innerHTML = ``
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
-                                document.querySelector('#chat-log').value += (split_data[i] + '\n');
-                                document.querySelector('#chat-log').value += ('Testing new Hand1\n');
                                 var card_data_split = split_data[i].split("|");
                                 var card_name = card_data_split[0];
                                 var string_id = (i-4).toString();
@@ -298,7 +284,6 @@
                                 } else {
                                     full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
                                 }
-                                document.querySelector('#chat-log').value += ('Testing new Hand4\n');
                                 document.getElementById('current-hand-player-1').innerHTML += full_string;
                             }
                         } else {
@@ -311,11 +296,9 @@
                             }
                         }
                     } else if (split_data[2] === "2") {
-                        document.querySelector('#chat-log').value += ('Update P2 hand\n');
                         document.getElementById('current-hand-player-2').innerHTML = ``
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
-                                document.querySelector('#chat-log').value += (split_data[i] + '\n');
                                 var card_data_split = split_data[i].split("|");
                                 var card_name = card_data_split[0];
                                 var string_id = (i-4).toString();
@@ -344,6 +327,8 @@
             } else {
             document.querySelector('#chat-log').value += (data.message + '\n');
             }
+            var textarea = document.getElementById('chat-log');
+            textarea.scrollTop = textarea.scrollHeight;
         };
 
         gameSocket.onclose = function(e) {
