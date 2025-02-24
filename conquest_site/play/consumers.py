@@ -42,10 +42,14 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         global active_lobbies
+        global active_games
+        global condition_lobby
+        global condition_games
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
         condition_lobby.acquire()
+        condition_games.acquire()
         if message == "Create lobby":
             print("code to create lobby for:", self.name)
             if self.name == "":
@@ -112,6 +116,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     if active_lobbies[0][i] == self.name:
                         first_name = active_lobbies[0][i]
                         second_name = active_lobbies[1][i]
+                game_id = self.create_game(first_name, second_name, game_id)
                 message = "Move to game/" + game_id + "/" + first_name + "/" + second_name
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
@@ -133,16 +138,36 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     )
         condition_lobby.notify_all()
         condition_lobby.release()
+        condition_games.notify_all()
+        condition_games.release()
 
     async def chat_message(self, event):
         message = event["message"]
         print("send:", message)
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        # FIXME: Disconnect() method of WebSocketConsumer not being called
+        # FIXME: https://github.com/django/channels/issues/1466
+        # FIXME: Needs Django Channels dev team to fix this issue
+        try:
+            await self.send(text_data=json.dumps({"message": message}))
+        except autobahn.exception.Disconnected:
+            await self.close()
 
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+    def create_game(self, name_1, name_2, game_id):
+        global active_games
+        global card_array
+        global planet_array
+        for i in range(len(active_games)):
+            if active_games[i].game_id == game_id:
+                new_game_id = game_id + random.choice('0123456789ABCDEF')
+                return self.create_game(name_1, name_2, new_game_id)
+        active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array))
+        return game_id
+
 
 
 chat_messages = [[], []]
@@ -172,10 +197,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                 room_already_exists = True
                 game_id_if_exists = i
                 self.game_position = i
-        if not room_already_exists:
-            active_games.append(GameClass.Game("1", "alex", "Example", card_array, planet_array))
-            active_games[len(active_games) - 1].game_sockets.append(self)
-            self.game_position = len(active_games) - 1
+        if room_already_exists:
+            if not active_games[game_id_if_exists].game_sockets:
+                active_games[game_id_if_exists].game_sockets.append(self)
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
