@@ -10,7 +10,6 @@ h4 {
     overflow: hidden;
 }
 
-
 #LargeHelperCard {
     position: absolute;
     top: 0%;
@@ -216,12 +215,16 @@ h4 {
     position:absolute;
     bottom:0;
     right:40px;
+    height: 15px;
+    width: calc(10vw - 10px);
 }
 
 #chat-log {
     position:absolute;
     bottom:30px;
     right:0;
+    width: calc(10vw + 30px);
+    height: 20vh;
 }
 
 #current-hand-player-1 {
