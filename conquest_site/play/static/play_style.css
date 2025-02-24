@@ -79,7 +79,7 @@ h4 {
 
 .planet-div {
     position: relative;
-    margin-left:3vw;
+    margin-left:1vw;
     float:left;
     pointer-events: auto;
     height: 10vh;
@@ -108,8 +108,8 @@ h4 {
     position:absolute;
     top:26%;
     border: 5px solid yellow;
-    width:95vw;
-    max-width:95vw;
+    width:80vw;
+    max-width:80vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -123,8 +123,8 @@ h4 {
     position:absolute;
     bottom:26%;
     border: 5px solid yellow;
-    width:95vw;
-    max-width:95vw;
+    width:80vw;
+    max-width:80vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -135,7 +135,7 @@ h4 {
 }
 
 .player-1-in-play {
-    margin-left:3vw;
+    margin-left:1vw;
     float:left;
     width: 10vw;
     max-width:10vw;
@@ -149,7 +149,7 @@ h4 {
 }
 
 .player-2-in-play {
-    margin-left:3vw;
+    margin-left:1vw;
     float:left;
     width: 10vw;
     max-width:10vw;
@@ -278,8 +278,8 @@ h4 {
 
 #planets-in-play {
     position:absolute;
-    width: 95vw;
-    max-width: 95vw;
+    width: 80vw;
+    max-width: 80vw;
     top:43%;
     border: 5px solid blue;
     margin: auto;
