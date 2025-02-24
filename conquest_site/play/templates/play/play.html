@@ -11,10 +11,6 @@
     <input id="chat-message-submit" type="button" value="Send">
     <div id="info-box">
         <p class="info-box-sub">Test</p>
-        <p class="info-box-sub">Test</p>
-        <p class="info-box-sub">Test</p>
-        <p class="info-box-sub">Test</p>
-        <p class="info-box-sub">Test</p>
     </div>
     <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
     <div id="current-hand-player-1">
@@ -146,6 +142,12 @@
                         }
                         full_string += `</div>`;
                         document.getElementById('planets-in-play').innerHTML += full_string;
+                    }
+                } else if (split_data[1] === "INFO_BOX") {
+                    document.getElementById('info-box').innerHTML = ``;
+                    for (var i = 2; i < split_data.length; i++) {
+                        var full_string = `<p class="info-box-sub">` + split_data[i] + `</p>`
+                        document.getElementById("info-box").innerHTML += full_string;
                     }
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
