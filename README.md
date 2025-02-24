@@ -3,15 +3,12 @@ Repo for the Warhammer 40k Conquest website using Python Django
 
 Needs a bunch of explaining that I am not willing to do rn.
 
-# NEWS FLASH: V0.9!
+# Version alpha-1.0
 
-(Will be V1.0.0 when multithreading is fully working)
-
-Unlike the PS5, we have games!
-
-That was a lot of work. Got delayed a lot since I was busy with uni.
-
-Going to try to get an actual website up and running.
+The website is now developed enough for me to want to deploy it.
+Everything appears to be working, but it needs to have a public test
+to see if it survives coming into contact with the public. I can only
+test so many possible sources of errors myself.
 
 # What is this?
 
