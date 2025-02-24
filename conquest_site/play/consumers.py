@@ -185,7 +185,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if chat_messages[0][i] == self.room_name:
                 await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
         if room_already_exists:
-            await active_games[game_id_if_exists].joined_requests_graphics()
+            await active_games[game_id_if_exists].joined_requests_graphics(self.name)
         condition_games.notify_all()
         condition_games.release()
 

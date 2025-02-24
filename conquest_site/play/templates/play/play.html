@@ -145,8 +145,12 @@
                     }
                 } else if (split_data[1] === "INFO_BOX") {
                     document.getElementById('info-box').innerHTML = ``;
-                    for (var i = 2; i < split_data.length; i++) {
-                        var full_string = `<p class="info-box-sub">` + split_data[i] + `</p>`
+                    var color = "green";
+                    if (split_data[2] === "{{ user.username }}") {
+                        color = "red";
+                    }
+                    for (var i = 3; i < split_data.length; i++) {
+                        var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
                         document.getElementById("info-box").innerHTML += full_string;
                     }
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
