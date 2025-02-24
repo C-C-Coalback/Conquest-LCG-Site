@@ -130,7 +130,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print(self.room_name)
         print(self.name)
 
-    async def receive(self, text_data):
+    async def receive(self, text_data): # noqa
         global cards_array
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]

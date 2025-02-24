@@ -40,7 +40,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         condition_lobby.notify_all()
         condition_lobby.release()
 
-    async def receive(self, text_data):
+    async def receive(self, text_data): # noqa
         global active_lobbies
         global active_games
         global condition_lobby
@@ -236,7 +236,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, {"type": "chat.message", "message": text_update}
             )
 
-    async def receive(self, text_data):
+    async def receive(self, text_data): # noqa
         global active_games
         global chat_messages
         text_data_json = json.loads(text_data)
