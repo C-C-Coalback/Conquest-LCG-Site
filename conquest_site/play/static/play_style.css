@@ -294,3 +294,26 @@ h4 {
     pointer-events: auto;
     background: transparent;
 }
+
+#info-box {
+    position: absolute;
+    width: 10vw;
+    max-width: 10vw;
+    height: 10vh;
+    max-height: 10vh;
+    top: 43%;
+    border: 5px solid blue;
+    right: 0;
+    margin: auto;
+    overflow-x:hidden;
+    overflow-y:scroll;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    background: transparent;
+}
+
+.info-box-sub {
+    margin-bottom: -5px;
+}
