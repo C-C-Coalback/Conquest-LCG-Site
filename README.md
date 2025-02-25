@@ -26,7 +26,7 @@ Current game progress: Everything, except:
 - card text (brutal is already working though)
 - action windows
 - a victory/loss screen
-- some targeting follicles so that players can see what planets/units are being targeted
+- ~~some targeting follicles so that players can see what planets/units are being targeted~~
 - proper god damn multithreading
 - ???
 - and more!
@@ -36,12 +36,15 @@ Current game progress: Everything, except:
 Yes. This is using Django for webpage stuff, channels and dahpne for web sockets, whitenoise for static files, and redis so that I can use Docker. I don't know what Docker is, but all the channels documentation recommended it so eh.
 Probably some more that I am forgetting, but they should be relatively minor hiccups really.
 
+More dependencies added. Uvicorn[standard] is the main one. Just read the requirements file.
+
 # How can I run it myself?
 
 Don't. I mean, you can, but I don't know how I run it. I'll give my steps here though:
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
-In the other, navigate to the manage.py file and run 'py manage.py runserver'
+In the other, navigate to the manage.py file and run 'py -m uvicorn conquest_site.asgi:application'.
+Note that we are now using uvicorn instead of just running the runserver command.
 
 And it should just work. You need to set the secret key in the settings.py file first. May also need to collect static.
 
