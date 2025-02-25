@@ -6,7 +6,22 @@
 <h2>Sign up</h2>
 <form method="post">
   {% csrf_token %}
-  {{ form }}
+  {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.username.errors }}
+        <label for="{{ form.username.id_for_label }}">Username:</label>
+        {{ form.username }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.password.errors }}
+        <label for="{{ form.password1.id_for_label }}">Password:</label>
+        {{ form.password1 }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.password.errors }}
+        <label for="{{ form.password2.id_for_label }}">Password:</label>
+        {{ form.password2 }}
+    </div>
   <button type="submit">Sign Up</button>
 </form>
 {% endblock %}
