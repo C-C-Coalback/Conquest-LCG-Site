@@ -10,6 +10,8 @@ Everything appears to be working, but it needs to have a public test
 to see if it survives coming into contact with the public. I can only
 test so many possible sources of errors myself.
 
+I plan to deploy the site using apache; this requires reading.
+
 # What is this?
 
 Warhammer 40k Conquest card game. Something something board game geek, see my other repos.
