@@ -10,7 +10,8 @@ Everything appears to be working, but it needs to have a public test
 to see if it survives coming into contact with the public. I can only
 test so many possible sources of errors myself.
 
-I plan on self-hosting the site, likely through NGINX. If I can't figure it out, I will use DigitalOcean instead.
+I plan on self-hosting the site, unsure what with. It's a coin toss between NGINX and Apache.
+If I can't figure it out, I will use DigitalOcean instead.
 
 # What is this?
 
