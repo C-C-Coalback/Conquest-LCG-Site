@@ -30,7 +30,7 @@ Currently we have: async chat rooms; login/logout; deck-building; async lobbies.
 
 Current game progress: Everything, except:
 
-- shielding
+- shielding (Half done, too closely tied with combat turns at the moment.)
 - card text (brutal is already working though)
 - action windows
 - a victory/loss screen
