@@ -53,6 +53,11 @@ class Game:
         self.player_with_initiative = self.name_1
         self.number_reset_combat_turn = "1"
         self.player_reset_combat_turn = self.name_1
+        self.number_who_is_shielding = None
+        self.player_who_is_shielding = None
+        self.planet_of_damaged_unit = None
+        self.position_of_damaged_unit = None
+        self.damage_taken_by_unit = None
         self.mode = "Normal"
         self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
@@ -245,7 +250,11 @@ class Game:
         elif self.phase == "COMBAT":
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    if name == self.player_with_combat_turn:
+                    if self.mode == "SHIELD":
+                        if name == self.player_who_is_shielding:
+                            await self.resolve_shield_of_unit(name, -1)
+                    elif name == self.player_with_combat_turn:
+
                         if self.number_with_combat_turn == "1":
                             self.number_with_combat_turn = "2"
                             self.player_with_combat_turn = self.name_2
@@ -276,9 +285,17 @@ class Game:
                                 await self.check_combat_end(name)
                         else:
                             await self.send_info_box(name)
+            if len(game_update_string) == 3:
+                if game_update_string[0] == "HAND":
+                    print("Card in hand clicked on")
+                    if self.mode == "SHIELD":
+                        if name == self.player_who_is_shielding:
+                            if game_update_string[1] == self.number_who_is_shielding:
+                                hand_pos = int(game_update_string[2])
+                                await self.resolve_shield_of_unit(name, hand_pos)
             if len(game_update_string) == 4:
-                print("Unit clicked on.")
                 if game_update_string[0] == "IN_PLAY":
+                    print("Unit clicked on.")
                     if name == self.player_with_combat_turn:
                         if self.mode == "RETREAT":
                             if game_update_string[1] == self.number_with_combat_turn:
@@ -334,42 +351,45 @@ class Game:
                                 if self.number_with_combat_turn == "1":
                                     attack_value = self.p1.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
-                                    unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
-                                                                             self.defender_position,
-                                                                             damage=attack_value, can_shield=False)
-                                    self.p1.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-                                    await self.p1.send_units_at_planet(self.attacker_planet)
-                                    if unit_dead:
-                                        self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
-                                        if self.p2.warlord_just_got_bloodied:
-                                            self.p2.warlord_just_got_bloodied = False
-                                            await self.p2.send_hq()
-                                        await self.p2.send_discard()
-                                    self.number_with_combat_turn = "2"
-                                    self.player_with_combat_turn = self.name_2
+                                    if attack_value > 0:
+                                        unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
+                                                                                 self.defender_position,
+                                                                                 damage=attack_value)
+                                        self.mode = "SHIELD"
+                                        self.player_who_is_shielding = self.name_2
+                                        self.number_who_is_shielding = "2"
+                                        self.planet_of_damaged_unit = self.defender_planet
+                                        self.position_of_damaged_unit = self.defender_position
+                                        self.damage_taken_by_unit = attack_value
+                                        self.p2.set_aiming_reticle_in_play(self.defender_planet,
+                                                                           self.defender_position, "red")
+                                    else:
+                                        self.p1.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                             self.attacker_position)
+                                        await self.p1.send_units_at_planet(self.attacker_planet)
                                     await self.p2.send_units_at_planet(self.defender_planet)
-                                    self.reset_combat_positions()
-                                    self.p1.has_passed = False
                                     await self.send_info_box(name)
                                 elif self.number_with_combat_turn == "2":
                                     attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
-                                    unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
-                                                                             self.defender_position,
-                                                                             damage=attack_value, can_shield=False)
-                                    self.p2.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-                                    await self.p2.send_units_at_planet(self.attacker_planet)
-                                    if unit_dead:
-                                        self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
-                                        if self.p1.warlord_just_got_bloodied:
-                                            self.p1.warlord_just_got_bloodied = False
-                                            await self.p1.send_hq()
-                                        await self.p1.send_discard()
-                                    self.number_with_combat_turn = "1"
-                                    self.player_with_combat_turn = self.name_1
+                                    if attack_value > 0:
+                                        unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
+                                                                                 self.defender_position,
+                                                                                 damage=attack_value, can_shield=False)
+
+                                        self.mode = "SHIELD"
+                                        self.player_who_is_shielding = self.name_1
+                                        self.number_who_is_shielding = "1"
+                                        self.planet_of_damaged_unit = self.defender_planet
+                                        self.position_of_damaged_unit = self.defender_position
+                                        self.damage_taken_by_unit = attack_value
+                                        self.p1.set_aiming_reticle_in_play(self.defender_planet,
+                                                                           self.defender_position, "red")
+                                    else:
+                                        self.p2.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                             self.attacker_position)
+                                        await self.p2.send_units_at_planet(self.attacker_planet)
                                     await self.p1.send_units_at_planet(self.defender_planet)
-                                    self.reset_combat_positions()
-                                    self.p2.has_passed = False
                                     await self.send_info_box(name)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
@@ -379,6 +399,62 @@ class Game:
         self.defender_planet = -1
         self.attacker_position = -1
         self.attacker_planet = -1
+
+    def reset_shielding_values(self):
+        self.number_who_is_shielding = None
+        self.player_who_is_shielding = None
+        self.planet_of_damaged_unit = None
+        self.position_of_damaged_unit = None
+        self.damage_taken_by_unit = None
+
+    async def resolve_shield_of_unit(self, name, hand_pos):
+        if name == self.name_1:
+            self.p1.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
+            self.p2.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            shield_on_card = 0
+            if hand_pos != -1:
+                shield_on_card = self.p1.get_shields_given_pos(hand_pos)
+                self.p1.discard_card_from_hand(hand_pos)
+                await self.p1.send_hand()
+                await self.p1.send_discard()
+            amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
+            self.p1.remove_damage_from_pos(self.defender_planet, self.defender_position,
+                                           amount_to_shield)
+            if self.p1.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
+                self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
+                if self.p1.warlord_just_got_bloodied:
+                    self.p1.warlord_just_got_bloodied = False
+                    await self.p1.send_hq()
+                await self.p1.send_discard()
+            self.number_with_combat_turn = "1"
+            self.player_with_combat_turn = self.name_1
+
+        elif name == self.name_2:
+            self.p2.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
+            self.p1.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            shield_on_card = 0
+            if hand_pos != -1:
+                shield_on_card = self.p2.get_shields_given_pos(hand_pos)
+                self.p2.discard_card_from_hand(hand_pos)
+                await self.p2.send_hand()
+                await self.p2.send_discard()
+            amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
+            self.p2.remove_damage_from_pos(self.defender_planet, self.defender_position,
+                                           amount_to_shield)
+            if self.p2.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
+                self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
+                if self.p2.warlord_just_got_bloodied:
+                    self.p2.warlord_just_got_bloodied = False
+                    await self.p2.send_hq()
+                await self.p2.send_discard()
+            self.number_with_combat_turn = "2"
+            self.player_with_combat_turn = self.name_2
+        self.reset_shielding_values()
+        self.mode = "Normal"
+        await self.send_info_box(name)
+        await self.p1.send_units_at_planet(self.attacker_planet)
+        await self.p2.send_units_at_planet(self.attacker_planet)
+        self.reset_combat_positions()
 
     async def check_combat_end(self, name):
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)

@@ -68,7 +68,6 @@ class Player:
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
-        self.headquarters[0].assign_damage(3)
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
@@ -380,6 +379,12 @@ class Player:
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         return damage_too_great
+
+    def check_if_card_is_destroyed(self, planet_id, unit_id):
+        return not self.cards_in_play[planet_id + 1][unit_id].check_health()
+
+    def remove_damage_from_pos(self, planet_id, unit_id, amount):
+        self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
