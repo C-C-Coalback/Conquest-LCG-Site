@@ -60,6 +60,7 @@ h4 {
     left: 0;
     height: 8vh;
     width: 5vw;
+    pointer-events: none;
 }
 
 .large-aiming-reticle {
@@ -68,6 +69,7 @@ h4 {
     left: 0;
     height: 10vh;
     width: 10vw;
+    pointer-events: none;
 }
 
 .planet {
