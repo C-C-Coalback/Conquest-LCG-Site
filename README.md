@@ -3,6 +3,13 @@ Repo for the Warhammer 40k Conquest website using Python Django
 
 Needs a bunch of explaining that I am not willing to do rn.
 
+# Update 06/03/2025
+
+Like any good ping pong ball, I am all over the place.
+
+Going to use Daphne for deployment, simply because there
+is more documentation compared to uvicorn.
+
 # Version alpha-1.0
 
 The website is now developed enough for me to want to deploy it.
@@ -41,12 +48,17 @@ More dependencies added. Uvicorn[standard] is the main one. Just read the requir
 
 # How can I run it myself?
 
-Don't. I mean, you can, but I don't know how I run it. I'll give my steps here though:
-
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
-In the other, navigate to the manage.py file and run 'py -m uvicorn conquest_site.asgi:application'.
-Note that we are now using uvicorn instead of just running the runserver command.
 
-And it should just work. You need to set the secret key in the settings.py file first. May also need to collect static.
+If you are wanting to run this for development purposes, I recommend navigating
+to settings.py in the conquest_site app and adding
+"IPAddr = 127.0.0.1" just before the CHANNEL_LAYERS assignment.
+You can now open a second console, navigate to the manage.py file, and simply run
+"py manage.py runserver", and it should work.
 
-Really this is just for me to show that I am making progress on the site.
+If you want to run this on a LAN/similar, no need to change anything. Open a second console,
+navigate to the manage.py file and run 
+'daphne -b {YOUR_IP_HERE} -p 8080 conquest_site.asgi:application'.
+You will need to allow python through your firewall on the private network.
+Then others can connect to the site using a web browser and heading
+to "http://{YOUR_IP_HERE}:8080".
