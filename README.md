@@ -24,6 +24,8 @@ If I can't figure it out, I will use DigitalOcean instead.
 
 Warhammer 40k Conquest card game. Something something board game geek, see my other repos.
 
+Here is a link to The Hive Tyrant's tutorial for the game: https://www.youtube.com/watch?v=NE8NL9PfjXU
+
 # What is the current progress?
 
 Currently we have: async chat rooms; login/logout; deck-building; async lobbies. Only thing really left to do is the actual game.
