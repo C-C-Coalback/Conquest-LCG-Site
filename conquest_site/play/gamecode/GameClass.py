@@ -89,7 +89,10 @@ class Game:
         if self.phase == "DEPLOY":
             info_string += "Active: " + self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
-            info_string += "Active: " + self.player_with_combat_turn + "/"
+            if self.mode == "SHIELD":
+                info_string += "Active: " + self.player_who_is_shielding + "/"
+            else:
+                info_string += "Active: " + self.player_with_combat_turn + "/"
         await self.game_sockets[0].receive_game_update(info_string)
 
     async def send_planet_array(self):
