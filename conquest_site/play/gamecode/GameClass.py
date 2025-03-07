@@ -77,13 +77,21 @@ class Game:
         await self.p2.send_resources()
         await self.p1.send_discard()
         await self.p2.send_discard()
-        await self.send_info_box(name)
+        await self.send_info_box()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
-    async def send_info_box(self, name):
+    async def send_info_box(self):
         info_string = "GAME_INFO/INFO_BOX/"
-        info_string += name + "/"
+        if self.phase == "DEPLOY":
+            info_string += self.player_with_deploy_turn + "/"
+        elif self.phase == "COMBAT":
+            if self.mode == "SHIELD":
+                info_string += self.player_who_is_shielding + "/"
+            else:
+                info_string += self.player_with_combat_turn + "/"
+        else:
+            info_string += "Unspecified/"
         info_string += "Phase: " + self.phase + "/"
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "DEPLOY":
@@ -140,7 +148,7 @@ class Game:
                     if self.p1.has_passed and self.p2.has_passed:
                         print("Both passed, move to warlord movement.")
                         self.phase = "COMMAND"
-                    await self.send_info_box(name)
+                    await self.send_info_box()
             if len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if name == self.player_with_deploy_turn:
@@ -156,7 +164,7 @@ class Game:
                                     if not self.p2.has_passed:
                                         self.player_with_deploy_turn = self.name_2
                                         self.number_with_deploy_turn = "2"
-                                        await self.send_info_box(name)
+                                        await self.send_info_box()
                                 else:
                                     self.p1.aiming_reticle_color = "blue"
                                     self.p1.aiming_reticle_coords_hand = self.card_pos_to_deploy
@@ -170,7 +178,7 @@ class Game:
                                     if not self.p1.has_passed:
                                         self.player_with_deploy_turn = self.name_1
                                         self.number_with_deploy_turn = "1"
-                                        await self.send_info_box(name)
+                                        await self.send_info_box()
                                 else:
                                     self.p2.aiming_reticle_color = "blue"
                                     self.p2.aiming_reticle_coords_hand = self.card_pos_to_deploy
@@ -191,7 +199,7 @@ class Game:
                                 if not self.p2.has_passed:
                                     self.player_with_deploy_turn = self.name_2
                                     self.number_with_deploy_turn = "2"
-                                    await self.send_info_box(name)
+                                    await self.send_info_box()
                             self.card_pos_to_deploy = -1
                             self.p1.aiming_reticle_color = None
                             self.p1.aiming_reticle_coords_hand = None
@@ -207,7 +215,7 @@ class Game:
                                 if not self.p1.has_passed:
                                     self.player_with_deploy_turn = self.name_1
                                     self.number_with_deploy_turn = "1"
-                                    await self.send_info_box(name)
+                                    await self.send_info_box()
                             self.card_pos_to_deploy = -1
                             self.p2.aiming_reticle_color = None
                             self.p2.aiming_reticle_coords_hand = None
@@ -249,7 +257,7 @@ class Game:
                         await self.send_planet_array()
                         self.p1.has_passed = False
                         self.p2.has_passed = False
-                        await self.send_info_box(name)
+                        await self.send_info_box()
         elif self.phase == "COMBAT":
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -287,7 +295,7 @@ class Game:
                                 self.mode = "Normal"
                                 await self.check_combat_end(name)
                         else:
-                            await self.send_info_box(name)
+                            await self.send_info_box()
             if len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     print("Card in hand clicked on")
@@ -384,7 +392,7 @@ class Game:
                                         self.number_with_combat_turn = "2"
                                         self.player_with_combat_turn = self.name_2
                                         name = self.name_2
-                                    await self.send_info_box(name)
+                                    await self.send_info_box()
                                 elif self.number_with_combat_turn == "2":
                                     attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
@@ -418,7 +426,7 @@ class Game:
                                         self.number_with_combat_turn = "1"
                                         self.player_with_combat_turn = self.name_1
                                         name = self.name_1
-                                    await self.send_info_box(name)
+                                    await self.send_info_box()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -488,7 +496,7 @@ class Game:
             self.player_with_combat_turn = self.name_2
         self.reset_shielding_values()
         self.mode = "Normal"
-        await self.send_info_box(name)
+        await self.send_info_box()
         await self.p1.send_units_at_planet(self.attacker_planet)
         await self.p2.send_units_at_planet(self.attacker_planet)
         self.reset_combat_positions()
@@ -497,7 +505,7 @@ class Game:
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
         p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
         if p1_has_units and p2_has_units:
-            await self.send_info_box(name)
+            await self.send_info_box()
         else:
             if p1_has_units:
                 print("Player 1 wins battle")
@@ -533,7 +541,7 @@ class Game:
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
                 await self.send_planet_array()
-                await self.send_info_box(name)
+                await self.send_info_box()
             else:
                 self.phase = "HEADQUARTERS"
                 self.automated_headquarters_phase()
@@ -547,7 +555,7 @@ class Game:
                 await self.p2.send_resources()
                 await self.p2.send_hand()
                 await self.send_planet_array()
-                await self.send_info_box(name)
+                await self.send_info_box()
 
     def reset_values_for_new_round(self):
         self.p1.has_passed = False

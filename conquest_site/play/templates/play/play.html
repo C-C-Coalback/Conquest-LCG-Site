@@ -144,9 +144,9 @@
                     }
                 } else if (split_data[1] === "INFO_BOX") {
                     document.getElementById('info-box').innerHTML = ``;
-                    var color = "green";
+                    var color = "red";
                     if (split_data[2] === "{{ user.username }}") {
-                        color = "red";
+                        color = "green";
                     }
                     for (var i = 3; i < split_data.length; i++) {
                         var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
