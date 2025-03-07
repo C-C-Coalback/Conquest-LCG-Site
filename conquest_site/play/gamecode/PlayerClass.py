@@ -361,7 +361,18 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
     def get_flying_given_pos(self, planet_id, unit_id):
+        rokkitboy_present = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id, "Rokkitboy")
+        if rokkitboy_present:
+            return False
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
+
+    def search_card_at_planet(self, planet_id, name_of_card):
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            current_name = self.cards_in_play[planet_id + 1][i].get_name()
+            print(current_name, name_of_card)
+            if self.cards_in_play[planet_id + 1][i].get_name() == name_of_card:
+                return True
+        return False
 
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()

@@ -386,7 +386,6 @@ class Game:
                                                                                   self.attacker_position)
                                         def_flying = self.p1.get_flying_given_pos(self.defender_planet,
                                                                                   self.defender_position)
-                                        print("\n\nFLYING:", att_flying, def_flying, "\n\n")
                                         if def_flying and not att_flying:
                                             attack_value = int(attack_value / 2 + (attack_value % 2 > 0))
                                         unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
@@ -422,6 +421,15 @@ class Game:
         self.planet_of_damaged_unit = None
         self.position_of_damaged_unit = None
         self.damage_taken_by_unit = None
+
+    def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card):
+        if number == 1:
+            is_present = self.p2.search_card_at_planet(planet, name_of_card)
+            return is_present
+        elif number == 2:
+            is_present = self.p1.search_card_at_planet(planet, name_of_card)
+            return is_present
+        return None
 
     async def resolve_shield_of_unit(self, name, hand_pos):
         if name == self.name_1:
