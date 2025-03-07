@@ -359,6 +359,7 @@ class Game:
                                                                                   self.attacker_position)
                                         def_flying = self.p2.get_flying_given_pos(self.defender_planet,
                                                                                   self.defender_position)
+                                        # Flying check
                                         if def_flying and not att_flying:
                                             attack_value = attack_value / 2 + (attack_value % 2 > 0)
                                         unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
@@ -422,12 +423,12 @@ class Game:
         self.position_of_damaged_unit = None
         self.damage_taken_by_unit = None
 
-    def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card):
+    def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card, bloodied_relevant=False):
         if number == 1:
-            is_present = self.p2.search_card_at_planet(planet, name_of_card)
+            is_present = self.p2.search_card_at_planet(planet, name_of_card, bloodied_relevant)
             return is_present
         elif number == 2:
-            is_present = self.p1.search_card_at_planet(planet, name_of_card)
+            is_present = self.p1.search_card_at_planet(planet, name_of_card, bloodied_relevant)
             return is_present
         return None
 

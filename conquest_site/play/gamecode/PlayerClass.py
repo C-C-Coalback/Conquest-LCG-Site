@@ -366,11 +366,15 @@ class Player:
             return False
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
-    def search_card_at_planet(self, planet_id, name_of_card):
+    def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             current_name = self.cards_in_play[planet_id + 1][i].get_name()
             print(current_name, name_of_card)
             if self.cards_in_play[planet_id + 1][i].get_name() == name_of_card:
+                if not bloodied_relevant:
+                    return True
+                if self.cards_in_play[planet_id + 1][i].get_bloodied():
+                    return False
                 return True
         return False
 
@@ -391,6 +395,11 @@ class Player:
         return attack_value
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
+        zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
+                                                                       "Zarathur, High Sorcerer",
+                                                                       bloodied_relevant=True)
+        if zara_check:
+            damage += 1
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         return damage_too_great
 
