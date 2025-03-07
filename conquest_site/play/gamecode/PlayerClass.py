@@ -398,6 +398,10 @@ class Player:
 
     def get_attack_given_pos(self, planet_id, unit_id):
         attack_value = self.cards_in_play[planet_id + 1][unit_id].get_attack()
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
+            nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
+            if nazdreg_check:
+                self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
         # if self.search_card_at_planet("Nazdreg", planet_id) != -1:
         #     if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
         #         self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
