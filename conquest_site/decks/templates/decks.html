@@ -4,6 +4,7 @@
 
 {% block content %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'decks_style.css' %}">
 <h2>Decks</h2>
 <h1>Either use conquestdb.com to create decks and paste them in the text box,</h1>
 <h1>or configure decks manually.</h1>
@@ -146,7 +147,7 @@
                 warlord_name = warlord_name.split(' ').join('_');
                 var route_text = "/static/images/" + warlord_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML =
-                `<img src=` + route_text + ` alt=` + route_text + ` />`
+                `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                 cardCount = 0
 
 
@@ -177,7 +178,7 @@
                 card_name = card_name.split(' ').join('_');
                 var route_text = "/static/images/" + card_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML +=
-                `<img src=` + route_text + ` alt=` + route_text + ` />`
+                `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
 
 
 
@@ -199,7 +200,7 @@
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
-                                    `<img src=` + route_text + ` alt=` + route_text + ` />`
+                                    `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
                                     if (cardCount === 10) {
                                         document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -213,7 +214,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
                             if (cardCount === 10) {
                                 document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -242,7 +243,7 @@
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
-                                    `<img src=` + route_text + ` alt=` + route_text + ` />`
+                                    `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
                                     if (cardCount === 10) {
                                         document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -256,7 +257,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
                             if (cardCount === 10) {
                                 document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -284,7 +285,7 @@
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
-                                    `<img src=` + route_text + ` alt=` + route_text + ` />`
+                                    `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
                                     if (cardCount === 10) {
                                         document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -298,7 +299,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
                             if (cardCount === 10) {
                                 document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -326,7 +327,7 @@
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
-                                    `<img src=` + route_text + ` alt=` + route_text + ` />`
+                                    `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
                                     if (cardCount === 10) {
                                         document.getElementById('current-deck').innerHTML += `<p></p>`
@@ -340,7 +341,7 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` />`
+                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
                             if (cardCount === 10) {
                                 document.getElementById('current-deck').innerHTML += `<p></p>`
