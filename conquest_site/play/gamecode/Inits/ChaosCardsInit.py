@@ -51,7 +51,7 @@ def chaos_cards_init():
                                              1, 4, 2, False, ""),
                         CardClasses.ArmyCard("Black Legion Heldrake", "Flying, No Wargear Attachments",
                                              "Black Legion. Daemon. Elite.", 8, "Chaos", "Loyal",
-                                             8, 8, 3, False, ""),
+                                             8, 8, 3, False, "", flying=True),
                         CardClasses.ArmyCard("Ravenous Flesh Hounds", "No Attachments.\n"
                                                                       "Action: Sacrifice a Cultist unit to "
                                                                       "remove all damage from this unit.",

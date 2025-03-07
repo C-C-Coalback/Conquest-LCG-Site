@@ -355,6 +355,12 @@ class Game:
                                     attack_value = self.p1.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
                                     if attack_value > 0:
+                                        att_flying = self.p1.get_flying_given_pos(self.attacker_planet,
+                                                                                  self.attacker_position)
+                                        def_flying = self.p2.get_flying_given_pos(self.defender_planet,
+                                                                                  self.defender_position)
+                                        if def_flying and not att_flying:
+                                            attack_value = attack_value / 2 + (attack_value % 2 > 0)
                                         unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
                                                                                  self.defender_position,
                                                                                  damage=attack_value)
@@ -376,6 +382,13 @@ class Game:
                                     attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
                                     if attack_value > 0:
+                                        att_flying = self.p2.get_flying_given_pos(self.attacker_planet,
+                                                                                  self.attacker_position)
+                                        def_flying = self.p1.get_flying_given_pos(self.defender_planet,
+                                                                                  self.defender_position)
+                                        print("\n\nFLYING:", att_flying, def_flying, "\n\n")
+                                        if def_flying and not att_flying:
+                                            attack_value = int(attack_value / 2 + (attack_value % 2 > 0))
                                         unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
                                                                                  self.defender_position,
                                                                                  damage=attack_value, can_shield=False)

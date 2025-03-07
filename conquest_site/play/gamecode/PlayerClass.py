@@ -360,6 +360,9 @@ class Player:
     def check_ready_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
+    def get_flying_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_flying()
+
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
 
