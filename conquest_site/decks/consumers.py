@@ -49,8 +49,18 @@ def second_part_deck_validation(deck):
         if factions[0] == factions[1]:
             print("Main faction and ally faction can not be the same")
             return "Main faction and ally faction can not be the same"
-        if (factions[0] == "Orks" and factions[1] == "Chaos") or (factions[0] == "Chaos" and factions[1] == "Orks"):
-            return deck_validation(deck, remaining_signature_squad, factions)
+        alignment_wheel = ["Astra Militarum", "Space Marines", "Tau", "Eldar",
+                           "Dark Eldar", "Chaos", "Orks"]
+        position_main_faction = -1
+        for i in range(len(alignment_wheel)):
+            if alignment_wheel[i] == factions[0]:
+                position_main_faction = i
+        if position_main_faction != -1:
+            ally_pos_1 = (position_main_faction + 1) % 7
+            ally_pos_2 = (position_main_faction - 1) % 7
+            if factions[1] == alignment_wheel[ally_pos_1] \
+                    or factions[1] == alignment_wheel[ally_pos_2]:
+                return deck_validation(deck, remaining_signature_squad, factions)
         return "Issue with faction matching."
     return "Unknown issue"
 
