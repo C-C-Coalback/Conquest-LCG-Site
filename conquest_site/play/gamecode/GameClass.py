@@ -376,6 +376,9 @@ class Game:
                                     else:
                                         self.p1.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                              self.attacker_position)
+                                        self.reset_combat_positions()
+                                        self.number_with_combat_turn = "2"
+                                        self.player_with_combat_turn = self.name_2
                                         await self.p1.send_units_at_planet(self.attacker_planet)
                                     await self.p2.send_units_at_planet(self.defender_planet)
                                     await self.send_info_box(name)
@@ -404,8 +407,13 @@ class Game:
                                     else:
                                         self.p2.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                              self.attacker_position)
+
                                         await self.p2.send_units_at_planet(self.attacker_planet)
                                     await self.p1.send_units_at_planet(self.defender_planet)
+                                    if attack_value < 1:
+                                        self.reset_combat_positions()
+                                        self.number_with_combat_turn = "1"
+                                        self.player_with_combat_turn = self.name_1
                                     await self.send_info_box(name)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
