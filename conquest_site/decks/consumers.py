@@ -174,12 +174,19 @@ class DecksConsumer(AsyncWebsocketConsumer):
             elif split_message[0] == "Ally":
                 print("Trying to set ally faction to:", split_message[1])
                 changed_ally = False
-                if self.main_faction == "Chaos" and split_message[1] == "Orks":
-                    self.ally_faction = "Orks"
-                    changed_ally = True
-                elif self.main_faction == "Orks" and split_message[1] == "Chaos":
-                    self.ally_faction = "Chaos"
-                    changed_ally = True
+                alignment_wheel = ["Astra Militarum", "Space Marines", "Tau", "Eldar",
+                                   "Dark Eldar", "Chaos", "Orks"]
+                position_main_faction = -1
+                for i in range(len(alignment_wheel)):
+                    if alignment_wheel[i] == self.main_faction:
+                        position_main_faction = i
+                if position_main_faction != -1:
+                    ally_pos_1 = (position_main_faction + 1) % 7
+                    ally_pos_2 = (position_main_faction - 1) % 7
+                    if split_message[1] == alignment_wheel[ally_pos_1] \
+                            or split_message[1] == alignment_wheel[ally_pos_2]:
+                        self.ally_faction = split_message[1]
+                        changed_ally = True
                 print(self.main_faction, self.ally_faction)
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
