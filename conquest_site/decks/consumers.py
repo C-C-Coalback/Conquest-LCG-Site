@@ -176,6 +176,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
                     await self.send(text_data=json.dumps({"message": "SS/Shrine of Warpflame"}))
                     await self.send(text_data=json.dumps({"message": "SS/Mark of Chaos"}))
+                if card_object.get_name() == "Captain Cato Sicarius":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Sicarius's Chosen"}))
+                    await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
+                    await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Cato's Stronghold"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Tallassarian Tempest Blade"}))
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":

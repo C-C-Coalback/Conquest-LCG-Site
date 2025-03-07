@@ -1,12 +1,14 @@
-from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit
+from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
+    SpaceMarinesCardsInit
 
 
 def init_player_cards():
+    space_marines_card_array = SpaceMarinesCardsInit.space_marines_cards_init()
     orks_card_array = OrksCardsInit.orks_cards_init()
     chaos_card_array = ChaosCardsInit.chaos_cards_init()
     neutral_card_array = NeutralCardsInit.neutral_cards_init()
     final_card_array = FinalCardInit.final_card_init()
-    card_array = orks_card_array + chaos_card_array + neutral_card_array + final_card_array
+    card_array = space_marines_card_array + orks_card_array + chaos_card_array + neutral_card_array + final_card_array
     return card_array
 
 

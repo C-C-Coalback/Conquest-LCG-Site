@@ -99,7 +99,7 @@ class Card:
 
 class UnitCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, card_type, attack, health, command,
-                 unique, image_name, brutal=False, applies_discounts=None, action_in_hand=False
+                 unique, image_name, brutal=False, flying=False, applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -110,6 +110,8 @@ class UnitCard(Card):
         self.command = command
         self.by_base_brutal = brutal
         self.brutal = brutal
+        self.by_base_flying = flying
+        self.flying = flying
         self.extra_attack_until_end_of_battle = 0
 
     def get_by_base_brutal(self):
@@ -217,11 +219,11 @@ class UnitCard(Card):
 
 class WarlordCard(UnitCard):
     def __init__(self, name, text, traits, faction, attack, health, bloodied_attack, bloodied_health, bloodied_text,
-                 starting_resources, starting_cards, image_name, brutal=False, applies_discounts=None
+                 starting_resources, starting_cards, image_name, brutal=False, flying=False, applies_discounts=None
                  , action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None):
         super().__init__(name, text, traits, -1, faction, "Signature", "Warlord", attack, health, 999,
-                         True, image_name, brutal, applies_discounts, action_in_hand, allowed_phases_in_hand,
+                         True, image_name, brutal, flying, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play)
         self.bloodied = False
         self.bloodied_attack = bloodied_attack
@@ -276,10 +278,10 @@ class WarlordCard(UnitCard):
 
 class ArmyCard(UnitCard):
     def __init__(self, name, text, traits, cost, faction, loyalty, attack, health, command, unique,
-                 image_name, brutal=False, applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 image_name, brutal=False, flying=False, applies_discounts=None, action_in_hand=False,
+                 allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
-                         unique, image_name, brutal, applies_discounts, action_in_hand, allowed_phases_in_hand,
+                         unique, image_name, brutal, flying, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play)
 
     def print_info(self):
