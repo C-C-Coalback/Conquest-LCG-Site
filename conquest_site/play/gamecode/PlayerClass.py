@@ -324,16 +324,31 @@ class Player:
                     return "FAIL/Insufficient resources"
         return "FAIL/Invalid card"
 
-    def commit_warlord_to_planet(self, planet_pos=None):
+    def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
         if planet_pos is None:
             planet_pos = self.warlord_commit_location + 1
-        for i in range(len(headquarters_list)):
-            if headquarters_list[i].get_card_type() == "Warlord":
-                print(headquarters_list[i].get_name())
-                self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
-                self.headquarters.remove(headquarters_list[i])
-                return True
+        if only_warlord:
+            for i in range(len(headquarters_list)):
+                if headquarters_list[i].get_card_type() == "Warlord":
+                    print(headquarters_list[i].get_name())
+                    self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
+                    self.headquarters.remove(headquarters_list[i])
+                    return True
+            return False
+        else:
+            i = 0
+            while i < len(headquarters_list):
+                card_type = headquarters_list[i].get_card_type()
+                if card_type == "Warlord" or card_type == "Army" or card_type == "Token":
+                    print(headquarters_list[i].get_name())
+                    if card_type != "Warlord":
+                        headquarters_list[i].exhaust_card()
+                    self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
+                    self.headquarters.remove(headquarters_list[i])
+                    i -= 1
+                i += 1
+        return None
 
     def count_command_at_planet(self, planet_id):
         counted_command = 0
