@@ -402,11 +402,9 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
-        # if self.search_card_at_planet("Nazdreg", planet_id) != -1:
-        #     if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
-        #         self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
-        # if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Goff Boyz":
-        #     attack_value = attack_value + 3
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Goff Boyz":
+            if self.game.round_number == planet_id:
+                attack_value = attack_value + 3
         if self.cards_in_play[planet_id + 1][unit_id].get_brutal():
             attack_value = attack_value + self.cards_in_play[planet_id + 1][unit_id].get_damage()
         self.cards_in_play[planet_id + 1][unit_id].reset_brutal()
