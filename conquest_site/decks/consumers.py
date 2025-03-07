@@ -150,6 +150,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         await self.send(text_data=json.dumps({"message": message}))
                     if self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
                         await self.send(text_data=json.dumps({"message": message}))
+                    if card_object.get_faction() == "Neutral":
+                        await self.send(text_data=json.dumps({"message": message}))
                 if card_object.get_name() == "Nazdreg":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Nazdreg's Flash Gitz"}))
