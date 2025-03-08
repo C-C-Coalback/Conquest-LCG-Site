@@ -427,6 +427,13 @@ class Player:
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         return damage_too_great
 
+    def suffer_area_effect(self, planet_id, amount):
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            self.assign_damage_to_pos(planet_id, i, amount)
+
+    def get_number_of_units_at_planet(self, planet_id):
+        return len(self.cards_in_play[planet_id + 1])
+
     def check_if_card_is_destroyed(self, planet_id, unit_id):
         return not self.cards_in_play[planet_id + 1][unit_id].check_health()
 
