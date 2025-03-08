@@ -156,33 +156,43 @@ class Game:
                             print("Deploy card in hand at pos", game_update_string[2])
                             self.card_pos_to_deploy = int(game_update_string[2])
                             if self.number_with_deploy_turn == "1":
-                                played_support = self.p1.play_card_if_support(self.card_pos_to_deploy)
-                                if played_support == "SUCCESS/Support":
-                                    await self.p1.send_hand()
-                                    await self.p1.send_hq()
-                                    await self.p1.send_resources()
-                                    if not self.p2.has_passed:
-                                        self.player_with_deploy_turn = self.name_2
-                                        self.number_with_deploy_turn = "2"
-                                        await self.send_info_box()
-                                else:
+                                card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
+                                if card.get_card_type() == "Support":
+                                    played_support = self.p1.play_card_if_support(self.card_pos_to_deploy,
+                                                                                  already_checked=True, card=card)
+                                    if played_support == "SUCCESS/Support":
+                                        await self.p1.send_hand()
+                                        await self.p1.send_hq()
+                                        await self.p1.send_resources()
+                                        if not self.p2.has_passed:
+                                            self.player_with_deploy_turn = self.name_2
+                                            self.number_with_deploy_turn = "2"
+                                            await self.send_info_box()
+                                elif card.get_card_type() == "Army":
                                     self.p1.aiming_reticle_color = "blue"
                                     self.p1.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                     await self.p1.send_hand()
-                            elif self.number_with_deploy_turn == "2":
-                                played_support = self.p2.play_card_if_support(self.card_pos_to_deploy)
-                                if played_support == "SUCCESS/Support":
-                                    await self.p2.send_hand()
-                                    await self.p2.send_hq()
-                                    await self.p2.send_resources()
-                                    if not self.p1.has_passed:
-                                        self.player_with_deploy_turn = self.name_1
-                                        self.number_with_deploy_turn = "1"
-                                        await self.send_info_box()
                                 else:
+                                    self.card_pos_to_deploy = -1
+                            elif self.number_with_deploy_turn == "2":
+                                card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
+                                if card.get_card_type() == "Support":
+                                    played_support = self.p2.play_card_if_support(self.card_pos_to_deploy,
+                                                                                  already_checked=True, card=card)
+                                    if played_support == "SUCCESS/Support":
+                                        await self.p2.send_hand()
+                                        await self.p2.send_hq()
+                                        await self.p2.send_resources()
+                                        if not self.p1.has_passed:
+                                            self.player_with_deploy_turn = self.name_1
+                                            self.number_with_deploy_turn = "1"
+                                            await self.send_info_box()
+                                elif card.get_card_type() == "Army":
                                     self.p2.aiming_reticle_color = "blue"
                                     self.p2.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                     await self.p2.send_hand()
+                                else:
+                                    self.card_pos_to_deploy = -1
 
             elif len(game_update_string) == 2:
                 if name == self.player_with_deploy_turn:

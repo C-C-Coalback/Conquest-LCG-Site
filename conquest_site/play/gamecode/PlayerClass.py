@@ -285,13 +285,20 @@ class Player:
         for i in range(len(self.headquarters)):
             self.headquarters[i].print_info()
 
-    def play_card_if_support(self, position_hand):
+    def play_card_if_support(self, position_hand, already_checked=False, card=None):
+        if already_checked:
+            played_card = self.play_card(-2, card=card)
+            return "SUCCESS/Support"
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         if card.card_type == "Support":
             print("Need to play support card")
             played_card = self.play_card(-2, card=card)
             return "SUCCESS/Support"
         return "SUCCESS/Not Support"
+
+    def get_card_in_hand(self, position_hand):
+        card = FindCard.find_card(self.cards[position_hand], self.card_array)
+        return card
 
     def add_card_to_planet(self, card, position):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
