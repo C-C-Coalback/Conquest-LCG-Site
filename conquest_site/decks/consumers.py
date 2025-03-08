@@ -167,27 +167,35 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/Bigga Is Betta"}))
                     await self.send(text_data=json.dumps({"message": "SS/Kraktoof Hall"}))
                     await self.send(text_data=json.dumps({"message": "SS/Cybork Body"}))
-                if card_object.get_name() == "Zarathur, High Sorcerer":
+                elif card_object.get_name() == "Zarathur, High Sorcerer":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Zarathur's Flamers"}))
                     await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
                     await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
                     await self.send(text_data=json.dumps({"message": "SS/Shrine of Warpflame"}))
                     await self.send(text_data=json.dumps({"message": "SS/Mark of Chaos"}))
-                if card_object.get_name() == "Captain Cato Sicarius":
+                elif card_object.get_name() == "Captain Cato Sicarius":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Sicarius's Chosen"}))
                     await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
                     await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
                     await self.send(text_data=json.dumps({"message": "SS/Cato's Stronghold"}))
                     await self.send(text_data=json.dumps({"message": "SS/Tallassarian Tempest Blade"}))
-                if card_object.get_name() == "Colonel Straken":
+                elif card_object.get_name() == "Colonel Straken":
                     for i in range(4):
                         await self.send(text_data=json.dumps({"message": "SS/Straken's Command Squad"}))
                     await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
                     await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
                     await self.send(text_data=json.dumps({"message": "SS/Omega Zero Command"}))
                     await self.send(text_data=json.dumps({"message": "SS/Straken's Cunning"}))
+                elif card_object.get_name() == "Packmaster Kith":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Kith's Khymeramasters"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Pact of the Haemonculi"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Pact of the Haemonculi"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Khymera Den"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Agonizer of Bren"}))
+
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":
