@@ -275,7 +275,6 @@ class Game:
                         if name == self.player_who_is_shielding:
                             await self.resolve_shield_of_unit(name, -1)
                     elif name == self.player_with_combat_turn:
-
                         if self.number_with_combat_turn == "1":
                             self.number_with_combat_turn = "2"
                             self.player_with_combat_turn = self.name_2
@@ -306,7 +305,23 @@ class Game:
                                 await self.check_combat_end(name)
                         else:
                             await self.send_info_box()
-            if len(game_update_string) == 3:
+            elif len(game_update_string) == 2:
+                if game_update_string[0] == "PLANETS":
+                    if self.mode == "Normal":
+                        if name == self.player_with_combat_turn:
+                            chosen_planet = int(game_update_string[1])
+                            if chosen_planet == self.last_planet_checked_for_battle:
+                                if self.attacker_position != -1:
+                                    if self.number_with_combat_turn == "1":
+                                        amount_aoe = self.p1.cards_in_play[chosen_planet + 1][self.attacker_position].get_area_effect()
+                                        if amount_aoe > 0:
+                                            print("P2 needs to suffer area effect (", str(amount_aoe), ")")
+                                    elif self.number_with_combat_turn == "2":
+                                        amount_aoe = self.p2.cards_in_play[chosen_planet + 1][self.attacker_position].get_area_effect()
+                                        if amount_aoe > 0:
+                                            print("P1 needs to suffer area effect (", str(amount_aoe), ")")
+
+            elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     print("Card in hand clicked on")
                     if self.mode == "SHIELD":
@@ -314,7 +329,7 @@ class Game:
                             if game_update_string[1] == self.number_who_is_shielding:
                                 hand_pos = int(game_update_string[2])
                                 await self.resolve_shield_of_unit(name, hand_pos)
-            if len(game_update_string) == 4:
+            elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     print("Unit clicked on.")
                     if name == self.player_with_combat_turn:

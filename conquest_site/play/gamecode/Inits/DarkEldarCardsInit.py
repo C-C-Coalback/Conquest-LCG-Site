@@ -70,7 +70,8 @@ def dark_eldar_cards_init():
                                                                             "attacks it may instead deal its "
                                                                             "Area Effect damage to each enemy "
                                                                             "unit at this planet.",
-                                                   "Warrior. Kabalite.", 2, faction, "Common", 2, 2, 0, False),
+                                                   "Warrior. Kabalite.", 2, faction, "Common", 2, 2, 0, False,
+                                                   area_effect=1),
                               CardClasses.ArmyCard("Syren Zythlex", "Reaction: After an enemy unit is deployed at "
                                                                     "this planet, exhaust it.",
                                                    "Warrior. Wych.", 3, faction, "Loyal", 2, 3, 2, True),

@@ -47,7 +47,7 @@ def chaos_cards_init():
                                              , brutal=True),
                         CardClasses.ArmyCard("Vicious Bloodletter", "Area Effect (3), No Wargear Attachments",
                                              "Daemon. Elite. Khorne.", 5, "Chaos", "Loyal",
-                                             4, 4, 0, False, ""),
+                                             4, 4, 0, False, area_effect=3),
                         CardClasses.ArmyCard("Umbral Preacher", "Each army unit at this "
                                                                 "planet cannot retreat from battle.",
                                              "Cultist. Priest.", 3, "Chaos", "Common",

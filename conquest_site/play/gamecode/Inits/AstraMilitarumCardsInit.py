@@ -55,7 +55,7 @@ def astra_militarum_cards_init():
                                                                              "Area Effect damage to each enemy "
                                                                              "unit at this planet.",
                                                         "Vehicle. Tank. Mordian.", 4, faction, "Common",
-                                                        3, 3, 2, False),
+                                                        3, 3, 2, False, area_effect=1),
                                    CardClasses.ArmyCard("Assault Valkyrie", "No Wargear Attachments.\n Flying. (This "
                                                                             "unit takes half damage from non-Flying "
                                                                             "units.", "Vehicle. Transport.",

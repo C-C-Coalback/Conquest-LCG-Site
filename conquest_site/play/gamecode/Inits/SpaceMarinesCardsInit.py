@@ -40,7 +40,7 @@ def space_marines_cards_init():
                                                                                 "Area Effect damage to each enemy "
                                                                                 "unit at this planet.",
                                                      "Soldier. Ultramarines.", 2, faction,
-                                                     "Common", 1, 3, 1, False, ""),
+                                                     "Common", 1, 3, 1, False, area_effect=1),
                                 CardClasses.ArmyCard("Honored Librarian", "Enemy units cannot attack this unit while "
                                                                           "you control a unit not named "
                                                                           "\"Honored Librarian\" at this planet",
@@ -57,7 +57,7 @@ def space_marines_cards_init():
                                                                              "Area Effect damage to each enemy "
                                                                              "unit at this planet.",
                                                      "Soldier. Blood Angels.", 4, faction,
-                                                     "Common", 3, 3, 1, False, ""),
+                                                     "Common", 3, 3, 1, False, area_effect=2),
                                 CardClasses.ArmyCard("Land Raider", "No Wargear Attachments.\n Non-Vehicle units you "
                                                                     "control at this planet cannot be targeted by "
                                                                     "enemy card abilities.", "Vehicle. Tank. Elite.",
