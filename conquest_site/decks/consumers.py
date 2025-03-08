@@ -195,6 +195,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/Pact of the Haemonculi"}))
                     await self.send(text_data=json.dumps({"message": "SS/Khymera Den"}))
                     await self.send(text_data=json.dumps({"message": "SS/Agonizer of Bren"}))
+                elif card_object.get_name() == "Eldorath Starbane":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Starbane's Council"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Foresight"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Foresight"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Alaitoc Shrine"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Mobility"}))
 
 
         elif len(split_message) == 2:
