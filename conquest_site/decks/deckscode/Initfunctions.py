@@ -1,5 +1,5 @@
 from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
-    SpaceMarinesCardsInit, EldarCardsInit, AstraMilitarumCardsInit, DarkEldarCardsInit
+    SpaceMarinesCardsInit, EldarCardsInit, AstraMilitarumCardsInit, TauCardsInit, DarkEldarCardsInit
 
 
 def init_player_cards():
@@ -9,10 +9,11 @@ def init_player_cards():
     chaos_card_array = ChaosCardsInit.chaos_cards_init()
     dark_eldar_card_array = DarkEldarCardsInit.dark_eldar_cards_init()
     eldar_card_array = EldarCardsInit.eldar_cards_init()
+    tau_card_array = TauCardsInit.tau_cards_init()
     neutral_card_array = NeutralCardsInit.neutral_cards_init()
     final_card_array = FinalCardInit.final_card_init()
     card_array = space_marines_card_array + astra_militarum_card_array + orks_card_array + chaos_card_array + \
-        dark_eldar_card_array + eldar_card_array + neutral_card_array + final_card_array
+        dark_eldar_card_array + eldar_card_array + tau_card_array + neutral_card_array + final_card_array
     return card_array
 
 

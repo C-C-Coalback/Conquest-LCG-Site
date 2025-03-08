@@ -202,7 +202,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/Foresight"}))
                     await self.send(text_data=json.dumps({"message": "SS/Alaitoc Shrine"}))
                     await self.send(text_data=json.dumps({"message": "SS/Mobility"}))
-
+                elif card_object.get_name() == "Commander Shadowsun":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Shadowsun's Stealth Cadre"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Squadron Redeployment"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Squadron Redeployment"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Communications Relay"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Command-Link Drone"}))
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":
