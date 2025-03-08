@@ -334,10 +334,10 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
-                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
-                            cardCount += 1
-                            if (cardCount === 10) {
-                                document.getElementById('current-deck').innerHTML += `<p></p>`
+                            `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`;
+                            cardCount += 1;
+                            if (cardCount % 10 === 0) {
+                                document.getElementById('current-deck').innerHTML += `<p></p>`;
                             }
                         }
                     }
