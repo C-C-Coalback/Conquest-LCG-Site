@@ -42,6 +42,7 @@ def second_part_deck_validation(deck):
         print("Faction chosen does not match the warlord")
         return "Warlord does not match main faction"
     if len(factions) == 1 and warlord_matches:
+        factions.append("None")
         return deck_validation(deck, remaining_signature_squad, factions)
     if len(factions) == 2 and warlord_matches:
         if factions[0] == factions[1]:
