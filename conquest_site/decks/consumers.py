@@ -4,6 +4,7 @@ import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .deckscode import CardClasses, Initfunctions, FindCard
 import os
+import copy
 
 cards_array = Initfunctions.init_player_cards()
 planet_cards_array = Initfunctions.init_planet_cards()
@@ -29,12 +30,9 @@ def second_part_deck_validation(deck):
     if warlord_card.get_card_type() != "Warlord":
         print("Card in Warlord position is not a warlord")
         return "Card in Warlord position is not a warlord"
-    if warlord_card.get_name() == "Nazdreg":
-        remaining_signature_squad = ['1x Cybork Body', '1x Kraktoof Hall',
-                                     '2x Bigga Is Betta', "4x Nazdreg's Flash Gitz"]
-    if warlord_card.get_name() == "Zarathur, High Sorcerer":
-        remaining_signature_squad = ['1x Mark of Chaos', '1x Shrine of Warpflame',
-                                     '2x Infernal Gateway', "4x Zarathur's Flamers"]
+    remaining_signature_squad = copy.deepcopy(warlord_card.get_signature_squad())
+    print("Warlord name: ", warlord_card.get_name())
+    print("Remaining signature squad list: ", remaining_signature_squad)
     factions = deck[2].split(sep=" (")
     if len(factions) == 2:
         factions[1] = factions[1][:-1]
@@ -79,7 +77,7 @@ def deck_validation(deck, remaining_signature_squad, factions):
             print(remaining_signature_squad)
         else:
             print("No match")
-            return "Unexpected Card in Signature Squad"
+            return "Unexpected Card in Signature Squad: " + deck[current_index]
         current_index += 1
     if len(remaining_signature_squad) > 0:
         return "Missing something from signature squad"
@@ -183,6 +181,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
                     await self.send(text_data=json.dumps({"message": "SS/Cato's Stronghold"}))
                     await self.send(text_data=json.dumps({"message": "SS/Tallassarian Tempest Blade"}))
+                if card_object.get_name() == "Colonel Straken":
+                    for i in range(4):
+                        await self.send(text_data=json.dumps({"message": "SS/Straken's Command Squad"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Omega Zero Command"}))
+                    await self.send(text_data=json.dumps({"message": "SS/Straken's Cunning"}))
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":

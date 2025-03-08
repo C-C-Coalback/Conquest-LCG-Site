@@ -6,7 +6,10 @@ def chaos_cards_init():
                                                 "Interrupt: When damage is assigned to an enemy unit at this"
                                                 " planet, increase that damage by 1.","Psyker. Tzeentch.",
                                                 "Chaos", 1, 6, 1, 5,
-                                                "Bloodied.", 7, 7, ""),
+                                                "Bloodied.", 7, 7,
+                                                ['1x Mark of Chaos', '1x Shrine of Warpflame',
+                                                 '2x Infernal Gateway', "4x Zarathur's Flamers"]
+                                                ),
                         CardClasses.ArmyCard("Zarathur's Flamers", "Action: Sacrifice this unit to deal 2 "
                                                                    "damage to a target non-warlord "
                                                                    "unit at the same planet.",

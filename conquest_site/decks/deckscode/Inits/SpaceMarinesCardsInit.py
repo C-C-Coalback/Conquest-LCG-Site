@@ -7,7 +7,9 @@ def space_marines_cards_init():
                                                         "Reaction: After an enemy unit at this planet"
                                                         "is destoyed, gain 1 resource.", "Soldier. Ultramarines.",
                                                         faction, 2, 6, 2, 5,
-                                                        "Bloodied.", 7, 7, ""),
+                                                        "Bloodied.", 7, 7,
+                                                        ["1x Cato's Stronghold", "1x Tallassarian Tempest Blade",
+                                                         "2x The Fury of Sicarius", "4x Sicaruis's Chosen"]),
                                 CardClasses.ArmyCard("Sicaruis's Chosen", "Reaction: After this unit enters play, "
                                                                           "move a target enemy army unit at an "
                                                                           "adjacent planet to this planet "

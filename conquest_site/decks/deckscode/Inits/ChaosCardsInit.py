@@ -4,9 +4,11 @@ from .. import CardClasses
 def chaos_cards_init():
     chaos_card_array = [CardClasses.WarlordCard("Zarathur, High Sorcerer",
                                                 "Interrupt: When damage is assigned to an enemy unit at this"
-                                                " planet, increase that damage by 1.","Psyker. Tzeentch.",
+                                                " planet, increase that damage by 1.", "Psyker. Tzeentch.",
                                                 "Chaos", 1, 6, 1, 5,
-                                                "Bloodied.", 7, 7, ""),
+                                                "Bloodied.", 7, 7,
+                                                ['1x Mark of Chaos', '1x Shrine of Warpflame',
+                                                 '2x Infernal Gateway', "4x Zarathur's Flamers"]),
                         CardClasses.ArmyCard("Zarathur's Flamers", "Action: Sacrifice this unit to deal 2 "
                                                                    "damage to a target non-warlord "
                                                                    "unit at the same planet.",
@@ -78,7 +80,8 @@ def chaos_cards_init():
                                                            " any attachments at a target planet or HQ.", "Power.",
                                               3, "Chaos", "Common", 1, False, ""),
                         CardClasses.EventCard("Tzeentch's Firestorm", "Action: Deal X damage "
-                                                                      "to a target non-warlord unit.", "Power. Tzeentch.",
+                                                                      "to a target non-warlord unit.",
+                                              "Power. Tzeentch.",
                                               999, "Chaos", "Loyal", 2, False, ""),
                         CardClasses.EventCard("Promise of Glory", "Deploy Action: Put 2 Cultist "
                                                                   "tokens into play at your HQ.",
