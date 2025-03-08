@@ -388,6 +388,9 @@ class Player:
             return False
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
+    def get_armorbane_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
+
     def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             current_name = self.cards_in_play[planet_id + 1][i].get_name()

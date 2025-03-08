@@ -412,6 +412,7 @@ class Game:
                                         await self.p2.send_units_at_planet(chosen_planet)
                         elif self.defender_position == -1:
                             if game_update_string[1] != self.number_with_combat_turn:
+                                armorbane_check = False
                                 self.defender_planet = int(game_update_string[2])
                                 self.defender_position = int(game_update_string[3])
                                 print("Defender:", self.defender_planet, self.defender_position)
@@ -429,6 +430,8 @@ class Game:
                                         unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
                                                                                  self.defender_position,
                                                                                  damage=attack_value)
+                                        armorbane_check = self.p1.get_armorbane_given_pos(self.attacker_planet,
+                                                                                          self.attacker_position)
                                         self.mode = "SHIELD"
                                         self.player_who_is_shielding = self.name_2
                                         self.number_who_is_shielding = "2"
@@ -437,18 +440,22 @@ class Game:
                                         self.damage_taken_by_unit = attack_value
                                         self.p2.set_aiming_reticle_in_play(self.defender_planet,
                                                                            self.defender_position, "red")
+                                        if armorbane_check and attack_value > 0:
+                                            await self.resolve_shield_of_unit(self.name_2, -1)
                                     else:
                                         self.p1.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                              self.attacker_position)
 
                                         await self.p1.send_units_at_planet(self.attacker_planet)
-                                    await self.p2.send_units_at_planet(self.defender_planet)
+                                    if not armorbane_check or attack_value < 1:
+                                        await self.p2.send_units_at_planet(self.defender_planet)
                                     if attack_value < 1:
                                         self.reset_combat_positions()
                                         self.number_with_combat_turn = "2"
                                         self.player_with_combat_turn = self.name_2
                                         name = self.name_2
-                                    await self.send_info_box()
+                                    if not armorbane_check or attack_value < 1:
+                                        await self.send_info_box()
                                 elif self.number_with_combat_turn == "2":
                                     attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
                                                                                 self.attacker_position)
@@ -462,7 +469,8 @@ class Game:
                                         unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
                                                                                  self.defender_position,
                                                                                  damage=attack_value, can_shield=False)
-
+                                        armorbane_check = self.p2.get_armorbane_given_pos(self.attacker_planet,
+                                                                                          self.attacker_position)
                                         self.mode = "SHIELD"
                                         self.player_who_is_shielding = self.name_1
                                         self.number_who_is_shielding = "1"
@@ -471,18 +479,22 @@ class Game:
                                         self.damage_taken_by_unit = attack_value
                                         self.p1.set_aiming_reticle_in_play(self.defender_planet,
                                                                            self.defender_position, "red")
+                                        if armorbane_check and attack_value > 0:
+                                            await self.resolve_shield_of_unit(self.name_1, -1)
                                     else:
                                         self.p2.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                              self.attacker_position)
 
                                         await self.p2.send_units_at_planet(self.attacker_planet)
-                                    await self.p1.send_units_at_planet(self.defender_planet)
+                                    if not armorbane_check or attack_value < 1:
+                                        await self.p1.send_units_at_planet(self.defender_planet)
                                     if attack_value < 1:
                                         self.reset_combat_positions()
                                         self.number_with_combat_turn = "1"
                                         self.player_with_combat_turn = self.name_1
                                         name = self.name_1
-                                    await self.send_info_box()
+                                    if not armorbane_check or attack_value < 1:
+                                        await self.send_info_box()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 

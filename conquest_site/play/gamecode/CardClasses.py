@@ -120,6 +120,12 @@ class UnitCard(Card):
         self.area_effect = area_effect
         self.extra_attack_until_end_of_battle = 0
 
+    def get_by_base_armorbane(self):
+        return self.by_base_armorbane
+
+    def get_armorbane(self):
+        return self.armorbane
+
     def get_by_base_area_effect(self):
         return self.by_base_area_effect
 
