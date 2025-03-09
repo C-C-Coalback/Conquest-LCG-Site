@@ -550,80 +550,50 @@ class Game:
         unit_dead = False
         print("Info shielding:", self.defender_planet, self.defender_position)
         if name == self.name_1:
-            self.p1.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
-            shield_on_card = 0
-            if hand_pos != -1:
-                shield_on_card = self.p1.get_shields_given_pos(hand_pos)
-                self.p1.discard_card_from_hand(hand_pos)
-                await self.p1.send_hand()
-                await self.p1.send_discard()
-            amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
-            self.p1.remove_damage_from_pos(self.defender_planet, self.defender_position,
-                                           amount_to_shield)
-            if self.p1.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
-                unit_dead = True
-                self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
-                if self.resources_need_sending_outside_normal_sends:
-                    await self.p1.send_resources()
-                    await self.p2.send_resources()
-                    self.resources_need_sending_outside_normal_sends = False
-                if self.p1.warlord_just_got_bloodied:
-                    self.p1.warlord_just_got_bloodied = False
-                    await self.p1.send_hq()
-                await self.p1.send_discard()
-            self.number_of_units_left_to_suffer_damage -= 1
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        primary_player.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
+        shield_on_card = 0
+        if hand_pos != -1:
+            shield_on_card = primary_player.get_shields_given_pos(hand_pos)
+            primary_player.discard_card_from_hand(hand_pos)
+            await primary_player.send_hand()
+            await primary_player.send_discard()
+        amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
+        primary_player.remove_damage_from_pos(self.defender_planet, self.defender_position,
+                                              amount_to_shield)
+        if primary_player.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
+            unit_dead = True
+            primary_player.destroy_card_in_play(self.defender_planet, self.defender_position)
+            if self.resources_need_sending_outside_normal_sends:
+                await primary_player.send_resources()
+                await secondary_player.send_resources()
+                self.resources_need_sending_outside_normal_sends = False
+            if primary_player.warlord_just_got_bloodied:
+                primary_player.warlord_just_got_bloodied = False
+                await primary_player.send_hq()
+            await primary_player.send_discard()
+        self.number_of_units_left_to_suffer_damage -= 1
 
-            if self.number_of_units_left_to_suffer_damage <= 0:
-                self.number_of_units_left_to_suffer_damage = 0
-                self.number_with_combat_turn = "1"
-                self.player_with_combat_turn = self.name_1
-                self.p2.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-                self.reset_shielding_values()
-                self.mode = "Normal"
-            else:
-                if not unit_dead:
-                    self.next_unit_to_suffer_damage += 1
-                self.defender_position = self.next_unit_to_suffer_damage
-                self.p1.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
-        elif name == self.name_2:
-            self.p2.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
-            shield_on_card = 0
-            if hand_pos != -1:
-                shield_on_card = self.p2.get_shields_given_pos(hand_pos)
-                self.p2.discard_card_from_hand(hand_pos)
-                await self.p2.send_hand()
-                await self.p2.send_discard()
-            amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
-            self.p2.remove_damage_from_pos(self.defender_planet, self.defender_position,
-                                           amount_to_shield)
-            if self.p2.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
-                unit_dead = True
-                self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
-                if self.resources_need_sending_outside_normal_sends:
-                    await self.p1.send_resources()
-                    await self.p2.send_resources()
-                    self.resources_need_sending_outside_normal_sends = False
-                if self.p2.warlord_just_got_bloodied:
-                    self.p2.warlord_just_got_bloodied = False
-                    await self.p2.send_hq()
-                await self.p2.send_discard()
-            self.number_of_units_left_to_suffer_damage -= 1
-            if self.number_of_units_left_to_suffer_damage <= 0:
-                self.number_of_units_left_to_suffer_damage = 0
-                self.p1.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-                self.reset_shielding_values()
-                self.mode = "Normal"
-                self.number_with_combat_turn = "2"
-                self.player_with_combat_turn = self.name_2
-            else:
-                if not unit_dead:
-                    self.next_unit_to_suffer_damage += 1
-                self.defender_position = self.next_unit_to_suffer_damage
-                self.p2.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
+        if self.number_of_units_left_to_suffer_damage <= 0:
+            self.number_of_units_left_to_suffer_damage = 0
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_shielding_values()
+            self.mode = "Normal"
+        else:
+            if not unit_dead:
+                self.next_unit_to_suffer_damage += 1
+            self.defender_position = self.next_unit_to_suffer_damage
+            primary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
 
         await self.send_info_box()
-        await self.p1.send_units_at_planet(self.attacker_planet)
-        await self.p2.send_units_at_planet(self.attacker_planet)
+        await primary_player.send_units_at_planet(self.attacker_planet)
+        await secondary_player.send_units_at_planet(self.attacker_planet)
         if self.number_of_units_left_to_suffer_damage <= 0:
             self.reset_combat_positions()
 
