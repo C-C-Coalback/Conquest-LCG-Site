@@ -59,6 +59,7 @@ class Game:
         self.position_of_damaged_unit = None
         self.damage_taken_by_unit = None
         self.mode = "Normal"
+        self.stored_mode = self.mode
         self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
         self.planet_aiming_reticle_active = False
@@ -67,6 +68,7 @@ class Game:
         self.next_unit_to_suffer_damage = -1
         self.resources_need_sending_outside_normal_sends = False
         self.actions_allowed = True
+        self.player_with_action = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -505,6 +507,15 @@ class Game:
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
+    async def update_game_event_action(self, name, game_update_string):
+        if len(game_update_string) == 1:
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                self.mode = self.stored_mode
+                self.player_with_action = ""
+                print("Canceled special action")
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -514,8 +525,20 @@ class Game:
             if game_update_string[0] == "action-button":
                 if self.actions_allowed:
                     print("Need to run action code")
-                    self.mode = "ACTION"
-        if self.phase == "DEPLOY":
+                    if self.phase == "DEPLOY":
+                        if self.player_with_deploy_turn == name:
+                            self.stored_mode = self.mode
+                            self.mode = "ACTION"
+                            self.player_with_action = name
+                            print("Special deploy action")
+                    else:
+                        self.stored_mode = self.mode
+                        self.mode = "ACTION"
+                        self.player_with_action = name
+                        print("Special action")
+        if self.mode == "ACTION":
+            await self.update_game_event_action(name, game_update_string)
+        elif self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "COMMAND":
             await self.update_game_event_command_section(name, game_update_string)
