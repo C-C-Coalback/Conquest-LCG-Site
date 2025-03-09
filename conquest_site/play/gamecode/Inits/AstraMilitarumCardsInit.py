@@ -68,7 +68,8 @@ def astra_militarum_cards_init():
                                                                           "non-warlord unit at this planet. "
                                                                           "(Limit once per phase.)",
                                                         "Soldier. Officer. Vostroya.",
-                                                        3, faction, "Loyal", 2, 3, 2, True),
+                                                        3, faction, "Loyal", 2, 3, 2, True,
+                                                        action_in_play=True, allowed_phases_in_play="ALL"),
                                    CardClasses.ArmyCard("Enginseer Augur", "Interrupt: When this unit leaves play, "
                                                                            "search the top 6 cards of your deck for "
                                                                            "an Astra Militarum support card with "
@@ -94,11 +95,13 @@ def astra_militarum_cards_init():
                                                                                "(Units with Ranged attack during the "
                                                                                "ranged skirmish at the beginning "
                                                                                "of the battle.)", "Tactic.", 1,
-                                                         faction, "Loyal", 2, False),
+                                                         faction, "Loyal", 2, False, action_in_hand=True,
+                                                         allowed_phases_in_hand="COMBAT"),
                                    CardClasses.EventCard("Suppressive Fire", "Combat Action: Exhaust a unit you "
                                                                              "control to exhaust a target non-warlord "
                                                                              "unit at the same planet.", "Tactic.",
-                                                         0, faction, "Common", 1, False),
+                                                         0, faction, "Common", 1, False, action_in_hand=True,
+                                                         allowed_phases_in_hand="COMBAT"),
                                    CardClasses.AttachmentCard("Hostile Environment Gear", "Attach to an army unit.\n"
                                                                                           "Attached unit gets +3 HP.",
                                                               "Wargear. Armor.", 1, faction, "Common", 1, False),
@@ -125,6 +128,7 @@ def astra_militarum_cards_init():
                                    CardClasses.SupportCard("Catachan Outpost", "Combat Action: Exhaust this support to "
                                                                                "give a target unit +2 ATK for its "
                                                                                "next attack this phase.", "Location.",
-                                                           2, faction, "Common", False),
+                                                           2, faction, "Common", False, action_in_play=True,
+                                                           allowed_phases_in_play="COMBAT"),
                                    ]
     return astra_militarum_cards_array

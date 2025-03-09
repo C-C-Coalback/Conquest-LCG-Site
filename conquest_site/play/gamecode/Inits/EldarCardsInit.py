@@ -31,7 +31,8 @@ def eldar_cards_init():
                          CardClasses.ArmyCard("Wildrider Squadron", "No Wargear Attachments.\n"
                                                                     "Combat Action: Move this unit to an adjacent"
                                                                     " planet. (Limit once per phase.)",
-                                              "Vehicle. Saim-Hann.", 4, faction, "Common", 3, 4, 1, False),
+                                              "Vehicle. Saim-Hann.", 4, faction, "Common", 3, 4, 1, False,
+                                              action_in_play=True, allowed_phases_in_play="COMBAT"),
                          CardClasses.ArmyCard("Soaring Falcon", "No Wargear Attachments.\n"
                                                                 "Mobile.", "Vehicle.",
                                               3, faction, "Common", 1, 5, 2, False),
@@ -67,17 +68,20 @@ def eldar_cards_init():
                          CardClasses.EventCard("Superiority", "Interrupt: When a command struggle at a planet begins, "
                                                               "a target army unit at that planet loses all command "
                                                               "icons until the end of that command struggle.",
-                                               "Tactic.", 1, faction, "Common", 1, False),
+                                               "Tactic.", 1, faction, "Common", 1, False, action_in_hand=True,
+                                               allowed_phases_in_hand="COMMAND"),
                          CardClasses.EventCard("Nullify", "Interrupt: When your opponent plays an event card, "
                                                           "exhaust a unique Eldar unit to cancel its effects.",
                                                "Power.", 0, faction, "Common", 1, False),
                          CardClasses.EventCard("Doom", "Deploy Action: Destroy each non-unique unit at "
                                                        "each player's HQ.", "Power.",
-                                               4, faction, "Common", 1, False),
+                                               4, faction, "Common", 1, False, action_in_hand=True,
+                                               allowed_phases_in_hand="DEPLOY"),
                          CardClasses.EventCard("Gift of Isha", "Action: Put the topmost Eldar unit from your discard "
                                                                "pile into play at a planet. If that unit is still "
                                                                "in play at the end of the phase, discard it.",
-                                               "Power. Blessing.", 2, faction, "Loyal", 2, False),
+                                               "Power. Blessing.", 2, faction, "Loyal", 2, False,
+                                               action_in_hand=True, allowed_phases_in_hand="ALL"),
                          CardClasses.AttachmentCard("Banshee Power Sword", "Attach to an army unit.\n"
                                                                            "Attached unit gets +1 ATK.\n"
                                                                            "Interrupt: When attached unit declares an "
@@ -93,6 +97,7 @@ def eldar_cards_init():
                                                  applies_discounts=[True, 1, True]),
                          CardClasses.SupportCard("Craftworld Gate", "Action: Exhaust this support to return a target "
                                                                     "army unit you control to your hand.",
-                                                 "Location.", 1, faction, "Loyal", False)
+                                                 "Location.", 1, faction, "Loyal", False,
+                                                 action_in_play=True, allowed_phases_in_play="ALL")
                          ]
     return eldar_cards_array

@@ -427,7 +427,7 @@ class Game:
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
-    async def update_game_event_deploy_action(self, name, game_update_string):
+    async def update_game_event_deploy_action_hand(self, name, game_update_string):
         print("Deploy special action, card in hand at pos", game_update_string[2])
         self.card_pos_to_deploy = int(game_update_string[2])
         if self.number_with_deploy_turn == "1":
@@ -479,7 +479,7 @@ class Game:
                     if name == self.player_with_deploy_turn:
                         if game_update_string[1] == self.number_with_deploy_turn:
                             self.condition_sub_game.acquire()
-                            await self.update_game_event_deploy_action(name, game_update_string)
+                            await self.update_game_event_deploy_action_hand(name, game_update_string)
                             self.condition_sub_game.acquire()
                             self.condition_sub_game.notify_all()
                             self.condition_sub_game.release()
