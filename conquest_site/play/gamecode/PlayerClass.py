@@ -423,6 +423,12 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() != "Colonel Straken":
+            straken_check = self.search_card_at_planet(planet_id, "Colonel Straken", bloodied_relevant=True)
+            if straken_check:
+                if self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait("Soldier") or \
+                        self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait("Warrior"):
+                    attack_value += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
