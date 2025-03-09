@@ -517,8 +517,6 @@ class Game:
                 if self.actions_allowed:
                     print("Need to run action code")
                     self.mode = "ACTION"
-            self.condition_main_game.notify_all()
-            self.condition_main_game.release()
         if self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "COMMAND":
