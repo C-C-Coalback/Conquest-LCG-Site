@@ -513,6 +513,7 @@ class Game:
                 self.mode = self.stored_mode
                 self.player_with_action = ""
                 print("Canceled special action")
+                await self.game_sockets[0].receive_game_update(name + " canceled their action request")
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -523,7 +524,7 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif len(game_update_string) == 1:
             if game_update_string[0] == "action-button":
-                if self.actions_allowed:
+                if self.actions_allowed and self.mode != "ACTION":
                     print("Need to run action code")
                     if self.phase == "DEPLOY":
                         if self.player_with_deploy_turn == name:
@@ -531,11 +532,13 @@ class Game:
                             self.mode = "ACTION"
                             self.player_with_action = name
                             print("Special deploy action")
+                            await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
                     else:
                         self.stored_mode = self.mode
                         self.mode = "ACTION"
                         self.player_with_action = name
                         print("Special action")
+                        await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
         if self.mode == "ACTION":
             await self.update_game_event_action(name, game_update_string)
         elif self.phase == "DEPLOY":
