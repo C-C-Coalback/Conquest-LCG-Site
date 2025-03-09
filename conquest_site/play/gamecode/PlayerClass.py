@@ -391,11 +391,22 @@ class Player:
     def get_armorbane_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
-    def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False):
+    def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True):
+        if not ability_checking:
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                current_name = self.cards_in_play[planet_id + 1][i].get_name()
+                print(current_name, name_of_card)
+                if self.cards_in_play[planet_id + 1][i].get_name() == name_of_card:
+                    if not bloodied_relevant:
+                        return True
+                    if self.cards_in_play[planet_id + 1][i].get_bloodied():
+                        return False
+                    return True
+            return False
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            current_name = self.cards_in_play[planet_id + 1][i].get_name()
+            current_name = self.cards_in_play[planet_id + 1][i].get_ability()
             print(current_name, name_of_card)
-            if self.cards_in_play[planet_id + 1][i].get_name() == name_of_card:
+            if self.cards_in_play[planet_id + 1][i].get_ability() == name_of_card:
                 if not bloodied_relevant:
                     return True
                 if self.cards_in_play[planet_id + 1][i].get_bloodied():
@@ -408,11 +419,11 @@ class Player:
 
     def get_attack_given_pos(self, planet_id, unit_id):
         attack_value = self.cards_in_play[planet_id + 1][unit_id].get_attack()
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() != "Nazdreg":
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() != "Nazdreg":
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Goff Boyz":
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
         if self.cards_in_play[planet_id + 1][unit_id].get_brutal():

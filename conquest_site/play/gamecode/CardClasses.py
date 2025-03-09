@@ -5,7 +5,9 @@ class Card:
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name = name
+        self.ability = name
         self.text = text
+        self.blanked = False
         self.traits = traits
         self.cost = cost
         self.faction = faction
@@ -27,6 +29,17 @@ class Card:
 
     def get_name(self):
         return self.name
+
+    def get_ability(self):
+        if self.blanked:
+            return "BLANKED"
+        return self.ability
+
+    def set_blanked(self, new_val):
+        self.blanked = new_val
+
+    def get_blanked(self):
+        return self.blanked
 
     def get_once_per_phase_used(self):
         return self.once_per_phase_used
