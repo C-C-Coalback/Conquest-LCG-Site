@@ -1,28 +1,19 @@
 # Conquest-LCG-site
-Repo for the Warhammer 40k Conquest website using Python Django
+Repo for the Warhammer 40k Conquest website using Python Django.
 
-Needs a bunch of explaining that I am not willing to do rn.
+# Update 09/03/2025
 
-# Update 06/03/2025
-
-Like any good ping pong ball, I am all over the place.
-
-Going to use Daphne for deployment, simply because there
-is more documentation compared to uvicorn.
-
-# Version alpha-1.0
-
-The website is now developed enough for me to want to deploy it.
-Everything appears to be working, but it needs to have a public test
-to see if it survives coming into contact with the public. I can only
-test so many possible sources of errors myself.
+Made significant progress on the game; supporting more card effects, 
+actually able to use more cards, although without effects. Added shielding,
+for attacks only, working through adding actions.
 
 I plan on self-hosting the site, unsure what with. It's a coin toss between NGINX and Apache.
 If I can't figure it out, I will use DigitalOcean instead.
 
 # What is this?
 
-Warhammer 40k Conquest card game. Something something board game geek, see my other repos.
+Warhammer 40k Conquest card game. See the Board Game Geek page: 
+https://boardgamegeek.com/boardgame/156776/warhammer-40000-conquest
 
 Here is a link to The Hive Tyrant's tutorial for the game: https://www.youtube.com/watch?v=NE8NL9PfjXU
 
@@ -33,20 +24,14 @@ Currently we have: async chat rooms; login/logout; deck-building; async lobbies.
 Current game progress: Everything, except:
 
 - shielding (Half done, too closely tied with combat turns at the moment.)
-- card text (brutal is already working though)
-- action windows
+- card text (A significant amount of the raw traits/warlord abilities are working.)
+- action windows (getting there, added them to the deploy phase)
+- attachment support
 - a victory/loss screen
 - ~~some targeting follicles so that players can see what planets/units are being targeted~~
 - proper god damn multithreading
 - ???
 - and more!
-
-# Dependencies?
-
-Yes. This is using Django for webpage stuff, channels and dahpne for web sockets, whitenoise for static files, and redis so that I can use Docker. I don't know what Docker is, but all the channels documentation recommended it so eh.
-Probably some more that I am forgetting, but they should be relatively minor hiccups really.
-
-More dependencies added. Uvicorn[standard] is the main one. Just read the requirements file.
 
 # How can I run it myself?
 
