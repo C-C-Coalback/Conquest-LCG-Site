@@ -511,6 +511,9 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
+        elif len(game_update_string) == 1:
+            if game_update_string[0] == "action-button":
+                print("Need to run action code")
         elif self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "COMMAND":
