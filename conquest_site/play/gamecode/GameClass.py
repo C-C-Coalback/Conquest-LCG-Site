@@ -66,6 +66,7 @@ class Game:
         self.number_of_units_left_to_suffer_damage = 0
         self.next_unit_to_suffer_damage = -1
         self.resources_need_sending_outside_normal_sends = False
+        self.actions_allowed = True
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -513,8 +514,12 @@ class Game:
             self.condition_main_game.release()
         elif len(game_update_string) == 1:
             if game_update_string[0] == "action-button":
-                print("Need to run action code")
-        elif self.phase == "DEPLOY":
+                if self.actions_allowed:
+                    print("Need to run action code")
+                    self.mode = "ACTION"
+            self.condition_main_game.notify_all()
+            self.condition_main_game.release()
+        if self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "COMMAND":
             await self.update_game_event_command_section(name, game_update_string)
@@ -523,7 +528,6 @@ class Game:
         else:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
-
 
     def reset_combat_positions(self):
         self.defender_position = -1
