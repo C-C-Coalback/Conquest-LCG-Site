@@ -26,13 +26,17 @@ class Card:
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
         self.aiming_reticle_color = None
+        self.bloodied = False
 
     def get_name(self):
         return self.name
 
-    def get_ability(self):
+    def get_ability(self, bloodied_relevant=False):
         if self.blanked:
             return "BLANKED"
+        if bloodied_relevant:
+            if self.bloodied:
+                return "BLOODIED"
         return self.ability
 
     def set_blanked(self, new_val):

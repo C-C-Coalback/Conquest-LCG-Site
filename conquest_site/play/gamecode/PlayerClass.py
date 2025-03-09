@@ -339,8 +339,13 @@ class Player:
             for i in range(len(headquarters_list)):
                 if headquarters_list[i].get_card_type() == "Warlord":
                     print(headquarters_list[i].get_name())
+                    summon_khymera = False
+                    if headquarters_list[i].get_ability() == "Packmaster Kith":
+                        summon_khymera = True
                     self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
                     self.headquarters.remove(headquarters_list[i])
+                    if summon_khymera:
+                        self.summon_token_at_planet("Khymera", planet_pos - 1)
                     return True
             return False
         else:
@@ -351,8 +356,13 @@ class Player:
                     print(headquarters_list[i].get_name())
                     if card_type != "Warlord":
                         headquarters_list[i].exhaust_card()
+                    summon_khymera = False
+                    if headquarters_list[i].get_ability() == "Packmaster Kith":
+                        summon_khymera = True
                     self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
                     self.headquarters.remove(headquarters_list[i])
+                    if summon_khymera:
+                        self.summon_token_at_planet("Khymera", planet_pos - 1)
                     i -= 1
                 i += 1
         return None
@@ -474,6 +484,11 @@ class Player:
             if cato_check:
                 self.game.add_resources_to_opponent(self.number, 1)
             self.add_card_in_play_to_discard(planet_num, card_pos)
+
+    def summon_token_at_planet(self, token_name, planet_num):
+        card = FindCard.find_card(token_name, self.card_array)
+        if card.get_name() != "FINAL CARD":
+            self.add_card_to_planet(card, planet_num)
 
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
