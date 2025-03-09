@@ -514,6 +514,26 @@ class Game:
                 self.player_with_action = ""
                 print("Canceled special action")
                 await self.game_sockets[0].receive_game_update(name + " canceled their action request")
+        elif len(game_update_string) == 2:
+            pass
+        elif len(game_update_string) == 3:
+            if game_update_string[0] == "HAND":
+                if name == self.player_with_deploy_turn:
+                    if game_update_string[1] == self.number_with_deploy_turn:
+                        print("Deploy card in hand at pos", game_update_string[2])
+                        self.card_pos_to_deploy = int(game_update_string[2])
+                        if self.number_with_deploy_turn == "1":
+                            card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
+                            ability = card.get_ability()
+                            if ability == "Promise of Glory":
+                                print("Resolve Promise of Glory")
+                        elif self.number_with_deploy_turn == "2":
+                            card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
+                            ability = card.get_ability()
+                            if ability == "Promise of Glory":
+                                print("Resolve Promise of Glory")
+        elif len(game_update_string) == 4:
+            pass
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
