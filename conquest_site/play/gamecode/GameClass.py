@@ -507,6 +507,54 @@ class Game:
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
+    async def update_game_event_deploy_action(self, name, game_update_string):
+        print("Deploy card in hand at pos", game_update_string[2])
+        self.card_pos_to_deploy = int(game_update_string[2])
+        if self.number_with_deploy_turn == "1":
+            card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
+            ability = card.get_ability()
+            if self.p1.spend_resources(card.get_cost()):
+                if ability == "Promise of Glory":
+                    print("Resolve Promise of Glory")
+                    self.p1.summon_token_at_hq("Cultist", amount=2)
+                    self.p1.discard_card_from_hand(self.card_pos_to_deploy)
+                    self.mode = self.stored_mode
+                    self.player_with_action = ""
+                    self.player_with_deploy_turn = self.name_2
+                    self.number_with_deploy_turn = "2"
+                    await self.p1.send_hq()
+                    await self.p1.send_hand()
+                    await self.p1.send_discard()
+                    await self.p1.send_resources()
+                    await self.send_info_box()
+                else:
+                    self.p1.add_resources(card.get_cost())
+                    await self.game_sockets[0].receive_game_update(card.get_name() + "not "
+                                                                                     "implemented")
+        elif self.number_with_deploy_turn == "2":
+            card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
+            ability = card.get_ability()
+            if self.p2.spend_resources(card.get_cost()):
+                if ability == "Promise of Glory":
+                    print("Resolve Promise of Glory")
+                    self.p2.summon_token_at_hq("Cultist", amount=2)
+                    self.p2.discard_card_from_hand(self.card_pos_to_deploy)
+                    self.mode = self.stored_mode
+                    self.player_with_action = ""
+                    self.player_with_deploy_turn = self.name_1
+                    self.number_with_deploy_turn = "1"
+                    await self.p2.send_hq()
+                    await self.p2.send_hand()
+                    await self.p2.send_discard()
+                    await self.p2.send_resources()
+                    await self.send_info_box()
+                else:
+                    self.p2.add_resources(card.get_cost())
+                    await self.game_sockets[0].receive_game_update(card.get_name() + "not "
+                                                                                     "implemented")
+        self.condition_sub_game.notify_all()
+        self.condition_sub_game.release()
+
     async def update_game_event_action(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -521,48 +569,11 @@ class Game:
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
                         if game_update_string[1] == self.number_with_deploy_turn:
-                            print("Deploy card in hand at pos", game_update_string[2])
-                            self.card_pos_to_deploy = int(game_update_string[2])
-                            if self.number_with_deploy_turn == "1":
-                                card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
-                                ability = card.get_ability()
-                                if self.p1.spend_resources(card.get_cost()):
-                                    if ability == "Promise of Glory":
-                                        print("Resolve Promise of Glory")
-                                        self.p1.summon_token_at_hq("Cultist", amount=2)
-                                        self.p1.discard_card_from_hand(self.card_pos_to_deploy)
-                                        self.mode = self.stored_mode
-                                        self.player_with_action = ""
-                                        self.player_with_deploy_turn = self.name_2
-                                        self.number_with_deploy_turn = "2"
-                                        await self.p1.send_hq()
-                                        await self.p1.send_hand()
-                                        await self.p1.send_discard()
-                                        await self.p1.send_resources()
-                                        await self.send_info_box()
-                                    else:
-                                        self.p1.add_resources(card.get_cost())
-                                        await self.game_sockets[0].receive_game_update(card.get_name() + " not implemented")
-                            elif self.number_with_deploy_turn == "2":
-                                card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
-                                ability = card.get_ability()
-                                if self.p2.spend_resources(card.get_cost()):
-                                    if ability == "Promise of Glory":
-                                        print("Resolve Promise of Glory")
-                                        self.p2.summon_token_at_hq("Cultist", amount=2)
-                                        self.p2.discard_card_from_hand(self.card_pos_to_deploy)
-                                        self.mode = self.stored_mode
-                                        self.player_with_action = ""
-                                        self.player_with_deploy_turn = self.name_1
-                                        self.number_with_deploy_turn = "1"
-                                        await self.p2.send_hq()
-                                        await self.p2.send_hand()
-                                        await self.p2.send_discard()
-                                        await self.p2.send_resources()
-                                        await self.send_info_box()
-                                    else:
-                                        self.p2.add_resources(card.get_cost())
-                                        await self.game_sockets[0].receive_game_update(card.get_name() + " not implemented")
+                            self.condition_sub_game.acquire()
+                            await self.update_game_event_deploy_action(name, game_update_string)
+                            self.condition_sub_game.acquire()
+                            self.condition_sub_game.notify_all()
+                            self.condition_sub_game.release()
         elif len(game_update_string) == 4:
             pass
         self.condition_main_game.notify_all()
