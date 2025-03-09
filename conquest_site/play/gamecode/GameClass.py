@@ -548,6 +548,7 @@ class Game:
                 if self.resources_need_sending_outside_normal_sends:
                     await self.p1.send_resources()
                     await self.p2.send_resources()
+                    self.resources_need_sending_outside_normal_sends = False
                 if self.p1.warlord_just_got_bloodied:
                     self.p1.warlord_just_got_bloodied = False
                     await self.p1.send_hq()
@@ -583,6 +584,7 @@ class Game:
                 if self.resources_need_sending_outside_normal_sends:
                     await self.p1.send_resources()
                     await self.p2.send_resources()
+                    self.resources_need_sending_outside_normal_sends = False
                 if self.p2.warlord_just_got_bloodied:
                     self.p2.warlord_just_got_bloodied = False
                     await self.p2.send_hq()
