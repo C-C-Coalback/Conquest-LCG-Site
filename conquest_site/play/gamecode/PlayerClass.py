@@ -490,6 +490,12 @@ class Player:
         if card.get_name() != "FINAL CARD":
             self.add_card_to_planet(card, planet_num)
 
+    def summon_token_at_hq(self, token_name, amount=1):
+        card = FindCard.find_card(token_name, self.card_array)
+        if card.get_name() != "FINAL CARD":
+            for _ in range(amount):
+                self.add_to_hq(card)
+
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
         # self.discard_object(card_object)
