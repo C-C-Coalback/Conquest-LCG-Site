@@ -24,12 +24,14 @@ def tau_cards_init():
                                                1, faction, "Signature", False),
                        CardClasses.EventCard("Squadron Redeployment", "Action: Exhaust an army unit with 1 or more "
                                                                       "attachments to move it to a target planet.",
-                                             "Tactic.", 0, faction, "Signature", 1, False),
+                                             "Tactic.", 0, faction, "Signature", 1, False, action_in_hand=True,
+                                             allowed_phases_in_hand="ALL"),
                        CardClasses.AttachmentCard("Command-Link Drone", "Attach to a unit.\n"
                                                                         "Attached unit gets +1 ATK.\n"
                                                                         "Action: Pay 1 resource to attach this card "
                                                                         "to a different unit.", "Drone.",
-                                                  0, faction, "Signature", 3, False),
+                                                  0, faction, "Signature", 3, False, action_in_play=True,
+                                                  allowed_phases_in_play="ALL"),
                        CardClasses.ArmyCard("Recon Drone", "Limited.", "Drone. Ally.", 0, faction, "Loyal",
                                             0, 1, 2, False),
                        CardClasses.ArmyCard("Vior'la Marksman", "Ranged.", "Scout. Shas'la.", 1, faction, "Common",
@@ -69,12 +71,15 @@ def tau_cards_init():
                                             3, faction, "Common", 4, 2, 1, False),
                        CardClasses.EventCard("Even the Odds", "Action: Move a target attachment to another eligible "
                                                               "unit controlled by the same player.", "Tactic.",
-                                             1, faction, "Common", 1, False),
+                                             1, faction, "Common", 1, False, action_in_hand=True,
+                                             allowed_phases_in_hand="ALL"),
                        CardClasses.EventCard("Calculated Strike", "Action: Destroy a target Limited card.",
-                                             "Tactic.", 1, faction, "Common", 1, False),
+                                             "Tactic.", 1, faction, "Common", 1, False, action_in_hand=True,
+                                             allowed_phases_in_hand="ALL"),
                        CardClasses.EventCard("Deception", "Deploy Action: Return a target non-Elite army "
                                                           "unit to its owner's hand.", "Tactic.",
-                                             2, faction, "Loyal", 2, False),
+                                             2, faction, "Loyal", 2, False, action_in_hand=True,
+                                             allowed_phases_in_hand="DEPLOY"),
                        CardClasses.AttachmentCard("Repulsor Impact Field", "Attach to an army unit."
                                                                            "Limit 1 per unit.\n"
                                                                            "Reaction: After attached unit is damaged "
@@ -93,6 +98,7 @@ def tau_cards_init():
                                                                   "reduce its cost by 1.\n"
                                                                   "Combat Action: Exhaust this support to deploy "
                                                                   "an attachment from your hand.",
-                                               "Upgrade.", 2, faction, "Common", False)
+                                               "Upgrade.", 2, faction, "Common", False, action_in_play=True,
+                                               allowed_phases_in_play="COMBAT")
                        ]
     return tau_cards_array

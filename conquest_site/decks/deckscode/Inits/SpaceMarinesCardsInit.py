@@ -67,11 +67,12 @@ def space_marines_cards_init():
                                 CardClasses.ArmyCard("Veteran Brother Maxos", "Combat Action: Pay the printed cost "
                                                                               "of a Space Marines unit in your hand "
                                                                               "to put it into play at this planet.",
-                                                     "Soldier. Ultramarines.", 3, faction, "Loyal",
-                                                     2, 3, 2, True, ""),
+                                                     "Soldier. Ultramarines.", 3, faction, "Loyal", 2, 3, 2,
+                                                     True, action_in_play=True, allowed_phases_in_play="COMBAT"),
                                 CardClasses.ArmyCard("Eager Recruit", "Ambush. (You may deploy this card during"
                                                                       " the combat phase.", "Scout. Ultramarines.",
-                                                     1, faction, "Common", 2, 1, 0, False, ""),
+                                                     1, faction, "Common", 2, 1, 0, False,
+                                                     action_in_hand=True, allowed_phases_in_hand="COMBAT"),
                                 CardClasses.ArmyCard("Iron Hands Techmarine", "This unit gains 1 command icon "
                                                                               "for each enemy unit at this planet.",
                                                      "Soldier. Iron Hands.", 3, faction, "Common", 1, 3, 1, False, ""),
@@ -88,14 +89,16 @@ def space_marines_cards_init():
                                                                           "the targeted planet, and place the "
                                                                           "remaining cards on the bottom of your deck "
                                                                           "in any order.", "Tactic.", 2, faction,
-                                                      "Loyal", 2, False, ""),
+                                                      "Loyal", 2, False, action_in_hand=True,
+                                                      allowed_phases_in_hand="COMBAT"),
                                 CardClasses.EventCard("Indomitable", "Reaction: After a Space Marines unit is assigned "
                                                                      "damage by an attack, prevent all of that damage.",
-                                                      "Power.", 1, faction, "Common", 1, False, ""),
+                                                      "Power.", 1, faction, "Common", 1, False),
                                 CardClasses.EventCard("Exterminatus",
                                                       "Deploy Action: Destroy all non-unique units at a "
                                                       "target non-first planet.", "Tactic.",
-                                                      3, faction, "Common", 1, False, ""),
+                                                      3, faction, "Common", 1, False, action_in_hand=True,
+                                                      allowed_phases_in_hand="DEPLOY"),
                                 CardClasses.AttachmentCard("Godwyn Pattern Bolter", "Attach to an army unit.\n"
                                                                                     "Attached unit gets +1 ATK, +1HP, "
                                                                                     "and while attacking ignores the "

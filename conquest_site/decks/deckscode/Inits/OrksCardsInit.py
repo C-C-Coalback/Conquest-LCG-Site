@@ -12,13 +12,13 @@ def orks_cards_init():
                                             "(Limit once per phase.)",
                                             "Nob. Warrior.", 3, "Orks", "Signature", 2, 4, 1, False,
                                             "Nazdreg's_Flash_Gitz",
-                                            action_in_play=True, allowed_phases_in_play="Combat"),
+                                            action_in_play=True, allowed_phases_in_play="COMBAT"),
                        CardClasses.SupportCard("Kraktoof Hall",
                                                "Combat Action: Exhaust this support to move 1 damage from a "
                                                "target unit you control to another target unit "
                                                "at the same planet.", "Location.", 2, "Orks", "Signature",
                                                False, "Kraktoof_Hall", action_in_play=True,
-                                               allowed_phases_in_play="Combat"),
+                                               allowed_phases_in_play="COMBAT"),
                        CardClasses.EventCard("Bigga Is Betta", "Interrupt: When you deploy an Orks unit, "
                                                                "reduce its cost by 2. "
                                                                "Deal 1 damage to that unit after it enters play.",
@@ -67,15 +67,14 @@ def orks_cards_init():
                                                            "Each unit you control gets "
                                                            "+2 ATK until the end of the battle.",
                                              "Power.", 3, "Orks", "Loyal", 2, False,
-                                             "Battle_Cry", action_in_hand=True, allowed_phases_in_hand="Combat"),
+                                             "Battle_Cry", action_in_hand=True, allowed_phases_in_hand="COMBAT"),
                        CardClasses.EventCard("Snotling Attack", "Deploy Action: Put 4 Snotlings tokens "
                                                                 "into play divided among any number of planets.",
-                                             "Tactic.",
-                                             2, "Orks", "Common", 1, False,
-                                             "Snotling_Attack", action_in_hand=True, allowed_phases_in_hand="Deploy"),
+                                             "Tactic.", 2, "Orks", "Common", 1, False,
+                                             action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
                        CardClasses.EventCard("Squig Bombin'", "Action: Destroy a target support card.", "Tactic.",
                                              2, "Orks", "Common", 1, False, "Squig_Bombin'", action_in_hand=True,
-                                             allowed_phases_in_hand="All"),
+                                             allowed_phases_in_hand="ALL"),
                        CardClasses.AttachmentCard("Rokkit Launcha",
                                                   "Attach to an army unit.Attached unit gains Ranged.",
                                                   "Wargear. Weapon.", 1, "Orks", "Common", 1, False,
@@ -84,7 +83,7 @@ def orks_cards_init():
                                                              "Each player deals 1 indirect damage "
                                                              "among the units he controls at "
                                                              "that planet.", "Artillery. Weapon.", 1, "Orks", "Common",
-                                               False, "Ork_Kannon"),
+                                               False, action_in_play=True, allowed_phases_in_play="COMBAT"),
                        CardClasses.SupportCard("Bigtoof Banna", "Limited.\nInterrupt: When you deploy an Orks unit, "
                                                                 "exhaust this support to reduce that unit's cost by 1.",
                                                "Upgrade.", 1, "Orks", "Common", True,
@@ -93,5 +92,5 @@ def orks_cards_init():
                                                "Combat Action: Exhaust this support to move an Orks unit "
                                                "you control to the first planet.",
                                                "Location.", 2, "Orks", "Common", False,
-                                               "Tellyporta_Pad")]
+                                               action_in_play=True, allowed_phases_in_play="COMBAT")]
     return orks_card_array

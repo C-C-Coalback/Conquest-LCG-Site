@@ -17,11 +17,13 @@ def dark_eldar_cards_init():
                               CardClasses.SupportCard("Khymera Den", "Action: Exhaust this support to move any "
                                                                      "number of Khymera tokens you control to "
                                                                      "a target planet.", "Location.",
-                                                      1, faction, "Signature", False),
+                                                      1, faction, "Signature", False, action_in_play=True,
+                                                      allowed_phases_in_play="ALL"),
                               CardClasses.EventCard("Pact of the Haemonculi", "Deploy Action: Sacrifice a unit to "
                                                                               "discard 1 card at random from your "
                                                                               "opponent's hand. Then, draw 2 cards.",
-                                                    "Tactic.", 2, faction, "Signature", 1, False),
+                                                    "Tactic.", 2, faction, "Signature", 1, False,
+                                                    action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
                               CardClasses.AttachmentCard("Agonizer of Bren", "Attach to an army unit.\n"
                                                                              "Attached unit gets +1 ATK for each "
                                                                              "Khymera token you control.",
@@ -35,7 +37,8 @@ def dark_eldar_cards_init():
                               CardClasses.ArmyCard("Haemonculus Tormentor", "Action: Pay 1 resource to give this "
                                                                             "unit +2 ATK until the end of the phase.",
                                                    "Scholar. Haemonculus.", 4, faction,
-                                                   "Common", 2, 4, 1, False),
+                                                   "Common", 2, 4, 1, False, action_in_play=True,
+                                                   allowed_phases_in_play="ALL"),
                               CardClasses.ArmyCard("Hellion Gang", "Flying. (This unit takes half damage from "
                                                                    "non-Flying units.", "Scout. Raider.",
                                                    2, faction, "Common", 2, 2, 1, False),
@@ -76,13 +79,16 @@ def dark_eldar_cards_init():
                                                    "Warrior. Wych.", 3, faction, "Loyal", 2, 3, 2, True),
                               CardClasses.EventCard("Power from Pain", "Combat Action: Your opponent must sacrifice "
                                                                        "an army unit if able.", "Power. Torture.",
-                                                    2, faction, "Common", 1, False),
+                                                    2, faction, "Common", 1, False, action_in_hand=True,
+                                                    allowed_phases_in_hand="COMBAT"),
                               CardClasses.EventCard("Archon's Terror", "Combat Action: Rout a target non-unique unit.",
-                                                    "Power.", 2, faction, "Common", 1, False),
+                                                    "Power.", 2, faction, "Common", 1, False, action_in_hand=True,
+                                                    allowed_phases_in_hand="COMBAT"),
                               CardClasses.EventCard("Raid", "Limited. (Limit one Limited card per round.)\n"
                                                             "Action: Take 1 resource from your opponent if he has "
                                                             "more resources than you.", "Tactic.",
-                                                    0, faction, "Loyal", 2, False),
+                                                    0, faction, "Loyal", 2, False, action_in_hand=True,
+                                                    allowed_phases_in_hand="ALL"),
                               CardClasses.AttachmentCard("Suffering", "Attach to an army unit.\n"
                                                                       "Attached unit gets -2 ATK.",
                                                          "Condition. Torture.", 1, faction, "Loyal", 2, False),
@@ -101,6 +107,7 @@ def dark_eldar_cards_init():
                                                                             "printed text box of a target army unit "
                                                                             "as if it were blank (except for Traits) "
                                                                             "until the end of the phase.",
-                                                      "Location.", 2, faction, "Loyal", False)
+                                                      "Location.", 2, faction, "Loyal", False, action_in_play=True,
+                                                      allowed_phases_in_play="ALL")
                               ]
     return dark_eldar_cards_array
