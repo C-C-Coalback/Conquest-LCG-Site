@@ -468,6 +468,11 @@ class Player:
             else:
                 self.add_card_in_play_to_discard(planet_num, card_pos)
         else:
+            cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
+                                                                           "Captain Cato Sicarius",
+                                                                           bloodied_relevant=True)
+            if cato_check:
+                self.game.add_resources_to_opponent(self.number, 1)
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
     def remove_card_from_play(self, planet_num, card_pos):

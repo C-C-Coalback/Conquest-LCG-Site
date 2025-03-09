@@ -65,6 +65,7 @@ class Game:
         self.planet_aiming_reticle_position = -1
         self.number_of_units_left_to_suffer_damage = 0
         self.next_unit_to_suffer_damage = -1
+        self.resources_need_sending_outside_normal_sends = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -520,6 +521,13 @@ class Game:
             return is_present
         return None
 
+    def add_resources_to_opponent(self, number, amount):
+        self.resources_need_sending_outside_normal_sends = True
+        if number == 1:
+            self.p2.add_resources(amount)
+        elif number == 2:
+            self.p1.add_resources(amount)
+
     async def resolve_shield_of_unit(self, name, hand_pos):
         unit_dead = False
         print("Info shielding:", self.defender_planet, self.defender_position)
@@ -537,6 +545,9 @@ class Game:
             if self.p1.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
                 unit_dead = True
                 self.p1.destroy_card_in_play(self.defender_planet, self.defender_position)
+                if self.resources_need_sending_outside_normal_sends:
+                    await self.p1.send_resources()
+                    await self.p2.send_resources()
                 if self.p1.warlord_just_got_bloodied:
                     self.p1.warlord_just_got_bloodied = False
                     await self.p1.send_hq()
@@ -569,6 +580,9 @@ class Game:
             if self.p2.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
                 unit_dead = True
                 self.p2.destroy_card_in_play(self.defender_planet, self.defender_position)
+                if self.resources_need_sending_outside_normal_sends:
+                    await self.p1.send_resources()
+                    await self.p2.send_resources()
                 if self.p2.warlord_just_got_bloodied:
                     self.p2.warlord_just_got_bloodied = False
                     await self.p2.send_hq()
