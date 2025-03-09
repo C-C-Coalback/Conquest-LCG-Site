@@ -134,6 +134,8 @@ class Game:
 
     async def update_game_event_deploy_section(self, name, game_update_string):
         print("Need to run deploy turn code.")
+        print(self.player_with_deploy_turn, self.number_with_deploy_turn)
+        print(name == self.player_with_deploy_turn)
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 print("Need to pass")
@@ -153,84 +155,58 @@ class Game:
         if len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 if name == self.player_with_deploy_turn:
+                    print(game_update_string[1] == self.number_with_deploy_turn)
                     if game_update_string[1] == self.number_with_deploy_turn:
                         print("Deploy card in hand at pos", game_update_string[2])
                         self.card_pos_to_deploy = int(game_update_string[2])
                         if self.number_with_deploy_turn == "1":
-                            card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
-                            if card.get_card_type() == "Support":
-                                played_support = self.p1.play_card_if_support(self.card_pos_to_deploy,
-                                                                              already_checked=True, card=card)
-                                if played_support == "SUCCESS/Support":
-                                    await self.p1.send_hand()
-                                    await self.p1.send_hq()
-                                    await self.p1.send_resources()
-                                    if not self.p2.has_passed:
-                                        self.player_with_deploy_turn = self.name_2
-                                        self.number_with_deploy_turn = "2"
-                                        await self.send_info_box()
-                            elif card.get_card_type() == "Army":
-                                self.p1.aiming_reticle_color = "blue"
-                                self.p1.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                                await self.p1.send_hand()
-                            else:
-                                self.card_pos_to_deploy = -1
-                        elif self.number_with_deploy_turn == "2":
-                            card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
-                            if card.get_card_type() == "Support":
-                                played_support = self.p2.play_card_if_support(self.card_pos_to_deploy,
-                                                                              already_checked=True, card=card)
-                                if played_support == "SUCCESS/Support":
-                                    await self.p2.send_hand()
-                                    await self.p2.send_hq()
-                                    await self.p2.send_resources()
-                                    if not self.p1.has_passed:
-                                        self.player_with_deploy_turn = self.name_1
-                                        self.number_with_deploy_turn = "1"
-                                        await self.send_info_box()
-                            elif card.get_card_type() == "Army":
-                                self.p2.aiming_reticle_color = "blue"
-                                self.p2.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                                await self.p2.send_hand()
-                            else:
-                                self.card_pos_to_deploy = -1
-
+                            primary_player = self.p1
+                            secondary_player = self.p2
+                        else:
+                            primary_player = self.p2
+                            secondary_player = self.p1
+                        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+                        if card.get_card_type() == "Support":
+                            played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
+                                                                                 already_checked=True, card=card)
+                            if played_support == "SUCCESS/Support":
+                                await primary_player.send_hand()
+                                await primary_player.send_hq()
+                                await primary_player.send_resources()
+                                if not secondary_player.has_passed:
+                                    self.player_with_deploy_turn = secondary_player.get_name_player()
+                                    self.number_with_deploy_turn = secondary_player.get_number()
+                                    await self.send_info_box()
+                        elif card.get_card_type() == "Army":
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            await primary_player.send_hand()
+                        else:
+                            self.card_pos_to_deploy = -1
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
                 if self.card_pos_to_deploy != -1:
                     print("Deploy card at planet", game_update_string[1])
                     if self.number_with_deploy_turn == "1":
-                        print("P1 plays card")
-                        played_card = self.p1.play_card(int(game_update_string[1]),
-                                                        position_hand=self.card_pos_to_deploy)
-                        if played_card == "SUCCESS":
-                            await self.p1.send_hand()
-                            await self.p1.send_units_at_planet(int(game_update_string[1]))
-                            await self.p1.send_resources()
-                            if not self.p2.has_passed:
-                                self.player_with_deploy_turn = self.name_2
-                                self.number_with_deploy_turn = "2"
-                                await self.send_info_box()
-                        self.card_pos_to_deploy = -1
-                        self.p1.aiming_reticle_color = None
-                        self.p1.aiming_reticle_coords_hand = None
-                        await self.p1.send_hand()
-                    if self.number_with_deploy_turn == "2":
-                        print("P2 plays card")
-                        played_card = self.p2.play_card(int(game_update_string[1]),
-                                                        position_hand=self.card_pos_to_deploy)
-                        if played_card == "SUCCESS":
-                            await self.p2.send_hand()
-                            await self.p2.send_units_at_planet(int(game_update_string[1]))
-                            await self.p2.send_resources()
-                            if not self.p1.has_passed:
-                                self.player_with_deploy_turn = self.name_1
-                                self.number_with_deploy_turn = "1"
-                                await self.send_info_box()
-                        self.card_pos_to_deploy = -1
-                        self.p2.aiming_reticle_color = None
-                        self.p2.aiming_reticle_coords_hand = None
-                        await self.p2.send_hand()
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    played_card = primary_player.play_card(int(game_update_string[1]),
+                                                           position_hand=self.card_pos_to_deploy)
+                    if played_card == "SUCCESS":
+                        await primary_player.send_hand()
+                        await primary_player.send_units_at_planet(int(game_update_string[1]))
+                        await primary_player.send_resources()
+                        if not secondary_player.has_passed:
+                            self.player_with_deploy_turn = secondary_player.get_name_player()
+                            self.number_with_deploy_turn = secondary_player.get_number()
+                            await self.send_info_box()
+                    self.card_pos_to_deploy = -1
+                    primary_player.aiming_reticle_color = None
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.send_hand()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -320,47 +296,31 @@ class Game:
                         if chosen_planet == self.last_planet_checked_for_battle:
                             if self.attacker_position != -1:
                                 if self.number_with_combat_turn == "1":
-                                    amount_aoe = self.p1.cards_in_play[chosen_planet + 1][
-                                        self.attacker_position].get_area_effect()
-                                    if amount_aoe > 0:
-                                        print("P2 needs to suffer area effect (", str(amount_aoe), ")")
-                                        self.p2.suffer_area_effect(chosen_planet, amount_aoe)
-                                        self.number_of_units_left_to_suffer_damage = self.p2.get_number_of_units_at_planet(
-                                            chosen_planet)
-                                        if self.number_of_units_left_to_suffer_damage > 0:
-                                            self.p2.set_aiming_reticle_in_play(chosen_planet, 0, "red")
-                                            for i in range(1, self.number_of_units_left_to_suffer_damage):
-                                                self.p2.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                                        self.mode = "SHIELD"
-                                        self.player_who_is_shielding = self.name_2
-                                        self.number_who_is_shielding = "2"
-                                        self.next_unit_to_suffer_damage = 0
-                                        self.defender_position = self.next_unit_to_suffer_damage
-                                        self.defender_planet = chosen_planet
-                                        self.damage_taken_by_unit = amount_aoe
-                                        await self.send_info_box()
-                                        await self.p2.send_units_at_planet(chosen_planet)
-                                elif self.number_with_combat_turn == "2":
-                                    amount_aoe = self.p2.cards_in_play[chosen_planet + 1][
-                                        self.attacker_position].get_area_effect()
-                                    if amount_aoe > 0:
-                                        print("P1 needs to suffer area effect (", str(amount_aoe), ")")
-                                        self.p1.suffer_area_effect(chosen_planet, amount_aoe)
-                                        self.number_of_units_left_to_suffer_damage = self.p1.get_number_of_units_at_planet(
-                                            chosen_planet)
-                                        if self.number_of_units_left_to_suffer_damage > 0:
-                                            self.p1.set_aiming_reticle_in_play(chosen_planet, 0, "red")
-                                            for i in range(1, self.number_of_units_left_to_suffer_damage):
-                                                self.p1.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                                        self.mode = "SHIELD"
-                                        self.player_who_is_shielding = self.name_1
-                                        self.number_who_is_shielding = "1"
-                                        self.next_unit_to_suffer_damage = 0
-                                        self.defender_position = self.next_unit_to_suffer_damage
-                                        self.defender_planet = chosen_planet
-                                        self.damage_taken_by_unit = amount_aoe
-                                        await self.send_info_box()
-                                        await self.p1.send_units_at_planet(chosen_planet)
+                                    primary_player = self.p1
+                                    secondary_player = self.p2
+                                else:
+                                    primary_player = self.p2
+                                    secondary_player = self.p1
+                                amount_aoe = primary_player.cards_in_play[chosen_planet + 1][
+                                    self.attacker_position].get_area_effect()
+                                if amount_aoe > 0:
+                                    print("Player needs to suffer area effect (", str(amount_aoe), ")")
+                                    secondary_player.suffer_area_effect(chosen_planet, amount_aoe)
+                                    self.number_of_units_left_to_suffer_damage = \
+                                        secondary_player.get_number_of_units_at_planet(chosen_planet)
+                                    if self.number_of_units_left_to_suffer_damage > 0:
+                                        secondary_player.set_aiming_reticle_in_play(chosen_planet, 0, "red")
+                                        for i in range(1, self.number_of_units_left_to_suffer_damage):
+                                            secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                                    self.mode = "SHIELD"
+                                    self.player_who_is_shielding = secondary_player.get_name_player()
+                                    self.number_who_is_shielding = secondary_player.get_number()
+                                    self.next_unit_to_suffer_damage = 0
+                                    self.defender_position = self.next_unit_to_suffer_damage
+                                    self.defender_planet = chosen_planet
+                                    self.damage_taken_by_unit = amount_aoe
+                                    await self.send_info_box()
+                                    await secondary_player.send_units_at_planet(chosen_planet)
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 print("Card in hand clicked on")
@@ -380,13 +340,12 @@ class Game:
                             print("Retreat unit", chosen_planet, chosen_unit)
                             if chosen_planet == self.last_planet_checked_for_battle:
                                 if self.number_with_combat_turn == "1":
-                                    self.p1.retreat_unit(chosen_planet, chosen_unit)
-                                    await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                                    await self.p1.send_hq()
-                                elif self.number_with_combat_turn == "2":
-                                    self.p2.retreat_unit(chosen_planet, chosen_unit)
-                                    await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
-                                    await self.p2.send_hq()
+                                    player = self.p1
+                                else:
+                                    player = self.p2
+                                player.retreat_unit(chosen_planet, chosen_unit)
+                                await player.send_units_at_planet(self.last_planet_checked_for_battle)
+                                await player.send_hq()
                     elif self.attacker_position == -1:
                         if game_update_string[1] == self.number_with_combat_turn:
                             chosen_planet = int(game_update_string[2])
@@ -394,31 +353,26 @@ class Game:
                             valid_unit = False
                             if chosen_planet == self.last_planet_checked_for_battle:
                                 if self.number_with_combat_turn == "1":
-                                    is_ready = self.p1.check_ready_pos(chosen_planet, chosen_unit)
-                                    if is_ready:
-                                        print("Unit ready, can be used")
-                                        valid_unit = True
-                                        self.p1.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
-                                    else:
-                                        print("Unit not ready")
-                                if self.number_with_combat_turn == "2":
-                                    is_ready = self.p2.check_ready_pos(chosen_planet, chosen_unit)
-                                    if is_ready:
-                                        print("Unit ready, can be used")
-                                        valid_unit = True
-                                        self.p2.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
-                                    else:
-                                        print("Unit not ready")
+                                    player = self.p1
+                                else:
+                                    player = self.p2
+                                is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
+                                if is_ready:
+                                    print("Unit ready, can be used")
+                                    valid_unit = True
+                                    player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                else:
+                                    print("Unit not ready")
                             if valid_unit:
                                 self.attacker_planet = chosen_planet
                                 self.attacker_position = chosen_unit
                                 print("Attacker:", self.attacker_planet, self.attacker_position)
                                 if self.number_with_combat_turn == "1":
-                                    self.p1.exhaust_given_pos(self.attacker_planet, self.attacker_position)
-                                    await self.p1.send_units_at_planet(chosen_planet)
-                                elif self.number_with_combat_turn == "2":
-                                    self.p2.exhaust_given_pos(self.attacker_planet, self.attacker_position)
-                                    await self.p2.send_units_at_planet(chosen_planet)
+                                    player = self.p1
+                                else:
+                                    player = self.p2
+                                player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                                await player.send_units_at_planet(chosen_planet)
                     elif self.defender_position == -1:
                         if game_update_string[1] != self.number_with_combat_turn:
                             armorbane_check = False
@@ -426,84 +380,50 @@ class Game:
                             self.defender_position = int(game_update_string[3])
                             print("Defender:", self.defender_planet, self.defender_position)
                             if self.number_with_combat_turn == "1":
-                                attack_value = self.p1.get_attack_given_pos(self.attacker_planet,
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
+                                                                               self.attacker_position)
+                            if attack_value > 0:
+                                att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
+                                                                                 self.attacker_position)
+                                def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                                   self.defender_position)
+                                # Flying check
+                                if def_flying and not att_flying:
+                                    attack_value = attack_value / 2 + (attack_value % 2 > 0)
+                                unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
+                                                                                  self.defender_position,
+                                                                                  damage=attack_value)
+                                armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                         self.attacker_position)
+                                self.mode = "SHIELD"
+                                self.player_who_is_shielding = secondary_player.get_name_player()
+                                self.number_who_is_shielding = secondary_player.get_number()
+                                self.planet_of_damaged_unit = self.defender_planet
+                                self.position_of_damaged_unit = self.defender_position
+                                self.damage_taken_by_unit = attack_value
+                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                            self.defender_position, "red")
+                                if armorbane_check and attack_value > 0:
+                                    await self.resolve_shield_of_unit(secondary_player.get_name(), -1)
+                            else:
+                                primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                             self.attacker_position)
-                                if attack_value > 0:
-                                    att_flying = self.p1.get_flying_given_pos(self.attacker_planet,
-                                                                              self.attacker_position)
-                                    def_flying = self.p2.get_flying_given_pos(self.defender_planet,
-                                                                              self.defender_position)
-                                    # Flying check
-                                    if def_flying and not att_flying:
-                                        attack_value = attack_value / 2 + (attack_value % 2 > 0)
-                                    unit_dead = self.p2.assign_damage_to_pos(self.defender_planet,
-                                                                             self.defender_position,
-                                                                             damage=attack_value)
-                                    armorbane_check = self.p1.get_armorbane_given_pos(self.attacker_planet,
-                                                                                      self.attacker_position)
-                                    self.mode = "SHIELD"
-                                    self.player_who_is_shielding = self.name_2
-                                    self.number_who_is_shielding = "2"
-                                    self.planet_of_damaged_unit = self.defender_planet
-                                    self.position_of_damaged_unit = self.defender_position
-                                    self.damage_taken_by_unit = attack_value
-                                    self.p2.set_aiming_reticle_in_play(self.defender_planet,
-                                                                       self.defender_position, "red")
-                                    if armorbane_check and attack_value > 0:
-                                        await self.resolve_shield_of_unit(self.name_2, -1)
-                                else:
-                                    self.p1.reset_aiming_reticle_in_play(self.attacker_planet,
-                                                                         self.attacker_position)
 
-                                    await self.p1.send_units_at_planet(self.attacker_planet)
-                                if not armorbane_check or attack_value < 1:
-                                    await self.p2.send_units_at_planet(self.defender_planet)
-                                if attack_value < 1:
-                                    self.reset_combat_positions()
-                                    self.number_with_combat_turn = "2"
-                                    self.player_with_combat_turn = self.name_2
-                                    name = self.name_2
-                                if not armorbane_check or attack_value < 1:
-                                    await self.send_info_box()
-                            elif self.number_with_combat_turn == "2":
-                                attack_value = self.p2.get_attack_given_pos(self.attacker_planet,
-                                                                            self.attacker_position)
-                                if attack_value > 0:
-                                    att_flying = self.p2.get_flying_given_pos(self.attacker_planet,
-                                                                              self.attacker_position)
-                                    def_flying = self.p1.get_flying_given_pos(self.defender_planet,
-                                                                              self.defender_position)
-                                    if def_flying and not att_flying:
-                                        attack_value = int(attack_value / 2 + (attack_value % 2 > 0))
-                                    unit_dead = self.p1.assign_damage_to_pos(self.defender_planet,
-                                                                             self.defender_position,
-                                                                             damage=attack_value, can_shield=False)
-                                    armorbane_check = self.p2.get_armorbane_given_pos(self.attacker_planet,
-                                                                                      self.attacker_position)
-                                    self.mode = "SHIELD"
-                                    self.player_who_is_shielding = self.name_1
-                                    self.number_who_is_shielding = "1"
-                                    self.planet_of_damaged_unit = self.defender_planet
-                                    self.position_of_damaged_unit = self.defender_position
-                                    self.damage_taken_by_unit = attack_value
-                                    self.p1.set_aiming_reticle_in_play(self.defender_planet,
-                                                                       self.defender_position, "red")
-                                    if armorbane_check and attack_value > 0:
-                                        await self.resolve_shield_of_unit(self.name_1, -1)
-                                else:
-                                    self.p2.reset_aiming_reticle_in_play(self.attacker_planet,
-                                                                         self.attacker_position)
-
-                                    await self.p2.send_units_at_planet(self.attacker_planet)
-                                if not armorbane_check or attack_value < 1:
-                                    await self.p1.send_units_at_planet(self.defender_planet)
-                                if attack_value < 1:
-                                    self.reset_combat_positions()
-                                    self.number_with_combat_turn = "1"
-                                    self.player_with_combat_turn = self.name_1
-                                    name = self.name_1
-                                if not armorbane_check or attack_value < 1:
-                                    await self.send_info_box()
+                                await primary_player.send_units_at_planet(self.attacker_planet)
+                            if not armorbane_check or attack_value < 1:
+                                await secondary_player.send_units_at_planet(self.defender_planet)
+                            if attack_value < 1:
+                                self.reset_combat_positions()
+                                self.number_with_combat_turn = secondary_player.get_number()
+                                self.player_with_combat_turn = secondary_player.get_name_player()
+                                name = secondary_player.get_name_player()
+                            if not armorbane_check or attack_value < 1:
+                                await self.send_info_box()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -511,47 +431,31 @@ class Game:
         print("Deploy card in hand at pos", game_update_string[2])
         self.card_pos_to_deploy = int(game_update_string[2])
         if self.number_with_deploy_turn == "1":
-            card = self.p1.get_card_in_hand(self.card_pos_to_deploy)
-            ability = card.get_ability()
-            if self.p1.spend_resources(card.get_cost()):
-                if ability == "Promise of Glory":
-                    print("Resolve Promise of Glory")
-                    self.p1.summon_token_at_hq("Cultist", amount=2)
-                    self.p1.discard_card_from_hand(self.card_pos_to_deploy)
-                    self.mode = self.stored_mode
-                    self.player_with_action = ""
-                    self.player_with_deploy_turn = self.name_2
-                    self.number_with_deploy_turn = "2"
-                    await self.p1.send_hq()
-                    await self.p1.send_hand()
-                    await self.p1.send_discard()
-                    await self.p1.send_resources()
-                    await self.send_info_box()
-                else:
-                    self.p1.add_resources(card.get_cost())
-                    await self.game_sockets[0].receive_game_update(card.get_name() + "not "
-                                                                                     "implemented")
-        elif self.number_with_deploy_turn == "2":
-            card = self.p2.get_card_in_hand(self.card_pos_to_deploy)
-            ability = card.get_ability()
-            if self.p2.spend_resources(card.get_cost()):
-                if ability == "Promise of Glory":
-                    print("Resolve Promise of Glory")
-                    self.p2.summon_token_at_hq("Cultist", amount=2)
-                    self.p2.discard_card_from_hand(self.card_pos_to_deploy)
-                    self.mode = self.stored_mode
-                    self.player_with_action = ""
-                    self.player_with_deploy_turn = self.name_1
-                    self.number_with_deploy_turn = "1"
-                    await self.p2.send_hq()
-                    await self.p2.send_hand()
-                    await self.p2.send_discard()
-                    await self.p2.send_resources()
-                    await self.send_info_box()
-                else:
-                    self.p2.add_resources(card.get_cost())
-                    await self.game_sockets[0].receive_game_update(card.get_name() + "not "
-                                                                                     "implemented")
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        ability = card.get_ability()
+        if primary_player.spend_resources(card.get_cost()):
+            if ability == "Promise of Glory":
+                print("Resolve Promise of Glory")
+                primary_player.summon_token_at_hq("Cultist", amount=2)
+                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                self.mode = self.stored_mode
+                self.player_with_action = ""
+                self.player_with_deploy_turn = secondary_player.name_player
+                self.number_with_deploy_turn = secondary_player.number
+                await primary_player.send_hq()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await primary_player.send_resources()
+                await self.send_info_box()
+            else:
+                primary_player.add_resources(card.get_cost())
+                await self.game_sockets[0].receive_game_update(card.get_name() + "not "
+                                                                                 "implemented")
         self.condition_sub_game.notify_all()
         self.condition_sub_game.release()
 
@@ -627,10 +531,10 @@ class Game:
         self.damage_taken_by_unit = None
 
     def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card, bloodied_relevant=False):
-        if number == 1:
+        if number == "1":
             is_present = self.p2.search_card_at_planet(planet, name_of_card, bloodied_relevant)
             return is_present
-        elif number == 2:
+        elif number == "2":
             is_present = self.p1.search_card_at_planet(planet, name_of_card, bloodied_relevant)
             return is_present
         return None

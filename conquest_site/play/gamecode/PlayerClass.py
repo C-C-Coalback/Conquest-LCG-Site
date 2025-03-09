@@ -35,7 +35,7 @@ class Player:
     def __init__(self, name, number, card_array, game):
         self.game = game
         self.card_array = card_array
-        self.number = number
+        self.number = str(number)
         self.name_player = name
         self.position_activated = []
         self.has_initiative = True
