@@ -510,8 +510,6 @@ class Game:
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
-            self.condition_main_game.notify_all()
-            self.condition_main_game.release()
         elif len(game_update_string) == 1:
             if game_update_string[0] == "action-button":
                 if self.actions_allowed:
