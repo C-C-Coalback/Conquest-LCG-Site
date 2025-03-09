@@ -207,6 +207,14 @@ h4 {
     bottom:calc(13% + 0px);
 }
 
+#request-action-div {
+    position: absolute;
+    right:0;
+    bottom: calc(45px + 20vh);
+    width: auto;
+    height: 15px;
+}
+
 #chat-message-submit {
     position:absolute;
     bottom:0;
