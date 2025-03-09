@@ -14,7 +14,7 @@ def chaos_cards_init():
                                                                    "damage to a target non-warlord "
                                                                    "unit at the same planet.",
                                              "Daemon. Tzeentch.", 2, "Chaos", "Signature",
-                                             2, 2, 1, False, ""),
+                                             2, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
                         CardClasses.SupportCard("Shrine of Warpflame", "Reaction: After an enemy unit is "
                                                                        "destroyed, exhaust this support to return "
                                                                        "the topmost Tzeentch card from "
@@ -26,7 +26,8 @@ def chaos_cards_init():
                                                                   "from your hand at a planet. If that unit "
                                                                   "is still in play at the "
                                                                   "end of the phase, sacrifice it.", "Power. Tzeentch",
-                                              1, "Chaos", "Signature", 1, False, ""),
+                                              1, "Chaos", "Signature", 1, False, action_in_hand=True,
+                                              allowed_phases_in_hand="COMBAT"),
                         CardClasses.AttachmentCard("Mark of Chaos", "Attach to an army unit.\n"
                                                                     "Interrupt: When attached unit leaves play, "
                                                                     "deal 1 damage to each enemy unit at this planet.",
@@ -59,7 +60,7 @@ def chaos_cards_init():
                                                                       "Action: Sacrifice a Cultist unit to "
                                                                       "remove all damage from this unit.",
                                              "Daemon. Elite. Khorne.", 5, "Chaos", "Common",
-                                             3, 6, 1, False, ""),
+                                             3, 6, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
                         CardClasses.ArmyCard("Virulent Plague Squad", "This unit gets +1 ATK for each unit "
                                                                       "in your opponent's discard pile.",
                                              "Death Guard. Nurgle. Warrior.", 4, "Chaos", "Common",
@@ -79,13 +80,16 @@ def chaos_cards_init():
                                              2, 3, 2, True, ""),
                         CardClasses.EventCard("Warpstorm", "Combat Action: Deal 2 damage to each unit without"
                                                            " any attachments at a target planet or HQ.", "Power.",
-                                              3, "Chaos", "Common", 1, False, ""),
+                                              3, "Chaos", "Common", 1, False, action_in_hand=True,
+                                              allowed_phases_in_hand="COMBAT"),
                         CardClasses.EventCard("Tzeentch's Firestorm", "Action: Deal X damage "
                                                                       "to a target non-warlord unit.", "Power. Tzeentch.",
-                                              999, "Chaos", "Loyal", 2, False, ""),
+                                              999, "Chaos", "Loyal", 2, False, action_in_hand=True,
+                                              allowed_phases_in_hand="ALL"),
                         CardClasses.EventCard("Promise of Glory", "Deploy Action: Put 2 Cultist "
                                                                   "tokens into play at your HQ.",
-                                              "Tactic.", 0, "Chaos", "Common", 1, False, ""),
+                                              "Tactic.", 0, "Chaos", "Common", 1, False, action_in_hand=True,
+                                              allowed_phases_in_hand="DEPLOY"),
                         CardClasses.AttachmentCard("Rune-Encrusted Armor", "Attach to an army unit.\n"
                                                                            "Attached unit gets +2 ATK and +2 HP.",
                                                    "Armor. Wargear.", 2, "Chaos", "Common", 1, False, ""),
