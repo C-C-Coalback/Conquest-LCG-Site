@@ -400,6 +400,8 @@ class Player:
                     print(headquarters_list[i].get_name())
                     if card_type != "Warlord":
                         headquarters_list[i].exhaust_card()
+                        if headquarters_list[i].get_ability() == "Experimental Devilfish":
+                            headquarters_list[i].ready_card()
                     summon_khymera = False
                     if headquarters_list[i].get_ability() == "Packmaster Kith":
                         summon_khymera = True
