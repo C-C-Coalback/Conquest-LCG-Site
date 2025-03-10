@@ -758,6 +758,10 @@ class Game:
                 winner.add_resources(1)
                 await winner.send_resources()
                 await loser.send_resources()
+        elif planet_name == "Barlus":
+            loser.discard_card_at_random()
+            await loser.send_hand()
+            await loser.send_discard()
         if self.round_number == self.last_planet_checked_for_battle:
             winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
             await winner.send_hq()
