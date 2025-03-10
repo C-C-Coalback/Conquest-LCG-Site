@@ -63,6 +63,7 @@ class Player:
         self.condition_player_sub = threading.Condition()
         self.aiming_reticle_color = None
         self.aiming_reticle_coords_hand = None
+        self.can_play_limited = True
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -88,6 +89,12 @@ class Player:
         await self.send_resources()
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
+
+    def get_can_play_limited(self):
+        return self.can_play_limited
+
+    def set_can_play_limited(self, new_val):
+        self.can_play_limited = new_val
 
     async def send_hand(self):
         if self.cards:
@@ -294,12 +301,16 @@ class Player:
     def play_card_if_support(self, position_hand, already_checked=False, card=None):
         if already_checked:
             played_card = self.play_card(-2, card=card)
-            return "SUCCESS/Support"
+            if played_card == "SUCCESS":
+                return "SUCCESS/Support"
+            return played_card
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         if card.card_type == "Support":
             print("Need to play support card")
             played_card = self.play_card(-2, card=card)
-            return "SUCCESS/Support"
+            if played_card == "SUCCESS":
+                return "SUCCESS/Support"
+            return played_card
         return "SUCCESS/Not Support"
 
     def get_card_in_hand(self, position_hand):
@@ -317,22 +328,45 @@ class Player:
         if card is not None:
             if position == -2:
                 print("Play card to HQ")
-                if self.spend_resources(card.get_cost()):
-                    self.add_to_hq(card)
-                    self.cards.remove(card.get_name())
-                    print("Played card to HQ")
-                    return "SUCCESS"
+                print(card.get_limited(), self.can_play_limited)
+                if card.get_limited():
+                    if self.can_play_limited:
+                        if self.spend_resources(card.get_cost()):
+                            self.add_to_hq(card)
+                            self.cards.remove(card.get_name())
+                            self.set_can_play_limited(False)
+                            print("Played card to HQ")
+                            return "SUCCESS"
+                    else:
+                        return "FAIL/Limited already played"
+                else:
+                    if self.spend_resources(card.get_cost()):
+                        self.add_to_hq(card)
+                        self.cards.remove(card.get_name())
+                        print("Played card to HQ")
+                        return "SUCCESS"
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources"
         if position_hand is not None:
             if position_hand != -1:
                 if -1 < position < 7:
                     card = FindCard.find_card(self.cards[position_hand], self.card_array)
-                    if self.spend_resources(card.get_cost()):
-                        self.add_card_to_planet(card, position)
-                        self.cards.remove(card.get_name())
-                        print("Played card to planet", position)
-                        return "SUCCESS"
+                    if card.get_limited():
+                        if self.can_play_limited:
+                            if self.spend_resources(card.get_cost()):
+                                self.add_card_to_planet(card, position)
+                                self.cards.remove(card.get_name())
+                                self.set_can_play_limited(False)
+                                print("Played card to planet", position)
+                                return "SUCCESS"
+                        else:
+                            return "FAIL/Limited already played"
+                    else:
+                        if self.spend_resources(card.get_cost()):
+                            self.add_card_to_planet(card, position)
+                            self.cards.remove(card.get_name())
+                            print("Played card to planet", position)
+                            return "SUCCESS"
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources"
         return "FAIL/Invalid card"

@@ -33,7 +33,7 @@ def tau_cards_init():
                                                   0, faction, "Signature", 3, False, action_in_play=True,
                                                   allowed_phases_in_play="ALL"),
                        CardClasses.ArmyCard("Recon Drone", "Limited.", "Drone. Ally.", 0, faction, "Loyal",
-                                            0, 1, 2, False),
+                                            0, 1, 2, False, limited=True),
                        CardClasses.ArmyCard("Vior'la Marksman", "Ranged.", "Scout. Shas'la.", 1, faction, "Common",
                                             1, 2, 1, False),
                        CardClasses.ArmyCard("Carnivore Pack", "Interrupt: When this unit is destroyed, "
@@ -93,7 +93,8 @@ def tau_cards_init():
                                                                        "Interrupt: When you deploy a Tau unit, exhaust "
                                                                        "this support to reduce that unit's cost by 1.",
                                                "Location.", 1, faction, "Common", True,
-                                               applies_discounts=[True, 1, True]),
+                                               applies_discounts=[True, 1, True],
+                                               is_faction_limited_unique_discounter=True, limited=True),
                        CardClasses.SupportCard("Ambush Platform", "Interrupt: When you deploy an attachment, "
                                                                   "reduce its cost by 1.\n"
                                                                   "Combat Action: Exhaust this support to deploy "

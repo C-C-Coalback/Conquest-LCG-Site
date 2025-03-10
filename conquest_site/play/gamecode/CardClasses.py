@@ -1,7 +1,8 @@
 class Card:
     def __init__(self, name, text, traits, cost, faction, loyalty, shields, card_type, unique, image_name="",
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
+                 limited=False):
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name = name
@@ -27,6 +28,11 @@ class Card:
         self.once_per_phase_used = False
         self.aiming_reticle_color = None
         self.bloodied = False
+        self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
+        self.limited = limited
+
+    def get_limited(self):
+        return self.limited
 
     def get_name(self):
         return self.name
@@ -44,6 +50,9 @@ class Card:
 
     def get_blanked(self):
         return self.blanked
+
+    def get_is_faction_limited_unique_discounter(self):
+        return self.is_faction_limited_unique_discounter
 
     def get_once_per_phase_used(self):
         return self.once_per_phase_used
@@ -119,10 +128,11 @@ class UnitCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, card_type, attack, health, command,
                  unique, image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False
-                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play)
+                         action_in_play, allowed_phases_in_play, limited)
         self.attack = attack
         self.health = health
         self.damage = 0
@@ -335,11 +345,12 @@ class ArmyCard(UnitCard):
     def __init__(self, name, text, traits, cost, faction, loyalty, attack, health, command, unique,
                  image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False,
-                 allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play)
+                         action_in_play, allowed_phases_in_play, limited)
 
     def print_info(self):
         if self.unique:
@@ -357,10 +368,12 @@ class ArmyCard(UnitCard):
 class EventCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
-                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Event", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
+                         limited=False)
 
     def print_info(self):
         if self.unique:
@@ -379,10 +392,11 @@ class EventCard(Card):
 class AttachmentCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
-                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play, limited)
 
     def print_info(self):
         if self.unique:
@@ -401,10 +415,12 @@ class AttachmentCard(Card):
 class SupportCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, unique, image_name="", applies_discounts=None
                  , action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          0, "Support", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
+                         is_faction_limited_unique_discounter, limited)
 
     def print_info(self):
         if self.unique:

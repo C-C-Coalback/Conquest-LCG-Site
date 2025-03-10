@@ -94,7 +94,8 @@ def eldar_cards_init():
                                                                          "exhaust this support to reduce that "
                                                                          "unit's cost by 1.",
                                                  "Location.", 1, faction, "Common", True,
-                                                 applies_discounts=[True, 1, True]),
+                                                 applies_discounts=[True, 1, True],
+                                                 is_faction_limited_unique_discounter=True, limited=True),
                          CardClasses.SupportCard("Craftworld Gate", "Action: Exhaust this support to return a target "
                                                                     "army unit you control to your hand.",
                                                  "Location.", 1, faction, "Loyal", False,

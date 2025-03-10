@@ -736,6 +736,8 @@ class Game:
         self.p2.retreat_warlord()
         self.p1.ready_all_in_play()
         self.p2.ready_all_in_play()
+        self.p1.set_can_play_limited(True)
+        self.p2.set_can_play_limited(True)
         if self.round_number == 0:
             self.planets_in_play_array[5] = True
         elif self.round_number == 1:

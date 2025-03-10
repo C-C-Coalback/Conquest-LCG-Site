@@ -23,8 +23,8 @@ def neutral_cards_init():
                                                                      " 1 resource from this card to "
                                                                      "your resource pool.",
                                                   "Location.", 1, "Neutral", "Common", False,
-                                                  ""),
+                                                  limited=True),
                           CardClasses.AttachmentCard("Promotion", "Limited.\nAttach to an army unit.\n"
                                                                   "Attached unit gains 2 command icons.", "Skill.",
-                                                     0, "Neutral", "Common", 1, False, "")]
+                                                     0, "Neutral", "Common", 1, False, limited=True)]
     return neutral_card_array

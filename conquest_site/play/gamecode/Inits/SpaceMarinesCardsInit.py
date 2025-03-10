@@ -116,7 +116,8 @@ def space_marines_cards_init():
                                                                               "support to reduce that "
                                                                               "unit's cost by 1.",
                                                         "Location.", 1, faction, "Common", True, "",
-                                                        applies_discounts=[True, 1, True]),
+                                                        applies_discounts=[True, 1, True],
+                                                        is_faction_limited_unique_discounter=True, limited=True),
                                 CardClasses.SupportCard("Holy Sepulchre", "Reaction: After a Space Marines unit enters "
                                                                           "your discard pile, exhaust this support to "
                                                                           "return that unit to your hand.", "Location",

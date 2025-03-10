@@ -89,7 +89,7 @@ def dark_eldar_cards_init():
                                                             "Action: Take 1 resource from your opponent if he has "
                                                             "more resources than you.", "Tactic.",
                                                     0, faction, "Loyal", 2, False, action_in_hand=True,
-                                                    allowed_phases_in_hand="ALL"),
+                                                    allowed_phases_in_hand="ALL", limited=True),
                               CardClasses.AttachmentCard("Suffering", "Attach to an army unit.\n"
                                                                       "Attached unit gets -2 ATK.",
                                                          "Condition. Torture.", 1, faction, "Loyal", 2, False),
@@ -103,7 +103,8 @@ def dark_eldar_cards_init():
                                                                           "unit, exhaust this support to reduce "
                                                                           "that unit's cost by 1.",
                                                       "Location.", 1, faction, "Common", True, "",
-                                                      applies_discounts=[True, 1, True]),
+                                                      applies_discounts=[True, 1, True],
+                                                      is_faction_limited_unique_discounter=True, limited=True),
                               CardClasses.SupportCard("Twisted Laboratory", "Action: Exhaust this support to treat the "
                                                                             "printed text box of a target army unit "
                                                                             "as if it were blank (except for Traits) "

@@ -117,7 +117,8 @@ def astra_militarum_cards_init():
                                                                               "Militarum unit, exhaust this support "
                                                                               "to reduce that unit's cost by 1.",
                                                            "Location.", 1, faction, "Common", True,
-                                                           applies_discounts=[True, 1, True]),
+                                                           applies_discounts=[True, 1, True],
+                                                           is_faction_limited_unique_discounter=True, limited=True),
                                    CardClasses.SupportCard("Rockrete Bunker", "If this card has 4 or more damage on "
                                                                               "it, sacrifice it.\n"
                                                                               "Reaction: After damage is assigned to "

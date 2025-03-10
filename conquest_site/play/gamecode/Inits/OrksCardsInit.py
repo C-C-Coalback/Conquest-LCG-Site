@@ -89,7 +89,8 @@ def orks_cards_init():
                        CardClasses.SupportCard("Bigtoof Banna", "Limited.\nInterrupt: When you deploy an Orks unit, "
                                                                 "exhaust this support to reduce that unit's cost by 1.",
                                                "Upgrade.", 1, "Orks", "Common", True,
-                                               "Bigtoof_Banna", applies_discounts=[True, 1, True]),
+                                               "Bigtoof_Banna", applies_discounts=[True, 1, True],
+                                               is_faction_limited_unique_discounter=True, limited=True),
                        CardClasses.SupportCard("Tellyporta Pad",
                                                "Combat Action: Exhaust this support to move an Orks unit "
                                                "you control to the first planet.",
