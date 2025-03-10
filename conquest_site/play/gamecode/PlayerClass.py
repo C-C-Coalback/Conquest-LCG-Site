@@ -271,6 +271,12 @@ class Player:
         card_object = FindCard.find_card(shield_card_name, self.card_array)
         return card_object.get_shields()
 
+    def get_damage_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_damage()
+
+    def set_damage_given_pos(self, planet_id, unit_id, amount):
+        return self.cards_in_play[planet_id + 1][unit_id].set_damage(amount)
+
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.retreat_warlord()

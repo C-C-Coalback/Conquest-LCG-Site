@@ -57,7 +57,7 @@ class Game:
         self.player_who_is_shielding = None
         self.planet_of_damaged_unit = None
         self.position_of_damaged_unit = None
-        self.damage_taken_by_unit = None
+        self.damage_on_unit_before_new_damage = None
         self.mode = "Normal"
         self.stored_mode = self.mode
         self.condition_main_game = threading.Condition()
@@ -318,7 +318,7 @@ class Game:
                                     self.next_unit_to_suffer_damage = 0
                                     self.defender_position = self.next_unit_to_suffer_damage
                                     self.defender_planet = chosen_planet
-                                    self.damage_taken_by_unit = amount_aoe
+                                    self.damage_on_unit_before_new_damage = amount_aoe
                                     await self.send_info_box()
                                     await secondary_player.send_units_at_planet(chosen_planet)
         elif len(game_update_string) == 3:
@@ -405,7 +405,8 @@ class Game:
                                 self.number_who_is_shielding = secondary_player.get_number()
                                 self.planet_of_damaged_unit = self.defender_planet
                                 self.position_of_damaged_unit = self.defender_position
-                                self.damage_taken_by_unit = attack_value
+                                self.damage_on_unit_before_new_damage = \
+                                    secondary_player.get_damage_given_pos(self.defender_planet, self.defender_position)
                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                             self.defender_position, "red")
                                 if armorbane_check and attack_value > 0:
@@ -533,7 +534,7 @@ class Game:
         self.player_who_is_shielding = None
         self.planet_of_damaged_unit = None
         self.position_of_damaged_unit = None
-        self.damage_taken_by_unit = None
+        self.damage_on_unit_before_new_damage = None
 
     def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card, bloodied_relevant=False):
         if number == "1":
@@ -576,9 +577,11 @@ class Game:
             primary_player.discard_card_from_hand(hand_pos)
             await primary_player.send_hand()
             await primary_player.send_discard()
-        amount_to_shield = min(shield_on_card, self.damage_taken_by_unit)
+        amount_to_shield = shield_on_card
         primary_player.remove_damage_from_pos(self.defender_planet, self.defender_position,
                                               amount_to_shield)
+        if primary_player.get_damage_given_pos(self.defender_planet, self.defender_position) < 0:
+            primary_player.set_damage_given_pos(self.defender_planet, self.defender_position, 0)
         if primary_player.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
             unit_dead = True
             primary_player.destroy_card_in_play(self.defender_planet, self.defender_position)

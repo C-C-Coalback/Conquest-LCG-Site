@@ -193,6 +193,9 @@ class UnitCard(Card):
     def get_damage(self):
         return self.damage
 
+    def set_damage(self, amount):
+        self.damage = amount
+
     def get_command(self):
         if self.name == "Bad Dok" and self.damage > 0:
             return self.command + 3
@@ -250,6 +253,10 @@ class UnitCard(Card):
                                 return amount
 
     def assign_damage(self, amount):
+        if amount > 0:
+            if self.get_ability() == "Blood Angels Veterans":
+                if self.get_ready():
+                    amount = amount - 1
         self.damage = self.damage + amount
 
     def check_health(self):
