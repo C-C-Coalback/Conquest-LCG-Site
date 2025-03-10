@@ -258,6 +258,9 @@ class Game:
                                                position_hand=self.card_pos_to_deploy, discounts=0)
         if played_card == "SUCCESS":
             await primary_player.send_hand()
+            await secondary_player.send_hand()
+            await primary_player.send_discard()
+            await secondary_player.send_discard()
             await primary_player.send_units_at_planet(int(planet_pos))
             await primary_player.send_resources()
             if not secondary_player.has_passed:
@@ -677,6 +680,20 @@ class Game:
             self.p2.add_resources(amount)
         elif number == 2:
             self.p1.add_resources(amount)
+
+    def discard_card_at_random_from_opponent(self, number):
+        print("\nGot to discard at random request\n")
+        number = int(number)
+        print(number == 1)
+        print(number == 2)
+        print(number == "1")
+        print(number == "2")
+        if number == 1:
+            print("Discard p2")
+            self.p2.discard_card_at_random()
+        elif number == 2:
+            print("Discard p1")
+            self.p1.discard_card_at_random()
 
     async def resolve_shield_of_unit(self, name, hand_pos):
         unit_dead = False

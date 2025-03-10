@@ -1,4 +1,5 @@
 from . import FindCard
+import random
 from random import shuffle
 import copy
 import threading
@@ -350,6 +351,8 @@ class Player:
                         self.add_to_hq(card)
                         self.cards.remove(card.get_name())
                         print("Played card to HQ")
+                        if card.get_ability() == "Murder of Razorwings":
+                            self.game.discard_card_at_random_from_opponent(self.number)
                         return "SUCCESS"
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources"
@@ -373,10 +376,20 @@ class Player:
                             self.add_card_to_planet(card, position)
                             self.cards.remove(card.get_name())
                             print("Played card to planet", position)
+                            print(card.get_ability())
+                            if card.get_ability() == "Murder of Razorwings":
+                                self.game.discard_card_at_random_from_opponent(self.number)
                             return "SUCCESS"
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources"
         return "FAIL/Invalid card"
+
+    def discard_card_at_random(self):
+        print("")
+        if self.cards:
+            pos = random.randint(1, len(self.cards))
+            print(pos)
+            self.discard_card_from_hand(pos)
 
     def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
