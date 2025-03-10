@@ -252,6 +252,8 @@ class Player:
         if amount > self.resources:
             return False
         else:
+            if amount < 0:
+                amount = 0
             self.resources = self.resources - amount
             return True
 
@@ -320,18 +322,19 @@ class Player:
     def add_card_to_planet(self, card, position):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
 
-    def play_card(self, position, card=None, position_hand=None):
+    def play_card(self, position, card=None, position_hand=None, discounts=0):
         if card is None and position_hand is None:
             return "ERROR/play_card function called incorrectly"
         if card is not None and position_hand is not None:
             return "ERROR/play_card function called incorrectly"
         if card is not None:
+            cost = card.get_cost() - discounts
             if position == -2:
                 print("Play card to HQ")
                 print(card.get_limited(), self.can_play_limited)
                 if card.get_limited():
                     if self.can_play_limited:
-                        if self.spend_resources(card.get_cost()):
+                        if self.spend_resources(cost):
                             self.add_to_hq(card)
                             self.cards.remove(card.get_name())
                             self.set_can_play_limited(False)
@@ -340,7 +343,7 @@ class Player:
                     else:
                         return "FAIL/Limited already played"
                 else:
-                    if self.spend_resources(card.get_cost()):
+                    if self.spend_resources(cost):
                         self.add_to_hq(card)
                         self.cards.remove(card.get_name())
                         print("Played card to HQ")
@@ -351,9 +354,10 @@ class Player:
             if position_hand != -1:
                 if -1 < position < 7:
                     card = FindCard.find_card(self.cards[position_hand], self.card_array)
+                    cost = card.get_cost() - discounts
                     if card.get_limited():
                         if self.can_play_limited:
-                            if self.spend_resources(card.get_cost()):
+                            if self.spend_resources(cost):
                                 self.add_card_to_planet(card, position)
                                 self.cards.remove(card.get_name())
                                 self.set_can_play_limited(False)
@@ -362,7 +366,7 @@ class Player:
                         else:
                             return "FAIL/Limited already played"
                     else:
-                        if self.spend_resources(card.get_cost()):
+                        if self.spend_resources(cost):
                             self.add_card_to_planet(card, position)
                             self.cards.remove(card.get_name())
                             print("Played card to planet", position)
@@ -477,6 +481,27 @@ class Player:
                     return False
                 return True
         return False
+
+    def search_hq_for_discounts(self, faction_of_card):
+        discounts_available = 0
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_applies_discounts():
+                if self.headquarters[i].get_is_faction_limited_unique_discounter():
+                    if self.headquarters[i].get_faction() == faction_of_card:
+                        if self.headquarters[i].get_ready():
+                            discounts_available += self.headquarters[i].get_discount_amount()
+
+        return discounts_available
+
+    def perform_discount_at_pos_hq(self, pos, faction_of_card):
+        discount = 0
+        if self.headquarters[pos].get_applies_discounts():
+            if self.headquarters[pos].get_is_faction_limited_unique_discounter():
+                if self.headquarters[pos].get_faction() == faction_of_card:
+                    if self.headquarters[pos].get_ready():
+                        self.headquarters[pos].exhaust_card()
+                        discount += self.headquarters[pos].get_discount_amount()
+        return discount
 
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()

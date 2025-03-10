@@ -71,6 +71,9 @@ class Game:
         self.actions_allowed = True
         self.player_with_action = ""
         self.action_chosen = ""
+        self.available_discounts = 0
+        self.discounts_applied = 0
+        self.faction_of_card_to_play = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -142,14 +145,28 @@ class Game:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 print("Need to pass")
                 if name == self.player_with_deploy_turn:
-                    if self.number_with_deploy_turn == "1":
-                        self.number_with_deploy_turn = "2"
-                        self.player_with_deploy_turn = self.name_2
-                        self.p1.has_passed = True
-                    else:
-                        self.number_with_deploy_turn = "1"
-                        self.player_with_deploy_turn = self.name_1
-                        self.p2.has_passed = True
+                    if self.mode == "Normal":
+                        if self.number_with_deploy_turn == "1":
+                            self.number_with_deploy_turn = "2"
+                            self.player_with_deploy_turn = self.name_2
+                            self.p1.has_passed = True
+                            self.discounts_applied = 0
+                            self.available_discounts = 0
+                        else:
+                            self.number_with_deploy_turn = "1"
+                            self.player_with_deploy_turn = self.name_1
+                            self.p2.has_passed = True
+                            self.discounts_applied = 0
+                            self.available_discounts = 0
+                    elif self.mode == "DISCOUNT":
+                        print("Play card with no discounts")
+                        await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                       discounts=self.discounts_applied)
+                        self.mode = "Normal"
+                        self.planet_aiming_reticle_position = -1
+                        self.planet_aiming_reticle_active = False
+                        self.available_discounts = 0
+                        self.discounts_applied = 0
                 if self.p1.has_passed and self.p2.has_passed:
                     print("Both passed, move to warlord movement.")
                     self.phase = "COMMAND"
@@ -168,6 +185,7 @@ class Game:
                             primary_player = self.p2
                             secondary_player = self.p1
                         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+                        self.faction_of_card_to_play = card.get_faction()
                         if card.get_card_type() == "Support":
                             played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
                                                                                  already_checked=True, card=card)
@@ -185,15 +203,43 @@ class Game:
                             await primary_player.send_hand()
                         else:
                             self.card_pos_to_deploy = -1
+            if game_update_string[0] == "HQ":
+                if name == self.player_with_deploy_turn:
+                    if game_update_string[1] == self.number_with_deploy_turn:
+                        if self.mode == "DISCOUNT":
+                            if self.number_with_deploy_turn == "1":
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
+                                                                                  self.faction_of_card_to_play)
+                            if discount_received > 0:
+                                self.discounts_applied += discount_received
+                            if self.discounts_applied >= self.available_discounts:
+                                await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                               discounts=self.discounts_applied)
+                                self.mode = "Normal"
+
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
                 if self.card_pos_to_deploy != -1:
-                    await self.deploy_card_routine(name, game_update_string[1])
-                    self.condition_main_game.acquire()
+                    if self.number_with_deploy_turn == "1":
+                        player = self.p1
+                    else:
+                        player = self.p2
+                    self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
+                    if self.available_discounts > 0:
+                        self.stored_mode = self.mode
+                        self.mode = "DISCOUNT"
+                        self.planet_aiming_reticle_position = int(game_update_string[1])
+                        self.planet_aiming_reticle_active = True
+                        await self.send_planet_array()
+                    else:
+                        await self.deploy_card_routine(name, game_update_string[1])
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
-    async def deploy_card_routine(self, name, planet_pos):
+    async def deploy_card_routine(self, name, planet_pos, discounts=0):
         print("Deploy card at planet", planet_pos)
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
@@ -202,7 +248,7 @@ class Game:
             primary_player = self.p2
             secondary_player = self.p1
         played_card = primary_player.play_card(int(planet_pos),
-                                               position_hand=self.card_pos_to_deploy)
+                                               position_hand=self.card_pos_to_deploy, discounts=0)
         if played_card == "SUCCESS":
             await primary_player.send_hand()
             await primary_player.send_units_at_planet(int(planet_pos))
@@ -214,10 +260,14 @@ class Game:
         self.card_pos_to_deploy = -1
         primary_player.aiming_reticle_color = None
         primary_player.aiming_reticle_coords_hand = None
+        self.planet_aiming_reticle_active = False
+        self.planet_aiming_reticle_position = -1
+        self.discounts_applied = 0
+        self.available_discounts = 0
+        self.faction_of_card_to_play = ""
         await primary_player.send_hand()
+        await primary_player.send_hq()
         print("Finished deploying card")
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def update_game_event_command_section(self, name, game_update_string):
         print("Run warlord assignment code.")
