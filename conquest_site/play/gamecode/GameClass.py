@@ -396,6 +396,8 @@ class Game:
                                 # Flying check
                                 if def_flying and not att_flying:
                                     attack_value = attack_value / 2 + (attack_value % 2 > 0)
+                                self.damage_on_unit_before_new_damage = \
+                                    secondary_player.get_damage_given_pos(self.defender_planet, self.defender_position)
                                 unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
                                                                                   self.defender_position,
                                                                                   damage=attack_value)
@@ -406,8 +408,6 @@ class Game:
                                 self.number_who_is_shielding = secondary_player.get_number()
                                 self.planet_of_damaged_unit = self.defender_planet
                                 self.position_of_damaged_unit = self.defender_position
-                                self.damage_on_unit_before_new_damage = \
-                                    secondary_player.get_damage_given_pos(self.defender_planet, self.defender_position)
                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                             self.defender_position, "red")
                                 if armorbane_check and attack_value > 0:
@@ -614,8 +614,10 @@ class Game:
         amount_to_shield = shield_on_card
         primary_player.remove_damage_from_pos(self.defender_planet, self.defender_position,
                                               amount_to_shield)
-        if primary_player.get_damage_given_pos(self.defender_planet, self.defender_position) < 0:
-            primary_player.set_damage_given_pos(self.defender_planet, self.defender_position, 0)
+        if primary_player.get_damage_given_pos(self.defender_planet, self.defender_position) < \
+                self.damage_on_unit_before_new_damage:
+            primary_player.set_damage_given_pos(self.defender_planet, self.defender_position,
+                                                self.damage_on_unit_before_new_damage)
         if primary_player.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
             unit_dead = True
             primary_player.destroy_card_in_play(self.defender_planet, self.defender_position)
