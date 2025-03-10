@@ -371,6 +371,8 @@ class Player:
         counted_command = 0
         for i in range(len(self.cards_in_play[planet_id + 1])):
             counted_command += self.cards_in_play[planet_id + 1][i].get_command()
+            if self.cards_in_play[planet_id + 1][i].get_ability() == "Iron Hands Techmarine":
+                counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         return counted_command
 
     def check_for_warlord(self, planet_id):

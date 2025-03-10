@@ -544,6 +544,15 @@ class Game:
             return is_present
         return None
 
+    def request_number_of_enemy_units_at_planet(self, number, planet):
+        if number == "1":
+            count = self.p2.get_number_of_units_at_planet(planet)
+            return count
+        elif number == "2":
+            count = self.p1.get_number_of_units_at_planet(planet)
+            return count
+        return None
+
     def add_resources_to_opponent(self, number, amount):
         self.resources_need_sending_outside_normal_sends = True
         if number == 1:
