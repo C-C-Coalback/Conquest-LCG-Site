@@ -733,6 +733,23 @@ class Game:
         if self.number_of_units_left_to_suffer_damage <= 0:
             self.reset_combat_positions()
 
+    async def resolve_winning_combat(self, winner, loser):
+        planet_name = self.planet_array[self.last_planet_checked_for_battle]
+        print("Resolve battle ability of:", planet_name)
+        if planet_name == "Osus IV":
+            if loser.spend_resources(1):
+                winner.add_resources(1)
+                await winner.send_resources()
+                await loser.send_resources()
+        if self.round_number == self.last_planet_checked_for_battle:
+            winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
+            await winner.send_hq()
+            await winner.send_units_at_planet(self.last_planet_checked_for_battle)
+            winner.capture_planet(self.last_planet_checked_for_battle,
+                                  self.planet_cards_array)
+            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+            await winner.send_victory_display()
+
     async def check_combat_end(self, name):
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
         p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
@@ -740,25 +757,9 @@ class Game:
             await self.send_info_box()
         else:
             if p1_has_units:
-                print("Player 1 wins battle")
-                if self.round_number == self.last_planet_checked_for_battle:
-                    self.p1.retreat_all_at_planet(self.last_planet_checked_for_battle)
-                    await self.p1.send_hq()
-                    await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                    self.p1.capture_planet(self.last_planet_checked_for_battle,
-                                           self.planet_cards_array)
-                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    await self.p1.send_victory_display()
+                await self.resolve_winning_combat(self.p1, self.p2)
             if p2_has_units:
-                print("Player 2 wins battle")
-                if self.round_number == self.last_planet_checked_for_battle:
-                    self.p2.retreat_all_at_planet(self.last_planet_checked_for_battle)
-                    await self.p2.send_hq()
-                    await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
-                    self.p2.capture_planet(self.last_planet_checked_for_battle,
-                                           self.planet_cards_array)
-                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    await self.p2.send_victory_display()
+                await self.resolve_winning_combat(self.p2, self.p1)
             if not p1_has_units and not p2_has_units:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
@@ -843,6 +844,7 @@ class Game:
                 p2_has_warlord = self.p2.check_for_warlord(i)
                 if p1_has_warlord or p2_has_warlord:
                     self.last_planet_checked_for_battle = i
+                    self.ranged_skirmish_active = True
                     return True
             i = i + 1
         return False
