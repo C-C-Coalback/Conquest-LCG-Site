@@ -62,6 +62,7 @@ class Game:
         self.stored_mode = self.mode
         self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
+        self.condition_discounting = threading.Condition()
         self.planet_aiming_reticle_active = False
         self.planet_aiming_reticle_position = -1
         self.number_of_units_left_to_suffer_damage = 0
@@ -187,27 +188,34 @@ class Game:
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
                 if self.card_pos_to_deploy != -1:
-                    print("Deploy card at planet", game_update_string[1])
-                    if self.number_with_deploy_turn == "1":
-                        primary_player = self.p1
-                        secondary_player = self.p2
-                    else:
-                        primary_player = self.p2
-                        secondary_player = self.p1
-                    played_card = primary_player.play_card(int(game_update_string[1]),
-                                                           position_hand=self.card_pos_to_deploy)
-                    if played_card == "SUCCESS":
-                        await primary_player.send_hand()
-                        await primary_player.send_units_at_planet(int(game_update_string[1]))
-                        await primary_player.send_resources()
-                        if not secondary_player.has_passed:
-                            self.player_with_deploy_turn = secondary_player.get_name_player()
-                            self.number_with_deploy_turn = secondary_player.get_number()
-                            await self.send_info_box()
-                    self.card_pos_to_deploy = -1
-                    primary_player.aiming_reticle_color = None
-                    primary_player.aiming_reticle_coords_hand = None
-                    await primary_player.send_hand()
+                    await self.deploy_card_routine(name, game_update_string[1])
+                    self.condition_main_game.acquire()
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
+
+    async def deploy_card_routine(self, name, planet_pos):
+        print("Deploy card at planet", planet_pos)
+        if self.number_with_deploy_turn == "1":
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        played_card = primary_player.play_card(int(planet_pos),
+                                               position_hand=self.card_pos_to_deploy)
+        if played_card == "SUCCESS":
+            await primary_player.send_hand()
+            await primary_player.send_units_at_planet(int(planet_pos))
+            await primary_player.send_resources()
+            if not secondary_player.has_passed:
+                self.player_with_deploy_turn = secondary_player.get_name_player()
+                self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+        self.card_pos_to_deploy = -1
+        primary_player.aiming_reticle_color = None
+        primary_player.aiming_reticle_coords_hand = None
+        await primary_player.send_hand()
+        print("Finished deploying card")
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
