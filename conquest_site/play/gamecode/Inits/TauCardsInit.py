@@ -35,7 +35,7 @@ def tau_cards_init():
                        CardClasses.ArmyCard("Recon Drone", "Limited.", "Drone. Ally.", 0, faction, "Loyal",
                                             0, 1, 2, False, limited=True),
                        CardClasses.ArmyCard("Vior'la Marksman", "Ranged.", "Scout. Shas'la.", 1, faction, "Common",
-                                            1, 2, 1, False),
+                                            1, 2, 1, False, ranged=True),
                        CardClasses.ArmyCard("Carnivore Pack", "Interrupt: When this unit is destroyed, "
                                                               "gain 3 resources.", "Warrior. Kroot.",
                                             3, faction, "Common", 3, 3, 0, False),
@@ -61,7 +61,7 @@ def tau_cards_init():
                                                           "Attached unit gains Area Effect (2).\"", "Drone.",
                                             2, faction, "Loyal", 2, 2, 1, False),
                        CardClasses.ArmyCard("Stingwing Swarm", "Ranged.", "Warrior. Vespid.", 4, faction, "Common",
-                                            3, 3, 1, False),
+                                            3, 3, 1, False, ranged=True),
                        CardClasses.ArmyCard("Fireblade Kais'vre", "Interrupt: When you use a Tau card as a shield card "
                                                                   "at this planet, it gains 1 shield icon.",
                                             "Solider. Hero.", 3, faction, "Loyal", 2, 3, 2, True),

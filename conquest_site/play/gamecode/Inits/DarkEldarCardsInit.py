@@ -31,7 +31,7 @@ def dark_eldar_cards_init():
                               CardClasses.ArmyCard("Sybarite Marksman", "Ranged. (This unit attacks during the "
                                                                         "ranged skirmish at the beginning of"
                                                                         " a battle.)", "Warrior. Kabalite.",
-                                                   1, faction, "Common", 2, 1, 0, False),
+                                                   1, faction, "Common", 2, 1, 0, False, ranged=True),
                               CardClasses.ArmyCard("Incubus Warrior", "", "Warrior.", 2, faction,
                                                    "Common", 3, 1, 2, False),
                               CardClasses.ArmyCard("Haemonculus Tormentor", "Action: Pay 1 resource to give this "
@@ -49,7 +49,7 @@ def dark_eldar_cards_init():
                               CardClasses.ArmyCard("Baleful Mandrake", "Ranged. (This unit attacks during the "
                                                                        "ranged skirmish at the beginning of"
                                                                        " a battle.)", "Warrior.",
-                                                   3, faction, "Common", 3, 2, 1, False),
+                                                   3, faction, "Common", 3, 2, 1, False, ranged=True),
                               CardClasses.ArmyCard("Vile Raider", "No Wargear Attachments.\n"
                                                                   "Mobile. (At the beginning of the combat phase, "
                                                                   "this unit may move to an adjacent planet.",

@@ -36,14 +36,14 @@ def astra_militarum_cards_init():
                                    CardClasses.ArmyCard("Ratling Deadeye", "Ranged. (This unit attacks during the "
                                                                            "ranged skirmish at the beginning of"
                                                                            " a battle.)", "Scout. Abhuman.", 1,
-                                                        faction, "Common", 1, 1, 1, False),
+                                                        faction, "Common", 1, 1, 1, False, ranged=True),
                                    CardClasses.ArmyCard("Cadian Mortar Squad", "Ranged. (This unit attacks during the "
                                                                                "ranged skirmish at the beginning of"
                                                                                " a battle.)\n"
                                                                                "Reaction: After an army unit you "
                                                                                "control at this planet leaves play, "
                                                                                "ready this unit.", "Soldier. Cadia.",
-                                                        3, faction, "Loyal", 1, 3, 2, False),
+                                                        3, faction, "Loyal", 1, 3, 2, False, ranged=True),
                                    CardClasses.ArmyCard("Sanctioned Psyker", "", "Psyker.", 2, faction, "Common",
                                                         0, 4, 2, False),
                                    CardClasses.ArmyCard("Leman Russ Battle Tank", "No Wargear Attachments.",

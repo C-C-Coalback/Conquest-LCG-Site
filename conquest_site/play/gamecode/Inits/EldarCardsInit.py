@@ -24,7 +24,7 @@ def eldar_cards_init():
                          CardClasses.ArmyCard("Biel-Tan Guardians", "", "Warrior. Biel-Tan. Ally.",
                                               1, faction, "Loyal", 1, 1, 2, False),
                          CardClasses.ArmyCard("Altansar Rangers", "Ranged.", "Scout. Altansar.", 3, faction,
-                                              "Common", 2, 2, 2, False),
+                                              "Common", 2, 2, 2, False, ranged=True),
                          CardClasses.ArmyCard("Eldar Survivalist", "+1 resource and +1 card when command struggle"
                                                                    "is won at this planet."
                                               , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False),
