@@ -69,6 +69,7 @@ class Game:
         self.resources_need_sending_outside_normal_sends = False
         self.actions_allowed = True
         self.player_with_action = ""
+        self.action_chosen = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -458,10 +459,19 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Exterminatus":
+                        print("Resolve Exterminatus")
+                        self.action_chosen = "Exterminatus"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     else:
                         primary_player.add_resources(card.get_cost())
-                        await self.game_sockets[0].receive_game_update(card.get_name() + "not "
+                        await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                          "implemented")
+
+
         self.condition_sub_game.notify_all()
         self.condition_sub_game.release()
 
@@ -473,7 +483,31 @@ class Game:
                 print("Canceled special action")
                 await self.game_sockets[0].receive_game_update(name + " canceled their action request")
         elif len(game_update_string) == 2:
-            pass
+            if game_update_string[0] == "PLANETS":
+                chosen_planet = int(game_update_string[1])
+                if self.action_chosen == "Exterminatus":
+                    if self.round_number != chosen_planet:
+                        if self.number_with_deploy_turn == "1":
+                            primary_player = self.p1
+                            secondary_player = self.p2
+                        else:
+                            primary_player = self.p2
+                            secondary_player = self.p2
+                        self.p1.destroy_all_cards_at_planet(chosen_planet)
+                        self.p2.destroy_all_cards_at_planet(chosen_planet)
+                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                        primary_player.aiming_reticle_color = None
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.card_pos_to_deploy = -1
+                        self.player_with_action = ""
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                        self.mode = self.stored_mode
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await self.p1.send_units_at_planet(chosen_planet)
+                        await self.p2.send_units_at_planet(chosen_planet)
+                        await self.send_info_box()
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 if self.phase == "DEPLOY":

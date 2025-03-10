@@ -493,6 +493,17 @@ class Player:
                 self.game.add_resources_to_opponent(self.number, 1)
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
+    def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True):
+        i = 0
+        while i < len(self.cards_in_play[planet_num + 1]):
+            if ignore_uniques:
+                if not self.cards_in_play[planet_num + 1][i].get_unique():
+                    self.destroy_card_in_play(planet_num, i)
+                    i = i - 1
+                i = i + 1
+            else:
+                self.destroy_card_in_play(planet_num, i)
+
     def summon_token_at_planet(self, token_name, planet_num):
         card = FindCard.find_card(token_name, self.card_array)
         if card.get_name() != "FINAL CARD":
