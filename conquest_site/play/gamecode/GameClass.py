@@ -74,6 +74,7 @@ class Game:
         self.available_discounts = 0
         self.discounts_applied = 0
         self.faction_of_card_to_play = ""
+        self.ranged_skirmish_active = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -108,10 +109,16 @@ class Game:
         if self.phase == "DEPLOY":
             info_string += "Active: " + self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
-            if self.mode == "SHIELD":
-                info_string += "Active: " + self.player_who_is_shielding + "/"
+            if self.ranged_skirmish_active:
+                if self.mode == "SHIELD":
+                    info_string += "Active (RANGED): " + self.player_who_is_shielding + "/"
+                else:
+                    info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
-                info_string += "Active: " + self.player_with_combat_turn + "/"
+                if self.mode == "SHIELD":
+                    info_string += "Active: " + self.player_who_is_shielding + "/"
+                else:
+                    info_string += "Active: " + self.player_with_combat_turn + "/"
         await self.game_sockets[0].receive_game_update(info_string)
 
     async def send_planet_array(self):
@@ -331,16 +338,24 @@ class Game:
                         self.reset_combat_positions()
                     if self.p1.has_passed and self.p2.has_passed:
                         if self.mode == "Normal":
-                            print("Both players passed, need to run combat round end.")
-                            self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
-                            self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
-                            self.p1.has_passed = False
-                            self.p2.has_passed = False
-                            self.reset_combat_turn()
-                            await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                            await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
-                            self.mode = "RETREAT"
-                            await self.check_combat_end(name)
+                            if self.ranged_skirmish_active:
+                                print("Both players passed, end ranged skirmish")
+                                self.p1.has_passed = False
+                                self.p2.has_passed = False
+                                self.reset_combat_turn()
+                                self.ranged_skirmish_active = False
+                                await self.send_info_box()
+                            else:
+                                print("Both players passed, need to run combat round end.")
+                                self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
+                                self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
+                                self.p1.has_passed = False
+                                self.p2.has_passed = False
+                                self.reset_combat_turn()
+                                await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                                await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                                self.mode = "RETREAT"
+                                await self.check_combat_end(name)
                         elif self.mode == "RETREAT":
                             self.p1.has_passed = False
                             self.p2.has_passed = False
@@ -417,13 +432,21 @@ class Game:
                                     player = self.p1
                                 else:
                                     player = self.p2
-                                is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
-                                if is_ready:
-                                    print("Unit ready, can be used")
-                                    valid_unit = True
-                                    player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                can_continue = False
+                                if self.ranged_skirmish_active:
+                                    is_ranged = player.get_ranged_given_pos(chosen_planet, chosen_unit)
+                                    if is_ranged:
+                                        can_continue = True
                                 else:
-                                    print("Unit not ready")
+                                    can_continue = True
+                                if can_continue:
+                                    is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
+                                    if is_ready:
+                                        print("Unit ready, can be used")
+                                        valid_unit = True
+                                        player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                    else:
+                                        print("Unit not ready")
                             if valid_unit:
                                 self.attacker_planet = chosen_planet
                                 self.attacker_position = chosen_unit
@@ -890,11 +913,14 @@ class Game:
     def check_battle(self, planet_id):
         if planet_id == self.round_number:
             print("First planet: battle occurs at ", planet_id)
+            self.ranged_skirmish_active = True
             return 1
         if self.p1.check_for_warlord(planet_id):
             print("p1 warlord present. Battle at ", planet_id)
+            self.ranged_skirmish_active = True
             return 1
         elif self.p2.check_for_warlord(planet_id):
             print("p2 warlord present. Battle at ", planet_id)
+            self.ranged_skirmish_active = True
             return 1
         return 0
