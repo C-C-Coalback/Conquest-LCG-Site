@@ -239,6 +239,8 @@ class Game:
                     await self.p2.send_hand()
                     await self.p1.send_resources()
                     await self.p2.send_resources()
+                    await self.p1.send_units_at_all_planets()
+                    await self.p2.send_units_at_all_planets()
                     self.phase = "COMBAT"
                     self.check_battle(self.round_number)
                     self.last_planet_checked_for_battle = self.round_number
@@ -811,6 +813,8 @@ class Game:
             resources_won = chosen_planet.get_resources()
             cards_won = chosen_planet.get_cards()
             ret_val = ["1", resources_won, cards_won]
+            if self.p1.search_card_in_hq("Omega Zero Command"):
+                self.p1.summon_token_at_planet("Guardsman", planet_id)
             return ret_val
         elif command_p2 > command_p1:
             print("P2 wins command")
@@ -818,7 +822,10 @@ class Game:
             resources_won = chosen_planet.get_resources()
             cards_won = chosen_planet.get_cards()
             ret_val = ["2", resources_won, cards_won]
+            if self.p2.search_card_in_hq("Omega Zero Command"):
+                self.p2.summon_token_at_planet("Guardsman", planet_id)
             return ret_val
+        return None
 
     def check_battle(self, planet_id):
         if planet_id == self.round_number:

@@ -424,10 +424,22 @@ class Player:
         for i in range(len(self.cards_in_play[planet_id + 1])):
             current_name = self.cards_in_play[planet_id + 1][i].get_ability()
             print(current_name, name_of_card)
-            if self.cards_in_play[planet_id + 1][i].get_ability() == name_of_card:
+            if current_name == name_of_card:
                 if not bloodied_relevant:
                     return True
                 if self.cards_in_play[planet_id + 1][i].get_bloodied():
+                    return False
+                return True
+        return False
+
+    def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True):
+        for i in range(len(self.headquarters)):
+            current_name = self.headquarters[i].get_ability()
+            print(current_name, name_of_card)
+            if current_name == name_of_card:
+                if not bloodied_relevant:
+                    return True
+                if self.headquarters[i].get_bloodied():
                     return False
                 return True
         return False
