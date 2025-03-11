@@ -277,8 +277,6 @@ class Game:
                         await self.send_info_box()
                     else:
                         await self.deploy_card_routine(name, game_update_string[1])
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def shield_card_during_deploy(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -439,8 +437,6 @@ class Game:
                     self.p1.has_passed = False
                     self.p2.has_passed = False
                     await self.send_info_box()
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def update_game_event_combat_section(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -632,8 +628,6 @@ class Game:
                                 name = secondary_player.get_name_player()
                             if not armorbane_check or attack_value < 1:
                                 await self.send_info_box()
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def update_game_event_deploy_action_hand(self, name, game_update_string):
         print("Deploy special action, card in hand at pos", game_update_string[2])
@@ -676,9 +670,6 @@ class Game:
                         primary_player.add_resources(card.get_cost())
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                          "implemented")
-
-        self.condition_sub_game.notify_all()
-        self.condition_sub_game.release()
 
     async def update_game_event_action(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -725,12 +716,11 @@ class Game:
                             self.condition_sub_game.release()
         elif len(game_update_string) == 4:
             pass
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
+        may_try_action = True
         if self.phase == "DEPLOY" and self.mode == "SHIELD":
             await self.shield_card_during_deploy(name, game_update_string)
         elif self.phase == "SETUP":
@@ -752,10 +742,12 @@ class Game:
                         self.player_with_action = name
                         print("Special action")
                         await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+                    may_try_action = False
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if name == self.player_with_deploy_turn:
-                    await self.update_game_event_deploy_section(name, game_update_string)
-        elif self.mode == "ACTION":
+                if self.phase == "DEPLOY":
+                    if name == self.player_with_deploy_turn:
+                        await self.update_game_event_deploy_section(name, game_update_string)
+        if self.mode == "ACTION" and may_try_action:
             await self.update_game_event_action(name, game_update_string)
         elif self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
@@ -763,9 +755,8 @@ class Game:
             await self.update_game_event_command_section(name, game_update_string)
         elif self.phase == "COMBAT":
             await self.update_game_event_combat_section(name, game_update_string)
-        else:
-            self.condition_main_game.notify_all()
-            self.condition_main_game.release()
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
 
     def reset_combat_positions(self):
         self.defender_position = -1
