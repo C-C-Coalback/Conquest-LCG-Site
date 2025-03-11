@@ -78,6 +78,8 @@ class Game:
         self.ranged_skirmish_active = False
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
+        self.damage_is_taken_one_at_a_time = False
+        self.damage_left_to_take = 0
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -305,6 +307,9 @@ class Game:
             await primary_player.send_hand()
             await primary_player.send_discard()
         amount_to_shield = shield_on_card
+        if self.damage_is_taken_one_at_a_time:
+            if amount_to_shield > 1:
+                amount_to_shield = 1
         primary_player.remove_damage_from_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit,
                                               amount_to_shield)
         if primary_player.get_damage_given_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit) < \
@@ -322,13 +327,25 @@ class Game:
                 primary_player.warlord_just_got_bloodied = False
                 await primary_player.send_hq()
             await primary_player.send_discard()
-
-        self.mode = "Normal"
+        will_switch_back_to_normal = True
+        if not unit_dead and self.damage_is_taken_one_at_a_time:
+            self.damage_left_to_take -= 1
+            will_switch_back_to_normal = False
+            primary_player.set_aiming_reticle_in_play(self.planet_of_damaged_unit,
+                                                      self.position_of_damaged_unit, "red")
+            if self.damage_left_to_take < 1:
+                self.damage_left_to_take = 0
+                self.damage_is_taken_one_at_a_time = False
+                will_switch_back_to_normal = True
+                primary_player.reset_aiming_reticle_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
+        if unit_dead:
+            self.damage_is_taken_one_at_a_time = False
+            self.damage_left_to_take = False
+        if will_switch_back_to_normal:
+            self.mode = "Normal"
         await self.send_info_box()
         await primary_player.send_units_at_planet(self.planet_of_damaged_unit)
         await secondary_player.send_units_at_planet(self.planet_of_damaged_unit)
-
-
 
     async def deploy_card_routine(self, name, planet_pos, discounts=0):
         print("Deploy card at planet", planet_pos)
@@ -353,6 +370,8 @@ class Game:
                 self.number_who_is_shielding = str(primary_player.get_number())
                 self.planet_of_damaged_unit = int(planet_pos)
                 self.position_of_damaged_unit = position_of_unit
+                self.damage_is_taken_one_at_a_time = True
+                self.damage_left_to_take = damage_to_take
                 self.mode = "SHIELD"
                 print("Position of the damaged unit:", planet_pos, position_of_unit)
                 primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
