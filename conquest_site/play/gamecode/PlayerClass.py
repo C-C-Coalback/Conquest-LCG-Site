@@ -385,6 +385,8 @@ class Player:
                                 self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.discard_card_at_random_from_opponent(self.number)
+                            if card.get_ability() == "Kith's Khymeramasters":
+                                self.summon_token_at_planet("Khymera", position)
                             return "SUCCESS", location_of_unit
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources", -1
