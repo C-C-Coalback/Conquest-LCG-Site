@@ -99,7 +99,10 @@ class Game:
     async def send_info_box(self):
         info_string = "GAME_INFO/INFO_BOX/"
         if self.phase == "DEPLOY":
-            info_string += self.player_with_deploy_turn + "/"
+            if self.mode == "SHIELD":
+                info_string += self.player_who_is_shielding + "/"
+            else:
+                info_string += self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
             if self.mode == "SHIELD":
                 info_string += self.player_who_is_shielding + "/"
@@ -110,7 +113,10 @@ class Game:
         info_string += "Phase: " + self.phase + "/"
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "DEPLOY":
-            info_string += "Active: " + self.player_with_deploy_turn + "/"
+            if self.mode == "SHIELD":
+                info_string += "Active: " + self.player_who_is_shielding + "/"
+            else:
+                info_string += "Active: " + self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
             if self.ranged_skirmish_active:
                 if self.mode == "SHIELD":
@@ -290,10 +296,10 @@ class Game:
                                                position_hand=self.card_pos_to_deploy, discounts=discounts,
                                                damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
-            #if damage_to_take > 0:
-            #    self.player_who_is_shielding = player.get_name_player()
-            #    self.number_who_is_shielding = str(player.get_number())
-            #    self.mode = "SHIELD"
+            if damage_to_take > 0:
+                self.player_who_is_shielding = primary_player.get_name_player()
+                self.number_who_is_shielding = str(primary_player.get_number())
+                self.mode = "SHIELD"
             await primary_player.send_hand()
             await secondary_player.send_hand()
             await primary_player.send_discard()
