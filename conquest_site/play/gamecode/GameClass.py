@@ -659,6 +659,13 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Pact of the Haemonculi":
+                        print("Resolve PotH")
+                        self.action_chosen = "Pact of the Haemonculi"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Exterminatus":
                         print("Resolve Exterminatus")
                         self.action_chosen = "Exterminatus"
@@ -696,6 +703,7 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         self.card_pos_to_deploy = -1
                         self.player_with_action = ""
+                        self.action_chosen = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
                         self.mode = self.stored_mode
@@ -715,7 +723,37 @@ class Game:
                             self.condition_sub_game.notify_all()
                             self.condition_sub_game.release()
         elif len(game_update_string) == 4:
-            pass
+            if game_update_string[0] == "IN_PLAY":
+                if self.phase == "DEPLOY":
+                    if name == self.player_with_deploy_turn:
+                        if game_update_string[1] == self.number_with_deploy_turn:
+                            if self.action_chosen == "Pact of the Haemonculi":
+                                if self.number_with_deploy_turn == "1":
+                                    primary_player = self.p1
+                                    secondary_player = self.p2
+                                else:
+                                    primary_player = self.p2
+                                    secondary_player = self.p2
+                                if primary_player.sacrifice_card_in_play(int(game_update_string[2]),
+                                                                         int(game_update_string[3])):
+                                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                    secondary_player.discard_card_at_random()
+                                    primary_player.draw_card()
+                                    primary_player.draw_card()
+                                    primary_player.aiming_reticle_color = None
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    self.card_pos_to_deploy = -1
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    self.mode = self.stored_mode
+                                    await primary_player.send_hand()
+                                    await secondary_player.send_hand()
+                                    await primary_player.send_units_at_planet(int(game_update_string[2]))
+
+
+
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()

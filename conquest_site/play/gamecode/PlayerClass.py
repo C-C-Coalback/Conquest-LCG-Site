@@ -592,6 +592,12 @@ class Player:
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
         self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
+    def sacrifice_card_in_play(self, planet_num, card_pos):
+        if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
+            return False
+        self.add_card_in_play_to_discard(planet_num, card_pos)
+        return True
+
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
