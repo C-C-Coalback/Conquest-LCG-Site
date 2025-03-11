@@ -75,6 +75,8 @@ class Game:
         self.discounts_applied = 0
         self.faction_of_card_to_play = ""
         self.ranged_skirmish_active = False
+        self.interrupt_active = False
+        self.what_is_being_interrupted = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
