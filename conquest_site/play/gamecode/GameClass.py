@@ -73,6 +73,7 @@ class Game:
         self.action_chosen = ""
         self.available_discounts = 0
         self.discounts_applied = 0
+        self.damage_for_unit_to_take_on_play = []
         self.faction_of_card_to_play = ""
         self.ranged_skirmish_active = False
         self.interrupt_active = False
@@ -168,7 +169,7 @@ class Game:
                             self.discounts_applied = 0
                             self.available_discounts = 0
                     elif self.mode == "DISCOUNT":
-                        print("Play card with no discounts")
+                        print("Play card with not all discounts")
                         await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
                                                        discounts=self.discounts_applied)
                         self.mode = "Normal"
@@ -186,6 +187,7 @@ class Game:
                     print(game_update_string[1] == self.number_with_deploy_turn)
                     if game_update_string[1] == self.number_with_deploy_turn:
                         print("Deploy card in hand at pos", game_update_string[2])
+                        previous_card_pos_to_deploy = self.card_pos_to_deploy
                         self.card_pos_to_deploy = int(game_update_string[2])
                         if self.number_with_deploy_turn == "1":
                             primary_player = self.p1
@@ -211,7 +213,7 @@ class Game:
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             await primary_player.send_hand()
                         else:
-                            self.card_pos_to_deploy = -1
+                            self.card_pos_to_deploy = previous_card_pos_to_deploy
             if game_update_string[0] == "HQ":
                 if name == self.player_with_deploy_turn:
                     if game_update_string[1] == self.number_with_deploy_turn:
@@ -228,6 +230,30 @@ class Game:
                                 await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
                                                                discounts=self.discounts_applied)
                                 self.mode = "Normal"
+            elif game_update_string[0] == "HAND":
+                if name == self.player_with_deploy_turn:
+                    if game_update_string[1] == self.number_with_deploy_turn:
+                        if self.mode == "DISCOUNT":
+                            if self.number_with_deploy_turn == "1":
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            discount_received, damage = player.perform_discount_at_pos_hand(int(game_update_string[2]),
+                                                                                            self.faction_of_card_to_play
+                                                                                            )
+                            if discount_received > 0:
+                                self.discounts_applied += discount_received
+                                player.discard_card_from_hand(int(game_update_string[2]))
+                                if damage > 0:
+                                    self.damage_for_unit_to_take_on_play.append(damage)
+                                    # self.player_who_is_shielding = player.get_name_player()
+                                    # self.number_who_is_shielding = str(player.get_number())
+                                if self.discounts_applied >= self.available_discounts:
+                                    await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                                   discounts=self.discounts_applied)
+                                else:
+                                    await player.send_hand()
+                                    await player.send_discard()
 
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
@@ -237,6 +263,7 @@ class Game:
                     else:
                         player = self.p2
                     self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
+                    self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
                     if self.available_discounts > 0:
                         self.stored_mode = self.mode
                         self.mode = "DISCOUNT"
@@ -256,8 +283,12 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
+        damage_to_take = sum(self.damage_for_unit_to_take_on_play)
+        print("position hand of unit: ", self.card_pos_to_deploy)
+        print("Damage to take: ", damage_to_take)
         played_card = primary_player.play_card(int(planet_pos),
-                                               position_hand=self.card_pos_to_deploy, discounts=0)
+                                               position_hand=self.card_pos_to_deploy, discounts=discounts,
+                                               damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
             await primary_player.send_hand()
             await secondary_player.send_hand()
@@ -269,6 +300,7 @@ class Game:
                 self.player_with_deploy_turn = secondary_player.get_name_player()
                 self.number_with_deploy_turn = secondary_player.get_number()
                 await self.send_info_box()
+        self.damage_for_unit_to_take_on_play = []
         self.card_pos_to_deploy = -1
         primary_player.aiming_reticle_color = None
         primary_player.aiming_reticle_coords_hand = None
@@ -279,6 +311,7 @@ class Game:
         self.faction_of_card_to_play = ""
         await primary_player.send_hand()
         await primary_player.send_hq()
+        await self.send_planet_array()
         print("Finished deploying card")
 
     async def update_game_event_command_section(self, name, game_update_string):

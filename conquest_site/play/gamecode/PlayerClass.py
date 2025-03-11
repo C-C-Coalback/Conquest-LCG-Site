@@ -326,7 +326,7 @@ class Player:
     def add_card_to_planet(self, card, position):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
 
-    def play_card(self, position, card=None, position_hand=None, discounts=0):
+    def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         if card is None and position_hand is None:
             return "ERROR/play_card function called incorrectly"
         if card is not None and position_hand is not None:
@@ -368,6 +368,9 @@ class Player:
                                 self.cards.remove(card.get_name())
                                 self.set_can_play_limited(False)
                                 print("Played card to planet", position)
+                                location_of_unit = len(self.cards_in_play[position + 1]) - 1
+                                if damage_to_take > 0:
+                                    self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 return "SUCCESS"
                         else:
                             return "FAIL/Limited already played"
@@ -377,6 +380,9 @@ class Player:
                             self.cards.remove(card.get_name())
                             print("Played card to planet", position)
                             print(card.get_ability())
+                            location_of_unit = len(self.cards_in_play[position + 1]) - 1
+                            if damage_to_take > 0:
+                                self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.discard_card_at_random_from_opponent(self.number)
                             return "SUCCESS"
@@ -511,6 +517,14 @@ class Player:
 
         return discounts_available
 
+    def search_hand_for_discounts(self, faction_of_card):
+        discounts_available = 0
+        for i in range(len(self.cards)):
+            if self.cards[i] == "Bigga Is Betta":
+                if faction_of_card == "Orks":
+                    discounts_available += 2
+        return discounts_available
+
     def perform_discount_at_pos_hq(self, pos, faction_of_card):
         discount = 0
         if self.headquarters[pos].get_applies_discounts():
@@ -520,6 +534,15 @@ class Player:
                         self.headquarters[pos].exhaust_card()
                         discount += self.headquarters[pos].get_discount_amount()
         return discount
+
+    def perform_discount_at_pos_hand(self, pos, faction_of_card):
+        discount = 0
+        damage = 0
+        if self.cards[pos] == "Bigga Is Betta":
+            if faction_of_card == "Orks":
+                discount += 2
+                damage += 1
+        return discount, damage
 
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
