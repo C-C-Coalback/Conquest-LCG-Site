@@ -244,10 +244,10 @@ class Game:
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                                 player.discard_card_from_hand(int(game_update_string[2]))
+                                if self.card_pos_to_deploy > int(game_update_string[2]):
+                                    self.card_pos_to_deploy -= 1
                                 if damage > 0:
                                     self.damage_for_unit_to_take_on_play.append(damage)
-                                    # self.player_who_is_shielding = player.get_name_player()
-                                    # self.number_who_is_shielding = str(player.get_number())
                                 if self.discounts_applied >= self.available_discounts:
                                     await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
                                                                    discounts=self.discounts_applied)
@@ -290,6 +290,10 @@ class Game:
                                                position_hand=self.card_pos_to_deploy, discounts=discounts,
                                                damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
+            #if damage_to_take > 0:
+            #    self.player_who_is_shielding = player.get_name_player()
+            #    self.number_who_is_shielding = str(player.get_number())
+            #    self.mode = "SHIELD"
             await primary_player.send_hand()
             await secondary_player.send_hand()
             await primary_player.send_discard()
