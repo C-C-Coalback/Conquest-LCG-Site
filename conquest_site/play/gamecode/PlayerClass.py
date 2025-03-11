@@ -395,7 +395,7 @@ class Player:
     def discard_card_at_random(self):
         print("")
         if self.cards:
-            pos = random.randint(1, len(self.cards))
+            pos = random.randint(1, len(self.cards) - 1)
             print(pos)
             self.discard_card_from_hand(pos)
 
@@ -592,6 +592,12 @@ class Player:
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
         self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
+    def sacrifice_card_in_hq(self, card_pos):
+        if self.headquarters[card_pos].get_card_type() == "Warlord":
+            return False
+        self.add_card_in_hq_to_discard(card_pos)
+        return True
+
     def sacrifice_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             return False
@@ -642,10 +648,18 @@ class Player:
         # self.discard_object(card_object)
         del self.cards_in_play[planet_num + 1][card_pos]
 
+    def remove_card_from_hq(self, card_pos):
+        del self.headquarters[card_pos]
+
     def add_card_in_play_to_discard(self, planet_num, card_pos):
         card_name = self.cards_in_play[planet_num + 1][card_pos].get_name()
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
+
+    def add_card_in_hq_to_discard(self, card_pos):
+        card_name = self.headquarters[card_pos].get_name()
+        self.discard.append(card_name)
+        self.remove_card_from_hq(card_pos)
 
     def retreat_warlord(self):
         for i in range(len(self.cards_in_play[0])):
