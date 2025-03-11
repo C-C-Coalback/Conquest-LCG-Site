@@ -205,8 +205,9 @@ class Game:
                         self.faction_of_card_to_play = card.get_faction()
                         if card.get_card_type() == "Support":
                             played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
-                                                                                 already_checked=True, card=card)
-                            if played_support == "SUCCESS/Support":
+                                                                                 already_checked=True, card=card)[0]
+                            print(played_support)
+                            if played_support == "SUCCESS":
                                 await primary_player.send_hand()
                                 await primary_player.send_hq()
                                 await primary_player.send_resources()
@@ -282,6 +283,54 @@ class Game:
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
+    async def shield_card_during_deploy(self, name, game_update_string):
+        if len(game_update_string) == 1:
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                if self.mode == "SHIELD":
+                    if name == self.player_who_is_shielding:
+                        await self.deploy_resolve_shield_of_unit(name, -1)
+
+    async def deploy_resolve_shield_of_unit(self, name, hand_pos):
+        unit_dead = False
+        if name == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        primary_player.reset_aiming_reticle_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
+        shield_on_card = 0
+        if hand_pos != -1:
+            shield_on_card = primary_player.get_shields_given_pos(hand_pos)
+            primary_player.discard_card_from_hand(hand_pos)
+            await primary_player.send_hand()
+            await primary_player.send_discard()
+        amount_to_shield = shield_on_card
+        primary_player.remove_damage_from_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit,
+                                              amount_to_shield)
+        if primary_player.get_damage_given_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit) < \
+                self.damage_on_unit_before_new_damage:
+            primary_player.set_damage_given_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit,
+                                                self.damage_on_unit_before_new_damage)
+        if primary_player.check_if_card_is_destroyed(self.planet_of_damaged_unit, self.position_of_damaged_unit):
+            unit_dead = True
+            primary_player.destroy_card_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
+            if self.resources_need_sending_outside_normal_sends:
+                await primary_player.send_resources()
+                await secondary_player.send_resources()
+                self.resources_need_sending_outside_normal_sends = False
+            if primary_player.warlord_just_got_bloodied:
+                primary_player.warlord_just_got_bloodied = False
+                await primary_player.send_hq()
+            await primary_player.send_discard()
+
+        self.mode = "Normal"
+        await self.send_info_box()
+        await primary_player.send_units_at_planet(self.planet_of_damaged_unit)
+        await secondary_player.send_units_at_planet(self.planet_of_damaged_unit)
+
+
+
     async def deploy_card_routine(self, name, planet_pos, discounts=0):
         print("Deploy card at planet", planet_pos)
         if self.number_with_deploy_turn == "1":
@@ -293,16 +342,21 @@ class Game:
         damage_to_take = sum(self.damage_for_unit_to_take_on_play)
         print("position hand of unit: ", self.card_pos_to_deploy)
         print("Damage to take: ", damage_to_take)
-        played_card = primary_player.play_card(int(planet_pos),
-                                               position_hand=self.card_pos_to_deploy, discounts=discounts,
-                                               damage_to_take=damage_to_take)
+        played_card, position_of_unit = primary_player.play_card(int(planet_pos),
+                                                                 position_hand=self.card_pos_to_deploy,
+                                                                 discounts=discounts,
+                                                                 damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
-            if damage_to_take > 0:
-                pass
-                # self.player_who_is_shielding = primary_player.get_name_player()
-                # self.number_who_is_shielding = str(primary_player.get_number())
-                # self.mode = "SHIELD"
             self.mode = "Normal"
+            if damage_to_take > 0:
+                self.damage_on_unit_before_new_damage = 0
+                self.player_who_is_shielding = primary_player.get_name_player()
+                self.number_who_is_shielding = str(primary_player.get_number())
+                self.planet_of_damaged_unit = int(planet_pos)
+                self.position_of_damaged_unit = position_of_unit
+                self.mode = "SHIELD"
+                print("Position of the damaged unit:", planet_pos, position_of_unit)
+                primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
             await primary_player.send_hand()
             await secondary_player.send_hand()
             await primary_player.send_discard()
@@ -605,7 +659,6 @@ class Game:
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                          "implemented")
 
-
         self.condition_sub_game.notify_all()
         self.condition_sub_game.release()
 
@@ -660,7 +713,9 @@ class Game:
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
-        if self.phase == "SETUP":
+        if self.phase == "DEPLOY" and self.mode == "SHIELD":
+            await self.shield_card_during_deploy(name, game_update_string)
+        elif self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif len(game_update_string) == 1:
             if game_update_string[0] == "action-button":
@@ -679,7 +734,7 @@ class Game:
                         self.player_with_action = name
                         print("Special action")
                         await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-        if self.mode == "ACTION":
+        elif self.mode == "ACTION":
             await self.update_game_event_action(name, game_update_string)
         elif self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)

@@ -328,9 +328,9 @@ class Player:
 
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         if card is None and position_hand is None:
-            return "ERROR/play_card function called incorrectly"
+            return "ERROR/play_card function called incorrectly", -1
         if card is not None and position_hand is not None:
-            return "ERROR/play_card function called incorrectly"
+            return "ERROR/play_card function called incorrectly", -1
         if card is not None:
             cost = card.get_cost() - discounts
             if position == -2:
@@ -343,9 +343,9 @@ class Player:
                             self.cards.remove(card.get_name())
                             self.set_can_play_limited(False)
                             print("Played card to HQ")
-                            return "SUCCESS"
+                            return "SUCCESS", -1
                     else:
-                        return "FAIL/Limited already played"
+                        return "FAIL/Limited already played", -1
                 else:
                     if self.spend_resources(cost):
                         self.add_to_hq(card)
@@ -353,9 +353,9 @@ class Player:
                         print("Played card to HQ")
                         if card.get_ability() == "Murder of Razorwings":
                             self.game.discard_card_at_random_from_opponent(self.number)
-                        return "SUCCESS"
+                        return "SUCCESS", -1
                 print("Insufficient resources")
-                return "FAIL/Insufficient resources"
+                return "FAIL/Insufficient resources", -1
         if position_hand is not None:
             if position_hand != -1:
                 if -1 < position < 7:
@@ -371,9 +371,9 @@ class Player:
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
                                 if damage_to_take > 0:
                                     self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
-                                return "SUCCESS"
+                                return "SUCCESS", location_of_unit
                         else:
-                            return "FAIL/Limited already played"
+                            return "FAIL/Limited already played", -1
                     else:
                         if self.spend_resources(cost):
                             self.add_card_to_planet(card, position)
@@ -385,10 +385,10 @@ class Player:
                                 self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.discard_card_at_random_from_opponent(self.number)
-                            return "SUCCESS"
+                            return "SUCCESS", location_of_unit
                     print("Insufficient resources")
-                    return "FAIL/Insufficient resources"
-        return "FAIL/Invalid card"
+                    return "FAIL/Insufficient resources", -1
+        return "FAIL/Invalid card", -1
 
     def discard_card_at_random(self):
         print("")
