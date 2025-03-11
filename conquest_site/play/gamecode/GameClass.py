@@ -276,6 +276,7 @@ class Game:
                         self.planet_aiming_reticle_position = int(game_update_string[1])
                         self.planet_aiming_reticle_active = True
                         await self.send_planet_array()
+                        await self.send_info_box()
                     else:
                         await self.deploy_card_routine(name, game_update_string[1])
         self.condition_main_game.notify_all()
@@ -297,9 +298,11 @@ class Game:
                                                damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
             if damage_to_take > 0:
-                self.player_who_is_shielding = primary_player.get_name_player()
-                self.number_who_is_shielding = str(primary_player.get_number())
-                self.mode = "SHIELD"
+                pass
+                # self.player_who_is_shielding = primary_player.get_name_player()
+                # self.number_who_is_shielding = str(primary_player.get_number())
+                # self.mode = "SHIELD"
+            self.mode = "Normal"
             await primary_player.send_hand()
             await secondary_player.send_hand()
             await primary_player.send_discard()
