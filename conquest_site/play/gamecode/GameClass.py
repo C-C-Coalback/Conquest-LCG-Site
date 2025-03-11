@@ -178,11 +178,6 @@ class Game:
                         print("Play card with not all discounts")
                         await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
                                                        discounts=self.discounts_applied)
-                        self.mode = "Normal"
-                        self.planet_aiming_reticle_position = -1
-                        self.planet_aiming_reticle_active = False
-                        self.available_discounts = 0
-                        self.discounts_applied = 0
                 if self.p1.has_passed and self.p2.has_passed:
                     print("Both passed, move to warlord movement.")
                     self.phase = "COMMAND"
@@ -286,9 +281,13 @@ class Game:
     async def shield_card_during_deploy(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if self.mode == "SHIELD":
-                    if name == self.player_who_is_shielding:
-                        await self.deploy_resolve_shield_of_unit(name, -1)
+                if name == self.player_who_is_shielding:
+                    await self.deploy_resolve_shield_of_unit(name, -1)
+        elif len(game_update_string) == 3:
+            if game_update_string[0] == "HAND":
+                if name == self.player_who_is_shielding:
+                    if game_update_string[1] == self.number_who_is_shielding:
+                        await self.deploy_resolve_shield_of_unit(name, int(game_update_string[2]))
 
     async def deploy_resolve_shield_of_unit(self, name, hand_pos):
         unit_dead = False
@@ -734,6 +733,9 @@ class Game:
                         self.player_with_action = name
                         print("Special action")
                         await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                if name == self.player_with_deploy_turn:
+                    await self.update_game_event_deploy_section(name, game_update_string)
         elif self.mode == "ACTION":
             await self.update_game_event_action(name, game_update_string)
         elif self.phase == "DEPLOY":
