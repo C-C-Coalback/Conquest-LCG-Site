@@ -210,6 +210,9 @@
                         if (card_data_split[4] !== "") {
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                         }
+                        for (var j = 5; j < card_data_split.length; j++) {
+                            console.log(card_data_split[j]);
+                        }
                         if (damage === "0") {
                             full_string += `</div>`
                         } else {

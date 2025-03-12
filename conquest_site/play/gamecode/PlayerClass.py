@@ -172,8 +172,8 @@ class Player:
                 for a in range(len(attachments_list)):
                     print("Adding attachments")
                     print(attachments_list[a].get_name())
-                    # single_card_string += "|"
-                    # single_card_string += attachments_list[a].get_name()
+                    single_card_string += "|"
+                    single_card_string += attachments_list[a].get_name()
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
