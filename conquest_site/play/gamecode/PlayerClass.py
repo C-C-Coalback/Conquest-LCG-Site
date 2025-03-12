@@ -165,11 +165,15 @@ class Player:
                         single_card_string += "H"
                 else:
                     single_card_string += "H"
-                if current_card.aiming_reticle_color is None:
-                    pass
-                else:
-                    single_card_string += "|"
+                single_card_string += "|"
+                if current_card.aiming_reticle_color is not None:
                     single_card_string += current_card.aiming_reticle_color
+                attachments_list = current_card.get_attachments()
+                for a in range(len(attachments_list)):
+                    print("Adding attachments")
+                    print(attachments_list[a].get_name())
+                    # single_card_string += "|"
+                    # single_card_string += attachments_list[a].get_name()
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string

@@ -319,7 +319,7 @@ class Game:
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1
                 await primary_player.send_hand()
-                await primary_player.send_discard()
+                await primary_player.send_units_at_planet(int(game_update_string[2]))
                 await primary_player.send_resources()
                 if not secondary_player.has_passed:
                     self.player_with_deploy_turn = secondary_player.get_name_player()
