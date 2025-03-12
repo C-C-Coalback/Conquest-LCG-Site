@@ -659,6 +659,21 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Doom":
+                        print("Resolve Doom")
+                        primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
+                        secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
+                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                        self.mode = self.stored_mode
+                        self.player_with_action = ""
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                        await primary_player.send_hq()
+                        await secondary_player.send_hq()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await primary_player.send_resources()
+                        await self.send_info_box()
                     elif ability == "Pact of the Haemonculi":
                         print("Resolve PotH")
                         self.action_chosen = "Pact of the Haemonculi"

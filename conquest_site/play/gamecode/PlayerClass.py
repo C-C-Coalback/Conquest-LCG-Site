@@ -604,6 +604,37 @@ class Player:
         self.add_card_in_play_to_discard(planet_num, card_pos)
         return True
 
+    def destroy_card_in_hq(self, card_pos):
+        if self.headquarters[card_pos].get_card_type() == "Warlord":
+            if not self.headquarters[card_pos].get_bloodied():
+                self.headquarters[card_pos].bloody_warlord()
+            else:
+                self.add_card_in_hq_to_discard(card_pos)
+        else:
+            self.add_card_in_hq_to_discard(card_pos)
+
+    def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True):
+        i = 0
+        while i < len(self.headquarters):
+            card_type = self.headquarters[i].get_card_type()
+            if ignore_uniques and units_only:
+                if not self.headquarters[i].get_unique() and (card_type == "Army" or card_type == "Token"):
+                    self.destroy_card_in_hq(i)
+                    i = i - 1
+                i = i + 1
+            elif ignore_uniques and not units_only:
+                if not self.headquarters[i].get_unique():
+                    self.destroy_card_in_hq(i)
+                    i = i - 1
+                i = i + 1
+            elif not ignore_uniques and units_only:
+                if card_type == "Army" or card_type == "Token":
+                    self.destroy_card_in_hq(i)
+                    i = i - 1
+                i = i + 1
+            else:
+                self.destroy_card_in_hq(i)
+
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
