@@ -80,6 +80,8 @@ class Game:
         self.what_is_being_interrupted = ""
         self.damage_is_taken_one_at_a_time = False
         self.damage_left_to_take = 0
+        self.positions_of_units_to_take_damage = []
+        self.card_type_of_selected_card_in_hand = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -186,38 +188,47 @@ class Game:
                 await self.send_info_box()
         if len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
-                if name == self.player_with_deploy_turn:
-                    print(game_update_string[1] == self.number_with_deploy_turn)
-                    if game_update_string[1] == self.number_with_deploy_turn:
-                        print("Deploy card in hand at pos", game_update_string[2])
-                        previous_card_pos_to_deploy = self.card_pos_to_deploy
-                        self.card_pos_to_deploy = int(game_update_string[2])
-                        if self.number_with_deploy_turn == "1":
-                            primary_player = self.p1
-                            secondary_player = self.p2
-                        else:
-                            primary_player = self.p2
-                            secondary_player = self.p1
-                        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-                        self.faction_of_card_to_play = card.get_faction()
-                        if card.get_card_type() == "Support":
-                            played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
-                                                                                 already_checked=True, card=card)[0]
-                            print(played_support)
-                            if played_support == "SUCCESS":
+                if self.mode == "Normal":
+                    if name == self.player_with_deploy_turn:
+                        print(game_update_string[1] == self.number_with_deploy_turn)
+                        if game_update_string[1] == self.number_with_deploy_turn:
+                            print("Deploy card in hand at pos", game_update_string[2])
+                            previous_card_pos_to_deploy = self.card_pos_to_deploy
+                            self.card_pos_to_deploy = int(game_update_string[2])
+                            if self.number_with_deploy_turn == "1":
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+                            self.faction_of_card_to_play = card.get_faction()
+                            if card.get_card_type() == "Support":
+                                played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
+                                                                                     already_checked=True, card=card)[0]
+                                print(played_support)
+                                if played_support == "SUCCESS":
+                                    await primary_player.send_hand()
+                                    await primary_player.send_hq()
+                                    await primary_player.send_resources()
+                                    if not secondary_player.has_passed:
+                                        self.player_with_deploy_turn = secondary_player.get_name_player()
+                                        self.number_with_deploy_turn = secondary_player.get_number()
+                                        await self.send_info_box()
+                                self.card_pos_to_deploy = -1
+                            elif card.get_card_type() == "Army":
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                self.card_type_of_selected_card_in_hand = "Army"
                                 await primary_player.send_hand()
-                                await primary_player.send_hq()
-                                await primary_player.send_resources()
-                                if not secondary_player.has_passed:
-                                    self.player_with_deploy_turn = secondary_player.get_name_player()
-                                    self.number_with_deploy_turn = secondary_player.get_number()
-                                    await self.send_info_box()
-                        elif card.get_card_type() == "Army":
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                            await primary_player.send_hand()
-                        else:
-                            self.card_pos_to_deploy = previous_card_pos_to_deploy
+                            elif card.get_card_type() == "Attachment":
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                self.card_type_of_selected_card_in_hand = "Attachment"
+                                await primary_player.send_hand()
+                            else:
+                                self.card_type_of_selected_card_in_hand = ""
+                                self.card_pos_to_deploy = previous_card_pos_to_deploy
             if game_update_string[0] == "HQ":
                 if name == self.player_with_deploy_turn:
                     if game_update_string[1] == self.number_with_deploy_turn:
@@ -238,26 +249,27 @@ class Game:
                 if name == self.player_with_deploy_turn:
                     if game_update_string[1] == self.number_with_deploy_turn:
                         if self.mode == "DISCOUNT":
-                            if self.number_with_deploy_turn == "1":
-                                player = self.p1
-                            else:
-                                player = self.p2
-                            discount_received, damage = player.perform_discount_at_pos_hand(int(game_update_string[2]),
-                                                                                            self.faction_of_card_to_play
-                                                                                            )
-                            if discount_received > 0:
-                                self.discounts_applied += discount_received
-                                player.discard_card_from_hand(int(game_update_string[2]))
-                                if self.card_pos_to_deploy > int(game_update_string[2]):
-                                    self.card_pos_to_deploy -= 1
-                                if damage > 0:
-                                    self.damage_for_unit_to_take_on_play.append(damage)
-                                if self.discounts_applied >= self.available_discounts:
-                                    await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
-                                                                   discounts=self.discounts_applied)
+                            if self.card_type_of_selected_card_in_hand == "Army":
+                                if self.number_with_deploy_turn == "1":
+                                    player = self.p1
                                 else:
-                                    await player.send_hand()
-                                    await player.send_discard()
+                                    player = self.p2
+                                discount_received, damage = player.perform_discount_at_pos_hand(int(game_update_string[2]),
+                                                                                                self.faction_of_card_to_play
+                                                                                                )
+                                if discount_received > 0:
+                                    self.discounts_applied += discount_received
+                                    player.discard_card_from_hand(int(game_update_string[2]))
+                                    if self.card_pos_to_deploy > int(game_update_string[2]):
+                                        self.card_pos_to_deploy -= 1
+                                    if damage > 0:
+                                        self.damage_for_unit_to_take_on_play.append(damage)
+                                    if self.discounts_applied >= self.available_discounts:
+                                        await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                                       discounts=self.discounts_applied)
+                                    else:
+                                        await player.send_hand()
+                                        await player.send_discard()
 
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
@@ -277,6 +289,16 @@ class Game:
                         await self.send_info_box()
                     else:
                         await self.deploy_card_routine(name, game_update_string[1])
+        elif len(game_update_string) == 4:
+            if game_update_string[0] == "IN_PLAY":
+                if self.mode == "Normal":
+                    if self.card_type_of_selected_card_in_hand == "Attachment":
+                        if name == self.player_with_deploy_turn:
+                            if self.number_with_deploy_turn == "1":
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            print("Run deploy attachment (to unit in play) code.")
 
     async def shield_card_during_deploy(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -443,7 +465,7 @@ class Game:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if self.mode == "SHIELD":
                     if name == self.player_who_is_shielding:
-                        await self.resolve_shield_of_unit(name, -1)
+                        await self.resolve_shield_of_unit_from_attack(name, -1)
                 elif name == self.player_with_combat_turn:
                     if self.number_with_combat_turn == "1":
                         self.number_with_combat_turn = "2"
@@ -523,7 +545,7 @@ class Game:
                     if name == self.player_who_is_shielding:
                         if game_update_string[1] == self.number_who_is_shielding:
                             hand_pos = int(game_update_string[2])
-                            await self.resolve_shield_of_unit(name, hand_pos)
+                            await self.resolve_shield_of_unit_from_attack(name, hand_pos)
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 print("Unit clicked on.")
@@ -613,7 +635,7 @@ class Game:
                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                             self.defender_position, "red")
                                 if armorbane_check and attack_value > 0:
-                                    await self.resolve_shield_of_unit(secondary_player.get_name(), -1)
+                                    await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
                             else:
                                 primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                             self.attacker_position)
@@ -794,7 +816,6 @@ class Game:
                                     await secondary_player.send_hand()
                                     await primary_player.send_units_at_planet(int(game_update_string[2]))
 
-
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -888,7 +909,7 @@ class Game:
             print("Discard p1")
             self.p1.discard_card_at_random()
 
-    async def resolve_shield_of_unit(self, name, hand_pos):
+    async def resolve_shield_of_unit_from_attack(self, name, hand_pos):
         unit_dead = False
         print("Info shielding:", self.defender_planet, self.defender_position)
         if name == self.name_1:
