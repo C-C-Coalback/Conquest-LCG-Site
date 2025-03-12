@@ -276,6 +276,9 @@ class Player:
         self.discard.append(self.cards[card_pos])
         del self.cards[card_pos]
 
+    def remove_card_from_hand(self, card_pos):
+        del self.cards[card_pos]
+
     def get_shields_given_pos(self, pos_in_hand):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array)
@@ -322,6 +325,13 @@ class Player:
     def get_card_in_hand(self, position_hand):
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         return card
+
+    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0):
+        cost = card.get_cost() - discounts
+        if self.spend_resources(cost):
+            self.cards_in_play[planet + 1][position].add_attachment(card)
+            return True
+        return False
 
     def add_card_to_planet(self, card, position):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))

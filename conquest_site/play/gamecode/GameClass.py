@@ -254,9 +254,10 @@ class Game:
                                     player = self.p1
                                 else:
                                     player = self.p2
-                                discount_received, damage = player.perform_discount_at_pos_hand(int(game_update_string[2]),
-                                                                                                self.faction_of_card_to_play
-                                                                                                )
+                                discount_received, damage = player.perform_discount_at_pos_hand(
+                                    int(game_update_string[2]),
+                                    self.faction_of_card_to_play
+                                    )
                                 if discount_received > 0:
                                     self.discounts_applied += discount_received
                                     player.discard_card_from_hand(int(game_update_string[2]))
@@ -294,11 +295,40 @@ class Game:
                 if self.mode == "Normal":
                     if self.card_type_of_selected_card_in_hand == "Attachment":
                         if name == self.player_with_deploy_turn:
-                            if self.number_with_deploy_turn == "1":
-                                player = self.p1
-                            else:
-                                player = self.p2
-                            print("Run deploy attachment (to unit in play) code.")
+                            await self.deploy_card_routine_attachment(name, game_update_string)
+
+    async def deploy_card_routine_attachment(self, name, game_update_string):
+        print("Deploy attachment to: player ", game_update_string[1], "planet ", game_update_string[2],
+              "position ", game_update_string[3])
+        print("Position of card in hand: ", self.card_pos_to_deploy)
+        if self.number_with_deploy_turn == "1":
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        print("Name of card:", card.get_name())
+        if game_update_string[1] != primary_player.get_number():
+            print("Attachment cards may only be played to own units for now.")
+        else:
+            played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
+                                                                         int(game_update_string[3]))
+            if played_card:
+                primary_player.remove_card_from_hand(self.card_pos_to_deploy)
+                print("Succeeded (?) in playing attachment")
+                primary_player.aiming_reticle_coords_hand = -1
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await primary_player.send_resources()
+                if not secondary_player.has_passed:
+                    self.player_with_deploy_turn = secondary_player.get_name_player()
+                    self.number_with_deploy_turn = secondary_player.get_number()
+                    await self.send_info_box()
+                self.card_pos_to_deploy = -1
+                self.mode = "Normal"
+                self.card_type_of_selected_card_in_hand = ""
+                self.faction_of_card_to_play = ""
 
     async def shield_card_during_deploy(self, name, game_update_string):
         if len(game_update_string) == 1:

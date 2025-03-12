@@ -1,3 +1,6 @@
+import copy
+
+
 class Card:
     def __init__(self, name, text, traits, cost, faction, loyalty, shields, card_type, unique, image_name="",
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
@@ -137,6 +140,7 @@ class UnitCard(Card):
         self.health = health
         self.damage = 0
         self.command = command
+        self.attachments = []
         self.by_base_brutal = brutal
         self.brutal = brutal
         self.by_base_flying = flying
@@ -148,6 +152,16 @@ class UnitCard(Card):
         self.extra_attack_until_end_of_battle = 0
         self.by_base_ranged = ranged
         self.ranged = ranged
+
+    def get_attachments(self):
+        return self.attachments
+
+    def add_attachment(self, attachment_card):
+        print("Adding attachment to:", self.name)
+        print(attachment_card.name)
+        self.attachments.append(copy.deepcopy(attachment_card))
+        for i in range(len(self.attachments)):
+            print(self.attachments[i].get_name())
 
     def set_ranged(self, new_val):
         self.ranged = new_val

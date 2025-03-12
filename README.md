@@ -1,14 +1,15 @@
 # Conquest-LCG-site
 Repo for the Warhammer 40k Conquest website using Python Django.
 
-# Update 09/03/2025
+# News/similar:
 
-Made significant progress on the game; supporting more card effects, 
-actually able to use more cards, although without effects. Added shielding,
-for attacks only, working through adding actions.
+I should really get a better name for this section.
 
-I plan on self-hosting the site, unsure what with. It's a coin toss between NGINX and Apache.
-If I can't figure it out, I will use DigitalOcean instead.
+Working on adding attachments to the game. Currently, attachments
+are handled on the back-end, but there is no code for displaying
+or sending the images to the users. Also, there is no code to check
+if the attachment can actually go on the unit (e.g. no wargear 
+attachments), but that's a small issue.
 
 # What is this?
 
