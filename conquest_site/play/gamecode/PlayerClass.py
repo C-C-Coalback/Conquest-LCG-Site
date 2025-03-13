@@ -330,10 +330,13 @@ class Player:
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         return card
 
+    def attach_card(self, card, planet, position):
+        self.cards_in_play[planet + 1][position].add_attachment(card)
+
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0):
         cost = card.get_cost() - discounts
         if self.spend_resources(cost):
-            self.cards_in_play[planet + 1][position].add_attachment(card)
+            self.attach_card(card, planet, position)
             return True
         return False
 
