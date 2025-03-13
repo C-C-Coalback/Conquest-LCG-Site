@@ -39,12 +39,15 @@ h4 {
 .Card-div {
     position: relative;
     height:8vh;
-    width:5vw;
+    width:auto;
+}
+
+.Card-div + .Card-div {
+    margin-left:0vw;
 }
 
 .Card {
     position: relative;
-    left: 0;
     height:8vh;
     width:5vw;
 }
@@ -58,8 +61,13 @@ h4 {
 .Attachment-Card {
     position: absolute;
     top: 0;
+    left: 0;
     height: 8vh;
     width: 5vw;
+}
+
+.Attachment-Card + .Card {
+    margin-left: 1vw;
 }
 
 .Attachment-Card + .Attachment-Card {

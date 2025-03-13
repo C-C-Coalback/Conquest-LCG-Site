@@ -5,11 +5,9 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 I should really get a better name for this section.
 
-Working on adding attachments to the game. Currently, attachments
-are handled on the back-end, but there is no code for displaying
-or sending the images to the users. Also, there is no code to check
-if the attachment can actually go on the unit (e.g. no wargear 
-attachments), but that's a small issue.
+Attachments now show up in play. Spacing happens correctly.
+Now need to add support for displaying attachments in the HQ, playing 
+attachments to cards in the HQ, and then code for specific attachments.
 
 # What is this?
 
