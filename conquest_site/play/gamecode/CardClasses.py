@@ -388,10 +388,18 @@ class AttachmentCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False):
+                 limited=False, type_of_units_allowed_for_attachment="Army/Token/Warlord/Synapse",
+                 unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
+                 must_be_enemy_unit=True, limit_one_per_unit=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, image_name, applies_discounts, action_in_hand
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play, limited)
+        self.type_of_units_allowed_for_attachment = type_of_units_allowed_for_attachment
+        self.unit_must_be_unique = unit_must_be_unique
+        self.unit_must_match_faction = unit_must_match_faction
+        self.must_be_won_unit = must_be_own_unit
+        self.must_be_enemy_unit = must_be_enemy_unit
+        self.limit_one_per_unit = False
 
     def print_info(self):
         if self.unique:

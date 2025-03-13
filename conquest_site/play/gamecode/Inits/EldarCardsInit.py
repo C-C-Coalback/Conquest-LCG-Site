@@ -20,7 +20,8 @@ def eldar_cards_init():
                                                1, faction, "Signature", 1, False),
                          CardClasses.AttachmentCard("Mobility", "Attach to an army unit.\n"
                                                                 "Attached unit gains Mobile.", "Skill.",
-                                                    0, faction, "Signature", 3, False),
+                                                    0, faction, "Signature", 3, False,
+                                                    type_of_units_allowed_for_attachment="Army"),
                          CardClasses.ArmyCard("Biel-Tan Guardians", "", "Warrior. Biel-Tan. Ally.",
                                               1, faction, "Loyal", 1, 1, 2, False),
                          CardClasses.ArmyCard("Altansar Rangers", "Ranged.", "Scout. Altansar.", 3, faction,
@@ -91,7 +92,8 @@ def eldar_cards_init():
                                                                            "attack against a non-warlord unit, discard "
                                                                            "X cards from your hand to give attached "
                                                                            "unit +X ATK for that attack.",
-                                                    "Wargear, Weapon.", 1, faction, "Common", 1, False),
+                                                    "Wargear, Weapon.", 1, faction, "Common", 1, False,
+                                                    type_of_units_allowed_for_attachment="Army"),
                          CardClasses.SupportCard("Corsair Trading Port", "Limited.\n"
                                                                          "Interrupt: When you deploy an Eldar unit, "
                                                                          "exhaust this support to reduce that "

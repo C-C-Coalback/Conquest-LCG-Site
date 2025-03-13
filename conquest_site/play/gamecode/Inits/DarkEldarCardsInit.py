@@ -27,7 +27,8 @@ def dark_eldar_cards_init():
                               CardClasses.AttachmentCard("Agonizer of Bren", "Attach to an army unit.\n"
                                                                              "Attached unit gets +1 ATK for each "
                                                                              "Khymera token you control.",
-                                                         "Wargear. Weapon.", 1, faction, "Signature", 3, False),
+                                                         "Wargear. Weapon.", 1, faction, "Signature", 3, False,
+                                                         type_of_units_allowed_for_attachment="Army"),
                               CardClasses.ArmyCard("Sybarite Marksman", "Ranged. (This unit attacks during the "
                                                                         "ranged skirmish at the beginning of"
                                                                         " a battle.)", "Warrior. Kabalite.",
@@ -94,11 +95,13 @@ def dark_eldar_cards_init():
                                                     allowed_phases_in_hand="ALL", limited=True),
                               CardClasses.AttachmentCard("Suffering", "Attach to an army unit.\n"
                                                                       "Attached unit gets -2 ATK.",
-                                                         "Condition. Torture.", 1, faction, "Loyal", 2, False),
+                                                         "Condition. Torture.", 1, faction, "Loyal", 2, False,
+                                                         type_of_units_allowed_for_attachment="Army"),
                               CardClasses.AttachmentCard("Hypex Injector", "Attach to an army unit.\n"
                                                                            "Reaction: After you play a Dark Eldar "
                                                                            "event card, ready attached unit.",
-                                                         "Wargear.", 0, faction, "Common", 1, False),
+                                                         "Wargear.", 0, faction, "Common", 1, False,
+                                                         type_of_units_allowed_for_attachment="Army"),
                               CardClasses.SupportCard("Altar of Torment", "Limited. (Limit one Limited card per "
                                                                           "round.)\n"
                                                                           "Interrupt: When you deploy a Dark Eldar "

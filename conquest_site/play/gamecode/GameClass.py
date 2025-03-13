@@ -322,6 +322,8 @@ class Game:
             if primary_player.spend_resources(int(card.get_cost())):
                 played_card = secondary_player.play_attachment_card_to_in_play(
                     card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True)
+                if not played_card:
+                    primary_player.add_resources(int(card.get_cost()))
             enemy_card = True
         if played_card:
             primary_player.remove_card_from_hand(self.card_pos_to_deploy)

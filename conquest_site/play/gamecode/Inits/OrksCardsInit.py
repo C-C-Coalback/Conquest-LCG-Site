@@ -28,9 +28,8 @@ def orks_cards_init():
                                              "Bigga_Is_Betta", [True, 2, True]),
                        CardClasses.AttachmentCard("Cybork Body", "Attach to an army unit.\nDouble attached unit's HP.",
                                                   "Wargear. Bionics.", 1, "Orks", "Signature", 3, False,
-                                                  "Cybork_Body"),
-                       CardClasses.ArmyCard("Sniveling Grot", "", "Runt. Ally.", 0, "Orks", "Common", 1, 1, 0, False,
-                                            "Sniveling_Grot"),
+                                                  type_of_units_allowed_for_attachment="Army"),
+                       CardClasses.ArmyCard("Sniveling Grot", "", "Runt. Ally.", 0, "Orks", "Common", 1, 1, 0, False),
                        CardClasses.ArmyCard("Goff Nob", "", "Warrior. Nob. Elite.", 5, "Orks", "Loyal", 6, 6, 0, False,
                                             "Goff_Nob"),
                        CardClasses.ArmyCard("Weirdboy Maniak", "Reaction: After this unit enters play, "
@@ -80,7 +79,7 @@ def orks_cards_init():
                        CardClasses.AttachmentCard("Rokkit Launcha",
                                                   "Attach to an army unit.Attached unit gains Ranged.",
                                                   "Wargear. Weapon.", 1, "Orks", "Common", 1, False,
-                                                  "Rokkit_Launcha"),
+                                                  "Rokkit_Launcha", type_of_units_allowed_for_attachment="Army"),
                        CardClasses.SupportCard("Ork Kannon", "Combat Action: Exhaust this support to target a planet. "
                                                              "Each player deals 1 indirect damage "
                                                              "among the units he controls at "

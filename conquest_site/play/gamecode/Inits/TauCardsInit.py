@@ -86,10 +86,12 @@ def tau_cards_init():
                                                                            "Reaction: After attached unit is damaged "
                                                                            "by an attack, deal 2 damage to the "
                                                                            "attacker.", "Wargear.",
-                                                  2, faction, "Loyal", 2, False),
+                                                  2, faction, "Loyal", 2, False,
+                                                  type_of_units_allowed_for_attachment="Army", limit_one_per_unit=True),
                        CardClasses.AttachmentCard("Ion Rifle", "Attach to an army unit.\n"
                                                                "Attached unit gets +3 ATK.", "Wargear. Weapon.",
-                                                  1, faction, "Common", 1, False),
+                                                  1, faction, "Common", 1, False,
+                                                  type_of_units_allowed_for_attachment="Army"),
                        CardClasses.SupportCard("Frontline Launch Bay", "Limited.\n"
                                                                        "Interrupt: When you deploy a Tau unit, exhaust "
                                                                        "this support to reduce that unit's cost by 1.",

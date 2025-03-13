@@ -32,7 +32,7 @@ def chaos_cards_init():
                                                                     "Interrupt: When attached unit leaves play, "
                                                                     "deal 1 damage to each enemy unit at this planet.",
                                                    "Curse.", 0, "Chaos", "Signature", 3,
-                                                   False, ""),
+                                                   False, type_of_units_allowed_for_attachment="Army"),
                         CardClasses.ArmyCard("Alpha Legion Infiltrator", "", "Alpha Legion. Scout.",
                                              2, "Chaos", "Loyal", 4, 1, 1,
                                              False, ""),
@@ -96,11 +96,13 @@ def chaos_cards_init():
                                               allowed_phases_in_hand="DEPLOY"),
                         CardClasses.AttachmentCard("Rune-Encrusted Armor", "Attach to an army unit.\n"
                                                                            "Attached unit gets +2 ATK and +2 HP.",
-                                                   "Armor. Wargear.", 2, "Chaos", "Common", 1, False, ""),
+                                                   "Armor. Wargear.", 2, "Chaos", "Common", 1, False,
+                                                   type_of_units_allowed_for_attachment="Army"),
                         CardClasses.AttachmentCard("Dire Mutation", "Ambush.\nAttach to an army unit.\n"
                                                                     "Forced Interrupt: When attached unit exhaust,"
                                                                     " deal it 1 damage.", "Curse. Tzeentch.",
-                                                   1, "Chaos", "Common", 1, False, ""),
+                                                   1, "Chaos", "Common", 1, False,
+                                                   type_of_units_allowed_for_attachment="Army"),
                         CardClasses.SupportCard("Fortress of Madness", "Limited.\nInterrupt: When you deploy"
                                                                        " a Chaos unit, exhaust this support to "
                                                                        "reduce that unit's cost by 1.",

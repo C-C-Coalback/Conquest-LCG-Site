@@ -32,7 +32,8 @@ def astra_militarum_cards_init():
                                                                                    "Attached unit gets +1 ATK.\n"
                                                                                    "Interrupt: When attached unit "
                                                                                    "leaves play, draw 3 cards.",
-                                                              "Skill.", 1, faction, "Signature", 3, False),
+                                                              "Skill.", 1, faction, "Signature", 3, False,
+                                                              type_of_units_allowed_for_attachment="Army"),
                                    CardClasses.ArmyCard("Ratling Deadeye", "Ranged. (This unit attacks during the "
                                                                            "ranged skirmish at the beginning of"
                                                                            " a battle.)", "Scout. Abhuman.", 1,
@@ -106,13 +107,16 @@ def astra_militarum_cards_init():
                                                          allowed_phases_in_hand="COMBAT"),
                                    CardClasses.AttachmentCard("Hostile Environment Gear", "Attach to an army unit.\n"
                                                                                           "Attached unit gets +3 HP.",
-                                                              "Wargear. Armor.", 1, faction, "Common", 1, False),
+                                                              "Wargear. Armor.", 1, faction, "Common", 1, False,
+                                                              type_of_units_allowed_for_attachment="Army"),
                                    CardClasses.AttachmentCard("Bodyguard", "Attach to an army unit you control.\n"
                                                                            "Forced Reaction: After a unit you control "
                                                                            "is assigned damage by an attack at this "
                                                                            "planet, reassign 1 of that damage to "
                                                                            "attached unit.", "Condition.", 0,
-                                                              faction, "Loyal", 2, False),
+                                                              faction, "Loyal", 2, False,
+                                                              type_of_units_allowed_for_attachment="Army",
+                                                              must_be_own_unit=True),
                                    CardClasses.SupportCard("Imperial Bunker", "Limited. (Limit one Limited card "
                                                                               "per round.)\n"
                                                                               "Interrupt: When you deploy an Astra "

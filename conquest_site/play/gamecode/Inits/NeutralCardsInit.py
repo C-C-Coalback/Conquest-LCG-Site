@@ -26,5 +26,6 @@ def neutral_cards_init():
                                                   limited=True),
                           CardClasses.AttachmentCard("Promotion", "Limited.\nAttach to an army unit.\n"
                                                                   "Attached unit gains 2 command icons.", "Skill.",
-                                                     0, "Neutral", "Common", 1, False, limited=True)]
+                                                     0, "Neutral", "Common", 1, False, limited=True,
+                                                     type_of_units_allowed_for_attachment="Army")]
     return neutral_card_array
