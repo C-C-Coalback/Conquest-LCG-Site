@@ -334,15 +334,38 @@ class Player:
         print("Adding attachment code")
         print(card.get_name())
         print(self.cards_in_play[planet + 1][position].get_no_attachments())
+        allowed_types = card.type_of_units_allowed_for_attachment
+        type_of_card = self.cards_in_play[planet + 1][position].get_card_type()
+        if type_of_card not in allowed_types:
+            print("Can't play to this card type.", type_of_card, allowed_types)
+            return False
+        if card.unit_must_be_unique:
+            if not self.cards_in_play[planet + 1][position].get_unique():
+                print("Must be a unique unit, but is not")
+                return False
+        if card.limit_one_per_unit:
+            attachments_active = self.cards_in_play[planet + 1][position].get_attachments()
+            for i in range(len(attachments_active)):
+                if attachments_active[i].get_name() == card.get_name():
+                    print("Limit one per unit")
+                    return False
         if self.cards_in_play[planet + 1][position].get_no_attachments():
+            print("Unit may not have attachments")
             return False
         if card.check_for_a_trait("Wargear."):
             if not self.cards_in_play[planet + 1][position].get_wargear_attachments_permitted():
+                print("Unit may not have wargear")
                 return False
         self.cards_in_play[planet + 1][position].add_attachment(card)
         return True
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False):
+        if card.must_be_own_unit and not_own_attachment:
+            print("Must be own unit, but is not")
+            return False
+        if card.must_be_enemy_unit and not not_own_attachment:
+            print("Must be enemy unit, but is not")
+            return False
         if not_own_attachment:
             if self.attach_card(card, planet, position):
                 return True
