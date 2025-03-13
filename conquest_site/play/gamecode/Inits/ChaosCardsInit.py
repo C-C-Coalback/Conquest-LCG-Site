@@ -48,14 +48,16 @@ def chaos_cards_init():
                                              , brutal=True),
                         CardClasses.ArmyCard("Vicious Bloodletter", "Area Effect (3), No Wargear Attachments",
                                              "Daemon. Elite. Khorne.", 5, "Chaos", "Loyal",
-                                             4, 4, 0, False, area_effect=3),
+                                             4, 4, 0, False, area_effect=3,
+                                             wargear_attachments_permitted=False),
                         CardClasses.ArmyCard("Umbral Preacher", "Each army unit at this "
                                                                 "planet cannot retreat from battle.",
                                              "Cultist. Priest.", 3, "Chaos", "Common",
                                              1, 4, 2, False, ""),
                         CardClasses.ArmyCard("Black Legion Heldrake", "Flying, No Wargear Attachments",
                                              "Black Legion. Daemon. Elite.", 8, "Chaos", "Loyal",
-                                             8, 8, 3, False, "", flying=True),
+                                             8, 8, 3, False, "", flying=True,
+                                             wargear_attachments_permitted=False),
                         CardClasses.ArmyCard("Ravenous Flesh Hounds", "No Attachments.\n"
                                                                       "Action: Sacrifice a Cultist unit to "
                                                                       "remove all damage from this unit.",
@@ -64,15 +66,16 @@ def chaos_cards_init():
                         CardClasses.ArmyCard("Virulent Plague Squad", "This unit gets +1 ATK for each unit "
                                                                       "in your opponent's discard pile.",
                                              "Death Guard. Nurgle. Warrior.", 4, "Chaos", "Common",
-                                             1, 4, 1, False, ""),
+                                             1, 4, 1, False),
                         CardClasses.ArmyCard("Chaos Fanatics", "", "Cultist.", 2, "Chaos",
                                              "Common", 1, 2, 2, False, ""),
                         CardClasses.ArmyCard("Soul Grinder", "No Wargear Attachments.\n"
-                                                             "Reaction: After you win a command struggle at this planet,"
+                                                             "Reaction: After you win a command "
+                                                             "struggle at this planet,"
                                                              " your opponent must sacrifice a non-warlord unit"
                                                              " at the same planet, if able.",
                                              "Daemon. Elite. War Engine.", 6, "Chaos", "Common",
-                                             4, 6, 2, False, ""),
+                                             4, 6, 2, False, wargear_attachments_permitted=False),
                         CardClasses.ArmyCard("Xavaes Split-Tongue", "Reaction: After an enemy unit at this "
                                                                     "planet is destroyed, put a Cultist token "
                                                                     "into play at your HQ.",

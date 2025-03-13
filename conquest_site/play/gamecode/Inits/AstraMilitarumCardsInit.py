@@ -48,18 +48,20 @@ def astra_militarum_cards_init():
                                                         0, 4, 2, False),
                                    CardClasses.ArmyCard("Leman Russ Battle Tank", "No Wargear Attachments.",
                                                         "Vehicle. Tank. Elite.", 5, faction, "Loyal",
-                                                        4, 6, 4, False),
+                                                        4, 6, 4, False, wargear_attachments_permitted=False),
                                    CardClasses.ArmyCard("Mordian Hellhound", "No Wargear Attachments.\n"
                                                                              "Area Effect (1). (When this unit "
                                                                              "attacks it may instead deal its "
                                                                              "Area Effect damage to each enemy "
                                                                              "unit at this planet.",
                                                         "Vehicle. Tank. Mordian.", 4, faction, "Common",
-                                                        3, 3, 2, False, area_effect=1),
+                                                        3, 3, 2, False, area_effect=1,
+                                                        wargear_attachments_permitted=False),
                                    CardClasses.ArmyCard("Assault Valkyrie", "No Wargear Attachments.\n Flying. (This "
                                                                             "unit takes half damage from non-Flying "
                                                                             "units.", "Vehicle. Transport.",
-                                                        4, faction, "Common", 4, 4, 1, False),
+                                                        4, faction, "Common", 4, 4, 1, False,
+                                                        wargear_attachments_permitted=False),
                                    CardClasses.ArmyCard("Stalwart Ogryn", "Immune to enemy events.",
                                                         "Warrior. Abhuman.", 2, faction, "Common",
                                                         2, 2, 1, False),

@@ -132,7 +132,7 @@ class UnitCard(Card):
                  unique, image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False, ranged=False):
+                 limited=False, ranged=False, wargear_attachments_permitted=True):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited)
@@ -152,6 +152,7 @@ class UnitCard(Card):
         self.extra_attack_until_end_of_battle = 0
         self.by_base_ranged = ranged
         self.ranged = ranged
+        self.wargear_attachments_permitted = wargear_attachments_permitted
 
     def get_attachments(self):
         return self.attachments
@@ -306,11 +307,13 @@ class WarlordCard(UnitCard):
                  starting_resources, starting_cards, signature_squad, image_name="", brutal=False, flying=False,
                  armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None, ranged=False):
+                 action_in_play=False, allowed_phases_in_play=None, ranged=False,
+                 wargear_attachments_permitted=True):
         super().__init__(name, text, traits, -1, faction, "Signature", "Warlord", attack, health, 999,
                          True, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play, ranged=ranged)
+                         action_in_play, allowed_phases_in_play, ranged=ranged,
+                         wargear_attachments_permitted=wargear_attachments_permitted)
         self.bloodied = False
         self.bloodied_attack = bloodied_attack
         self.bloodied_health = bloodied_health
@@ -371,11 +374,12 @@ class ArmyCard(UnitCard):
                  image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False,
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False, ranged=False):
+                 limited=False, ranged=False, wargear_attachments_permitted=True):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play, limited, ranged=ranged)
+                         action_in_play, allowed_phases_in_play, limited, ranged=ranged,
+                         wargear_attachments_permitted=wargear_attachments_permitted)
 
     def print_info(self):
         if self.unique:
@@ -466,7 +470,7 @@ class TokenCard(UnitCard):
         super().__init__(name, text, traits, -1, faction, "Common", "Token",
                          attack, health, 0, False, applies_discounts=applies_discounts, action_in_hand=False
                          , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                         ranged=False)
+                         ranged=False, wargear_attachments_permitted=True)
 
     def print_info(self):
         print("Name:", self.name)

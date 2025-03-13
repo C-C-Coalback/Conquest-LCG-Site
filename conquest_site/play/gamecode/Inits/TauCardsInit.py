@@ -68,7 +68,8 @@ def tau_cards_init():
                        CardClasses.ArmyCard("Experimental Devilfish", "No Wargear Attachments.\n"
                                                                       "Reaction: After this unit commits to a "
                                                                       "planet, ready it.", "Vehicle. Transport.",
-                                            3, faction, "Common", 4, 2, 1, False),
+                                            3, faction, "Common", 4, 2, 1, False,
+                                            wargear_attachments_permitted=False),
                        CardClasses.EventCard("Even the Odds", "Action: Move a target attachment to another eligible "
                                                               "unit controlled by the same player.", "Tactic.",
                                              1, faction, "Common", 1, False, action_in_hand=True,

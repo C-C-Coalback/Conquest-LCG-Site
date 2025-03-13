@@ -61,10 +61,11 @@ def space_marines_cards_init():
                                 CardClasses.ArmyCard("Land Raider", "No Wargear Attachments.\n Non-Vehicle units you "
                                                                     "control at this planet cannot be targeted by "
                                                                     "enemy card abilities.", "Vehicle. Tank. Elite.",
-                                                     5, faction, "Common", 3, 7, 3, False, ""),
+                                                     5, faction, "Common", 3, 7, 3, False,
+                                                     wargear_attachments_permitted=False),
                                 CardClasses.ArmyCard("Ultramarines Dreadnought", "No Wargear Attachments.",
                                                      "Vehicle. Ultramarines. Elite.", 6, faction, "Loyal",
-                                                     8, 8, 0, False, ""),
+                                                     8, 8, 0, False, wargear_attachments_permitted=False),
                                 CardClasses.ArmyCard("Veteran Brother Maxos", "Combat Action: Pay the printed cost "
                                                                               "of a Space Marines unit in your hand "
                                                                               "to put it into play at this planet.",
@@ -80,7 +81,8 @@ def space_marines_cards_init():
                                 CardClasses.ArmyCard("Raven Guard Speeder", "No Wargear Attachments.\n Flying. (This "
                                                                             "unit takes half damage from non-Flying "
                                                                             "units.", "Vehicle. Raven Guard.",
-                                                     4, faction, "Common", 3, 3, 2, False, "", flying=True),
+                                                     4, faction, "Common", 3, 3, 2, False, flying=True,
+                                                     wargear_attachments_permitted=False),
                                 CardClasses.ArmyCard("Deathwing Guard", "", "Soldier. Dark Angels. Elite.", 5, faction,
                                                      "Loyal", 2, 9, 4, False, ""),
                                 CardClasses.EventCard("Drop Pod Assault", "Combat Action: Target a planet where a "

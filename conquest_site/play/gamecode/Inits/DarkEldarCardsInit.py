@@ -53,13 +53,15 @@ def dark_eldar_cards_init():
                               CardClasses.ArmyCard("Vile Raider", "No Wargear Attachments.\n"
                                                                   "Mobile. (At the beginning of the combat phase, "
                                                                   "this unit may move to an adjacent planet.",
-                                                   "Vehicle. Transport.", 4, faction, "Common", 2, 4, 2, False),
+                                                   "Vehicle. Transport.", 4, faction, "Common", 2, 4, 2, False,
+                                                   wargear_attachments_permitted=False),
                               CardClasses.ArmyCard("Black Heart Ravager", "No Wargear Attachments.\n"
                                                                           "Flying. (This unit takes half damage from "
                                                                           "non-Flying units.)\n"
                                                                           "Reaction: After this unit damages a "
                                                                           "non-warlord unit, rout that unit.",
-                                                   "Vehicle. Tank. Elite.", 6, faction, "Loyal", 2, 5, 2, False),
+                                                   "Vehicle. Tank. Elite.", 6, faction, "Loyal", 2, 5, 2, False,
+                                                   wargear_attachments_permitted=False),
                               CardClasses.ArmyCard("Murder of Razorwings", "No Attachments.\n"
                                                                            "Reaction: After you deploy this unit, "
                                                                            "discard 1 card at random from your "

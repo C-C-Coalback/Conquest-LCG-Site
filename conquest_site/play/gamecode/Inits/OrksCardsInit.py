@@ -42,7 +42,7 @@ def orks_cards_init():
                                             "Tankbusta_Bommaz"),
                        CardClasses.ArmyCard("Rugged Killa Kans", "No Wargear Attachments.\nBrutal.", "Vehicle. Walker.",
                                             4, "Orks", "Loyal", 2, 5, 2, False,
-                                            "Rugged_Killa_Kans", brutal=True),
+                                            "Rugged_Killa_Kans", brutal=True, wargear_attachments_permitted=False),
                        CardClasses.ArmyCard("Enraged Ork", "Brutal.", "Warrior. Boyz.", 2, "Orks", "Loyal", 0, 5, 1,
                                             False, "Enraged_Ork", brutal=True),
                        CardClasses.ArmyCard("Crushface", "Interrupt: When you deploy another Orks unit at this planet, "

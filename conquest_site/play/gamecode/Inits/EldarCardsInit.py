@@ -32,16 +32,19 @@ def eldar_cards_init():
                                                                     "Combat Action: Move this unit to an adjacent"
                                                                     " planet. (Limit once per phase.)",
                                               "Vehicle. Saim-Hann.", 4, faction, "Common", 3, 4, 1, False,
-                                              action_in_play=True, allowed_phases_in_play="COMBAT"),
+                                              action_in_play=True, allowed_phases_in_play="COMBAT",
+                                              wargear_attachments_permitted=False),
                          CardClasses.ArmyCard("Soaring Falcon", "No Wargear Attachments.\n"
                                                                 "Mobile.", "Vehicle.",
-                                              3, faction, "Common", 1, 5, 2, False),
+                                              3, faction, "Common", 1, 5, 2, False,
+                                              wargear_attachments_permitted=False),
                          CardClasses.ArmyCard("Wailing Wraithfighter", "No Wargear Attachments.\n"
                                                                        "Flying.\n"
                                                                        "Reaction: After this unit is declared as an "
                                                                        "attacker, your opponent must choose and "
                                                                        "discard 1 card from his hand, if able.",
-                                              "Vehicle. Spirit. Elite.", 6, faction, "Loyal", 3, 5, 2, False),
+                                              "Vehicle. Spirit. Elite.", 6, faction, "Loyal", 3, 5, 2, False,
+                                              wargear_attachments_permitted=False),
                          CardClasses.ArmyCard("Iyanden Wraithguard", "Armorbane.", "Drone. Spirit. Iyanden.",
                                               3, faction, "Loyal", 4, 2, 1, False, armorbane=True),
                          CardClasses.ArmyCard("Shrouded Harlequin", "Interrupt: When this unit is destroyed, exhaust "
