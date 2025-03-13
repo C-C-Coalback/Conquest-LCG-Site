@@ -66,7 +66,7 @@ def dark_eldar_cards_init():
                                                                            "Reaction: After you deploy this unit, "
                                                                            "discard 1 card at random from your "
                                                                            "opponent's hand.", "Creature. Ally.",
-                                                   1, faction, "Loyal", 1, 1, 0, False),
+                                                   1, faction, "Loyal", 1, 1, 0, False, no_attachments=True),
                               CardClasses.ArmyCard("Coliseum Fighters", "Reaction: After this unit enters play, "
                                                                         "return the topmost event card from your "
                                                                         "discard pile to your hand.",

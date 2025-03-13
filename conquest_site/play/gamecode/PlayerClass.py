@@ -331,6 +331,11 @@ class Player:
         return card
 
     def attach_card(self, card, planet, position):
+        print("Adding attachment code")
+        print(card.get_name())
+        print(self.cards_in_play[planet + 1][position].get_no_attachments())
+        if self.cards_in_play[planet + 1][position].get_no_attachments():
+            return False
         if card.check_for_a_trait("Wargear."):
             if not self.cards_in_play[planet + 1][position].get_wargear_attachments_permitted():
                 return False

@@ -132,7 +132,7 @@ class UnitCard(Card):
                  unique, image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False, ranged=False, wargear_attachments_permitted=True):
+                 limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited)
@@ -153,6 +153,10 @@ class UnitCard(Card):
         self.by_base_ranged = ranged
         self.ranged = ranged
         self.wargear_attachments_permitted = wargear_attachments_permitted
+        self.no_attachments = no_attachments
+
+    def get_no_attachments(self):
+        return self.no_attachments
 
     def get_wargear_attachments_permitted(self):
         return self.wargear_attachments_permitted
@@ -249,48 +253,6 @@ class UnitCard(Card):
             print("Damage exceeds health")
             return 1
 
-    def shield_window(self, player, amount):
-        print(self.get_name(), "taking", amount, "damage.")
-        print("GOT HERE")
-        player.set_turn(True)
-        player.extra_text = "Shield window"
-        player.position_activated = []
-        while True:
-            pygame.time.wait(500)
-            player.c.acquire()
-            player.c.notify_all()
-            current_active = player.position_activated
-            player.c.release()
-            if len(current_active) > 0:
-                if current_active[0] == "PASS":
-                    print("No shields used")
-                    player.set_turn(False)
-                    return amount
-                if len(current_active) > 1:
-                    print("GOT HERE + :", current_active)
-                    if current_active[1] == "Hand" and int((current_active[0])[1]) == player.number:
-                        if int(current_active[2]) < len(player.cards):
-                            print("Attempting to shield")
-                            print("Position of card: Player", current_active[0], "Hand pos:", current_active[2])
-                            position = int(current_active[2])
-                            if position == -1:
-                                print("No shields used")
-                                return amount
-                            shield = player.get_shields_given_pos(position)
-                            if shield == -1:
-                                input("Card somehow found in hand but not in database.")
-                            elif shield == 0:
-                                print("Card has no shields on it. Use something else.")
-                            else:
-                                player.discard_card_from_hand(position)
-                                print("shield value:", shield)
-                                amount = int(amount)
-                                shield = int(shield)
-                                amount = amount - shield
-                                if amount < 0:
-                                    amount = 0
-                                return amount
-
     def assign_damage(self, amount):
         if amount > 0:
             if self.get_ability() == "Blood Angels Veterans":
@@ -311,12 +273,13 @@ class WarlordCard(UnitCard):
                  armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None, ranged=False,
-                 wargear_attachments_permitted=True):
+                 wargear_attachments_permitted=True, no_attachments=False):
         super().__init__(name, text, traits, -1, faction, "Signature", "Warlord", attack, health, 999,
                          True, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, ranged=ranged,
-                         wargear_attachments_permitted=wargear_attachments_permitted)
+                         wargear_attachments_permitted=wargear_attachments_permitted,
+                         no_attachments=no_attachments)
         self.bloodied = False
         self.bloodied_attack = bloodied_attack
         self.bloodied_health = bloodied_health
@@ -377,12 +340,12 @@ class ArmyCard(UnitCard):
                  image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False,
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False, ranged=False, wargear_attachments_permitted=True):
+                 limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited, ranged=ranged,
-                         wargear_attachments_permitted=wargear_attachments_permitted)
+                         wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments)
 
     def print_info(self):
         if self.unique:
@@ -405,7 +368,7 @@ class EventCard(Card):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Event", unique, image_name, applies_discounts, action_in_hand
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
-                         limited=False)
+                         limited=limited)
 
     def print_info(self):
         if self.unique:
@@ -469,11 +432,12 @@ class SupportCard(Card):
 
 
 class TokenCard(UnitCard):
-    def __init__(self, name, text, traits, faction, attack, health, applies_discounts=None):
+    def __init__(self, name, text, traits, faction, attack, health, applies_discounts=None,
+                 no_attachments=False):
         super().__init__(name, text, traits, -1, faction, "Common", "Token",
                          attack, health, 0, False, applies_discounts=applies_discounts, action_in_hand=False
                          , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                         ranged=False, wargear_attachments_permitted=True)
+                         ranged=False, wargear_attachments_permitted=True, no_attachments=no_attachments)
 
     def print_info(self):
         print("Name:", self.name)

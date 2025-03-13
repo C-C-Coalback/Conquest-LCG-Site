@@ -62,7 +62,8 @@ def chaos_cards_init():
                                                                       "Action: Sacrifice a Cultist unit to "
                                                                       "remove all damage from this unit.",
                                              "Daemon. Elite. Khorne.", 5, "Chaos", "Common",
-                                             3, 6, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+                                             3, 6, 1, False, action_in_play=True, allowed_phases_in_play="ALL",
+                                             no_attachments=True),
                         CardClasses.ArmyCard("Virulent Plague Squad", "This unit gets +1 ATK for each unit "
                                                                       "in your opponent's discard pile.",
                                              "Death Guard. Nurgle. Warrior.", 4, "Chaos", "Common",

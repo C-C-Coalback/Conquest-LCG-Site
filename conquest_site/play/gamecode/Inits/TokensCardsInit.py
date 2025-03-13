@@ -7,6 +7,7 @@ def tokens_cards_init():
                                                           "sacrifice this unit to reduce its cost by 1.",
                                                "Cultist.", "Chaos", 1, 1, applies_discounts=[True, 1, False]),
                          CardClasses.TokenCard("Guardsman", "", "Soldier.", "Astra Militarum", 1, 2),
-                         CardClasses.TokenCard("Khymera", "No Attachments.", "Creature.", "Dark Eldar", 2, 1),
+                         CardClasses.TokenCard("Khymera", "No Attachments.", "Creature.", "Dark Eldar", 2, 1,
+                                               no_attachments=True),
                          CardClasses.TokenCard("Termagant", "", " Creature. Termagant.", "Tyranids", 1, 1)]
     return tokens_card_array
