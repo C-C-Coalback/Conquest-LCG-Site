@@ -44,6 +44,7 @@ h4 {
 
 .Card {
     position: relative;
+    left: 0;
     height:8vh;
     width:5vw;
 }
@@ -52,6 +53,17 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+.Attachment-Card {
+    position: absolute;
+    top: 0;
+    height: 8vh;
+    width: 5vw;
+}
+
+.Attachment-Card + .Attachment-Card {
+    margin-left: 1vw;
 }
 
 .aiming-reticle {

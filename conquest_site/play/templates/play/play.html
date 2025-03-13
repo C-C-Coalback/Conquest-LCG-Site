@@ -212,6 +212,10 @@
                         }
                         for (var j = 5; j < card_data_split.length; j++) {
                             console.log(card_data_split[j]);
+                            attachment_string_id = (j-5).toString();
+                            var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
+                            var attachment_rotation = "";
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                         if (damage === "0") {
                             full_string += `</div>`

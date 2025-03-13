@@ -137,7 +137,7 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 hostname = socket.gethostname()
 IPAddr = socket.gethostbyname(hostname)
-print("Your Computer IP Address is:" + IPAddr)
+
 ASGI_APPLICATION = "conquest_site.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
