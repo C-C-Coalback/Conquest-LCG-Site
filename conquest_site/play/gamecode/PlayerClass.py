@@ -331,13 +331,22 @@ class Player:
         return card
 
     def attach_card(self, card, planet, position):
+        if card.check_for_a_trait("Wargear."):
+            if not self.cards_in_play[planet + 1][position].get_wargear_attachments_permitted():
+                return False
         self.cards_in_play[planet + 1][position].add_attachment(card)
+        return True
 
-    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0):
+    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False):
+        if not_own_attachment:
+            if self.attach_card(card, planet, position):
+                return True
+            return False
         cost = card.get_cost() - discounts
         if self.spend_resources(cost):
-            self.attach_card(card, planet, position)
-            return True
+            if self.attach_card(card, planet, position):
+                return True
+            self.add_resources(cost)
         return False
 
     def add_card_to_planet(self, card, position):

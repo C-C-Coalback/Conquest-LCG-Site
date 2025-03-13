@@ -154,6 +154,9 @@ class UnitCard(Card):
         self.ranged = ranged
         self.wargear_attachments_permitted = wargear_attachments_permitted
 
+    def get_wargear_attachments_permitted(self):
+        return self.wargear_attachments_permitted
+
     def get_attachments(self):
         return self.attachments
 
