@@ -618,31 +618,56 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
 
     def get_attack_given_pos(self, planet_id, unit_id):
-        attack_value = self.cards_in_play[planet_id + 1][unit_id].get_attack()
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() != "Nazdreg":
+        card = self.cards_in_play[planet_id + 1][unit_id]
+        attack_value = card.get_attack()
+        if card.get_ability() != "Nazdreg":
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
-                self.cards_in_play[planet_id + 1][unit_id].set_brutal(True)
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() != "Colonel Straken":
+                card.set_brutal(True)
+        if card.get_ability() != "Colonel Straken":
             straken_check = self.search_card_at_planet(planet_id, "Colonel Straken", bloodied_relevant=True)
             if straken_check:
-                if self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait("Soldier") or \
-                        self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait("Warrior"):
+                if card.check_for_a_trait("Soldier") or card.check_for_a_trait("Warrior"):
                     attack_value += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Boyz":
+        if card.get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
-        if self.cards_in_play[planet_id + 1][unit_id].get_brutal():
-            attack_value = attack_value + self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        if self.cards[planet_id + 1][unit_id].get_ability() == "Infantry Conscripts":
+        if card.get_brutal():
+            attack_value = attack_value + card.get_damage()
+        if card.get_ability() == "Infantry Conscripts":
             support_count = 0
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_card_type() == "Support":
                     support_count += 1
             attack_value += support_count * 2
-        self.cards_in_play[planet_id + 1][unit_id].reset_brutal()
-        attack_value += self.cards_in_play[planet_id + 1][unit_id].get_extra_attack_until_end_of_battle()
+        attachments = card.get_attachments()
+        for i in range(len(attachments)):
+            if attachments[i].get_ability() == "Agonizer of Bren":
+                attack_value += self.count_copies_in_play("Khymera")
+        card.reset_brutal()
+        attack_value += card.get_extra_attack_until_end_of_battle()
         return attack_value
+
+    def count_copies_in_play(self, card_name):
+        num_copies = 0
+        for i in range(7):
+            num_copies += self.count_copies_at_planet(planet_num=i, card_name=card_name)
+        num_copies += self.count_copies_at_hq(card_name)
+        return num_copies
+
+    def count_copies_at_planet(self, planet_num, card_name):
+        num_copies = 0
+        for i in range(len(self.cards_in_play[planet_num + 1])):
+            if self.cards_in_play[planet_num + 1][i].get_name() == card_name:
+                num_copies += 1
+        return num_copies
+
+    def count_copies_at_hq(self, card_name):
+        num_copies = 0
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_name() == card_name:
+                num_copies += 1
+        return num_copies
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
