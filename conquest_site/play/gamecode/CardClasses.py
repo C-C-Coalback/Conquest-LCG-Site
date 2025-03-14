@@ -240,9 +240,13 @@ class UnitCard(Card):
         self.damage = amount
 
     def get_command(self):
+        command = self.command
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Promotion":
+                command = command + 2
         if self.name == "Bad Dok" and self.damage > 0:
-            return self.command + 3
-        return self.command
+            command = command + 3
+        return command
 
     def damage_card(self, player, amount, can_shield=True):
         self.assign_damage(amount)
