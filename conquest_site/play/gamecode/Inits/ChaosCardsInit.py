@@ -97,7 +97,8 @@ def chaos_cards_init():
                         CardClasses.AttachmentCard("Rune-Encrusted Armor", "Attach to an army unit.\n"
                                                                            "Attached unit gets +2 ATK and +2 HP.",
                                                    "Armor. Wargear.", 2, "Chaos", "Common", 1, False,
-                                                   type_of_units_allowed_for_attachment="Army"),
+                                                   type_of_units_allowed_for_attachment="Army", extra_attack=2,
+                                                   extra_health=2),
                         CardClasses.AttachmentCard("Dire Mutation", "Ambush.\nAttach to an army unit.\n"
                                                                     "Forced Interrupt: When attached unit exhaust,"
                                                                     " deal it 1 damage.", "Curse. Tzeentch.",

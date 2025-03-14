@@ -93,7 +93,7 @@ def eldar_cards_init():
                                                                            "X cards from your hand to give attached "
                                                                            "unit +X ATK for that attack.",
                                                     "Wargear, Weapon.", 1, faction, "Common", 1, False,
-                                                    type_of_units_allowed_for_attachment="Army"),
+                                                    type_of_units_allowed_for_attachment="Army", extra_attack=1),
                          CardClasses.SupportCard("Corsair Trading Port", "Limited.\n"
                                                                          "Interrupt: When you deploy an Eldar unit, "
                                                                          "exhaust this support to reduce that "

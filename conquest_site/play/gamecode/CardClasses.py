@@ -228,10 +228,16 @@ class UnitCard(Card):
         self.brutal = self.by_base_brutal
 
     def get_attack(self):
-        return self.attack
+        attack = self.attack
+        for i in range(len(self.attachments)):
+            attack += self.attachments[i].get_extra_attack()
+        return attack
 
     def get_health(self):
-        return self.health
+        health = self.health
+        for i in range(len(self.attachments)):
+            health += self.attachments[i].get_extra_health()
+        return health
 
     def get_damage(self):
         return self.damage
@@ -242,8 +248,7 @@ class UnitCard(Card):
     def get_command(self):
         command = self.command
         for i in range(len(self.attachments)):
-            if self.attachments[i].get_ability() == "Promotion":
-                command = command + 2
+            command += self.attachments[i].get_extra_command()
         if self.name == "Bad Dok" and self.damage > 0:
             command = command + 3
         return command
@@ -265,7 +270,7 @@ class UnitCard(Card):
         self.damage = self.damage + amount
 
     def check_health(self):
-        if self.health > self.damage:
+        if self.get_health() > self.damage:
             return 1
         else:
             return 0
@@ -394,7 +399,8 @@ class AttachmentCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, type_of_units_allowed_for_attachment="Army/Token/Warlord/Synapse",
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
-                 must_be_enemy_unit=False, limit_one_per_unit=False):
+                 must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
+                 extra_command=0):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
@@ -406,6 +412,18 @@ class AttachmentCard(Card):
         self.must_be_own_unit = must_be_own_unit
         self.must_be_enemy_unit = must_be_enemy_unit
         self.limit_one_per_unit = limit_one_per_unit
+        self.extra_attack = extra_attack
+        self.extra_health = extra_health
+        self.extra_command = extra_command
+
+    def get_extra_command(self):
+        return self.extra_command
+
+    def get_extra_attack(self):
+        return self.extra_attack
+
+    def get_extra_health(self):
+        return self.extra_health
 
     def print_info(self):
         if self.unique:

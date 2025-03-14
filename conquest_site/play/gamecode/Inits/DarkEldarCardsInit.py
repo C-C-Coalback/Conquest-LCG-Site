@@ -96,7 +96,8 @@ def dark_eldar_cards_init():
                               CardClasses.AttachmentCard("Suffering", "Attach to an army unit.\n"
                                                                       "Attached unit gets -2 ATK.",
                                                          "Condition. Torture.", 1, faction, "Loyal", 2, False,
-                                                         type_of_units_allowed_for_attachment="Army"),
+                                                         type_of_units_allowed_for_attachment="Army",
+                                                         extra_attack=-2),
                               CardClasses.AttachmentCard("Hypex Injector", "Attach to an army unit.\n"
                                                                            "Reaction: After you play a Dark Eldar "
                                                                            "event card, ready attached unit.",

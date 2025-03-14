@@ -33,7 +33,7 @@ def space_marines_cards_init():
                                                                                          "cards cannot be used while "
                                                                                          "this unit is attacking.",
                                                            "Relic. Weapon.", 1, faction, "Signature", 3, True,
-                                                           unit_must_be_unique=True),
+                                                           unit_must_be_unique=True, extra_attack=1),
                                 CardClasses.ArmyCard("10th Company Scout", "", "Scout. Ultramarines.", 1, faction,
                                                      "Common", 2, 1, 1, False, ""),
                                 CardClasses.ArmyCard("Tactical Squad Cardinis", "Area Effect (1). (When this unit "
@@ -108,7 +108,8 @@ def space_marines_cards_init():
                                                                                     "and while attacking ignores the "
                                                                                     "Flying keyword on enemy units.",
                                                            "Wargear. Weapon.", 1, faction, "Common", 1, False,
-                                                           type_of_units_allowed_for_attachment="Army"),
+                                                           type_of_units_allowed_for_attachment="Army",
+                                                           extra_attack=1, extra_health=1),
                                 CardClasses.AttachmentCard("Iron Halo", "Limit 1 Relic per player.\n"
                                                                         "Attach to a unique unit.\n"
                                                                         "Reaction: After attached unit is assigned "

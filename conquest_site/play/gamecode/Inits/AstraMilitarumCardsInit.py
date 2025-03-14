@@ -33,7 +33,8 @@ def astra_militarum_cards_init():
                                                                                    "Interrupt: When attached unit "
                                                                                    "leaves play, draw 3 cards.",
                                                               "Skill.", 1, faction, "Signature", 3, False,
-                                                              type_of_units_allowed_for_attachment="Army"),
+                                                              type_of_units_allowed_for_attachment="Army",
+                                                              extra_attack=1),
                                    CardClasses.ArmyCard("Ratling Deadeye", "Ranged. (This unit attacks during the "
                                                                            "ranged skirmish at the beginning of"
                                                                            " a battle.)", "Scout. Abhuman.", 1,
@@ -108,7 +109,8 @@ def astra_militarum_cards_init():
                                    CardClasses.AttachmentCard("Hostile Environment Gear", "Attach to an army unit.\n"
                                                                                           "Attached unit gets +3 HP.",
                                                               "Wargear. Armor.", 1, faction, "Common", 1, False,
-                                                              type_of_units_allowed_for_attachment="Army"),
+                                                              type_of_units_allowed_for_attachment="Army",
+                                                              extra_health=3),
                                    CardClasses.AttachmentCard("Bodyguard", "Attach to an army unit you control.\n"
                                                                            "Forced Reaction: After a unit you control "
                                                                            "is assigned damage by an attack at this "

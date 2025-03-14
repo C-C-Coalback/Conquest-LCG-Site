@@ -31,7 +31,7 @@ def tau_cards_init():
                                                                         "Action: Pay 1 resource to attach this card "
                                                                         "to a different unit.", "Drone.",
                                                   0, faction, "Signature", 3, False, action_in_play=True,
-                                                  allowed_phases_in_play="ALL"),
+                                                  allowed_phases_in_play="ALL", extra_attack=1),
                        CardClasses.ArmyCard("Recon Drone", "Limited.", "Drone. Ally.", 0, faction, "Loyal",
                                             0, 1, 2, False, limited=True),
                        CardClasses.ArmyCard("Vior'la Marksman", "Ranged.", "Scout. Shas'la.", 1, faction, "Common",
@@ -91,7 +91,7 @@ def tau_cards_init():
                        CardClasses.AttachmentCard("Ion Rifle", "Attach to an army unit.\n"
                                                                "Attached unit gets +3 ATK.", "Wargear. Weapon.",
                                                   1, faction, "Common", 1, False,
-                                                  type_of_units_allowed_for_attachment="Army"),
+                                                  type_of_units_allowed_for_attachment="Army", extra_attack=3),
                        CardClasses.SupportCard("Frontline Launch Bay", "Limited.\n"
                                                                        "Interrupt: When you deploy a Tau unit, exhaust "
                                                                        "this support to reduce that unit's cost by 1.",
