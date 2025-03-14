@@ -180,6 +180,12 @@ class UnitCard(Card):
                 return True
         return self.ranged
 
+    def get_ignores_flying(self):
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Godwyn Pattern Bolter":
+                return True
+        return False
+
     def reset_ranged(self):
         self.ranged = self.by_base_ranged
 

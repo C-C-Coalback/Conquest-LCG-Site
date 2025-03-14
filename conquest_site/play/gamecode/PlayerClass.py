@@ -541,6 +541,9 @@ class Player:
     def get_armorbane_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
+    def get_ignores_flying_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_ignores_flying()
+
     def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True):
         if not ability_checking:
             for i in range(len(self.cards_in_play[planet_id + 1])):
