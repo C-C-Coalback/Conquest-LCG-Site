@@ -701,8 +701,8 @@ class Game:
                                                                                self.attacker_position)
                             if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                     self.attacker_position) == "Starbane's Council":
-                                if not secondary_player.get_ready_given_pos(self.attacker_planet,
-                                                                            self.attacker_position):
+                                if not secondary_player.get_ready_given_pos(self.defender_planet,
+                                                                            self.defender_position):
                                     attack_value += 2
                             if attack_value > 0:
                                 att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
