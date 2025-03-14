@@ -751,12 +751,27 @@ class Player:
         del self.headquarters[card_pos]
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
-        card_name = self.cards_in_play[planet_num + 1][card_pos].get_name()
+        card = self.cards_in_play[planet_num + 1][card_pos]
+        card_name = card.get_name()
+        for i in range(len(card.get_attachments())):
+            if card.get_attachments()[i].get_ability() == "Straken's Cunning":
+                self.draw_card()
+                self.draw_card()
+                self.draw_card()
+                self.game.cards_need_sending_outside_normal_sends = True
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
     def add_card_in_hq_to_discard(self, card_pos):
         card_name = self.headquarters[card_pos].get_name()
+        card = self.headquarters[card_pos]
+        card_name = card.get_name()
+        for i in range(len(card.get_attachments())):
+            if card.get_attachments()[i].get_ability() == "Straken's Cunning":
+                self.draw_card()
+                self.draw_card()
+                self.draw_card()
+                self.game.cards_need_sending_outside_normal_sends = True
         self.discard.append(card_name)
         self.remove_card_from_hq(card_pos)
 

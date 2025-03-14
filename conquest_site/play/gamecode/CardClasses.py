@@ -187,6 +187,9 @@ class UnitCard(Card):
         return self.by_base_armorbane
 
     def get_armorbane(self):
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
+                return True
         return self.armorbane
 
     def get_by_base_area_effect(self):

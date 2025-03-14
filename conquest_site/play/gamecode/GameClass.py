@@ -68,6 +68,7 @@ class Game:
         self.number_of_units_left_to_suffer_damage = 0
         self.next_unit_to_suffer_damage = -1
         self.resources_need_sending_outside_normal_sends = False
+        self.cards_need_sending_outside_normal_sends = False
         self.actions_allowed = True
         self.player_with_action = ""
         self.action_chosen = ""
@@ -1022,6 +1023,10 @@ class Game:
                 await primary_player.send_resources()
                 await secondary_player.send_resources()
                 self.resources_need_sending_outside_normal_sends = False
+            if self.cards_need_sending_outside_normal_sends:
+                await primary_player.send_hand()
+                await secondary_player.send_hand()
+                self.cards_need_sending_outside_normal_sends = False
             if primary_player.warlord_just_got_bloodied:
                 primary_player.warlord_just_got_bloodied = False
                 await primary_player.send_hq()
