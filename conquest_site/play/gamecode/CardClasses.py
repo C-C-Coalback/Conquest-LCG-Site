@@ -237,6 +237,9 @@ class UnitCard(Card):
         health = self.health
         for i in range(len(self.attachments)):
             health += self.attachments[i].get_extra_health()
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Cybork Body":
+                health = 2 * health
         return health
 
     def get_damage(self):
