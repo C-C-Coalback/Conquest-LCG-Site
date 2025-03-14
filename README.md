@@ -5,9 +5,12 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 I should really get a better name for this section.
 
-Attachments now show up in play. Spacing happens correctly.
-Now need to add support for displaying attachments in the HQ, playing 
-attachments to cards in the HQ, and then code for specific attachments.
+All the core code for attachments 
+is present. Individual attachments are being added.
+
+Need to change the multithreading 
+in the game logic to a "lock" method instead of
+an "acquire" method: if locked, then just ignore the request.
 
 # What is this?
 
