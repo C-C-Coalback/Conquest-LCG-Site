@@ -161,11 +161,32 @@ class Game:
         print("Need to run deploy turn code.")
         print(self.player_with_deploy_turn, self.number_with_deploy_turn)
         print(name == self.player_with_deploy_turn)
-        if len(game_update_string) == 1:
-            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+        if self.mode == "SHIELD":
+            await self.shield_card_during_deploy(name, game_update_string)
+        elif self.mode == "ACTION":
+            await self.update_game_event_action(name, game_update_string)
+        elif len(game_update_string) == 1:
+            if game_update_string[0] == "action-button":
+                if self.actions_allowed and self.mode != "ACTION":
+                    print("Need to run action code")
+                    if self.player_with_deploy_turn == name:
+                        self.stored_mode = self.mode
+                        self.mode = "ACTION"
+                        self.player_with_action = name
+                        print("Special deploy action")
+                        await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+                elif self.mode == "ACTION":
+                    self.mode = self.stored_mode
+                    self.stored_mode = ""
+                    await self.game_sockets[0].receive_game_update(name + " cancelled their action request.")
+            elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 print("Need to pass")
                 if name == self.player_with_deploy_turn:
-                    if self.mode == "Normal":
+                    if self.mode == "ACTION":
+                        self.mode = self.stored_mode
+                        self.stored_mode = ""
+                        await self.game_sockets[0].receive_game_update(name + " cancelled their action request.")
+                    elif self.mode == "Normal":
                         if self.number_with_deploy_turn == "1":
                             self.number_with_deploy_turn = "2"
                             self.player_with_deploy_turn = self.name_2
@@ -186,9 +207,34 @@ class Game:
                     print("Both passed, move to warlord movement.")
                     self.phase = "COMMAND"
                 await self.send_info_box()
-        if len(game_update_string) == 3:
+        elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
-                if self.mode == "Normal":
+                if self.mode == "DISCOUNT":
+                    if name == self.player_with_deploy_turn:
+                        if game_update_string[1] == self.number_with_deploy_turn:
+                            if self.card_type_of_selected_card_in_hand == "Army":
+                                if self.number_with_deploy_turn == "1":
+                                    player = self.p1
+                                else:
+                                    player = self.p2
+                                discount_received, damage = player.perform_discount_at_pos_hand(
+                                    int(game_update_string[2]),
+                                    self.faction_of_card_to_play
+                                )
+                                if discount_received > 0:
+                                    self.discounts_applied += discount_received
+                                    player.discard_card_from_hand(int(game_update_string[2]))
+                                    if self.card_pos_to_deploy > int(game_update_string[2]):
+                                        self.card_pos_to_deploy -= 1
+                                    if damage > 0:
+                                        self.damage_for_unit_to_take_on_play.append(damage)
+                                    if self.discounts_applied >= self.available_discounts:
+                                        await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                                       discounts=self.discounts_applied)
+                                    else:
+                                        await player.send_hand()
+                                        await player.send_discard()
+                elif self.mode == "Normal":
                     if name == self.player_with_deploy_turn:
                         print(game_update_string[1] == self.number_with_deploy_turn)
                         if game_update_string[1] == self.number_with_deploy_turn:
@@ -242,40 +288,15 @@ class Game:
                                 player = self.p1
                             else:
                                 player = self.p2
-                            discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
-                                                                                  self.faction_of_card_to_play)
-                            if discount_received > 0:
-                                self.discounts_applied += discount_received
-                            if self.discounts_applied >= self.available_discounts:
-                                await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
-                                                               discounts=self.discounts_applied)
-                                self.mode = "Normal"
-            elif game_update_string[0] == "HAND":
-                if name == self.player_with_deploy_turn:
-                    if game_update_string[1] == self.number_with_deploy_turn:
-                        if self.mode == "DISCOUNT":
                             if self.card_type_of_selected_card_in_hand == "Army":
-                                if self.number_with_deploy_turn == "1":
-                                    player = self.p1
-                                else:
-                                    player = self.p2
-                                discount_received, damage = player.perform_discount_at_pos_hand(
-                                    int(game_update_string[2]),
-                                    self.faction_of_card_to_play
-                                    )
+                                discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
+                                                                                      self.faction_of_card_to_play)
                                 if discount_received > 0:
                                     self.discounts_applied += discount_received
-                                    player.discard_card_from_hand(int(game_update_string[2]))
-                                    if self.card_pos_to_deploy > int(game_update_string[2]):
-                                        self.card_pos_to_deploy -= 1
-                                    if damage > 0:
-                                        self.damage_for_unit_to_take_on_play.append(damage)
-                                    if self.discounts_applied >= self.available_discounts:
-                                        await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
-                                                                       discounts=self.discounts_applied)
-                                    else:
-                                        await player.send_hand()
-                                        await player.send_discard()
+                                if self.discounts_applied >= self.available_discounts:
+                                    await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                                   discounts=self.discounts_applied)
+                                    self.mode = "Normal"
 
         elif len(game_update_string) == 2:
             if name == self.player_with_deploy_turn:
@@ -884,35 +905,32 @@ class Game:
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
-        may_try_action = True
-        if self.phase == "DEPLOY" and self.mode == "SHIELD":
-            await self.shield_card_during_deploy(name, game_update_string)
-        elif self.phase == "SETUP":
+        # if self.phase == "DEPLOY" and self.mode == "SHIELD":
+        #     await self.shield_card_during_deploy(name, game_update_string)
+        if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
-        elif len(game_update_string) == 1:
-            if game_update_string[0] == "action-button":
-                if self.actions_allowed and self.mode != "ACTION":
-                    print("Need to run action code")
-                    if self.phase == "DEPLOY":
-                        if self.player_with_deploy_turn == name:
-                            self.stored_mode = self.mode
-                            self.mode = "ACTION"
-                            self.player_with_action = name
-                            print("Special deploy action")
-                            await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-                    else:
-                        self.stored_mode = self.mode
-                        self.mode = "ACTION"
-                        self.player_with_action = name
-                        print("Special action")
-                        await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-                    may_try_action = False
-            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if self.phase == "DEPLOY":
-                    if name == self.player_with_deploy_turn:
-                        await self.update_game_event_deploy_section(name, game_update_string)
-        if self.mode == "ACTION" and may_try_action:
-            await self.update_game_event_action(name, game_update_string)
+        # elif len(game_update_string) == 1:
+        #     if game_update_string[0] == "action-button":
+        #         if self.actions_allowed and self.mode != "ACTION":
+        #             print("Need to run action code")
+        #             if self.phase == "DEPLOY":
+        #                 if self.player_with_deploy_turn == name:
+        #                     self.stored_mode = self.mode
+        #                     self.mode = "ACTION"
+        #                     self.player_with_action = name
+        #                     print("Special deploy action")
+        #                     await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+        #             else:
+        #                 self.stored_mode = self.mode
+        #                 self.mode = "ACTION"
+        #                 self.player_with_action = name
+        #                 print("Special action")
+        #                 await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+        #             may_try_action = False
+        #     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+        #         if self.phase == "DEPLOY":
+        #             if name == self.player_with_deploy_turn:
+        #                 await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "DEPLOY":
             await self.update_game_event_deploy_section(name, game_update_string)
         elif self.phase == "COMMAND":

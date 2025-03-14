@@ -127,7 +127,6 @@ h4 {
     border: 5px solid yellow;
     width:80vw;
     max-width:80vw;
-    overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
@@ -142,7 +141,6 @@ h4 {
     border: 5px solid yellow;
     width:80vw;
     max-width:80vw;
-    overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
@@ -259,7 +257,7 @@ h4 {
     left: 10vw;
     margin: auto;
     border: 5px solid green;
-    max-width: 85vw;
+    max-width: 60vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
@@ -285,7 +283,7 @@ h4 {
     left: 10vw;
     margin: auto;
     border: 5px solid red;
-    max-width: 85vw;
+    max-width: 60vw;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
