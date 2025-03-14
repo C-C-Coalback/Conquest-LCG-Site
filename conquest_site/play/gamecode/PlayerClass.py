@@ -710,6 +710,8 @@ class Player:
             else:
                 self.add_card_in_hq_to_discard(card_pos)
         else:
+            if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
+                self.add_resources(3)
             self.add_card_in_hq_to_discard(card_pos)
 
     def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True):
@@ -740,6 +742,8 @@ class Player:
                 self.bloody_warlord_given_pos(planet_num, card_pos)
                 self.warlord_just_got_bloodied = True
             else:
+                if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
+                    self.add_resources(3)
                 self.add_card_in_play_to_discard(planet_num, card_pos)
         else:
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
