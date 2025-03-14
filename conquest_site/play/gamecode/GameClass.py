@@ -231,9 +231,12 @@ class Game:
                             else:
                                 self.card_type_of_selected_card_in_hand = ""
                                 self.card_pos_to_deploy = previous_card_pos_to_deploy
-            if game_update_string[0] == "HQ":
+            elif game_update_string[0] == "HQ":
                 if name == self.player_with_deploy_turn:
                     if game_update_string[1] == self.number_with_deploy_turn:
+                        if self.mode == "Normal":
+                            if self.card_type_of_selected_card_in_hand == "Attachment":
+                                await self.deploy_card_routine_attachment(name, game_update_string)
                         if self.mode == "DISCOUNT":
                             if self.number_with_deploy_turn == "1":
                                 player = self.p1
@@ -300,6 +303,8 @@ class Game:
                             await self.deploy_card_routine_attachment(name, game_update_string)
 
     async def deploy_card_routine_attachment(self, name, game_update_string):
+        if game_update_string[0] == "HQ":
+            game_update_string = ["HQ", game_update_string[1], "-2", game_update_string[2]]
         print("Deploy attachment to: player ", game_update_string[1], "planet ", game_update_string[2],
               "position ", game_update_string[3])
         print("Position of card in hand: ", self.card_pos_to_deploy)
@@ -341,9 +346,15 @@ class Game:
                 primary_player.aiming_reticle_coords_hand = -1
                 await primary_player.send_hand()
                 if enemy_card:
-                    await secondary_player.send_units_at_planet(int(game_update_string[2]))
+                    if game_update_string[2] == "-2":
+                        await secondary_player.send_hq()
+                    else:
+                        await secondary_player.send_units_at_planet(int(game_update_string[2]))
                 else:
-                    await primary_player.send_units_at_planet(int(game_update_string[2]))
+                    if game_update_string[2] == "-2":
+                        await primary_player.send_hq()
+                    else:
+                        await primary_player.send_units_at_planet(int(game_update_string[2]))
                 await primary_player.send_resources()
                 if not secondary_player.has_passed:
                     self.player_with_deploy_turn = secondary_player.get_name_player()

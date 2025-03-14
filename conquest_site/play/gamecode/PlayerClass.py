@@ -331,32 +331,36 @@ class Player:
         return card
 
     def attach_card(self, card, planet, position):
+        if planet == -2:
+            target_card = self.headquarters[position]
+        else:
+            target_card = self.cards_in_play[planet + 1][position]
         print("Adding attachment code")
         print(card.get_name())
-        print(self.cards_in_play[planet + 1][position].get_no_attachments())
+        print(target_card.get_no_attachments())
         allowed_types = card.type_of_units_allowed_for_attachment
-        type_of_card = self.cards_in_play[planet + 1][position].get_card_type()
+        type_of_card = target_card.get_card_type()
         if type_of_card not in allowed_types:
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
         if card.unit_must_be_unique:
-            if not self.cards_in_play[planet + 1][position].get_unique():
+            if not target_card.get_unique():
                 print("Must be a unique unit, but is not")
                 return False
         if card.limit_one_per_unit:
-            attachments_active = self.cards_in_play[planet + 1][position].get_attachments()
+            attachments_active = target_card.get_attachments()
             for i in range(len(attachments_active)):
                 if attachments_active[i].get_name() == card.get_name():
                     print("Limit one per unit")
                     return False
-        if self.cards_in_play[planet + 1][position].get_no_attachments():
+        if target_card.get_no_attachments():
             print("Unit may not have attachments")
             return False
         if card.check_for_a_trait("Wargear."):
-            if not self.cards_in_play[planet + 1][position].get_wargear_attachments_permitted():
+            if not target_card.get_wargear_attachments_permitted():
                 print("Unit may not have wargear")
                 return False
-        self.cards_in_play[planet + 1][position].add_attachment(card)
+        target_card.add_attachment(card)
         return True
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False):
