@@ -175,6 +175,9 @@ class UnitCard(Card):
         self.ranged = new_val
 
     def get_ranged(self):
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Rokkit Launcha":
+                return True
         return self.ranged
 
     def reset_ranged(self):
