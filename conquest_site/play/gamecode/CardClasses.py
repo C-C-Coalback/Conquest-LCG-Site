@@ -427,6 +427,9 @@ class SupportCard(Card):
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
                          is_faction_limited_unique_discounter, limited)
 
+    def get_attachments(self):
+        return []
+
     def print_info(self):
         if self.unique:
             print("Name: *", self.name)

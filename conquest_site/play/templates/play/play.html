@@ -210,7 +210,7 @@
                         for (var j = 5; j < card_data_split.length; j++) {
                             console.log(card_data_split[j]);
                             var attachment_string_id = (j-5).toString();
-                            attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + attachment_string_id;
+                            attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
                             var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
                             var attachment_rotation = "";
                             full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
@@ -251,10 +251,27 @@
                             }
                             var route_text = "/static/images/" + card_name + ".jpg";
                             var rotation = "";
+                            var full_string = `<div class="Card-div">`;
                             if (is_ready === "E") {
                                 rotation = " style='transform:rotate(90deg);'";
                             }
-                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            for (var j = 5; j < card_data_split.length; j++) {
+                                console.log(card_data_split[j]);
+                                var attachment_string_id = (j-5).toString();
+                                attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
+                                var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
+                                var attachment_rotation = "";
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            }
+                            var style_string = "";
+                            if (card_data_split.length > 5) {
+                                if (rotation === "") {
+                                    style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                } else {
+                                    style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                }
+                            }
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             if (damage === "0") {
                                 full_string += `</div>`
                             } else {
@@ -278,10 +295,27 @@
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             var rotation = "";
+                            var full_string = `<div class="Card-div">`;
                             if (is_ready === "E") {
                                 rotation = " style='transform:rotate(90deg);'";
                             }
-                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            for (var j = 5; j < card_data_split.length; j++) {
+                                console.log(card_data_split[j]);
+                                var attachment_string_id = (j-5).toString();
+                                attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
+                                var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
+                                var attachment_rotation = "";
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            }
+                            var style_string = "";
+                            if (card_data_split.length > 5) {
+                                if (rotation === "") {
+                                    style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                } else {
+                                    style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                }
+                            }
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             if (damage === "0") {
                                 full_string += `</div>`
                             } else {

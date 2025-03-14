@@ -69,7 +69,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
-        self.headquarters.append(FindCard.find_card(deck_list[0], self.card_array))
+        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array)))
         self.deck = deck_list[1:]
         self.shuffle_deck()
         self.deck_loaded = True
@@ -135,6 +135,16 @@ class Player:
                         single_card_string += "B|"
                     else:
                         single_card_string += "H|"
+                else:
+                    single_card_string += "H|"
+                if current_card.aiming_reticle_color is not None:
+                    single_card_string += current_card.aiming_reticle_color
+                attachments_list = current_card.get_attachments()
+                for a in range(len(attachments_list)):
+                    print("Adding attachments")
+                    print(attachments_list[a].get_name())
+                    single_card_string += "|"
+                    single_card_string += attachments_list[a].get_name()
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
