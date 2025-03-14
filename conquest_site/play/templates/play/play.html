@@ -235,94 +235,49 @@
                         document.getElementById(target_planet_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "HQ") {
-                    if (split_data[2] === "1") {
-                        document.getElementById('headquarters-player-1').innerHTML = ``
-                        for (var i = 3; i < split_data.length; i++) {
-                            var card_data_split = split_data[i].split("|");
-                            var card_name = card_data_split[0];
-                            var is_ready = card_data_split[1];
-                            var damage = card_data_split[2];
-                            var hale = card_data_split[3];
-                            var string_id = (i-3).toString();
-                            string_id = "HQ/1/" + string_id;
-                            card_name = card_name.split(' ').join('_');
-                            if (hale === "B") {
-                                card_name += "_bloodied";
-                            }
-                            var route_text = "/static/images/" + card_name + ".jpg";
-                            var rotation = "";
-                            var full_string = `<div class="Card-div">`;
-                            if (is_ready === "E") {
-                                rotation = " style='transform:rotate(90deg);'";
-                            }
-                            for (var j = 5; j < card_data_split.length; j++) {
-                                console.log(card_data_split[j]);
-                                var attachment_string_id = (j-5).toString();
-                                attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
-                                var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
-                                var attachment_rotation = "";
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            }
-                            var style_string = "";
-                            if (card_data_split.length > 5) {
-                                if (rotation === "") {
-                                    style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
-                                } else {
-                                    style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
-                                }
-                            }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            if (damage === "0") {
-                                full_string += `</div>`
-                            } else {
-                                full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
-                            }
-                            document.getElementById('headquarters-player-1').innerHTML += full_string;
+                    var target_headquarters = "headquarters-player-" + split_data[2];
+                    document.getElementById(target_headquarters).innerHTML = ``
+                    for (var i = 3; i < split_data.length; i++) {
+                        var card_data_split = split_data[i].split("|");
+                        var card_name = card_data_split[0];
+                        var is_ready = card_data_split[1];
+                        var damage = card_data_split[2];
+                        var hale = card_data_split[3];
+                        var string_id = (i-3).toString();
+                        string_id = "HQ/" + split_data[2] + "/" + string_id;
+                        card_name = card_name.split(' ').join('_');
+                        if (hale === "B") {
+                            card_name += "_bloodied";
                         }
-                    } else if (split_data[2] === "2") {
-                        document.getElementById('headquarters-player-2').innerHTML = ``
-                        for (var i = 3; i < split_data.length; i++) {
-                            var card_data_split = split_data[i].split("|");
-                            var card_name = card_data_split[0];
-                            var is_ready = card_data_split[1];
-                            var damage = card_data_split[2];
-                            var hale = card_data_split[3];
-                            var string_id = (i-3).toString();
-                            string_id = "HQ/2/" + string_id;
-                            if (hale === "B") {
-                                card_name += "_bloodied";
-                            }
-                            card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
-                            var rotation = "";
-                            var full_string = `<div class="Card-div">`;
-                            if (is_ready === "E") {
-                                rotation = " style='transform:rotate(90deg);'";
-                            }
-                            for (var j = 5; j < card_data_split.length; j++) {
-                                console.log(card_data_split[j]);
-                                var attachment_string_id = (j-5).toString();
-                                attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
-                                var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
-                                var attachment_rotation = "";
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            }
-                            var style_string = "";
-                            if (card_data_split.length > 5) {
-                                if (rotation === "") {
-                                    style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
-                                } else {
-                                    style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
-                                }
-                            }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            if (damage === "0") {
-                                full_string += `</div>`
-                            } else {
-                                full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
-                            }
-                            document.getElementById('headquarters-player-2').innerHTML += full_string;
+                        var route_text = "/static/images/" + card_name + ".jpg";
+                        var rotation = "";
+                        var full_string = `<div class="Card-div">`;
+                        if (is_ready === "E") {
+                            rotation = " style='transform:rotate(90deg);'";
                         }
+                        for (var j = 5; j < card_data_split.length; j++) {
+                            console.log(card_data_split[j]);
+                            var attachment_string_id = (j-5).toString();
+                            attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
+                            var attachment_route_text = "/static/images/" + card_data_split[j].split(' ').join('_') + ".jpg";
+                            var attachment_rotation = "";
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        }
+                        var style_string = "";
+                        if (card_data_split.length > 5) {
+                            if (rotation === "") {
+                                style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                            } else {
+                                style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                            }
+                        }
+                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        if (damage === "0") {
+                            full_string += `</div>`
+                        } else {
+                            full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
+                        }
+                        document.getElementById(target_headquarters).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
