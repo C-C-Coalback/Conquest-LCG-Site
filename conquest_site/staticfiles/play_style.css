@@ -272,6 +272,27 @@ h4 {
     left: 5vw;
 }
 
+#test-collapse {
+    position: absolute;
+    right: 0;
+    top: 30vh;
+    border: 5px solid red;
+    max-width: 20vw;
+    overflow-y:hidden;
+    overflow-x:scroll;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+summary::-webkit-details-marker {
+  color: blue;
+}
+summary:focus {
+  outline-style: none;
+}
+
 #current-discard-player-1 {
     position:absolute;
     top:0;
@@ -325,7 +346,7 @@ h4 {
     max-width: 10vw;
     height: 10vh;
     max-height: 10vh;
-    top: 43%;
+    top: 53%;
     border: 5px solid blue;
     right: 0;
     margin: auto;
