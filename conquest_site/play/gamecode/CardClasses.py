@@ -33,6 +33,19 @@ class Card:
         self.bloodied = False
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
         self.limited = limited
+        self.counter = 0
+
+    def get_counter(self):
+        return self.counter
+
+    def set_counter(self, new_val):
+        self.counter = new_val
+
+    def increment_counter(self):
+        self.counter += 1
+
+    def decrement_counter(self):
+        self.counter -= 1
 
     def get_limited(self):
         return self.limited

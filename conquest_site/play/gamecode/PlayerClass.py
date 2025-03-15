@@ -316,6 +316,9 @@ class Player:
 
     def add_to_hq(self, card_object):
         self.headquarters.append(copy.deepcopy(card_object))
+        last_element_index = len(self.headquarters) - 1
+        if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
+            self.headquarters[last_element_index].set_counter(4)
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):
