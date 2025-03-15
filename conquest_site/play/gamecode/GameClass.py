@@ -58,6 +58,7 @@ class Game:
         self.planet_of_damaged_unit = None
         self.position_of_damaged_unit = None
         self.damage_on_unit_before_new_damage = None
+        self.damage_on_units_list_before_new_damage = []
         self.mode = "Normal"
         self.stored_mode = self.mode
         self.condition_main_game = threading.Condition()
@@ -598,7 +599,7 @@ class Game:
                     if name == self.player_with_combat_turn:
                         chosen_planet = int(game_update_string[1])
                         if chosen_planet == self.last_planet_checked_for_battle:
-                            if self.attacker_position != -1:
+                            if self.attacker_position != -1 and self.defender_position == -1:
                                 if self.number_with_combat_turn == "1":
                                     primary_player = self.p1
                                     secondary_player = self.p2
@@ -609,6 +610,10 @@ class Game:
                                     self.attacker_position].get_area_effect()
                                 if amount_aoe > 0:
                                     print("Player needs to suffer area effect (", str(amount_aoe), ")")
+                                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                                        self.damage_on_units_list_before_new_damage.append(secondary_player.
+                                                                                           get_damage_given_pos
+                                                                                           (chosen_planet, i))
                                     secondary_player.suffer_area_effect(chosen_planet, amount_aoe)
                                     self.number_of_units_left_to_suffer_damage = \
                                         secondary_player.get_number_of_units_at_planet(chosen_planet)
@@ -622,7 +627,7 @@ class Game:
                                     self.next_unit_to_suffer_damage = 0
                                     self.defender_position = self.next_unit_to_suffer_damage
                                     self.defender_planet = chosen_planet
-                                    self.damage_on_unit_before_new_damage = amount_aoe
+                                    self.damage_on_unit_before_new_damage = -1
                                     await self.send_info_box()
                                     await secondary_player.send_units_at_planet(chosen_planet)
         elif len(game_update_string) == 3:
@@ -992,9 +997,9 @@ class Game:
 
     def add_resources_to_opponent(self, number, amount):
         self.resources_need_sending_outside_normal_sends = True
-        if number == 1:
+        if int(number) == 1:
             self.p2.add_resources(amount)
-        elif number == 2:
+        elif int(number) == 2:
             self.p1.add_resources(amount)
 
     def discard_card_at_random_from_opponent(self, number):
@@ -1012,7 +1017,6 @@ class Game:
             self.p1.discard_card_at_random()
 
     async def resolve_shield_of_unit_from_attack(self, name, hand_pos):
-        unit_dead = False
         print("Info shielding:", self.defender_planet, self.defender_position)
         if name == self.name_1:
             primary_player = self.p1
@@ -1030,10 +1034,14 @@ class Game:
         amount_to_shield = shield_on_card
         primary_player.remove_damage_from_pos(self.defender_planet, self.defender_position,
                                               amount_to_shield)
+        if self.damage_on_units_list_before_new_damage:
+            self.damage_on_unit_before_new_damage = self.damage_on_units_list_before_new_damage[0]
+            del self.damage_on_units_list_before_new_damage[0]
         if primary_player.get_damage_given_pos(self.defender_planet, self.defender_position) < \
                 self.damage_on_unit_before_new_damage:
             primary_player.set_damage_given_pos(self.defender_planet, self.defender_position,
                                                 self.damage_on_unit_before_new_damage)
+        """
         if primary_player.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
             unit_dead = True
             primary_player.destroy_card_in_play(self.defender_planet, self.defender_position)
@@ -1049,18 +1057,38 @@ class Game:
                 primary_player.warlord_just_got_bloodied = False
                 await primary_player.send_hq()
             await primary_player.send_discard()
+        """
         self.number_of_units_left_to_suffer_damage -= 1
 
         if self.number_of_units_left_to_suffer_damage <= 0:
+            i = 0
+            while i < len(primary_player.cards_in_play[self.defender_planet + 1]):
+                unit_dead = primary_player.check_if_card_is_destroyed(self.defender_planet, i)
+                if unit_dead:
+                    primary_player.destroy_card_in_play(self.defender_planet, i)
+                    if self.resources_need_sending_outside_normal_sends:
+                        await primary_player.send_resources()
+                        await secondary_player.send_resources()
+                        self.resources_need_sending_outside_normal_sends = False
+                    if self.cards_need_sending_outside_normal_sends:
+                        await primary_player.send_hand()
+                        await secondary_player.send_hand()
+                        self.cards_need_sending_outside_normal_sends = False
+                    if primary_player.warlord_just_got_bloodied:
+                        primary_player.warlord_just_got_bloodied = False
+                        await primary_player.send_hq()
+                    await primary_player.send_discard()
+                    i = i - 1
+                i = i + 1
             self.number_of_units_left_to_suffer_damage = 0
             self.number_with_combat_turn = primary_player.get_number()
             self.player_with_combat_turn = primary_player.get_name_player()
             secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
             self.reset_shielding_values()
             self.mode = "Normal"
+            self.actions_allowed = True
         else:
-            if not unit_dead:
-                self.next_unit_to_suffer_damage += 1
+            self.next_unit_to_suffer_damage += 1
             self.defender_position = self.next_unit_to_suffer_damage
             primary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
 
@@ -1149,6 +1177,7 @@ class Game:
             self.number_with_combat_turn = "2"
 
     def automated_headquarters_phase(self):
+        self.actions_allowed = True
         self.p1.add_resources(4)
         self.p2.add_resources(4)
         self.p1.draw_card()

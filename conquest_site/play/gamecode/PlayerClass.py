@@ -771,6 +771,7 @@ class Player:
                                                                            bloodied_relevant=True)
             if cato_check:
                 self.game.add_resources_to_opponent(self.number, 1)
+                self.game.resources_need_sending_outside_normal_sends = True
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
                 self.summon_token_at_planet("Guardsman", planet_num)
             self.add_card_in_play_to_discard(planet_num, card_pos)
