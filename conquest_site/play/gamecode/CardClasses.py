@@ -265,6 +265,8 @@ class UnitCard(Card):
         attack = self.attack
         for i in range(len(self.attachments)):
             attack += self.attachments[i].get_extra_attack()
+        if self.get_ability() == "Fire Warrior Strike Team":
+            attack += len(self.attachments)
         return attack
 
     def get_health(self):
