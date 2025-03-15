@@ -28,7 +28,9 @@ def eldar_cards_init():
                                               "Common", 2, 2, 2, False, ranged=True),
                          CardClasses.ArmyCard("Eldar Survivalist", "+1 resource and +1 card when command struggle"
                                                                    "is won at this planet."
-                                              , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False),
+                                              , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False,
+                                              additional_resources_command_struggle=1,
+                                              additional_cards_command_struggle=1),
                          CardClasses.ArmyCard("Wildrider Squadron", "No Wargear Attachments.\n"
                                                                     "Combat Action: Move this unit to an adjacent"
                                                                     " planet. (Limit once per phase.)",

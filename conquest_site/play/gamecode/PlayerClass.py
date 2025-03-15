@@ -513,6 +513,14 @@ class Player:
                 counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         return counted_command
 
+    def get_bonus_winnings_at_planet(self, planet_id):
+        extra_resources = 0
+        extra_cards = 0
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            extra_resources += self.cards_in_play[planet_id + 1][i].get_additional_resources_command_struggle()
+            extra_cards += self.cards_in_play[planet_id + 1][i].get_additional_cards_command_struggle()
+        return extra_resources, extra_cards
+
     def check_for_warlord(self, planet_id):
         print("Looking for warlord at:", self.cards_in_play[0][planet_id])
         if not self.cards_in_play[planet_id + 1]:

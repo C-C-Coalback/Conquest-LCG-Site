@@ -8,11 +8,11 @@ def neutral_cards_init():
                                                 "Common", 1, False, ""),
                           CardClasses.ArmyCard("Void Pirate", "+1 card when command struggle won at this planet.",
                                                "Ally.", 1, "Neutral", "Common", 0, 1, 1,
-                                               False, ""),
+                                               False, additional_cards_command_struggle=1),
                           CardClasses.ArmyCard("Rogue Trader", "+1 resource when "
                                                                "command struggle won at this planet.", "Ally.",
                                                1, "Neutral", "Common", 0, 1, 1,
-                                               False, ""),
+                                               False, additional_resources_command_struggle=1),
                           CardClasses.EventCard("Fall Back!", "Reaction: After an Elite unit is destroyed, "
                                                               "put it into play from your discard pile at your HQ.",
                                                 "Tactic.", 1, "Neutral", "Common", 1,

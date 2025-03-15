@@ -1227,6 +1227,9 @@ class Game:
             chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
             resources_won = chosen_planet.get_resources()
             cards_won = chosen_planet.get_cards()
+            extra_resources, extra_cards = self.p1.get_bonus_winnings_at_planet(planet_id)
+            resources_won += extra_resources
+            cards_won += extra_cards
             ret_val = ["1", resources_won, cards_won]
             if self.p1.search_card_in_hq("Omega Zero Command"):
                 self.p1.summon_token_at_planet("Guardsman", planet_id)
@@ -1236,6 +1239,9 @@ class Game:
             chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
             resources_won = chosen_planet.get_resources()
             cards_won = chosen_planet.get_cards()
+            extra_resources, extra_cards = self.p2.get_bonus_winnings_at_planet(planet_id)
+            resources_won += extra_resources
+            cards_won += extra_cards
             ret_val = ["2", resources_won, cards_won]
             if self.p2.search_card_in_hq("Omega Zero Command"):
                 self.p2.summon_token_at_planet("Guardsman", planet_id)
