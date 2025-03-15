@@ -910,41 +910,52 @@ class Game:
                                     await secondary_player.send_hand()
                                     await primary_player.send_units_at_planet(int(game_update_string[2]))
 
+    def validate_received_game_string(self, game_update_string):
+        if len(game_update_string) == 1 or len(game_update_string) == 2:
+            return True
+        if len(game_update_string) == 3:
+            if game_update_string[0] == "HQ":
+                if game_update_string[1] == "1":
+                    if len(self.p1.headquarters) > int(game_update_string[2]):
+                        return True
+                elif game_update_string[1] == "2":
+                    if len(self.p2.headquarters) > int(game_update_string[2]):
+                        return True
+            elif game_update_string[0] == "HAND":
+                if game_update_string[1] == "1":
+                    if len(self.p1.cards) > int(game_update_string[2]):
+                        return True
+                elif game_update_string[1] == "2":
+                    if len(self.p2.cards) > int(game_update_string[2]):
+                        return True
+        if len(game_update_string) == 4:
+            if game_update_string[0] == "ATTACHMENT":
+                print("Attachment selecting not supported")
+            elif game_update_string[0] == "IN_PLAY":
+                if game_update_string[1] == "1":
+                    if len(self.p1.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
+                        return True
+                elif game_update_string[1] == "2":
+                    if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
+                        return True
+        if len(game_update_string) == 5:
+            print("Attachment selecting not supported")
+        print("Bad string")
+        return False
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
-        # if self.phase == "DEPLOY" and self.mode == "SHIELD":
-        #     await self.shield_card_during_deploy(name, game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
-        # elif len(game_update_string) == 1:
-        #     if game_update_string[0] == "action-button":
-        #         if self.actions_allowed and self.mode != "ACTION":
-        #             print("Need to run action code")
-        #             if self.phase == "DEPLOY":
-        #                 if self.player_with_deploy_turn == name:
-        #                     self.stored_mode = self.mode
-        #                     self.mode = "ACTION"
-        #                     self.player_with_action = name
-        #                     print("Special deploy action")
-        #                     await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-        #             else:
-        #                 self.stored_mode = self.mode
-        #                 self.mode = "ACTION"
-        #                 self.player_with_action = name
-        #                 print("Special action")
-        #                 await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-        #             may_try_action = False
-        #     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-        #         if self.phase == "DEPLOY":
-        #             if name == self.player_with_deploy_turn:
-        #                 await self.update_game_event_deploy_section(name, game_update_string)
-        elif self.phase == "DEPLOY":
-            await self.update_game_event_deploy_section(name, game_update_string)
-        elif self.phase == "COMMAND":
-            await self.update_game_event_command_section(name, game_update_string)
-        elif self.phase == "COMBAT":
-            await self.update_game_event_combat_section(name, game_update_string)
+        if self.validate_received_game_string(game_update_string):
+            print("String validated as ok")
+            if self.phase == "DEPLOY":
+                await self.update_game_event_deploy_section(name, game_update_string)
+            elif self.phase == "COMMAND":
+                await self.update_game_event_command_section(name, game_update_string)
+            elif self.phase == "COMBAT":
+                await self.update_game_event_combat_section(name, game_update_string)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
