@@ -84,6 +84,8 @@ class Game:
         self.damage_left_to_take = 0
         self.positions_of_units_to_take_damage = []
         self.card_type_of_selected_card_in_hand = ""
+        self.cards_in_search_box = []
+        self.name_player_who_is_searching = "alex"
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -99,8 +101,18 @@ class Game:
         await self.p1.send_discard()
         await self.p2.send_discard()
         await self.send_info_box()
+        await self.send_search()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
+
+    async def send_search(self):
+        if self.cards_in_search_box and self.name_player_who_is_searching:
+            card_string = "/".join(self.cards_in_search_box)
+            card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/" + card_string
+            await self.game_sockets[0].receive_game_update(card_string)
+        else:
+            card_string = "GAME_INFO/SEARCH/"
+            await self.game_sockets[0].receive_game_update(card_string)
 
     async def send_info_box(self):
         info_string = "GAME_INFO/INFO_BOX/"
