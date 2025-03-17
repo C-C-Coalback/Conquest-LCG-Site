@@ -1097,6 +1097,48 @@ class Game:
         self.player_resolving_battle_ability = ""
         self.number_resolving_battle_ability = -1
 
+    async def resolve_battle_conclusion(self, name, game_string):
+        if name == self.name_2:
+            winner = self.p2
+        else:
+            winner = self.p1
+        if self.round_number == self.last_planet_checked_for_battle:
+            winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
+            await winner.send_hq()
+            await winner.send_units_at_planet(self.last_planet_checked_for_battle)
+            winner.capture_planet(self.last_planet_checked_for_battle,
+                                  self.planet_cards_array)
+            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+            await winner.send_victory_display()
+        self.planet_aiming_reticle_active = False
+        self.planet_aiming_reticle_position = -1
+        another_battle = self.find_next_planet_for_combat()
+        if another_battle:
+            self.set_battle_initiative()
+            self.p1.has_passed = False
+            self.p2.has_passed = False
+            self.mode = "Normal"
+            self.planet_aiming_reticle_active = True
+            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            await self.send_planet_array()
+            await self.send_info_box()
+        else:
+            self.phase = "HEADQUARTERS"
+            self.automated_headquarters_phase()
+            self.reset_values_for_new_round()
+            await self.p1.send_hq()
+            await self.p1.send_units_at_all_planets()
+            await self.p1.send_resources()
+            await self.p1.send_hand()
+            await self.p2.send_hq()
+            await self.p2.send_units_at_all_planets()
+            await self.p2.send_resources()
+            await self.p2.send_hand()
+            await self.send_planet_array()
+            await self.send_info_box()
+        self.reset_battle_resolve_attributes()
+        self.reset_choices_available()
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_player_making_choices:
             if len(game_update_string) == 2:
@@ -1104,48 +1146,26 @@ class Game:
                     if self.choice_context == "Resolve Battle Ability?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             print("Wants to resolve battle ability")
-                        elif self.choices_available[int(game_update_string[1])] == "No":
-                            print("Does not want to resolve battle ability")
                             if name == self.name_2:
                                 winner = self.p2
+                                loser = self.p1
                             else:
                                 winner = self.p1
-                            if self.round_number == self.last_planet_checked_for_battle:
-                                winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
-                                await winner.send_hq()
-                                await winner.send_units_at_planet(self.last_planet_checked_for_battle)
-                                winner.capture_planet(self.last_planet_checked_for_battle,
-                                                      self.planet_cards_array)
-                                self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                                await winner.send_victory_display()
-                            self.planet_aiming_reticle_active = False
-                            self.planet_aiming_reticle_position = -1
-                            another_battle = self.find_next_planet_for_combat()
-                            if another_battle:
-                                self.set_battle_initiative()
-                                self.p1.has_passed = False
-                                self.p2.has_passed = False
-                                self.mode = "Normal"
-                                self.planet_aiming_reticle_active = True
-                                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                                await self.send_planet_array()
-                                await self.send_info_box()
-                            else:
-                                self.phase = "HEADQUARTERS"
-                                self.automated_headquarters_phase()
-                                self.reset_values_for_new_round()
-                                await self.p1.send_hq()
-                                await self.p1.send_units_at_all_planets()
-                                await self.p1.send_resources()
-                                await self.p1.send_hand()
-                                await self.p2.send_hq()
-                                await self.p2.send_units_at_all_planets()
-                                await self.p2.send_resources()
-                                await self.p2.send_hand()
-                                await self.send_planet_array()
-                                await self.send_info_box()
-                            self.reset_battle_resolve_attributes()
-                            self.reset_choices_available()
+                                loser = self.p2
+                            if self.battle_ability_to_resolve == "Osus IV":
+                                if loser.spend_resources(1):
+                                    winner.add_resources(1)
+                                    await winner.send_resources()
+                                    await loser.send_resources()
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                            elif self.battle_ability_to_resolve == "Barlus":
+                                loser.discard_card_at_random()
+                                await loser.send_hand()
+                                await loser.send_discard()
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                        elif self.choices_available[int(game_update_string[1])] == "No":
+                            print("Does not want to resolve battle ability")
+                            await self.resolve_battle_conclusion(name, game_update_string)
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
