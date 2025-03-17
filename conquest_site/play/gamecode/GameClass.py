@@ -1,3 +1,5 @@
+import copy
+
 from . import PlayerClass
 import random
 from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
@@ -35,7 +37,10 @@ class Game:
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
-        self.planet_array = ["Barlus", "Osus IV", "Ferrin", "Elouith", "Iridial", "Y'varn", "Atrox Prime"]
+        self.planet_array = []
+        for i in range(7):
+            self.planet_array.append(self.planet_cards_array[i].get_name())
+        random.shuffle(self.planet_array)
         self.planets_in_play_array = [True, True, True, True, True, False, False]
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
