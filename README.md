@@ -5,26 +5,8 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 I should really get a better name for this section.
 
-Have been doing some thinking. Currently, the attack/defend and 
-shielding systems are pretty terrible. I have a new, better idea 
-for how to handle them.
-
-- Unit is declared as an attacker. 
-- Unit is declared as a defender/aoe.
-- Damage is dealt to all units that need to be damaged. Each time
-a unit is damaged, an internal value is set to say how much damage
-they took, and that they need to be shielded. Likely use a list
-to keep track of the individual instances of damage.
-- Shielding mode. The player can shield/not shield each damage.
-- After all units have had their shielding states resolved,
-we proceed to unit destruction. Each unit is checked to see if it
-has been destroyed. If yes, destroy. If this causes an interrupt,
-pause unit destruction and resume after the interrupt.
-- Once all unit destruction checks have been performed, continue
-to the turn/action/whatever of the next player.
-
-This will take considerable effort to implement. However,
-it is nescessary for the long-term health of the game.
+50% of all core cards have been implemented. Unfortunately, 
+they are not going to get easier.
 
 # What is this?
 

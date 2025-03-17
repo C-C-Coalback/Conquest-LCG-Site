@@ -74,6 +74,7 @@ class Game:
         self.next_unit_to_suffer_damage = -1
         self.resources_need_sending_outside_normal_sends = False
         self.cards_need_sending_outside_normal_sends = False
+        self.hqs_need_sending_outside_normal_sends = False
         self.actions_allowed = True
         self.player_with_action = ""
         self.action_chosen = ""
@@ -1261,6 +1262,13 @@ class Game:
         elif int(number) == 2:
             self.p1.add_resources(amount)
 
+    def summon_enemy_token_at_hq(self, number, token_name, amount):
+        self.hqs_need_sending_outside_normal_sends = True
+        if int(number) == 1:
+            self.p2.summon_token_at_hq(token_name, amount)
+        elif int(number) == 2:
+            self.p1.summon_token_at_hq(token_name, amount)
+
     def discard_card_at_random_from_opponent(self, number):
         print("\nGot to discard at random request\n")
         number = int(number)
@@ -1308,6 +1316,10 @@ class Game:
                 unit_dead = primary_player.check_if_card_is_destroyed(self.defender_planet, i)
                 if unit_dead:
                     primary_player.destroy_card_in_play(self.defender_planet, i)
+                    if self.hqs_need_sending_outside_normal_sends:
+                        await primary_player.send_hq()
+                        await secondary_player.send_hq()
+                        self.hqs_need_sending_outside_normal_sends = False
                     if self.resources_need_sending_outside_normal_sends:
                         await primary_player.send_resources()
                         await secondary_player.send_resources()
