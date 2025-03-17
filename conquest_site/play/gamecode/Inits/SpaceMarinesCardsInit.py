@@ -11,7 +11,7 @@ def space_marines_cards_init():
                                                         ["1x Cato's Stronghold", "1x Tallassarian Tempest Blade",
                                                          "2x The Fury of Sicarius", "4x Sicarius's Chosen"]
                                                         ),
-                                CardClasses.ArmyCard("Sicaruis's Chosen", "Reaction: After this unit enters play, "
+                                CardClasses.ArmyCard("Sicarius's Chosen", "Reaction: After this unit enters play, "
                                                                           "move a target enemy army unit at an "
                                                                           "adjacent planet to this planet "
                                                                           "and deal it 1 damage.",

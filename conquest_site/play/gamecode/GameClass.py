@@ -733,56 +733,70 @@ class Game:
                                 secondary_player = self.p1
                             attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
-                            if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                    self.attacker_position) == "Starbane's Council":
-                                if not secondary_player.get_ready_given_pos(self.defender_planet,
-                                                                            self.defender_position):
-                                    attack_value += 2
-                            if attack_value > 0:
-                                att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
-                                                                                 self.attacker_position)
-                                def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
-                                                                                   self.defender_position)
-                                att_ignores_flying = primary_player.get_ignores_flying_given_pos(self.attacker_planet,
-                                                                                                 self.attacker_position)
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                                        == "Silvered Blade Avengers":
-                                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
-                                            .get_card_type() != "Warlord":
-                                        secondary_player.exhaust_given_pos(self.defender_planet, self.defender_position)
-                                # Flying check
-                                if def_flying and not att_flying and not att_ignores_flying:
-                                    attack_value = attack_value / 2 + (attack_value % 2 > 0)
-                                self.damage_on_unit_before_new_damage = \
-                                    secondary_player.get_damage_given_pos(self.defender_planet, self.defender_position)
-                                unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
-                                                                                  self.defender_position,
-                                                                                  damage=attack_value)
-                                armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                         self.attacker_position)
-                                self.mode = "SHIELD"
-                                self.player_who_is_shielding = secondary_player.get_name_player()
-                                self.number_who_is_shielding = secondary_player.get_number()
-                                self.planet_of_damaged_unit = self.defender_planet
-                                self.position_of_damaged_unit = self.defender_position
-                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                            self.defender_position, "red")
-                                if armorbane_check and attack_value > 0:
-                                    await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
-                            else:
-                                primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
-                                                                            self.attacker_position)
+                            can_continue = True
+                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                                    .get_ability() == "Honored Librarian":
+                                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                    if secondary_player.cards_in_play[self.defender_planet + 1][i]\
+                                            .get_ability() != "Honored Librarian":
+                                        can_continue = False
+                            if can_continue:
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) == "Starbane's Council":
+                                    if not secondary_player.get_ready_given_pos(self.defender_planet,
+                                                                                self.defender_position):
+                                        attack_value += 2
+                                if attack_value > 0:
+                                    att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
+                                                                                     self.attacker_position)
+                                    def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                                       self.defender_position)
+                                    att_ignores_flying = primary_player.get_ignores_flying_given_pos(
+                                        self.attacker_planet, self.attacker_position)
+                                    if primary_player.get_ability_given_pos(
+                                            self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
+                                        if secondary_player.cards_in_play[
+                                            self.defender_planet + 1][self.defender_position]\
+                                                .get_card_type() != "Warlord":
+                                            secondary_player.exhaust_given_pos(self.defender_planet,
+                                                                               self.defender_position)
+                                    # Flying check
+                                    if def_flying and not att_flying and not att_ignores_flying:
+                                        attack_value = attack_value / 2 + (attack_value % 2 > 0)
+                                    self.damage_on_unit_before_new_damage = \
+                                        secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                              self.defender_position)
+                                    unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
+                                                                                      self.defender_position,
+                                                                                      damage=attack_value)
+                                    armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                             self.attacker_position)
+                                    self.mode = "SHIELD"
+                                    self.player_who_is_shielding = secondary_player.get_name_player()
+                                    self.number_who_is_shielding = secondary_player.get_number()
+                                    self.planet_of_damaged_unit = self.defender_planet
+                                    self.position_of_damaged_unit = self.defender_position
+                                    secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                self.defender_position, "red")
+                                    if armorbane_check and attack_value > 0:
+                                        await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
+                                else:
+                                    primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                                self.attacker_position)
 
-                                await primary_player.send_units_at_planet(self.attacker_planet)
-                            if not armorbane_check or attack_value < 1:
-                                await secondary_player.send_units_at_planet(self.defender_planet)
-                            if attack_value < 1:
-                                self.reset_combat_positions()
-                                self.number_with_combat_turn = secondary_player.get_number()
-                                self.player_with_combat_turn = secondary_player.get_name_player()
-                                name = secondary_player.get_name_player()
-                            if not armorbane_check or attack_value < 1:
-                                await self.send_info_box()
+                                    await primary_player.send_units_at_planet(self.attacker_planet)
+                                if not armorbane_check or attack_value < 1:
+                                    await secondary_player.send_units_at_planet(self.defender_planet)
+                                if attack_value < 1:
+                                    self.reset_combat_positions()
+                                    self.number_with_combat_turn = secondary_player.get_number()
+                                    self.player_with_combat_turn = secondary_player.get_name_player()
+                                    name = secondary_player.get_name_player()
+                                if not armorbane_check or attack_value < 1:
+                                    await self.send_info_box()
+                            else:
+                                self.defender_planet = -1
+                                self.defender_position = -1
 
     async def update_game_event_deploy_action_hand(self, name, game_update_string):
         print("Deploy special action, card in hand at pos", game_update_string[2])
