@@ -65,6 +65,7 @@ class Player:
         self.aiming_reticle_color = None
         self.aiming_reticle_coords_hand = None
         self.can_play_limited = True
+        self.number_cards_to_search = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -263,6 +264,17 @@ class Player:
             self.cards.append(self.deck[0])
             del self.deck[0]
 
+    def draw_card_at_location_deck(self, position):
+        if not self.deck:
+            print("Deck is empty, you lose!")
+        else:
+            if len(self.deck) > position:
+                self.cards.append(self.deck[position])
+                del self.deck[position]
+
+    def bottom_remaining_cards(self):
+        self.deck = self.deck[self.number_cards_to_search:] + self.deck[:self.number_cards_to_search]
+
     def spend_resources(self, amount):
         if amount > self.resources:
             return False
@@ -319,6 +331,12 @@ class Player:
         last_element_index = len(self.headquarters) - 1
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
+        elif self.headquarters[last_element_index].get_ability() == "Swordwind Farseer":
+            if len(self.deck) > 5:
+                self.number_cards_to_search = 6
+                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
+                self.game.name_player_who_is_searching = self.name_player
+                self.game.number_who_is_searching = str(self.number)
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):
@@ -396,6 +414,13 @@ class Player:
 
     def add_card_to_planet(self, card, position):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
+        last_element_index = len(self.cards_in_play[position + 1]) - 1
+        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
+            if len(self.deck) > 5:
+                self.number_cards_to_search = 6
+                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
+                self.game.name_player_who_is_searching = self.name_player
+                self.game.number_who_is_searching = str(self.number)
 
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         if card is None and position_hand is None:

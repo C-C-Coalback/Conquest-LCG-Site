@@ -86,6 +86,8 @@ class Game:
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = "alex"
+        self.number_who_is_searching = "1"
+        self.what_to_do_with_searched_card = "DRAW"
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -928,8 +930,14 @@ class Game:
                                     await primary_player.send_units_at_planet(int(game_update_string[2]))
 
     def validate_received_game_string(self, game_update_string):
-        if len(game_update_string) == 1 or len(game_update_string) == 2:
+        if len(game_update_string) == 1:
             return True
+        if len(game_update_string) == 2:
+            if game_update_string[0] == "SEARCH":
+                if len(self.cards_in_search_box) > int(game_update_string[1]):
+                    return True
+            if game_update_string[0] == "PLANETS":
+                return True
         if len(game_update_string) == 3:
             if game_update_string[0] == "HQ":
                 if game_update_string[1] == "1":
@@ -960,6 +968,23 @@ class Game:
         print("Bad string")
         return False
 
+    async def resolve_card_in_search_box(self, name, game_update_string):
+        if name == self.name_player_who_is_searching:
+            if len(game_update_string) == 2:
+                if game_update_string[0] == "SEARCH":
+                    if self.what_to_do_with_searched_card == "DRAW":
+                        if self.number_who_is_searching == "1":
+                            self.p1.draw_card_at_location_deck(int(game_update_string[1]))
+                            self.p2.number_cards_to_search -= 1
+                            await self.p1.send_hand()
+                            self.p1.bottom_remaining_cards()
+                        else:
+                            self.p2.draw_card_at_location_deck(int(game_update_string[2]))
+                            self.p2.number_cards_to_search -= 1
+                            await self.p1.send_hand()
+                            self.p2.bottom_remaining_cards()
+                    self.cards_in_search_box = []
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -967,12 +992,19 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         if self.validate_received_game_string(game_update_string):
             print("String validated as ok")
-            if self.phase == "DEPLOY":
+            if self.cards_in_search_box:
+                print("Need to resolve search box")
+                await self.resolve_card_in_search_box(name, game_update_string)
+                if not self.cards_in_search_box:
+                    await self.send_search()
+            elif self.phase == "DEPLOY":
                 await self.update_game_event_deploy_section(name, game_update_string)
             elif self.phase == "COMMAND":
                 await self.update_game_event_command_section(name, game_update_string)
             elif self.phase == "COMBAT":
                 await self.update_game_event_combat_section(name, game_update_string)
+        if self.cards_in_search_box:
+            await self.send_search()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
