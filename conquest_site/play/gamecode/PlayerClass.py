@@ -890,6 +890,10 @@ class Player:
     def add_card_in_play_to_discard(self, planet_num, card_pos):
         card = self.cards_in_play[planet_num + 1][card_pos]
         card_name = card.get_name()
+        if card.get_card_type() == "Army":
+            for i in range(len(self.cards_in_play[planet_num + 1])):
+                if self.cards_in_play[planet_num + 1][i].get_ability() == "Cadian Mortar Squad":
+                    self.ready_given_pos(planet_num, i)
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                 self.draw_card()
