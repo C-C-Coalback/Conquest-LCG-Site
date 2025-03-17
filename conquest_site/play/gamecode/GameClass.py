@@ -88,6 +88,11 @@ class Game:
         self.name_player_who_is_searching = "alex"
         self.number_who_is_searching = "1"
         self.what_to_do_with_searched_card = "DRAW"
+        self.traits_of_searched_card = None
+        self.card_type_of_searched_card = None
+        self.faction_of_searched_card = None
+        self.all_conditions_searched_card_required = False
+        self.no_restrictions_on_chosen_card = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -973,6 +978,39 @@ class Game:
         print("Bad string")
         return False
 
+    def check_if_card_searched_satisfies_conditions(self, card):
+        if not self.all_conditions_searched_card_required:
+            if self.faction_of_searched_card is not None:
+                if card.get_faction() == self.faction_of_searched_card:
+                    return True
+            if self.card_type_of_searched_card is not None:
+                if card.get_card_type() == self.card_type_of_searched_card:
+                    return True
+            if self.traits_of_searched_card is not None:
+                if self.traits_of_searched_card in card.get_traits():
+                    return True
+            return False
+        else:
+            if self.faction_of_searched_card is not None:
+                if card.get_faction() != self.faction_of_searched_card:
+                    return False
+            if self.card_type_of_searched_card is not None:
+                if card.get_card_type() != self.card_type_of_searched_card:
+                    return False
+            if self.traits_of_searched_card is not None:
+                if self.traits_of_searched_card not in card.get_traits():
+                    return False
+            return True
+
+    def reset_search_values(self):
+        self.what_to_do_with_searched_card = "DRAW"
+        self.traits_of_searched_card = None
+        self.card_type_of_searched_card = None
+        self.faction_of_searched_card = None
+        self.all_conditions_searched_card_required = False
+        self.no_restrictions_on_chosen_card = False
+        self.cards_in_search_box = []
+
     async def resolve_card_in_search_box(self, name, game_update_string):
         if name == self.name_player_who_is_searching:
             if len(game_update_string) == 1:
@@ -986,16 +1024,29 @@ class Game:
                 if game_update_string[0] == "SEARCH":
                     if self.what_to_do_with_searched_card == "DRAW":
                         if self.number_who_is_searching == "1":
-                            self.p1.draw_card_at_location_deck(int(game_update_string[1]))
-                            self.p2.number_cards_to_search -= 1
-                            await self.p1.send_hand()
-                            self.p1.bottom_remaining_cards()
+                            valid_card = True
+                            if not self.no_restrictions_on_chosen_card:
+                                card_chosen = FindCard.find_card(self.p1.deck[int(game_update_string[1])],
+                                                                 self.card_array)
+                                valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                            if valid_card:
+                                self.p1.draw_card_at_location_deck(int(game_update_string[1]))
+                                self.p2.number_cards_to_search -= 1
+                                await self.p1.send_hand()
+                                self.p1.bottom_remaining_cards()
+                                self.reset_search_values()
                         else:
-                            self.p2.draw_card_at_location_deck(int(game_update_string[2]))
-                            self.p2.number_cards_to_search -= 1
-                            await self.p1.send_hand()
-                            self.p2.bottom_remaining_cards()
-                    self.cards_in_search_box = []
+                            valid_card = True
+                            if not self.no_restrictions_on_chosen_card:
+                                card_chosen = FindCard.find_card(self.p2.deck[int(game_update_string[1])],
+                                                                 self.card_array)
+                                valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                            if valid_card:
+                                self.p2.draw_card_at_location_deck(int(game_update_string[2]))
+                                self.p2.number_cards_to_search -= 1
+                                await self.p1.send_hand()
+                                self.p2.bottom_remaining_cards()
+                                self.reset_search_values()
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -1097,23 +1148,6 @@ class Game:
                 self.damage_on_unit_before_new_damage:
             primary_player.set_damage_given_pos(self.defender_planet, self.defender_position,
                                                 self.damage_on_unit_before_new_damage)
-        """
-        if primary_player.check_if_card_is_destroyed(self.defender_planet, self.defender_position):
-            unit_dead = True
-            primary_player.destroy_card_in_play(self.defender_planet, self.defender_position)
-            if self.resources_need_sending_outside_normal_sends:
-                await primary_player.send_resources()
-                await secondary_player.send_resources()
-                self.resources_need_sending_outside_normal_sends = False
-            if self.cards_need_sending_outside_normal_sends:
-                await primary_player.send_hand()
-                await secondary_player.send_hand()
-                self.cards_need_sending_outside_normal_sends = False
-            if primary_player.warlord_just_got_bloodied:
-                primary_player.warlord_just_got_bloodied = False
-                await primary_player.send_hq()
-            await primary_player.send_discard()
-        """
         self.number_of_units_left_to_suffer_damage -= 1
 
         if self.number_of_units_left_to_suffer_damage <= 0:

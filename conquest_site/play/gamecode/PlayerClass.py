@@ -337,6 +337,22 @@ class Player:
                 self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
                 self.game.name_player_who_is_searching = self.name_player
                 self.game.number_who_is_searching = str(self.number)
+                self.game.what_to_do_with_searched_card = "DRAW"
+                self.game.traits_of_searched_card = None
+                self.game.card_type_of_searched_card = None
+                self.game.faction_of_searched_card = None
+                self.game.no_restrictions_on_chosen_card = True
+        elif self.headquarters[last_element_index].get_ability() == "Earth Caste Technician":
+            if len(self.deck) > 5:
+                self.number_cards_to_search = 6
+                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
+                self.game.name_player_who_is_searching = self.name_player
+                self.game.number_who_is_searching = str(self.number)
+                self.game.what_to_do_with_searched_card = "DRAW"
+                self.game.traits_of_searched_card = "Drone"
+                self.game.card_type_of_searched_card = "Attachment"
+                self.game.faction_of_searched_card = None
+                self.game.no_restrictions_on_chosen_card = False
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):
@@ -421,6 +437,22 @@ class Player:
                 self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
                 self.game.name_player_who_is_searching = self.name_player
                 self.game.number_who_is_searching = str(self.number)
+                self.game.what_to_do_with_searched_card = "DRAW"
+                self.game.traits_of_searched_card = None
+                self.game.card_type_of_searched_card = None
+                self.game.faction_of_searched_card = None
+                self.game.no_restrictions_on_chosen_card = True
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
+            if len(self.deck) > 5:
+                self.number_cards_to_search = 6
+                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
+                self.game.name_player_who_is_searching = self.name_player
+                self.game.number_who_is_searching = str(self.number)
+                self.game.what_to_do_with_searched_card = "DRAW"
+                self.game.traits_of_searched_card = "Drone"
+                self.game.card_type_of_searched_card = "Attachment"
+                self.game.faction_of_searched_card = None
+                self.game.no_restrictions_on_chosen_card = False
 
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         if card is None and position_hand is None:
