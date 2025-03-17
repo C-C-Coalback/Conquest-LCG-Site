@@ -1,5 +1,4 @@
 import copy
-
 from . import PlayerClass
 import random
 from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
@@ -697,6 +696,7 @@ class Game:
                                     player = self.p1
                                 else:
                                     player = self.p2
+                                player.exhaust_given_pos(chosen_planet, chosen_unit)
                                 player.retreat_unit(chosen_planet, chosen_unit)
                                 await player.send_units_at_planet(self.last_planet_checked_for_battle)
                                 await player.send_hq()
@@ -1074,10 +1074,12 @@ class Game:
                                 valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
                             if valid_card:
                                 self.p1.draw_card_at_location_deck(int(game_update_string[1]))
-                                self.p2.number_cards_to_search -= 1
+                                self.p1.number_cards_to_search -= 1
                                 await self.p1.send_hand()
                                 self.p1.bottom_remaining_cards()
                                 self.reset_search_values()
+                                if self.battle_ability_to_resolve == "Plannum":
+                                    self.reset_battle_resolve_attributes()
                         else:
                             valid_card = True
                             if not self.no_restrictions_on_chosen_card:
@@ -1085,11 +1087,14 @@ class Game:
                                                                  self.card_array)
                                 valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
                             if valid_card:
-                                self.p2.draw_card_at_location_deck(int(game_update_string[2]))
+                                self.p2.draw_card_at_location_deck(int(game_update_string[1]))
                                 self.p2.number_cards_to_search -= 1
-                                await self.p1.send_hand()
+                                await self.p2.send_hand()
                                 self.p2.bottom_remaining_cards()
                                 self.reset_search_values()
+                                if self.battle_ability_to_resolve == "Elouith":
+                                    self.reset_battle_resolve_attributes()
+                                    await self.resolve_battle_conclusion(name, game_update_string)
 
     def reset_choices_available(self):
         self.choices_available = []
@@ -1103,19 +1108,21 @@ class Game:
         self.number_resolving_battle_ability = -1
 
     async def resolve_battle_conclusion(self, name, game_string):
+        winner = None
         if name == self.name_2:
             winner = self.p2
-        else:
+        elif name == self.name_1:
             winner = self.p1
-        if self.round_number == self.last_planet_checked_for_battle:
-            winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
-            await winner.send_hq()
-            await winner.send_units_at_planet(self.last_planet_checked_for_battle)
-            winner.capture_planet(self.last_planet_checked_for_battle,
-                                  self.planet_cards_array)
-            self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-            await winner.send_victory_display()
-        self.planet_aiming_reticle_active = False
+        if winner is not None:
+            if self.round_number == self.last_planet_checked_for_battle:
+                winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                await winner.send_hq()
+                await winner.send_units_at_planet(self.last_planet_checked_for_battle)
+                winner.capture_planet(self.last_planet_checked_for_battle,
+                                      self.planet_cards_array)
+                self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                await winner.send_victory_display()
+            self.planet_aiming_reticle_active = False
         self.planet_aiming_reticle_position = -1
         another_battle = self.find_next_planet_for_combat()
         if another_battle:
@@ -1168,6 +1175,17 @@ class Game:
                                 await loser.send_hand()
                                 await loser.send_discard()
                                 await self.resolve_battle_conclusion(name, game_update_string)
+                            elif self.battle_ability_to_resolve == "Elouith":
+                                winner.number_cards_to_search = 3
+                                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                                self.name_player_who_is_searching = winner.name_player
+                                self.number_who_is_searching = str(winner.number)
+                                self.what_to_do_with_searched_card = "DRAW"
+                                self.traits_of_searched_card = None
+                                self.card_type_of_searched_card = None
+                                self.faction_of_searched_card = None
+                                self.no_restrictions_on_chosen_card = True
+                                await self.send_search()
                         elif self.choices_available[int(game_update_string[1])] == "No":
                             print("Does not want to resolve battle ability")
                             await self.resolve_battle_conclusion(name, game_update_string)
@@ -1325,18 +1343,6 @@ class Game:
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
         print("Resolve battle ability of:", planet_name)
-        self.need_to_resolve_battle_ability = False
-        """
-        if planet_name == "Osus IV":
-            if loser.spend_resources(1):
-                winner.add_resources(1)
-                await winner.send_resources()
-                await loser.send_resources()
-        elif planet_name == "Barlus":
-            loser.discard_card_at_random()
-            await loser.send_hand()
-            await loser.send_discard()
-            """
         self.need_to_resolve_battle_ability = True
         self.battle_ability_to_resolve = planet_name
         self.player_resolving_battle_ability = winner.name_player
@@ -1370,35 +1376,7 @@ class Game:
             if not p1_has_units and not p2_has_units:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-
-            """
-            self.planet_aiming_reticle_active = False
-            self.planet_aiming_reticle_position = -1
-            another_battle = self.find_next_planet_for_combat()
-            if another_battle:
-                self.set_battle_initiative()
-                self.p1.has_passed = False
-                self.p2.has_passed = False
-                self.mode = "Normal"
-                self.planet_aiming_reticle_active = True
-                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                await self.send_planet_array()
-                await self.send_info_box()
-            else:
-                self.phase = "HEADQUARTERS"
-                self.automated_headquarters_phase()
-                self.reset_values_for_new_round()
-                await self.p1.send_hq()
-                await self.p1.send_units_at_all_planets()
-                await self.p1.send_resources()
-                await self.p1.send_hand()
-                await self.p2.send_hq()
-                await self.p2.send_units_at_all_planets()
-                await self.p2.send_resources()
-                await self.p2.send_hand()
-                await self.send_planet_array()
-                await self.send_info_box()
-            """
+                await self.resolve_battle_conclusion(name, ["", ""])
 
     def reset_values_for_new_round(self):
         self.p1.has_passed = False
