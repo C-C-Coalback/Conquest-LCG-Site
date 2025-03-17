@@ -730,6 +730,11 @@ class Game:
                                                                                    self.defender_position)
                                 att_ignores_flying = primary_player.get_ignores_flying_given_pos(self.attacker_planet,
                                                                                                  self.attacker_position)
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position)\
+                                        == "Silvered Blade Avengers":
+                                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                                            .get_card_type() != "Warlord":
+                                        secondary_player.exhaust_given_pos(self.defender_planet, self.defender_position)
                                 # Flying check
                                 if def_flying and not att_flying and not att_ignores_flying:
                                     attack_value = attack_value / 2 + (attack_value % 2 > 0)
