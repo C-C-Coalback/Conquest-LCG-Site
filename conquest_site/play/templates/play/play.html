@@ -285,8 +285,17 @@
                         }
                         document.getElementById(target_headquarters).innerHTML += full_string;
                     }
+                } else if (split_data[1] === "CHOICE") {
+                    var full_string = `<details><summary>Choices</summary>`
+                    if (split_data[2] === "{{ user.username }}") {
+                        for (var i = 3; i < split_data.length; i++) {
+                            full_string += `<input id="CHOICE/` + (i-3).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);">`
+                        }
+                    }
+                    full_string += `</details>`;
+                    document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "SEARCH") {
-                    var full_string = `<details><summary>This is what you want to show before expanding</summary>`
+                    var full_string = `<details><summary>Search for card</summary>`
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 3; i < split_data.length; i++) {
                             var card_name = split_data[i];
@@ -304,8 +313,6 @@
                         }
                     }
                     full_string += `</details>`;
-                    console.log("Got to before HTML assignment")
-                    console.log(split_data[2])
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
