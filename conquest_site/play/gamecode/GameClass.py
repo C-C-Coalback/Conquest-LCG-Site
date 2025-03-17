@@ -1126,6 +1126,13 @@ class Game:
             return count
         return None
 
+    def request_number_of_enemy_units_in_discard(self, number):
+        if number == "1":
+            return self.p2.count_units_in_discard()
+        elif number == "2":
+            return self.p1.count_units_in_discard()
+        return None
+
     def add_resources_to_opponent(self, number, amount):
         self.resources_need_sending_outside_normal_sends = True
         if int(number) == 1:

@@ -735,6 +735,8 @@ class Player:
                 attack_value = attack_value + 3
         if card.get_brutal():
             attack_value = attack_value + card.get_damage()
+        if card.get_ability() == "Virulent Plague Squad":
+            attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
         if card.get_ability() == "Infantry Conscripts":
             support_count = 0
             for i in range(len(self.headquarters)):
@@ -762,6 +764,14 @@ class Player:
             if self.cards_in_play[planet_num + 1][i].get_name() == card_name:
                 num_copies += 1
         return num_copies
+
+    def count_units_in_discard(self):
+        count = 0
+        for i in range(len(self.discard)):
+            card = FindCard.find_card(self.discard[i], self.card_array)
+            if card.get_card_type() == "Army":
+                count = count + 1
+        return count
 
     def count_copies_at_hq(self, card_name):
         num_copies = 0
