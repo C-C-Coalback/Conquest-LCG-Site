@@ -975,7 +975,14 @@ class Game:
 
     async def resolve_card_in_search_box(self, name, game_update_string):
         if name == self.name_player_who_is_searching:
-            if len(game_update_string) == 2:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    if self.number_who_is_searching == "1":
+                        self.p1.bottom_remaining_cards()
+                    else:
+                        self.p2.bottom_remaining_cards()
+                    self.cards_in_search_box = []
+            elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.what_to_do_with_searched_card == "DRAW":
                         if self.number_who_is_searching == "1":
