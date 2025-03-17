@@ -377,7 +377,7 @@ class Player:
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         return card
 
-    def attach_card(self, card, planet, position):
+    def attach_card(self, card, planet, position, army_unit_as_attachment=False):
         if planet == -2:
             target_card = self.headquarters[position]
         else:
@@ -385,8 +385,20 @@ class Player:
         print("Adding attachment code")
         print(card.get_name())
         print(target_card.get_no_attachments())
-        allowed_types = card.type_of_units_allowed_for_attachment
         type_of_card = target_card.get_card_type()
+        if army_unit_as_attachment:
+            if type_of_card != "Army":
+                print("Army units as attachments can only be attached to other army units")
+                return False
+            if target_card.get_no_attachments():
+                print("Unit may not have attachments")
+                return False
+            if target_card.check_for_a_trait("Vehicle"):
+                print("Vehicles may not have army units as attachments")
+                return False
+            target_card.add_attachment(card)
+            return True
+        allowed_types = card.type_of_units_allowed_for_attachment
         if type_of_card not in allowed_types:
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
@@ -410,22 +422,34 @@ class Player:
         target_card.add_attachment(card)
         return True
 
-    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False):
-        if card.must_be_own_unit and not_own_attachment:
-            print("Must be own unit, but is not")
-            return False
-        if card.must_be_enemy_unit and not not_own_attachment:
-            print("Must be enemy unit, but is not")
-            return False
-        if not_own_attachment:
-            if self.attach_card(card, planet, position):
-                return True
-            return False
-        cost = card.get_cost() - discounts
-        if self.spend_resources(cost):
-            if self.attach_card(card, planet, position):
-                return True
-            self.add_resources(cost)
+    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
+                                        army_unit_as_attachment=False):
+        if army_unit_as_attachment:
+            if not_own_attachment:
+                if self.attach_card(card, planet, position, army_unit_as_attachment=army_unit_as_attachment):
+                    return True
+                return False
+            cost = card.get_cost() - discounts
+            if self.spend_resources(cost):
+                if self.attach_card(card, planet, position, army_unit_as_attachment=army_unit_as_attachment):
+                    return True
+                self.add_resources(cost)
+        else:
+            if card.must_be_own_unit and not_own_attachment:
+                print("Must be own unit, but is not")
+                return False
+            if card.must_be_enemy_unit and not not_own_attachment:
+                print("Must be enemy unit, but is not")
+                return False
+            if not_own_attachment:
+                if self.attach_card(card, planet, position):
+                    return True
+                return False
+            cost = card.get_cost() - discounts
+            if self.spend_resources(cost):
+                if self.attach_card(card, planet, position):
+                    return True
+                self.add_resources(cost)
         return False
 
     def add_card_to_planet(self, card, position):

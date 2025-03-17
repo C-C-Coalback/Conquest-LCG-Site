@@ -302,8 +302,7 @@ class Game:
                 if name == self.player_with_deploy_turn:
                     if game_update_string[1] == self.number_with_deploy_turn:
                         if self.mode == "Normal":
-                            if self.card_type_of_selected_card_in_hand == "Attachment":
-                                await self.deploy_card_routine_attachment(name, game_update_string)
+                            await self.deploy_card_routine_attachment(name, game_update_string)
                         if self.mode == "DISCOUNT":
                             if self.number_with_deploy_turn == "1":
                                 player = self.p1
@@ -340,9 +339,8 @@ class Game:
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if self.mode == "Normal":
-                    if self.card_type_of_selected_card_in_hand == "Attachment":
-                        if name == self.player_with_deploy_turn:
-                            await self.deploy_card_routine_attachment(name, game_update_string)
+                    if name == self.player_with_deploy_turn:
+                        await self.deploy_card_routine_attachment(name, game_update_string)
 
     async def deploy_card_routine_attachment(self, name, game_update_string):
         if game_update_string[0] == "HQ":
@@ -361,51 +359,63 @@ class Game:
         else:
             player_gaining_attachment = self.p2
         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-        limited = card.get_limited()
-        print("Limited state of card:", limited)
-        print("Name of card:", card.get_name())
-        if not primary_player.can_play_limited and limited:
-            pass
-        else:
-            if primary_player.get_number() == player_gaining_attachment.get_number():
-                print("Playing own card")
-                played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
-                                                                             int(game_update_string[3]))
-                enemy_card = False
+        can_continue = False
+        army_unit_as_attachment = False
+        non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre"]
+        if card.get_card_type() == "Attachment":
+            can_continue = True
+        elif card.get_ability() in non_attachs_that_can_be_played_as_attach:
+            can_continue = True
+            army_unit_as_attachment = True
+        if can_continue:
+            limited = card.get_limited()
+            print("Limited state of card:", limited)
+            print("Name of card:", card.get_name())
+            if not primary_player.can_play_limited and limited:
+                pass
             else:
-                played_card = False
-                if primary_player.spend_resources(int(card.get_cost())):
-                    played_card = secondary_player.play_attachment_card_to_in_play(
-                        card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True)
-                    if not played_card:
-                        primary_player.add_resources(int(card.get_cost()))
-                enemy_card = True
-            if played_card:
-                if limited:
-                    primary_player.can_play_limited = False
-                primary_player.remove_card_from_hand(self.card_pos_to_deploy)
-                print("Succeeded (?) in playing attachment")
-                primary_player.aiming_reticle_coords_hand = -1
-                await primary_player.send_hand()
-                if enemy_card:
-                    if game_update_string[2] == "-2":
-                        await secondary_player.send_hq()
-                    else:
-                        await secondary_player.send_units_at_planet(int(game_update_string[2]))
+                if primary_player.get_number() == player_gaining_attachment.get_number():
+                    print("Playing own card")
+                    played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
+                                                                                 int(game_update_string[3]),
+                                                                                 army_unit_as_attachment=
+                                                                                 army_unit_as_attachment)
+                    enemy_card = False
                 else:
-                    if game_update_string[2] == "-2":
-                        await primary_player.send_hq()
+                    played_card = False
+                    if primary_player.spend_resources(int(card.get_cost())):
+                        played_card = secondary_player.play_attachment_card_to_in_play(
+                            card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True,
+                            army_unit_as_attachment=army_unit_as_attachment)
+                        if not played_card:
+                            primary_player.add_resources(int(card.get_cost()))
+                    enemy_card = True
+                if played_card:
+                    if limited:
+                        primary_player.can_play_limited = False
+                    primary_player.remove_card_from_hand(self.card_pos_to_deploy)
+                    print("Succeeded (?) in playing attachment")
+                    primary_player.aiming_reticle_coords_hand = -1
+                    await primary_player.send_hand()
+                    if enemy_card:
+                        if game_update_string[2] == "-2":
+                            await secondary_player.send_hq()
+                        else:
+                            await secondary_player.send_units_at_planet(int(game_update_string[2]))
                     else:
-                        await primary_player.send_units_at_planet(int(game_update_string[2]))
-                await primary_player.send_resources()
-                if not secondary_player.has_passed:
-                    self.player_with_deploy_turn = secondary_player.get_name_player()
-                    self.number_with_deploy_turn = secondary_player.get_number()
-                    await self.send_info_box()
-                self.card_pos_to_deploy = -1
-                self.mode = "Normal"
-                self.card_type_of_selected_card_in_hand = ""
-                self.faction_of_card_to_play = ""
+                        if game_update_string[2] == "-2":
+                            await primary_player.send_hq()
+                        else:
+                            await primary_player.send_units_at_planet(int(game_update_string[2]))
+                    await primary_player.send_resources()
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.get_name_player()
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                        await self.send_info_box()
+                    self.card_pos_to_deploy = -1
+                    self.mode = "Normal"
+                    self.card_type_of_selected_card_in_hand = ""
+                    self.faction_of_card_to_play = ""
 
     async def shield_card_during_deploy(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -735,9 +745,9 @@ class Game:
                                                                                    self.defender_position)
                                 att_ignores_flying = primary_player.get_ignores_flying_given_pos(self.attacker_planet,
                                                                                                  self.attacker_position)
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position)\
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                         == "Silvered Blade Avengers":
-                                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                             .get_card_type() != "Warlord":
                                         secondary_player.exhaust_given_pos(self.defender_planet, self.defender_position)
                                 # Flying check

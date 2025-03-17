@@ -224,7 +224,11 @@ class UnitCard(Card):
         return self.by_base_area_effect
 
     def get_area_effect(self):
-        return self.area_effect
+        area_effect = self.area_effect
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Gun Drones":
+                area_effect += 2
+        return area_effect
 
     def get_by_base_flying(self):
         return self.by_base_flying
@@ -264,7 +268,10 @@ class UnitCard(Card):
     def get_attack(self):
         attack = self.attack
         for i in range(len(self.attachments)):
-            attack += self.attachments[i].get_extra_attack()
+            if self.attachments[i].get_card_type() == "Attachment":
+                attack += self.attachments[i].get_extra_attack()
+            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
+                attack += 2
         if self.get_ability() == "Fire Warrior Strike Team":
             attack += len(self.attachments)
         return attack
@@ -272,7 +279,10 @@ class UnitCard(Card):
     def get_health(self):
         health = self.health
         for i in range(len(self.attachments)):
-            health += self.attachments[i].get_extra_health()
+            if self.attachments[i].get_card_type() == "Attachment":
+                health += self.attachments[i].get_extra_health()
+            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
+                health += 2
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Cybork Body":
                 health = 2 * health
@@ -287,7 +297,8 @@ class UnitCard(Card):
     def get_command(self):
         command = self.command
         for i in range(len(self.attachments)):
-            command += self.attachments[i].get_extra_command()
+            if self.attachments[i].get_card_type() == "Attachment":
+                command += self.attachments[i].get_extra_command()
         if self.name == "Bad Dok" and self.damage > 0:
             command = command + 3
         return command
