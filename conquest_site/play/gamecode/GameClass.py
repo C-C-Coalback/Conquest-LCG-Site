@@ -106,6 +106,7 @@ class Game:
         self.choices_available = []
         self.name_player_making_choices = ""
         self.choice_context = ""
+        self.damage_from_atrox = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -655,27 +656,7 @@ class Game:
                                 amount_aoe = primary_player.cards_in_play[chosen_planet + 1][
                                     self.attacker_position].get_area_effect()
                                 if amount_aoe > 0:
-                                    print("Player needs to suffer area effect (", str(amount_aoe), ")")
-                                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                                        self.damage_on_units_list_before_new_damage.append(secondary_player.
-                                                                                           get_damage_given_pos
-                                                                                           (chosen_planet, i))
-                                    secondary_player.suffer_area_effect(chosen_planet, amount_aoe)
-                                    self.number_of_units_left_to_suffer_damage = \
-                                        secondary_player.get_number_of_units_at_planet(chosen_planet)
-                                    if self.number_of_units_left_to_suffer_damage > 0:
-                                        secondary_player.set_aiming_reticle_in_play(chosen_planet, 0, "red")
-                                        for i in range(1, self.number_of_units_left_to_suffer_damage):
-                                            secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                                    self.mode = "SHIELD"
-                                    self.player_who_is_shielding = secondary_player.get_name_player()
-                                    self.number_who_is_shielding = secondary_player.get_number()
-                                    self.next_unit_to_suffer_damage = 0
-                                    self.defender_position = self.next_unit_to_suffer_damage
-                                    self.defender_planet = chosen_planet
-                                    self.damage_on_unit_before_new_damage = -1
-                                    await self.send_info_box()
-                                    await secondary_player.send_units_at_planet(chosen_planet)
+                                    await self.aoe_routine(primary_player, secondary_player, chosen_planet, amount_aoe)
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 print("Card in hand clicked on")
@@ -815,6 +796,28 @@ class Game:
                             else:
                                 self.defender_planet = -1
                                 self.defender_position = -1
+
+    async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe):
+        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+            self.damage_on_units_list_before_new_damage.append(secondary_player.
+                                                               get_damage_given_pos
+                                                               (chosen_planet, i))
+        secondary_player.suffer_area_effect(chosen_planet, amount_aoe)
+        self.number_of_units_left_to_suffer_damage = \
+            secondary_player.get_number_of_units_at_planet(chosen_planet)
+        if self.number_of_units_left_to_suffer_damage > 0:
+            secondary_player.set_aiming_reticle_in_play(chosen_planet, 0, "red")
+            for i in range(1, self.number_of_units_left_to_suffer_damage):
+                secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+        self.mode = "SHIELD"
+        self.player_who_is_shielding = secondary_player.get_name_player()
+        self.number_who_is_shielding = secondary_player.get_number()
+        self.next_unit_to_suffer_damage = 0
+        self.defender_position = self.next_unit_to_suffer_damage
+        self.defender_planet = chosen_planet
+        self.damage_on_unit_before_new_damage = -1
+        await self.send_info_box()
+        await secondary_player.send_units_at_planet(chosen_planet)
 
     async def update_game_event_deploy_action_hand(self, name, game_update_string):
         print("Deploy special action, card in hand at pos", game_update_string[2])
@@ -1244,6 +1247,21 @@ class Game:
                             await self.p2.send_hq()
                             self.reset_battle_resolve_attributes()
                             await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Atrox Prime":
+                if len(game_update_string) == 2:
+                    planet_pos = int(game_update_string[1])
+                    if self.last_planet_checked_for_battle + 1 == planet_pos or \
+                            self.last_planet_checked_for_battle - 1 == planet_pos:
+                        if name == self.name_1:
+                            print("Resolve AOE")
+                            await self.aoe_routine(self.p1, self.p2, planet_pos, 1)
+                            self.damage_from_atrox = True
+                            self.reset_battle_resolve_attributes()
+                        elif name == self.name_2:
+                            print("Resolve AOE")
+                            await self.aoe_routine(self.p2, self.p1, planet_pos, 1)
+                            self.damage_from_atrox = True
+                            self.reset_battle_resolve_attributes()
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -1391,12 +1409,19 @@ class Game:
                     i = i - 1
                 i = i + 1
             self.number_of_units_left_to_suffer_damage = 0
-            self.number_with_combat_turn = primary_player.get_number()
-            self.player_with_combat_turn = primary_player.get_name_player()
-            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-            self.reset_shielding_values()
-            self.mode = "Normal"
-            self.actions_allowed = True
+            if self.damage_from_atrox:
+                if name == self.name_1:
+                    await self.resolve_battle_conclusion(self.name_2, "")
+                elif name == self.name_2:
+                    await self.resolve_battle_conclusion(self.name_1, "")
+                self.attacker_planet = self.defender_planet
+            else:
+                self.number_with_combat_turn = primary_player.get_number()
+                self.player_with_combat_turn = primary_player.get_name_player()
+                secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                self.reset_shielding_values()
+                self.mode = "Normal"
+                self.actions_allowed = True
         else:
             self.next_unit_to_suffer_damage += 1
             self.defender_position = self.next_unit_to_suffer_damage
