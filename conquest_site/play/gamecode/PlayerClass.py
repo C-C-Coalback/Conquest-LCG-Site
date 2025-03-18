@@ -488,6 +488,15 @@ class Player:
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = False
 
+    def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
+        card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))
+        if unit_only:
+            if card.get_card_type() != "Army":
+                return False
+        self.headquarters.append(card)
+        del self.cards[hand_pos]
+        return True
+
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         if card is None and position_hand is None:
             return "ERROR/play_card function called incorrectly", -1

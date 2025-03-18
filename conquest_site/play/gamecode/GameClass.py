@@ -109,6 +109,9 @@ class Game:
         self.damage_from_atrox = False
         self.damage_on_units_hq_before_new_damage = []
         self.unit_to_move_position = [-1, -1]
+        self.yvarn_active = False
+        self.p1_triggered_yvarn = False
+        self.p2_triggered_yvarn = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1205,7 +1208,12 @@ class Game:
                                     await self.resolve_battle_conclusion(name, game_update_string)
                                     await self.send_search()
                             else:
+                                if self.battle_ability_to_resolve == "Y'varn":
+                                    self.yvarn_active = True
+                                    self.p1_triggered_yvarn = False
+                                    self.p2_triggered_yvarn = False
                                 self.reset_choices_available()
+                                await self.send_search()
                         elif self.choices_available[int(game_update_string[1])] == "No":
                             print("Does not want to resolve battle ability")
                             await self.resolve_battle_conclusion(name, game_update_string)
@@ -1225,7 +1233,41 @@ class Game:
                         await self.resolve_battle_conclusion(name, game_update_string)
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
-        if name == self.player_resolving_battle_ability:
+        if self.yvarn_active:
+            if name == self.name_1:
+                if not self.p1_triggered_yvarn:
+                    if len(game_update_string) == 1:
+                        if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                            await self.game_sockets[i].receive_game_update(self.name_1 + " declines y'varn.")
+                            self.p1_triggered_yvarn = True
+                    elif len(game_update_string) == 3:
+                        if game_update_string[0] == "HAND":
+                            if game_update_string[1] == "1":
+                                played = self.p1.put_card_in_hand_into_hq(int(game_update_string[2]))
+                                if played:
+                                    self.p1_triggered_yvarn = True
+                                    await self.p1.send_hq()
+                                    await self.p1.send_hand()
+            elif name == self.name_2:
+                if not self.p2_triggered_yvarn:
+                    if len(game_update_string) == 1:
+                        if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                            await self.game_sockets[i].receive_game_update(self.name_2 + " declines y'varn.")
+                            self.p2_triggered_yvarn = True
+                    elif len(game_update_string) == 3:
+                        if game_update_string[0] == "HAND":
+                            if game_update_string[1] == "2":
+                                played = self.p2.put_card_in_hand_into_hq(int(game_update_string[2]))
+                                if played:
+                                    self.p2_triggered_yvarn = True
+                                    await self.p2.send_hq()
+                                    await self.p2.send_hand()
+            if self.p1_triggered_yvarn and self.p2_triggered_yvarn:
+                self.yvarn_active = False
+                self.reset_choices_available()
+                await self.send_search()
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+        elif name == self.player_resolving_battle_ability:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     self.reset_battle_resolve_attributes()
