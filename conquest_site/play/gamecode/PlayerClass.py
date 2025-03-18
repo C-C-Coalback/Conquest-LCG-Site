@@ -561,6 +561,16 @@ class Player:
             print(pos)
             self.discard_card_from_hand(pos)
 
+    def move_unit_to_planet(self, origin_planet, origin_position, destination):
+        if origin_planet == -2:
+            headquarters_list = self.headquarters
+            self.cards_in_play[destination + 1].append(copy.deepcopy(headquarters_list[origin_position]))
+            self.remove_card_from_hq(origin_position)
+        else:
+            self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
+                                                                     [origin_position]))
+            self.remove_card_from_play(origin_planet, origin_position)
+
     def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
         if planet_pos is None:

@@ -108,6 +108,7 @@ class Game:
         self.choice_context = ""
         self.damage_from_atrox = False
         self.damage_on_units_hq_before_new_damage = []
+        self.unit_to_move_position = [-1, -1]
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1273,6 +1274,60 @@ class Game:
                             await self.p2.send_hq()
                             self.reset_battle_resolve_attributes()
                             await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Plannum":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if self.unit_to_move_position[0] != -1 and self.unit_to_move_position[1] != -1:
+                            if self.player_resolving_battle_ability == self.name_1:
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                self.unit_to_move_position[1])
+                            player.move_unit_to_planet(self.unit_to_move_position[0], self.unit_to_move_position[1],
+                                                       int(game_update_string[1]))
+                            if self.unit_to_move_position[0] == -2:
+                                await player.send_hq()
+                            else:
+                                await player.send_units_at_planet(self.unit_to_move_position[0])
+                            await player.send_units_at_planet(int(game_update_string[1]))
+                            self.reset_battle_resolve_attributes()
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == str(self.number_resolving_battle_ability):
+                            if self.player_resolving_battle_ability == self.name_1:
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            if player.headquarters[int(game_update_string[2])].get_card_type() != "Warlord" and \
+                                    player.headquarters[int(game_update_string[2])].get_card_type() != "Support":
+                                if self.unit_to_move_position[0] != -1:
+                                    player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                        self.unit_to_move_position[1])
+                                self.unit_to_move_position[0] = -2
+                                self.unit_to_move_position[1] = int(game_update_string[2])
+                                player.set_aiming_reticle_in_play(-2, self.unit_to_move_position[1], "blue")
+                                await player.send_hq()
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == str(self.number_resolving_battle_ability):
+                            if self.player_resolving_battle_ability == self.name_1:
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]\
+                                    .get_card_type() != "Warlord" and \
+                                    player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]\
+                                    .get_card_type() != "Support":
+                                if self.unit_to_move_position[0] != -1:
+                                    player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                        self.unit_to_move_position[1])
+                                self.unit_to_move_position[0] = int(game_update_string[2])
+                                self.unit_to_move_position[1] = int(game_update_string[3])
+                                player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                  self.unit_to_move_position[1], "blue")
+                                await player.send_units_at_planet(self.unit_to_move_position[0])
             elif self.battle_ability_to_resolve == "Atrox Prime":
                 if len(game_update_string) == 2:
                     planet_pos = int(game_update_string[1])
