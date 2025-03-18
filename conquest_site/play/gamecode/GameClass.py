@@ -1238,7 +1238,7 @@ class Game:
                 if not self.p1_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.game_sockets[i].receive_game_update(self.name_1 + " declines y'varn.")
+                            await self.game_sockets[0].receive_game_update(self.name_1 + " declines y'varn.")
                             self.p1_triggered_yvarn = True
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
@@ -1252,7 +1252,7 @@ class Game:
                 if not self.p2_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.game_sockets[i].receive_game_update(self.name_2 + " declines y'varn.")
+                            await self.game_sockets[0].receive_game_update(self.name_2 + " declines y'varn.")
                             self.p2_triggered_yvarn = True
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
