@@ -278,6 +278,9 @@
                             }
                         }
                         full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        if (card_data_split[4] !== "") {
+                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                        }
                         if (damage === "0") {
                             full_string += `</div>`
                         } else {

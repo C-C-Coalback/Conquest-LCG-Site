@@ -88,7 +88,7 @@ class Game:
         self.what_is_being_interrupted = ""
         self.damage_is_taken_one_at_a_time = False
         self.damage_left_to_take = 0
-        self.positions_of_units_to_take_damage = []
+        self.positions_of_units_hq_to_take_damage = []
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = "alex"
@@ -107,6 +107,7 @@ class Game:
         self.name_player_making_choices = ""
         self.choice_context = ""
         self.damage_from_atrox = False
+        self.damage_on_units_hq_before_new_damage = []
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1262,6 +1263,117 @@ class Game:
                             await self.aoe_routine(self.p2, self.p1, planet_pos, 1)
                             self.damage_from_atrox = True
                             self.reset_battle_resolve_attributes()
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        self.damage_from_atrox = True
+                        if game_update_string[1] == "1":
+                            self.p1.suffer_area_effect_at_hq(1)
+                            if self.positions_of_units_hq_to_take_damage:
+                                self.p1.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[0],
+                                                                   "red")
+                            for i in range(1, len(self.positions_of_units_hq_to_take_damage)):
+                                self.p1.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[i],
+                                                                   "blue")
+                            self.player_who_is_shielding = self.name_1
+                            self.number_who_is_shielding = "1"
+                            self.reset_battle_resolve_attributes()
+                            await self.p1.send_hq()
+                        elif game_update_string[1] == "2":
+                            self.p2.suffer_area_effect_at_hq(1)
+                            if self.positions_of_units_hq_to_take_damage:
+                                self.p2.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[0],
+                                                                   "red")
+                            for i in range(1, len(self.positions_of_units_hq_to_take_damage)):
+                                self.p2.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[i],
+                                                                   "blue")
+                            self.player_who_is_shielding = self.name_2
+                            self.number_who_is_shielding = "2"
+                            self.reset_battle_resolve_attributes()
+                            await self.p2.send_hq()
+
+    async def destroy_check_cards_in_hq(self, player):
+        print("All units have been damaged. Move to destruction")
+        i = 0
+        while i < len(player.headquarters):
+            if player.headquarters[i].get_card_type != "Support":
+                if player.check_if_card_is_destroyed(-2, i):
+                    player.destroy_card_in_hq(i)
+                    i = i - 1
+            i = i + 1
+        if self.damage_from_atrox:
+            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
+
+    async def shield_card_in_hq_check(self, name, game_update_string):
+        if name == self.player_who_is_shielding:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    if name == self.name_1:
+                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                        self.p1.reset_aiming_reticle_in_play(-2, unit_pos)
+                        del self.positions_of_units_hq_to_take_damage[0]
+                        del self.damage_on_units_hq_before_new_damage[0]
+                        if self.positions_of_units_hq_to_take_damage:
+                            unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                            self.p1.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                        else:
+                            await self.destroy_check_cards_in_hq(self.p1)
+                        await self.p1.send_hq()
+                    elif name == self.name_2:
+                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                        self.p2.reset_aiming_reticle_in_play(-2, unit_pos)
+                        del self.positions_of_units_hq_to_take_damage[0]
+                        del self.damage_on_units_hq_before_new_damage[0]
+                        if self.positions_of_units_hq_to_take_damage:
+                            unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                            self.p2.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                        else:
+                            await self.destroy_check_cards_in_hq(self.p2)
+                        await self.p1.send_hq()
+            if len(game_update_string) == 3:
+                if game_update_string[0] == "HAND":
+                    if game_update_string[1] == str(self.number_who_is_shielding):
+                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                        hand_pos = int(game_update_string[2])
+                        if name == self.name_1:
+                            shield_card = self.p1.get_card_in_hand(hand_pos)
+                            if shield_card.get_shields() > 0:
+                                self.p1.remove_damage_from_pos(-2, unit_pos, shield_card.get_shields())
+                                if self.p1.get_damage_given_pos(-2, unit_pos) < \
+                                        self.damage_on_units_hq_before_new_damage[0]:
+                                    self.p1.set_damage_given_pos(-2, unit_pos,
+                                                                 self.damage_on_units_hq_before_new_damage[0])
+                                self.p1.discard_card_from_hand(hand_pos)
+                                self.p1.reset_aiming_reticle_in_play(-2, unit_pos)
+                                del self.positions_of_units_hq_to_take_damage[0]
+                                del self.damage_on_units_hq_before_new_damage[0]
+                                if self.positions_of_units_hq_to_take_damage:
+                                    unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                                    self.p1.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                                else:
+                                    await self.destroy_check_cards_in_hq(self.p1)
+                                await self.p1.send_hq()
+                                await self.p1.send_hand()
+                                await self.p1.send_discard()
+                        elif name == self.name_2:
+                            shield_card = self.p2.get_card_in_hand(hand_pos)
+                            if shield_card.get_shields() > 0:
+                                self.p2.remove_damage_from_pos(-2, unit_pos, shield_card.get_shields())
+                                if self.p2.get_damage_given_pos(-2, unit_pos) < \
+                                        self.damage_on_units_hq_before_new_damage[0]:
+                                    self.p2.set_damage_given_pos(-2, unit_pos,
+                                                                 self.damage_on_units_hq_before_new_damage[0])
+                                self.p2.reset_aiming_reticle_in_play(-2, unit_pos)
+                                self.p2.discard_card_from_hand(hand_pos)
+                                del self.positions_of_units_hq_to_take_damage[0]
+                                del self.damage_on_units_hq_before_new_damage[0]
+                                if self.positions_of_units_hq_to_take_damage:
+                                    unit_pos = self.positions_of_units_hq_to_take_damage[0]
+                                    self.p2.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                                else:
+                                    await self.destroy_check_cards_in_hq(self.p2)
+                                await self.p2.send_hq()
+                                await self.p2.send_hand()
+                                await self.p2.send_discard()
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -1278,6 +1390,8 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.positions_of_units_hq_to_take_damage:
+                await self.shield_card_in_hq_check(name, game_update_string)
             elif self.battle_ability_to_resolve:
                 await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":

@@ -293,10 +293,16 @@ class Player:
         return False
 
     def set_aiming_reticle_in_play(self, planet_id, unit_id, color):
-        self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = color
+        if planet_id == -2:
+            self.headquarters[unit_id].aiming_reticle_color = color
+        else:
+            self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = color
 
     def reset_aiming_reticle_in_play(self, planet_id, unit_id):
-        self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
+        if planet_id == -2:
+            self.headquarters[unit_id].aiming_reticle_color = None
+        else:
+            self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
 
     def discard_card_from_hand(self, card_pos):
         self.discard.append(self.cards[card_pos])
@@ -311,9 +317,13 @@ class Player:
         return card_object.get_shields()
 
     def get_damage_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_damage()
         return self.cards_in_play[planet_id + 1][unit_id].get_damage()
 
     def set_damage_given_pos(self, planet_id, unit_id, amount):
+        if planet_id == -2:
+            return self.headquarters[unit_id].set_damage(amount)
         return self.cards_in_play[planet_id + 1][unit_id].set_damage(amount)
 
     def get_ranged_given_pos(self, planet_id, unit_id):
@@ -789,14 +799,27 @@ class Player:
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         return damage_too_great
 
+    def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
+        damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
+
     def suffer_area_effect(self, planet_id, amount):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             self.assign_damage_to_pos(planet_id, i, amount)
+
+    def suffer_area_effect_at_hq(self, amount):
+        self.game.positions_of_units_hq_to_take_damage = []
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_card_type() != "Support":
+                self.game.damage_on_units_hq_before_new_damage.append(self.headquarters[i].get_damage())
+                self.assign_damage_to_pos_hq(i, amount)
+                self.game.positions_of_units_hq_to_take_damage.append(i)
 
     def get_number_of_units_at_planet(self, planet_id):
         return len(self.cards_in_play[planet_id + 1])
 
     def check_if_card_is_destroyed(self, planet_id, unit_id):
+        if planet_id == -2:
+            return not self.headquarters[unit_id].check_health()
         return not self.cards_in_play[planet_id + 1][unit_id].check_health()
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
