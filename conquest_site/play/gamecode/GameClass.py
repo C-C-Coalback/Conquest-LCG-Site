@@ -37,9 +37,10 @@ class Game:
         self.current_board_state = ""
         self.running = True
         self.planet_array = []
-        for i in range(7):
+        for i in range(10):
             self.planet_array.append(self.planet_cards_array[i].get_name())
         random.shuffle(self.planet_array)
+        self.planet_array = self.planet_array[:7]
         self.planets_in_play_array = [True, True, True, True, True, False, False]
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
@@ -1187,9 +1188,37 @@ class Game:
                                 self.faction_of_searched_card = None
                                 self.no_restrictions_on_chosen_card = True
                                 await self.send_search()
+                            else:
+                                self.reset_choices_available()
                         elif self.choices_available[int(game_update_string[1])] == "No":
                             print("Does not want to resolve battle ability")
                             await self.resolve_battle_conclusion(name, game_update_string)
+
+    async def resolve_battle_ability_routine(self, name, game_update_string):
+        if name == self.player_resolving_battle_ability:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    self.reset_battle_resolve_attributes()
+                    await self.resolve_battle_conclusion(name, game_update_string)
+            if self.battle_ability_to_resolve == "Ferrin":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            if self.p1.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)].\
+                                    get_card_type != "Warlord":
+                                self.p1.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
+                                await self.p1.send_hq()
+                                await self.p1.send_units_at_planet(int(game_update_string[2]))
+                                self.reset_battle_resolve_attributes()
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                        elif game_update_string[1] == "2":
+                            if self.p2.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)]. \
+                                    get_card_type != "Warlord":
+                                self.p2.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
+                                await self.p2.send_hq()
+                                await self.p2.send_units_at_planet(int(game_update_string[2]))
+                                self.reset_battle_resolve_attributes()
+                                await self.resolve_battle_conclusion(name, game_update_string)
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -1206,6 +1235,8 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.battle_ability_to_resolve:
+                await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":
                 await self.update_game_event_deploy_section(name, game_update_string)
             elif self.phase == "COMMAND":

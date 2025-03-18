@@ -951,6 +951,10 @@ class Player:
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         del self.cards_in_play[planet_id + 1][unit_id]
 
+    def rout_unit(self, planet_id, unit_id):
+        self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
+        self.retreat_unit(planet_id, unit_id)
+
     def ready_all_in_headquarters(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].ready_card()
