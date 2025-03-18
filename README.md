@@ -5,8 +5,10 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 I should really get a better name for this section.
 
-50% of all core cards have been implemented. Unfortunately, 
-they are not going to get easier.
+The planets have now all been implemented. If you chose the right 
+cards, you could have a full, honest game of Conquest now. UI is 
+quite clunky though, need to sort that out first. 
+Focusing on getting cards working before that.
 
 # What is this?
 
