@@ -1291,6 +1291,14 @@ class Game:
                                 await self.p2.send_units_at_planet(int(game_update_string[2]))
                                 self.reset_battle_resolve_attributes()
                                 await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Carnath":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "Resolve Battle Ability?"
+                        self.name_player_making_choices = name
+                        await self.send_search()
             elif self.battle_ability_to_resolve == "Iridial":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
