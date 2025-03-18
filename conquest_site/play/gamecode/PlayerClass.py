@@ -800,7 +800,10 @@ class Player:
         return not self.cards_in_play[planet_id + 1][unit_id].check_health()
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
-        self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
+        if planet_id == -2:
+            self.headquarters[unit_id].remove_damage(amount)
+        else:
+            self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":

@@ -1219,6 +1219,31 @@ class Game:
                                 await self.p2.send_units_at_planet(int(game_update_string[2]))
                                 self.reset_battle_resolve_attributes()
                                 await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Iridial":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                            await self.p1.send_units_at_planet(int(game_update_string[2]))
+                            self.reset_battle_resolve_attributes()
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                        elif game_update_string[1] == "2":
+                            self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                            await self.p2.send_units_at_planet(int(game_update_string[2]))
+                            self.reset_battle_resolve_attributes()
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == "1":
+                            self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                            await self.p1.send_hq()
+                            self.reset_battle_resolve_attributes()
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                        elif game_update_string[1] == "2":
+                            self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                            await self.p2.send_hq()
+                            self.reset_battle_resolve_attributes()
+                            await self.resolve_battle_conclusion(name, game_update_string)
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
