@@ -1154,6 +1154,7 @@ class Game:
             await self.p2.send_hand()
             await self.send_planet_array()
             await self.send_info_box()
+        self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
         self.reset_choices_available()
 
@@ -1192,11 +1193,35 @@ class Game:
                                 self.faction_of_searched_card = None
                                 self.no_restrictions_on_chosen_card = True
                                 await self.send_search()
+                            elif self.battle_ability_to_resolve == "Tarrus":
+                                winner_count = winner.count_units_in_play_all()
+                                loser_count = loser.count_units_in_play_all()
+                                if winner_count < loser_count:
+                                    self.choices_available = ["Cards", "Resources"]
+                                    self.choice_context = "Gains from Tarrus"
+                                    await self.send_search()
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    await self.send_search()
                             else:
                                 self.reset_choices_available()
                         elif self.choices_available[int(game_update_string[1])] == "No":
                             print("Does not want to resolve battle ability")
                             await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Gains from Tarrus":
+                        if self.choices_available[int(game_update_string[1])] == "Cards":
+                            if name == self.name_1:
+                                for _ in range(3):
+                                    self.p1.draw_card()
+                            elif name == self.name_2:
+                                for _ in range(3):
+                                    self.p2.draw_card()
+                        elif self.choices_available[int(game_update_string[1])] == "Resources":
+                            if name == self.name_1:
+                                self.p1.add_resources(3)
+                            elif name == self.name_2:
+                                self.p2.add_resources(3)
+                        await self.resolve_battle_conclusion(name, game_update_string)
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if name == self.player_resolving_battle_ability:

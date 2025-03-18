@@ -607,6 +607,15 @@ class Player:
                 counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         return counted_command
 
+    def count_units_in_play_all(self):
+        unit_count = 0
+        for i in range(7):
+            unit_count += len(self.cards_in_play[i])
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_card_type() != "Support":
+                unit_count += 1
+        return unit_count
+
     def get_bonus_winnings_at_planet(self, planet_id):
         extra_resources = 0
         extra_cards = 0
