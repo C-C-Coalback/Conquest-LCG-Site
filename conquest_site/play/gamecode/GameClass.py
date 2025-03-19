@@ -115,6 +115,9 @@ class Game:
         self.p2_triggered_yvarn = False
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
+        self.reactions_needing_resolving = []
+        self.positions_of_unit_triggering_reaction = []
+        self.player_who_resolves_reaction = []
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1422,6 +1425,42 @@ class Game:
                             await primary_player.send_hand()
                             await primary_player.send_discard()
 
+    async def resolve_reaction(self, name, game_update_string):
+        if name == self.player_who_resolves_reaction[0]:
+            if name == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.reactions_needing_resolving[0]
+                    del self.player_who_resolves_reaction[0]
+            if len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    print("Check what player")
+                    if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
+                        if self.reactions_needing_resolving[0] == "Sicarius's Chosen":
+                            print("Resolve Sicarius's chosen")
+                            origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                            target_planet = int(game_update_string[2])
+                            if int(game_update_string[1]) == int(secondary_player.get_number()):
+                                print("test")
+                                if abs(origin_planet - target_planet) == 1:
+                                    print("test")
+                                    if secondary_player.cards_in_play[target_planet + 1][int(game_update_string[3])].get_card_type() == "Army":
+                                        secondary_player.move_unit_to_planet(target_planet, int(game_update_string[3]), origin_planet)
+                                        new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
+                                        secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1)
+                                        secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos, "red")
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        await secondary_player.send_units_at_planet(origin_planet)
+                                        await secondary_player.send_units_at_planet(target_planet)
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -1437,6 +1476,9 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.reactions_needing_resolving:
+                print("Resolve reaction")
+                await self.resolve_reaction(name, game_update_string)
             elif self.positions_of_units_to_take_damage:
                 print("Using better shield mechanism")
                 await self.better_shield_card_resolution(name, game_update_string)

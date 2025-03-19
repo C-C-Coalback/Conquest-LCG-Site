@@ -482,6 +482,10 @@ class Player:
                 self.game.card_type_of_searched_card = None
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
+            self.game.reactions_needing_resolving.append("Sicarius's Chosen")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
+            self.game.player_who_resolves_reaction.append(self.name_player)
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
             no_units_damaged = True
             for i in range(len(self.cards_in_play[position + 1]) - 1):
