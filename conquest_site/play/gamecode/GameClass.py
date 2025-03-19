@@ -208,9 +208,7 @@ class Game:
         print("Need to run deploy turn code.")
         print(self.player_with_deploy_turn, self.number_with_deploy_turn)
         print(name == self.player_with_deploy_turn)
-        if self.mode == "SHIELD":
-            await self.shield_card_during_deploy(name, game_update_string)
-        elif self.mode == "ACTION":
+        if self.mode == "ACTION":
             await self.update_game_event_action(name, game_update_string)
         elif len(game_update_string) == 1:
             if game_update_string[0] == "action-button":
@@ -443,73 +441,6 @@ class Game:
                     self.card_type_of_selected_card_in_hand = ""
                     self.faction_of_card_to_play = ""
 
-    async def shield_card_during_deploy(self, name, game_update_string):
-        if len(game_update_string) == 1:
-            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if name == self.player_who_is_shielding:
-                    await self.deploy_resolve_shield_of_unit(name, -1)
-        elif len(game_update_string) == 3:
-            if game_update_string[0] == "HAND":
-                if name == self.player_who_is_shielding:
-                    if game_update_string[1] == self.number_who_is_shielding:
-                        await self.deploy_resolve_shield_of_unit(name, int(game_update_string[2]))
-
-    async def deploy_resolve_shield_of_unit(self, name, hand_pos):
-        unit_dead = False
-        if name == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        primary_player.reset_aiming_reticle_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
-        shield_on_card = 0
-        if hand_pos != -1:
-            shield_on_card = primary_player.get_shields_given_pos(hand_pos)
-            primary_player.discard_card_from_hand(hand_pos)
-            await primary_player.send_hand()
-            await primary_player.send_discard()
-        amount_to_shield = shield_on_card
-        if self.damage_is_taken_one_at_a_time:
-            if amount_to_shield > 1:
-                amount_to_shield = 1
-        primary_player.remove_damage_from_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit,
-                                              amount_to_shield)
-        if primary_player.get_damage_given_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit) < \
-                self.damage_on_unit_before_new_damage:
-            primary_player.set_damage_given_pos(self.planet_of_damaged_unit, self.position_of_damaged_unit,
-                                                self.damage_on_unit_before_new_damage)
-        if primary_player.check_if_card_is_destroyed(self.planet_of_damaged_unit, self.position_of_damaged_unit):
-            unit_dead = True
-            primary_player.destroy_card_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
-            if self.resources_need_sending_outside_normal_sends:
-                await primary_player.send_resources()
-                await secondary_player.send_resources()
-                self.resources_need_sending_outside_normal_sends = False
-            if primary_player.warlord_just_got_bloodied:
-                primary_player.warlord_just_got_bloodied = False
-                await primary_player.send_hq()
-            await primary_player.send_discard()
-        will_switch_back_to_normal = True
-        if not unit_dead and self.damage_is_taken_one_at_a_time:
-            self.damage_left_to_take -= 1
-            will_switch_back_to_normal = False
-            primary_player.set_aiming_reticle_in_play(self.planet_of_damaged_unit,
-                                                      self.position_of_damaged_unit, "red")
-            if self.damage_left_to_take < 1:
-                self.damage_left_to_take = 0
-                self.damage_is_taken_one_at_a_time = False
-                will_switch_back_to_normal = True
-                primary_player.reset_aiming_reticle_in_play(self.planet_of_damaged_unit, self.position_of_damaged_unit)
-        if unit_dead:
-            self.damage_is_taken_one_at_a_time = False
-            self.damage_left_to_take = False
-        if will_switch_back_to_normal:
-            self.mode = "Normal"
-        await self.send_info_box()
-        await primary_player.send_units_at_planet(self.planet_of_damaged_unit)
-        await secondary_player.send_units_at_planet(self.planet_of_damaged_unit)
-
     async def deploy_card_routine(self, name, planet_pos, discounts=0):
         print("Deploy card at planet", planet_pos)
         if self.number_with_deploy_turn == "1":
@@ -599,10 +530,7 @@ class Game:
     async def update_game_event_combat_section(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if self.mode == "SHIELD":
-                    if name == self.player_who_is_shielding:
-                        await self.resolve_shield_of_unit_from_attack(name, -1)
-                elif name == self.player_with_combat_turn:
+                if name == self.player_with_combat_turn:
                     if self.number_with_combat_turn == "1":
                         self.number_with_combat_turn = "2"
                         self.player_with_combat_turn = self.name_2
@@ -671,7 +599,6 @@ class Game:
                     if name == self.player_who_is_shielding:
                         if game_update_string[1] == self.number_who_is_shielding:
                             hand_pos = int(game_update_string[2])
-                            await self.resolve_shield_of_unit_from_attack(name, hand_pos)
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 print("Unit clicked on.")
@@ -1083,7 +1010,8 @@ class Game:
                                 await self.p1.send_hand()
                                 self.p1.bottom_remaining_cards()
                                 self.reset_search_values()
-                                if self.battle_ability_to_resolve == "Plannum":
+                                if self.battle_ability_to_resolve == "Elouith":
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                                     self.reset_battle_resolve_attributes()
                         else:
                             valid_card = True
@@ -1098,8 +1026,8 @@ class Game:
                                 self.p2.bottom_remaining_cards()
                                 self.reset_search_values()
                                 if self.battle_ability_to_resolve == "Elouith":
-                                    self.reset_battle_resolve_attributes()
                                     await self.resolve_battle_conclusion(name, game_update_string)
+                                    self.reset_battle_resolve_attributes()
 
     def reset_choices_available(self):
         self.choices_available = []
@@ -1265,8 +1193,7 @@ class Game:
         elif name == self.player_resolving_battle_ability:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    self.reset_battle_resolve_attributes()
-                    await self.resolve_battle_conclusion(name, game_update_string)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             if self.battle_ability_to_resolve == "Ferrin":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -1276,16 +1203,16 @@ class Game:
                                 self.p1.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
                                 await self.p1.send_hq()
                                 await self.p1.send_units_at_planet(int(game_update_string[2]))
-                                self.reset_battle_resolve_attributes()
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
                         elif game_update_string[1] == "2":
                             if self.p2.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)]. \
                                     get_card_type != "Warlord":
                                 self.p2.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
                                 await self.p2.send_hq()
                                 await self.p2.send_units_at_planet(int(game_update_string[2]))
-                                self.reset_battle_resolve_attributes()
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
             elif self.battle_ability_to_resolve == "Carnath":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -1300,25 +1227,21 @@ class Game:
                         if game_update_string[1] == "1":
                             self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
                             await self.p1.send_units_at_planet(int(game_update_string[2]))
-                            self.reset_battle_resolve_attributes()
-                            await self.resolve_battle_conclusion(name, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
                         elif game_update_string[1] == "2":
                             self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
                             await self.p2.send_units_at_planet(int(game_update_string[2]))
-                            self.reset_battle_resolve_attributes()
-                            await self.resolve_battle_conclusion(name, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == "1":
                             self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
                             await self.p1.send_hq()
-                            self.reset_battle_resolve_attributes()
-                            await self.resolve_battle_conclusion(name, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
                         elif game_update_string[1] == "2":
                             self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
                             await self.p2.send_hq()
-                            self.reset_battle_resolve_attributes()
-                            await self.resolve_battle_conclusion(name, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             elif self.battle_ability_to_resolve == "Plannum":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -1336,8 +1259,7 @@ class Game:
                             else:
                                 await player.send_units_at_planet(self.unit_to_move_position[0])
                             await player.send_units_at_planet(int(game_update_string[1]))
-                            self.reset_battle_resolve_attributes()
-                            await self.resolve_battle_conclusion(name, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == str(self.number_resolving_battle_ability):
@@ -1382,12 +1304,10 @@ class Game:
                             print("Resolve AOE")
                             await self.aoe_routine(self.p1, self.p2, planet_pos, 1)
                             self.damage_from_atrox = True
-                            self.reset_battle_resolve_attributes()
                         elif name == self.name_2:
                             print("Resolve AOE")
                             await self.aoe_routine(self.p2, self.p1, planet_pos, 1)
                             self.damage_from_atrox = True
-                            self.reset_battle_resolve_attributes()
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         self.damage_from_atrox = True
@@ -1406,7 +1326,6 @@ class Game:
                                     first_one = False
                                 else:
                                     player.set_aiming_reticle_in_play(-2, i, "blue")
-                        self.reset_battle_resolve_attributes()
                         await player.send_hq()
 
     async def destroy_check_cards_in_hq(self, player):
@@ -1503,78 +1422,6 @@ class Game:
                             await primary_player.send_hand()
                             await primary_player.send_discard()
 
-    async def shield_card_in_hq_check(self, name, game_update_string):
-        if name == self.player_who_is_shielding:
-            if len(game_update_string) == 1:
-                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    if name == self.name_1:
-                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                        self.p1.reset_aiming_reticle_in_play(-2, unit_pos)
-                        del self.positions_of_units_hq_to_take_damage[0]
-                        del self.damage_on_units_hq_before_new_damage[0]
-                        if self.positions_of_units_hq_to_take_damage:
-                            unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                            self.p1.set_aiming_reticle_in_play(-2, unit_pos, "red")
-                        else:
-                            await self.destroy_check_cards_in_hq(self.p1)
-                        await self.p1.send_hq()
-                    elif name == self.name_2:
-                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                        self.p2.reset_aiming_reticle_in_play(-2, unit_pos)
-                        del self.positions_of_units_hq_to_take_damage[0]
-                        del self.damage_on_units_hq_before_new_damage[0]
-                        if self.positions_of_units_hq_to_take_damage:
-                            unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                            self.p2.set_aiming_reticle_in_play(-2, unit_pos, "red")
-                        else:
-                            await self.destroy_check_cards_in_hq(self.p2)
-                        await self.p1.send_hq()
-            if len(game_update_string) == 3:
-                if game_update_string[0] == "HAND":
-                    if game_update_string[1] == str(self.number_who_is_shielding):
-                        unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                        hand_pos = int(game_update_string[2])
-                        if name == self.name_1:
-                            shield_card = self.p1.get_card_in_hand(hand_pos)
-                            if shield_card.get_shields() > 0:
-                                self.p1.remove_damage_from_pos(-2, unit_pos, shield_card.get_shields())
-                                if self.p1.get_damage_given_pos(-2, unit_pos) < \
-                                        self.damage_on_units_hq_before_new_damage[0]:
-                                    self.p1.set_damage_given_pos(-2, unit_pos,
-                                                                 self.damage_on_units_hq_before_new_damage[0])
-                                self.p1.discard_card_from_hand(hand_pos)
-                                self.p1.reset_aiming_reticle_in_play(-2, unit_pos)
-                                del self.positions_of_units_hq_to_take_damage[0]
-                                del self.damage_on_units_hq_before_new_damage[0]
-                                if self.positions_of_units_hq_to_take_damage:
-                                    unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                                    self.p1.set_aiming_reticle_in_play(-2, unit_pos, "red")
-                                else:
-                                    await self.destroy_check_cards_in_hq(self.p1)
-                                await self.p1.send_hq()
-                                await self.p1.send_hand()
-                                await self.p1.send_discard()
-                        elif name == self.name_2:
-                            shield_card = self.p2.get_card_in_hand(hand_pos)
-                            if shield_card.get_shields() > 0:
-                                self.p2.remove_damage_from_pos(-2, unit_pos, shield_card.get_shields())
-                                if self.p2.get_damage_given_pos(-2, unit_pos) < \
-                                        self.damage_on_units_hq_before_new_damage[0]:
-                                    self.p2.set_damage_given_pos(-2, unit_pos,
-                                                                 self.damage_on_units_hq_before_new_damage[0])
-                                self.p2.reset_aiming_reticle_in_play(-2, unit_pos)
-                                self.p2.discard_card_from_hand(hand_pos)
-                                del self.positions_of_units_hq_to_take_damage[0]
-                                del self.damage_on_units_hq_before_new_damage[0]
-                                if self.positions_of_units_hq_to_take_damage:
-                                    unit_pos = self.positions_of_units_hq_to_take_damage[0]
-                                    self.p2.set_aiming_reticle_in_play(-2, unit_pos, "red")
-                                else:
-                                    await self.destroy_check_cards_in_hq(self.p2)
-                                await self.p2.send_hq()
-                                await self.p2.send_hand()
-                                await self.p2.send_discard()
-
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -1593,8 +1440,6 @@ class Game:
             elif self.positions_of_units_to_take_damage:
                 print("Using better shield mechanism")
                 await self.better_shield_card_resolution(name, game_update_string)
-            elif self.positions_of_units_hq_to_take_damage:
-                await self.shield_card_in_hq_check(name, game_update_string)
             elif self.battle_ability_to_resolve:
                 await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":
@@ -1685,82 +1530,6 @@ class Game:
         elif number == 2:
             print("Discard p1")
             self.p1.discard_card_at_random()
-
-    async def resolve_shield_of_unit_from_attack(self, name, hand_pos):
-        print("Info shielding:", self.defender_planet, self.defender_position)
-        if name == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        primary_player.reset_aiming_reticle_in_play(self.defender_planet, self.defender_position)
-        shield_on_card = 0
-        if hand_pos != -1:
-            shield_on_card = primary_player.get_shields_given_pos(hand_pos)
-            primary_player.discard_card_from_hand(hand_pos)
-            await primary_player.send_hand()
-            await primary_player.send_discard()
-        amount_to_shield = shield_on_card
-        primary_player.remove_damage_from_pos(self.defender_planet, self.defender_position,
-                                              amount_to_shield)
-        if self.damage_on_units_list_before_new_damage:
-            self.damage_on_unit_before_new_damage = self.damage_on_units_list_before_new_damage[0]
-            del self.damage_on_units_list_before_new_damage[0]
-        if primary_player.get_damage_given_pos(self.defender_planet, self.defender_position) < \
-                self.damage_on_unit_before_new_damage:
-            primary_player.set_damage_given_pos(self.defender_planet, self.defender_position,
-                                                self.damage_on_unit_before_new_damage)
-        self.number_of_units_left_to_suffer_damage -= 1
-
-        if self.number_of_units_left_to_suffer_damage <= 0:
-            i = 0
-            while i < len(primary_player.cards_in_play[self.defender_planet + 1]):
-                unit_dead = primary_player.check_if_card_is_destroyed(self.defender_planet, i)
-                if unit_dead:
-                    primary_player.destroy_card_in_play(self.defender_planet, i)
-                    if self.hqs_need_sending_outside_normal_sends:
-                        await primary_player.send_hq()
-                        await secondary_player.send_hq()
-                        self.hqs_need_sending_outside_normal_sends = False
-                    if self.resources_need_sending_outside_normal_sends:
-                        await primary_player.send_resources()
-                        await secondary_player.send_resources()
-                        self.resources_need_sending_outside_normal_sends = False
-                    if self.cards_need_sending_outside_normal_sends:
-                        await primary_player.send_hand()
-                        await secondary_player.send_hand()
-                        self.cards_need_sending_outside_normal_sends = False
-                    if primary_player.warlord_just_got_bloodied:
-                        primary_player.warlord_just_got_bloodied = False
-                        await primary_player.send_hq()
-                    await primary_player.send_discard()
-                    i = i - 1
-                i = i + 1
-            self.number_of_units_left_to_suffer_damage = 0
-            if self.damage_from_atrox:
-                if name == self.name_1:
-                    await self.resolve_battle_conclusion(self.name_2, "")
-                elif name == self.name_2:
-                    await self.resolve_battle_conclusion(self.name_1, "")
-                self.attacker_planet = self.defender_planet
-            else:
-                self.number_with_combat_turn = primary_player.get_number()
-                self.player_with_combat_turn = primary_player.get_name_player()
-                secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
-                self.reset_shielding_values()
-                self.mode = "Normal"
-                self.actions_allowed = True
-        else:
-            self.next_unit_to_suffer_damage += 1
-            self.defender_position = self.next_unit_to_suffer_damage
-            primary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
-
-        await self.send_info_box()
-        await primary_player.send_units_at_planet(self.attacker_planet)
-        await secondary_player.send_units_at_planet(self.attacker_planet)
-        if self.number_of_units_left_to_suffer_damage <= 0:
-            self.reset_combat_positions()
 
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
