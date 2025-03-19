@@ -535,6 +535,7 @@ class Game:
             await primary_player.send_discard()
             await secondary_player.send_discard()
             await primary_player.send_units_at_planet(int(planet_pos))
+            await secondary_player.send_units_at_planet(int(planet_pos))
             await primary_player.send_resources()
             if not secondary_player.has_passed:
                 self.player_with_deploy_turn = secondary_player.get_name_player()
@@ -1402,7 +1403,6 @@ class Game:
                                     player.set_aiming_reticle_in_play(-2, i, "blue")
                         self.reset_battle_resolve_attributes()
                         await player.send_hq()
-
 
     async def destroy_check_cards_in_hq(self, player):
         print("All units have been damaged. Move to destruction")

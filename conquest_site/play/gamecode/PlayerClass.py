@@ -479,6 +479,31 @@ class Player:
                 self.game.card_type_of_searched_card = None
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
+            no_units_damaged = True
+            for i in range(len(self.cards_in_play[position + 1]) - 1):
+                if no_units_damaged:
+                    self.set_aiming_reticle_in_play(position, i, "red")
+                    no_units_damaged = False
+                else:
+                    self.set_aiming_reticle_in_play(position, i, "blue")
+                self.assign_damage_to_pos(position, i, 1)
+            if int(self.number) == 1:
+                for i in range(len(self.game.p2.cards_in_play[position + 1])):
+                    if no_units_damaged:
+                        self.game.p2.set_aiming_reticle_in_play(position, i, "red")
+                        no_units_damaged = False
+                    else:
+                        self.game.p2.set_aiming_reticle_in_play(position, i, "blue")
+                    self.game.p2.assign_damage_to_pos(position, i, 1)
+            else:
+                for i in range(len(self.game.p1.cards_in_play[position + 1])):
+                    if no_units_damaged:
+                        self.game.p1.set_aiming_reticle_in_play(position, i, "red")
+                        no_units_damaged = False
+                    else:
+                        self.game.p1.set_aiming_reticle_in_play(position, i, "blue")
+                    self.game.p1.assign_damage_to_pos(position, i, 1)
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
             if len(self.deck) > 5:
                 self.number_cards_to_search = 6
