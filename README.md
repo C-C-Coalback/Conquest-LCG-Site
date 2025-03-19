@@ -23,17 +23,20 @@ Currently we have: async chat rooms; login/logout; deck-building; async lobbies.
 
 Current game progress: Everything, except:
 
-- shielding (Half done, too closely tied with combat turns at the moment.)
-- card text (A significant amount of the raw traits/warlord abilities are working.)
+- ~~shielding~~
+- card text (See the spreadsheet)
 - action windows (getting there, added them to the deploy phase)
-- attachment support
+- ~~attachment support~~
 - a victory/loss screen
 - ~~some targeting follicles so that players can see what planets/units are being targeted~~
-- proper god damn multithreading
+- ~~proper god damn multithreading~~
+- Better deck building/selecting interface (low priority)
 - ???
 - and more!
 
 # How can I run it myself?
+
+First run "py -m pip install -r requirements.txt" to install dependencies.
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
 
