@@ -1109,9 +1109,9 @@ class Game:
 
     async def resolve_battle_conclusion(self, name, game_string):
         winner = None
-        if name == self.name_2:
+        if self.player_resolving_battle_ability == self.name_2:
             winner = self.p2
-        elif name == self.name_1:
+        elif self.player_resolving_battle_ability == self.name_1:
             winner = self.p1
         if winner is not None:
             if self.round_number == self.last_planet_checked_for_battle:
