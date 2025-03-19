@@ -156,43 +156,46 @@ class Player:
             await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_planet(self, planet_id):
-        if self.cards_in_play[planet_id + 1]:
-            print("Need to send units")
-            card_strings = []
-            for i in range(len(self.cards_in_play[planet_id + 1])):
-                current_card = self.cards_in_play[planet_id + 1][i]
-                single_card_string = current_card.get_name()
-                single_card_string = single_card_string + "|"
-                if current_card.ready:
-                    single_card_string += "R|"
-                else:
-                    single_card_string += "E|"
-                single_card_string += str(current_card.get_damage())
-                single_card_string += "|"
-                if current_card.get_card_type() == "Warlord":
-                    if current_card.get_bloodied():
-                        single_card_string += "B"
+        if planet_id == -2:
+            await self.send_hq()
+        else:
+            if self.cards_in_play[planet_id + 1]:
+                print("Need to send units")
+                card_strings = []
+                for i in range(len(self.cards_in_play[planet_id + 1])):
+                    current_card = self.cards_in_play[planet_id + 1][i]
+                    single_card_string = current_card.get_name()
+                    single_card_string = single_card_string + "|"
+                    if current_card.ready:
+                        single_card_string += "R|"
+                    else:
+                        single_card_string += "E|"
+                    single_card_string += str(current_card.get_damage())
+                    single_card_string += "|"
+                    if current_card.get_card_type() == "Warlord":
+                        if current_card.get_bloodied():
+                            single_card_string += "B"
+                        else:
+                            single_card_string += "H"
                     else:
                         single_card_string += "H"
-                else:
-                    single_card_string += "H"
-                single_card_string += "|"
-                if current_card.aiming_reticle_color is not None:
-                    single_card_string += current_card.aiming_reticle_color
-                attachments_list = current_card.get_attachments()
-                for a in range(len(attachments_list)):
-                    print("Adding attachments")
-                    print(attachments_list[a].get_name())
                     single_card_string += "|"
-                    single_card_string += attachments_list[a].get_name()
-                card_strings.append(single_card_string)
-            joined_string = "/".join(card_strings)
-            joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
-            print(joined_string)
-            await self.game.game_sockets[0].receive_game_update(joined_string)
-        else:
-            joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+                    if current_card.aiming_reticle_color is not None:
+                        single_card_string += current_card.aiming_reticle_color
+                    attachments_list = current_card.get_attachments()
+                    for a in range(len(attachments_list)):
+                        print("Adding attachments")
+                        print(attachments_list[a].get_name())
+                        single_card_string += "|"
+                        single_card_string += attachments_list[a].get_name()
+                    card_strings.append(single_card_string)
+                joined_string = "/".join(card_strings)
+                joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
+                print(joined_string)
+                await self.game.game_sockets[0].receive_game_update(joined_string)
+            else:
+                joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
+                await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_all_planets(self):
         for i in range(7):
@@ -819,34 +822,40 @@ class Player:
         return num_copies
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
+        if planet_id == -2:
+            return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
+        self.game.damage_on_units_list_before_new_damage.append(self.cards_in_play[planet_id + 1][unit_id].get_damage())
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                        "Zarathur, High Sorcerer",
                                                                        bloodied_relevant=True)
         if zara_check:
             damage += 1
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
+        self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
         return damage_too_great
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
+        self.game.damage_on_units_list_before_new_damage.append(self.headquarters[unit_id].get_damage())
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
+        self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
+        return damage_too_great
 
     def suffer_area_effect(self, planet_id, amount):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             self.assign_damage_to_pos(planet_id, i, amount)
 
     def suffer_area_effect_at_hq(self, amount):
-        self.game.positions_of_units_hq_to_take_damage = []
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_card_type() != "Support":
-                self.game.damage_on_units_hq_before_new_damage.append(self.headquarters[i].get_damage())
                 self.assign_damage_to_pos_hq(i, amount)
-                self.game.positions_of_units_hq_to_take_damage.append(i)
 
     def get_number_of_units_at_planet(self, planet_id):
         return len(self.cards_in_play[planet_id + 1])
 
     def check_if_card_is_destroyed(self, planet_id, unit_id):
         if planet_id == -2:
+            if self.headquarters[unit_id].get_card_type() == "Support":
+                return False
             return not self.headquarters[unit_id].check_health()
         return not self.cards_in_play[planet_id + 1][unit_id].check_health()
 

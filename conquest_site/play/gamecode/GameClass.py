@@ -89,6 +89,7 @@ class Game:
         self.damage_is_taken_one_at_a_time = False
         self.damage_left_to_take = 0
         self.positions_of_units_hq_to_take_damage = []
+        self.positions_of_units_to_take_damage = [] # Format: (player_num, planet_num, unit_pos)
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = "alex"
@@ -112,6 +113,8 @@ class Game:
         self.yvarn_active = False
         self.p1_triggered_yvarn = False
         self.p2_triggered_yvarn = False
+        self.damage_from_attack = False
+        self.attacker_location = [-1, -1, -1]
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -525,15 +528,7 @@ class Game:
         if played_card == "SUCCESS":
             self.mode = "Normal"
             if damage_to_take > 0:
-                self.damage_on_unit_before_new_damage = 0
-                self.player_who_is_shielding = primary_player.get_name_player()
-                self.number_who_is_shielding = str(primary_player.get_number())
-                self.planet_of_damaged_unit = int(planet_pos)
-                self.position_of_damaged_unit = position_of_unit
                 self.damage_is_taken_one_at_a_time = True
-                self.damage_left_to_take = damage_to_take
-                self.mode = "SHIELD"
-                print("Position of the damaged unit:", planet_pos, position_of_unit)
                 primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
             await primary_player.send_hand()
             await secondary_player.send_hand()
@@ -661,7 +656,13 @@ class Game:
                                 amount_aoe = primary_player.cards_in_play[chosen_planet + 1][
                                     self.attacker_position].get_area_effect()
                                 if amount_aoe > 0:
+                                    self.damage_from_attack = True
+                                    self.attacker_location = (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position)
                                     await self.aoe_routine(primary_player, secondary_player, chosen_planet, amount_aoe)
+                                    self.reset_combat_positions()
+                                    self.number_with_combat_turn = secondary_player.get_number()
+                                    self.player_with_combat_turn = secondary_player.get_name_player()
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 print("Card in hand clicked on")
@@ -773,17 +774,15 @@ class Game:
                                     unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
                                                                                       self.defender_position,
                                                                                       damage=attack_value)
+                                    self.damage_from_attack = True
+                                    self.attacker_location = (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position)
                                     armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
                                                                                              self.attacker_position)
-                                    self.mode = "SHIELD"
-                                    self.player_who_is_shielding = secondary_player.get_name_player()
-                                    self.number_who_is_shielding = secondary_player.get_number()
-                                    self.planet_of_damaged_unit = self.defender_planet
-                                    self.position_of_damaged_unit = self.defender_position
                                     secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                 self.defender_position, "red")
-                                    if armorbane_check and attack_value > 0:
-                                        await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
+                                    # if armorbane_check and attack_value > 0:
+                                    #     await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
                                 else:
                                     primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                                 self.attacker_position)
@@ -791,13 +790,11 @@ class Game:
                                     await primary_player.send_units_at_planet(self.attacker_planet)
                                 if not armorbane_check or attack_value < 1:
                                     await secondary_player.send_units_at_planet(self.defender_planet)
-                                if attack_value < 1:
-                                    self.reset_combat_positions()
-                                    self.number_with_combat_turn = secondary_player.get_number()
-                                    self.player_with_combat_turn = secondary_player.get_name_player()
-                                    name = secondary_player.get_name_player()
-                                if not armorbane_check or attack_value < 1:
-                                    await self.send_info_box()
+                                self.reset_combat_positions()
+                                self.number_with_combat_turn = secondary_player.get_number()
+                                self.player_with_combat_turn = secondary_player.get_name_player()
+                                # if not armorbane_check or attack_value < 1:
+                                #     await self.send_info_box()
                             else:
                                 self.defender_planet = -1
                                 self.defender_position = -1
@@ -814,13 +811,6 @@ class Game:
             secondary_player.set_aiming_reticle_in_play(chosen_planet, 0, "red")
             for i in range(1, self.number_of_units_left_to_suffer_damage):
                 secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-        self.mode = "SHIELD"
-        self.player_who_is_shielding = secondary_player.get_name_player()
-        self.number_who_is_shielding = secondary_player.get_number()
-        self.next_unit_to_suffer_damage = 0
-        self.defender_position = self.next_unit_to_suffer_damage
-        self.defender_planet = chosen_planet
-        self.damage_on_unit_before_new_damage = -1
         await self.send_info_box()
         await secondary_player.send_units_at_planet(chosen_planet)
 
@@ -1397,29 +1387,23 @@ class Game:
                     if game_update_string[0] == "HQ":
                         self.damage_from_atrox = True
                         if game_update_string[1] == "1":
-                            self.p1.suffer_area_effect_at_hq(1)
-                            if self.positions_of_units_hq_to_take_damage:
-                                self.p1.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[0],
-                                                                   "red")
-                            for i in range(1, len(self.positions_of_units_hq_to_take_damage)):
-                                self.p1.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[i],
-                                                                   "blue")
-                            self.player_who_is_shielding = self.name_1
-                            self.number_who_is_shielding = "1"
-                            self.reset_battle_resolve_attributes()
-                            await self.p1.send_hq()
-                        elif game_update_string[1] == "2":
-                            self.p2.suffer_area_effect_at_hq(1)
-                            if self.positions_of_units_hq_to_take_damage:
-                                self.p2.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[0],
-                                                                   "red")
-                            for i in range(1, len(self.positions_of_units_hq_to_take_damage)):
-                                self.p2.set_aiming_reticle_in_play(-2, self.positions_of_units_hq_to_take_damage[i],
-                                                                   "blue")
-                            self.player_who_is_shielding = self.name_2
-                            self.number_who_is_shielding = "2"
-                            self.reset_battle_resolve_attributes()
-                            await self.p2.send_hq()
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        player.suffer_area_effect_at_hq(1)
+                        self.player_who_is_shielding = str(player.name_player)
+                        self.number_who_is_shielding = str(player.number)
+                        first_one = True
+                        for i in range(len(player.headquarters)):
+                            if player.headquarters[i].get_card_type() != "Support":
+                                if first_one:
+                                    player.set_aiming_reticle_in_play(-2, i, "red")
+                                    first_one = False
+                                else:
+                                    player.set_aiming_reticle_in_play(-2, i, "blue")
+                        self.reset_battle_resolve_attributes()
+                        await player.send_hq()
+
 
     async def destroy_check_cards_in_hq(self, player):
         print("All units have been damaged. Move to destruction")
@@ -1432,6 +1416,88 @@ class Game:
             i = i + 1
         if self.damage_from_atrox:
             await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
+
+    async def destroy_check_cards_at_planet(self, player, planet_num):
+        print("All units have been damaged. Move to destruction")
+        i = 0
+        while i < len(player.cards_in_play[planet_num + 1]):
+            if player.check_if_card_is_destroyed(planet_num, i):
+                player.destroy_card_in_play(planet_num, i)
+                i = i - 1
+            i = i + 1
+
+    async def destroy_check_all_cards(self):
+        for i in range(7):
+            await self.destroy_check_cards_at_planet(self.p1, i)
+            await self.destroy_check_cards_at_planet(self.p2, i)
+        await self.destroy_check_cards_in_hq(self.p1)
+        await self.destroy_check_cards_in_hq(self.p2)
+
+    def advance_damage_aiming_reticle(self):
+        pos_holder = self.positions_of_units_to_take_damage[0]
+        player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+        if player_num == 1:
+            self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+        elif player_num == 2:
+            self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+
+    def clear_attacker_aiming_reticle(self):
+        player_num, planet_pos, unit_pos = self.attacker_location
+        if player_num == 1:
+            self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+        elif player_num == 2:
+            self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+        self.damage_from_attack = False
+        self.attacker_location = [-1, -1, -1]
+
+    async def better_shield_card_resolution(self, name, game_update_string):
+        if name == self.player_who_is_shielding:
+            pos_holder = self.positions_of_units_to_take_damage[0]
+            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+            if player_num == 1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    del self.positions_of_units_to_take_damage[0]
+                    del self.damage_on_units_list_before_new_damage[0]
+                    if self.positions_of_units_to_take_damage:
+                        self.advance_damage_aiming_reticle()
+                    else:
+                        await self.destroy_check_all_cards()
+                        if self.damage_from_attack:
+                            self.clear_attacker_aiming_reticle()
+                    await primary_player.send_units_at_planet(planet_pos)
+                    await secondary_player.send_units_at_planet(planet_pos)
+            elif len(game_update_string) == 3:
+                if game_update_string[0] == "HAND":
+                    if game_update_string[1] == str(self.number_who_is_shielding):
+                        hand_pos = int(game_update_string[2])
+                        shields = primary_player.get_shields_given_pos(hand_pos)
+                        if shields > 0:
+                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
+                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) < \
+                                    self.damage_on_units_list_before_new_damage[0]:
+                                primary_player.set_damage_given_pos(planet_pos, unit_pos,
+                                                                    self.damage_on_units_list_before_new_damage[0])
+                            primary_player.discard_card_from_hand(hand_pos)
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            del self.positions_of_units_to_take_damage[0]
+                            del self.damage_on_units_list_before_new_damage[0]
+                            if self.positions_of_units_to_take_damage:
+                                self.advance_damage_aiming_reticle()
+                            else:
+                                if self.damage_from_attack:
+                                    self.clear_attacker_aiming_reticle()
+                                await self.destroy_check_all_cards()
+                            await primary_player.send_units_at_planet(planet_pos)
+                            await secondary_player.send_units_at_planet(planet_pos)
+                            await primary_player.send_hand()
+                            await primary_player.send_discard()
 
     async def shield_card_in_hq_check(self, name, game_update_string):
         if name == self.player_who_is_shielding:
@@ -1520,6 +1586,9 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.positions_of_units_to_take_damage:
+                print("Using better shield mechanism")
+                await self.better_shield_card_resolution(name, game_update_string)
             elif self.positions_of_units_hq_to_take_damage:
                 await self.shield_card_in_hq_check(name, game_update_string)
             elif self.battle_ability_to_resolve:
@@ -1532,6 +1601,18 @@ class Game:
                 await self.update_game_event_combat_section(name, game_update_string)
         if self.cards_in_search_box:
             await self.send_search()
+        if self.positions_of_units_to_take_damage:
+            print("Entering better shield mode")
+            pos_holder = self.positions_of_units_to_take_damage[0]
+            player_num = pos_holder[0]
+            if player_num == 1:
+                self.player_who_is_shielding = self.name_1
+                self.number_who_is_shielding = "1"
+                self.p1.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
+            elif player_num == 2:
+                self.player_who_is_shielding = self.name_2
+                self.number_who_is_shielding = "2"
+                self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
