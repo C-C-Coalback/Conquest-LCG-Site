@@ -771,6 +771,11 @@ class Game:
                                     self.damage_on_unit_before_new_damage = \
                                         secondary_player.get_damage_given_pos(self.defender_planet,
                                                                               self.defender_position)
+                                    if secondary_player.check_for_trait_given_pos(self.defender_planet,
+                                                                                  self.defender_position, "Vehicle"):
+                                        if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                                self.attacker_position):
+                                            attack_value = attack_value * 2
                                     unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
                                                                                       self.defender_position,
                                                                                       damage=attack_value)

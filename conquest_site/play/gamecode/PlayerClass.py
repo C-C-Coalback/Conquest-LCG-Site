@@ -332,6 +332,9 @@ class Player:
     def get_ranged_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_ranged()
 
+    def check_for_trait_given_pos(self, planet_id, unit_id, trait):
+        return self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait(trait)
+
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.retreat_warlord()
