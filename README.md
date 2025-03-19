@@ -5,10 +5,10 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 I should really get a better name for this section.
 
-The planets have now all been implemented. If you chose the right 
-cards, you could have a full, honest game of Conquest now. UI is 
-quite clunky though, need to sort that out first. 
-Focusing on getting cards working before that.
+The game has been updated to use a shielding system that is 
+not completely terrible. With the new one, it will be simple
+to add new effects that involve dealing damage (Sicarius's Chosen, 
+Weirdboy Maniak, Warpstorm, etc.)
 
 # What is this?
 
