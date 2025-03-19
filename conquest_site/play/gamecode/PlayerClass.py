@@ -1009,10 +1009,18 @@ class Player:
                         j = j - 1
                     j = j + 1
 
-    def retreat_unit(self, planet_id, unit_id):
-        # print("Name of card:", self.cards_in_play[planet_id + 1][unit_id].get_name())
+    def retreat_unit(self, planet_id, unit_id, exhaust=False):
+        if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
+            enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
+                                                                                   "Umbral Preacher")
+            if own_umbral_check or enemy_umbral_check:
+                return False
+        if exhaust:
+            self.exhaust_given_pos(planet_id, unit_id)
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         del self.cards_in_play[planet_id + 1][unit_id]
+        return True
 
     def rout_unit(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()

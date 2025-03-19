@@ -685,8 +685,7 @@ class Game:
                                     player = self.p1
                                 else:
                                     player = self.p2
-                                player.exhaust_given_pos(chosen_planet, chosen_unit)
-                                player.retreat_unit(chosen_planet, chosen_unit)
+                                player.retreat_unit(chosen_planet, chosen_unit, exhaust=True)
                                 await player.send_units_at_planet(self.last_planet_checked_for_battle)
                                 await player.send_hq()
                     elif self.attacker_position == -1:
