@@ -1041,6 +1041,11 @@ class Player:
                         j = j - 1
                     j = j + 1
 
+    def move_unit_at_planet_to_hq(self, planet_id, unit_id):
+        self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
+        del self.cards_in_play[planet_id + 1][unit_id]
+        return True
+
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
@@ -1085,6 +1090,10 @@ class Player:
     def retreat_all_at_planet(self, planet_id):
         while self.cards_in_play[planet_id + 1]:
             self.retreat_unit(planet_id, 0)
+
+    def move_all_at_planet_to_hq(self, planet_id):
+        while self.cards_in_play[planet_id + 1]:
+            self.move_unit_at_planet_to_hq(planet_id, 0)
 
     def capture_planet(self, planet_id, planet_cards):
         planet_name = self.cards_in_play[0][planet_id]

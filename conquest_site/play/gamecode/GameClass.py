@@ -1051,7 +1051,7 @@ class Game:
             winner = self.p1
         if winner is not None:
             if self.round_number == self.last_planet_checked_for_battle:
-                winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
                 await winner.send_hq()
                 await winner.send_units_at_planet(self.last_planet_checked_for_battle)
                 winner.capture_planet(self.last_planet_checked_for_battle,
@@ -1588,7 +1588,7 @@ class Game:
         await self.send_search()
         if not self.need_to_resolve_battle_ability:
             if self.round_number == self.last_planet_checked_for_battle:
-                winner.retreat_all_at_planet(self.last_planet_checked_for_battle)
+                winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
                 await winner.send_hq()
                 await winner.send_units_at_planet(self.last_planet_checked_for_battle)
                 winner.capture_planet(self.last_planet_checked_for_battle,
