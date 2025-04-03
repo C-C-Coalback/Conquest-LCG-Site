@@ -1549,7 +1549,7 @@ class Game:
                 if game_update_string[0] == "HAND":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hand_pos = int(game_update_string[2])
-                        shields = primary_player.get_shields_given_pos(hand_pos)
+                        shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos)
                         if shields > 0:
                             took_damage = True
                             primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)

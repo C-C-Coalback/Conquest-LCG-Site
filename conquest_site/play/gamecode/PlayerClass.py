@@ -315,10 +315,16 @@ class Player:
     def remove_card_from_hand(self, card_pos):
         del self.cards[card_pos]
 
-    def get_shields_given_pos(self, pos_in_hand):
+    def get_shields_given_pos(self, pos_in_hand, planet_pos=None):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array)
-        return card_object.get_shields()
+        shields = card_object.get_shields()
+        if shields > 0:
+            if card_object.get_faction() == "Tau":
+                if planet_pos is not None:
+                    if self.search_card_at_planet(planet_pos, "Fireblade Kais'vre"):
+                        shields += 1
+        return shields
 
     def get_damage_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
