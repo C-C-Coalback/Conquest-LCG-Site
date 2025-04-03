@@ -468,6 +468,8 @@ class Game:
                                                                  damage_to_take=damage_to_take)
         if played_card == "SUCCESS":
             self.mode = "Normal"
+            if secondary_player.search_card_at_planet(int(planet_pos), "Syren Zythlex"):
+                primary_player.exhaust_given_pos(int(planet_pos), position_of_unit)
             if damage_to_take > 0:
                 self.damage_is_taken_one_at_a_time = True
                 primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
