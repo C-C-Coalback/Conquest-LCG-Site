@@ -89,7 +89,7 @@ class Game:
         self.damage_is_taken_one_at_a_time = False
         self.damage_left_to_take = 0
         self.positions_of_units_hq_to_take_damage = []
-        self.positions_of_units_to_take_damage = [] # Format: (player_num, planet_num, unit_pos)
+        self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = "alex"
@@ -357,7 +357,7 @@ class Game:
                         self.discounts_applied = 0
                         self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
                         self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
-                        temp_av_disc, temp_auto_disc = player.\
+                        temp_av_disc, temp_auto_disc = player. \
                             search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
                         self.available_discounts += temp_av_disc
                         self.discounts_applied += temp_auto_disc
@@ -688,10 +688,10 @@ class Game:
                             attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
                             can_continue = True
-                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                     .get_ability() == "Honored Librarian":
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
-                                    if secondary_player.cards_in_play[self.defender_planet + 1][i]\
+                                    if secondary_player.cards_in_play[self.defender_planet + 1][i] \
                                             .get_ability() != "Honored Librarian":
                                         can_continue = False
                             if can_continue:
@@ -710,7 +710,7 @@ class Game:
                                     if primary_player.get_ability_given_pos(
                                             self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
                                         if secondary_player.cards_in_play[
-                                            self.defender_planet + 1][self.defender_position]\
+                                            self.defender_planet + 1][self.defender_position] \
                                                 .get_card_type() != "Warlord":
                                             secondary_player.exhaust_given_pos(self.defender_planet,
                                                                                self.defender_position)
@@ -1332,7 +1332,7 @@ class Game:
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         if game_update_string[1] == "1":
-                            if self.p1.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)].\
+                            if self.p1.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)]. \
                                     get_card_type != "Warlord":
                                 self.p1.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
                                 await self.p1.send_hq()
@@ -1361,21 +1361,25 @@ class Game:
                         if game_update_string[1] == "1":
                             self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
                             await self.p1.send_units_at_planet(int(game_update_string[2]))
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
                         elif game_update_string[1] == "2":
                             self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
                             await self.p2.send_units_at_planet(int(game_update_string[2]))
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == "1":
                             self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
                             await self.p1.send_hq()
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
                         elif game_update_string[1] == "2":
                             self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
                             await self.p2.send_hq()
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
             elif self.battle_ability_to_resolve == "Plannum":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -1393,7 +1397,8 @@ class Game:
                             else:
                                 await player.send_units_at_planet(self.unit_to_move_position[0])
                             await player.send_units_at_planet(int(game_update_string[1]))
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == str(self.number_resolving_battle_ability):
@@ -1417,10 +1422,10 @@ class Game:
                                 player = self.p1
                             else:
                                 player = self.p2
-                            if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]\
+                            if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
                                     .get_card_type() != "Warlord" and \
-                                    player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]\
-                                    .get_card_type() != "Support":
+                                    player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
+                                            .get_card_type() != "Support":
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
@@ -1581,8 +1586,10 @@ class Game:
                                 print("test")
                                 if abs(origin_planet - target_planet) == 1:
                                     print("test")
-                                    if secondary_player.cards_in_play[target_planet + 1][int(game_update_string[3])].get_card_type() == "Army":
-                                        secondary_player.move_unit_to_planet(target_planet, int(game_update_string[3]), origin_planet)
+                                    if secondary_player.cards_in_play[target_planet + 1][
+                                        int(game_update_string[3])].get_card_type() == "Army":
+                                        secondary_player.move_unit_to_planet(target_planet, int(game_update_string[3]),
+                                                                             origin_planet)
                                         new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
                                         secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1)
                                         secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos, "red")
@@ -1604,13 +1611,64 @@ class Game:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         primary_player.mobile_resolved = True
+                        self.unit_to_move_position = [-1, -1]
                         await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+
+                elif len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        planet_pos = int(game_update_string[1])
+                        if self.unit_to_move_position[0] != -1 and self.unit_to_move_position[1] != -1:
+                            if abs(planet_pos - self.unit_to_move_position[0]) == 1:
+                                primary_player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                            self.unit_to_move_position[1])
+                                primary_player.set_available_mobile_given_pos(self.unit_to_move_position[0],
+                                                                              self.unit_to_move_position[1], False)
+                                primary_player.move_unit_to_planet(self.unit_to_move_position[0],
+                                                                   self.unit_to_move_position[1], planet_pos)
+                                if not primary_player.search_cards_for_available_mobile():
+                                    primary_player.mobile_resolved = True
+                                await primary_player.send_units_at_planet(self.unit_to_move_position[0])
+                                await primary_player.send_units_at_planet(planet_pos)
+                                self.unit_to_move_position = [-1, -1]
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if int(game_update_string[1]) == int(primary_player.number):
+                            self.unit_to_move_position[0] = int(game_update_string[2])
+                            self.unit_to_move_position[1] = int(game_update_string[3])
+                            primary_player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                      self.unit_to_move_position[1], "blue")
+                            await primary_player.send_units_at_planet(self.unit_to_move_position[0])
         else:
             if name == secondary_player.name_player:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         secondary_player.mobile_resolved = True
+                        self.unit_to_move_position = [-1, -1]
                         await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+                elif len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        planet_pos = int(game_update_string[1])
+                        if self.unit_to_move_position[0] != -1 and self.unit_to_move_position[1] != -1:
+                            if abs(planet_pos - self.unit_to_move_position[0]) == 1:
+                                secondary_player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                              self.unit_to_move_position[1])
+                                secondary_player.set_available_mobile_given_pos(self.unit_to_move_position[0],
+                                                                                self.unit_to_move_position[1], False)
+                                secondary_player.move_unit_to_planet(self.unit_to_move_position[0],
+                                                                     self.unit_to_move_position[1], planet_pos)
+                                if not secondary_player.search_cards_for_available_mobile():
+                                    secondary_player.mobile_resolved = True
+                                await secondary_player.send_units_at_planet(self.unit_to_move_position[0])
+                                await secondary_player.send_units_at_planet(planet_pos)
+                                self.unit_to_move_position = [-1, -1]
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if int(game_update_string[1]) == int(secondary_player.number):
+                            self.unit_to_move_position[0] = int(game_update_string[2])
+                            self.unit_to_move_position[1] = int(game_update_string[3])
+                            secondary_player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
+                                                                        self.unit_to_move_position[1], "blue")
+                            await secondary_player_player.send_units_at_planet(self.unit_to_move_position[0])
         if primary_player.mobile_resolved and secondary_player.mobile_resolved:
             await self.game_sockets[0].receive_game_update("mobile complete")
             self.check_battle(self.round_number)
