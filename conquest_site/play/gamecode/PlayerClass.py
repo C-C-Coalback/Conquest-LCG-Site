@@ -835,6 +835,12 @@ class Player:
                     discounts_available += 2
         return discounts_available
 
+    def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil):
+        for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == card_abil:
+                return True
+        return False
+
     def perform_discount_at_pos_hq(self, pos, faction_of_card):
         discount = 0
         if self.headquarters[pos].get_applies_discounts():
@@ -919,7 +925,7 @@ class Player:
                 num_copies += 1
         return num_copies
 
-    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True):
+    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         self.game.damage_on_units_list_before_new_damage.append(self.cards_in_play[planet_id + 1][unit_id].get_damage())
@@ -930,12 +936,14 @@ class Player:
             damage += 1
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
+        self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
         return damage_too_great
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
         self.game.damage_on_units_list_before_new_damage.append(self.headquarters[unit_id].get_damage())
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
+        self.game.positions_attackers_of_units_to_take_damage.append(None)
         return damage_too_great
 
     def suffer_area_effect(self, planet_id, amount):

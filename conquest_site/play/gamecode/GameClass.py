@@ -90,6 +90,7 @@ class Game:
         self.damage_left_to_take = 0
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
+        self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = "alex"
@@ -725,12 +726,13 @@ class Game:
                                         if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                                 self.attacker_position):
                                             attack_value = attack_value * 2
-                                    unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
-                                                                                      self.defender_position,
-                                                                                      damage=attack_value)
-                                    self.damage_from_attack = True
                                     self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                               self.attacker_position)
+                                    unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
+                                                                                      self.defender_position,
+                                                                                      damage=attack_value,
+                                                                                      att_pos=self.attacker_location)
+                                    self.damage_from_attack = True
                                     armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
                                                                                              self.attacker_position)
                                     secondary_player.set_aiming_reticle_in_play(self.defender_planet,
@@ -1525,8 +1527,16 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
+                            att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                            if att_num == 1:
+                                self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
+                            else:
+                                self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
                     del self.positions_of_units_to_take_damage[0]
                     del self.damage_on_units_list_before_new_damage[0]
+                    del self.positions_attackers_of_units_to_take_damage[0]
                     if self.positions_of_units_to_take_damage:
                         self.advance_damage_aiming_reticle()
                     else:
@@ -1541,15 +1551,27 @@ class Game:
                         hand_pos = int(game_update_string[2])
                         shields = primary_player.get_shields_given_pos(hand_pos)
                         if shields > 0:
+                            took_damage = True
                             primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
-                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) < \
+                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
                                     self.damage_on_units_list_before_new_damage[0]:
                                 primary_player.set_damage_given_pos(planet_pos, unit_pos,
                                                                     self.damage_on_units_list_before_new_damage[0])
+                                took_damage = False
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            if took_damage:
+                                if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                    if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
+                                                                                "Repulsor Impact Field"):
+                                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                        if att_num == 1:
+                                            self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
+                                        else:
+                                            self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
                             del self.positions_of_units_to_take_damage[0]
                             del self.damage_on_units_list_before_new_damage[0]
+                            del self.positions_attackers_of_units_to_take_damage[0]
                             if self.positions_of_units_to_take_damage:
                                 self.advance_damage_aiming_reticle()
                             else:
