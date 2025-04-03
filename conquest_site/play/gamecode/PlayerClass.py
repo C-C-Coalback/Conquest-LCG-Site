@@ -812,7 +812,7 @@ class Player:
                 return True
         return False
 
-    def search_hq_for_discounts(self, faction_of_card):
+    def search_hq_for_discounts(self, faction_of_card, traits):
         discounts_available = 0
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_applies_discounts():
@@ -820,7 +820,28 @@ class Player:
                     if self.headquarters[i].get_faction() == faction_of_card:
                         if self.headquarters[i].get_ready():
                             discounts_available += self.headquarters[i].get_discount_amount()
+            if "Daemon" in traits:
+                if self.headquarters[i].get_ability() == "Cultist":
+                    discounts_available += 1
+                elif self.headquarters[i].get_ability() == "Splintered Path Acolyte":
+                    discounts_available += 2
 
+        return discounts_available
+
+    def search_planet_for_discounts(self, planet_pos, traits):
+        discounts_available = 0
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if "Daemon" in traits:
+                if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
+                    discounts_available += 1
+                elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Splintered Path Acolyte":
+                    discounts_available += 2
+        return discounts_available
+
+    def search_all_planets_for_discounts(self, traits):
+        discounts_available = 0
+        for i in range(7):
+            discounts_available += self.search_planet_for_discounts(i, traits)
         return discounts_available
 
     def search_same_planet_for_discounts(self, faction_of_card, planet_pos):
@@ -847,7 +868,7 @@ class Player:
                 return True
         return False
 
-    def perform_discount_at_pos_hq(self, pos, faction_of_card):
+    def perform_discount_at_pos_hq(self, pos, faction_of_card, traits):
         discount = 0
         if self.headquarters[pos].get_applies_discounts():
             if self.headquarters[pos].get_is_faction_limited_unique_discounter():
@@ -855,6 +876,13 @@ class Player:
                     if self.headquarters[pos].get_ready():
                         self.headquarters[pos].exhaust_card()
                         discount += self.headquarters[pos].get_discount_amount()
+        if "Daemon" in traits:
+            if self.headquarters[pos].get_ability() == "Cultist":
+                discount += 1
+                self.sacrifice_card_in_hq(pos)
+            elif self.headquarters[pos].get_ability() == "Splintered Path Acolyte":
+                discount += 2
+                self.sacrifice_card_in_hq(pos)
         return discount
 
     def perform_discount_at_pos_hand(self, pos, faction_of_card):
@@ -865,6 +893,17 @@ class Player:
                 discount += 2
                 damage += 1
         return discount, damage
+
+    def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits):
+        discount = 0
+        if "Daemon" in traits:
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
+                discount += 1
+                self.sacrifice_card_in_play(planet_pos, unit_pos)
+            elif self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Splintered Path Acolyte":
+                discount += 2
+                self.sacrifice_card_in_play(planet_pos, unit_pos)
+        return discount
 
     def exhaust_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()

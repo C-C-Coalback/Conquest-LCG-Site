@@ -83,6 +83,7 @@ class Game:
         self.discounts_applied = 0
         self.damage_for_unit_to_take_on_play = []
         self.faction_of_card_to_play = ""
+        self.traits_of_card_to_play = ""
         self.ranged_skirmish_active = False
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
@@ -299,6 +300,7 @@ class Game:
                                 secondary_player = self.p1
                             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
                             self.faction_of_card_to_play = card.get_faction()
+                            self.traits_of_card_to_play = card.get_traits()
                             if card.get_card_type() == "Support":
                                 played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
                                                                                      already_checked=True, card=card)[0]
@@ -339,9 +341,11 @@ class Game:
                                 player = self.p2
                             if self.card_type_of_selected_card_in_hand == "Army":
                                 discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
-                                                                                      self.faction_of_card_to_play)
+                                                                                      self.faction_of_card_to_play,
+                                                                                      self.traits_of_card_to_play)
                                 if discount_received > 0:
                                     self.discounts_applied += discount_received
+                                    await player.send_hq()
                                 if self.discounts_applied >= self.available_discounts:
                                     await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
                                                                    discounts=self.discounts_applied)
@@ -356,10 +360,12 @@ class Game:
                         else:
                             player = self.p2
                         self.discounts_applied = 0
-                        self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
+                        self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
+                                                                                  self.traits_of_card_to_play)
                         self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
                         temp_av_disc, temp_auto_disc = player. \
                             search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
+                        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
                         self.available_discounts += temp_av_disc
                         self.discounts_applied += temp_auto_disc
                         if self.available_discounts > self.discounts_applied:
@@ -377,6 +383,23 @@ class Game:
                 if self.mode == "Normal":
                     if name == self.player_with_deploy_turn:
                         await self.deploy_card_routine_attachment(name, game_update_string)
+                elif self.mode == "DISCOUNT":
+                    if game_update_string[1] == self.number_with_deploy_turn:
+                        if self.number_with_deploy_turn == "1":
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        if self.card_type_of_selected_card_in_hand == "Army":
+                            discount_received = player.perform_discount_at_pos_in_play(int(game_update_string[2]),
+                                                                                       int(game_update_string[3]),
+                                                                                       self.traits_of_card_to_play)
+                            if discount_received > 0:
+                                self.discounts_applied += discount_received
+                                await player.send_units_at_planet(int(game_update_string[2]))
+                            if self.discounts_applied >= self.available_discounts:
+                                await self.deploy_card_routine(name, self.planet_aiming_reticle_position,
+                                                               discounts=self.discounts_applied)
+                                self.mode = "Normal"
 
     async def deploy_card_routine_attachment(self, name, game_update_string):
         if game_update_string[0] == "HQ":
