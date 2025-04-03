@@ -979,9 +979,22 @@ class Player:
                                                                        bloodied_relevant=True)
         if zara_check:
             damage += 1
+        bodyguard_damage_list = []
+        if att_pos is not None:
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if i != unit_id:
+                    if self.search_attachments_at_pos(planet_id, i, "Bodyguard"):
+                        if damage > 0:
+                            damage = damage - 1
+                            bodyguard_damage_list.append(i)
+        damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
-        self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
-        self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
+        damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
+        for i in range(len(bodyguard_damage_list)):
+            self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1)
+        if damage_on_card_after > damage_on_card_before:
+            self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
+            self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
         return damage_too_great
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):

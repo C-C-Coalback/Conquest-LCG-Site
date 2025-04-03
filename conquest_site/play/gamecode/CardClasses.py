@@ -35,6 +35,9 @@ class Card:
         self.limited = limited
         self.counter = 0
 
+    def set_available_mobile(self, new_val):
+        return None
+
     def get_counter(self):
         return self.counter
 
