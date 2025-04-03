@@ -761,6 +761,16 @@ class Player:
 
         return discounts_available
 
+    def search_same_planet_for_discounts(self, faction_of_card, planet_pos):
+        discounts_available = 0
+        automatic_discounts = 0
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.cards_in_play[planet_pos + 1][i].get_ability() == "Crushface":
+                if faction_of_card == "Orks":
+                    discounts_available += 1
+                    automatic_discounts += 1
+        return discounts_available, automatic_discounts
+
     def search_hand_for_discounts(self, faction_of_card):
         discounts_available = 0
         for i in range(len(self.cards)):

@@ -346,23 +346,30 @@ class Game:
                                     self.mode = "Normal"
 
         elif len(game_update_string) == 2:
-            if name == self.player_with_deploy_turn:
-                if self.card_pos_to_deploy != -1:
-                    if self.number_with_deploy_turn == "1":
-                        player = self.p1
-                    else:
-                        player = self.p2
-                    self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
-                    self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
-                    if self.available_discounts > 0:
-                        self.stored_mode = self.mode
-                        self.mode = "DISCOUNT"
-                        self.planet_aiming_reticle_position = int(game_update_string[1])
-                        self.planet_aiming_reticle_active = True
-                        await self.send_planet_array()
-                        await self.send_info_box()
-                    else:
-                        await self.deploy_card_routine(name, game_update_string[1])
+            if game_update_string[0] == "PLANETS":
+                if name == self.player_with_deploy_turn:
+                    if self.card_pos_to_deploy != -1:
+                        if self.number_with_deploy_turn == "1":
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        self.discounts_applied = 0
+                        self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play)
+                        self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
+                        temp_av_disc, temp_auto_disc = player.\
+                            search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
+                        self.available_discounts += temp_av_disc
+                        self.discounts_applied += temp_auto_disc
+                        if self.available_discounts > self.discounts_applied:
+                            self.stored_mode = self.mode
+                            self.mode = "DISCOUNT"
+                            self.planet_aiming_reticle_position = int(game_update_string[1])
+                            self.planet_aiming_reticle_active = True
+                            await self.send_planet_array()
+                            await self.send_info_box()
+                        else:
+                            await self.deploy_card_routine(name, game_update_string[1],
+                                                           discounts=self.discounts_applied)
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if self.mode == "Normal":
