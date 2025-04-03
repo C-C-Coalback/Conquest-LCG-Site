@@ -824,6 +824,12 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Deception":
+                        self.action_chosen = "Deception"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Exterminatus":
                         print("Resolve Exterminatus")
                         self.action_chosen = "Exterminatus"
@@ -877,20 +883,19 @@ class Game:
                         if game_update_string[1] == self.number_with_deploy_turn:
                             self.condition_sub_game.acquire()
                             await self.update_game_event_deploy_action_hand(name, game_update_string)
-                            self.condition_sub_game.acquire()
                             self.condition_sub_game.notify_all()
                             self.condition_sub_game.release()
             elif game_update_string[0] == "HQ":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
-                        if game_update_string[1] == self.number_with_deploy_turn:
-                            if self.action_chosen == "Pact of the Haemonculi":
+                        if self.action_chosen == "Pact of the Haemonculi":
+                            if game_update_string[1] == self.number_with_deploy_turn:
                                 if self.number_with_deploy_turn == "1":
                                     primary_player = self.p1
                                     secondary_player = self.p2
                                 else:
                                     primary_player = self.p2
-                                    secondary_player = self.p2
+                                    secondary_player = self.p1
                                 if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
                                     primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                                     secondary_player.discard_card_at_random()
@@ -907,12 +912,39 @@ class Game:
                                     await primary_player.send_hand()
                                     await secondary_player.send_hand()
                                     await primary_player.send_hq()
+                        elif self.action_chosen == "Deception":
+                            if self.number_with_deploy_turn == "1":
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            if game_update_string[1] == "1":
+                                player_returning = self.p1
+                            else:
+                                player_returning = self.p2
+                            unit_pos = int(game_update_string[2])
+                            card = player_returning.headquarters[unit_pos]
+                            if card.get_card_type() == "Army":
+                                if not card.check_for_a_trait("Elite"):
+                                    player_returning.return_card_to_hand(-2, unit_pos)
+                                    primary_player.aiming_reticle_color = None
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    self.card_pos_to_deploy = -1
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    self.mode = self.stored_mode
+                                    await player_returning.send_hand()
+                                    await player_returning.send_hq()
+
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
-                        if game_update_string[1] == self.number_with_deploy_turn:
-                            if self.action_chosen == "Pact of the Haemonculi":
+                        if self.action_chosen == "Pact of the Haemonculi":
+                            if game_update_string[1] == self.number_with_deploy_turn:
                                 if self.number_with_deploy_turn == "1":
                                     primary_player = self.p1
                                     secondary_player = self.p2
@@ -936,6 +968,36 @@ class Game:
                                     await primary_player.send_hand()
                                     await secondary_player.send_hand()
                                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+                        elif self.action_chosen == "Deception":
+                            if self.number_with_deploy_turn == "1":
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            if game_update_string[1] == "1":
+                                player_returning = self.p1
+                            else:
+                                player_returning = self.p2
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
+                            if card.get_card_type() == "Army":
+                                if not card.check_for_a_trait("Elite"):
+                                    player_returning.return_card_to_hand(planet_pos, unit_pos)
+                                    primary_player.aiming_reticle_color = None
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                    self.card_pos_to_deploy = -1
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    self.mode = self.stored_mode
+                                    await player_returning.send_hand()
+                                    await player_returning.send_units_at_planet(planet_pos)
+                                    await primary_player.send_hand()
+                                    await primary_player.send_discard()
 
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:

@@ -598,6 +598,15 @@ class Player:
                     return "FAIL/Insufficient resources", -1
         return "FAIL/Invalid card", -1
 
+    def return_card_to_hand(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            self.cards.append(self.headquarters[unit_pos].get_name())
+            self.remove_card_from_hq(unit_pos)
+            return None
+        self.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
+        self.remove_card_from_play(planet_pos, unit_pos)
+        return None
+
     def discard_card_at_random(self):
         print("")
         if self.cards:
