@@ -118,6 +118,7 @@ class Game:
         self.reactions_needing_resolving = []
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
+        self.snotlings_left_to_place = 0
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -839,6 +840,14 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Snotling Attack":
+                        print("Resolve Snotling Attack")
+                        self.action_chosen = "Snotling Attack"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        self.snotlings_left_to_place = 4
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     else:
                         primary_player.add_resources(card.get_cost())
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
@@ -878,6 +887,32 @@ class Game:
                         await self.p1.send_units_at_planet(chosen_planet)
                         await self.p2.send_units_at_planet(chosen_planet)
                         await self.send_info_box()
+                elif self.action_chosen == "Snotling Attack":
+                    if self.number_with_deploy_turn == "1":
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p2
+                    primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
+                    self.snotlings_left_to_place = self.snotlings_left_to_place - 1
+                    await primary_player.send_units_at_planet(int(game_update_string[1]))
+                    if self.snotlings_left_to_place == 0:
+                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                        primary_player.aiming_reticle_color = None
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.card_pos_to_deploy = -1
+                        self.player_with_action = ""
+                        self.action_chosen = ""
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                        self.mode = self.stored_mode
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await self.p1.send_units_at_planet(chosen_planet)
+                        await self.p2.send_units_at_planet(chosen_planet)
+                        await self.send_info_box()
+
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 if self.phase == "DEPLOY":
