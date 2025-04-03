@@ -358,6 +358,15 @@ class Player:
                 self.game.card_type_of_searched_card = None
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
+        elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
+            i = len(self.discard) - 1
+            while i > -1:
+                card = FindCard.find_card(self.discard[i], self.card_array)
+                if card.get_card_type() == "Event":
+                    self.cards.append(card.get_name())
+                    del self.discard[i]
+                    return None
+                i = i - 1
         elif self.headquarters[last_element_index].get_ability() == "Earth Caste Technician":
             if len(self.deck) > 5:
                 self.number_cards_to_search = 6
@@ -482,6 +491,15 @@ class Player:
                 self.game.card_type_of_searched_card = None
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
+            i = len(self.discard) - 1
+            while i > -1:
+                card = FindCard.find_card(self.discard[i], self.card_array)
+                if card.get_card_type() == "Event":
+                    self.cards.append(card.get_name())
+                    del self.discard[i]
+                    return None
+                i = i - 1
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
             self.game.reactions_needing_resolving.append("Sicarius's Chosen")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
