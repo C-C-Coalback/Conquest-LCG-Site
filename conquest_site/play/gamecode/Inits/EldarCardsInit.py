@@ -40,7 +40,7 @@ def eldar_cards_init():
                          CardClasses.ArmyCard("Soaring Falcon", "No Wargear Attachments.\n"
                                                                 "Mobile.", "Vehicle.",
                                               3, faction, "Common", 1, 5, 2, False,
-                                              wargear_attachments_permitted=False),
+                                              wargear_attachments_permitted=False, mobile=True),
                          CardClasses.ArmyCard("Wailing Wraithfighter", "No Wargear Attachments.\n"
                                                                        "Flying.\n"
                                                                        "Reaction: After this unit is declared as an "

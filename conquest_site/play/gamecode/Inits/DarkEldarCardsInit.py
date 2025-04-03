@@ -55,7 +55,7 @@ def dark_eldar_cards_init():
                                                                   "Mobile. (At the beginning of the combat phase, "
                                                                   "this unit may move to an adjacent planet.",
                                                    "Vehicle. Transport.", 4, faction, "Common", 2, 4, 2, False,
-                                                   wargear_attachments_permitted=False),
+                                                   wargear_attachments_permitted=False, mobile=True),
                               CardClasses.ArmyCard("Black Heart Ravager", "No Wargear Attachments.\n"
                                                                           "Flying. (This unit takes half damage from "
                                                                           "non-Flying units.)\n"

@@ -40,7 +40,7 @@ def tau_cards_init():
                                                               "gain 3 resources.", "Warrior. Kroot.",
                                             3, faction, "Common", 3, 3, 0, False),
                        CardClasses.ArmyCard("Vash'ya Trailblazer", "Mobile.", "Scout. Pilot.",
-                                            2, faction, "Common", 1, 1, 2, False),
+                                            2, faction, "Common", 1, 1, 2, False, mobile=True),
                        CardClasses.ArmyCard("Fire Warrior Elite", "Interrupt: When an enemy unit would declare an "
                                                                   "attack against a unit you control at this planet, "
                                                                   "declare this unit as the defender instead.",
@@ -49,7 +49,7 @@ def tau_cards_init():
                                                                         "for every attachment on it.",
                                             "Soldier. Shas'la.", 4, faction, "Common", 1, 5, 1, False),
                        CardClasses.ArmyCard("Crisis Battle Guard", "Mobile.", "Soldier. Pilot. Elite.",
-                                            5, faction, "Loyal", 3, 5, 3, False),
+                                            5, faction, "Loyal", 3, 5, 3, False, mobile=True),
                        CardClasses.ArmyCard("Earth Caste Technician", "Reaction: After this unit enters play, "
                                                                       "search the top 6 cards of your deck for an "
                                                                       "attachment or Drone card. Reveal it, add it "

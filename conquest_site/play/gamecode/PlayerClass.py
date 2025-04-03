@@ -66,6 +66,7 @@ class Player:
         self.aiming_reticle_coords_hand = None
         self.can_play_limited = True
         self.number_cards_to_search = 0
+        self.mobile_resolved = True
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -741,6 +742,34 @@ class Player:
 
     def get_ready_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
+
+    def get_mobile_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_mobile()
+
+    def get_available_mobile_given_pos(self, planet_id, unit_id):
+        return self.cards_in_play[planet_id + 1][unit_id].get_available_mobile()
+
+    def set_available_mobile_given_pos(self, planet_id, unit_id, new_val):
+        if planet_id == -2:
+            self.headquarters[unit_id].set_available_mobile(new_val)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].set_available_mobile(new_val)
+        return None
+
+    def set_available_mobile_all(self, new_val):
+        for i in range(len(self.headquarters)):
+            self.set_available_mobile_given_pos(-2, i, new_val)
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.set_available_mobile_given_pos(planet_pos, unit_pos, new_val)
+
+    def search_cards_for_available_mobile(self):
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.get_mobile_given_pos(planet_pos, unit_pos):
+                    if self.get_available_mobile_given_pos(planet_pos, unit_pos):
+                        return True
+        return False
 
     def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True):
         if not ability_checking:

@@ -530,15 +530,24 @@ class Game:
                     await self.p1.send_units_at_all_planets()
                     await self.p2.send_units_at_all_planets()
                     self.phase = "COMBAT"
-                    self.check_battle(self.round_number)
-                    self.last_planet_checked_for_battle = self.round_number
-                    self.set_battle_initiative()
-                    self.planet_aiming_reticle_active = True
-                    self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                    await self.send_planet_array()
-                    self.p1.has_passed = False
-                    self.p2.has_passed = False
-                    await self.send_info_box()
+                    self.p1.set_available_mobile_all(True)
+                    self.p2.set_available_mobile_all(True)
+                    self.p1.mobile_resolved = False
+                    self.p2.mobile_resolved = False
+                    if not self.p1.search_cards_for_available_mobile():
+                        self.p1.mobile_resolved = True
+                    if not self.p2.search_cards_for_available_mobile():
+                        self.p2.mobile_resolved = True
+                    if self.p1.mobile_resolved and self.p2.mobile_resolved:
+                        self.check_battle(self.round_number)
+                        self.last_planet_checked_for_battle = self.round_number
+                        self.set_battle_initiative()
+                        self.planet_aiming_reticle_active = True
+                        self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                        await self.send_planet_array()
+                        self.p1.has_passed = False
+                        self.p2.has_passed = False
+                        await self.send_info_box()
 
     async def update_game_event_combat_section(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -1583,6 +1592,37 @@ class Game:
                                         await secondary_player.send_units_at_planet(origin_planet)
                                         await secondary_player.send_units_at_planet(target_planet)
 
+    async def resolve_mobile(self, name, game_update_string):
+        if self.player_with_initiative == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if not primary_player.mobile_resolved:
+            if name == primary_player.name_player:
+                if len(game_update_string) == 1:
+                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                        primary_player.mobile_resolved = True
+                        await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+        else:
+            if name == secondary_player.name_player:
+                if len(game_update_string) == 1:
+                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                        secondary_player.mobile_resolved = True
+                        await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+        if primary_player.mobile_resolved and secondary_player.mobile_resolved:
+            await self.game_sockets[0].receive_game_update("mobile complete")
+            self.check_battle(self.round_number)
+            self.last_planet_checked_for_battle = self.round_number
+            self.set_battle_initiative()
+            self.planet_aiming_reticle_active = True
+            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            await self.send_planet_array()
+            self.p1.has_passed = False
+            self.p2.has_passed = False
+            await self.send_info_box()
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -1604,6 +1644,9 @@ class Game:
             elif self.positions_of_units_to_take_damage:
                 print("Using better shield mechanism")
                 await self.better_shield_card_resolution(name, game_update_string)
+            elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
+                print("Resolve mobile")
+                await self.resolve_mobile(name, game_update_string)
             elif self.battle_ability_to_resolve:
                 await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":
