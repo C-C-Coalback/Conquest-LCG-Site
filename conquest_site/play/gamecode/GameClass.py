@@ -786,6 +786,22 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Raid":
+                        if primary_player.can_play_limited:
+                            if primary_player.resources < secondary_player.resources:
+                                if secondary_player.spend_resources(1):
+                                    primary_player.add_resources(1)
+                                    primary_player.can_play_limited = False
+                                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                    self.mode = self.stored_mode
+                                    self.player_with_action = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    await primary_player.send_hand()
+                                    await primary_player.send_discard()
+                                    await primary_player.send_resources()
+                                    await secondary_player.send_resources()
+                                    await self.send_info_box()
                     elif ability == "Doom":
                         print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
