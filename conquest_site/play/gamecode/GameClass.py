@@ -907,7 +907,8 @@ class Game:
         print(card.get_allowed_phases_while_in_hand(), self.phase)
         print(card.get_has_action_while_in_hand())
         if card.get_has_action_while_in_hand():
-            if card.get_allowed_phases_while_in_hand() == "COMBAT" and self.phase == "COMBAT":
+            if card.get_allowed_phases_while_in_hand() == "COMBAT" or \
+                    card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.spend_resources(card.get_cost()):
                     if ability == "Battle Cry":
                         print("Resolve Battle Cry")
@@ -920,6 +921,13 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Warpstorm":
+                        print("Resolve Warpstorm")
+                        self.action_chosen = "Warpstorm"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     else:
                         primary_player.add_resources(card.get_cost())
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
@@ -962,6 +970,40 @@ class Game:
                         await self.p1.send_units_at_planet(chosen_planet)
                         await self.p2.send_units_at_planet(chosen_planet)
                         await self.send_info_box()
+                elif self.action_chosen == "Warpstorm":
+                    if self.player_with_action == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p2
+                    first_unit_damaged = True
+                    for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                        if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+                            if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
+                                primary_player.assign_damage_to_pos(chosen_planet, i, 2)
+                                primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                                if first_unit_damaged:
+                                    primary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
+                                    first_unit_damaged = False
+                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                        if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+                            if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
+                                secondary_player.assign_damage_to_pos(chosen_planet, i, 2)
+                                secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                                if first_unit_damaged:
+                                    secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
+                                    first_unit_damaged = False
+                    self.mode = "Normal"
+                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                    primary_player.aiming_reticle_color = None
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.send_hand()
+                    await primary_player.send_discard()
+                    await self.p1.send_units_at_planet(chosen_planet)
+                    await self.p2.send_units_at_planet(chosen_planet)
+                    await self.send_info_box()
+
                 elif self.action_chosen == "Snotling Attack":
                     if self.number_with_deploy_turn == "1":
                         primary_player = self.p1
