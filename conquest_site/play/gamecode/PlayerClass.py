@@ -933,6 +933,14 @@ class Player:
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_end_of_battle()
 
+    def refresh_once_per_phase_abilities(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].set_once_per_phase_used(False)
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].set_once_per_phase_used(False)
+
     def perform_discount_at_pos_hand(self, pos, faction_of_card):
         discount = 0
         damage = 0

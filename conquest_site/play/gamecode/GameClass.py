@@ -994,14 +994,6 @@ class Game:
                         await self.p1.send_units_at_planet(chosen_planet)
                         await self.p2.send_units_at_planet(chosen_planet)
                         await self.send_info_box()
-                elif self.action_chosen == "Drop Pod Assault":
-                    if self.player_with_action == self.name_1:
-                        primary_player = self.p1
-                        secondary_player = self.p2
-                    else:
-                        primary_player = self.p2
-                        secondary_player = self.p2
-
                 elif self.action_chosen == "Warpstorm":
                     if self.player_with_action == self.name_1:
                         primary_player = self.p1
@@ -1073,13 +1065,10 @@ class Game:
                             self.condition_sub_game.release()
                 elif self.phase == "COMBAT":
                     if name == self.player_with_action:
-                        if self.player_with_action == self.name_1:
-                            if game_update_string[1] == "1":
-                                await self.update_game_event_combat_action_hand(name, game_update_string)
-                        elif self.player_with_action == self.name_2:
-                            if game_update_string[1] == "2":
-                                await self.update_game_event_combat_action_hand(name, game_update_string)
-
+                        if self.player_with_action == self.name_1 and game_update_string[1] == "1":
+                            await self.update_game_event_combat_action_hand(name, game_update_string)
+                        elif self.player_with_action == self.name_2 and game_update_string[1] == "2":
+                            await self.update_game_event_combat_action_hand(name, game_update_string)
             elif game_update_string[0] == "HQ":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
@@ -1193,6 +1182,44 @@ class Game:
                                     await player_returning.send_units_at_planet(planet_pos)
                                     await primary_player.send_hand()
                                     await primary_player.send_discard()
+                elif self.phase == "COMBAT":
+                    print("is combat")
+                    if name == self.player_with_action:
+                        print("ok player")
+                        if not self.action_chosen:
+                            print("action not chosen")
+                            if name == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if game_update_string[1] == "1":
+                                card_chosen = self.p1.cards_in_play[planet_pos + 1][unit_pos]
+                                player_owning_card = self.p1
+                            else:
+                                card_chosen = self.p2.cards_in_play[planet_pos + 1][unit_pos]
+                                player_owning_card = self.p2
+                            if card_chosen.get_has_action_while_in_play():
+                                if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
+                                        card_chosen.get_allowed_phases_while_in_play() == "ALL":
+                                    print("reached new in play unit action")
+                                    ability = card_chosen.get_ability()
+                                    if ability == "Nazdreg's Flash Gitz":
+                                        if not card_chosen.get_once_per_phase_used():
+                                            if player_owning_card.name_player == name:
+                                                if not card_chosen.get_ready():
+                                                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                                    player_owning_card.set_aiming_reticle_in_play(planet_pos,
+                                                                                                  unit_pos, "red")
+                                                    player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                                                    card_chosen.set_once_per_phase_used(True)
+                                                    self.player_with_action = ""
+                                                    self.action_chosen = ""
+                                                    self.mode = "Normal"
+                                                    await player_owning_card.send_units_at_planet(planet_pos)
 
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:
@@ -1684,6 +1711,12 @@ class Game:
             self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
         elif player_num == 2:
             self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+
+    def change_phase(self, new_val, refresh_abilities=True):
+        self.phase = new_val
+        if refresh_abilities:
+            self.p1.refresh_once_per_phase_abilities()
+            self.p2.refresh_once_per_phase_abilities()
 
     def clear_attacker_aiming_reticle(self):
         player_num, planet_pos, unit_pos = self.attacker_location
