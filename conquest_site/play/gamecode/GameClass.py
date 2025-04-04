@@ -1249,9 +1249,7 @@ class Game:
                     if len(self.p2.cards) > int(game_update_string[2]):
                         return True
         if len(game_update_string) == 4:
-            if game_update_string[0] == "ATTACHMENT":
-                print("Attachment selecting not supported")
-            elif game_update_string[0] == "IN_PLAY":
+            if game_update_string[0] == "IN_PLAY":
                 if game_update_string[1] == "1":
                     if len(self.p1.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
                         return True
@@ -1259,7 +1257,36 @@ class Game:
                     if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
                         return True
         if len(game_update_string) == 5:
-            print("Attachment selecting not supported")
+            if game_update_string[0] == "ATTACHMENT":
+                if game_update_string[1] == "HQ":
+                    pos_unit = int(game_update_string[3])
+                    pos_attachment = int(game_update_string[4])
+                    if game_update_string[2] == "1":
+                        if len(self.p1.headquarters) > pos_unit:
+                            card = self.p1.headquarters[pos_unit]
+                            if len(card.get_attachments()) > pos_attachment:
+                                return True
+                    elif game_update_string[2] == "2":
+                        if len(self.p2.headquarters) > pos_unit:
+                            card = self.p2.headquarters[pos_unit]
+                            if len(card.get_attachments()) > pos_attachment:
+                                return True
+        if len(game_update_string) == 6:
+            if game_update_string[0] == "ATTACHMENT":
+                if game_update_string[1] == "IN_PLAY":
+                    pos_planet = int(game_update_string[3])
+                    pos_unit = int(game_update_string[4])
+                    pos_attachment = int(game_update_string[5])
+                    if game_update_string[2] == "1":
+                        if len(self.p1.cards_in_play[pos_planet + 1]) > pos_unit:
+                            card = self.p1.cards_in_play[pos_planet + 1][pos_unit]
+                            if len(card.get_attachments()) > pos_attachment:
+                                return True
+                    elif game_update_string[2] == "2":
+                        if len(self.p2.cards_in_play[pos_planet + 1]) > pos_unit:
+                            card = self.p2.cards_in_play[pos_planet + 1][pos_unit]
+                            if len(card.get_attachments()) > pos_attachment:
+                                return True
         print("Bad string")
         return False
 
