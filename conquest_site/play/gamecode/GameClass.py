@@ -226,10 +226,6 @@ class Game:
                         self.player_with_action = name
                         print("Special deploy action")
                         await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
-                elif self.mode == "ACTION":
-                    self.mode = self.stored_mode
-                    self.stored_mode = ""
-                    await self.game_sockets[0].receive_game_update(name + " cancelled their action request.")
             elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 print("Need to pass")
                 if name == self.player_with_deploy_turn:
@@ -574,8 +570,18 @@ class Game:
                         await self.send_info_box()
 
     async def update_game_event_combat_section(self, name, game_update_string):
-        if len(game_update_string) == 1:
-            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+        if self.mode == "ACTION":
+            await self.update_game_event_action(name, game_update_string)
+        elif len(game_update_string) == 1:
+            if game_update_string[0] == "action-button":
+                if self.actions_allowed and self.mode != "ACTION":
+                    print("Need to run action code")
+                    self.stored_mode = self.mode
+                    self.mode = "ACTION"
+                    self.player_with_action = name
+                    print("Special combat action")
+                    await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+            elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.player_with_combat_turn:
                     if self.number_with_combat_turn == "1":
                         self.number_with_combat_turn = "2"
@@ -890,10 +896,13 @@ class Game:
     async def update_game_event_action(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                self.mode = self.stored_mode
-                self.player_with_action = ""
-                print("Canceled special action")
-                await self.game_sockets[0].receive_game_update(name + " canceled their action request")
+                if self.action_chosen == "":
+                    self.mode = self.stored_mode
+                    self.player_with_action = ""
+                    print("Canceled special action")
+                    await self.game_sockets[0].receive_game_update(name + " canceled their action request")
+                else:
+                    await self.game_sockets[0].receive_game_update("Too far in; action must be concluded now")
         elif len(game_update_string) == 2:
             if game_update_string[0] == "PLANETS":
                 chosen_planet = int(game_update_string[1])
@@ -956,6 +965,9 @@ class Game:
                             await self.update_game_event_deploy_action_hand(name, game_update_string)
                             self.condition_sub_game.notify_all()
                             self.condition_sub_game.release()
+                else:
+                    if name == self.player_with_action:
+                        print("got to new action code")
             elif game_update_string[0] == "HQ":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
