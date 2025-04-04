@@ -100,6 +100,7 @@ class Game:
         self.traits_of_searched_card = None
         self.card_type_of_searched_card = None
         self.faction_of_searched_card = None
+        self.max_cost_of_searched_card = None
         self.all_conditions_searched_card_required = False
         self.no_restrictions_on_chosen_card = False
         self.need_to_resolve_battle_ability = False
@@ -921,6 +922,29 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Drop Pod Assault":
+                        if self.last_planet_checked_for_battle != -1:
+                            self.action_chosen = "Drop Pod Assault"
+                            self.choice_context = "Drop Pod Assault"
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.number_cards_to_search = 6
+                            self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                            self.name_player_who_is_searching = primary_player.name_player
+                            self.number_who_is_searching = str(primary_player.number)
+                            self.what_to_do_with_searched_card = "PLAY TO BATTLE"
+                            self.traits_of_searched_card = None
+                            self.card_type_of_searched_card = "Army"
+                            self.faction_of_searched_card = "Space Marines"
+                            self.max_cost_of_searched_card = 3
+                            self.all_conditions_searched_card_required = True
+                            self.no_restrictions_on_chosen_card = False
+                            await self.send_search()
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                        else:
+                            primary_player.add_resources(card.get_cost())
+                            await self.game_sockets[0].receive_game_update("No battle taking place")
                     elif ability == "Warpstorm":
                         print("Resolve Warpstorm")
                         self.action_chosen = "Warpstorm"
@@ -970,6 +994,14 @@ class Game:
                         await self.p1.send_units_at_planet(chosen_planet)
                         await self.p2.send_units_at_planet(chosen_planet)
                         await self.send_info_box()
+                elif self.action_chosen == "Drop Pod Assault":
+                    if self.player_with_action == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p2
+
                 elif self.action_chosen == "Warpstorm":
                     if self.player_with_action == self.name_1:
                         primary_player = self.p1
@@ -1215,6 +1247,9 @@ class Game:
             if self.traits_of_searched_card is not None:
                 if self.traits_of_searched_card in card.get_traits():
                     return True
+            if self.max_cost_of_searched_card is not None:
+                if card.get_cost() > self.max_cost_of_searched_card:
+                    return True
             return False
         else:
             if self.faction_of_searched_card is not None:
@@ -1225,6 +1260,9 @@ class Game:
                     return False
             if self.traits_of_searched_card is not None:
                 if self.traits_of_searched_card not in card.get_traits():
+                    return False
+            if self.max_cost_of_searched_card is not None:
+                if card.get_cost() > self.max_cost_of_searched_card:
                     return False
             return True
 
@@ -1238,6 +1276,7 @@ class Game:
         self.cards_in_search_box = []
 
     async def resolve_card_in_search_box(self, name, game_update_string):
+        card_chosen = None
         if name == self.name_player_who_is_searching:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -1248,37 +1287,60 @@ class Game:
                     self.cards_in_search_box = []
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
-                    if self.what_to_do_with_searched_card == "DRAW":
-                        if self.number_who_is_searching == "1":
-                            valid_card = True
-                            if not self.no_restrictions_on_chosen_card:
-                                card_chosen = FindCard.find_card(self.p1.deck[int(game_update_string[1])],
-                                                                 self.card_array)
-                                valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
-                            if valid_card:
+                    if self.number_who_is_searching == "1":
+                        valid_card = True
+                        if not self.no_restrictions_on_chosen_card:
+                            card_chosen = FindCard.find_card(self.p1.deck[int(game_update_string[1])],
+                                                             self.card_array)
+                            valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                        if valid_card:
+                            if self.what_to_do_with_searched_card == "DRAW":
                                 self.p1.draw_card_at_location_deck(int(game_update_string[1]))
-                                self.p1.number_cards_to_search -= 1
                                 await self.p1.send_hand()
-                                self.p1.bottom_remaining_cards()
-                                self.reset_search_values()
-                                if self.battle_ability_to_resolve == "Elouith":
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                                    self.reset_battle_resolve_attributes()
-                        else:
-                            valid_card = True
-                            if not self.no_restrictions_on_chosen_card:
-                                card_chosen = FindCard.find_card(self.p2.deck[int(game_update_string[1])],
-                                                                 self.card_array)
-                                valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
-                            if valid_card:
+                            elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
+                                self.p1.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
+                                                                             int(game_update_string[1]), card_chosen)
+                                if self.action_chosen == "Drop Pod Assault":
+                                    self.p1.discard_card_from_hand(self.p1.aiming_reticle_coords_hand)
+                                    self.p1.aiming_reticle_coords_hand = None
+                                    self.mode = "Normal"
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    await self.p1.send_hand()
+                                await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                            self.p1.number_cards_to_search -= 1
+                            self.p1.bottom_remaining_cards()
+                            self.reset_search_values()
+                            if self.battle_ability_to_resolve == "Elouith":
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                                self.reset_battle_resolve_attributes()
+                    else:
+                        valid_card = True
+                        if not self.no_restrictions_on_chosen_card:
+                            card_chosen = FindCard.find_card(self.p2.deck[int(game_update_string[1])],
+                                                             self.card_array)
+                            valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                        if valid_card:
+                            if self.what_to_do_with_searched_card == "DRAW":
                                 self.p2.draw_card_at_location_deck(int(game_update_string[1]))
-                                self.p2.number_cards_to_search -= 1
                                 await self.p2.send_hand()
-                                self.p2.bottom_remaining_cards()
-                                self.reset_search_values()
-                                if self.battle_ability_to_resolve == "Elouith":
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                                    self.reset_battle_resolve_attributes()
+                            elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
+                                self.p2.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
+                                                                             int(game_update_string[1]), card_chosen)
+                                if self.action_chosen == "Drop Pod Assault":
+                                    self.p2.discard_card_from_hand(self.p2.aiming_reticle_coords_hand)
+                                    self.p2.aiming_reticle_coords_hand = None
+                                    self.mode = "Normal"
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    await self.p2.send_hand()
+                                await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                            self.p2.number_cards_to_search -= 1
+                            self.p2.bottom_remaining_cards()
+                            self.reset_search_values()
+                            if self.battle_ability_to_resolve == "Elouith":
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                                self.reset_battle_resolve_attributes()
 
     def reset_choices_available(self):
         self.choices_available = []
@@ -1371,6 +1433,7 @@ class Game:
                                 self.traits_of_searched_card = None
                                 self.card_type_of_searched_card = None
                                 self.faction_of_searched_card = None
+                                self.max_cost_of_searched_card = None
                                 self.no_restrictions_on_chosen_card = True
                                 await self.send_search()
                             elif self.battle_ability_to_resolve == "Tarrus":

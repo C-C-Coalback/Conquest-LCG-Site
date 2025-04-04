@@ -276,6 +276,14 @@ class Player:
                 self.cards.append(self.deck[position])
                 del self.deck[position]
 
+    def play_card_to_battle_at_location_deck(self, planet_pos, deck_pos, card):
+        if not self.deck:
+            print("??? TRYING TO PLAY A CARD FROM DECK DESPITE DECK EMPTY ???")
+        else:
+            if len(self.deck) > deck_pos:
+                self.add_card_to_planet(card, planet_pos)
+                del self.deck[deck_pos]
+
     def bottom_remaining_cards(self):
         self.deck = self.deck[self.number_cards_to_search:] + self.deck[:self.number_cards_to_search]
 
