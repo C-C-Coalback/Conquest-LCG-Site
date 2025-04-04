@@ -885,6 +885,46 @@ class Player:
                 self.sacrifice_card_in_hq(pos)
         return discount
 
+    def increase_attack_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
+        if planet_pos == -2:
+            if expiration == "EOB":
+                self.headquarters[unit_pos].increase_extra_attack_until_end_of_battle(amount)
+            return None
+        if expiration == "EOB":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
+
+    def increase_attack_of_all_units_at_hq(self, amount, required_faction=None, expiration="EOB"):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                if required_faction is None:
+                    self.increase_attack_of_unit_at_pos(-2, i, amount, expiration)
+                elif required_faction == self.headquarters[i].get_faction():
+                    self.increase_attack_of_unit_at_pos(-2, i, amount, expiration)
+
+    def increase_attack_of_all_units_at_planet(self, amount, planet_pos, required_faction=None, expiration="EOB"):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.cards_in_play[planet_pos + 1][i].get_is_unit():
+                if required_faction is None:
+                    self.increase_attack_of_unit_at_pos(planet_pos, i, amount, expiration)
+                elif required_faction == self.cards_in_play[planet_pos + 1][i].get_faction():
+                    self.increase_attack_of_unit_at_pos(planet_pos, i, amount, expiration)
+
+    def increase_attack_of_all_units_at_all_planets(self, amount, required_faction=None, expiration="EOB"):
+        for planet_pos in range(7):
+            self.increase_attack_of_all_units_at_planet(amount, planet_pos, required_faction, expiration)
+
+    def increase_attack_of_all_units_in_play(self, amount, required_faction=None, expiration="EOB"):
+        self.increase_attack_of_all_units_at_hq(amount, required_faction, expiration)
+        self.increase_attack_of_all_units_at_all_planets(amount, required_faction, expiration)
+
+    def reset_extra_attack_eob(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].reset_extra_attack_until_end_of_battle()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_end_of_battle()
+
     def perform_discount_at_pos_hand(self, pos, faction_of_card):
         discount = 0
         damage = 0

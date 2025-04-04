@@ -18,6 +18,10 @@ class Card:
         self.loyalty = loyalty
         self.shields = shields
         self.card_type = card_type
+        self.is_unit = False
+        if self.card_type == "Army" or self.card_type == "Warlord"\
+                or self.card_type == "Token" or self.card_type == "Synapse":
+            self.is_unit = True
         self.unique = unique
         self.ready = True
         self.image_name = image_name
@@ -34,6 +38,9 @@ class Card:
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
         self.limited = limited
         self.counter = 0
+
+    def get_is_unit(self):
+        return self.is_unit
 
     def set_available_mobile(self, new_val):
         return None

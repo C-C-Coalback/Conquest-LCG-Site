@@ -813,7 +813,7 @@ class Game:
         print(card.get_allowed_phases_while_in_hand(), self.phase)
         print(card.get_has_action_while_in_hand())
         if card.get_has_action_while_in_hand():
-            if card.get_allowed_phases_while_in_hand() == self.phase or \
+            if card.get_allowed_phases_while_in_hand() == "DEPLOY" or \
                     card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.spend_resources(card.get_cost()):
                     if ability == "Promise of Glory":
@@ -893,6 +893,38 @@ class Game:
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                          "implemented")
 
+    async def update_game_event_combat_action_hand(self, name, game_update_string):
+        print("Deploy special action, card in hand at pos", game_update_string[2])
+        self.card_pos_to_deploy = int(game_update_string[2])
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        ability = card.get_ability()
+        print(card.get_allowed_phases_while_in_hand(), self.phase)
+        print(card.get_has_action_while_in_hand())
+        if card.get_has_action_while_in_hand():
+            if card.get_allowed_phases_while_in_hand() == "COMBAT" and self.phase == "COMBAT":
+                if primary_player.spend_resources(card.get_cost()):
+                    if ability == "Battle Cry":
+                        print("Resolve Battle Cry")
+                        primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
+                                                                            expiration="EOB")
+                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                        self.mode = "Normal"
+                        self.player_with_action = ""
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await primary_player.send_resources()
+                        await self.send_info_box()
+                    else:
+                        primary_player.add_resources(card.get_cost())
+                        await self.game_sockets[0].receive_game_update(card.get_name() + " not "
+                                                                                         "implemented")
+
     async def update_game_event_action(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -965,9 +997,15 @@ class Game:
                             await self.update_game_event_deploy_action_hand(name, game_update_string)
                             self.condition_sub_game.notify_all()
                             self.condition_sub_game.release()
-                else:
+                elif self.phase == "COMBAT":
                     if name == self.player_with_action:
-                        print("got to new action code")
+                        if self.player_with_action == self.name_1:
+                            if game_update_string[1] == "1":
+                                await self.update_game_event_combat_action_hand(name, game_update_string)
+                        elif self.player_with_action == self.name_2:
+                            if game_update_string[1] == "2":
+                                await self.update_game_event_combat_action_hand(name, game_update_string)
+
             elif game_update_string[0] == "HQ":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
@@ -1228,6 +1266,8 @@ class Game:
                 await winner.send_victory_display()
             self.planet_aiming_reticle_active = False
         self.planet_aiming_reticle_position = -1
+        self.p1.reset_extra_attack_eob()
+        self.p2.reset_extra_attack_eob()
         another_battle = self.find_next_planet_for_combat()
         if another_battle:
             self.set_battle_initiative()
