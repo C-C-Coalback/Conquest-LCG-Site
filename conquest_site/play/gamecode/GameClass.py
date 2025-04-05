@@ -921,6 +921,15 @@ class Game:
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             card.exhaust_card()
                             await primary_player.send_hq()
+                    elif card.get_ability() == "Tellyporta Pad":
+                        if card.get_ready():
+                            if self.planets_in_play_array[self.round_number]:
+                                self.action_chosen = "Tellyporta Pad"
+                                primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                                card.exhaust_card()
+                                await primary_player.send_hq()
+                            else:
+                                await self.game_sockets[0].receive_game_update("First planet not in play")
 
     async def update_game_event_combat_action_hand(self, name, game_update_string):
         print("Combat special action, card in hand at pos", game_update_string[2])
@@ -1174,6 +1183,26 @@ class Game:
                                 self.mode = "Normal"
                                 await primary_player.send_hq()
                                 await self.send_info_box()
+                        elif self.action_chosen == "Tellyporta Pad":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if game_update_string[1] == primary_player.get_number():
+                                card = primary_player.headquarters[int(game_update_string[2])]
+                                if card.get_faction() == "Orks":
+                                    if card.get_is_unit():
+                                        primary_player.move_unit_to_planet(-2, int(game_update_string[2]),
+                                                                           self.round_number)
+                                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                    self.position_of_actioned_card[1])
+                                        self.position_of_actioned_card = (-1, -1)
+                                        self.action_chosen = ""
+                                        self.player_with_action = ""
+                                        self.mode = "Normal"
+                                        await primary_player.send_hq()
+                                        await primary_player.send_units_at_planet(self.round_number)
+
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if self.phase == "DEPLOY":
@@ -1291,6 +1320,28 @@ class Game:
                             self.mode = "Normal"
                             await primary_player.send_hq()
                             await self.send_info_box()
+                        elif self.action_chosen == "Tellyporta Pad":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                                if card.get_faction() == "Orks":
+                                    if card.get_is_unit():
+                                        primary_player.move_unit_to_planet(planet_pos, unit_pos,
+                                                                           self.round_number)
+                                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                    self.position_of_actioned_card[1])
+                                        self.position_of_actioned_card = (-1, -1)
+                                        self.action_chosen = ""
+                                        self.player_with_action = ""
+                                        self.mode = "Normal"
+                                        await primary_player.send_hq()
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                        await primary_player.send_units_at_planet(self.round_number)
 
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:
