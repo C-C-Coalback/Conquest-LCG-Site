@@ -898,13 +898,27 @@ class Player:
                 self.sacrifice_card_in_hq(pos)
         return discount
 
+    def check_is_unit_at_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_is_unit():
+                return True
+            return False
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+            return True
+        return False
+
     def increase_attack_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
         if planet_pos == -2:
             if expiration == "EOB":
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_battle(amount)
+            elif expiration == "NEXT":
+                self.headquarters[unit_pos].increase_extra_attack_until_next_attack(amount)
             return None
         if expiration == "EOB":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
+        elif expiration == "NEXT":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_next_attack(amount)
+        return None
 
     def increase_attack_of_all_units_at_hq(self, amount, required_faction=None, expiration="EOB"):
         for i in range(len(self.headquarters)):
@@ -937,6 +951,25 @@ class Player:
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_end_of_battle()
+
+    def reset_extra_attack_until_next_attack_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_is_unit():
+                self.headquarters[unit_pos].reset_extra_attack_until_next_attack()
+            return None
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+            self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
+        return None
+
+    def reset_extra_attack_eop(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].reset_extra_attack_until_end_of_phase()
+                self.headquarters[i].reset_extra_attack_until_next_attack()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_end_of_phase()
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
 
     def refresh_once_per_phase_abilities(self):
         for i in range(len(self.headquarters)):
@@ -1000,6 +1033,8 @@ class Player:
                 attack_value += self.count_copies_in_play("Khymera")
         card.reset_brutal()
         attack_value += card.get_extra_attack_until_end_of_battle()
+        attack_value += card.get_extra_attack_until_next_attack()
+        attack_value += card.get_extra_attack_until_end_of_phase()
         return attack_value
 
     def count_copies_in_play(self, card_name):

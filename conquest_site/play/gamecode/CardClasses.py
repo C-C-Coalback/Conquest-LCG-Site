@@ -178,12 +178,32 @@ class UnitCard(Card):
         self.by_base_area_effect = area_effect
         self.area_effect = area_effect
         self.extra_attack_until_end_of_battle = 0
+        self.extra_attack_until_next_attack = 0
+        self.extra_attack_until_end_of_phase = 0
         self.by_base_ranged = ranged
         self.ranged = ranged
         self.wargear_attachments_permitted = wargear_attachments_permitted
         self.no_attachments = no_attachments
         self.additional_resources_command_struggle = additional_resources_command_struggle
         self.additional_cards_command_struggle = additional_cards_command_struggle
+
+    def get_extra_attack_until_end_of_phase(self):
+        return self.extra_attack_until_end_of_phase
+
+    def increase_extra_attack_until_end_of_phase(self, amount):
+        self.extra_attack_until_end_of_phase += amount
+
+    def reset_extra_attack_until_end_of_phase(self):
+        self.extra_attack_until_end_of_phase = 0
+
+    def get_extra_attack_until_next_attack(self):
+        return self.extra_attack_until_next_attack
+
+    def increase_extra_attack_until_next_attack(self, amount):
+        self.extra_attack_until_next_attack += amount
+
+    def reset_extra_attack_until_next_attack(self):
+        self.extra_attack_until_next_attack = 0
 
     def get_available_mobile(self):
         return self.available_mobile

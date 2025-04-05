@@ -122,6 +122,7 @@ class Game:
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
         self.snotlings_left_to_place = 0
+        self.position_of_actioned_card = (-1, -1)
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -753,6 +754,9 @@ class Game:
                                     self.damage_on_unit_before_new_damage = \
                                         secondary_player.get_damage_given_pos(self.defender_planet,
                                                                               self.defender_position)
+                                    primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
+                                                                                                  self.attacker_position
+                                                                                                  )
                                     if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                                   self.defender_position, "Vehicle"):
                                         if primary_player.get_ability_given_pos(self.attacker_planet,
@@ -896,8 +900,29 @@ class Game:
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                          "implemented")
 
+    async def update_game_event_combat_action_hq(self, name, game_update_string):
+        print("Combat special action, card in hq at pos", game_update_string[2])
+        self.position_of_actioned_card = (-2, int(game_update_string[2]))
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if int(game_update_string[1]) == int(primary_player.get_number()):
+            card = primary_player.headquarters[self.position_of_actioned_card[1]]
+            if card.get_has_action_while_in_play():
+                if card.get_allowed_phases_while_in_play() == self.phase or \
+                        card.get_allowed_phases_while_in_play() == "ALL":
+                    print("trying to resolve combat special")
+                    if card.get_ability() == "Catachan Outpost":
+                        self.action_chosen = "Catachan Outpost"
+                        primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                        card.exhaust_card()
+                        await primary_player.send_hq()
+
     async def update_game_event_combat_action_hand(self, name, game_update_string):
-        print("Deploy special action, card in hand at pos", game_update_string[2])
+        print("Combat special action, card in hand at pos", game_update_string[2])
         self.card_pos_to_deploy = int(game_update_string[2])
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -1124,7 +1149,30 @@ class Game:
                                     self.mode = self.stored_mode
                                     await player_returning.send_hand()
                                     await player_returning.send_hq()
-
+                elif self.phase == "COMBAT":
+                    if name == self.player_with_action:
+                        if not self.action_chosen:
+                            await self.update_game_event_combat_action_hq(name, game_update_string)
+                        if self.action_chosen == "Catachan Outpost":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if int(game_update_string[1] == "1"):
+                                player_receiving_buff = self.p1
+                            else:
+                                player_receiving_buff = self.p2
+                            if player_receiving_buff.check_is_unit_at_pos(-2, int(game_update_string[2])):
+                                player_receiving_buff.increase_attack_of_unit_at_pos(-2, int(game_update_string[2]), 2,
+                                                                                     expiration="NEXT")
+                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                            self.position_of_actioned_card[1])
+                                self.position_of_actioned_card = (-1, -1)
+                                self.action_chosen = ""
+                                self.player_with_action = ""
+                                self.mode = "Normal"
+                                await primary_player.send_hq()
+                                await self.send_info_box()
         elif len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if self.phase == "DEPLOY":
@@ -1222,6 +1270,26 @@ class Game:
                                                     self.action_chosen = ""
                                                     self.mode = "Normal"
                                                     await player_owning_card.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Catachan Outpost":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if int(game_update_string[1] == "1"):
+                                player_receiving_buff = self.p1
+                            else:
+                                player_receiving_buff = self.p2
+                            player_receiving_buff.increase_attack_of_unit_at_pos(int(game_update_string[2]),
+                                                                                 int(game_update_string[3]), 2,
+                                                                                 expiration="NEXT")
+                            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                        self.position_of_actioned_card[1])
+                            self.position_of_actioned_card = (-1, -1)
+                            self.action_chosen = ""
+                            self.player_with_action = ""
+                            self.mode = "Normal"
+                            await primary_player.send_hq()
+                            await self.send_info_box()
 
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:
@@ -1743,6 +1811,8 @@ class Game:
 
     def change_phase(self, new_val, refresh_abilities=True):
         self.phase = new_val
+        self.p1.reset_extra_attack_eop()
+        self.p2.reset_extra_attack_eop()
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
