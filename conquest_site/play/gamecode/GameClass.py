@@ -916,10 +916,11 @@ class Game:
                         card.get_allowed_phases_while_in_play() == "ALL":
                     print("trying to resolve combat special")
                     if card.get_ability() == "Catachan Outpost":
-                        self.action_chosen = "Catachan Outpost"
-                        primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
-                        card.exhaust_card()
-                        await primary_player.send_hq()
+                        if card.get_ready():
+                            self.action_chosen = "Catachan Outpost"
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            card.exhaust_card()
+                            await primary_player.send_hq()
 
     async def update_game_event_combat_action_hand(self, name, game_update_string):
         print("Combat special action, card in hand at pos", game_update_string[2])
