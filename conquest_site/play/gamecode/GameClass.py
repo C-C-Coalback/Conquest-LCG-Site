@@ -253,7 +253,7 @@ class Game:
                                                        discounts=self.discounts_applied)
                 if self.p1.has_passed and self.p2.has_passed:
                     print("Both passed, move to warlord movement.")
-                    self.phase = "COMMAND"
+                    self.change_phase("COMMAND")
                 await self.send_info_box()
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
@@ -550,7 +550,7 @@ class Game:
                     await self.p2.send_resources()
                     await self.p1.send_units_at_all_planets()
                     await self.p2.send_units_at_all_planets()
-                    self.phase = "COMBAT"
+                    self.change_phase("COMBAT")
                     self.p1.set_available_mobile_all(True)
                     self.p2.set_available_mobile_all(True)
                     self.p1.mobile_resolved = False
@@ -1437,7 +1437,7 @@ class Game:
             await self.send_planet_array()
             await self.send_info_box()
         else:
-            self.phase = "HEADQUARTERS"
+            self.change_phase("HEADQUARTERS")
             self.automated_headquarters_phase()
             self.reset_values_for_new_round()
             await self.p1.send_hq()
@@ -2150,7 +2150,7 @@ class Game:
         elif self.round_number == 1:
             self.planets_in_play_array[6] = True
         self.round_number += 1
-        self.phase = "DEPLOY"
+        self.change_phase("DEPLOY")
         self.swap_initiative()
 
     def swap_initiative(self):
