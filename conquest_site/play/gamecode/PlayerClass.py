@@ -64,6 +64,7 @@ class Player:
         self.condition_player_sub = threading.Condition()
         self.aiming_reticle_color = None
         self.aiming_reticle_coords_hand = None
+        self.aiming_reticle_coords_hand_2 = None
         self.can_play_limited = True
         self.number_cards_to_search = 0
         self.mobile_resolved = True
@@ -106,7 +107,7 @@ class Player:
                 pass
             else:
                 for i in range(len(card_array)):
-                    if self.aiming_reticle_coords_hand == i:
+                    if self.aiming_reticle_coords_hand == i or self.aiming_reticle_coords_hand_2 == i:
                         card_array[i] = card_array[i] + "|" + self.aiming_reticle_color
             card_string = "/".join(card_array)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
@@ -555,6 +556,7 @@ class Player:
                 self.game.card_type_of_searched_card = "Attachment"
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = False
+        return last_element_index
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
         card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))
@@ -960,6 +962,19 @@ class Player:
         if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
             self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
         return None
+
+    def sacrifice_check_eop(self):
+        sacrificed_locations = [False, False, False, False, False, False, False, False]
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_sacrifice_end_of_phase():
+                self.sacrifice_card_in_hq(i)
+                sacrificed_locations[0] = True
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.cards_in_play[planet_pos + 1][unit_pos].get_sacrifice_end_of_phase():
+                    self.sacrifice_card_in_play(planet_pos, unit_pos)
+                    sacrificed_locations[planet_pos + 1] = True
+        return sacrificed_locations
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):

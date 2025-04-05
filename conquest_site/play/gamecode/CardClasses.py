@@ -38,6 +38,13 @@ class Card:
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
         self.limited = limited
         self.counter = 0
+        self.sacrifice_end_of_phase = False
+
+    def set_sacrifice_end_of_phase(self, new_val):
+        self.sacrifice_end_of_phase = new_val
+
+    def get_sacrifice_end_of_phase(self):
+        return self.sacrifice_end_of_phase
 
     def get_is_unit(self):
         return self.is_unit

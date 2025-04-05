@@ -254,7 +254,7 @@ class Game:
                                                        discounts=self.discounts_applied)
                 if self.p1.has_passed and self.p2.has_passed:
                     print("Both passed, move to warlord movement.")
-                    self.change_phase("COMMAND")
+                    await self.change_phase("COMMAND")
                 await self.send_info_box()
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
@@ -553,7 +553,7 @@ class Game:
                     await self.p2.send_resources()
                     await self.p1.send_units_at_all_planets()
                     await self.p2.send_units_at_all_planets()
-                    self.change_phase("COMBAT")
+                    await self.change_phase("COMBAT")
                     self.p1.set_available_mobile_all(True)
                     self.p2.set_available_mobile_all(True)
                     self.p1.mobile_resolved = False
@@ -932,67 +932,88 @@ class Game:
                                 await self.game_sockets[0].receive_game_update("First planet not in play")
 
     async def update_game_event_combat_action_hand(self, name, game_update_string):
-        print("Combat special action, card in hand at pos", game_update_string[2])
-        self.card_pos_to_deploy = int(game_update_string[2])
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-        ability = card.get_ability()
-        print(card.get_allowed_phases_while_in_hand(), self.phase)
-        print(card.get_has_action_while_in_hand())
-        if card.get_has_action_while_in_hand():
-            if card.get_allowed_phases_while_in_hand() == "COMBAT" or \
-                    card.get_allowed_phases_while_in_hand() == "ALL":
-                if primary_player.spend_resources(card.get_cost()):
-                    if ability == "Battle Cry":
-                        print("Resolve Battle Cry")
-                        primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
-                                                                            expiration="EOB")
-                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                        self.mode = "Normal"
-                        self.player_with_action = ""
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
-                    elif ability == "Drop Pod Assault":
-                        if self.last_planet_checked_for_battle != -1:
-                            self.action_chosen = "Drop Pod Assault"
-                            self.choice_context = "Drop Pod Assault"
+        if not self.action_chosen:
+            print("Combat special action, card in hand at pos", game_update_string[2])
+            self.card_pos_to_deploy = int(game_update_string[2])
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            ability = card.get_ability()
+            print(card.get_allowed_phases_while_in_hand(), self.phase)
+            print(card.get_has_action_while_in_hand())
+            if card.get_has_action_while_in_hand():
+                if card.get_allowed_phases_while_in_hand() == "COMBAT" or \
+                        card.get_allowed_phases_while_in_hand() == "ALL":
+                    if primary_player.spend_resources(card.get_cost()):
+                        if ability == "Battle Cry":
+                            print("Resolve Battle Cry")
+                            primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
+                                                                                expiration="EOB")
+                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            self.mode = "Normal"
+                            self.player_with_action = ""
+                            await primary_player.send_hand()
+                            await primary_player.send_discard()
+                            await primary_player.send_resources()
+                            await self.send_info_box()
+                        elif ability == "Drop Pod Assault":
+                            if self.last_planet_checked_for_battle != -1:
+                                self.action_chosen = "Drop Pod Assault"
+                                self.choice_context = "Drop Pod Assault"
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                primary_player.number_cards_to_search = 6
+                                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                                self.name_player_who_is_searching = primary_player.name_player
+                                self.number_who_is_searching = str(primary_player.number)
+                                self.what_to_do_with_searched_card = "PLAY TO BATTLE"
+                                self.traits_of_searched_card = None
+                                self.card_type_of_searched_card = "Army"
+                                self.faction_of_searched_card = "Space Marines"
+                                self.max_cost_of_searched_card = 3
+                                self.all_conditions_searched_card_required = True
+                                self.no_restrictions_on_chosen_card = False
+                                await self.send_search()
+                                await primary_player.send_hand()
+                                await primary_player.send_resources()
+                            else:
+                                primary_player.add_resources(card.get_cost())
+                                await self.game_sockets[0].receive_game_update("No battle taking place")
+                        elif ability == "Warpstorm":
+                            print("Resolve Warpstorm")
+                            self.action_chosen = "Warpstorm"
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                            primary_player.number_cards_to_search = 6
-                            self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
-                            self.name_player_who_is_searching = primary_player.name_player
-                            self.number_who_is_searching = str(primary_player.number)
-                            self.what_to_do_with_searched_card = "PLAY TO BATTLE"
-                            self.traits_of_searched_card = None
-                            self.card_type_of_searched_card = "Army"
-                            self.faction_of_searched_card = "Space Marines"
-                            self.max_cost_of_searched_card = 3
-                            self.all_conditions_searched_card_required = True
-                            self.no_restrictions_on_chosen_card = False
-                            await self.send_search()
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                        elif ability == "Infernal Gateway":
+                            self.action_chosen = "Infernal Gateway"
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         else:
                             primary_player.add_resources(card.get_cost())
-                            await self.game_sockets[0].receive_game_update("No battle taking place")
-                    elif ability == "Warpstorm":
-                        print("Resolve Warpstorm")
-                        self.action_chosen = "Warpstorm"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
-                    else:
-                        primary_player.add_resources(card.get_cost())
-                        await self.game_sockets[0].receive_game_update(card.get_name() + " not "
-                                                                                         "implemented")
+                            await self.game_sockets[0].receive_game_update(card.get_name() + " not "
+                                                                                             "implemented")
+        elif self.action_chosen == "Infernal Gateway":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            if primary_player.aiming_reticle_coords_hand_2 is None:
+                card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array)
+                if card.get_is_unit():
+                    if card.get_faction() == "Chaos":
+                        if card.get_cost() <= 3:
+                            primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
+                            await primary_player.send_hand()
+            else:
+                await self.game_sockets[0].receive_game_update("already chosen a valid unit for infernal gateway")
 
     async def update_game_event_action(self, name, game_update_string):
         if len(game_update_string) == 1:
@@ -1031,6 +1052,33 @@ class Game:
                         await self.p1.send_units_at_planet(chosen_planet)
                         await self.p2.send_units_at_planet(chosen_planet)
                         await self.send_info_box()
+                elif self.action_chosen == "Infernal Gateway":
+                    if self.player_with_action == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p2
+                    if primary_player.aiming_reticle_coords_hand_2 is None:
+                        await self.game_sockets[0].receive_game_update("Choose a valid unit first")
+                    else:
+                        pos_hand = primary_player.aiming_reticle_coords_hand_2
+                        pos_planet = int(game_update_string[1])
+                        card = FindCard.find_card(primary_player.cards[pos_hand], self.card_array)
+                        unit_pos = primary_player.add_card_to_planet(card, pos_planet)
+                        primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
+                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.aiming_reticle_coords_hand_2 = None
+                        primary_player.discard_card_from_hand(pos_hand)
+                        if pos_hand < self.card_pos_to_deploy:
+                            self.card_pos_to_deploy -= 1
+                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                        self.mode = "Normal"
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        await primary_player.send_hand()
+                        await primary_player.send_units_at_planet(pos_planet)
+                        await primary_player.send_discard()
                 elif self.action_chosen == "Warpstorm":
                     if self.player_with_action == self.name_1:
                         primary_player = self.p1
@@ -1596,8 +1644,9 @@ class Game:
             await self.send_planet_array()
             await self.send_info_box()
         else:
-            self.change_phase("HEADQUARTERS")
+            await self.change_phase("HEADQUARTERS")
             self.automated_headquarters_phase()
+            await self.change_phase("DEPLOY")
             self.reset_values_for_new_round()
             await self.p1.send_hq()
             await self.p1.send_units_at_all_planets()
@@ -1898,8 +1947,26 @@ class Game:
         elif player_num == 2:
             self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
 
-    def change_phase(self, new_val, refresh_abilities=True):
+    async def change_phase(self, new_val, refresh_abilities=True):
         self.phase = new_val
+        sacrifice_locations = self.p1.sacrifice_check_eop()
+        if sacrifice_locations:
+            for i in range(len(sacrifice_locations)):
+                if sacrifice_locations[i]:
+                    if i == 0:
+                        await self.p1.send_hq()
+                    else:
+                        await self.p1.send_units_at_planet(i - 1)
+            await self.p1.send_discard()
+        sacrifice_locations = self.p2.sacrifice_check_eop()
+        if sacrifice_locations:
+            for i in range(len(sacrifice_locations)):
+                if sacrifice_locations[i]:
+                    if i == 0:
+                        await self.p2.send_hq()
+                    else:
+                        await self.p2.send_units_at_planet(i - 1)
+            await self.p1.send_discard()
         self.p1.reset_extra_attack_eop()
         self.p2.reset_extra_attack_eop()
         if refresh_abilities:
@@ -2311,7 +2378,6 @@ class Game:
         elif self.round_number == 1:
             self.planets_in_play_array[6] = True
         self.round_number += 1
-        self.change_phase("DEPLOY")
         self.swap_initiative()
 
     def swap_initiative(self):
