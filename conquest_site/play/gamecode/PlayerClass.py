@@ -820,8 +820,13 @@ class Player:
                 return True
         return False
 
-    def search_hq_for_discounts(self, faction_of_card, traits):
+    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False):
         discounts_available = 0
+        if is_attachment:
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Ambush Platform":
+                    discounts_available += 1
+            return discounts_available
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_applies_discounts():
                 if self.headquarters[i].get_is_faction_limited_unique_discounter():

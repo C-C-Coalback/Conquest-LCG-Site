@@ -415,6 +415,7 @@ class Game:
         else:
             player_gaining_attachment = self.p2
         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
         can_continue = False
         army_unit_as_attachment = False
         non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre"]
@@ -435,16 +436,17 @@ class Game:
                     played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
                                                                                  int(game_update_string[3]),
                                                                                  army_unit_as_attachment=
-                                                                                 army_unit_as_attachment)
+                                                                                 army_unit_as_attachment,
+                                                                                 discounts=discounts)
                     enemy_card = False
                 else:
                     played_card = False
-                    if primary_player.spend_resources(int(card.get_cost())):
+                    if primary_player.spend_resources(int(card.get_cost()) - discounts):
                         played_card = secondary_player.play_attachment_card_to_in_play(
                             card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True,
                             army_unit_as_attachment=army_unit_as_attachment)
                         if not played_card:
-                            primary_player.add_resources(int(card.get_cost()))
+                            primary_player.add_resources(int(card.get_cost()) - discounts)
                     enemy_card = True
                 if played_card:
                     if limited:
