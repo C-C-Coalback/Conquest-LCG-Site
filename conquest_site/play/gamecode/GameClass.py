@@ -1300,6 +1300,43 @@ class Game:
                                                     self.action_chosen = ""
                                                     self.mode = "Normal"
                                                     await player_owning_card.send_units_at_planet(planet_pos)
+                                    elif ability == "Zarathur's Flamers":
+                                        if player_owning_card.name_player == name:
+                                            self.action_chosen = "Zarathur's Flamers"
+                                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                                            await player_owning_card.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Zarathur's Flamers":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            if int(game_update_string[1] == "1"):
+                                player_receiving_damage = self.p1
+                            else:
+                                player_receiving_damage = self.p2
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == self.position_of_actioned_card[0]:
+                                hitting_self = False
+                                if player_receiving_damage.get_number() == primary_player.get_number():
+                                    if int(game_update_string[3]) == self.position_of_actioned_card[1]:
+                                        hitting_self = True
+                                        await self.game_sockets[0].receive_game_update("Dont hit yourself")
+                                if not hitting_self:
+                                    player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                    player_receiving_damage.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                                    primary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    await secondary_player.send_units_at_planet(planet_pos)
+                                    await self.send_info_box()
                         elif self.action_chosen == "Catachan Outpost":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
