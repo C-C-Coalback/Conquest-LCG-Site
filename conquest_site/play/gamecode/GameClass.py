@@ -806,6 +806,40 @@ class Game:
         await self.send_info_box()
         await secondary_player.send_units_at_planet(chosen_planet)
 
+    async def update_game_event_deploy_action_hq(self, name, game_update_string):
+        print("Combat special action, card in hq at pos", game_update_string[2])
+        self.position_of_actioned_card = (-2, int(game_update_string[2]))
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if int(game_update_string[1]) == int(primary_player.get_number()):
+            card = primary_player.headquarters[self.position_of_actioned_card[1]]
+            ability = card.get_ability()
+            if card.get_has_action_while_in_play():
+                if card.get_allowed_phases_while_in_play() == self.phase or \
+                        card.get_allowed_phases_while_in_play() == "ALL":
+                    print("trying to resolve combat special")
+                    if ability == "Craftworld Gate":
+                        if card.get_ready():
+                            self.action_chosen = "Craftworld Gate"
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
+                    elif ability == "Khymera Den":
+                        if card.get_ready():
+                            self.action_chosen = "Khymera Den"
+                            self.khymera_to_move_positions = []
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
+                    elif ability == "Ravenous Flesh Hounds":
+                        self.action_chosen = "Ravenous Flesh Hounds"
+                        primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                        await primary_player.send_hq()
+
     async def update_game_event_deploy_action_hand(self, name, game_update_string):
         print("Deploy special action, card in hand at pos", game_update_string[2])
         self.card_pos_to_deploy = int(game_update_string[2])
@@ -1117,6 +1151,9 @@ class Game:
                                     if unit_pos_2 > unit_pos:
                                         unit_pos_2 -= 1
                                         self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
                     self.action_chosen = ""
                     self.player_with_action = ""
                     self.mode = "Normal"
@@ -1165,7 +1202,7 @@ class Game:
                         secondary_player = self.p2
                     else:
                         primary_player = self.p2
-                        secondary_player = self.p2
+                        secondary_player = self.p1
                     primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
                     self.snotlings_left_to_place = self.snotlings_left_to_place - 1
                     await primary_player.send_units_at_planet(int(game_update_string[1]))
@@ -1178,7 +1215,7 @@ class Game:
                         self.action_chosen = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                        self.mode = self.stored_mode
+                        self.mode = "Normal"
                         await primary_player.send_hand()
                         await primary_player.send_discard()
                         await self.p1.send_units_at_planet(chosen_planet)
@@ -1203,7 +1240,9 @@ class Game:
             elif game_update_string[0] == "HQ":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
-                        if self.action_chosen == "Pact of the Haemonculi":
+                        if not self.action_chosen:
+                            await self.update_game_event_deploy_action_hq(name, game_update_string)
+                        elif self.action_chosen == "Pact of the Haemonculi":
                             if game_update_string[1] == self.number_with_deploy_turn:
                                 if self.number_with_deploy_turn == "1":
                                     primary_player = self.p1
@@ -1227,6 +1266,65 @@ class Game:
                                     await primary_player.send_hand()
                                     await secondary_player.send_hand()
                                     await primary_player.send_hq()
+                        elif self.action_chosen == "Craftworld Gate":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.headquarters[unit_pos].get_is_unit():
+                                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                    self.action_chosen = ""
+                                    self.mode = "Normal"
+                                    self.player_with_action = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    await primary_player.send_hq()
+                                    await primary_player.send_hand()
+                                    await self.send_info_box()
+                                    self.position_of_actioned_card = (-1, -1)
+                        elif self.action_chosen == "Khymera Den":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.headquarters[unit_pos].get_name() == "Khymera":
+                                    self.khymera_to_move_positions.append((planet_pos, unit_pos))
+                                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                    await primary_player.send_hq()
+                        elif self.action_chosen == "Ravenous Flesh Hounds":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            if primary_player.get_number() == game_update_string[1]:
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1], 999)
+                                    primary_player.sacrifice_card_in_hq(unit_pos)
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.get_number()
+                                    await primary_player.send_hq()
+                                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await self.send_info_box()
                         elif self.action_chosen == "Deception":
                             if self.number_with_deploy_turn == "1":
                                 primary_player = self.p1
@@ -1352,7 +1450,53 @@ class Game:
             if game_update_string[0] == "IN_PLAY":
                 if self.phase == "DEPLOY":
                     if name == self.player_with_deploy_turn:
-                        if self.action_chosen == "Pact of the Haemonculi":
+                        if not self.action_chosen:
+                            print("action not chosen")
+                            if name == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if game_update_string[1] == "1":
+                                card_chosen = self.p1.cards_in_play[planet_pos + 1][unit_pos]
+                                player_owning_card = self.p1
+                            else:
+                                card_chosen = self.p2.cards_in_play[planet_pos + 1][unit_pos]
+                                player_owning_card = self.p2
+                            if card_chosen.get_has_action_while_in_play():
+                                if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
+                                        card_chosen.get_allowed_phases_while_in_play() == "ALL":
+                                    print("reached new in play unit action")
+                                    ability = card_chosen.get_ability()
+                                    if ability == "Haemonculus Tormentor":
+                                        if player_owning_card.name_player == name:
+                                            if player_owning_card.spend_resources(1):
+                                                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
+                                                                                                  2, expiration="EOP")
+                                                self.player_with_action = ""
+                                                self.action_chosen = ""
+                                                self.mode = "Normal"
+                                                self.player_with_deploy_turn = secondary_player.name_player
+                                                self.number_with_deploy_turn = secondary_player.get_number()
+                                                await player_owning_card.send_resources()
+                                                await self.game_sockets[0].receive_game_update("Haemonculus buffed")
+                                                await self.send_info_box()
+                                    elif ability == "Zarathur's Flamers":
+                                        if player_owning_card.name_player == name:
+                                            self.action_chosen = "Zarathur's Flamers"
+                                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                                            await player_owning_card.send_units_at_planet(planet_pos)
+                                    elif ability == "Ravenous Flesh Hounds":
+                                        if player_owning_card.name_player == name:
+                                            self.action_chosen = "Ravenous Flesh Hounds"
+                                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                                            await player_owning_card.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Pact of the Haemonculi":
                             if game_update_string[1] == self.number_with_deploy_turn:
                                 if self.number_with_deploy_turn == "1":
                                     primary_player = self.p1
@@ -1377,6 +1521,101 @@ class Game:
                                     await primary_player.send_hand()
                                     await secondary_player.send_hand()
                                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+                        elif self.action_chosen == "Craftworld Gate":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                    self.action_chosen = ""
+                                    self.mode = "Normal"
+                                    self.player_with_action = ""
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    await primary_player.send_hq()
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await primary_player.send_hand()
+                                    await self.send_info_box()
+                        elif self.action_chosen == "Khymera Den":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Khymera":
+                                    self.khymera_to_move_positions.append((planet_pos, unit_pos))
+                                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                    await primary_player.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Ravenous Flesh Hounds":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1], 999)
+                                    primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.get_number()
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await self.send_info_box()
+                        elif self.action_chosen == "Zarathur's Flamers":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            if int(game_update_string[1] == "1"):
+                                player_receiving_damage = self.p1
+                            else:
+                                player_receiving_damage = self.p2
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == self.position_of_actioned_card[0]:
+                                hitting_self = False
+                                if player_receiving_damage.get_number() == primary_player.get_number():
+                                    if int(game_update_string[3]) == self.position_of_actioned_card[1]:
+                                        hitting_self = True
+                                        await self.game_sockets[0].receive_game_update("Dont hit yourself")
+                                if not hitting_self:
+                                    player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                    player_receiving_damage.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                                    primary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.get_number()
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    await secondary_player.send_units_at_planet(planet_pos)
+                                    await self.send_info_box()
                         elif self.action_chosen == "Deception":
                             if self.number_with_deploy_turn == "1":
                                 primary_player = self.p1
@@ -2208,20 +2447,21 @@ class Game:
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                             if took_damage:
-                                att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                                 if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                    att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                                     if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                 "Repulsor Impact Field"):
                                         if att_num == 1:
                                             self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
                                         else:
                                             self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
-                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                    if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
-                                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() \
-                                                != "Warlord":
-                                            primary_player.rout_unit(planet_pos, unit_pos)
-                                            await primary_player.send_hq()
+                                    if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
+                                                "Black Heart Ravager":
+                                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() \
+                                                    != "Warlord":
+                                                primary_player.rout_unit(planet_pos, unit_pos)
+                                                await primary_player.send_hq()
                             del self.positions_of_units_to_take_damage[0]
                             del self.damage_on_units_list_before_new_damage[0]
                             del self.positions_attackers_of_units_to_take_damage[0]
