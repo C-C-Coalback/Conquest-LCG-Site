@@ -922,6 +922,12 @@ class Game:
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    if ability == "Craftworld Gate":
+                        if card.get_ready():
+                            self.action_chosen = "Craftworld Gate"
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
                     if ability == "Khymera Den":
                         if card.get_ready():
                             self.action_chosen = "Khymera Den"
@@ -1271,6 +1277,25 @@ class Game:
                                 self.mode = "Normal"
                                 await primary_player.send_hq()
                                 await self.send_info_box()
+                            elif self.action_chosen == "Craftworld Gate":
+                                if self.player_with_action == self.name_1:
+                                    primary_player = self.p1
+                                else:
+                                    primary_player = self.p2
+                                if primary_player.get_number() == game_update_string[1]:
+                                    planet_pos = -2
+                                    unit_pos = int(game_update_string[2])
+                                    if primary_player.headquarters[unit_pos].get_is_unit():
+                                        primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                        self.action_chosen = ""
+                                        self.mode = "Normal"
+                                        self.player_with_action = ""
+                                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                    self.position_of_actioned_card[1])
+
+                                        await primary_player.send_hq()
+                                        await primary_player.send_hand()
+                                        self.position_of_actioned_card = (-1, -1)
                         elif self.action_chosen == "Khymera Den":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
@@ -1466,13 +1491,30 @@ class Game:
                                     await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
                                     self.position_of_actioned_card = (-1, -1)
                                     await self.send_info_box()
+                        elif self.action_chosen == "Craftworld Gate":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                    self.action_chosen = ""
+                                    self.mode = "Normal"
+                                    self.player_with_action = ""
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    await primary_player.send_hq()
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await primary_player.send_hand()
                         elif self.action_chosen == "Khymera Den":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
-                                secondary_player = self.p2
                             else:
                                 primary_player = self.p2
-                                secondary_player = self.p2
                             if primary_player.get_number() == game_update_string[1]:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
