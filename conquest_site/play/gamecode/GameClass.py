@@ -911,6 +911,7 @@ class Game:
             secondary_player = self.p1
         if int(game_update_string[1]) == int(primary_player.get_number()):
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
+            ability = card.get_ability()
             if card.get_has_action_while_in_play():
                 if card.get_allowed_phases_while_in_play() == self.phase or \
                         card.get_allowed_phases_while_in_play() == "ALL":
@@ -921,6 +922,10 @@ class Game:
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             card.exhaust_card()
                             await primary_player.send_hq()
+                    elif ability == "Ravenous Flesh Hounds":
+                        self.action_chosen = "Ravenous Flesh Hounds"
+                        primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                        await primary_player.send_hq()
                     elif card.get_ability() == "Tellyporta Pad":
                         if card.get_ready():
                             if self.planets_in_play_array[self.round_number]:
@@ -1231,6 +1236,27 @@ class Game:
                                 self.mode = "Normal"
                                 await primary_player.send_hq()
                                 await self.send_info_box()
+                        elif self.action_chosen == "Ravenous Flesh Hounds":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                            self.position_of_actioned_card[1])
+                                primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                      self.position_of_actioned_card[1], 999)
+                                primary_player.sacrifice_card_in_hq(unit_pos)
+                                self.action_chosen = ""
+                                self.player_with_action = ""
+                                self.mode = "Normal"
+                                await primary_player.send_hq()
+                                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                self.position_of_actioned_card = (-1, -1)
+                                await self.send_info_box()
                         elif self.action_chosen == "Tellyporta Pad":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
@@ -1354,6 +1380,35 @@ class Game:
                                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                             self.position_of_actioned_card = (planet_pos, unit_pos)
                                             await player_owning_card.send_units_at_planet(planet_pos)
+                                    elif ability == "Ravenous Flesh Hounds":
+                                        if player_owning_card.name_player == name:
+                                            self.action_chosen = "Ravenous Flesh Hounds"
+                                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                                            await player_owning_card.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Ravenous Flesh Hounds":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
+                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                            self.position_of_actioned_card[1])
+                                primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                      self.position_of_actioned_card[1], 999)
+                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+
+                                self.action_chosen = ""
+                                self.player_with_action = ""
+                                self.mode = "Normal"
+                                await primary_player.send_units_at_planet(planet_pos)
+                                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                self.position_of_actioned_card = (-1, -1)
+                                await self.send_info_box()
                         elif self.action_chosen == "Zarathur's Flamers":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
