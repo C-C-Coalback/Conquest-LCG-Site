@@ -469,8 +469,9 @@ class Game:
                             await primary_player.send_units_at_planet(int(game_update_string[2]))
                     await primary_player.send_resources()
                     if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.get_name_player()
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                        if self.phase == "DEPLOY":
+                            self.player_with_deploy_turn = secondary_player.get_name_player()
+                            self.number_with_deploy_turn = secondary_player.get_number()
                         await self.send_info_box()
                     self.card_pos_to_deploy = -1
                     self.mode = "Normal"
@@ -956,7 +957,13 @@ class Game:
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
-                    if ability == "Craftworld Gate":
+                    elif ability == "Ambush Platform":
+                        if card.get_ready():
+                            self.action_chosen = "Ambush Platform"
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
+                    elif ability == "Craftworld Gate":
                         if card.get_ready():
                             self.action_chosen = "Craftworld Gate"
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
@@ -1052,6 +1059,21 @@ class Game:
                             primary_player.add_resources(card.get_cost())
                             await self.game_sockets[0].receive_game_update(card.get_name() + " not "
                                                                                              "implemented")
+        elif self.action_chosen == "Ambush Platform":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            if primary_player.aiming_reticle_coords_hand_2 is None:
+                card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array)
+                if card.get_card_type() == "Attachment" or card.get_ability() == "Gun Drones" or \
+                        card.get_ability() == "Shadowsun's Stealth Cadre":
+                    if not card.get_limited() or primary_player.can_play_limited:
+                        primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
+                        primary_player.aiming_reticle_color = "blue"
+                        await primary_player.send_hand()
+            else:
+                await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
         elif self.action_chosen == "Infernal Gateway":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1063,6 +1085,7 @@ class Game:
                     if card.get_faction() == "Chaos":
                         if card.get_cost() <= 3:
                             primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
+                            primary_player.aiming_reticle_color = "blue"
                             await primary_player.send_hand()
             else:
                 await self.game_sockets[0].receive_game_update("already chosen a valid unit for infernal gateway")
@@ -1394,6 +1417,59 @@ class Game:
                                         await primary_player.send_hq()
                                         await primary_player.send_hand()
                                         self.position_of_actioned_card = (-1, -1)
+                        elif self.action_chosen == "Ambush Platform":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if game_update_string[1] == "1":
+                                player_receiving_attachment = self.p1
+                            else:
+                                player_receiving_attachment = self.p2
+                            if primary_player.aiming_reticle_coords_hand_2 is not None:
+                                hand_pos = primary_player.aiming_reticle_coords_hand_2
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
+                                army_unit_as_attachment = False
+                                discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
+                                if card.get_ability() == "Gun Drones" or \
+                                        card.get_ability() == "Shadowsun's Stealth Cadre":
+                                    army_unit_as_attachment = True
+                                if primary_player.get_number() == player_receiving_attachment.get_number():
+                                    print("Playing own card")
+                                    played_card = primary_player.\
+                                        play_attachment_card_to_in_play(card, planet_pos, unit_pos,
+                                                                        army_unit_as_attachment=
+                                                                        army_unit_as_attachment,
+                                                                        discounts=discounts)
+                                    enemy_card = False
+                                else:
+                                    played_card = False
+                                    if primary_player.spend_resources(int(card.get_cost()) - discounts):
+                                        played_card = player_receiving_attachment.play_attachment_card_to_in_play(
+                                            card, planet_pos, unit_pos, not_own_attachment=True,
+                                            army_unit_as_attachment=army_unit_as_attachment)
+                                        if not played_card:
+                                            primary_player.add_resources(int(card.get_cost()) - discounts)
+                                    enemy_card = True
+                                if played_card:
+                                    if card.get_limited():
+                                        primary_player.can_play_limited = False
+                                    primary_player.remove_card_from_hand(hand_pos)
+                                    print("Succeeded (?) in playing attachment")
+                                    primary_player.aiming_reticle_coords_hand_2 = None
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await primary_player.send_hand()
+                                    if enemy_card:
+                                        await player_receiving_attachment.send_hq()
+                                    await primary_player.send_hq()
+                                    await primary_player.send_resources()
                         elif self.action_chosen == "Khymera Den":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
@@ -1706,6 +1782,60 @@ class Game:
                                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                             self.position_of_actioned_card = (planet_pos, unit_pos)
                                             await player_owning_card.send_units_at_planet(planet_pos)
+                        elif self.action_chosen == "Ambush Platform":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if game_update_string[1] == "1":
+                                player_receiving_attachment = self.p1
+                            else:
+                                player_receiving_attachment = self.p2
+                            if primary_player.aiming_reticle_coords_hand_2 is not None:
+                                hand_pos = primary_player.aiming_reticle_coords_hand_2
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
+                                army_unit_as_attachment = False
+                                discounts = primary_player.search_hq_for_discounts("", "",
+                                                                                   is_attachment=True)
+                                if card.get_ability() == "Gun Drones" or \
+                                        card.get_ability() == "Shadowsun's Stealth Cadre":
+                                    army_unit_as_attachment = True
+                                if primary_player.get_number() == player_receiving_attachment.get_number():
+                                    print("Playing own card")
+                                    played_card = primary_player. \
+                                        play_attachment_card_to_in_play(card, planet_pos, unit_pos,
+                                                                        army_unit_as_attachment=
+                                                                        army_unit_as_attachment,
+                                                                        discounts=discounts)
+                                    enemy_card = False
+                                else:
+                                    played_card = False
+                                    if primary_player.spend_resources(int(card.get_cost()) - discounts):
+                                        played_card = player_receiving_attachment.play_attachment_card_to_in_play(
+                                            card, planet_pos, unit_pos, not_own_attachment=True,
+                                            army_unit_as_attachment=army_unit_as_attachment)
+                                        if not played_card:
+                                            primary_player.add_resources(int(card.get_cost()) - discounts)
+                                    enemy_card = True
+                                if played_card:
+                                    if card.get_limited():
+                                        primary_player.can_play_limited = False
+                                    primary_player.remove_card_from_hand(hand_pos)
+                                    print("Succeeded (?) in playing attachment")
+                                    primary_player.aiming_reticle_coords_hand_2 = None
+                                    primary_player.reset_aiming_reticle_in_play(
+                                        self.position_of_actioned_card[0],
+                                        self.position_of_actioned_card[1])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await primary_player.send_hand()
+                                    if enemy_card:
+                                        await player_receiving_attachment.send_units_at_planet(planet_pos)
+                                    else:
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                    await primary_player.send_hq()
+                                    await primary_player.send_resources()
                         elif self.action_chosen == "Ravenous Flesh Hounds":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
