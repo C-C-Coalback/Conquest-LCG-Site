@@ -902,6 +902,12 @@ class Game:
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
+                    elif ability == "Squadron Redeployment":
+                        self.action_chosen = "Squadron Redeployment"
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Pact of the Haemonculi":
                         print("Resolve PotH")
                         self.action_chosen = "Pact of the Haemonculi"
@@ -1042,6 +1048,12 @@ class Game:
                             else:
                                 primary_player.add_resources(card.get_cost())
                                 await self.game_sockets[0].receive_game_update("No battle taking place")
+                        elif ability == "Squadron Redeployment":
+                            self.action_chosen = "Squadron Redeployment"
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
                         elif ability == "Warpstorm":
                             print("Resolve Warpstorm")
                             self.action_chosen = "Warpstorm"
@@ -1218,7 +1230,33 @@ class Game:
                     await self.p1.send_units_at_planet(chosen_planet)
                     await self.p2.send_units_at_planet(chosen_planet)
                     await self.send_info_box()
-
+                elif self.action_chosen == "Squadron Redeployment":
+                    if self.number_with_deploy_turn == "1":
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    origin_planet = self.unit_to_move_position[0]
+                    origin_pos = self.unit_to_move_position[1]
+                    dest_planet = int(game_update_string[1])
+                    hand_pos = primary_player.aiming_reticle_coords_hand
+                    primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                    primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    self.card_pos_to_deploy = -1
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                    primary_player.discard_card_from_hand(hand_pos)
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.send_hand()
+                    await primary_player.send_units_at_planet(origin_planet)
+                    await primary_player.send_units_at_planet(dest_planet)
+                    await primary_player.send_discard()
+                    await self.send_info_box()
                 elif self.action_chosen == "Snotling Attack":
                     if self.number_with_deploy_turn == "1":
                         primary_player = self.p1
@@ -1348,6 +1386,23 @@ class Game:
                                     await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
                                     self.position_of_actioned_card = (-1, -1)
                                     await self.send_info_box()
+                        elif self.action_chosen == "Squadron Redeployment":
+                            if self.unit_to_move_position == [-1, -1]:
+                                if self.player_with_action == self.name_1:
+                                    primary_player = self.p1
+                                else:
+                                    primary_player = self.p2
+                                if game_update_string[1] == primary_player.get_number():
+                                    planet_pos = -2
+                                    unit_pos = int(game_update_string[2])
+                                    if primary_player.headquarters[unit_pos].get_attachments():
+                                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                            self.unit_to_move_position = [planet_pos, unit_pos]
+                                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            await primary_player.send_hq()
+                            else:
+                                await self.game_sockets[0].receive_game_update("Already selected unit to move")
                         elif self.action_chosen == "Deception":
                             if self.number_with_deploy_turn == "1":
                                 primary_player = self.p1
@@ -1398,6 +1453,23 @@ class Game:
                                 self.mode = "Normal"
                                 await primary_player.send_hq()
                                 await self.send_info_box()
+                            elif self.action_chosen == "Squadron Redeployment":
+                                if self.unit_to_move_position == [-1, -1]:
+                                    if self.player_with_action == self.name_1:
+                                        primary_player = self.p1
+                                    else:
+                                        primary_player = self.p2
+                                    if game_update_string[1] == primary_player.get_number():
+                                        planet_pos = -2
+                                        unit_pos = int(game_update_string[2])
+                                        if primary_player.headquarters[unit_pos].get_attachments():
+                                            if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                                self.unit_to_move_position = [planet_pos, unit_pos]
+                                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                                await primary_player.send_hq()
+                                else:
+                                    await self.game_sockets[0].receive_game_update("Already selected unit to move")
                             elif self.action_chosen == "Craftworld Gate":
                                 if self.player_with_action == self.name_1:
                                     primary_player = self.p1
@@ -1659,6 +1731,23 @@ class Game:
                                     await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
                                     self.position_of_actioned_card = (-1, -1)
                                     await self.send_info_box()
+                        elif self.action_chosen == "Squadron Redeployment":
+                            if self.unit_to_move_position == [-1, -1]:
+                                if self.player_with_action == self.name_1:
+                                    primary_player = self.p1
+                                else:
+                                    primary_player = self.p2
+                                if game_update_string[1] == primary_player.get_number():
+                                    planet_pos = int(game_update_string[2])
+                                    unit_pos = int(game_update_string[3])
+                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
+                                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                            self.unit_to_move_position = [planet_pos, unit_pos]
+                                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            await primary_player.send_units_at_planet(planet_pos)
+                            else:
+                                await self.game_sockets[0].receive_game_update("Already selected unit to move")
                         elif self.action_chosen == "Zarathur's Flamers":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
@@ -1666,7 +1755,7 @@ class Game:
                             else:
                                 primary_player = self.p2
                                 secondary_player = self.p2
-                            if int(game_update_string[1] == "1"):
+                            if game_update_string[1] == "1":
                                 player_receiving_damage = self.p1
                             else:
                                 player_receiving_damage = self.p2
@@ -1836,6 +1925,23 @@ class Game:
                                         await primary_player.send_units_at_planet(planet_pos)
                                     await primary_player.send_hq()
                                     await primary_player.send_resources()
+                        elif self.action_chosen == "Squadron Redeployment":
+                            if self.unit_to_move_position == [-1, -1]:
+                                if self.player_with_action == self.name_1:
+                                    primary_player = self.p1
+                                else:
+                                    primary_player = self.p2
+                                if game_update_string[1] == primary_player.get_number():
+                                    planet_pos = int(game_update_string[2])
+                                    unit_pos = int(game_update_string[3])
+                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
+                                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                            self.unit_to_move_position = [planet_pos, unit_pos]
+                                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                            await primary_player.send_units_at_planet(planet_pos)
+                            else:
+                                await self.game_sockets[0].receive_game_update("Already selected unit to move")
                         elif self.action_chosen == "Ravenous Flesh Hounds":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
