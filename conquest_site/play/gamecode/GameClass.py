@@ -1161,6 +1161,8 @@ class Game:
                     else:
                         primary_player = self.p2
                         secondary_player = self.p2
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
                     for i in range(len(self.khymera_to_move_positions)):
                         planet_pos, unit_pos = self.khymera_to_move_positions[i]
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -1180,8 +1182,6 @@ class Game:
                     self.action_chosen = ""
                     self.player_with_action = ""
                     self.mode = "Normal"
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
                     await primary_player.send_units_at_all_planets()
                     await primary_player.send_hq()
                     await self.send_info_box()
