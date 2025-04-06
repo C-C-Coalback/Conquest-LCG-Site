@@ -62,7 +62,7 @@ def dark_eldar_cards_init():
                                                                           "Reaction: After this unit damages a "
                                                                           "non-warlord unit, rout that unit.",
                                                    "Vehicle. Tank. Elite.", 6, faction, "Loyal", 2, 5, 2, False,
-                                                   wargear_attachments_permitted=False),
+                                                   wargear_attachments_permitted=False, flying=True),
                               CardClasses.ArmyCard("Murder of Razorwings", "No Attachments.\n"
                                                                            "Reaction: After you deploy this unit, "
                                                                            "discard 1 card at random from your "

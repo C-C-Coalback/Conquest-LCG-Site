@@ -751,7 +751,7 @@ class Game:
                                                                                self.defender_position)
                                     # Flying check
                                     if def_flying and not att_flying and not att_ignores_flying:
-                                        attack_value = attack_value / 2 + (attack_value % 2 > 0)
+                                        attack_value = int(attack_value / 2 + (attack_value % 2))
                                     self.damage_on_unit_before_new_damage = \
                                         secondary_player.get_damage_given_pos(self.defender_planet,
                                                                               self.defender_position)
@@ -761,7 +761,8 @@ class Game:
                                     if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                                   self.defender_position, "Vehicle"):
                                         if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                                self.attacker_position):
+                                                                                self.attacker_position) \
+                                                == "Tankbusta Bommaz":
                                             attack_value = attack_value * 2
                                     self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                               self.attacker_position)
@@ -774,8 +775,6 @@ class Game:
                                                                                              self.attacker_position)
                                     secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                 self.defender_position, "red")
-                                    # if armorbane_check and attack_value > 0:
-                                    #     await self.resolve_shield_of_unit_from_attack(secondary_player.get_name(), -1)
                                 else:
                                     primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                                 self.attacker_position)
@@ -2129,12 +2128,17 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
-                            att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                             if att_num == 1:
                                 self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
                             else:
                                 self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
+                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                            if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                                    primary_player.rout_unit(planet_pos, unit_pos)
+                                    await primary_player.send_hq()
                     del self.positions_of_units_to_take_damage[0]
                     del self.damage_on_units_list_before_new_damage[0]
                     del self.positions_attackers_of_units_to_take_damage[0]
@@ -2162,14 +2166,20 @@ class Game:
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                             if took_damage:
+                                att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                                 if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                     if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                 "Repulsor Impact Field"):
-                                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                                         if att_num == 1:
                                             self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
                                         else:
                                             self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
+                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                    if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
+                                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() \
+                                                != "Warlord":
+                                            primary_player.rout_unit(planet_pos, unit_pos)
+                                            await primary_player.send_hq()
                             del self.positions_of_units_to_take_damage[0]
                             del self.damage_on_units_list_before_new_damage[0]
                             del self.positions_attackers_of_units_to_take_damage[0]
