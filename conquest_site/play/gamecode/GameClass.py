@@ -1421,6 +1421,16 @@ class Game:
                                                     self.action_chosen = ""
                                                     self.mode = "Normal"
                                                     await player_owning_card.send_units_at_planet(planet_pos)
+                                    elif ability == "Haemonculus Tormentor":
+                                        if player_owning_card.name_player == name:
+                                            if player_owning_card.spend_resources(1):
+                                                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
+                                                                                                  2, expiration="EOP")
+                                                self.player_with_action = ""
+                                                self.action_chosen = ""
+                                                self.mode = "Normal"
+                                                await player_owning_card.send_resources()
+                                                await self.game_sockets[0].receive_game_update("Haemonculus buffed")
                                     elif ability == "Zarathur's Flamers":
                                         if player_owning_card.name_player == name:
                                             self.action_chosen = "Zarathur's Flamers"

@@ -915,11 +915,15 @@ class Player:
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_battle(amount)
             elif expiration == "NEXT":
                 self.headquarters[unit_pos].increase_extra_attack_until_next_attack(amount)
+            elif expiration == "EOP":
+                self.headquarters[unit_pos].increase_extra_attack_until_end_of_phase(amount)
             return None
         if expiration == "EOB":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
         elif expiration == "NEXT":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_next_attack(amount)
+        elif expiration == "EOP":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_phase(amount)
         return None
 
     def increase_attack_of_all_units_at_hq(self, amount, required_faction=None, expiration="EOB"):
