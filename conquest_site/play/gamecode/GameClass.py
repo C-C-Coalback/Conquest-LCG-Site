@@ -122,6 +122,7 @@ class Game:
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
         self.snotlings_left_to_place = 0
+        self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
 
     async def joined_requests_graphics(self, name):
@@ -922,6 +923,13 @@ class Game:
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    if ability == "Khymera Den":
+                        if card.get_ready():
+                            self.action_chosen = "Khymera Den"
+                            self.khymera_to_move_positions = []
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
                     elif ability == "Ravenous Flesh Hounds":
                         self.action_chosen = "Ravenous Flesh Hounds"
                         primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
@@ -1084,6 +1092,34 @@ class Game:
                         await primary_player.send_hand()
                         await primary_player.send_units_at_planet(pos_planet)
                         await primary_player.send_discard()
+                elif self.action_chosen == "Khymera Den":
+                    if self.player_with_action == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p2
+                    for i in range(len(self.khymera_to_move_positions)):
+                        planet_pos, unit_pos = self.khymera_to_move_positions[i]
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    for i in range(len(self.khymera_to_move_positions)):
+                        planet_pos, unit_pos = self.khymera_to_move_positions[i]
+                        if planet_pos != int(game_update_string[1]):
+                            primary_player.move_unit_to_planet(planet_pos, unit_pos, int(game_update_string[1]))
+                            for j in range(len(self.khymera_to_move_positions)):
+                                planet_pos_2, unit_pos_2 = self.khymera_to_move_positions[j]
+                                if planet_pos == planet_pos_2:
+                                    if unit_pos_2 > unit_pos:
+                                        unit_pos_2 -= 1
+                                        self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    await primary_player.send_units_at_all_planets()
+                    await primary_player.send_hq()
+                    await self.send_info_box()
                 elif self.action_chosen == "Warpstorm":
                     if self.player_with_action == self.name_1:
                         primary_player = self.p1
@@ -1236,27 +1272,38 @@ class Game:
                                 self.mode = "Normal"
                                 await primary_player.send_hq()
                                 await self.send_info_box()
+                        elif self.action_chosen == "Khymera Den":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                            else:
+                                primary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.headquarters[unit_pos].get_name() == "Khymera":
+                                    self.khymera_to_move_positions.append((planet_pos, unit_pos))
+                                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                    await primary_player.send_hq()
                         elif self.action_chosen == "Ravenous Flesh Hounds":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
-                                secondary_player = self.p2
                             else:
                                 primary_player = self.p2
-                                secondary_player = self.p2
-                            unit_pos = int(game_update_string[2])
-                            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
-                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                            self.position_of_actioned_card[1])
-                                primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
-                                                                      self.position_of_actioned_card[1], 999)
-                                primary_player.sacrifice_card_in_hq(unit_pos)
-                                self.action_chosen = ""
-                                self.player_with_action = ""
-                                self.mode = "Normal"
-                                await primary_player.send_hq()
-                                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
-                                self.position_of_actioned_card = (-1, -1)
-                                await self.send_info_box()
+                            if primary_player.get_number() == game_update_string[1]:
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1], 999)
+                                    primary_player.sacrifice_card_in_hq(unit_pos)
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    await primary_player.send_hq()
+                                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await self.send_info_box()
                         elif self.action_chosen == "Tellyporta Pad":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
@@ -1393,22 +1440,37 @@ class Game:
                             else:
                                 primary_player = self.p2
                                 secondary_player = self.p2
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
-                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                            self.position_of_actioned_card[1])
-                                primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
-                                                                      self.position_of_actioned_card[1], 999)
-                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
+                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                                self.position_of_actioned_card[1])
+                                    primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                                          self.position_of_actioned_card[1], 999)
+                                    primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
 
-                                self.action_chosen = ""
-                                self.player_with_action = ""
-                                self.mode = "Normal"
-                                await primary_player.send_units_at_planet(planet_pos)
-                                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
-                                self.position_of_actioned_card = (-1, -1)
-                                await self.send_info_box()
+                                    self.action_chosen = ""
+                                    self.player_with_action = ""
+                                    self.mode = "Normal"
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                                    self.position_of_actioned_card = (-1, -1)
+                                    await self.send_info_box()
+                        elif self.action_chosen == "Khymera Den":
+                            if self.player_with_action == self.name_1:
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p2
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Khymera":
+                                    self.khymera_to_move_positions.append((planet_pos, unit_pos))
+                                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                    await primary_player.send_units_at_planet(planet_pos)
                         elif self.action_chosen == "Zarathur's Flamers":
                             if self.player_with_action == self.name_1:
                                 primary_player = self.p1
