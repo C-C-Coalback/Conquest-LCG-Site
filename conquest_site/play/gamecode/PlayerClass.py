@@ -1015,7 +1015,23 @@ class Player:
         return discount
 
     def exhaust_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            previous_state = self.headquarters[unit_id].get_ready()
+            self.headquarters[unit_id].exhaust_card()
+            new_state = self.headquarters[unit_id].get_ready()
+            if previous_state and not new_state:
+                for i in range(len(self.headquarters[unit_id].get_attachments())):
+                    if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
+                        self.assign_damage_to_pos(-2, unit_id, 1)
+            return None
+        previous_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
+        new_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
+        if previous_state and not new_state:
+            for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
+                if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
+                    self.assign_damage_to_pos(planet_id, unit_id, 1)
+        return None
 
     def get_attack_given_pos(self, planet_id, unit_id):
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -1296,9 +1312,10 @@ class Player:
                                                                                    "Umbral Preacher")
             if own_umbral_check or enemy_umbral_check:
                 return False
-        if exhaust:
-            self.exhaust_given_pos(planet_id, unit_id)
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
+        last_element_hq = len(self.headquarters) - 1
+        if exhaust:
+            self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 

@@ -920,7 +920,7 @@ class Game:
                         if card.get_ready():
                             self.action_chosen = "Catachan Outpost"
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
-                            card.exhaust_card()
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
                     elif ability == "Ravenous Flesh Hounds":
                         self.action_chosen = "Ravenous Flesh Hounds"
@@ -931,7 +931,7 @@ class Game:
                             if self.planets_in_play_array[self.round_number]:
                                 self.action_chosen = "Tellyporta Pad"
                                 primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
-                                card.exhaust_card()
+                                primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                                 await primary_player.send_hq()
                             else:
                                 await self.game_sockets[0].receive_game_update("First planet not in play")
@@ -1982,7 +1982,13 @@ class Game:
         print("All units have been damaged. Move to destruction")
         i = 0
         while i < len(player.cards_in_play[planet_num + 1]):
+            if self.attacker_planet == planet_num and self.attacker_position == i:
+                if self.player_with_combat_turn == player.name_player:
+                    player.set_aiming_reticle_in_play(planet_num, i, "blue")
             if player.check_if_card_is_destroyed(planet_num, i):
+                if self.attacker_planet == planet_num and self.attacker_position == i:
+                    self.attacker_planet = -1
+                    self.attacker_position = -1
                 player.destroy_card_in_play(planet_num, i)
                 i = i - 1
             i = i + 1
