@@ -126,6 +126,8 @@ class Game:
         self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
         self.active_effects = []  # Each item should be a tuple containing all relevant info
+        self.chosen_first_card = False
+        self.chosen_second_card = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1691,6 +1693,15 @@ class Game:
                                 await player_owning_card.send_resources()
                                 await self.game_sockets[0].receive_game_update("Haemonculus buffed")
                                 await self.send_info_box()
+                    elif ability == "Captain Markis":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.chosen_second_card = False
+                            self.chosen_first_card = False
+                            await player_owning_card.send_units_at_planet(planet_pos)
                     elif ability == "Veteran Brother Maxos":
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
@@ -1747,6 +1758,39 @@ class Game:
                     await primary_player.send_hand()
                     await secondary_player.send_hand()
                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+        elif self.action_chosen == "Captain Markis":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if planet_pos == self.position_of_actioned_card[0]:
+                if not self.chosen_first_card:
+                    if primary_player.get_number() == game_update_string[1]:
+
+                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_faction() == "Astra Militarum" \
+                                and primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            self.chosen_first_card = True
+                            primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                            await primary_player.send_units_at_planet(planet_pos)
+                            await primary_player.send_discard()
+                else:
+                    player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                    self.chosen_second_card = True
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
+                    self.position_of_actioned_card = (-1, -1)
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                    await primary_player.send_units_at_planet(planet_pos)
+                    await player_owning_card.send_units_at_planet(planet_pos)
+
         elif self.action_chosen == "Craftworld Gate":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
