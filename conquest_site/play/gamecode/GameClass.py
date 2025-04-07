@@ -1106,7 +1106,7 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
-        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        card = primary_player.get_card_in_hand(int(game_update_string[2]))
         ability = card.get_ability()
         print(card.get_allowed_phases_while_in_hand(), self.phase)
         print(card.get_has_action_while_in_hand())
@@ -1120,7 +1120,7 @@ class Game:
                             print("Resolve Battle Cry")
                             primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
                                                                                 expiration="EOB")
-                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.mode = "Normal"
                             self.player_with_action = ""
                             await primary_player.send_hand()
@@ -1132,7 +1132,7 @@ class Game:
                                 self.action_chosen = "Drop Pod Assault"
                                 self.choice_context = "Drop Pod Assault"
                                 primary_player.aiming_reticle_color = "blue"
-                                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                                 primary_player.number_cards_to_search = 6
                                 self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
                                 self.name_player_who_is_searching = primary_player.name_player
@@ -1153,26 +1153,26 @@ class Game:
                         elif ability == "Squadron Redeployment":
                             self.action_chosen = "Squadron Redeployment"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Warpstorm":
                             print("Resolve Warpstorm")
                             self.action_chosen = "Warpstorm"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Infernal Gateway":
                             self.action_chosen = "Infernal Gateway"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Promise of Glory":
                             print("Resolve Promise of Glory")
                             primary_player.summon_token_at_hq("Cultist", amount=2)
-                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.mode = self.stored_mode
                             self.player_with_action = ""
                             self.player_with_deploy_turn = secondary_player.name_player
@@ -1188,7 +1188,7 @@ class Game:
                                     if secondary_player.spend_resources(1):
                                         primary_player.add_resources(1)
                                         primary_player.can_play_limited = False
-                                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                                         self.mode = self.stored_mode
                                         self.player_with_action = ""
                                         self.player_with_deploy_turn = secondary_player.name_player
@@ -1202,7 +1202,7 @@ class Game:
                             print("Resolve Doom")
                             primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
                             secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
-                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.mode = self.stored_mode
                             self.player_with_action = ""
                             self.player_with_deploy_turn = secondary_player.name_player
@@ -1216,41 +1216,41 @@ class Game:
                         elif ability == "Squadron Redeployment":
                             self.action_chosen = "Squadron Redeployment"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Pact of the Haemonculi":
                             print("Resolve PotH")
                             self.action_chosen = "Pact of the Haemonculi"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Deception":
                             self.action_chosen = "Deception"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Exterminatus":
                             print("Resolve Exterminatus")
                             self.action_chosen = "Exterminatus"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Snotling Attack":
                             print("Resolve Snotling Attack")
                             self.action_chosen = "Snotling Attack"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             self.snotlings_left_to_place = 4
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Promise of Glory":
                             print("Resolve Promise of Glory")
                             primary_player.summon_token_at_hq("Cultist", amount=2)
-                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.mode = self.stored_mode
                             self.player_with_action = ""
                             self.player_with_deploy_turn = secondary_player.name_player
@@ -1266,7 +1266,7 @@ class Game:
                                     if secondary_player.spend_resources(1):
                                         primary_player.add_resources(1)
                                         primary_player.can_play_limited = False
-                                        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                                         self.mode = self.stored_mode
                                         self.player_with_action = ""
                                         self.player_with_deploy_turn = secondary_player.name_player
@@ -1280,7 +1280,7 @@ class Game:
                             print("Resolve Doom")
                             primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
                             secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
-                            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.mode = self.stored_mode
                             self.player_with_action = ""
                             self.player_with_deploy_turn = secondary_player.name_player
@@ -1294,34 +1294,34 @@ class Game:
                         elif ability == "Squadron Redeployment":
                             self.action_chosen = "Squadron Redeployment"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Pact of the Haemonculi":
                             print("Resolve PotH")
                             self.action_chosen = "Pact of the Haemonculi"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Deception":
                             self.action_chosen = "Deception"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Exterminatus":
                             print("Resolve Exterminatus")
                             self.action_chosen = "Exterminatus"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Snotling Attack":
                             print("Resolve Snotling Attack")
                             self.action_chosen = "Snotling Attack"
                             primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             self.snotlings_left_to_place = 4
                             await primary_player.send_hand()
                             await primary_player.send_resources()
@@ -1344,6 +1344,20 @@ class Game:
                         await primary_player.send_hand()
             else:
                 await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
+        elif self.action_chosen == "Veteran Brother Maxos":
+            if card.get_is_unit() and card.get_faction() == "Space Marines":
+                if primary_player.spend_resources(card.get_cost()):
+                    primary_player.add_card_to_planet(card, self.position_of_actioned_card[0])
+                    primary_player.remove_card_from_hand(int(game_update_string[2]))
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    await primary_player.send_hand()
+                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                    await primary_player.send_resources()
+                    self.position_of_actioned_card = (-1, -1)
         elif self.action_chosen == "Infernal Gateway":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1573,6 +1587,12 @@ class Game:
                                 await player_owning_card.send_resources()
                                 await self.game_sockets[0].receive_game_update("Haemonculus buffed")
                                 await self.send_info_box()
+                    elif ability == "Veteran Brother Maxos":
+                        if player_owning_card.name_player == name:
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            await player_owning_card.send_units_at_planet(planet_pos)
                     elif ability == "Zarathur's Flamers":
                         if player_owning_card.name_player == name:
                             self.action_chosen = "Zarathur's Flamers"
@@ -1638,8 +1658,9 @@ class Game:
                     self.action_chosen = ""
                     self.mode = "Normal"
                     self.player_with_action = ""
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.number
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     await primary_player.send_hq()
@@ -1679,8 +1700,9 @@ class Game:
                     self.action_chosen = ""
                     self.player_with_action = ""
                     self.mode = "Normal"
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
                     await primary_player.send_units_at_planet(planet_pos)
                     await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
                     self.position_of_actioned_card = (-1, -1)
