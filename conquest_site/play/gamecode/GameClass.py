@@ -125,6 +125,7 @@ class Game:
         self.snotlings_left_to_place = 0
         self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
+        self.active_effects = []  # Each item should be a tuple containing all relevant info
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1171,6 +1172,18 @@ class Game:
                             await primary_player.send_hand()
                             await primary_player.send_discard()
                             await primary_player.send_resources()
+                            await self.send_info_box()
+                        elif ability == "Power from Pain":
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.reactions_needing_resolving.append(ability)
+                            self.player_who_resolves_reaction.append(secondary_player.name_player)
+                            self.positions_of_unit_triggering_reaction.append((int(secondary_player.get_number()),
+                                                                               -1, -1))
+                            self.mode = "Normal"
+                            self.player_with_action = ""
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                            await primary_player.send_discard()
                             await self.send_info_box()
                         elif ability == "Archon's Terror":
                             self.action_chosen = ability
@@ -2676,14 +2689,41 @@ class Game:
                 secondary_player = self.p1
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    if self.reactions_needing_resolving[0] == "Power from Pain":
+                        await self.game_sockets[0].receive_game_update("No sacrifice for Power from Pain")
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
-            if len(game_update_string) == 4:
+                    await self.send_info_box()
+            elif len(game_update_string) == 3:
+                if game_update_string[0] == "HQ":
+                    if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
+                        if self.reactions_needing_resolving[0] == "Power from Pain":
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.headquarters[unit_pos].get_card_type() == "Army":
+                                primary_player.sacrifice_card_in_hq(unit_pos)
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await primary_player.send_hq()
+                                await primary_player.send_discard()
+                                await self.send_info_box()
+            elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     print("Check what player")
                     if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
-                        if self.reactions_needing_resolving[0] == "Sicarius's Chosen":
+                        if self.reactions_needing_resolving[0] == "Power from Pain":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await primary_player.send_units_at_planet(planet_pos)
+                                await primary_player.send_discard()
+                                await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
                             print("Resolve Sicarius's chosen")
                             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
                             target_planet = int(game_update_string[2])
@@ -2692,7 +2732,7 @@ class Game:
                                 if abs(origin_planet - target_planet) == 1:
                                     print("test")
                                     if secondary_player.cards_in_play[target_planet + 1][
-                                        int(game_update_string[3])].get_card_type() == "Army":
+                                            int(game_update_string[3])].get_card_type() == "Army":
                                         secondary_player.move_unit_to_planet(target_planet, int(game_update_string[3]),
                                                                              origin_planet)
                                         new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
