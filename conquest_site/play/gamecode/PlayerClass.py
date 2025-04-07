@@ -989,6 +989,14 @@ class Player:
                     sacrificed_locations[planet_pos + 1] = True
         return sacrificed_locations
 
+    def reset_extra_abilities_eop(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].reset_ranged()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
+
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():

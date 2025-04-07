@@ -122,7 +122,7 @@ class Game:
         self.reactions_needing_resolving = []
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
-        self.snotlings_left_to_place = 0
+        self.misc_counter = 0
         self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
         self.active_effects = []  # Each item should be a tuple containing all relevant info
@@ -1319,7 +1319,15 @@ class Game:
                             self.action_chosen = "Snotling Attack"
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            self.snotlings_left_to_place = 4
+                            self.misc_counter = 4
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                        elif ability == "Preemptive Barrage":
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.misc_target_planet = -1
+                            self.misc_counter = 3
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         elif ability == "Promise of Glory":
@@ -1390,14 +1398,6 @@ class Game:
                             self.action_chosen = "Exterminatus"
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            await primary_player.send_hand()
-                            await primary_player.send_resources()
-                        elif ability == "Snotling Attack":
-                            print("Resolve Snotling Attack")
-                            self.action_chosen = "Snotling Attack"
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            self.snotlings_left_to_place = 4
                             await primary_player.send_hand()
                             await primary_player.send_resources()
                         else:
@@ -1648,9 +1648,9 @@ class Game:
                 primary_player = self.p2
                 secondary_player = self.p1
             primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
-            self.snotlings_left_to_place = self.snotlings_left_to_place - 1
+            self.misc_counter = self.misc_counter - 1
             await primary_player.send_units_at_planet(int(game_update_string[1]))
-            if self.snotlings_left_to_place == 0:
+            if self.misc_counter == 0:
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                 primary_player.aiming_reticle_color = None
                 primary_player.aiming_reticle_coords_hand = None
@@ -1767,6 +1767,35 @@ class Game:
                     await primary_player.send_hand()
                     await secondary_player.send_hand()
                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+        elif self.action_chosen == "Preemptive Barrage":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if self.misc_target_planet == -1:
+                if card_chosen.get_faction() == "Astra Militarum":
+                    card_chosen.set_ranged(True)
+                    self.misc_target_planet = planet_pos
+                    self.misc_counter -= 1
+                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+            elif self.misc_target_planet == planet_pos:
+                if card_chosen.get_faction() == "Astra Militarum":
+                    card_chosen.set_ranged(True)
+                    self.misc_counter -= 1
+                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+                    if self.misc_counter == 0:
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        await primary_player.send_hand()
+                        await primary_player.send_hq()
+                        await primary_player.send_discard()
         elif self.action_chosen == "Suppressive Fire":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1793,9 +1822,6 @@ class Game:
                         self.player_with_action = ""
                         self.mode = "Normal"
                         self.misc_target_planet = -1
-                        if self.phase == "DEPLOY":
-                            self.player_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.get_number()
                         await player_owning_card.send_units_at_planet(planet_pos)
                         await primary_player.send_hand()
                         await primary_player.send_discard()
@@ -2613,7 +2639,6 @@ class Game:
                         await player.send_hq()
 
     async def destroy_check_cards_in_hq(self, player):
-        print("All units have been damaged. Move to destruction")
         i = 0
         while i < len(player.headquarters):
             if player.headquarters[i].get_card_type != "Support":
@@ -2625,7 +2650,6 @@ class Game:
             await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
-        print("All units have been damaged. Move to destruction")
         i = 0
         while i < len(player.cards_in_play[planet_num + 1]):
             if self.attacker_planet == planet_num and self.attacker_position == i:
@@ -2640,6 +2664,7 @@ class Game:
             i = i + 1
 
     async def destroy_check_all_cards(self):
+        print("All units have been damaged. Move to destruction")
         for i in range(7):
             await self.destroy_check_cards_at_planet(self.p1, i)
             await self.destroy_check_cards_at_planet(self.p2, i)
@@ -2676,6 +2701,8 @@ class Game:
             await self.p1.send_discard()
         self.p1.reset_extra_attack_eop()
         self.p2.reset_extra_attack_eop()
+        self.p1.reset_extra_abilities_eop()
+        self.p2.reset_extra_abilities_eop()
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
