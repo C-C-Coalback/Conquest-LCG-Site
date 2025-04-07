@@ -842,18 +842,18 @@ class Game:
                         await primary_player.send_hq()
 
     async def update_game_event_action_hand(self, name, game_update_string):
+        if self.number_with_deploy_turn == "1":
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        ability = card.get_ability()
+        print(card.get_allowed_phases_while_in_hand(), self.phase)
+        print(card.get_has_action_while_in_hand())
         if not self.action_chosen:
             self.card_pos_to_deploy = int(game_update_string[2])
-            if self.number_with_deploy_turn == "1":
-                primary_player = self.p1
-                secondary_player = self.p2
-            else:
-                primary_player = self.p2
-                secondary_player = self.p1
-            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-            ability = card.get_ability()
-            print(card.get_allowed_phases_while_in_hand(), self.phase)
-            print(card.get_has_action_while_in_hand())
             if card.get_has_action_while_in_hand():
                 if card.get_allowed_phases_while_in_hand() == self.phase or \
                         card.get_allowed_phases_while_in_hand() == "ALL":
@@ -1101,11 +1101,6 @@ class Game:
                             await primary_player.send_hand()
             else:
                 await self.game_sockets[0].receive_game_update("already chosen a valid unit for infernal gateway")
-        else:
-            primary_player.add_resources(card.get_cost())
-            await self.game_sockets[0].receive_game_update(card.get_name() + " not implemented")
-
-
 
     async def update_game_event_combat_action_hq(self, name, game_update_string):
         print("Combat special action, card in hq at pos", game_update_string[2])
