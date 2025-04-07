@@ -836,9 +836,13 @@ class Player:
             return discounts_available
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_applies_discounts():
+                print("applies")
                 if self.headquarters[i].get_is_faction_limited_unique_discounter():
+                    print("is fac lim uni dis")
                     if self.headquarters[i].get_faction() == faction_of_card:
+                        print("faction ok")
                         if self.headquarters[i].get_ready():
+                            print("ready")
                             discounts_available += self.headquarters[i].get_discount_amount()
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
