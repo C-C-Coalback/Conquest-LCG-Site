@@ -1172,6 +1172,12 @@ class Game:
                             await primary_player.send_discard()
                             await primary_player.send_resources()
                             await self.send_info_box()
+                        elif ability == "Archon's Terror":
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
                         elif ability == "Drop Pod Assault":
                             if self.last_planet_checked_for_battle != -1:
                                 self.action_chosen = "Drop Pod Assault"
@@ -1771,7 +1777,7 @@ class Game:
                 secondary_player = self.p2
             else:
                 primary_player = self.p2
-                secondary_player = self.p2
+                secondary_player = self.p1
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos = int(game_update_string[2])
                 unit_pos = int(game_update_string[3])
@@ -1809,13 +1815,37 @@ class Game:
                             await primary_player.send_units_at_planet(planet_pos)
             else:
                 await self.game_sockets[0].receive_game_update("Already selected unit to move")
+        elif self.action_chosen == "Archon's Terror":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if game_update_string[1] == "1":
+                player_being_routed = self.p1
+            else:
+                player_being_routed = self.p2
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+                player_being_routed.rout_unit(planet_pos, unit_pos)
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                await primary_player.send_discard()
+                await primary_player.send_hand()
+                await player_being_routed.send_hq()
+                await player_being_routed.send_units_at_planet(planet_pos)
         elif self.action_chosen == "Zarathur's Flamers":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
             else:
                 primary_player = self.p2
-                secondary_player = self.p2
+                secondary_player = self.p1
             if game_update_string[1] == "1":
                 player_receiving_damage = self.p1
             else:
