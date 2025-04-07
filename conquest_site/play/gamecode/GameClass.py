@@ -1811,9 +1811,13 @@ class Game:
             if planet_pos == self.position_of_actioned_card[0]:
                 if not self.chosen_first_card:
                     if primary_player.get_number() == game_update_string[1]:
-
                         if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_faction() == "Astra Militarum" \
                                 and primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            if self.position_of_actioned_card == (planet_pos, unit_pos):
+                                self.position_of_actioned_card = (-1, -1)
+                            elif self.position_of_actioned_card[1] > unit_pos:
+                                self.position_of_actioned_card = (self.position_of_actioned_card[0],
+                                                                  self.position_of_actioned_card[1] - 1)
                             self.chosen_first_card = True
                             primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                             await primary_player.send_units_at_planet(planet_pos)
@@ -1825,7 +1829,8 @@ class Game:
                         self.action_chosen = ""
                         self.player_with_action = ""
                         self.mode = "Normal"
-                        primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
+                        if self.position_of_actioned_card != (-1, -1):
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
                         self.position_of_actioned_card = (-1, -1)
                         if self.phase == "DEPLOY":
                             self.player_with_deploy_turn = secondary_player.name_player
