@@ -480,12 +480,20 @@ class Game:
 
     async def deploy_card_routine(self, name, planet_pos, discounts=0):
         print("Deploy card at planet", planet_pos)
-        if self.number_with_deploy_turn == "1":
-            primary_player = self.p1
-            secondary_player = self.p2
+        if self.phase != "DEPLOY":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
         else:
-            primary_player = self.p2
-            secondary_player = self.p1
+            if self.number_with_deploy_turn == "1":
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
         damage_to_take = sum(self.damage_for_unit_to_take_on_play)
         print("position hand of unit: ", self.card_pos_to_deploy)
         print("Damage to take: ", damage_to_take)
@@ -1392,10 +1400,7 @@ class Game:
             pass
         elif self.action_chosen == "Ambush":
             if self.card_pos_to_deploy != -1:
-                played_card, position_of_unit = primary_player.play_card(chosen_planet,
-                                                                         position_hand=self.card_pos_to_deploy,
-                                                                         discounts=0,
-                                                                         damage_to_take=0)
+                await self.deploy_card_routine(name, int(game_update_string[1]))
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_chosen = ""
                 self.player_with_action = ""
