@@ -1575,6 +1575,18 @@ class Game:
             await primary_player.send_units_at_all_planets()
             await primary_player.send_hq()
             await self.send_info_box()
+        elif self.action_chosen == "Wildrider Squadron":
+            if abs(chosen_planet - self.position_of_actioned_card[0]) == 1:
+                origin_planet, origin_pos = self.position_of_actioned_card
+                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                primary_player.cards_in_play[origin_planet + 1][origin_pos].set_once_per_phase_used(True)
+                primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                self.action_chosen = ""
+                self.mode = "Normal"
+                self.player_with_action = ""
+                self.position_of_actioned_card = (-1, -1)
+                await primary_player.send_units_at_planet(chosen_planet)
+                await primary_player.send_units_at_planet(origin_planet)
         elif self.action_chosen == "Warpstorm":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1711,6 +1723,13 @@ class Game:
                             self.chosen_second_card = False
                             self.chosen_first_card = False
                             await player_owning_card.send_units_at_planet(planet_pos)
+                    elif ability == "Wildrider Squadron":
+                        if not card_chosen.get_once_per_phase_used():
+                            if player_owning_card.name_player == name:
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                await player_owning_card.send_units_at_planet(planet_pos)
                     elif ability == "Veteran Brother Maxos":
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
