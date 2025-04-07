@@ -40,6 +40,9 @@ class Card:
         self.counter = 0
         self.sacrifice_end_of_phase = False
 
+    def get_ambush(self):
+        return False
+
     def set_sacrifice_end_of_phase(self, new_val):
         self.sacrifice_end_of_phase = new_val
 
@@ -164,7 +167,7 @@ class UnitCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
-                 mobile=False):
+                 mobile=False, ambush=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited)
@@ -193,6 +196,10 @@ class UnitCard(Card):
         self.no_attachments = no_attachments
         self.additional_resources_command_struggle = additional_resources_command_struggle
         self.additional_cards_command_struggle = additional_cards_command_struggle
+        self.ambush = ambush
+
+    def get_ambush(self):
+        return self.ambush
 
     def get_extra_attack_until_end_of_phase(self):
         return self.extra_attack_until_end_of_phase
@@ -457,14 +464,16 @@ class ArmyCard(UnitCard):
                  applies_discounts=None, action_in_hand=False,
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
-                 additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False):
+                 additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
+                 ambush=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited, ranged=ranged,
                          wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
                          additional_cards_command_struggle=additional_cards_command_struggle,
-                         additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile)
+                         additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
+                         ambush=ambush)
 
     def print_info(self):
         if self.unique:

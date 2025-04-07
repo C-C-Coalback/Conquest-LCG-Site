@@ -75,7 +75,8 @@ def space_marines_cards_init():
                                 CardClasses.ArmyCard("Eager Recruit", "Ambush. (You may deploy this card during"
                                                                       " the combat phase.", "Scout. Ultramarines.",
                                                      1, faction, "Common", 2, 1, 0, False,
-                                                     action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+                                                     action_in_hand=True, allowed_phases_in_hand="COMBAT",
+                                                     ambush=True),
                                 CardClasses.ArmyCard("Iron Hands Techmarine", "This unit gains 1 command icon "
                                                                               "for each enemy unit at this planet.",
                                                      "Soldier. Iron Hands.", 3, faction, "Common", 1, 3, 1, False, ""),

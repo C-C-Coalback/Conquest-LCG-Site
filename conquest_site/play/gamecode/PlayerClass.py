@@ -761,6 +761,9 @@ class Player:
             return self.headquarters[unit_id].get_ready()
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
+    def get_ambush_of_card(self, card):
+        return card.get_ambush()
+
     def get_mobile_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()
 

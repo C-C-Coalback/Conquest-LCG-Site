@@ -1115,7 +1115,13 @@ class Game:
             if card.get_has_action_while_in_hand():
                 if card.get_allowed_phases_while_in_hand() == self.phase or \
                         card.get_allowed_phases_while_in_hand() == "ALL":
-                    if primary_player.spend_resources(card.get_cost()):
+                    if primary_player.get_ambush_of_card(card):
+                        self.card_pos_to_deploy = int(game_update_string[2])
+                        self.action_chosen = "Ambush"
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        primary_player.aiming_reticle_color = "blue"
+                        await primary_player.send_hand()
+                    elif primary_player.spend_resources(card.get_cost()):
                         if ability == "Battle Cry":
                             print("Resolve Battle Cry")
                             primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
@@ -1376,8 +1382,28 @@ class Game:
 
     async def update_game_event_action_planet(self, name, game_update_string):
         chosen_planet = int(game_update_string[1])
+        if self.number_with_deploy_turn == "1":
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p2
         if not self.action_chosen:
             pass
+        elif self.action_chosen == "Ambush":
+            if self.card_pos_to_deploy != -1:
+                played_card, position_of_unit = primary_player.play_card(chosen_planet,
+                                                                         position_hand=self.card_pos_to_deploy,
+                                                                         discounts=0,
+                                                                         damage_to_take=0)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                self.card_pos_to_deploy = -1
+                await primary_player.send_hand()
+                await primary_player.send_units_at_planet(chosen_planet)
+                await primary_player.send_resources()
         elif self.action_chosen == "Exterminatus":
             if self.round_number != chosen_planet:
                 if self.number_with_deploy_turn == "1":
@@ -1897,7 +1923,7 @@ class Game:
                         await self.game_sockets[0].receive_game_update("Too far in; action must be concluded now")
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
-                    await update_game_event_action_planet(name, game_update_string)
+                    await self.update_game_event_action_planet(name, game_update_string)
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if self.player_with_action == self.name_1 and game_update_string[1] == "1":
