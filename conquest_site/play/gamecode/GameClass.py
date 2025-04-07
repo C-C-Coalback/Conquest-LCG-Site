@@ -1500,6 +1500,11 @@ class Game:
                     dest_planet = int(game_update_string[1])
                     hand_pos = primary_player.aiming_reticle_coords_hand
                     primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                    new_pos = len(primary_player.cards_in_play[dest_planet + 1])
+                    if self.positions_of_units_to_take_damage:
+                        for i in range(len(self.positions_of_units_to_take_damage)):
+                            self.positions_of_units_to_take_damage[i] = [int(primary_player.get_number()),
+                                                                         dest_planet, new_pos]
                     primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
                     self.action_chosen = ""
                     self.player_with_action = ""
