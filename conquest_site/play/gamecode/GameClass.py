@@ -752,9 +752,15 @@ class Game:
                                 print("Attacker:", self.attacker_planet, self.attacker_position)
                                 if self.number_with_combat_turn == "1":
                                     player = self.p1
+                                    other_player = self.p2
                                 else:
                                     player = self.p2
+                                    other_player = self.p1
                                 player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                                if player.get_ability_given_pos(chosen_planet, self.attacker_position) == "Wailing Wraithfighter":
+                                    self.reactions_needing_resolving.append("Wailing Wraithfighter")
+                                    self.positions_of_unit_triggering_reaction.append([-1, -1, -1])
+                                    self.player_who_resolves_reaction.append(other_player.name_player)
                                 await player.send_units_at_planet(chosen_planet)
                     elif self.defender_position == -1:
                         if game_update_string[1] != self.number_with_combat_turn:
@@ -3203,7 +3209,17 @@ class Game:
                     del self.player_who_resolves_reaction[0]
                     await self.send_info_box()
             elif len(game_update_string) == 3:
-                if game_update_string[0] == "HQ":
+                if game_update_string[0] == "HAND":
+                    if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
+                        hand_pos = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
+                        del self.positions_of_unit_triggering_reaction[0]
+                        del self.reactions_needing_resolving[0]
+                        del self.player_who_resolves_reaction[0]
+                        await primary_player.send_discard()
+                        await primary_player.send_hand()
+                        await self.send_info_box()
+                elif game_update_string[0] == "HQ":
                     if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
                         if self.reactions_needing_resolving[0] == "Power from Pain":
                             unit_pos = int(game_update_string[2])
