@@ -130,6 +130,9 @@ class Game:
         self.chosen_first_card = False
         self.chosen_second_card = False
         self.misc_target_planet = -1
+        self.misc_target_unit = (-1, -1)
+        self.misc_target_attachment = (-1, -1, -1)
+        self.misc_player_storage = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1294,6 +1297,16 @@ class Game:
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
                             await primary_player.send_resources()
+                        elif ability == "Even the Odds":
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.chosen_second_card = False
+                            self.chosen_first_card = False
+                            self.misc_target_attachment = (-1, -1, -1)
+                            self.misc_player_storage = ""
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
                         elif ability == "Squig Bombin'":
                             self.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
@@ -1890,6 +1903,34 @@ class Game:
                     await primary_player.send_hand()
                     await secondary_player.send_hand()
                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+        elif self.action_chosen == "Even the Odds":
+            if self.chosen_first_card:
+                if self.misc_player_storage == game_update_string[1]:
+                    if game_update_string[1] == "1":
+                        player_owning_card = self.p1
+                    else:
+                        player_owning_card = self.p2
+                    origin_planet, origin_pos, origin_attach_pos = self.misc_target_attachment
+                    dest_planet = int(game_update_string[2])
+                    dest_pos = int(game_update_string[3])
+                    if player_owning_card.move_attachment_card(origin_planet, origin_pos, origin_attach_pos,
+                                                               dest_planet, dest_pos):
+                        player_owning_card.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                        self.chosen_second_card = True
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                        self.chosen_second_card = True
+                        self.misc_target_attachment = (-1, -1, -1)
+                        self.misc_player_storage = ""
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await player_owning_card.send_units_at_planet(dest_planet)
+                        await player_owning_card.send_units_at_planet(origin_planet)
+                    else:
+                        await self.game_sockets[0].receive_game_update("Invalid attachment movement.")
         elif self.action_chosen == "Calculated Strike":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -2372,13 +2413,15 @@ class Game:
                                 self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                                 await self.game_sockets[0].receive_game_update(ability + " activated")
                                 await player_owning_card.send_units_at_planet(planet_pos)
+        elif self.action_chosen == "Even the Odds":
+            if not self.chosen_first_card:
+                self.misc_player_storage = player_owning_card.get_number()
+                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                await self.game_sockets[0].receive_game_update(card_chosen.get_name() + " chosen")
+                self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                self.chosen_first_card = True
+                await player_owning_card.send_hq()
         elif self.action_chosen == "Calculated Strike":
-            if self.player_with_action == self.name_1:
-                primary_player = self.p1
-                secondary_player = self.p2
-            else:
-                primary_player = self.p2
-                secondary_player = self.p1
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
@@ -2433,6 +2476,14 @@ class Game:
                                 await self.game_sockets[0].receive_game_update(ability + " activated")
                                 await player_owning_card.send_units_at_planet(planet_pos)
                                 await primary_player.send_resources()
+        elif self.action_chosen == "Even the Odds":
+            if not self.chosen_first_card:
+                self.misc_player_storage = player_owning_card.get_number()
+                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                await self.game_sockets[0].receive_game_update(card_chosen.get_name() + " chosen")
+                self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                self.chosen_first_card = True
+                await player_owning_card.send_units_at_planet(planet_pos)
         elif self.action_chosen == "Calculated Strike":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
