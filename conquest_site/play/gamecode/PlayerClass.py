@@ -440,12 +440,19 @@ class Player:
             return True
         return False
 
-    def remove_attachment_from_pos(self, planet, position, attachment_position):
+    def destroy_attachment_from_pos(self, planet, position, attachment_position):
+        self.remove_attachment_from_pos(planet, position, attachment_position, discard=True)
+
+    def remove_attachment_from_pos(self, planet, position, attachment_position, discard=False):
         if planet == -2:
             card = self.headquarters[position]
+            if discard:
+                self.discard.append(card.get_name())
             del card.get_attachments()[attachment_position]
         else:
             card = self.cards_in_play[planet + 1][position]
+            if discard:
+                self.discard.append(card.get_name())
             del card.get_attachments()[attachment_position]
 
     def attach_card(self, card, planet, position, army_unit_as_attachment=False):

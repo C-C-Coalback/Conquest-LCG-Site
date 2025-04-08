@@ -955,6 +955,34 @@ class Game:
                     await primary_player.send_hand()
                     await secondary_player.send_hand()
                     await primary_player.send_hq()
+        elif self.action_chosen == "Calculated Strike":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            unit_pos = int(game_update_string[2])
+            if player_being_hit.headquarters[unit_pos].get_limited():
+                player_being_hit.destroy_card_in_hq(unit_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_being_hit.send_discard()
+                await player_being_hit.send_hq()
         elif self.action_chosen == "Command-Link Drone":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1255,6 +1283,12 @@ class Game:
                         elif ability == "Suppressive Fire":
                             self.chosen_first_card = False
                             self.chosen_second_card = False
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                        elif ability == "Calculated Strike":
                             self.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
@@ -1856,6 +1890,35 @@ class Game:
                     await primary_player.send_hand()
                     await secondary_player.send_hand()
                     await primary_player.send_units_at_planet(int(game_update_string[2]))
+        elif self.action_chosen == "Calculated Strike":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_limited():
+                player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_being_hit.send_discard()
+                await player_being_hit.send_units_at_planet(planet_pos)
         elif self.action_chosen == "Command-Link Drone":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -2309,6 +2372,33 @@ class Game:
                                 self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                                 await self.game_sockets[0].receive_game_update(ability + " activated")
                                 await player_owning_card.send_units_at_planet(planet_pos)
+        elif self.action_chosen == "Calculated Strike":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            if player_being_hit.headquarters[unit_pos].get_attachments()[attachment_pos].get_limited():
+                player_being_hit.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_being_hit.send_discard()
+                await player_being_hit.send_units_at_planet(planet_pos)
 
     async def update_game_event_action_attachment_in_play(self, name, game_update_string):
         if name == self.name_1:
@@ -2343,6 +2433,33 @@ class Game:
                                 await self.game_sockets[0].receive_game_update(ability + " activated")
                                 await player_owning_card.send_units_at_planet(planet_pos)
                                 await primary_player.send_resources()
+        elif self.action_chosen == "Calculated Strike":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_limited():
+                player_being_hit.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_being_hit.send_discard()
+                await player_being_hit.send_units_at_planet(planet_pos)
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.player_with_action:
