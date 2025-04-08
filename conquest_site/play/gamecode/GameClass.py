@@ -878,6 +878,15 @@ class Game:
                                 primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                                 primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                                 await primary_player.send_hq()
+                        elif ability == "Kraktoof Hall":
+                            if card.get_ready():
+                                self.action_chosen = ability
+                                self.chosen_first_card = False
+                                self.chosen_second_card = False
+                                self.misc_target_planet = -1
+                                primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                                primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                                await primary_player.send_hq()
                         elif ability == "Craftworld Gate":
                             if card.get_ready():
                                 self.action_chosen = "Craftworld Gate"
@@ -1815,6 +1824,39 @@ class Game:
                         await primary_player.send_hand()
                         await primary_player.send_hq()
                         await primary_player.send_discard()
+        elif self.action_chosen == "Kraktoof Hall":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if not self.chosen_first_card:
+                if primary_player.get_number() == game_update_string[1]:
+                    if primary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                        self.chosen_first_card = True
+                        self.misc_target_planet = planet_pos
+                        await primary_player.send_units_at_planet(planet_pos)
+            elif self.misc_target_planet == planet_pos:
+                if game_update_string[1] == "1":
+                    player_owning_card = self.p1
+                else:
+                    player_owning_card = self.p2
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False)
+                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                self.chosen_second_card = True
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                self.position_of_actioned_card = (-1, -1)
+                await primary_player.send_hq()
+                await player_owning_card.send_units_at_planet(planet_pos)
         elif self.action_chosen == "Suppressive Fire":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
