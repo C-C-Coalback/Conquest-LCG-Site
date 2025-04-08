@@ -1078,6 +1078,33 @@ class Game:
                 self.mode = "Normal"
                 await primary_player.send_hq()
                 await self.send_info_box()
+        elif self.action_chosen == "Squig Bombin'":
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if int(game_update_string[1] == "1"):
+                player_destroying_support = self.p1
+            else:
+                player_destroying_support = self.p2
+            unit_pos = int(game_update_string[2])
+            if player_destroying_support.headquarters[unit_pos].get_card_type() == "Support":
+                player_destroying_support.destroy_card_in_hq(unit_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                self.player_with_action = ""
+                self.action_chosen = ""
+                self.mode = "Normal"
+                primary_player.aiming_reticle_coords_hand = None
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.get_name_player()
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_destroying_support.send_hq()
+                await player_destroying_support.send_discard()
         elif self.action_chosen == "Ambush Platform":
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -1200,6 +1227,12 @@ class Game:
                         elif ability == "Suppressive Fire":
                             self.chosen_first_card = False
                             self.chosen_second_card = False
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            await primary_player.send_hand()
+                            await primary_player.send_resources()
+                        elif ability == "Squig Bombin'":
                             self.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
