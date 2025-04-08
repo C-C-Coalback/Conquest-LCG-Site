@@ -1,14 +1,13 @@
 # Conquest-LCG-site
 Repo for the Warhammer 40k Conquest website using Python Django.
 
-# News/similar:
+# Live from the Traxis Sector:
 
-I should really get a better name for this section.
+Is this a better name?
 
-The game has been updated to use a shielding system that is 
-not completely terrible. With the new one, it will be simple
-to add new effects that involve dealing damage (Sicarius's Chosen, 
-Weirdboy Maniak, Warpstorm, etc.)
+Almost there! 80% of the core cards are working.
+Some revising needs to be done to the info box, but aside 
+from that it seems pretty good.
 
 # What is this?
 
