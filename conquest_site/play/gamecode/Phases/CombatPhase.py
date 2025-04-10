@@ -138,6 +138,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.reactions_needing_resolving.append("Wailing Wraithfighter")
                                 self.positions_of_unit_triggering_reaction.append([-1, -1, -1])
                                 self.player_who_resolves_reaction.append(other_player.name_player)
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Spiritseer Erathal":
+                                self.reactions_needing_resolving.append("Spiritseer Erathal")
+                                self.positions_of_unit_triggering_reaction.append([int(player.number),
+                                                                                   self.attacker_planet,
+                                                                                   self.attacker_position])
+                                self.player_who_resolves_reaction.append(player.name_player)
                             await player.send_units_at_planet(chosen_planet)
                 elif self.defender_position == -1:
                     if game_update_string[1] != self.number_with_combat_turn:
@@ -197,7 +204,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         attack_value = attack_value * 2
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) == "Burna Boyz":
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                        == "Burna Boyz":
                                     self.reactions_needing_resolving.append("Burna Boyz")
                                     self.positions_of_unit_triggering_reaction.append([int(primary_player.number),
                                                                                        self.attacker_planet,

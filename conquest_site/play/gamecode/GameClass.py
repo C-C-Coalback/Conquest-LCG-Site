@@ -1065,6 +1065,17 @@ class Game:
                                         await self.send_info_box()
                                         await primary_player.send_hq()
                                         await primary_player.send_resources()
+                        elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if self.attacker_planet == int(game_update_string[2]):
+                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.reactions_needing_resolving[0]
+                                    del self.player_who_resolves_reaction[0]
+                                    await self.send_info_box()
+                                    await primary_player.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Burna Boyz":
                             if primary_player.get_number() != game_update_string[1]:
                                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]
