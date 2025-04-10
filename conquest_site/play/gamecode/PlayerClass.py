@@ -595,6 +595,25 @@ class Player:
                 self.game.no_restrictions_on_chosen_card = False
         return last_element_index
 
+    async def resolve_hypex_injector(self):
+        for i in range(len(self.headquarters)):
+            for attach in self.headquarters[i].get_attachments():
+                found_any = False
+                if attach.get_ability() == "Hypex Injector":
+                    self.ready_given_pos(-2, i)
+                    found_any = True
+                if found_any:
+                    await self.send_hq()
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                for attach in self.cards_in_play[i + 1][j].get_attachments():
+                    found_any = False
+                    if attach.get_ability() == "Hypex Injector":
+                        self.ready_given_pos(i, j)
+                        found_any = True
+                    if found_any:
+                        await self.send_units_at_planet(i)
+
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
         card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))
         if unit_only:
@@ -1398,7 +1417,11 @@ class Player:
             self.ready_given_pos(planet_id, i)
 
     def ready_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            self.headquarters[unit_id].ready_card()
+            return None
         self.cards_in_play[planet_id + 1][unit_id].ready_card()
+        return None
 
     def check_if_units_present(self, planet_id):
         print("Checking for cards at:", self.cards_in_play[0][planet_id])

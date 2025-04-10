@@ -980,6 +980,7 @@ class Game:
                                 del self.positions_of_unit_triggering_reaction[0]
                                 del self.reactions_needing_resolving[0]
                                 del self.player_who_resolves_reaction[0]
+                                await secondary_player.resolve_hypex_injector()
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
@@ -995,6 +996,7 @@ class Game:
                                 del self.positions_of_unit_triggering_reaction[0]
                                 del self.reactions_needing_resolving[0]
                                 del self.player_who_resolves_reaction[0]
+                                await secondary_player.resolve_hypex_injector()
                                 await primary_player.send_units_at_planet(planet_pos)
                                 await primary_player.send_discard()
                                 await self.send_info_box()
