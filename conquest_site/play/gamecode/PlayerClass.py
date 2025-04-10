@@ -623,8 +623,13 @@ class Player:
                 self.game.no_restrictions_on_chosen_card = False
         return last_element_index
 
-    async def resolve_hypex_injector(self):
+    async def dark_eldar_event_played(self):
+        self.reset_reaction_beasthunter_wyches()
         for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Beasthunter Wyches":
+                self.game.reactions_needing_resolving.append("Beasthunter Wyches")
+                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -2, i])
+                self.player_who_resolves_reaction.append(self.name_player)
             for attach in self.headquarters[i].get_attachments():
                 found_any = False
                 if attach.get_ability() == "Hypex Injector":
@@ -634,6 +639,10 @@ class Player:
                     await self.send_hq()
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == "Beasthunter Wyches":
+                    self.game.reactions_needing_resolving.append("Beasthunter Wyches")
+                    self.game.positions_of_unit_triggering_reaction.append([int(self.number), i, j])
+                    self.game.player_who_resolves_reaction.append(self.name_player)
                 for attach in self.cards_in_play[i + 1][j].get_attachments():
                     found_any = False
                     if attach.get_ability() == "Hypex Injector":
@@ -1042,6 +1051,15 @@ class Player:
     def increase_attack_of_all_units_in_play(self, amount, required_faction=None, expiration="EOB"):
         self.increase_attack_of_all_units_at_hq(amount, required_faction, expiration)
         self.increase_attack_of_all_units_at_all_planets(amount, required_faction, expiration)
+
+    def reset_reaction_beasthunter_wyches(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Beasthunter Wyches":
+                self.headquarters[i].set_reaction_availabe(True)
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Beasthunter Wyches":
+                    self.cards_in_play[planet_pos + 1][unit_pos].set_reaction_available(True)
 
     def reset_extra_attack_eob(self):
         for i in range(len(self.headquarters)):

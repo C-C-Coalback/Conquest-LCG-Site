@@ -1017,10 +1017,23 @@ class Game:
                                 del self.positions_of_unit_triggering_reaction[0]
                                 del self.reactions_needing_resolving[0]
                                 del self.player_who_resolves_reaction[0]
-                                await secondary_player.resolve_hypex_injector()
+                                await secondary_player.dark_eldar_event_played()
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
+                                if primary_player.headquarters[unit_pos].get_reaction_available():
+                                    if primary_player.spend_resources(1):
+                                        primary_player.headquarters[unit_pos].set_reaction_available(False)
+                                        primary_player.summon_token_at_hq("Khymera", 1)
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        await self.send_info_box()
+                                        await primary_player.send_hq()
+                                        await primary_player.send_resources()
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     print("Check what player")
@@ -1033,10 +1046,25 @@ class Game:
                                 del self.positions_of_unit_triggering_reaction[0]
                                 del self.reactions_needing_resolving[0]
                                 del self.player_who_resolves_reaction[0]
-                                await secondary_player.resolve_hypex_injector()
+                                await secondary_player.dark_eldar_event_played()
                                 await primary_player.send_units_at_planet(planet_pos)
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_reaction_available():
+                                    if primary_player.spend_resources(1):
+                                        primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                            set_reaction_available(False)
+                                        primary_player.summon_token_at_hq("Khymera", 1)
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        await self.send_info_box()
+                                        await primary_player.send_hq()
+                                        await primary_player.send_resources()
                         elif self.reactions_needing_resolving[0] == "Burna Boyz":
                             if primary_player.get_number() != game_update_string[1]:
                                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]

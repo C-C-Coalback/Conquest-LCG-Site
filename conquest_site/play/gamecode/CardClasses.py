@@ -198,6 +198,13 @@ class UnitCard(Card):
         self.additional_resources_command_struggle = additional_resources_command_struggle
         self.additional_cards_command_struggle = additional_cards_command_struggle
         self.ambush = ambush
+        self.reaction_available = True
+
+    def get_reaction_available(self):
+        return self.reaction_available
+
+    def set_reaction_available(self, new_val):
+        self.reaction_available = new_val
 
     def get_indirect_damage(self):
         return self.not_yet_assigned_damage

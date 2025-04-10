@@ -105,7 +105,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.player_with_deploy_turn = secondary_player.name_player
                 self.number_with_deploy_turn = secondary_player.number
                 self.mode = self.stored_mode
-                await primary_player.resolve_hypex_injector()
+                await primary_player.dark_eldar_event_played()
                 await primary_player.send_hand()
                 await secondary_player.send_hand()
                 await primary_player.send_hq()

@@ -135,22 +135,6 @@ async def update_game_event_action_hand(self, name, game_update_string):
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
-                    elif ability == "Raid":
-                        if primary_player.can_play_limited:
-                            if primary_player.resources < secondary_player.resources:
-                                if secondary_player.spend_resources(1):
-                                    primary_player.add_resources(1)
-                                    primary_player.can_play_limited = False
-                                    primary_player.discard_card_from_hand(int(game_update_string[2]))
-                                    self.mode = self.stored_mode
-                                    self.player_with_action = ""
-                                    self.player_with_deploy_turn = secondary_player.name_player
-                                    self.number_with_deploy_turn = secondary_player.number
-                                    await primary_player.send_hand()
-                                    await primary_player.send_discard()
-                                    await primary_player.send_resources()
-                                    await secondary_player.send_resources()
-                                    await self.send_info_box()
                     elif ability == "Doom":
                         print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
@@ -166,12 +150,6 @@ async def update_game_event_action_hand(self, name, game_update_string):
                         await primary_player.send_discard()
                         await primary_player.send_resources()
                         await self.send_info_box()
-                    elif ability == "Squadron Redeployment":
-                        self.action_chosen = "Squadron Redeployment"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Pact of the Haemonculi":
                         print("Resolve PotH")
                         self.action_chosen = "Pact of the Haemonculi"
@@ -232,53 +210,12 @@ async def update_game_event_action_hand(self, name, game_update_string):
                                     self.player_with_action = ""
                                     self.player_with_deploy_turn = secondary_player.name_player
                                     self.number_with_deploy_turn = secondary_player.number
-                                    await primary_player.resolve_hypex_injector()
+                                    await primary_player.dark_eldar_event_played()
                                     await primary_player.send_hand()
                                     await primary_player.send_discard()
                                     await primary_player.send_resources()
                                     await secondary_player.send_resources()
                                     await self.send_info_box()
-                    elif ability == "Doom":
-                        print("Resolve Doom")
-                        primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
-                        secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True)
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.mode = self.stored_mode
-                        self.player_with_action = ""
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.number
-                        await primary_player.send_hq()
-                        await secondary_player.send_hq()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
-                    elif ability == "Squadron Redeployment":
-                        self.action_chosen = "Squadron Redeployment"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
-                    elif ability == "Pact of the Haemonculi":
-                        print("Resolve PotH")
-                        self.action_chosen = "Pact of the Haemonculi"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
-                    elif ability == "Deception":
-                        self.action_chosen = "Deception"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
-                    elif ability == "Exterminatus":
-                        print("Resolve Exterminatus")
-                        self.action_chosen = "Exterminatus"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     else:
                         primary_player.add_resources(card.get_cost())
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
