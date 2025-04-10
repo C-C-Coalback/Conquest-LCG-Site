@@ -197,6 +197,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         attack_value = attack_value * 2
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) == "Burna Boyz":
+                                    self.reactions_needing_resolving.append("Burna Boyz")
+                                    self.positions_of_unit_triggering_reaction.append([int(primary_player.number),
+                                                                                       self.attacker_planet,
+                                                                                       self.attacker_position])
+                                    self.player_who_resolves_reaction.append(primary_player.name_player)
+                                    self.last_defender_pos = (self.defender_planet, self.defender_position)
                                 unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
                                                                                   self.defender_position,
                                                                                   damage=attack_value,

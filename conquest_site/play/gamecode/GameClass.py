@@ -134,6 +134,7 @@ class Game:
         self.misc_target_unit = (-1, -1)
         self.misc_target_attachment = (-1, -1, -1)
         self.misc_player_storage = ""
+        self.last_defender_position = (-1, -1)
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -997,6 +998,22 @@ class Game:
                                 await primary_player.send_units_at_planet(planet_pos)
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Burna Boyz":
+                            if primary_player.get_number() != game_update_string[1]:
+                                origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                                if int(game_update_string[2]) == origin_planet:
+                                    prev_def_planet, prev_def_pos = self.last_defender_position
+                                    target_unit_pos = int(game_update_string[3])
+                                    if target_unit_pos == prev_def_pos:
+                                        await self.game_sockets[0].receive_game_update("Can't select last defender")
+                                    else:
+                                        secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
+                                        secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
+                                                                                    "blue")
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        await secondary_player.send_units_at_planet(origin_planet)
                         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
                             print("Resolve Sicarius's chosen")
                             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
