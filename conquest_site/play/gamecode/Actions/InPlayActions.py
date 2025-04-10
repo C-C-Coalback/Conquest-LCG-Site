@@ -88,7 +88,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 secondary_player = self.p2
             else:
                 primary_player = self.p2
-                secondary_player = self.p2
+                secondary_player = self.p1
             if primary_player.sacrifice_card_in_play(int(game_update_string[2]),
                                                      int(game_update_string[3])):
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
@@ -106,6 +106,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 await primary_player.dark_eldar_event_played()
                 await primary_player.send_hand()
                 await secondary_player.send_hand()
+                await secondary_player.send_discard()
+                await primary_player.send_discard()
                 await primary_player.send_units_at_planet(int(game_update_string[2]))
     elif self.action_chosen == "Even the Odds":
         if self.chosen_first_card:

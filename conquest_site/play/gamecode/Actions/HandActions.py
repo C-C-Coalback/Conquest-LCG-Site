@@ -157,6 +157,12 @@ async def update_game_event_action_hand(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Gift of Isha":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Deception":
                         self.action_chosen = "Deception"
                         primary_player.aiming_reticle_color = "blue"

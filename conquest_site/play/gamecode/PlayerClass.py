@@ -446,6 +446,13 @@ class Player:
         card = FindCard.find_card(self.cards[position_hand], self.card_array)
         return card
 
+    def get_card_in_discard(self, position_discard):
+        card = FindCard.find_card(self.discard[position_discard], self.card_array)
+        return card
+
+    def get_discard(self):
+        return self.discard
+
     def move_attachment_card(self, origin_planet, origin_position, origin_attachment_position,
                              destination_planet, destination_position):
         if origin_planet == -2:
@@ -558,9 +565,11 @@ class Player:
                 self.add_resources(cost)
         return False
 
-    def add_card_to_planet(self, card, position):
+    def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False):
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
+        if sacrifice_end_of_phase:
+            self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
             if len(self.deck) > 5:
                 self.number_cards_to_search = 6

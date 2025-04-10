@@ -215,6 +215,34 @@ async def update_game_event_action_planet(self, name, game_update_string):
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
         await primary_player.send_hq()
+    elif self.action_chosen == "Gift of Isha":
+        discard = primary_player.get_discard()
+        i = len(discard) - 1
+        card_found = False
+        while i > -1:
+            card = primary_player.get_card_in_discard(i)
+            if card.get_is_unit() and card.get_faction() == "Eldar":
+                card_found = True
+                primary_player.add_card_to_planet(card, chosen_planet, sacrifice_end_of_phase=True)
+                del discard[i]
+                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                primary_player.aiming_reticle_color = None
+                primary_player.aiming_reticle_coords_hand = None
+                self.card_pos_to_deploy = -1
+                self.player_with_action = ""
+                self.action_chosen = ""
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.number
+                self.mode = "Normal"
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await primary_player.send_units_at_planet(chosen_planet)
+                await self.send_info_box()
+                i = -1
+            i = i - 1
+        if not card_found:
+            await self.game_sockets[0].receive_game_update("No valid unit in discard")
     elif self.action_chosen == "Snotling Attack":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
