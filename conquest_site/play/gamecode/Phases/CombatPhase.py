@@ -1,188 +1,223 @@
-from .PlanetBattleAbilities import resolve_planet_battle_effect
+async def update_game_event_combat_section(self, name, game_update_string):
+    if self.mode == "ACTION":
+        await self.update_game_event_action(name, game_update_string)
+    elif len(game_update_string) == 1:
+        if game_update_string[0] == "action-button":
+            if self.actions_allowed and self.mode != "ACTION":
+                print("Need to run action code")
+                self.stored_mode = self.mode
+                self.mode = "ACTION"
+                self.player_with_action = name
+                print("Special combat action")
+                await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+        elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+            if name == self.player_with_combat_turn:
+                if self.number_with_combat_turn == "1":
+                    self.number_with_combat_turn = "2"
+                    self.player_with_combat_turn = self.name_2
+                    self.p1.has_passed = True
+                    self.reset_combat_positions()
+                else:
+                    self.number_with_combat_turn = "1"
+                    self.player_with_combat_turn = self.name_1
+                    self.p2.has_passed = True
+                    self.reset_combat_positions()
+                if self.p1.has_passed and self.p2.has_passed:
+                    if self.mode == "Normal":
+                        if self.ranged_skirmish_active:
+                            print("Both players passed, end ranged skirmish")
+                            self.p1.has_passed = False
+                            self.p2.has_passed = False
+                            self.reset_combat_turn()
+                            self.ranged_skirmish_active = False
+                            await self.send_info_box()
+                        else:
+                            print("Both players passed, need to run combat round end.")
+                            self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
+                            self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
+                            self.p1.has_passed = False
+                            self.p2.has_passed = False
+                            self.reset_combat_turn()
+                            await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                            await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                            self.mode = "RETREAT"
+                            await self.check_combat_end(name)
+                    elif self.mode == "RETREAT":
+                        self.p1.has_passed = False
+                        self.p2.has_passed = False
+                        self.reset_combat_turn()
+                        self.mode = "Normal"
+                        await self.check_combat_end(name)
+                else:
+                    await self.send_info_box()
+    elif len(game_update_string) == 2:
+        if game_update_string[0] == "PLANETS":
+            if self.mode == "Normal":
+                if name == self.player_with_combat_turn:
+                    chosen_planet = int(game_update_string[1])
+                    if chosen_planet == self.last_planet_checked_for_battle:
+                        if self.attacker_position != -1 and self.defender_position == -1:
+                            if self.number_with_combat_turn == "1":
+                                primary_player = self.p1
+                                secondary_player = self.p2
+                            else:
+                                primary_player = self.p2
+                                secondary_player = self.p1
+                            amount_aoe = primary_player.cards_in_play[chosen_planet + 1][
+                                self.attacker_position].get_area_effect()
+                            if amount_aoe > 0:
+                                self.damage_from_attack = True
+                                self.attacker_location = (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position)
+                                await self.aoe_routine(primary_player, secondary_player, chosen_planet, amount_aoe)
+                                self.reset_combat_positions()
+                                self.number_with_combat_turn = secondary_player.get_number()
+                                self.player_with_combat_turn = secondary_player.get_name_player()
+    elif len(game_update_string) == 3:
+        if game_update_string[0] == "HAND":
+            print("Card in hand clicked on")
+            if self.mode == "SHIELD":
+                if name == self.player_who_is_shielding:
+                    if game_update_string[1] == self.number_who_is_shielding:
+                        hand_pos = int(game_update_string[2])
+    elif len(game_update_string) == 4:
+        if game_update_string[0] == "IN_PLAY":
+            print("Unit clicked on.")
+            if name == self.player_with_combat_turn:
+                if self.mode == "RETREAT":
+                    if game_update_string[1] == self.number_with_combat_turn:
+                        chosen_planet = int(game_update_string[2])
+                        chosen_unit = int(game_update_string[3])
+                        print("Retreat unit", chosen_planet, chosen_unit)
+                        if chosen_planet == self.last_planet_checked_for_battle:
+                            if self.number_with_combat_turn == "1":
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            player.retreat_unit(chosen_planet, chosen_unit, exhaust=True)
+                            await player.send_units_at_planet(self.last_planet_checked_for_battle)
+                            await player.send_hq()
+                elif self.attacker_position == -1:
+                    if game_update_string[1] == self.number_with_combat_turn:
+                        chosen_planet = int(game_update_string[2])
+                        chosen_unit = int(game_update_string[3])
+                        valid_unit = False
+                        if chosen_planet == self.last_planet_checked_for_battle:
+                            if self.number_with_combat_turn == "1":
+                                player = self.p1
+                            else:
+                                player = self.p2
+                            can_continue = False
+                            if self.ranged_skirmish_active:
+                                is_ranged = player.get_ranged_given_pos(chosen_planet, chosen_unit)
+                                if is_ranged:
+                                    can_continue = True
+                            else:
+                                can_continue = True
+                            if can_continue:
+                                is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
+                                if is_ready:
+                                    print("Unit ready, can be used")
+                                    valid_unit = True
+                                    player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                else:
+                                    print("Unit not ready")
+                        if valid_unit:
+                            self.attacker_planet = chosen_planet
+                            self.attacker_position = chosen_unit
+                            print("Attacker:", self.attacker_planet, self.attacker_position)
+                            if self.number_with_combat_turn == "1":
+                                player = self.p1
+                                other_player = self.p2
+                            else:
+                                player = self.p2
+                                other_player = self.p1
+                            player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                            if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
+                                    == "Wailing Wraithfighter":
+                                self.reactions_needing_resolving.append("Wailing Wraithfighter")
+                                self.positions_of_unit_triggering_reaction.append([-1, -1, -1])
+                                self.player_who_resolves_reaction.append(other_player.name_player)
+                            await player.send_units_at_planet(chosen_planet)
+                elif self.defender_position == -1:
+                    if game_update_string[1] != self.number_with_combat_turn:
+                        armorbane_check = False
+                        self.defender_planet = int(game_update_string[2])
+                        self.defender_position = int(game_update_string[3])
+                        print("Defender:", self.defender_planet, self.defender_position)
+                        if self.number_with_combat_turn == "1":
+                            primary_player = self.p1
+                            secondary_player = self.p2
+                        else:
+                            primary_player = self.p2
+                            secondary_player = self.p1
+                        attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
+                                                                           self.attacker_position)
+                        can_continue = True
+                        if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
+                                .get_ability() == "Honored Librarian":
+                            for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                if secondary_player.cards_in_play[self.defender_planet + 1][i] \
+                                        .get_ability() != "Honored Librarian":
+                                    can_continue = False
+                        if can_continue:
+                            if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                    self.attacker_position) == "Starbane's Council":
+                                if not secondary_player.get_ready_given_pos(self.defender_planet,
+                                                                            self.defender_position):
+                                    attack_value += 2
+                            if attack_value > 0:
+                                att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
+                                                                                 self.attacker_position)
+                                def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                                   self.defender_position)
+                                att_ignores_flying = primary_player.get_ignores_flying_given_pos(
+                                    self.attacker_planet, self.attacker_position)
+                                if primary_player.get_ability_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
+                                    if secondary_player.cards_in_play[
+                                        self.defender_planet + 1][self.defender_position] \
+                                            .get_card_type() != "Warlord":
+                                        secondary_player.exhaust_given_pos(self.defender_planet,
+                                                                           self.defender_position)
+                                # Flying check
+                                if def_flying and not att_flying and not att_ignores_flying:
+                                    attack_value = int(attack_value / 2 + (attack_value % 2))
+                                self.damage_on_unit_before_new_damage = \
+                                    secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                          self.defender_position)
+                                primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
+                                                                                              self.attacker_position
+                                                                                              )
+                                if secondary_player.check_for_trait_given_pos(self.defender_planet,
+                                                                              self.defender_position, "Vehicle"):
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
+                                            == "Tankbusta Bommaz":
+                                        attack_value = attack_value * 2
+                                self.attacker_location = (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position)
+                                unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
+                                                                                  self.defender_position,
+                                                                                  damage=attack_value,
+                                                                                  att_pos=self.attacker_location)
+                                self.damage_from_attack = True
+                                armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                         self.attacker_position)
+                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                            self.defender_position, "red")
+                            else:
+                                primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                            self.attacker_position)
 
-"""
-def select_attacker(attacker, planet_id):
-    attacker.extra_text = "Combat turn\nChoose Attacker"
-    attacker.set_turn(True)
-    while True:
-        attacker.c.acquire()
-        attacker.c.notify_all()
-        current_active = attacker.position_activated
-        attacker.c.release()
-        print(current_active)
-        if len(current_active) == 1:
-            if current_active[0] == "PASS":
-                return -1
-        if len(current_active) == 4:
-            if current_active[1] == "PLAY":
-                if int(current_active[0][1]) == attacker.get_number():
-                    print("Correct player and is in play. Advancing.")
-                    pos_planet = int(current_active[2])
-                    if pos_planet == planet_id:
-                        print("Correct planet.")
-                        pos_unit = int(current_active[3])
-                        if len(attacker.get_cards_in_play()[planet_id + 1]) > pos_unit:
-                            print("Valid unit.")
-                            if attacker.check_ready_pos(planet_id, pos_unit):
-                                print("Unit is ready. Selecting as attacker")
-                                pos_attacker = pos_unit
-                                attacker.exhaust_given_pos(planet_id, pos_attacker)
-                                return pos_attacker
-
-def select_defender(attacker, defender, planet_id):
-    attacker.extra_text = "Combat turn\nChoose Defender"
-    attacker.set_turn(True)
-    while True:
-        pygame.time.wait(500)
-        attacker.c.acquire()
-        attacker.c.notify_all()
-        current_active = attacker.position_activated
-        attacker.c.release()
-        print(current_active)
-        if len(current_active) == 4:
-            if current_active[1] == "PLAY":
-                if int(current_active[0][1]) == defender.get_number():
-                    print("Correct player and is in play. Advancing.")
-                    pos_planet = int(current_active[2])
-                    if pos_planet == planet_id:
-                        print("Correct planet.")
-                        pos_unit = int(current_active[3])
-                        if len(defender.get_cards_in_play()[planet_id + 1]) > pos_unit:
-                            print("Valid unit. Selecting as defender,")
-                            pos_defender = pos_unit
-                            return pos_defender
-
-def unit_attacks_unit(att, defe, planet_id, att_pos, defe_pos):
-    att.set_turn(False)
-    defe.set_turn(True)
-    attack_value = att.get_attack_given_pos(planet_id, att_pos)
-    # if att.get_cards_in_play()[planet_id + 1][att_pos].get_name() == "Tankbusta Bommaz":
-    #     if defe.get_cards_in_play()[planet_id + 1][defe_pos].check_for_a_trait("Vehicle."):
-    #         attack_value = 2 * attack_value
-    damage_too_great = defe.assign_damage_to_pos(planet_id, defe_pos, attack_value)
-    att.set_turn(True)
-    defe.set_turn(False)
-    if damage_too_great:
-        print("Card must be discarded")
-        # input("Hold attack")
-        return 1
-    # input("Hold attack")
-    return 0
-
-def combat_turn(attacker, defender, planet_id):
-    print(attacker.get_name_player(), "\'s turn to attack")
-    attacker.position_activated = []
-    attacker.set_turn(True)
-    defender.position_activated = []
-    defender.set_turn(False)
-    pos_attacker = select_attacker(attacker, planet_id)
-    if pos_attacker == -1:
-        return True
-    pos_defender = select_defender(attacker, defender, planet_id)
-    # input("COMBAT TURN:" + str(pos_attacker) + "ATTACKS" + str(pos_defender))
-    unit_dead = unit_attacks_unit(attacker, defender, planet_id, pos_attacker, pos_defender)
-    if unit_dead:
-        if defender.check_if_warlord(planet_id, pos_defender):
-            defender.bloody_warlord_given_pos(planet_id, pos_defender)
-        else:
-            defender.add_card_in_play_to_discard(planet_id, pos_defender)
-    return False
-
-
-
-
-def determine_combat_initiative(p_one, p_two, planet_id):
-    p_one_has_warlord = p_one.check_for_warlord(planet_id)
-    p_two_has_warlord = p_two.check_for_warlord(planet_id)
-    if p_one_has_warlord == p_two_has_warlord:
-        return p_one.get_initiative()
-    return p_one_has_warlord
-
-def combat_round(p_one, p_two, planet_id):
-    planet_name = p_one.get_planet_name_given_position(planet_id - 1)
-    p_one_passed = False
-    p_two_passed = False
-    print("Both have units present. Combat round begins at:", planet_name)
-    print(p_one.get_name_player(), "units:")
-    p_one.print_cards_at_planet(planet_id)
-    print(p_two.get_name_player(), "units:")
-    p_two.print_cards_at_planet(planet_id)
-    while not p_one_passed or not p_two_passed:
-        if determine_combat_initiative(p_one, p_two, planet_id):
-            p_one.set_turn(True)
-            p_two.set_turn(False)
-            p_one_passed = combat_turn(p_one, p_two, planet_id)
-            p_two_passed = combat_turn(p_two, p_one, planet_id)
-        else:
-            p_one.set_turn(False)
-            p_two.set_turn(True)
-            p_two_passed = combat_turn(p_two, p_one, planet_id)
-            p_one_passed = combat_turn(p_one, p_two, planet_id)
-    p_one.ready_all_at_planet(planet_id)
-    p_two.ready_all_at_planet(planet_id)
-    if determine_combat_initiative(p_one, p_two, planet_id):
-        p_one.set_turn(True)
-        p_two.set_turn(False)
-        p_one.retreat_combat_window(planet_id)
-        p_two.retreat_combat_window(planet_id)
-    else:
-        p_one.set_turn(False)
-        p_two.set_turn(True)
-        p_two.retreat_combat_window(planet_id)
-        p_one.retreat_combat_window(planet_id)
-
-
-def resolve_battle(p_one, p_two, planet_id, first_planet):
-    player_one_check = p_one.check_if_units_present(planet_id)
-    player_two_check = p_two.check_if_units_present(planet_id)
-    while player_one_check and player_two_check:
-        print("Combat round happens!")
-        combat_round(p_one, p_two, planet_id)
-        player_one_check = p_one.check_if_units_present(planet_id)
-        player_two_check = p_two.check_if_units_present(planet_id)
-    if player_one_check and not player_two_check:
-        print(p_one.get_name_player(), "has units,", p_two.get_name_player(), "doesn't")
-        print(p_two.get_name_player(), "wins the battle")
-        resolve_planet_battle_effect(p_one, p_two, planet_id)
-        if first_planet:
-            p_one.retreat_all_at_planet(planet_id)
-            p_one.capture_planet(planet_id)
-    elif not player_one_check and player_two_check:
-        print(p_two.get_name_player(), "has units,", p_one.get_name_player(), "doesn't")
-        print(p_two.get_name_player(), "wins the battle")
-        resolve_planet_battle_effect(p_two, p_one, planet_id)
-        if first_planet:
-            p_two.retreat_all_at_planet(planet_id)
-            p_two.capture_planet(planet_id)
-        elif not player_one_check and not player_two_check:
-            print("Neither player has units")
-    if first_planet:
-        p_one.toggle_planet_in_play(planet_id)
-        p_two.toggle_planet_in_play(planet_id)
-
-def check_for_battle(p_one, p_two, planet_id, first_planet):
-    planet_name = p_one.get_planet_name_given_position(planet_id - 1)
-    print("Check for battle at:", planet_name)
-    if first_planet:
-        print(planet_name, "is first planet. Resolve battle")
-        resolve_battle(p_one, p_two, planet_id - 1, first_planet)
-    else:
-        print(planet_name, "is not first planet. Check warlords")
-        if p_one.check_for_warlord(planet_id - 1) or p_two.check_for_warlord(planet_id - 1):
-            print("Battle is resolved at:", planet_name)
-            resolve_battle(p_one, p_two, planet_id - 1, first_planet)
-
-"""
-
-
-def combat_phase(p_one, p_two, round_number):
-    p_one.set_phase("Combat")
-    p_two.set_phase("Combat")
-    index = round_number
-    planets_counted = 0
-    first_planet = True
-    while planets_counted < 5 and index < 7:
-        check_for_battle(p_one, p_two, index, first_planet)
-        first_planet = False
-        index += 1
-        planets_counted += 1
+                                await primary_player.send_units_at_planet(self.attacker_planet)
+                            if not armorbane_check or attack_value < 1:
+                                await secondary_player.send_units_at_planet(self.defender_planet)
+                            self.reset_combat_positions()
+                            self.number_with_combat_turn = secondary_player.get_number()
+                            self.player_with_combat_turn = secondary_player.get_name_player()
+                            # if not armorbane_check or attack_value < 1:
+                            #     await self.send_info_box()
+                        else:
+                            self.defender_planet = -1
+                            self.defender_position = -1
