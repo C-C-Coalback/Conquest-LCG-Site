@@ -135,6 +135,9 @@ class Game:
         self.misc_target_attachment = (-1, -1, -1)
         self.misc_player_storage = ""
         self.last_defender_position = (-1, -1)
+        self.location_of_indirect = ""
+        self.planet_of_indirect = -1
+        self.first_card_damaged = True
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1153,6 +1156,39 @@ class Game:
             self.p2.has_passed = False
             await self.send_info_box()
 
+    async def apply_indirect_damage(self, name, game_update_string):
+        if name == self.name_1 or name == self.name_2:
+            if name == self.name_1:
+                player = self.p1
+            else:
+                player = self.p2
+            if player.indirect_damage_applied < player.total_indirect_damage:
+                if self.location_of_indirect == "HQ" or self.location_of_indirect == "ALL":
+                    if len(game_update_string) == 3:
+                        if game_update_string[0] == "HQ":
+                            if game_update_string[1] == player.get_number():
+                                if player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1):
+                                    await player.send_hq()
+                if (self.location_of_indirect == "PLANET" and self.planet_of_indirect == int(game_update_string[2])) \
+                        or self.location_of_indirect == "ALL":
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == player.get_number():
+                                if player.increase_indirect_damage_at_pos(int(game_update_string[2]),
+                                                                          int(game_update_string[3]), 1):
+                                    await player.send_units_at_planet(int(game_update_string[2]))
+        if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
+                self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
+            await self.resolve_indirect_damage_applied()
+            self.p1.total_indirect_damage = 0
+            self.p2.total_indirect_damage = 0
+
+    async def resolve_indirect_damage_applied(self):
+        self.first_card_damaged = True
+        await self.p1.transform_indirect_into_damage()
+        await self.p2.transform_indirect_into_damage()
+        self.first_card_damaged = True
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -1161,10 +1197,11 @@ class Game:
         if self.validate_received_game_string(game_update_string):
             print("String validated as ok")
             if self.cards_in_search_box:
-                print("Need to resolve search box")
                 await self.resolve_card_in_search_box(name, game_update_string)
                 if not self.cards_in_search_box:
                     await self.send_search()
+            elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+                await self.apply_indirect_damage(name, game_update_string)
             elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
                 await self.update_game_event_action_applying_discounts(name, game_update_string)
             elif self.choices_available:

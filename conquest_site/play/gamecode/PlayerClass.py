@@ -68,6 +68,8 @@ class Player:
         self.can_play_limited = True
         self.number_cards_to_search = 0
         self.mobile_resolved = True
+        self.indirect_damage_applied = 0
+        self.total_indirect_damage = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -129,7 +131,7 @@ class Player:
                     single_card_string += "E|"
                 card_type = current_card.get_card_type()
                 if card_type == "Warlord" or card_type == "Army" or card_type == "Token":
-                    single_card_string += str(current_card.get_damage())
+                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -172,7 +174,7 @@ class Player:
                         single_card_string += "R|"
                     else:
                         single_card_string += "E|"
-                    single_card_string += str(current_card.get_damage())
+                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                     single_card_string += "|"
                     if current_card.get_card_type() == "Warlord":
                         if current_card.get_bloodied():
@@ -206,6 +208,32 @@ class Player:
     async def send_resources(self):
         joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
         await self.game.game_sockets[0].receive_game_update(joined_string)
+
+    async def transform_indirect_into_damage(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                damage = self.headquarters[i].get_indirect_damage()
+                if damage > 0:
+                    self.assign_damage_to_pos(-2, i, damage)
+                    self.headquarters[i].reset_indirect_damage()
+                    self.set_aiming_reticle_in_play(-2, i, "blue")
+                    if self.game.first_card_damaged:
+                        self.game.first_card_damaged = False
+                        self.set_aiming_reticle_in_play(-2, i, "red")
+                await self.send_hq()
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_is_unit():
+                    damage = self.cards_in_play[i + 1][j].get_indirect_damage()
+                    print("Indirect damage:", damage)
+                    if damage > 0:
+                        self.assign_damage_to_pos(i, j, damage)
+                        self.cards_in_play[i + 1][j].reset_indirect_damage()
+                        self.set_aiming_reticle_in_play(i, j, "blue")
+                        if self.game.first_card_damaged:
+                            self.game.first_card_damaged = False
+                            self.set_aiming_reticle_in_play(i, j, "red")
+                    await self.send_units_at_planet(i)
 
     async def send_victory_display(self):
         if self.victory_display:
@@ -1200,6 +1228,19 @@ class Player:
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
         return damage_too_great
+
+    def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
+        if planet_pos == -2:
+            if self.headquarters[card_pos].get_is_unit():
+                self.headquarters[card_pos].increase_not_yet_assigned_damage(amount)
+                self.indirect_damage_applied += 1
+                return True
+            return False
+        if self.cards_in_play[planet_pos + 1][card_pos].get_is_unit():
+            self.cards_in_play[planet_pos + 1][card_pos].increase_not_yet_assigned_damage(amount)
+            self.indirect_damage_applied += 1
+            return True
+        return False
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
         self.game.damage_on_units_list_before_new_damage.append(self.headquarters[unit_id].get_damage())

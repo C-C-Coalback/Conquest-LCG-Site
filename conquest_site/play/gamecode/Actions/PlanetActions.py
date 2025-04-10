@@ -202,6 +202,19 @@ async def update_game_event_action_planet(self, name, game_update_string):
         await primary_player.send_units_at_planet(dest_planet)
         await primary_player.send_discard()
         await self.send_info_box()
+    elif self.action_chosen == "Ork Kannon":
+        self.location_of_indirect = "PLANET"
+        self.planet_of_indirect = int(game_update_string[1])
+        self.p1.total_indirect_damage = 1
+        self.p2.total_indirect_damage = 1
+        self.p1.indirect_damage_applied = 0
+        self.p2.indirect_damage_applied = 0
+        self.action_chosen = ""
+        self.player_with_action = ""
+        self.mode = "Normal"
+        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                    self.position_of_actioned_card[1])
+        await primary_player.send_hq()
     elif self.action_chosen == "Snotling Attack":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1

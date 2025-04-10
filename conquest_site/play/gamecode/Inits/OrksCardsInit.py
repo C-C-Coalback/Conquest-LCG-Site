@@ -84,7 +84,8 @@ def orks_cards_init():
                                                              "Each player deals 1 indirect damage "
                                                              "among the units he controls at "
                                                              "that planet.", "Artillery. Weapon.", 1, "Orks", "Common",
-                                               False, "Ork_Kannon"),
+                                               False, "Ork_Kannon", action_in_play=True,
+                                               allowed_phases_in_play="COMBAT"),
                        CardClasses.SupportCard("Bigtoof Banna", "Limited.\nInterrupt: When you deploy an Orks unit, "
                                                                 "exhaust this support to reduce that unit's cost by 1.",
                                                "Upgrade.", 1, "Orks", "Common", True,

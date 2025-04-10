@@ -3,11 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-Is this a better name?
-
-Almost there! 80% of the core cards are working.
-Some revising needs to be done to the info box, but aside 
-from that it seems pretty good.
+The Orks are fully implemented!
 
 # What is this?
 

@@ -174,6 +174,7 @@ class UnitCard(Card):
         self.attack = attack
         self.health = health
         self.damage = 0
+        self.not_yet_assigned_damage = 0
         self.command = command
         self.attachments = []
         self.by_base_brutal = brutal
@@ -197,6 +198,15 @@ class UnitCard(Card):
         self.additional_resources_command_struggle = additional_resources_command_struggle
         self.additional_cards_command_struggle = additional_cards_command_struggle
         self.ambush = ambush
+
+    def get_indirect_damage(self):
+        return self.not_yet_assigned_damage
+
+    def increase_not_yet_assigned_damage(self, amount):
+        self.not_yet_assigned_damage += amount
+
+    def reset_indirect_damage(self):
+        self.not_yet_assigned_damage = 0
 
     def get_ambush(self):
         return self.ambush
