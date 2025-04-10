@@ -895,6 +895,23 @@ class Game:
                         self.advance_damage_aiming_reticle()
                     else:
                         await self.destroy_check_all_cards()
+                        if self.reactions_needing_resolving:
+                            i = 0
+                            while i < len(self.reactions_needing_resolving):
+                                if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                                    loc_of_mark = self.positions_of_unit_triggering_reaction[0][1]
+                                    secondary_player.suffer_area_effect(loc_of_mark, 1)
+                                    self.number_of_units_left_to_suffer_damage = \
+                                        secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                                    if self.number_of_units_left_to_suffer_damage > 0:
+                                        secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                                        for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                            secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                                    del self.positions_of_unit_triggering_reaction[i]
+                                    del self.reactions_needing_resolving[i]
+                                    del self.player_who_resolves_reaction[i]
+                                    i = i - 1
+                                i = i + 1
                         if self.damage_from_attack:
                             self.clear_attacker_aiming_reticle()
                     await primary_player.send_units_at_planet(planet_pos)
@@ -939,6 +956,23 @@ class Game:
                                 if self.damage_from_attack:
                                     self.clear_attacker_aiming_reticle()
                                 await self.destroy_check_all_cards()
+                                if self.reactions_needing_resolving:
+                                    i = 0
+                                    while i < len(self.reactions_needing_resolving):
+                                        if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                                            loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                                            secondary_player.suffer_area_effect(loc_of_mark, 1)
+                                            self.number_of_units_left_to_suffer_damage = \
+                                                secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                                            if self.number_of_units_left_to_suffer_damage > 0:
+                                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                                                for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                                            del self.positions_of_unit_triggering_reaction[i]
+                                            del self.reactions_needing_resolving[i]
+                                            del self.player_who_resolves_reaction[i]
+                                            i = i - 1
+                                        i = i + 1
                             await primary_player.send_units_at_planet(planet_pos)
                             await secondary_player.send_units_at_planet(planet_pos)
                             await primary_player.send_hand()
@@ -1167,6 +1201,28 @@ class Game:
                 self.player_who_is_shielding = self.name_2
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
+        if self.reactions_needing_resolving:
+            i = 0
+            while i < len(self.reactions_needing_resolving):
+                if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                    if self.positions_of_unit_triggering_reaction[i][0] == 1:
+                        secondary_player = self.p2
+                    else:
+                        secondary_player = self.p1
+                    loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                    secondary_player.suffer_area_effect(loc_of_mark, 1)
+                    self.number_of_units_left_to_suffer_damage = \
+                        secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                    if self.number_of_units_left_to_suffer_damage > 0:
+                        secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                        for j in range(1, self.number_of_units_left_to_suffer_damage):
+                            secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                    del self.positions_of_unit_triggering_reaction[i]
+                    del self.reactions_needing_resolving[i]
+                    del self.player_who_resolves_reaction[i]
+                    await secondary_player.send_units_at_planet(loc_of_mark)
+                    i = i - 1
+                i = i + 1
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 

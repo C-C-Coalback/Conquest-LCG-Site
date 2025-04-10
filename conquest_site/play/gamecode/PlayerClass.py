@@ -1346,6 +1346,10 @@ class Player:
                 self.draw_card()
                 self.draw_card()
                 self.game.cards_need_sending_outside_normal_sends = True
+        if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
+            self.game.reactions_needing_resolving.append("Mark of Chaos")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
+            self.game.player_who_resolves_reaction.append(self.name_player)
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
