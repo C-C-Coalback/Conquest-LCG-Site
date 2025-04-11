@@ -20,6 +20,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    elif ability == "Twisted Laboratory":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
                     elif ability == "Ork Kannon":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -109,6 +115,32 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 await primary_player.send_hand()
                 await secondary_player.send_hand()
                 await primary_player.send_hq()
+    elif self.action_chosen == "Twisted Laboratory":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
+            player_being_hit.set_blanked_given_pos(-2, unit_pos, exp="EOP")
+            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
+            self.position_of_actioned_card = (-1, -1)
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            if self.phase == "DEPLOY":
+                if not secondary_player.has_passed:
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.get_number()
+            await self.send_info_box()
+            await primary_player.send_hq()
     elif self.action_chosen == "Calculated Strike":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

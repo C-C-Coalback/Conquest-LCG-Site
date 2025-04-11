@@ -290,6 +290,22 @@ class Player:
         else:
             return self.discard[-1]
 
+    async def reveal_top_card_deck(self):
+        if not self.deck:
+            await self.game.game_sockets[0].receive_game_update("No cards left!")
+        else:
+            card_name = self.deck[0]
+            text = self.name_player + " reveals a " + card_name
+            await self.game.game_sockets[0].receive_game_update(text)
+
+    def get_top_card_deck(self):
+        if not self.deck:
+            print("Deck is empty, you lose!")
+            return None
+        else:
+            card = FindCard.find_card(self.deck[0], self.card_array)
+            return card
+
     def draw_card(self):
         if not self.deck:
             print("Deck is empty, you lose!")
@@ -849,6 +865,20 @@ class Player:
             return False
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
+    def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
+        if planet_id == -2:
+            self.headquarters[unit_id].set_blanked(True, exp=exp)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].set_blanked(True, exp=exp)
+        return None
+
+    def reset_all_blanked_eop(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].reset_blanked_eop()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eop()
+
     def get_armorbane_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
@@ -856,6 +886,8 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ignores_flying()
 
     def get_ability_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_ability()
         return self.cards_in_play[planet_id + 1][unit_id].get_ability()
 
     def get_ready_given_pos(self, planet_id, unit_id):
@@ -917,15 +949,19 @@ class Player:
                 return True
         return False
 
-    def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True):
+    def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True, ready_relevant=False):
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
             print(current_name, name_of_card)
             if current_name == name_of_card:
                 if not bloodied_relevant:
+                    if ready_relevant:
+                        return self.headquarters[i].get_ready()
                     return True
                 if self.headquarters[i].get_bloodied():
                     return False
+                if ready_relevant:
+                    return self.headquarters[i].get_ready()
                 return True
         return False
 
@@ -1418,6 +1454,18 @@ class Player:
             self.game.reactions_needing_resolving.append("Mark of Chaos")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
             self.game.player_who_resolves_reaction.append(self.name_player)
+        if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Murder Cogitator":
+                    if self.headquarters[i].get_ready():
+                        already_using_murder_cogitator = False
+                        for j in range(len(self.game.reactions_needing_resolving)):
+                            if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
+                                already_using_murder_cogitator = True
+                        if not already_using_murder_cogitator:
+                            self.game.reactions_needing_resolving.append("Murder Cogitator")
+                            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+                            self.game.player_who_resolves_reaction.append(self.name_player)
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
@@ -1431,6 +1479,19 @@ class Player:
                 self.draw_card()
                 self.draw_card()
                 self.game.cards_need_sending_outside_normal_sends = True
+        if card.get_is_unit():
+            if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
+                for i in range(len(self.headquarters)):
+                    if self.headquarters[i].get_ability() == "Murder Cogitator":
+                        if self.headquarters[i].get_ready():
+                            already_using_murder_cogitator = False
+                            for j in range(len(self.game.reactions_needing_resolving)):
+                                if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
+                                    already_using_murder_cogitator = True
+                            if not already_using_murder_cogitator:
+                                self.game.reactions_needing_resolving.append("Murder Cogitator")
+                                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+                                self.game.player_who_resolves_reaction.append(self.name_player)
         self.discard.append(card_name)
         self.remove_card_from_hq(card_pos)
 

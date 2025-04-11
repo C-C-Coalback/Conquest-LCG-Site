@@ -81,6 +81,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.action_chosen = ""
                                 self.mode = "Normal"
                                 await player_owning_card.send_units_at_planet(planet_pos)
+    elif self.action_chosen == "Twisted Laboratory":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        planet_pos = int(game_update_string[2])
+        unit_pos = int(game_update_string[3])
+        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+            player_being_hit.set_blanked_given_pos(planet_pos, unit_pos, exp="EOP")
+            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
+            self.position_of_actioned_card = (-1, -1)
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            if self.phase == "DEPLOY":
+                if not secondary_player.has_passed:
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.get_number()
+            await self.send_info_box()
+            await primary_player.send_hq()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if self.number_with_deploy_turn == "1":

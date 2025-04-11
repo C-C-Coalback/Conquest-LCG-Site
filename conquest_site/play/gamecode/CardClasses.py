@@ -11,7 +11,7 @@ class Card:
         self.name = name
         self.ability = name
         self.text = text
-        self.blanked = False
+        self.blanked_eop = False
         self.traits = traits
         self.cost = cost
         self.faction = faction
@@ -74,18 +74,22 @@ class Card:
         return self.name
 
     def get_ability(self, bloodied_relevant=False):
-        if self.blanked:
+        if self.blanked_eop:
             return "BLANKED"
         if bloodied_relevant:
             if self.bloodied:
                 return "BLOODIED"
         return self.ability
 
-    def set_blanked(self, new_val):
-        self.blanked = new_val
+    def set_blanked(self, new_val, exp="EOP"):
+        if exp == "EOP":
+            self.blanked_eop = new_val
+
+    def reset_blanked_eop(self):
+        self.blanked_eop = False
 
     def get_blanked(self):
-        return self.blanked
+        return self.blanked_eop
 
     def get_is_faction_limited_unique_discounter(self):
         return self.is_faction_limited_unique_discounter
@@ -246,15 +250,21 @@ class UnitCard(Card):
         return self.by_base_mobile
 
     def get_mobile(self):
+        if self.blanked_eop:
+            return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Mobility":
                 return True
         return self.mobile
 
     def get_additional_resources_command_struggle(self):
+        if self.blanked_eop:
+            return 0
         return self.additional_resources_command_struggle
 
     def get_additional_cards_command_struggle(self):
+        if self.blanked_eop:
+            return 0
         return self.additional_cards_command_struggle
 
     def get_no_attachments(self):
@@ -277,12 +287,16 @@ class UnitCard(Card):
         self.ranged = new_val
 
     def get_ranged(self):
+        if self.blanked_eop:
+            return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Rokkit Launcha":
                 return True
         return self.ranged
 
     def get_ignores_flying(self):
+        if self.blanked_eop:
+            return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Godwyn Pattern Bolter":
                 return True
@@ -295,6 +309,8 @@ class UnitCard(Card):
         return self.by_base_armorbane
 
     def get_armorbane(self):
+        if self.blanked_eop:
+            return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
                 return True
@@ -304,6 +320,8 @@ class UnitCard(Card):
         return self.by_base_area_effect
 
     def get_area_effect(self):
+        if self.blanked_eop:
+            return 0
         area_effect = self.area_effect
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Gun Drones":
@@ -314,6 +332,8 @@ class UnitCard(Card):
         return self.by_base_flying
 
     def get_flying(self):
+        if self.blanked_eop:
+            return False
         return self.flying
 
     def set_flying(self, new_val):
@@ -337,6 +357,8 @@ class UnitCard(Card):
             self.damage = 0
 
     def get_brutal(self):
+        if self.blanked_eop:
+            return False
         return self.brutal
 
     def set_brutal(self, new_val):
@@ -379,7 +401,7 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 command += self.attachments[i].get_extra_command()
-        if self.name == "Bad Dok" and self.damage > 0:
+        if self.get_ability() == "Bad Dok" and self.damage > 0:
             command = command + 3
         return command
 

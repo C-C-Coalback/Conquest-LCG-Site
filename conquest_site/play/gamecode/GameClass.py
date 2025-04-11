@@ -853,6 +853,8 @@ class Game:
         self.p2.reset_extra_attack_eop()
         self.p1.reset_extra_abilities_eop()
         self.p2.reset_extra_abilities_eop()
+        self.p1.reset_all_blanked_eop()
+        self.p2.reset_all_blanked_eop()
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
@@ -1021,6 +1023,27 @@ class Game:
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Murder Cogitator":
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
+                                if primary_player.headquarters[unit_pos].get_ready():
+                                    primary_player.exhaust_given_pos(-2, unit_pos)
+                                    await primary_player.send_hq()
+                                    await primary_player.reveal_top_card_deck()
+                                    card = primary_player.get_top_card_deck()
+                                    if card is not None:
+                                        if card.get_is_unit() and card.get_faction() == "Chaos":
+                                            await self.game_sockets[0].receive_game_update("Card is drawn")
+                                            primary_player.draw_card()
+                                            await primary_player.send_hand()
+                                        else:
+                                            await self.game_sockets[0].receive_game_update("Card is not drawn")
+                                    more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
+                                    if not more:
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                    await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
                             unit_pos = int(game_update_string[2])
                             if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
