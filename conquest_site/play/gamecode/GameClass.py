@@ -140,7 +140,9 @@ class Game:
         self.first_card_damaged = True
         self.cato_stronghold_activated = False
         self.allowed_planets_cato_stronghold = []
+        self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
+        self.alaitoc_shrine_activated = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1005,6 +1007,9 @@ class Game:
                         self.allowed_planets_cato_stronghold = []
                     if self.reactions_needing_resolving[0] == "Foresight":
                         primary_player.aiming_reticle_coords_hand = None
+                    if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
+                        self.allowed_units_alaitoc_shrine = []
+                        self.alaitoc_shrine_activated = False
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
@@ -1050,6 +1055,14 @@ class Game:
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
+                            if not self.cato_stronghold_activated:
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.get_ability_given_pos(-2, unit_pos) == "Alaitoc Shrine":
+                                    if primary_player.get_ready_given_pos(-2, unit_pos):
+                                        primary_player.exhaust_given_pos(-2, unit_pos)
+                                        self.alaitoc_shrine_activated = True
+                                        await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
                             if not self.cato_stronghold_activated:
                                 unit_pos = int(game_update_string[2])
@@ -1098,17 +1111,19 @@ class Game:
                     print(self.player_who_resolves_reaction)
                     if name == self.player_who_resolves_reaction[0]:
                         if self.reactions_needing_resolving[0] == "Power from Pain":
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
-                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-                                del self.positions_of_unit_triggering_reaction[0]
-                                del self.reactions_needing_resolving[0]
-                                del self.player_who_resolves_reaction[0]
-                                await secondary_player.dark_eldar_event_played()
-                                await primary_player.send_units_at_planet(planet_pos)
-                                await primary_player.send_discard()
-                                await self.send_info_box()
+                            if int(primary_player.get_number()) == int(
+                                    self.positions_of_unit_triggering_reaction[0][0]):
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                                    primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.reactions_needing_resolving[0]
+                                    del self.player_who_resolves_reaction[0]
+                                    await secondary_player.dark_eldar_event_played()
+                                    await primary_player.send_units_at_planet(planet_pos)
+                                    await primary_player.send_discard()
+                                    await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
                             print("Reached Starbane code")
                             planet_pos = int(game_update_string[2])
@@ -1125,35 +1140,61 @@ class Game:
                                     del self.reactions_needing_resolving[0]
                                     del self.player_who_resolves_reaction[0]
                                     await player_exhausting_unit.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
+                            if int(primary_player.get_number()) == int(
+                                    self.positions_of_unit_triggering_reaction[0][0]):
+                                if self.alaitoc_shrine_activated:
+                                    player_num = int(primary_player.get_number())
+                                    planet_pos = int(game_update_string[2])
+                                    unit_pos = int(game_update_string[3])
+                                    full_position = [player_num, planet_pos, unit_pos]
+                                    if full_position in self.allowed_units_alaitoc_shrine:
+                                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                                            del self.positions_of_unit_triggering_reaction[0]
+                                            del self.reactions_needing_resolving[0]
+                                            del self.player_who_resolves_reaction[0]
+                                            self.alaitoc_shrine_activated = False
+                                            self.allowed_units_alaitoc_shrine = []
+                                            await primary_player.send_units_at_planet(planet_pos)
+                                            await self.send_info_box()
+                                        else:
+                                            await self.game_sockets[0].receive_game_update("Unit already ready")
                         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
-                            if self.cato_stronghold_activated:
+                            if int(primary_player.get_number()) == int(
+                                    self.positions_of_unit_triggering_reaction[0][0]):
+                                if self.cato_stronghold_activated:
+                                    planet_pos = int(game_update_string[2])
+                                    unit_pos = int(game_update_string[3])
+                                    if planet_pos in self.allowed_planets_cato_stronghold:
+                                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                                            del self.positions_of_unit_triggering_reaction[0]
+                                            del self.reactions_needing_resolving[0]
+                                            del self.player_who_resolves_reaction[0]
+                                            self.allowed_planets_cato_stronghold = []
+                                            self.cato_stronghold_activated = False
+                                            await primary_player.send_units_at_planet(planet_pos)
+                                            await self.send_info_box()
+                                        else:
+                                            await self.game_sockets[0].receive_game_update("Unit already ready")
+                        elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
+                            if int(primary_player.get_number()) == int(
+                                    self.positions_of_unit_triggering_reaction[0][0]):
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
-                                if planet_pos in self.allowed_planets_cato_stronghold:
-                                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                                        primary_player.ready_given_pos(planet_pos, unit_pos)
-                                        del self.positions_of_unit_triggering_reaction[0]
-                                        del self.reactions_needing_resolving[0]
-                                        del self.player_who_resolves_reaction[0]
-                                        self.allowed_planets_cato_stronghold = []
-                                        self.cato_stronghold_activated = False
-                                        await primary_player.send_units_at_planet(planet_pos)
-                                        await self.send_info_box()
-                        elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
-                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_reaction_available():
-                                    if primary_player.spend_resources(1):
-                                        primary_player.cards_in_play[planet_pos + 1][unit_pos].\
-                                            set_reaction_available(False)
-                                        primary_player.summon_token_at_hq("Khymera", 1)
-                                        del self.positions_of_unit_triggering_reaction[0]
-                                        del self.reactions_needing_resolving[0]
-                                        del self.player_who_resolves_reaction[0]
-                                        await self.send_info_box()
-                                        await primary_player.send_hq()
-                                        await primary_player.send_resources()
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
+                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_reaction_available():
+                                        if primary_player.spend_resources(1):
+                                            primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                                set_reaction_available(False)
+                                            primary_player.summon_token_at_hq("Khymera", 1)
+                                            del self.positions_of_unit_triggering_reaction[0]
+                                            del self.reactions_needing_resolving[0]
+                                            del self.player_who_resolves_reaction[0]
+                                            await self.send_info_box()
+                                            await primary_player.send_hq()
+                                            await primary_player.send_resources()
                         elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
                             if primary_player.get_number() == game_update_string[1]:
                                 planet_pos = int(game_update_string[2])

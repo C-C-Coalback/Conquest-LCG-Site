@@ -771,6 +771,18 @@ class Player:
         if origin_planet == -2:
             headquarters_list = self.headquarters
             self.cards_in_play[destination + 1].append(copy.deepcopy(headquarters_list[origin_position]))
+            new_pos = len(self.cards_in_play[destination + 1]) - 1
+            if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
+                if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
+                    alaitoc_shrine_already_present = False
+                    for i in range(len(self.game.reactions_needing_resolving)):
+                        if self.game.reactions_needing_resolving[i] == "Alaitoc Shrine":
+                            alaitoc_shrine_already_present = True
+                    if not alaitoc_shrine_already_present:
+                        self.game.reactions_needing_resolving.append("Alaitoc Shrine")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.allowed_units_alaitoc_shrine.append([int(self.number), destination, new_pos])
             self.remove_card_from_hq(origin_position)
         else:
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
