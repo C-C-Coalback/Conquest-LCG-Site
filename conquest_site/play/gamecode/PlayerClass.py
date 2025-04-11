@@ -811,8 +811,7 @@ class Player:
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
                         self.game.positions_of_unit_triggering_reaction.append(int(self.number), planet_pos - 1, -1)
                         self.game.player_who_resolves_reaction.append(self.name_player)
-                    self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
-                    self.headquarters.remove(headquarters_list[i])
+                    self.move_unit_to_planet(-2, i, planet_pos - 1)
                     if summon_khymera:
                         self.summon_token_at_planet("Khymera", planet_pos - 1)
                     return True
@@ -834,8 +833,7 @@ class Player:
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
-                    self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
-                    self.headquarters.remove(headquarters_list[i])
+                    self.move_unit_to_planet(-2, i, planet_pos - 1)
                     if summon_khymera:
                         self.summon_token_at_planet("Khymera", planet_pos - 1)
                     i -= 1
