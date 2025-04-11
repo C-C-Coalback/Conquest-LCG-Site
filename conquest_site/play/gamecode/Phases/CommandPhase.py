@@ -54,6 +54,15 @@ async def update_game_event_command_section(self, name, game_update_string):
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await primary_player.send_hand()
+                    elif primary_player.cards[hand_pos] == "Superiority":
+                        if primary_player.spend_resources(1):
+                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
+                                                                               -1, -1])
+                            self.reactions_needing_resolving.append("Superiority")
+                            self.player_who_resolves_reaction.append(primary_player.name_player)
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            await primary_player.send_hand()
         if self.p1.has_passed and self.p2.has_passed:
             resolve_command_struggle(self)
             await self.p1.send_hand()

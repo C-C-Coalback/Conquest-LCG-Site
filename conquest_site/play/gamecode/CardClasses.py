@@ -203,6 +203,7 @@ class UnitCard(Card):
         self.additional_cards_command_struggle = additional_cards_command_struggle
         self.ambush = ambush
         self.reaction_available = True
+        self.hit_by_superiority = False
 
     def get_reaction_available(self):
         return self.reaction_available
@@ -398,6 +399,9 @@ class UnitCard(Card):
 
     def get_command(self):
         command = self.command
+        if self.hit_by_superiority:
+            self.hit_by_superiority = False
+            return 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 command += self.attachments[i].get_extra_command()
