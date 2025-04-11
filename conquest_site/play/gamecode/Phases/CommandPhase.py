@@ -37,6 +37,23 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p1.has_passed = True
                 elif name == self.name_2:
                     self.p2.has_passed = True
+        elif len(game_update_string) == 3:
+            if game_update_string[0] == "HAND":
+                if name == self.name_1:
+                    primary_player = self.p1
+                else:
+                    primary_player = self.p2
+                if game_update_string[1] == primary_player.get_number():
+                    hand_pos = int(game_update_string[2])
+                    if primary_player.cards[hand_pos] == "Foresight":
+                        warlord_planet = primary_player.warlord_commit_location
+                        self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
+                                                                           warlord_planet, -1])
+                        self.reactions_needing_resolving.append("Foresight")
+                        self.player_who_resolves_reaction.append(primary_player.name_player)
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        await primary_player.send_hand()
         if self.p1.has_passed and self.p2.has_passed:
             resolve_command_struggle(self)
             await self.p1.send_hand()

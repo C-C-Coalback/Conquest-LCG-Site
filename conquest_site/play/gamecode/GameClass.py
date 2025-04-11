@@ -1003,10 +1003,29 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Cato's Stronghold":
                         self.cato_stronghold_activated = False
                         self.allowed_planets_cato_stronghold = []
+                    if self.reactions_needing_resolving[0] == "Foresight":
+                        primary_player.aiming_reticle_coords_hand = None
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
                     await self.send_info_box()
+            elif len(game_update_string) == 2:
+                if game_update_string[0] == "PLANETS":
+                    if self.reactions_needing_resolving[0] == "Foresight":
+                        warlord_planet = primary_player.warlord_commit_location
+                        new_planet = int(game_update_string[1])
+                        if abs(warlord_planet - new_planet) == 1:
+                            primary_player.commit_warlord_to_planet_from_planet(warlord_planet, new_planet)
+                            del self.positions_of_unit_triggering_reaction[0]
+                            del self.reactions_needing_resolving[0]
+                            del self.player_who_resolves_reaction[0]
+                            await self.send_info_box()
+                            await primary_player.send_units_at_planet(new_planet)
+                            await primary_player.send_units_at_planet(warlord_planet)
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            primary_player.aiming_reticle_coords_hand = None
+                            await primary_player.send_hand()
+                            await primary_player.send_discard()
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":

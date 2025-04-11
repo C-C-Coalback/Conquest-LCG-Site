@@ -777,6 +777,25 @@ class Player:
                                                                      [origin_position]))
             self.remove_card_from_play(origin_planet, origin_position)
 
+    def commit_warlord_to_planet_from_planet(self, origin_planet, dest_planet):
+        self.warlord_commit_location = dest_planet
+        i = 0
+        warlord_committed = False
+        while i < len(self.cards_in_play[origin_planet + 1]) and not warlord_committed:
+            if self.cards_in_play[origin_planet + 1][i].get_card_type() == "Warlord":
+                warlord_committed = True
+                summon_khymera = False
+                if self.cards_in_play[origin_planet + 1][i].get_ability() == "Packmaster Kith":
+                    summon_khymera = True
+                if self.cards_in_play[origin_planet + 1][i].get_ability() == "Eldorath Starbane":
+                    self.game.reactions_needing_resolving.append("Eldorath Starbane")
+                    self.game.positions_of_unit_triggering_reaction.append([int(self.number), dest_planet, -1])
+                    self.game.player_who_resolves_reaction.append(self.name_player)
+                self.move_unit_to_planet(origin_planet, i, dest_planet)
+                if summon_khymera:
+                    self.summon_token_at_planet("Khymera", dest_planet)
+            i += 1
+
     def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
         if planet_pos is None:
@@ -790,7 +809,7 @@ class Player:
                         summon_khymera = True
                     if headquarters_list[i].get_ability() == "Eldorath Starbane":
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
-                        self.game.positions_of_unit_triggering_reaction.append(int(self.number), planet_pos, -1)
+                        self.game.positions_of_unit_triggering_reaction.append(int(self.number), planet_pos - 1, -1)
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
                     self.headquarters.remove(headquarters_list[i])
