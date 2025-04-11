@@ -140,6 +140,7 @@ class Game:
         self.first_card_damaged = True
         self.cato_stronghold_activated = False
         self.allowed_planets_cato_stronghold = []
+        self.committing_warlords = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -833,6 +834,8 @@ class Game:
 
     async def change_phase(self, new_val, refresh_abilities=True):
         self.phase = new_val
+        if self.phase == "COMMAND":
+            self.committing_warlords = True
         sacrifice_locations = self.p1.sacrifice_check_eop()
         if sacrifice_locations:
             for i in range(len(sacrifice_locations)):
@@ -1073,7 +1076,8 @@ class Game:
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     print("Check what player")
-                    if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
+                    print(self.player_who_resolves_reaction)
+                    if name == self.player_who_resolves_reaction[0]:
                         if self.reactions_needing_resolving[0] == "Power from Pain":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
@@ -1086,6 +1090,20 @@ class Game:
                                 await primary_player.send_units_at_planet(planet_pos)
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
+                            print("Reached Starbane code")
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if game_update_string[1] == "1":
+                                player_exhausting_unit = self.p1
+                            else:
+                                player_exhausting_unit = self.p2
+                            if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                                player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await player_exhausting_unit.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
                             if self.cato_stronghold_activated:
                                 planet_pos = int(game_update_string[2])
@@ -1564,52 +1582,6 @@ class Game:
             self.player_with_combat_turn = self.name_2
             self.number_reset_combat_turn = self.number_with_combat_turn
             self.player_reset_combat_turn = self.player_with_combat_turn
-
-    def resolve_command_struggle(self):
-        storage_command_struggle = [None, None, None, None, None, None, None]
-        for i in range(len(self.planet_array)):
-            if self.planets_in_play_array[i]:
-                print("Resolve command struggle at:", self.planet_array[i])
-                storage_command_struggle[i] = self.resolve_command_struggle_at_planet(i)
-        for i in range(len(storage_command_struggle)):
-            if storage_command_struggle[i] is not None:
-                if storage_command_struggle[i][0] == "1":
-                    self.p1.add_resources(storage_command_struggle[i][1])
-                    for _ in range(storage_command_struggle[i][2]):
-                        self.p1.draw_card()
-                else:
-                    self.p2.add_resources(storage_command_struggle[i][1])
-                    for _ in range(storage_command_struggle[i][2]):
-                        self.p2.draw_card()
-
-    def resolve_command_struggle_at_planet(self, planet_id):
-        command_p1 = self.p1.count_command_at_planet(planet_id)
-        command_p2 = self.p2.count_command_at_planet(planet_id)
-        if command_p1 > command_p2:
-            print("P1 wins command")
-            chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-            resources_won = chosen_planet.get_resources()
-            cards_won = chosen_planet.get_cards()
-            extra_resources, extra_cards = self.p1.get_bonus_winnings_at_planet(planet_id)
-            resources_won += extra_resources
-            cards_won += extra_cards
-            ret_val = ["1", resources_won, cards_won]
-            if self.p1.search_card_in_hq("Omega Zero Command"):
-                self.p1.summon_token_at_planet("Guardsman", planet_id)
-            return ret_val
-        elif command_p2 > command_p1:
-            print("P2 wins command")
-            chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-            resources_won = chosen_planet.get_resources()
-            cards_won = chosen_planet.get_cards()
-            extra_resources, extra_cards = self.p2.get_bonus_winnings_at_planet(planet_id)
-            resources_won += extra_resources
-            cards_won += extra_cards
-            ret_val = ["2", resources_won, cards_won]
-            if self.p2.search_card_in_hq("Omega Zero Command"):
-                self.p2.summon_token_at_planet("Guardsman", planet_id)
-            return ret_val
-        return None
 
     def check_battle(self, planet_id):
         if planet_id == self.round_number:

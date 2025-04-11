@@ -788,6 +788,10 @@ class Player:
                     summon_khymera = False
                     if headquarters_list[i].get_ability() == "Packmaster Kith":
                         summon_khymera = True
+                    if headquarters_list[i].get_ability() == "Eldorath Starbane":
+                        self.game.reactions_needing_resolving.append("Eldorath Starbane")
+                        self.game.positions_of_unit_triggering_reaction.append(int(self.number), planet_pos, -1)
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
                     self.headquarters.remove(headquarters_list[i])
                     if summon_khymera:
@@ -805,8 +809,12 @@ class Player:
                         if headquarters_list[i].get_ability() == "Experimental Devilfish":
                             headquarters_list[i].ready_card()
                     summon_khymera = False
-                    if headquarters_list[i].get_ability() == "Packmaster Kith":
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
                         summon_khymera = True
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
+                        self.game.reactions_needing_resolving.append("Eldorath Starbane")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     self.cards_in_play[planet_pos].append(copy.deepcopy(headquarters_list[i]))
                     self.headquarters.remove(headquarters_list[i])
                     if summon_khymera:
@@ -818,9 +826,10 @@ class Player:
     def count_command_at_planet(self, planet_id):
         counted_command = 0
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            counted_command += self.cards_in_play[planet_id + 1][i].get_command()
-            if self.cards_in_play[planet_id + 1][i].get_ability() == "Iron Hands Techmarine":
-                counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+            if self.get_ready_given_pos(planet_id, i):
+                counted_command += self.cards_in_play[planet_id + 1][i].get_command()
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Iron Hands Techmarine":
+                    counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         return counted_command
 
     def count_units_in_play_all(self):
