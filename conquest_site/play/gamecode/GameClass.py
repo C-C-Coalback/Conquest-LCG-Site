@@ -1099,11 +1099,13 @@ class Game:
                             else:
                                 player_exhausting_unit = self.p2
                             if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
-                                player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
-                                del self.positions_of_unit_triggering_reaction[0]
-                                del self.reactions_needing_resolving[0]
-                                del self.player_who_resolves_reaction[0]
-                                await player_exhausting_unit.send_units_at_planet(planet_pos)
+                                if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos].\
+                                        get_card_type() != "Warlord":
+                                    player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.reactions_needing_resolving[0]
+                                    del self.player_who_resolves_reaction[0]
+                                    await player_exhausting_unit.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
                             if self.cato_stronghold_activated:
                                 planet_pos = int(game_update_string[2])
