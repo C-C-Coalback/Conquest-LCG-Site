@@ -138,6 +138,8 @@ class Game:
         self.location_of_indirect = ""
         self.planet_of_indirect = -1
         self.first_card_damaged = True
+        self.cato_stronghold_activated = False
+        self.allowed_planets_cato_stronghold = []
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -995,6 +997,9 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.reactions_needing_resolving[0] == "Power from Pain":
                         await self.game_sockets[0].receive_game_update("No sacrifice for Power from Pain")
+                    if self.reactions_needing_resolving[0] == "Cato's Stronghold":
+                        self.cato_stronghold_activated = False
+                        self.allowed_planets_cato_stronghold = []
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
@@ -1023,6 +1028,14 @@ class Game:
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
+                            if not self.cato_stronghold_activated:
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":
+                                    if primary_player.get_ready_given_pos(-2, unit_pos):
+                                        primary_player.exhaust_given_pos(-2, unit_pos)
+                                        self.cato_stronghold_activated = True
+                                        await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Murder Cogitator":
                             unit_pos = int(game_update_string[2])
                             if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
@@ -1073,6 +1086,20 @@ class Game:
                                 await primary_player.send_units_at_planet(planet_pos)
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
+                            if self.cato_stronghold_activated:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if planet_pos in self.allowed_planets_cato_stronghold:
+                                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        self.allowed_planets_cato_stronghold = []
+                                        self.cato_stronghold_activated = False
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                        await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
@@ -1338,12 +1365,21 @@ class Game:
         self.position_of_damaged_unit = None
         self.damage_on_unit_before_new_damage = None
 
-    def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card, bloodied_relevant=False):
+    def request_search_for_enemy_card_at_planet(self, number, planet, name_of_card, bloodied_relevant=False,
+                                                ready_relevant=False):
         if number == "1":
-            is_present = self.p2.search_card_at_planet(planet, name_of_card, bloodied_relevant)
+            if planet == -2:
+                is_present = self.p2.search_card_in_hq(name_of_card, bloodied_relevant=bloodied_relevant,
+                                                       ready_relevant=ready_relevant)
+                return is_present
+            is_present = self.p2.search_card_at_planet(planet, name_of_card, bloodied_relevant=bloodied_relevant)
             return is_present
         elif number == "2":
-            is_present = self.p1.search_card_at_planet(planet, name_of_card, bloodied_relevant)
+            if planet == -2:
+                is_present = self.p1.search_card_in_hq(name_of_card, bloodied_relevant=bloodied_relevant,
+                                                       ready_relevant=ready_relevant)
+                return is_present
+            is_present = self.p1.search_card_at_planet(planet, name_of_card, bloodied_relevant=bloodied_relevant)
             return is_present
         return None
 

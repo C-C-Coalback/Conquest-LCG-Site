@@ -1466,6 +1466,15 @@ class Player:
                             self.game.reactions_needing_resolving.append("Murder Cogitator")
                             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                             self.game.player_who_resolves_reaction.append(self.name_player)
+        if self.game.request_search_for_enemy_card_at_planet(self.number, -2, "Cato's Stronghold", ready_relevant=True):
+            self.game.reactions_needing_resolving.append("Cato's Stronghold")
+            self.game.allowed_planets_cato_stronghold.append(planet_num)
+            if self.number == "1":
+                self.game.positions_of_unit_triggering_reaction.append([2, -1, -1])
+                self.game.player_who_resolves_reaction.append(self.game.name_2)
+            else:
+                self.game.positions_of_unit_triggering_reaction.append([1, -1, -1])
+                self.game.player_who_resolves_reaction.append(self.game.name_1)
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
