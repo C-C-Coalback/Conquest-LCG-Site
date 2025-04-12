@@ -144,6 +144,7 @@ class Game:
         self.committing_warlords = False
         self.alaitoc_shrine_activated = False
         self.resolving_enginseer_augur = False
+        self.banshee_power_sword_extra_attack = 0
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1057,6 +1058,12 @@ class Game:
                             await primary_player.send_discard()
                             await primary_player.send_hand()
                             await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Banshee Power Sword":
+                            hand_pos = int(game_update_string[2])
+                            primary_player.discard_card_from_hand(hand_pos)
+                            self.banshee_power_sword_extra_attack += 1
+                            await primary_player.send_discard()
+                            await primary_player.send_hand()
                         elif self.reactions_needing_resolving[0] == "Elysian Assault Team":
                             hand_pos = int(game_update_string[2])
                             if primary_player.cards[hand_pos] == "Elysian Assault Team":

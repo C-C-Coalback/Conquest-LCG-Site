@@ -145,6 +145,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                    self.attacker_planet,
                                                                                    self.attacker_position])
                                 self.player_who_resolves_reaction.append(player.name_player)
+                            if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
+                                                                "Banshee Power Sword"):
+                                self.reactions_needing_resolving.append("Banshee Power Sword")
+                                self.positions_of_unit_triggering_reaction.append([int(player.number),
+                                                                                   self.attacker_planet,
+                                                                                   self.attacker_position])
+                                self.player_who_resolves_reaction.append(player.name_player)
                             await player.send_units_at_planet(chosen_planet)
                 elif self.defender_position == -1:
                     if game_update_string[1] != self.number_with_combat_turn:
@@ -173,6 +180,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if not secondary_player.get_ready_given_pos(self.defender_planet,
                                                                             self.defender_position):
                                     attack_value += 2
+                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                                    .get_card_type() != "Warlord":
+                                attack_value += self.banshee_power_sword_extra_attack
+                                self.banshee_power_sword_extra_attack = 0
                             if attack_value > 0:
                                 att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
                                                                                  self.attacker_position)
