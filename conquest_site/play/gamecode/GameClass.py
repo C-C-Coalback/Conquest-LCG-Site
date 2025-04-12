@@ -1180,6 +1180,15 @@ class Game:
                                     del self.reactions_needing_resolving[0]
                                     del self.player_who_resolves_reaction[0]
                                     await player_exhausting_unit.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if game_update_string[1] != primary_player.get_number():
+                                secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await secondary_player.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Superiority":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])

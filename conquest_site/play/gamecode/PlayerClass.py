@@ -1396,6 +1396,10 @@ class Player:
         else:
             if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
+            if self.headquarters[card_pos].get_ability() == "Shrouded Harlequin":
+                self.game.reactions_needing_resolving.append("Shrouded Harlequin")
+                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+                self.game.player_who_resolves_reaction.append(self.name_player)
             self.add_card_in_hq_to_discard(card_pos)
 
     def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True):
@@ -1426,8 +1430,6 @@ class Player:
                 self.bloody_warlord_given_pos(planet_num, card_pos)
                 self.warlord_just_got_bloodied = True
             else:
-                if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
-                    self.add_resources(3)
                 self.add_card_in_play_to_discard(planet_num, card_pos)
         else:
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
@@ -1443,6 +1445,12 @@ class Player:
                 self.game.hqs_need_sending_outside_normal_sends = True
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
                 self.summon_token_at_planet("Guardsman", planet_num)
+            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
+                self.add_resources(3)
+            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
+                self.game.reactions_needing_resolving.append("Shrouded Harlequin")
+                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+                self.game.player_who_resolves_reaction.append(self.name_player)
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
     def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True):
