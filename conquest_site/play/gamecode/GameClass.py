@@ -1047,15 +1047,34 @@ class Game:
                             await primary_player.send_discard()
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
-                    if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
-                        hand_pos = int(game_update_string[2])
-                        primary_player.discard_card_from_hand(hand_pos)
-                        del self.positions_of_unit_triggering_reaction[0]
-                        del self.reactions_needing_resolving[0]
-                        del self.player_who_resolves_reaction[0]
-                        await primary_player.send_discard()
-                        await primary_player.send_hand()
-                        await self.send_info_box()
+                    if game_update_string[1] == primary_player.get_number():
+                        if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
+                            hand_pos = int(game_update_string[2])
+                            primary_player.discard_card_from_hand(hand_pos)
+                            del self.positions_of_unit_triggering_reaction[0]
+                            del self.reactions_needing_resolving[0]
+                            del self.player_who_resolves_reaction[0]
+                            await primary_player.send_discard()
+                            await primary_player.send_hand()
+                            await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Elysian Assault Team":
+                            hand_pos = int(game_update_string[2])
+                            if primary_player.cards[hand_pos] == "Elysian Assault Team":
+                                planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+                                card = FindCard.find_card("Elysian Assault Team", self.card_array)
+                                primary_player.add_card_to_planet(card, planet_pos)
+                                del primary_player.cards[hand_pos]
+                                more = False
+                                for i in range(len(primary_player.cards)):
+                                    if primary_player.cards[i] == "Elysian Assault Team":
+                                        more = True
+                                if not more:
+                                    del self.reactions_needing_resolving[0]
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.player_who_resolves_reaction[0]
+                                await primary_player.send_hand()
+                                await self.send_info_box()
+                                await primary_player.send_units_at_planet(planet_pos)
                 elif game_update_string[0] == "HQ":
                     if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
                         if self.reactions_needing_resolving[0] == "Power from Pain":

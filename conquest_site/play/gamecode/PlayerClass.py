@@ -1492,6 +1492,18 @@ class Player:
             self.game.reactions_needing_resolving.append("Mark of Chaos")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
             self.game.player_who_resolves_reaction.append(self.name_player)
+        if card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier"):
+            for i in range(len(self.cards)):
+                if self.cards[i] == "Elysian Assault Team":
+                    already_queued_elysian_assault_team = False
+                    for j in range(len(self.game.reactions_needing_resolving)):
+                        if self.game.reactions_needing_resolving[j] == "Elysian Assault Team":
+                            if self.game.player_who_resolves_reaction[j] == self.name_player:
+                                already_queued_elysian_assault_team = True
+                    if not already_queued_elysian_assault_team:
+                        self.game.reactions_needing_resolving.append("Elysian Assault Team")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
         if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Murder Cogitator":
@@ -1499,7 +1511,8 @@ class Player:
                         already_using_murder_cogitator = False
                         for j in range(len(self.game.reactions_needing_resolving)):
                             if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
-                                already_using_murder_cogitator = True
+                                if self.game.player_who_resolves_reaction[j] == self.name_player:
+                                    already_using_murder_cogitator = True
                         if not already_using_murder_cogitator:
                             self.game.reactions_needing_resolving.append("Murder Cogitator")
                             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
