@@ -143,6 +143,7 @@ class Game:
         self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
         self.alaitoc_shrine_activated = False
+        self.resolving_enginseer_augur = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -428,6 +429,8 @@ class Game:
                     else:
                         self.p2.bottom_remaining_cards()
                     self.cards_in_search_box = []
+                    if self.resolving_enginseer_augur:
+                        self.resolving_enginseer_augur = False
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
@@ -440,6 +443,12 @@ class Game:
                             if self.what_to_do_with_searched_card == "DRAW":
                                 self.p1.draw_card_at_location_deck(int(game_update_string[1]))
                                 await self.p1.send_hand()
+                            elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
+                                self.p1.add_to_hq(card_chosen)
+                                del self.p1.deck[int(game_update_string[1])]
+                                if self.resolving_enginseer_augur:
+                                    self.resolving_enginseer_augur = False
+                                await self.p1.send_hq()
                             elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                                 self.p1.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                              int(game_update_string[1]), card_chosen)
@@ -467,6 +476,11 @@ class Game:
                             if self.what_to_do_with_searched_card == "DRAW":
                                 self.p2.draw_card_at_location_deck(int(game_update_string[1]))
                                 await self.p2.send_hand()
+                            elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
+                                self.p2.add_to_hq(card_chosen)
+                                del self.p2.deck[int(game_update_string[1])]
+                                if self.resolving_enginseer_augur:
+                                    self.resolving_enginseer_augur = False
                             elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                                 self.p2.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                              int(game_update_string[1]), card_chosen)
@@ -1429,6 +1443,36 @@ class Game:
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         if self.reactions_needing_resolving:
+            if self.reactions_needing_resolving[0] == "Enginseer Augur" and not self.resolving_enginseer_augur:
+                self.resolving_enginseer_augur = True
+                self.what_to_do_with_searched_card = "PLAY TO HQ"
+                self.traits_of_searched_card = None
+                self.card_type_of_searched_card = "Support"
+                self.faction_of_searched_card = "Astra Militarum"
+                self.max_cost_of_searched_card = 2
+                self.all_conditions_searched_card_required = True
+                self.no_restrictions_on_chosen_card = False
+                if self.player_who_resolves_reaction[0] == self.name_1:
+                    self.p1.number_cards_to_search = 6
+                    if len(self.p1.deck) > 5:
+                        self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    else:
+                        self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.name_player_who_is_searching = self.p1.name_player
+                    self.number_who_is_searching = str(self.p1.number)
+                else:
+                    self.p2.number_cards_to_search = 6
+                    if len(self.p2.deck) > 5:
+                        self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    else:
+                        self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.name_player_who_is_searching = self.p2.name_player
+                    self.number_who_is_searching = str(self.p2.number)
+                del self.reactions_needing_resolving[0]
+                del self.positions_of_unit_triggering_reaction[0]
+                del self.player_who_resolves_reaction[0]
+                await self.send_search()
+                await self.send_info_box()
             i = 0
             while i < len(self.reactions_needing_resolving):
                 if self.reactions_needing_resolving[i] == "Mark of Chaos":

@@ -1513,6 +1513,10 @@ class Player:
             else:
                 self.game.positions_of_unit_triggering_reaction.append([1, -1, -1])
                 self.game.player_who_resolves_reaction.append(self.game.name_1)
+        if card.get_ability() == "Enginseer Augur":
+            self.game.reactions_needing_resolving.append("Enginseer Augur")
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
         self.discard.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
@@ -1539,6 +1543,10 @@ class Player:
                                 self.game.reactions_needing_resolving.append("Murder Cogitator")
                                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                                 self.game.player_who_resolves_reaction.append(self.name_player)
+        if card.get_ability() == "Enginseer Augur":
+            self.game.reactions_needing_resolving.append("Enginseer Augur")
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
         self.discard.append(card_name)
         self.remove_card_from_hq(card_pos)
 
