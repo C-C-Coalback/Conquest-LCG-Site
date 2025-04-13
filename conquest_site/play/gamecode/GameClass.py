@@ -145,6 +145,8 @@ class Game:
         self.alaitoc_shrine_activated = False
         self.resolving_enginseer_augur = False
         self.banshee_power_sword_extra_attack = 0
+        self.may_move_defender = True
+        self.fire_warrior_elite_active = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1025,6 +1027,13 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                         self.allowed_units_alaitoc_shrine = []
                         self.alaitoc_shrine_activated = False
+                    if self.reactions_needing_resolving[0] == "Fire Warrior Elite":
+                        self.may_move_defender = False
+                        current_planet, current_unit = self.last_defender_position
+                        last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                                   str(current_unit)]
+                        await CombatPhase.update_game_event_combat_section(
+                            self, secondary_player.name_player, last_game_update_string)
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
@@ -1164,6 +1173,23 @@ class Game:
                                     await primary_player.send_units_at_planet(planet_pos)
                                     await primary_player.send_discard()
                                     await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
+                            if game_update_string[1] == primary_player.get_number():
+                                current_planet, current_unit = self.last_defender_position
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                                    if primary_player.get_ability_given_pos(
+                                            planet_pos, unit_pos) == "Fire Warrior Elite":
+                                        primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
+                                        self.may_move_defender = False
+                                        print("Calling defender in the funny way")
+                                        await CombatPhase.update_game_event_combat_section(
+                                            self, secondary_player.name_player, game_update_string)
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
                             print("Reached Starbane code")
                             planet_pos = int(game_update_string[2])

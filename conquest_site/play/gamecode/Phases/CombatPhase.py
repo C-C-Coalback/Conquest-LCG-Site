@@ -125,6 +125,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         if valid_unit:
                             self.attacker_planet = chosen_planet
                             self.attacker_position = chosen_unit
+                            self.may_move_defender = True
                             print("Attacker:", self.attacker_planet, self.attacker_position)
                             if self.number_with_combat_turn == "1":
                                 player = self.p1
@@ -174,6 +175,24 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if secondary_player.cards_in_play[self.defender_planet + 1][i] \
                                         .get_ability() != "Honored Librarian":
                                     can_continue = False
+                        if self.may_move_defender:
+                            for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                if i != self.defender_position:
+                                    if secondary_player.get_ability_given_pos(self.defender_planet,
+                                                                              i) == "Fire Warrior Elite":
+                                        if not self.fire_warrior_elite_active:
+                                            self.fire_warrior_elite_active = True
+                                            can_continue = False
+                                            self.reactions_needing_resolving.append("Fire Warrior Elite")
+                                            self.positions_of_unit_triggering_reaction.append(
+                                                [int(secondary_player.number),
+                                                 self.defender_planet,
+                                                 -1])
+                                            self.player_who_resolves_reaction.append(secondary_player.name_player)
+                                            self.last_defender_position = (self.defender_planet, self.defender_position)
+                                            secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                        self.defender_position, "red")
+                                            await secondary_player.send_units_at_planet(self.defender_planet)
                         if can_continue:
                             if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                     self.attacker_position) == "Starbane's Council":
