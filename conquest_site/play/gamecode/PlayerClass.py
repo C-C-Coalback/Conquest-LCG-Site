@@ -150,6 +150,11 @@ class Player:
                     print(attachments_list[a].get_name())
                     single_card_string += "|"
                     single_card_string += attachments_list[a].get_name()
+                    single_card_string += "+"
+                    if attachments_list[a].get_ready():
+                        single_card_string += "R"
+                    else:
+                        single_card_string += "E"
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
@@ -192,6 +197,11 @@ class Player:
                         print(attachments_list[a].get_name())
                         single_card_string += "|"
                         single_card_string += attachments_list[a].get_name()
+                        single_card_string += "+"
+                        if attachments_list[a].get_ready():
+                            single_card_string += "R"
+                        else:
+                            single_card_string += "E"
                     card_strings.append(single_card_string)
                 joined_string = "/".join(card_strings)
                 joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
@@ -1639,6 +1649,9 @@ class Player:
     def ready_all_in_headquarters(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].ready_card()
+            if self.game.phase == "HEADQUARTERS":
+                for j in range(len(self.headquarters[i].get_attachments())):
+                    self.headquarters[i].get_attachments()[j].ready_card()
 
     def ready_all_in_play(self):
         for i in range(len(self.cards_in_play[0])):
@@ -1648,6 +1661,9 @@ class Player:
     def ready_all_at_planet(self, planet_id):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             self.ready_given_pos(planet_id, i)
+            if self.game.phase == "HEADQUARTERS":
+                for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
+                    self.cards_in_play[planet_id + 1][i].get_attachments()[j].ready_card()
 
     def ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:

@@ -706,7 +706,7 @@ class Game:
                                         primary_player.set_damage_given_pos(planet_pos, unit_pos,
                                                                             self.damage_on_units_list_before_new_damage[
                                                                                 0])
-                                await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
                                 if primary_player.spend_resources(1):
                                     await primary_player.send_resources()
@@ -1125,6 +1125,43 @@ class Game:
                                                 primary_player.rout_unit(planet_pos, unit_pos)
                                                 await primary_player.send_hq()
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+            elif len(game_update_string) == 5:
+                if planet_pos == -2:
+                    if game_update_string[0] == "ATTACHMENT":
+                        if game_update_string[1] == "HQ":
+                            if game_update_string[2] == self.number_who_is_shielding:
+                                if int(game_update_string[3]) == unit_pos:
+                                    attachment_pos = int(game_update_string[4])
+                                    attachment = primary_player.headquarters[unit_pos].get_attachments()[attachment_pos]
+                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready():
+                                        attachment.exhaust_card()
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        self.pos_shield_card = -1
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                                        if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                                                self.damage_on_units_list_before_new_damage[0]:
+                                            primary_player.set_damage_given_pos(
+                                                planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+            elif len(game_update_string) == 6:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "IN_PLAY":
+                        if game_update_string[2] == self.number_who_is_shielding:
+                            if int(game_update_string[3]) == planet_pos:
+                                if int(game_update_string[4]) == unit_pos:
+                                    attachment_pos = int(game_update_string[5])
+                                    attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                        .get_attachments()[attachment_pos]
+                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready():
+                                        attachment.exhaust_card()
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        self.pos_shield_card = -1
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                                        if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                                                self.damage_on_units_list_before_new_damage[0]:
+                                            primary_player.set_damage_given_pos(
+                                                planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def resolve_reaction(self, name, game_update_string):
         if name == self.player_who_resolves_reaction[0]:
