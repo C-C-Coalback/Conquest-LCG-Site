@@ -149,6 +149,7 @@ class Game:
         self.fire_warrior_elite_active = False
         self.before_command_struggle = False
         self.after_command_struggle = True
+        self.amount_spend_for_tzeentch_firestorm = -1
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -564,6 +565,12 @@ class Game:
         self.reset_choices_available()
 
     async def resolve_choice(self, name, game_update_string):
+        if name == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
         if name == self.name_player_making_choices:
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
@@ -633,6 +640,14 @@ class Game:
                             elif name == self.name_2:
                                 self.p2.add_resources(3)
                         await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Amount to spend for Tzeentch's Firestorm:":
+                        print(self.choices_available[int(game_update_string[1])])
+                        if primary_player.spend_resources(int(game_update_string[1])):
+                            self.amount_spend_for_tzeentch_firestorm = int(game_update_string[1])
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if self.yvarn_active:

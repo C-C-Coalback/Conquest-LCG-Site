@@ -88,7 +88,7 @@ def chaos_cards_init():
                                               allowed_phases_in_hand="COMBAT"),
                         CardClasses.EventCard("Tzeentch's Firestorm", "Action: Deal X damage "
                                                                       "to a target non-warlord unit.", "Power. Tzeentch.",
-                                              999, "Chaos", "Loyal", 2, False, action_in_hand=True,
+                                              0, "Chaos", "Loyal", 2, False, action_in_hand=True,
                                               allowed_phases_in_hand="ALL"),
                         CardClasses.EventCard("Promise of Glory", "Deploy Action: Put 2 Cultist "
                                                                   "tokens into play at your HQ.",

@@ -164,6 +164,36 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await player_owning_card.send_units_at_planet(origin_planet)
                 else:
                     await self.game_sockets[0].receive_game_update("Invalid attachment movement.")
+    elif self.action_chosen == "Tzeentch's Firestorm":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        planet_pos = int(game_update_string[2])
+        unit_pos = int(game_update_string[3])
+        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
+            player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            self.amount_spend_for_tzeentch_firestorm = -1
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            if self.phase == "DEPLOY":
+                if not secondary_player.has_passed:
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.get_number()
+            await self.send_info_box()
+            await player_being_hit.send_units_at_planet(planet_pos)
+            await primary_player.send_hand()
+            await primary_player.send_discard()
     elif self.action_chosen == "Calculated Strike":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

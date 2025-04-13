@@ -116,6 +116,18 @@ async def update_game_event_action_hand(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Tzeentch's Firestorm":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        await primary_player.send_hand()
+                        self.choices_available = []
+                        for i in range(primary_player.resources + 1):
+                            self.choices_available.append(str(i))
+                            self.name_player_making_choices = primary_player.name_player
+                            self.choice_context = "Amount to spend for Tzeentch's Firestorm:"
+                            self.amount_spend_for_tzeentch_firestorm = -1
+                            await self.send_search()
                     elif ability == "Infernal Gateway":
                         self.action_chosen = "Infernal Gateway"
                         primary_player.aiming_reticle_color = "blue"
