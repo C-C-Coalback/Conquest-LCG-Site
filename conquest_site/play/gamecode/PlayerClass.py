@@ -62,7 +62,7 @@ class Player:
         self.warlord_just_got_bloodied = False
         self.condition_player_main = threading.Condition()
         self.condition_player_sub = threading.Condition()
-        self.aiming_reticle_color = None
+        self.aiming_reticle_color = "blue"
         self.aiming_reticle_coords_hand = None
         self.aiming_reticle_coords_hand_2 = None
         self.can_play_limited = True
@@ -372,8 +372,9 @@ class Player:
             self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
 
     def discard_card_from_hand(self, card_pos):
-        self.discard.append(self.cards[card_pos])
-        del self.cards[card_pos]
+        if len(self.cards) > card_pos:
+            self.discard.append(self.cards[card_pos])
+            del self.cards[card_pos]
 
     def remove_card_from_hand(self, card_pos):
         del self.cards[card_pos]
@@ -827,11 +828,15 @@ class Player:
                 if headquarters_list[i].get_card_type() == "Warlord":
                     print(headquarters_list[i].get_name())
                     summon_khymera = False
-                    if headquarters_list[i].get_ability() == "Packmaster Kith":
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
                         summon_khymera = True
-                    if headquarters_list[i].get_ability() == "Eldorath Starbane":
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
-                        self.game.positions_of_unit_triggering_reaction.append(int(self.number), planet_pos - 1, -1)
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
+                        self.game.reactions_needing_resolving.append("Commander Shadowsun")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
                     if summon_khymera:
@@ -853,6 +858,10 @@ class Player:
                         summon_khymera = True
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
+                        self.game.reactions_needing_resolving.append("Commander Shadowsun")
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, planet_pos - 1)

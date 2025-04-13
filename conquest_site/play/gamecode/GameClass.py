@@ -152,6 +152,12 @@ class Game:
         self.amount_spend_for_tzeentch_firestorm = -1
         self.searching_enemy_deck = False
         self.bottom_cards_after_search = True
+        self.resolving_commander_shadowsun = False
+        self.shadowsun_chose_hand = True
+        self.effects_waiting_on_resolution = []
+        self.player_resolving_effect = []
+        self.location_hand_attachment_shadowsun = -1
+        self.name_attachment_discard_shadowsun = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -668,6 +674,45 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Shadowsun plays attachment from hand or discard?":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        if game_update_string[1] == "0":
+                            self.shadowsun_chose_hand = True
+                            self.location_hand_attachment_shadowsun = -1
+                            self.effects_waiting_on_resolution.append("Commander Shadowsun")
+                            self.player_resolving_effect.append(name)
+                            await self.game_sockets[0].receive_game_update("Choose card in hand")
+                        else:
+                            self.shadowsun_chose_hand = False
+                            self.name_attachment_discard_shadowsun = ""
+                            self.choice_context = "Shadowsun attachment from discard:"
+                            self.name_player_making_choices = name
+                            for i in range(len(primary_player.discard)):
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
+                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                    if card.get_name() not in self.choices_available:
+                                        self.choices_available.append(card.get_name())
+                            if not self.choices_available:
+                                self.choice_context = ""
+                                self.name_player_making_choices = ""
+                                await self.game_sockets[0].receive_game_update("No valid cards in discard")
+                                self.resolving_commander_shadowsun = False
+                            else:
+                                await self.game_sockets[0].receive_game_update("Choose card in discard")
+                        await self.send_search()
+                    elif self.choice_context == "Shadowsun attachment from discard:":
+                        self.name_attachment_discard_shadowsun = self.choices_available[int(game_update_string[1])]
+                        await self.game_sockets[0].receive_game_update(
+                            "Selected a " + self.name_attachment_discard_shadowsun)
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.effects_waiting_on_resolution.append("Commander Shadowsun")
+                        self.player_resolving_effect.append(name)
+                        await self.send_search()
                     elif self.choice_context == "Which deck to use Biel-Tan Warp Spiders:":
                         self.choices_available = []
                         self.choice_context = ""
@@ -1538,6 +1583,94 @@ class Game:
         await self.p2.transform_indirect_into_damage()
         self.first_card_damaged = True
 
+    async def resolve_effect(self, name, game_update_string):
+        if name == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if name == self.player_resolving_effect[0]:
+            if self.effects_waiting_on_resolution[0] == "Commander Shadowsun":
+                if self.shadowsun_chose_hand:
+                    if len(game_update_string) == 3:
+                        if game_update_string[0] == "HAND":
+                            if game_update_string[1] == primary_player.get_number():
+                                if self.location_hand_attachment_shadowsun == -1:
+                                    hand_pos = int(game_update_string[2])
+                                    card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
+                                    if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
+                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        self.location_hand_attachment_shadowsun = hand_pos
+                                        primary_player.aiming_reticle_coords_hand = hand_pos
+                                        primary_player.aiming_reticle_color = "blue"
+                                        await primary_player.send_hand()
+                    elif len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == primary_player.warlord_commit_location:
+                                if game_update_string[1] == primary_player.number:
+                                    player_receiving_attachment = primary_player
+                                    own_attachment = True
+                                else:
+                                    player_receiving_attachment = secondary_player
+                                    own_attachment = False
+                                card = FindCard.find_card(primary_player.cards[self.location_hand_attachment_shadowsun],
+                                                          self.card_array)
+                                army_unit_as_attachment = False
+                                if card.get_name() == "Shadowsun's Stealth Cadre":
+                                    army_unit_as_attachment = True
+                                if player_receiving_attachment.play_attachment_card_to_in_play(
+                                        card, planet_pos, unit_pos, discounts=card.get_cost(),
+                                        not_own_attachment=own_attachment,
+                                        army_unit_as_attachment=army_unit_as_attachment):
+                                    primary_player.remove_card_from_hand(self.location_hand_attachment_shadowsun)
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    self.shadowsun_chose_hand = False
+                                    self.location_hand_attachment_shadowsun = -1
+                                    self.resolving_commander_shadowsun = False
+                                    del self.effects_waiting_on_resolution[0]
+                                    del self.player_resolving_effect[0]
+                                    await player_receiving_attachment.send_units_at_planet(planet_pos)
+                                    await primary_player.send_hand()
+                                else:
+                                    await self.game_sockets[0].receive_game_update("Invalid target")
+                else:
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == primary_player.warlord_commit_location:
+                                if game_update_string[1] == primary_player.number:
+                                    player_receiving_attachment = primary_player
+                                    own_attachment = True
+                                else:
+                                    player_receiving_attachment = secondary_player
+                                    own_attachment = False
+                                card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array)
+                                army_unit_as_attachment = False
+                                if card.get_name() == "Shadowsun's Stealth Cadre":
+                                    army_unit_as_attachment = True
+                                if player_receiving_attachment.play_attachment_card_to_in_play(
+                                        card, planet_pos, unit_pos, discounts=card.get_cost(),
+                                        not_own_attachment=own_attachment,
+                                        army_unit_as_attachment=army_unit_as_attachment):
+                                    i = 0
+                                    removed_card = False
+                                    while i < len(primary_player.discard) and not removed_card:
+                                        if primary_player.discard[i] == self.name_attachment_discard_shadowsun:
+                                            removed_card = True
+                                            del primary_player.discard[i]
+                                    self.name_attachment_discard_shadowsun = ""
+                                    self.resolving_commander_shadowsun = False
+                                    del self.effects_waiting_on_resolution[0]
+                                    del self.player_resolving_effect[0]
+                                    await primary_player.send_discard()
+                                    await player_receiving_attachment.send_units_at_planet(planet_pos)
+                                else:
+                                    await self.game_sockets[0].receive_game_update("Invalid target")
+
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
         print(game_update_string)
@@ -1549,6 +1682,8 @@ class Game:
                 await self.resolve_card_in_search_box(name, game_update_string)
                 if not self.cards_in_search_box:
                     await self.send_search()
+            if self.effects_waiting_on_resolution:
+                await self.resolve_effect(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
                 await self.apply_indirect_damage(name, game_update_string)
             elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
@@ -1588,57 +1723,70 @@ class Game:
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         if self.reactions_needing_resolving:
-            if self.reactions_needing_resolving[0] == "Enginseer Augur" and not self.resolving_enginseer_augur:
-                self.resolving_enginseer_augur = True
-                self.what_to_do_with_searched_card = "PLAY TO HQ"
-                self.traits_of_searched_card = None
-                self.card_type_of_searched_card = "Support"
-                self.faction_of_searched_card = "Astra Militarum"
-                self.max_cost_of_searched_card = 2
-                self.all_conditions_searched_card_required = True
-                self.no_restrictions_on_chosen_card = False
-                if self.player_who_resolves_reaction[0] == self.name_1:
-                    self.p1.number_cards_to_search = 6
-                    if len(self.p1.deck) > 5:
-                        self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+            if not self.resolving_commander_shadowsun and not self.resolving_enginseer_augur:
+                if self.reactions_needing_resolving[0] == "Enginseer Augur":
+                    self.resolving_enginseer_augur = True
+                    self.what_to_do_with_searched_card = "PLAY TO HQ"
+                    self.traits_of_searched_card = None
+                    self.card_type_of_searched_card = "Support"
+                    self.faction_of_searched_card = "Astra Militarum"
+                    self.max_cost_of_searched_card = 2
+                    self.all_conditions_searched_card_required = True
+                    self.no_restrictions_on_chosen_card = False
+                    if self.player_who_resolves_reaction[0] == self.name_1:
+                        self.p1.number_cards_to_search = 6
+                        if len(self.p1.deck) > 5:
+                            self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                        self.name_player_who_is_searching = self.p1.name_player
+                        self.number_who_is_searching = str(self.p1.number)
                     else:
-                        self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
-                    self.name_player_who_is_searching = self.p1.name_player
-                    self.number_who_is_searching = str(self.p1.number)
-                else:
-                    self.p2.number_cards_to_search = 6
-                    if len(self.p2.deck) > 5:
-                        self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
-                    else:
-                        self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
-                    self.name_player_who_is_searching = self.p2.name_player
-                    self.number_who_is_searching = str(self.p2.number)
-                del self.reactions_needing_resolving[0]
-                del self.positions_of_unit_triggering_reaction[0]
-                del self.player_who_resolves_reaction[0]
-                await self.send_search()
-                await self.send_info_box()
-            i = 0
-            while i < len(self.reactions_needing_resolving):
-                if self.reactions_needing_resolving[i] == "Mark of Chaos":
-                    if self.positions_of_unit_triggering_reaction[i][0] == 1:
-                        secondary_player = self.p2
-                    else:
-                        secondary_player = self.p1
-                    loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
-                    secondary_player.suffer_area_effect(loc_of_mark, 1)
-                    self.number_of_units_left_to_suffer_damage = \
-                        secondary_player.get_number_of_units_at_planet(loc_of_mark)
-                    if self.number_of_units_left_to_suffer_damage > 0:
-                        secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
-                        for j in range(1, self.number_of_units_left_to_suffer_damage):
-                            secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
-                    del self.positions_of_unit_triggering_reaction[i]
-                    del self.reactions_needing_resolving[i]
-                    del self.player_who_resolves_reaction[i]
-                    await secondary_player.send_units_at_planet(loc_of_mark)
-                    i = i - 1
-                i = i + 1
+                        self.p2.number_cards_to_search = 6
+                        if len(self.p2.deck) > 5:
+                            self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                        self.name_player_who_is_searching = self.p2.name_player
+                        self.number_who_is_searching = str(self.p2.number)
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
+                elif self.reactions_needing_resolving[0] == "Commander Shadowsun":
+                    await self.game_sockets[0].receive_game_update("Resolve shadowsun")
+                    self.resolving_commander_shadowsun = True
+                    self.choices_available = ["Hand", "Discard"]
+                    self.choice_context = "Shadowsun plays attachment from hand or discard?"
+                    self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                    self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
+                i = 0
+                while i < len(self.reactions_needing_resolving):
+                    if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                        if self.positions_of_unit_triggering_reaction[i][0] == 1:
+                            secondary_player = self.p2
+                        else:
+                            secondary_player = self.p1
+                        loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                        secondary_player.suffer_area_effect(loc_of_mark, 1)
+                        self.number_of_units_left_to_suffer_damage = \
+                            secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                        if self.number_of_units_left_to_suffer_damage > 0:
+                            secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                            for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                        del self.positions_of_unit_triggering_reaction[i]
+                        del self.reactions_needing_resolving[i]
+                        del self.player_who_resolves_reaction[i]
+                        await secondary_player.send_units_at_planet(loc_of_mark)
+                        i = i - 1
+                    i = i + 1
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 

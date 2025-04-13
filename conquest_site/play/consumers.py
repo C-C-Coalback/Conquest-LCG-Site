@@ -300,6 +300,16 @@ class GameConsumer(AsyncWebsocketConsumer):
                     for i in range(num_times):
                         active_games[self.game_position].p2.draw_card()
                     await active_games[self.game_position].p2.send_hand()
+            elif message[1] == "DISCARD" and len(message) > 3:
+                hand_pos = int(message[3])
+                if message[2] == "1":
+                    active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
+                    await active_games[self.game_position].p1.send_hand()
+                    await active_games[self.game_position].p1.send_discard()
+                elif message[2] == "2":
+                    active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
+                    await active_games[self.game_position].p2.send_hand()
+                    await active_games[self.game_position].p2.send_discard()
             else:
                 message = self.name + ": " + message[1]
                 print("receive:", message)
