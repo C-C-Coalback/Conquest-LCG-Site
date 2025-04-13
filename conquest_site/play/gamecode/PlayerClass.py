@@ -329,8 +329,18 @@ class Player:
                 self.add_card_to_planet(card, planet_pos)
                 del self.deck[deck_pos]
 
+    def discard_card_from_deck(self, deck_pos):
+        if not self.deck:
+            print("??? HOW DID YOU GET HERE ???")
+        else:
+            if len(self.deck) > deck_pos:
+                self.discard.append(self.deck[deck_pos])
+                del self.deck[deck_pos]
+
     def bottom_remaining_cards(self):
-        self.deck = self.deck[self.number_cards_to_search:] + self.deck[:self.number_cards_to_search]
+        if self.game.bottom_cards_after_search:
+            self.deck = self.deck[self.number_cards_to_search:] + self.deck[:self.number_cards_to_search]
+        self.game.bottom_cards_after_search = True
 
     def spend_resources(self, amount):
         if amount > self.resources:

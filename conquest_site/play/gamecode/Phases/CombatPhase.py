@@ -134,6 +134,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 player = self.p2
                                 other_player = self.p1
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Biel-Tan Warp Spiders":
+                                self.choices_available = ["Own deck", "Enemy deck"]
+                                self.name_player_making_choices = player.name_player
+                                self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
+                                await self.send_search()
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
                                     == "Wailing Wraithfighter":
                                 self.reactions_needing_resolving.append("Wailing Wraithfighter")

@@ -150,6 +150,8 @@ class Game:
         self.before_command_struggle = False
         self.after_command_struggle = True
         self.amount_spend_for_tzeentch_firestorm = -1
+        self.searching_enemy_deck = False
+        self.bottom_cards_after_search = True
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -466,6 +468,13 @@ class Game:
                                     self.action_chosen = ""
                                     await self.p1.send_hand()
                                 await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
+                            elif self.what_to_do_with_searched_card == "DISCARD":
+                                if self.searching_enemy_deck:
+                                    self.p2.discard_card_from_deck(int(game_update_string[1]))
+                                    await self.p2.send_discard()
+                                else:
+                                    self.p1.discard_card_from_deck(int(game_update_string[1]))
+                                    await self.p1.send_discard()
                             self.p1.number_cards_to_search -= 1
                             self.p1.bottom_remaining_cards()
                             self.reset_search_values()
@@ -498,6 +507,13 @@ class Game:
                                     self.action_chosen = ""
                                     await self.p2.send_hand()
                                 await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
+                            elif self.what_to_do_with_searched_card == "DISCARD":
+                                if self.searching_enemy_deck:
+                                    self.p1.discard_card_from_deck(int(game_update_string[1]))
+                                    await self.p1.send_discard()
+                                else:
+                                    self.p2.discard_card_from_deck(int(game_update_string[1]))
+                                    await self.p2.send_discard()
                             self.p2.number_cards_to_search -= 1
                             self.p2.bottom_remaining_cards()
                             self.reset_search_values()
@@ -595,16 +611,20 @@ class Game:
                                 await loser.send_discard()
                                 await self.resolve_battle_conclusion(name, game_update_string)
                             elif self.battle_ability_to_resolve == "Elouith":
-                                winner.number_cards_to_search = 3
-                                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
-                                self.name_player_who_is_searching = winner.name_player
-                                self.number_who_is_searching = str(winner.number)
-                                self.what_to_do_with_searched_card = "DRAW"
-                                self.traits_of_searched_card = None
-                                self.card_type_of_searched_card = None
-                                self.faction_of_searched_card = None
-                                self.max_cost_of_searched_card = None
-                                self.no_restrictions_on_chosen_card = True
+                                if len(winner.deck) > 2:
+                                    winner.number_cards_to_search = 3
+                                    self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                                    self.name_player_who_is_searching = winner.name_player
+                                    self.number_who_is_searching = str(winner.number)
+                                    self.what_to_do_with_searched_card = "DRAW"
+                                    self.traits_of_searched_card = None
+                                    self.card_type_of_searched_card = None
+                                    self.faction_of_searched_card = None
+                                    self.max_cost_of_searched_card = None
+                                    self.no_restrictions_on_chosen_card = True
+                                else:
+                                    await self.game_sockets[0].receive_game_update("Too few cards in deck for search")
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                                 await self.send_search()
                             elif self.battle_ability_to_resolve == "Tarrus":
                                 winner_count = winner.count_units_in_play_all()
@@ -648,6 +668,31 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Which deck to use Biel-Tan Warp Spiders:":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        if game_update_string[1] == "0":
+                            player = primary_player
+                            self.searching_enemy_deck = False
+                        else:
+                            player = secondary_player
+                            self.searching_enemy_deck = True
+                        if len(player.deck) > 1:
+                            player.number_cards_to_search = 2
+                            self.bottom_cards_after_search = False
+                            self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                            self.name_player_who_is_searching = primary_player.name_player
+                            self.number_who_is_searching = str(primary_player.number)
+                            self.what_to_do_with_searched_card = "DISCARD"
+                            self.traits_of_searched_card = None
+                            self.card_type_of_searched_card = None
+                            self.faction_of_searched_card = None
+                            self.max_cost_of_searched_card = None
+                            self.no_restrictions_on_chosen_card = True
+                        else:
+                            await self.game_sockets[0].receive_game_update("Too few cards in deck")
+                        await self.send_search()
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if self.yvarn_active:
