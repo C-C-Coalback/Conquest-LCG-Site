@@ -706,36 +706,45 @@ class Game:
                                         primary_player.set_damage_given_pos(planet_pos, unit_pos,
                                                                             self.damage_on_units_list_before_new_damage[
                                                                                 0])
-                            del self.positions_of_units_to_take_damage[0]
-                            del self.damage_on_units_list_before_new_damage[0]
-                            del self.positions_attackers_of_units_to_take_damage[0]
-                            if self.positions_of_units_to_take_damage:
-                                self.advance_damage_aiming_reticle()
-                            else:
-                                if self.damage_from_attack:
-                                    self.clear_attacker_aiming_reticle()
-                                await self.destroy_check_all_cards()
-                                if self.reactions_needing_resolving:
-                                    i = 0
-                                    while i < len(self.reactions_needing_resolving):
-                                        if self.reactions_needing_resolving[i] == "Mark of Chaos":
-                                            loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
-                                            secondary_player.suffer_area_effect(loc_of_mark, 1)
-                                            self.number_of_units_left_to_suffer_damage = \
-                                                secondary_player.get_number_of_units_at_planet(loc_of_mark)
-                                            if self.number_of_units_left_to_suffer_damage > 0:
-                                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
-                                                for j in range(1, self.number_of_units_left_to_suffer_damage):
-                                                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
-                                            del self.positions_of_unit_triggering_reaction[i]
-                                            del self.reactions_needing_resolving[i]
-                                            del self.player_who_resolves_reaction[i]
-                                            i = i - 1
-                                        i = i + 1
-                            await primary_player.send_units_at_planet(planet_pos)
-                            await secondary_player.send_units_at_planet(planet_pos)
-                            await primary_player.send_hand()
-                            await primary_player.send_discard()
+                                del self.positions_of_units_to_take_damage[0]
+                                del self.damage_on_units_list_before_new_damage[0]
+                                del self.positions_attackers_of_units_to_take_damage[0]
+                                if self.positions_of_units_to_take_damage:
+                                    self.advance_damage_aiming_reticle()
+                                else:
+                                    if self.damage_from_attack:
+                                        self.clear_attacker_aiming_reticle()
+                                    await self.destroy_check_all_cards()
+                                    if self.reactions_needing_resolving:
+                                        i = 0
+                                        while i < len(self.reactions_needing_resolving):
+                                            if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                                                loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                                                secondary_player.suffer_area_effect(loc_of_mark, 1)
+                                                self.number_of_units_left_to_suffer_damage = \
+                                                    secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                                                if self.number_of_units_left_to_suffer_damage > 0:
+                                                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                                                    for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                                        secondary_player.set_aiming_reticle_in_play(
+                                                            loc_of_mark, j, "blue")
+                                                del self.positions_of_unit_triggering_reaction[i]
+                                                del self.reactions_needing_resolving[i]
+                                                del self.player_who_resolves_reaction[i]
+                                                i = i - 1
+                                            i = i + 1
+                                await primary_player.send_units_at_planet(planet_pos)
+                                await secondary_player.send_units_at_planet(planet_pos)
+                                await primary_player.send_hand()
+                                await primary_player.send_discard()
+                            elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
+                                if primary_player.spend_resources(1):
+                                    await primary_player.send_resources()
+                                    primary_player.aiming_reticle_coords_hand = self.pos_shield_card
+                                    primary_player.aiming_reticle_color = "blue"
+                                    await primary_player.send_hand()
+                                    self.effects_waiting_on_resolution.append("Glorious Intervention")
+                                    self.player_resolving_effect.append(primary_player.name_player)
                     elif self.choice_context == "Shadowsun plays attachment from hand or discard?":
                         self.choices_available = []
                         self.choice_context = ""
@@ -1757,6 +1766,49 @@ class Game:
                                     await player_receiving_attachment.send_units_at_planet(planet_pos)
                                 else:
                                     await self.game_sockets[0].receive_game_update("Invalid target")
+            elif self.effects_waiting_on_resolution[0] == "Glorious Intervention":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == primary_player.get_number():
+                            pos_holder = self.positions_of_units_to_take_damage[0]
+                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                            sac_planet_pos = int(game_update_string[2])
+                            sac_unit_pos = int(game_update_string[3])
+                            if sac_planet_pos == planet_pos:
+                                if sac_unit_pos != unit_pos:
+                                    if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos].\
+                                            get_card_type() != "Warlord":
+                                        if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]\
+                                                .check_for_a_trait("Warrior") or \
+                                                primary_player.cards_in_play[sac_planet_pos + 1][unit_pos]\
+                                                .check_for_a_trait("Soldier"):
+                                            primary_player.aiming_reticle_coords_hand = None
+                                            primary_player.discard_card_from_hand(self.pos_shield_card)
+                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                            self.pos_shield_card = -1
+                                            printed_atk = primary_player.cards_in_play[
+                                                sac_planet_pos + 1][sac_unit_pos].attack
+                                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                                                    self.damage_on_units_list_before_new_damage[0]:
+                                                primary_player.set_damage_given_pos(
+                                                    planet_pos, unit_pos,
+                                                    self.damage_on_units_list_before_new_damage[0])
+                                            primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
+                                            att_num, att_pla, att_pos = \
+                                                self.positions_attackers_of_units_to_take_damage[0]
+                                            secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
+                                            del self.effects_waiting_on_resolution[0]
+                                            del self.player_resolving_effect[0]
+                                            del self.positions_of_units_to_take_damage[0]
+                                            del self.damage_on_units_list_before_new_damage[0]
+                                            del self.positions_attackers_of_units_to_take_damage[0]
+                                            if self.positions_of_units_to_take_damage:
+                                                self.advance_damage_aiming_reticle()
+                                            await primary_player.send_units_at_planet(planet_pos)
+                                            await secondary_player.send_units_at_planet(planet_pos)
+                                            await primary_player.send_hand()
+                                            await primary_player.send_discard()
 
     async def update_game_event(self, name, game_update_string):
         self.condition_main_game.acquire()
@@ -1780,6 +1832,7 @@ class Game:
                 await self.resolve_choice(name, game_update_string)
             elif self.reactions_needing_resolving:
                 print("Resolve reaction")
+                print(self.reactions_needing_resolving[0])
                 await self.resolve_reaction(name, game_update_string)
             elif self.positions_of_units_to_take_damage:
                 print("Using better shield mechanism")

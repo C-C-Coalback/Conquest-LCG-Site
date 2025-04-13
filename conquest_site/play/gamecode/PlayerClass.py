@@ -1467,8 +1467,6 @@ class Player:
             if xavaes_check:
                 self.game.summon_enemy_token_at_hq(self.number, "Cultist", 1)
                 self.game.hqs_need_sending_outside_normal_sends = True
-            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
-                self.summon_token_at_planet("Guardsman", planet_num)
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
@@ -1520,6 +1518,8 @@ class Player:
                 self.draw_card()
                 self.draw_card()
                 self.game.cards_need_sending_outside_normal_sends = True
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
+            self.summon_token_at_planet("Guardsman", planet_num)
         if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
             self.game.reactions_needing_resolving.append("Mark of Chaos")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
