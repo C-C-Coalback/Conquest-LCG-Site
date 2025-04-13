@@ -3,7 +3,11 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
+All warlords are implemented!
+
 The Orks are fully implemented!
+
+The Drukhari (Dark Eldar) are fully implemented!
 
 # What is this?
 
