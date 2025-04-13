@@ -1038,6 +1038,11 @@ class Game:
                                                    str(current_unit)]
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, last_game_update_string)
+                    if self.reactions_needing_resolving[0] == "Soul Grinder":
+                        planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+                        unit_pos = self.positions_of_unit_triggering_reaction[0][2]
+                        secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        await secondary_player.send_units_at_planet(planet_pos)
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
@@ -1177,6 +1182,21 @@ class Game:
                                     await primary_player.send_units_at_planet(planet_pos)
                                     await primary_player.send_discard()
                                     await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Soul Grinder":
+                            if primary_player.get_number() == game_update_string[1]:
+                                planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
+                                unit_pos_sg = self.positions_of_unit_triggering_reaction[0][2]
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if planet_pos == planet_pos_sg:
+                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                                        primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                        secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                        await secondary_player.send_units_at_planet(planet_pos)
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
                         elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
                             if game_update_string[1] == primary_player.get_number():
                                 current_planet, current_unit = self.last_defender_position
