@@ -942,6 +942,11 @@ class Player:
     def get_ignores_flying_given_pos(self, planet_id, unit_id):
         return self.cards_in_play[planet_id + 1][unit_id].get_ignores_flying()
 
+    def get_faction_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_faction()
+        return self.cards_in_play[planet_id + 1][unit_id].get_faction()
+
     def get_ability_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_ability()

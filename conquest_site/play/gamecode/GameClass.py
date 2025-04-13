@@ -158,6 +158,12 @@ class Game:
         self.player_resolving_effect = []
         self.location_hand_attachment_shadowsun = -1
         self.name_attachment_discard_shadowsun = ""
+        self.recently_damaged_units = []
+        self.units_damaged_by_attack = []
+        self.units_damaged_by_attack_from_sm = []
+        self.alternative_shields = ["Indomitable", "Glorious Intervention"]
+        self.last_shield_string = ""
+        self.pos_shield_card = -1
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -674,6 +680,62 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Use alternative shield effect?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            await self.better_shield_card_resolution(name, self.last_shield_string, alt_shields=False)
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            pos_holder = self.positions_of_units_to_take_damage[0]
+                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                            if primary_player.cards[self.pos_shield_card] == "Indomitable":
+                                if primary_player.spend_resources(1):
+                                    await primary_player.send_resources()
+                                    primary_player.discard_card_from_hand(self.pos_shield_card)
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    self.pos_shield_card = -1
+                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                                    if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                                            self.damage_on_units_list_before_new_damage[0]:
+                                        primary_player.set_damage_given_pos(planet_pos, unit_pos,
+                                                                            self.damage_on_units_list_before_new_damage[
+                                                                                0])
+                            del self.positions_of_units_to_take_damage[0]
+                            del self.damage_on_units_list_before_new_damage[0]
+                            del self.positions_attackers_of_units_to_take_damage[0]
+                            if self.positions_of_units_to_take_damage:
+                                self.advance_damage_aiming_reticle()
+                            else:
+                                if self.damage_from_attack:
+                                    self.clear_attacker_aiming_reticle()
+                                await self.destroy_check_all_cards()
+                                if self.reactions_needing_resolving:
+                                    i = 0
+                                    while i < len(self.reactions_needing_resolving):
+                                        if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                                            loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                                            secondary_player.suffer_area_effect(loc_of_mark, 1)
+                                            self.number_of_units_left_to_suffer_damage = \
+                                                secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                                            if self.number_of_units_left_to_suffer_damage > 0:
+                                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                                                for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                                            del self.positions_of_unit_triggering_reaction[i]
+                                            del self.reactions_needing_resolving[i]
+                                            del self.player_who_resolves_reaction[i]
+                                            i = i - 1
+                                        i = i + 1
+                            await primary_player.send_units_at_planet(planet_pos)
+                            await secondary_player.send_units_at_planet(planet_pos)
+                            await primary_player.send_hand()
+                            await primary_player.send_discard()
                     elif self.choice_context == "Shadowsun plays attachment from hand or discard?":
                         self.choices_available = []
                         self.choice_context = ""
@@ -1001,7 +1063,7 @@ class Game:
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
 
-    async def better_shield_card_resolution(self, name, game_update_string):
+    async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True):
         if name == self.player_who_is_shielding:
             pos_holder = self.positions_of_units_to_take_damage[0]
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
@@ -1059,7 +1121,32 @@ class Game:
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hand_pos = int(game_update_string[2])
                         shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos)
-                        if shields > 0:
+                        alt_shield_check = False
+                        if alt_shields:
+                            if primary_player.cards[hand_pos] in self.alternative_shields:
+                                if primary_player.cards[hand_pos] == "Indomitable":
+                                    if primary_player.resources > 0:
+                                        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                            if primary_player.get_faction_given_pos(
+                                                    planet_pos, unit_pos) == "Space Marines":
+                                                alt_shield_check = True
+                                                self.pos_shield_card = hand_pos
+                                                self.choices_available = ["Shield", "Effect"]
+                                                self.name_player_making_choices = name
+                                                self.choice_context = "Use alternative shield effect?"
+                                                self.last_shield_string = game_update_string
+                                                await self.send_search()
+                                elif primary_player.cards[hand_pos] == "Glorious Intervention":
+                                    if primary_player.resources > 0:
+                                        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                            alt_shield_check = True
+                                            self.pos_shield_card = hand_pos
+                                            self.choices_available = ["Shield", "Effect"]
+                                            self.name_player_making_choices = name
+                                            self.choice_context = "Use alternative shield effect?"
+                                            self.last_shield_string = game_update_string
+                                            await self.send_search()
+                        if shields > 0 and not alt_shield_check:
                             took_damage = True
                             primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                             if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
