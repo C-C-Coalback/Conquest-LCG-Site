@@ -147,6 +147,8 @@ class Game:
         self.banshee_power_sword_extra_attack = 0
         self.may_move_defender = True
         self.fire_warrior_elite_active = False
+        self.before_command_struggle = False
+        self.after_command_struggle = True
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -852,6 +854,8 @@ class Game:
             self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
 
     async def change_phase(self, new_val, refresh_abilities=True):
+        self.p1.has_passed = False
+        self.p2.has_passed = False
         self.phase = new_val
         if self.phase == "COMMAND":
             self.committing_warlords = True

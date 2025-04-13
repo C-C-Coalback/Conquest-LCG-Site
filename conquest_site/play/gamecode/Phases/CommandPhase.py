@@ -2,8 +2,11 @@ from .. import FindCard
 
 
 async def update_game_event_command_section(self, name, game_update_string):
-    print("Run warlord assignment code.")
-    if self.committing_warlords:
+    print("Run command code.")
+    if self.mode == "ACTION":
+        await self.update_game_event_action(name, game_update_string)
+    elif self.committing_warlords:
+        print("Warlord assignment")
         if len(game_update_string) == 2:
             if game_update_string[0] == "PLANETS":
                 print("Save warlord to this planet")
@@ -28,9 +31,11 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p1.has_passed = False
                     self.p2.has_passed = False
                     self.committing_warlords = False
+                    self.before_command_struggle =True
                     await self.game_sockets[0].receive_game_update("Both players are given a chance to resolve "
                                                                    "cards/reactions before the command struggle.")
-    else:
+    elif self.before_command_struggle:
+        print("Before command struggle")
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.name_1:
@@ -63,7 +68,23 @@ async def update_game_event_command_section(self, name, game_update_string):
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             await primary_player.send_hand()
-        if self.p1.has_passed and self.p2.has_passed:
+    elif self.after_command_struggle:
+        print("After command struggle")
+        if len(game_update_string) == 1:
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                if name == self.name_1:
+                    self.p1.has_passed = True
+                elif name == self.name_2:
+                    self.p2.has_passed = True
+            if game_update_string[0] == "action-button":
+                if self.actions_allowed and self.mode != "ACTION":
+                    self.stored_mode = self.mode
+                    self.mode = "ACTION"
+                    self.player_with_action = name
+                    await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+    if self.p1.has_passed and self.p2.has_passed:
+        print("Both passed")
+        if self.before_command_struggle:
             resolve_command_struggle(self)
             await self.p1.send_hand()
             await self.p2.send_hand()
@@ -71,6 +92,14 @@ async def update_game_event_command_section(self, name, game_update_string):
             await self.p2.send_resources()
             await self.p1.send_units_at_all_planets()
             await self.p2.send_units_at_all_planets()
+            self.before_command_struggle = False
+            self.after_command_struggle = True
+            self.p1.has_passed = False
+            self.p2.has_passed = False
+            await self.game_sockets[0].receive_game_update("Window given for actions after command struggle.")
+        elif self.after_command_struggle:
+            self.before_command_struggle = False
+            self.after_command_struggle = False
             await self.change_phase("COMBAT")
             self.p1.set_available_mobile_all(True)
             self.p2.set_available_mobile_all(True)

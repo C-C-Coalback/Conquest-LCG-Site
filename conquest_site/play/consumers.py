@@ -281,10 +281,24 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
             elif message[1] == "DRAW" and len(message) > 2:
                 if message[2] == "1":
-                    active_games[self.game_position].p1.draw_card()
+                    num_times = 1
+                    if len(message) == 4:
+                        try:
+                            num_times = int(message[3])
+                        except:
+                            pass
+                    for i in range(num_times):
+                        active_games[self.game_position].p1.draw_card()
                     await active_games[self.game_position].p1.send_hand()
                 elif message[2] == "2":
-                    active_games[self.game_position].p2.draw_card()
+                    num_times = 1
+                    if len(message) == 4:
+                        try:
+                            num_times = int(message[3])
+                        except:
+                            pass
+                    for i in range(num_times):
+                        active_games[self.game_position].p2.draw_card()
                     await active_games[self.game_position].p2.send_hand()
             else:
                 message = self.name + ": " + message[1]
