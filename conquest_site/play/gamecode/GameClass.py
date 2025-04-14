@@ -96,7 +96,7 @@ class Game:
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
-        self.name_player_who_is_searching = "alex"
+        self.name_player_who_is_searching = ""
         self.number_who_is_searching = "1"
         self.what_to_do_with_searched_card = "DRAW"
         self.traits_of_searched_card = None
@@ -143,7 +143,7 @@ class Game:
         self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
         self.alaitoc_shrine_activated = False
-        self.resolving_enginseer_augur = False
+        self.resolving_search_box = False
         self.banshee_power_sword_extra_attack = 0
         self.may_move_defender = True
         self.fire_warrior_elite_active = False
@@ -152,7 +152,6 @@ class Game:
         self.amount_spend_for_tzeentch_firestorm = -1
         self.searching_enemy_deck = False
         self.bottom_cards_after_search = True
-        self.resolving_commander_shadowsun = False
         self.shadowsun_chose_hand = True
         self.effects_waiting_on_resolution = []
         self.player_resolving_effect = []
@@ -452,8 +451,8 @@ class Game:
                     else:
                         self.p2.bottom_remaining_cards()
                     self.cards_in_search_box = []
-                    if self.resolving_enginseer_augur:
-                        self.resolving_enginseer_augur = False
+                    if self.resolving_search_box:
+                        self.resolving_search_box = False
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
@@ -469,8 +468,8 @@ class Game:
                             elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
                                 self.p1.add_to_hq(card_chosen)
                                 del self.p1.deck[int(game_update_string[1])]
-                                if self.resolving_enginseer_augur:
-                                    self.resolving_enginseer_augur = False
+                                if self.resolving_search_box:
+                                    self.resolving_search_box = False
                                 await self.p1.send_hq()
                             elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                                 self.p1.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
@@ -509,8 +508,8 @@ class Game:
                             elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
                                 self.p2.add_to_hq(card_chosen)
                                 del self.p2.deck[int(game_update_string[1])]
-                                if self.resolving_enginseer_augur:
-                                    self.resolving_enginseer_augur = False
+                                if self.resolving_search_box:
+                                    self.resolving_search_box = False
                             elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                                 self.p2.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                              int(game_update_string[1]), card_chosen)
@@ -699,6 +698,43 @@ class Game:
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
+                    elif self.choice_context == "Target Holy Sepulchre:":
+                        target = self.choices_available[int(game_update_string[1])]
+                        primary_player.cards.append(target)
+                        primary_player.discard.remove(target)
+                        primary_player.stored_cards_recently_discarded.remove(target)
+                        primary_player.exhaust_card_in_hq_given_name("Holy Sepulchre")
+                        self.choices_available = []
+                        if self.holy_sepulchre_check(primary_player):
+                            for i in range(len(primary_player.stored_cards_recently_discarded)):
+                                card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
+                                                          self.card_array)
+                                if card.get_faction() == "Space Marines" and card.get_is_unit():
+                                    self.cards_in_search_box.append(card.get_name())
+                        if not self.choices_available:
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                        await self.send_search()
+                        await primary_player.send_hq()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                    elif self.choice_context == "Use Holy Sepulchre?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Target Holy Sepulchre:"
+                            for i in range(len(primary_player.stored_cards_recently_discarded)):
+                                card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
+                                                          self.card_array)
+                                if card.get_faction() == "Space Marines" and card.get_is_unit():
+                                    self.choices_available.append(card.get_name())
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            await self.send_search()
                     elif self.choice_context == "Use The Fury of Sicarius?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -782,7 +818,7 @@ class Game:
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
                                 await self.game_sockets[0].receive_game_update("No valid cards in discard")
-                                self.resolving_commander_shadowsun = False
+                                self.resolving_search_box = False
                             else:
                                 await self.game_sockets[0].receive_game_update("Choose card in discard")
                         await self.send_search()
@@ -1025,6 +1061,14 @@ class Game:
                 i = i - 1
             i = i + 1
 
+    def holy_sepulchre_check(self, player):
+        if player.search_card_in_hq("Holy Sepulchre", ready_relevant=True):
+            for card_name in player.stored_cards_recently_discarded:
+                card = FindCard.find_card(card_name, self.card_array)
+                if card.get_faction() == "Space Marines" and card.get_is_unit():
+                    return True
+        return False
+
     async def destroy_check_all_cards(self):
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
@@ -1036,8 +1080,32 @@ class Game:
             await self.destroy_check_cards_at_planet(self.p2, i)
         await self.destroy_check_cards_in_hq(self.p1)
         await self.destroy_check_cards_in_hq(self.p2)
+        self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
+        self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
+        if self.holy_sepulchre_check(self.p1):
+            already_sepulchre = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Holy Sepulchre":
+                    if self.player_who_resolves_reaction[i] == self.name_1:
+                        already_sepulchre = True
+            if not already_sepulchre:
+                self.reactions_needing_resolving.append("Holy Sepulchre")
+                self.player_who_resolves_reaction.append(self.name_1)
+                self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+        if self.holy_sepulchre_check(self.p2):
+            already_sepulchre = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Holy Sepulchre":
+                    if self.player_who_resolves_reaction[i] == self.name_2:
+                        already_sepulchre = True
+            if not already_sepulchre:
+                self.reactions_needing_resolving.append("Holy Sepulchre")
+                self.player_who_resolves_reaction.append(self.name_2)
+                self.positions_of_unit_triggering_reaction.append((2, -1, -1))
         await self.p1.send_resources()
         await self.p2.send_resources()
+        await self.p1.send_discard()
+        await self.p2.send_discard()
 
     def advance_damage_aiming_reticle(self):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -1766,7 +1834,7 @@ class Game:
                                     primary_player.aiming_reticle_coords_hand = None
                                     self.shadowsun_chose_hand = False
                                     self.location_hand_attachment_shadowsun = -1
-                                    self.resolving_commander_shadowsun = False
+                                    self.resolving_search_box = False
                                     del self.effects_waiting_on_resolution[0]
                                     del self.player_resolving_effect[0]
                                     await player_receiving_attachment.send_units_at_planet(planet_pos)
@@ -1800,7 +1868,7 @@ class Game:
                                             removed_card = True
                                             del primary_player.discard[i]
                                     self.name_attachment_discard_shadowsun = ""
-                                    self.resolving_commander_shadowsun = False
+                                    self.resolving_search_box = False
                                     del self.effects_waiting_on_resolution[0]
                                     del self.player_resolving_effect[0]
                                     await primary_player.send_discard()
@@ -1992,9 +2060,9 @@ class Game:
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         if self.reactions_needing_resolving:
-            if not self.resolving_commander_shadowsun and not self.resolving_enginseer_augur:
+            if not self.resolving_search_box:
                 if self.reactions_needing_resolving[0] == "Enginseer Augur":
-                    self.resolving_enginseer_augur = True
+                    self.resolving_search_box = True
                     self.what_to_do_with_searched_card = "PLAY TO HQ"
                     self.traits_of_searched_card = None
                     self.card_type_of_searched_card = "Support"
@@ -2023,9 +2091,19 @@ class Game:
                     del self.player_who_resolves_reaction[0]
                     await self.send_search()
                     await self.send_info_box()
+                elif self.reactions_needing_resolving[0] == "Holy Sepulchre":
+                    self.resolving_search_box = True
+                    self.choices_available = ["Yes", "No"]
+                    self.choice_context = "Use Holy Sepulchre?"
+                    self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
                 elif self.reactions_needing_resolving[0] == "Commander Shadowsun":
                     await self.game_sockets[0].receive_game_update("Resolve shadowsun")
-                    self.resolving_commander_shadowsun = True
+                    self.resolving_search_box = True
                     self.choices_available = ["Hand", "Discard"]
                     self.choice_context = "Shadowsun plays attachment from hand or discard?"
                     self.name_player_making_choices = self.player_who_resolves_reaction[0]

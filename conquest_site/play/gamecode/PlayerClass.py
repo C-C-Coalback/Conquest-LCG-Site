@@ -70,6 +70,8 @@ class Player:
         self.mobile_resolved = True
         self.indirect_damage_applied = 0
         self.total_indirect_damage = 0
+        self.cards_recently_discarded = []
+        self.stored_cards_recently_discarded = []
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -266,6 +268,13 @@ class Player:
         else:
             joined_string = "GAME_INFO/DISCARD/" + str(self.number) + "/" + top_card
             await self.game.game_sockets[0].receive_game_update(joined_string)
+
+    def exhaust_card_in_hq_given_name(self, card_name):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_name() == card_name and self.headquarters[i].get_ready():
+                self.exhaust_given_pos(-2, i)
+                return True
+        return False
 
     def get_headquarters(self):
         return self.headquarters
@@ -1593,6 +1602,7 @@ class Player:
             self.game.player_who_resolves_reaction.append(self.name_player)
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
         self.discard.append(card_name)
+        self.cards_recently_discarded.append(card_name)
         self.remove_card_from_play(planet_num, card_pos)
 
     def add_card_in_hq_to_discard(self, card_pos):
@@ -1623,6 +1633,7 @@ class Player:
             self.game.player_who_resolves_reaction.append(self.name_player)
             self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
         self.discard.append(card_name)
+        self.cards_recently_discarded.append(card_name)
         self.remove_card_from_hq(card_pos)
 
     def retreat_warlord(self):
