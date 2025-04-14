@@ -72,6 +72,8 @@ class Player:
         self.total_indirect_damage = 0
         self.cards_recently_discarded = []
         self.stored_cards_recently_discarded = []
+        self.cards_recently_destroyed = []
+        self.stored_cards_recently_destroyed = []
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1463,6 +1465,7 @@ class Player:
                 self.game.reactions_needing_resolving.append("Shrouded Harlequin")
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                 self.game.player_who_resolves_reaction.append(self.name_player)
+            self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
 
     def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True):
@@ -1512,6 +1515,7 @@ class Player:
                 self.game.reactions_needing_resolving.append("Shrouded Harlequin")
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                 self.game.player_who_resolves_reaction.append(self.name_player)
+            self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
     def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True):

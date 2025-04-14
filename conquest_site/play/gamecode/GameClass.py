@@ -710,7 +710,7 @@ class Game:
                                 card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
                                                           self.card_array)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
-                                    self.cards_in_search_box.append(card.get_name())
+                                    self.choices_available.append(card.get_name())
                         if not self.choices_available:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
@@ -719,6 +719,46 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Target Fall Back:":
+                        primary_player.spend_resources(1)
+                        target = self.choices_available[int(game_update_string[1])]
+                        card = FindCard.find_card(target, self.card_array)
+                        primary_player.add_to_hq(card)
+                        primary_player.discard.remove(target)
+                        primary_player.stored_cards_recently_discarded.remove(target)
+                        primary_player.stored_cards_recently_destroyed.remove(target)
+                        primary_player.discard_card_name_from_hand("Fall Back!")
+                        self.choices_available = []
+                        if self.fall_back_check(primary_player):
+                            for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                                card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                                          self.card_array)
+                                if card.check_for_a_trait("Elite") and card.get_is_unit():
+                                    self.choices_available.append(card.get_name())
+                        if not self.choices_available:
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                        await self.send_search()
+                        await primary_player.send_hq()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                    elif self.choice_context == "Use Fall Back?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Target Fall Back:"
+                            for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                                card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                                          self.card_array)
+                                if card.check_for_a_trait("Elite") and card.get_is_unit():
+                                    self.choices_available.append(card.get_name())
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            await self.send_search()
                     elif self.choice_context == "Use Holy Sepulchre?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1069,11 +1109,24 @@ class Game:
                     return True
         return False
 
+    def fall_back_check(self, player):
+        if player.search_hand_for_card("Fall Back!"):
+            if player.resources > 0:
+                for card_name in player.stored_cards_recently_discarded:
+                    card = FindCard.find_card(card_name, self.card_array)
+                    if card.check_for_a_trait("Elite"):
+                        return True
+        return False
+
     async def destroy_check_all_cards(self):
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
         self.faction_of_attacker = []
         self.furiable_unit_position = (-1, -1)
+        self.p1.cards_recently_discarded = []
+        self.p2.cards_recently_discarded = []
+        self.p1.cards_recently_destroyed = []
+        self.p2.cards_recently_destroyed = []
         print("All units have been damaged. Move to destruction")
         for i in range(7):
             await self.destroy_check_cards_at_planet(self.p1, i)
@@ -1082,6 +1135,28 @@ class Game:
         await self.destroy_check_cards_in_hq(self.p2)
         self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
         self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
+        self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
+        self.p2.stored_cards_recently_destroyed = copy.deepcopy(self.p2.cards_recently_destroyed)
+        if self.fall_back_check(self.p1):
+            already_fall_back = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Fall Back!":
+                    if self.player_who_resolves_reaction[i] == self.name_1:
+                        already_fall_back = True
+            if not already_fall_back:
+                self.reactions_needing_resolving.append("Fall Back!")
+                self.player_who_resolves_reaction.append(self.name_1)
+                self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+        if self.fall_back_check(self.p2):
+            already_fall_back = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Fall Back!":
+                    if self.player_who_resolves_reaction[i] == self.name_2:
+                        already_fall_back = True
+            if not already_fall_back:
+                self.reactions_needing_resolving.append("Fall Back!")
+                self.player_who_resolves_reaction.append(self.name_2)
+                self.positions_of_unit_triggering_reaction.append((2, -1, -1))
         if self.holy_sepulchre_check(self.p1):
             already_sepulchre = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -2086,6 +2161,16 @@ class Game:
                             self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
                         self.name_player_who_is_searching = self.p2.name_player
                         self.number_who_is_searching = str(self.p2.number)
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
+                elif self.reactions_needing_resolving[0] == "Fall Back!":
+                    self.resolving_search_box = True
+                    self.choices_available = ["Yes", "No"]
+                    self.choice_context = "Use Fall Back?"
+                    self.name_player_making_choices = self.player_who_resolves_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.player_who_resolves_reaction[0]
