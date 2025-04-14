@@ -1095,6 +1095,19 @@ class Player:
                     automatic_discounts += 1
         return discounts_available, automatic_discounts
 
+    def search_hand_for_card(self, card_name):
+        print("Looking for", card_name)
+        for i in range(len(self.cards)):
+            print(self.cards[i])
+            if self.cards[i] == card_name:
+                return True
+        return False
+
+    def get_card_type_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].get_card_type()
+        return self.cards_in_play[planet_pos + 1][unit_pos].get_card_type()
+
     def search_hand_for_discounts(self, faction_of_card):
         discounts_available = 0
         for i in range(len(self.cards)):

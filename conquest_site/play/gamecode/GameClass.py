@@ -158,12 +158,15 @@ class Game:
         self.player_resolving_effect = []
         self.location_hand_attachment_shadowsun = -1
         self.name_attachment_discard_shadowsun = ""
-        self.recently_damaged_units = []
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
         self.alternative_shields = ["Indomitable", "Glorious Intervention"]
         self.last_shield_string = ""
         self.pos_shield_card = -1
+        self.recently_damaged_units = []
+        self.damage_taken_was_from_attack = []
+        self.faction_of_attacker = []
+        self.furiable_unit_position = (-1, -1)
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -696,6 +699,29 @@ class Game:
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
+                    elif self.choice_context == "Use The Fury of Sicarius?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            primary_player.spend_resources(2)
+                            primary_player.discard_card_name_from_hand("The Fury of Sicarius")
+                            await primary_player.send_hand()
+                            await primary_player.send_discard()
+                            planet_pos, unit_pos = self.furiable_unit_position
+                            secondary_player.set_damage_given_pos(planet_pos, unit_pos, 999)
+                            await self.destroy_check_all_cards()
+                            await secondary_player.send_units_at_planet(planet_pos)
+                            await primary_player.send_units_at_planet(planet_pos)
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            await self.destroy_check_all_cards()
+                            await primary_player.send_units_at_planet(self.last_planet_checked_for_battle)
+                            await secondary_player.send_units_at_planet(self.last_planet_checked_for_battle)
                     elif self.choice_context == "Use alternative shield effect?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1000,12 +1026,18 @@ class Game:
             i = i + 1
 
     async def destroy_check_all_cards(self):
+        self.recently_damaged_units = []
+        self.damage_taken_was_from_attack = []
+        self.faction_of_attacker = []
+        self.furiable_unit_position = (-1, -1)
         print("All units have been damaged. Move to destruction")
         for i in range(7):
             await self.destroy_check_cards_at_planet(self.p1, i)
             await self.destroy_check_cards_at_planet(self.p2, i)
         await self.destroy_check_cards_in_hq(self.p1)
         await self.destroy_check_cards_in_hq(self.p2)
+        await self.p1.send_resources()
+        await self.p2.send_resources()
 
     def advance_damage_aiming_reticle(self):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -1071,8 +1103,11 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                        self.damage_taken_was_from_attack.append(True)
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                        self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
                             if att_num == 1:
                                 self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
@@ -1083,6 +1118,9 @@ class Game:
                                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                                     primary_player.rout_unit(planet_pos, unit_pos)
                                     await primary_player.send_hq()
+                    else:
+                        self.damage_taken_was_from_attack.append(False)
+                        self.faction_of_attacker.append("")
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
@@ -1137,8 +1175,13 @@ class Game:
                                 primary_player.discard_card_from_hand(hand_pos)
                                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                 if took_damage:
+                                    self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                        self.damage_taken_was_from_attack.append(True)
                                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                        self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
+                                            att_pla, att_pos
+                                        ))
                                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                     "Repulsor Impact Field"):
                                             if att_num == 1:
@@ -1152,6 +1195,9 @@ class Game:
                                                         .get_card_type() != "Warlord":
                                                     primary_player.rout_unit(planet_pos, unit_pos)
                                                     await primary_player.send_hq()
+                                    else:
+                                        self.damage_taken_was_from_attack.append(False)
+                                        self.faction_of_attacker.append("")
                                 await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                 elif game_update_string[0] == "HQ":
                     if game_update_string[1] == str(self.number_who_is_shielding):
@@ -1838,24 +1884,56 @@ class Game:
         else:
             if self.damage_from_attack:
                 self.clear_attacker_aiming_reticle()
-            await self.destroy_check_all_cards()
-            if self.reactions_needing_resolving:
-                i = 0
-                while i < len(self.reactions_needing_resolving):
-                    if self.reactions_needing_resolving[i] == "Mark of Chaos":
-                        loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
-                        secondary_player.suffer_area_effect(loc_of_mark, 1)
-                        self.number_of_units_left_to_suffer_damage = \
-                            secondary_player.get_number_of_units_at_planet(loc_of_mark)
-                        if self.number_of_units_left_to_suffer_damage > 0:
-                            secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
-                            for j in range(1, self.number_of_units_left_to_suffer_damage):
-                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
-                        del self.positions_of_unit_triggering_reaction[i]
-                        del self.reactions_needing_resolving[i]
-                        del self.player_who_resolves_reaction[i]
-                        i = i - 1
-                    i = i + 1
+            fury_of_cato_check = False
+            print("\n---FURY CHECK---\n")
+            print(self.recently_damaged_units)
+            print(self.damage_taken_was_from_attack)
+            print(self.faction_of_attacker)
+            for i in range(len(self.recently_damaged_units)):
+                if self.damage_taken_was_from_attack[i]:
+                    print("Damage was from attack")
+                    if self.faction_of_attacker[i] == "Space Marines":
+                        print("Attacker was a space marines unit")
+                        if self.recently_damaged_units[0][0] == 1:
+                            player_with_cato = self.p2
+                            player_without_cato = self.p1
+                        else:
+                            player_with_cato = self.p1
+                            player_without_cato = self.p2
+                        if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
+                            print("Has fury")
+                            if player_with_cato.resources > 1:
+                                print("Has resources")
+                                if player_without_cato.get_card_type_given_pos(
+                                        self.recently_damaged_units[0][1],
+                                        self.recently_damaged_units[0][2]) != "Warlord":
+                                    print("Not warlord")
+                                    fury_of_cato_check = True
+                                    self.choice_context = "Use The Fury of Sicarius?"
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = player_with_cato.name_player
+                                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
+                                                                   self.recently_damaged_units[0][2])
+                                    await self.send_search()
+            if not fury_of_cato_check:
+                await self.destroy_check_all_cards()
+                if self.reactions_needing_resolving:
+                    i = 0
+                    while i < len(self.reactions_needing_resolving):
+                        if self.reactions_needing_resolving[i] == "Mark of Chaos":
+                            loc_of_mark = self.positions_of_unit_triggering_reaction[i][1]
+                            secondary_player.suffer_area_effect(loc_of_mark, 1)
+                            self.number_of_units_left_to_suffer_damage = \
+                                secondary_player.get_number_of_units_at_planet(loc_of_mark)
+                            if self.number_of_units_left_to_suffer_damage > 0:
+                                secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
+                                for j in range(1, self.number_of_units_left_to_suffer_damage):
+                                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+                            del self.positions_of_unit_triggering_reaction[i]
+                            del self.reactions_needing_resolving[i]
+                            del self.player_who_resolves_reaction[i]
+                            i = i - 1
+                        i = i + 1
         await primary_player.send_units_at_planet(planet_pos)
         await secondary_player.send_units_at_planet(planet_pos)
         await primary_player.send_hand()
