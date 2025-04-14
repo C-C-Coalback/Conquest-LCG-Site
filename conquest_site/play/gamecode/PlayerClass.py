@@ -381,6 +381,13 @@ class Player:
         else:
             self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
 
+    def discard_card_name_from_hand(self, card_name):
+        for i in range(len(self.cards)):
+            if self.cards[i] == card_name:
+                self.discard_card_from_hand(i)
+                return True
+        return False
+
     def discard_card_from_hand(self, card_pos):
         if len(self.cards) > card_pos:
             self.discard.append(self.cards[card_pos])

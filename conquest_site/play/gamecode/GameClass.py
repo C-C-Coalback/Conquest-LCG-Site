@@ -680,6 +680,22 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Use No Mercy?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            self.effects_waiting_on_resolution.append("No Mercy")
+                            self.player_resolving_effect.append(name)
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            await self.better_shield_card_resolution(
+                                secondary_player.name_player, self.last_shield_string, alt_shields=False,
+                                can_no_mercy=False)
                     elif self.choice_context == "Use alternative shield effect?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1042,7 +1058,7 @@ class Game:
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
 
-    async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True):
+    async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
         if name == self.player_who_is_shielding:
             pos_holder = self.positions_of_units_to_take_damage[0]
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
@@ -1099,32 +1115,44 @@ class Game:
                                             self.last_shield_string = game_update_string
                                             await self.send_search()
                         if shields > 0 and not alt_shield_check:
-                            took_damage = True
-                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
-                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                    self.damage_on_units_list_before_new_damage[0]:
-                                primary_player.set_damage_given_pos(planet_pos, unit_pos,
-                                                                    self.damage_on_units_list_before_new_damage[0])
-                                took_damage = False
-                            primary_player.discard_card_from_hand(hand_pos)
-                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                            if took_damage:
-                                if self.positions_attackers_of_units_to_take_damage[0] is not None:
-                                    att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
-                                    if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
-                                                                                "Repulsor Impact Field"):
-                                        if att_num == 1:
-                                            self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
-                                        else:
-                                            self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
-                                    if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
-                                                "Black Heart Ravager":
-                                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() \
-                                                    != "Warlord":
-                                                primary_player.rout_unit(planet_pos, unit_pos)
-                                                await primary_player.send_hq()
-                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                            no_mercy_possible = False
+                            if can_no_mercy:
+                                for i in range(len(secondary_player.cards)):
+                                    if secondary_player.cards[i] == "No Mercy":
+                                        no_mercy_possible = True
+                            if no_mercy_possible:
+                                self.last_shield_string = game_update_string
+                                self.choice_context = "Use No Mercy?"
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                await self.send_search()
+                            else:
+                                took_damage = True
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
+                                if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                                        self.damage_on_units_list_before_new_damage[0]:
+                                    primary_player.set_damage_given_pos(planet_pos, unit_pos,
+                                                                        self.damage_on_units_list_before_new_damage[0])
+                                    took_damage = False
+                                primary_player.discard_card_from_hand(hand_pos)
+                                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                if took_damage:
+                                    if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                        if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
+                                                                                    "Repulsor Impact Field"):
+                                            if att_num == 1:
+                                                self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
+                                            else:
+                                                self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
+                                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                            if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
+                                                    "Black Heart Ravager":
+                                                if primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                                        .get_card_type() != "Warlord":
+                                                    primary_player.rout_unit(planet_pos, unit_pos)
+                                                    await primary_player.send_hq()
+                                await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                 elif game_update_string[0] == "HQ":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
@@ -1766,6 +1794,40 @@ class Game:
                                                 self.positions_attackers_of_units_to_take_damage[0]
                                             secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+            elif self.effects_waiting_on_resolution[0] == "No Mercy":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == primary_player.number:
+                            hq_pos = int(game_update_string[2])
+                            if primary_player.headquarters[hq_pos].get_is_unit() and \
+                                    primary_player.headquarters[hq_pos].get_unique() and \
+                                    primary_player.headquarters[hq_pos].get_ready():
+                                primary_player.exhaust_given_pos(-2, hq_pos)
+                                await primary_player.send_hq()
+                                primary_player.discard_card_name_from_hand("No Mercy")
+                                del self.effects_waiting_on_resolution[0]
+                                del self.player_resolving_effect[0]
+                                await primary_player.send_hand()
+                                await primary_player.send_discard()
+                                await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
+                                                                         alt_shields=False, can_no_mercy=False)
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == primary_player.number:
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit() and \
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_unique() and \
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ready():
+                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                await primary_player.send_units_at_planet(planet_pos)
+                                primary_player.discard_card_name_from_hand("No Mercy")
+                                del self.effects_waiting_on_resolution[0]
+                                del self.player_resolving_effect[0]
+                                await primary_player.send_hand()
+                                await primary_player.send_discard()
+                                await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
+                                                                         alt_shields=False, can_no_mercy=False)
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         del self.positions_of_units_to_take_damage[0]
