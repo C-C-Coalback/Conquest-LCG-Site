@@ -117,12 +117,12 @@ def astra_militarum_cards_init():
                                                                               "to reduce that unit's cost by 1.",
                                                            "Location.", 1, faction, "Common", True,
                                                            applies_discounts=[True, 1, True]),
-                                   CardClasses.SupportCard("Rockrete Bunker", "If this card has 4 or more damage on "
-                                                                              "it, sacrifice it.\n"
-                                                                              "Reaction: After damage is assigned to "
-                                                                              "a unit you control, exhaust this "
-                                                                              "support to reassign 1 of that damage "
-                                                                              "to this support.", "Upgrade.", 1,
+                                   CardClasses.SupportCard("Rockcrete Bunker", "If this card has 4 or more damage on "
+                                                                               "it, sacrifice it.\n"
+                                                                               "Reaction: After damage is assigned to "
+                                                                               "a unit you control, exhaust this "
+                                                                               "support to reassign 1 of that damage "
+                                                                               "to this support.", "Upgrade.", 1,
                                                            faction, "Common", False),
                                    CardClasses.SupportCard("Catachan Outpost", "Combat Action: Exhaust this support to "
                                                                                "give a target unit +2 ATK for its "

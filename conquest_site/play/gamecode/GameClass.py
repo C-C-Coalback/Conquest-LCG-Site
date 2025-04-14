@@ -1125,6 +1125,22 @@ class Game:
                                                 primary_player.rout_unit(planet_pos, unit_pos)
                                                 await primary_player.send_hq()
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                elif game_update_string[0] == "HQ":
+                    if game_update_string[1] == str(self.number_who_is_shielding):
+                        hq_pos = int(game_update_string[2])
+                        if primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
+                            print("is rockcrete bunker")
+                            if primary_player.headquarters[hq_pos].get_ready():
+                                print("is ready")
+                                primary_player.exhaust_given_pos(-2, hq_pos)
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                await primary_player.send_hq()
+                                if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
+                                        self.damage_on_units_list_before_new_damage[0]:
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                else:
+                                    await primary_player.send_units_at_planet(planet_pos)
             elif len(game_update_string) == 5:
                 if planet_pos == -2:
                     if game_update_string[0] == "ATTACHMENT":
