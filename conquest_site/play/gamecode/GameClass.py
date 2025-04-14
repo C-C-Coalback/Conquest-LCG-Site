@@ -743,6 +743,37 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Target Shrine of Warpflame:":
+                        target = self.choices_available[int(game_update_string[1])]
+                        primary_player.cards.append(target)
+                        primary_player.discard.remove(target)
+                        primary_player.exhaust_card_in_hq_given_name("Shrine of Warpflame")
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.resolving_search_box = False
+                        await self.send_search()
+                        await primary_player.send_hq()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                    elif self.choice_context == "Use Shrine of Warpflame?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Target Shrine of Warpflame:"
+                            print("\n---IN DISCARD---\n")
+                            await self.game_sockets[0].receive_game_update("Shrine of Warpflame triggered")
+                            print(primary_player.discard)
+                            for i in range(len(primary_player.discard)):
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                if card.check_for_a_trait("Tzeentch"):
+                                    self.choices_available.append(card.get_name())
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            await self.send_search()
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1177,6 +1208,28 @@ class Game:
                 self.reactions_needing_resolving.append("Holy Sepulchre")
                 self.player_who_resolves_reaction.append(self.name_2)
                 self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+        if self.p2.stored_cards_recently_destroyed:
+            if self.p1.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                already_warp_flame = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                        if self.player_who_resolves_reaction[i] == self.name_1:
+                            already_warp_flame = True
+                if not already_warp_flame:
+                    self.reactions_needing_resolving.append("Shrine of Warpflame")
+                    self.player_who_resolves_reaction.append(self.name_1)
+                    self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+        if self.p1.stored_cards_recently_destroyed:
+            if self.p2.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                already_warp_flame = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                        if self.player_who_resolves_reaction[i] == self.name_2:
+                            already_warp_flame = True
+                if not already_warp_flame:
+                    self.reactions_needing_resolving.append("Shrine of Warpflame")
+                    self.player_who_resolves_reaction.append(self.name_2)
+                    self.positions_of_unit_triggering_reaction.append((2, -1, -1))
         await self.p1.send_resources()
         await self.p2.send_resources()
         await self.p1.send_discard()
@@ -2161,6 +2214,16 @@ class Game:
                             self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
                         self.name_player_who_is_searching = self.p2.name_player
                         self.number_who_is_searching = str(self.p2.number)
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
+                elif self.reactions_needing_resolving[0] == "Shrine of Warpflame":
+                    self.resolving_search_box = True
+                    self.choices_available = ["Yes", "No"]
+                    self.choice_context = "Use Shrine of Warpflame?"
+                    self.name_player_making_choices = self.player_who_resolves_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.player_who_resolves_reaction[0]
