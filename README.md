@@ -3,11 +3,11 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-All warlords are implemented!
+THERE IS A SINGLE CARD LEFT!
 
-The Orks are fully implemented!
-
-The Drukhari (Dark Eldar) are fully implemented!
+Communications Relay is a massive prick. However, having now had 
+the displeasure of implementing Nullify, the experience should help
+me get through this last card.
 
 # What is this?
 

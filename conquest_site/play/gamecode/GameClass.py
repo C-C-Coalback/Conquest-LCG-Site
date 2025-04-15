@@ -646,6 +646,16 @@ class Game:
                 await self.send_search()
                 self.effects_waiting_on_resolution.append("No Mercy")
                 self.player_resolving_effect.append(self.first_player_nullified)
+            elif self.nullify_context == "Fall Back":
+                self.choices_available = []
+                self.name_player_making_choices = self.first_player_nullified
+                self.choice_context = "Target Fall Back:"
+                for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                    card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                              self.card_array)
+                    if card.check_for_a_trait("Elite") and card.get_is_unit():
+                        self.choices_available.append(card.get_name())
+                await self.send_search()
         else:
             if self.nullified_card_pos != -1:
                 primary_player.discard_card_from_hand(self.nullified_card_pos)
@@ -842,7 +852,7 @@ class Game:
                                 self.choice_context = "Use Nullify?"
                                 self.nullified_card_pos = -1
                                 self.nullified_card_name = "No Mercy"
-                                self.cost_card_nullified = 1
+                                self.cost_card_nullified = 0
                                 self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "No Mercy"
@@ -940,14 +950,29 @@ class Game:
                             await self.send_search()
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = "Target Fall Back:"
-                            for i in range(len(primary_player.stored_cards_recently_destroyed)):
-                                card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                                          self.card_array)
-                                if card.check_for_a_trait("Elite") and card.get_is_unit():
-                                    self.choices_available.append(card.get_name())
-                            await self.send_search()
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.game_sockets[0].receive_game_update(
+                                    primary_player.name_player + " wants to play Fall Back; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "Fall Back"
+                                self.cost_card_nullified = 1
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "Fall Back"
+                                await self.send_search()
+                            else:
+                                self.choices_available = []
+                                self.choice_context = "Target Fall Back:"
+                                for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                                    card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                                              self.card_array)
+                                    if card.check_for_a_trait("Elite") and card.get_is_unit():
+                                        self.choices_available.append(card.get_name())
+                                await self.send_search()
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -1747,7 +1772,7 @@ class Game:
                                     self.name_player_making_choices = secondary_player.name_player
                                     self.choice_context = "Use Nullify?"
                                     await self.game_sockets[0].receive_game_update(secondary_player.name_player +
-                                                                                   "Counter nullify offered.")
+                                                                                   " counter nullify offered.")
                                     await self.send_search()
                                 else:
                                     await self.complete_nullify()
@@ -1831,6 +1856,8 @@ class Game:
                                     self.choices_available = ["Yes", "No"]
                                     self.name_player_making_choices = secondary_player.name_player
                                     self.choice_context = "Use Nullify?"
+                                    await self.game_sockets[0].receive_game_update(secondary_player.name_player +
+                                                                                   " counter nullify offered.")
                                     await self.send_search()
                                 else:
                                     await self.complete_nullify()

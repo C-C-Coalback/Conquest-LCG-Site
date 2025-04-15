@@ -47,7 +47,7 @@ def eldar_cards_init():
                                                                        "attacker, your opponent must choose and "
                                                                        "discard 1 card from his hand, if able.",
                                               "Vehicle. Spirit. Elite.", 6, faction, "Loyal", 3, 5, 2, False,
-                                              wargear_attachments_permitted=False),
+                                              wargear_attachments_permitted=False, flying=True),
                          CardClasses.ArmyCard("Iyanden Wraithguard", "Armorbane.", "Drone. Spirit. Iyanden.",
                                               3, faction, "Loyal", 4, 2, 1, False, armorbane=True),
                          CardClasses.ArmyCard("Shrouded Harlequin", "Interrupt: When this unit is destroyed, exhaust "
