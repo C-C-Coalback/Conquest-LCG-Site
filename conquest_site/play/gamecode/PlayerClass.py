@@ -1046,6 +1046,15 @@ class Player:
                     return True
         return False
 
+    def get_immune_to_enemy_events(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_ability() == "Stalwart Ogryn":
+                return True
+            return False
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Stalwart Ogryn":
+            return True
+        return False
+
     def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True, ready_relevant=False):
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
@@ -1475,27 +1484,45 @@ class Player:
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
 
-    def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True):
+    def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True, enemy_event=False):
         i = 0
         while i < len(self.headquarters):
             card_type = self.headquarters[i].get_card_type()
             if ignore_uniques and units_only:
                 if not self.headquarters[i].get_unique() and (card_type == "Army" or card_type == "Token"):
-                    self.destroy_card_in_hq(i)
-                    i = i - 1
+                    if not enemy_event:
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
+                    elif not self.get_immune_to_enemy_events(-2, i):
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
                 i = i + 1
             elif ignore_uniques and not units_only:
                 if not self.headquarters[i].get_unique():
-                    self.destroy_card_in_hq(i)
-                    i = i - 1
+                    if not enemy_event:
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
+                    elif not self.get_immune_to_enemy_events(-2, i):
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
                 i = i + 1
             elif not ignore_uniques and units_only:
                 if card_type == "Army" or card_type == "Token":
+                    if not enemy_event:
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
+                    elif not self.get_immune_to_enemy_events(-2, i):
+                        self.destroy_card_in_hq(i)
+                        i = i - 1
+                i = i + 1
+            else:
+                if not enemy_event:
+                    self.destroy_card_in_hq(i)
+                    i = i - 1
+                elif not self.get_immune_to_enemy_events(-2, i):
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 i = i + 1
-            else:
-                self.destroy_card_in_hq(i)
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
@@ -1525,13 +1552,17 @@ class Player:
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
-    def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True):
+    def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True, enemy_event=True):
         i = 0
         while i < len(self.cards_in_play[planet_num + 1]):
             if ignore_uniques:
                 if not self.cards_in_play[planet_num + 1][i].get_unique():
-                    self.destroy_card_in_play(planet_num, i)
-                    i = i - 1
+                    if not enemy_event:
+                        self.destroy_card_in_play(planet_num, i)
+                        i = i - 1
+                    elif not self.get_immune_to_enemy_events(planet_num, i):
+                        self.destroy_card_in_play(planet_num, i)
+                        i = i - 1
                 i = i + 1
             else:
                 self.destroy_card_in_play(planet_num, i)

@@ -127,23 +127,29 @@ async def update_game_event_action_hq(self, name, game_update_string):
         else:
             player_being_hit = self.p2
         unit_pos = int(game_update_string[2])
-        if player_being_hit.headquarters[unit_pos].get_card_type() != "Warlord":
-            player_being_hit.assign_damage_to_pos(-2, unit_pos, self.amount_spend_for_tzeentch_firestorm)
-            player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
-            self.amount_spend_for_tzeentch_firestorm = -1
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            if self.phase == "DEPLOY":
-                if not secondary_player.has_passed:
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
-            await self.send_info_box()
-            await player_being_hit.send_hq()
-            await primary_player.send_hand()
-            await primary_player.send_discard()
+        can_continue = True
+        if player_being_hit.name_player == secondary_player.name_player:
+            if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+        if can_continue:
+            if player_being_hit.headquarters[unit_pos].get_card_type() != "Warlord":
+                player_being_hit.assign_damage_to_pos(-2, unit_pos, self.amount_spend_for_tzeentch_firestorm)
+                player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.amount_spend_for_tzeentch_firestorm = -1
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await player_being_hit.send_hq()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
     elif self.action_chosen == "Twisted Laboratory":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -182,22 +188,28 @@ async def update_game_event_action_hq(self, name, game_update_string):
         else:
             player_being_hit = self.p2
         unit_pos = int(game_update_string[2])
-        if player_being_hit.headquarters[unit_pos].get_limited():
-            player_being_hit.destroy_card_in_hq(unit_pos)
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            if self.phase == "DEPLOY":
-                if not secondary_player.has_passed:
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
-            await self.send_info_box()
-            await primary_player.send_hand()
-            await primary_player.send_discard()
-            await player_being_hit.send_discard()
-            await player_being_hit.send_hq()
+        can_continue = True
+        if player_being_hit.name_player == secondary_player.name_player:
+            if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+        if can_continue:
+            if player_being_hit.headquarters[unit_pos].get_limited():
+                player_being_hit.destroy_card_in_hq(unit_pos)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.phase == "DEPLOY":
+                    if not secondary_player.has_passed:
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.get_number()
+                await self.send_info_box()
+                await primary_player.send_hand()
+                await primary_player.send_discard()
+                await player_being_hit.send_discard()
+                await player_being_hit.send_hq()
     elif self.action_chosen == "Command-Link Drone":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -315,20 +327,26 @@ async def update_game_event_action_hq(self, name, game_update_string):
         else:
             player_returning = self.p2
         unit_pos = int(game_update_string[2])
-        card = player_returning.headquarters[unit_pos]
-        if card.get_card_type() == "Army":
-            if not card.check_for_a_trait("Elite"):
-                player_returning.return_card_to_hand(-2, unit_pos)
-                primary_player.aiming_reticle_color = None
-                primary_player.aiming_reticle_coords_hand = None
-                self.card_pos_to_deploy = -1
-                self.player_with_action = ""
-                self.action_chosen = ""
-                self.player_with_deploy_turn = secondary_player.name_player
-                self.number_with_deploy_turn = secondary_player.number
-                self.mode = self.stored_mode
-                await player_returning.send_hand()
-                await player_returning.send_hq()
+        can_continue = True
+        if player_returning.name_player == secondary_player.name_player:
+            if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+        if can_continue:
+            card = player_returning.headquarters[unit_pos]
+            if card.get_card_type() == "Army":
+                if not card.check_for_a_trait("Elite"):
+                    player_returning.return_card_to_hand(-2, unit_pos)
+                    primary_player.aiming_reticle_color = None
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.card_pos_to_deploy = -1
+                    self.player_with_action = ""
+                    self.action_chosen = ""
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.number
+                    self.mode = self.stored_mode
+                    await player_returning.send_hand()
+                    await player_returning.send_hq()
     elif self.action_chosen == "Catachan Outpost":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

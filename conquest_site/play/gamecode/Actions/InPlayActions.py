@@ -157,6 +157,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if secondary_player.get_immune_to_enemy_card_abilities(dest_planet, dest_pos):
                         can_continue = False
                         await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    if secondary_player.get_immune_to_enemy_events(dest_planet, dest_pos):
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Immune to enemy events.")
                 if can_continue:
                     if player_owning_card.move_attachment_card(origin_planet, origin_pos, origin_attach_pos,
                                                                dest_planet, dest_pos):
@@ -194,6 +197,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
@@ -230,6 +236,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_limited():
                 player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
@@ -366,6 +375,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Immune to enemy events.")
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
@@ -523,6 +535,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
         if can_continue:
             if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                 player_being_routed.rout_unit(planet_pos, unit_pos)
@@ -593,6 +608,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
         if can_continue:
             card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
             if card.get_card_type() == "Army":

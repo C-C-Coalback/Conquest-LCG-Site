@@ -51,8 +51,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
             else:
                 primary_player = self.p2
                 secondary_player = self.p2
-            self.p1.destroy_all_cards_at_planet(chosen_planet)
-            self.p2.destroy_all_cards_at_planet(chosen_planet)
+            primary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=False)
+            secondary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=True)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
@@ -156,11 +156,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
                 if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
-                    secondary_player.assign_damage_to_pos(chosen_planet, i, 2)
-                    secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                    if first_unit_damaged:
-                        secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
-                        first_unit_damaged = False
+                    if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
+                        secondary_player.assign_damage_to_pos(chosen_planet, i, 2)
+                        secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                        if first_unit_damaged:
+                            secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
+                            first_unit_damaged = False
         self.mode = "Normal"
         primary_player.discard_card_from_hand(self.card_pos_to_deploy)
         primary_player.aiming_reticle_color = None
