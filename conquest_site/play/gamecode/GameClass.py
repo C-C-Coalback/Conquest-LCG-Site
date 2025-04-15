@@ -169,7 +169,7 @@ class Game:
         self.nullified_card_pos = -1
         self.nullify_context = ""
         self.nullify_count = 0
-        self.first_player_nullifed = None
+        self.first_player_nullified = None
         self.cost_card_nullified = 0
         self.nullified_card_name = ""
         self.nullify_enabled = True
@@ -603,7 +603,7 @@ class Game:
         self.reset_choices_available()
 
     async def complete_nullify(self):
-        if self.first_player_nullifed == self.name_1:
+        if self.first_player_nullified == self.name_1:
             primary_player = self.p1
             secondary_player = self.p2
         else:
@@ -629,8 +629,15 @@ class Game:
                 self.player_resolving_effect.append(primary_player.name_player)
             elif self.nullify_context == "Bigga Is Betta":
                 self.nullify_enabled = False
-                await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullifed,
-                                                                   self.nullify_string)
+                new_string_list = self.nullify_string.split(sep="/")
+                await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
+                                                                   new_string_list)
+                self.nullify_enabled = True
+            elif self.nullify_context == "Foresight":
+                self.nullify_enabled = False
+                new_string_list = self.nullify_string.split(sep="/")
+                await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
+                                                                     new_string_list)
                 self.nullify_enabled = True
         else:
             if self.nullified_card_pos != -1:
@@ -646,7 +653,7 @@ class Game:
             elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
                 self.pos_shield_card = -1
         while self.nullify_count > 0:
-            if self.first_player_nullifed == self.name_1:
+            if self.first_player_nullified == self.name_1:
                 card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
                 if self.p2.aiming_reticle_coords_hand is not None:
                     if self.p2.aiming_reticle_coords_hand > card_pos_discard:
@@ -670,15 +677,15 @@ class Game:
                         if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                             self.p2.aiming_reticle_coords_hand -= 1
                     self.nullify_count -= 1
-        if self.card_pos_to_deploy != -1:
-            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+            if self.card_pos_to_deploy != -1:
+                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
         self.nullify_count = 0
         self.nullify_context = ""
         self.nullify_string = ""
         self.nullified_card_pos = -1
         self.nullified_card_name = ""
         self.cost_card_nullified = 0
-        self.first_player_nullifed = ""
+        self.first_player_nullified = ""
         self.p1.num_nullify_played = 0
         self.p2.num_nullify_played = 0
         await self.p1.send_hand()
@@ -957,7 +964,7 @@ class Game:
                                 self.nullified_card_pos = -1
                                 self.nullified_card_name = "The Fury of Sicarius"
                                 self.cost_card_nullified = 2
-                                self.first_player_nullifed = primary_player.name_player
+                                self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "The Fury of Sicarius"
                                 await self.send_search()
                             else:
@@ -993,7 +1000,7 @@ class Game:
                                     self.nullified_card_pos = self.pos_shield_card
                                     self.nullified_card_name = "Indomitable"
                                     self.cost_card_nullified = 1
-                                    self.first_player_nullifed = primary_player.name_player
+                                    self.first_player_nullified = primary_player.name_player
                                     self.nullify_context = "Indomitable"
                                     await self.send_search()
                                 elif primary_player.spend_resources(1):
@@ -1009,7 +1016,7 @@ class Game:
                                     self.nullified_card_pos = self.pos_shield_card
                                     self.nullified_card_name = "Glorious Intervention"
                                     self.cost_card_nullified = 1
-                                    self.first_player_nullifed = primary_player.name_player
+                                    self.first_player_nullified = primary_player.name_player
                                     self.nullify_context = "Glorious Intervention"
                                     await self.send_search()
                                 elif primary_player.spend_resources(1):

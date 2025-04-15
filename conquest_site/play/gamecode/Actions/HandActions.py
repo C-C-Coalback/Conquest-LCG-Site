@@ -31,7 +31,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.nullified_card_pos = int(game_update_string[2])
                         self.nullified_card_name = ability
                         self.cost_card_nullified = card.get_cost()
-                        self.first_player_nullifed = primary_player.name_player
+                        self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Regular Action"
                         await self.send_search()
                     elif ability == "Battle Cry":

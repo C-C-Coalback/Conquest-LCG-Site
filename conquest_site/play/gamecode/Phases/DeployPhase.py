@@ -70,7 +70,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.nullified_card_name = "Bigga Is Betta"
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)
-                                    self.first_player_nullifed = player.name_player
+                                    self.first_player_nullified = player.name_player
                                     self.nullify_context = "Bigga Is Betta"
                                     await self.send_search()
                                 else:
