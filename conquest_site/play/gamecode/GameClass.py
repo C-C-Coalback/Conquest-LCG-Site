@@ -1660,23 +1660,34 @@ class Game:
                                 player_exhausting_unit = self.p1
                             else:
                                 player_exhausting_unit = self.p2
-                            if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
-                                if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
-                                        get_card_type() != "Warlord":
-                                    player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
-                                    del self.positions_of_unit_triggering_reaction[0]
-                                    del self.reactions_needing_resolving[0]
-                                    del self.player_who_resolves_reaction[0]
-                                    await player_exhausting_unit.send_units_at_planet(planet_pos)
+                            can_continue = True
+                            if player_exhausting_unit.name_player == secondary_player.name_player:
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                            if can_continue:
+                                if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                                    if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
+                                            get_card_type() != "Warlord":
+                                        player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+                                        del self.positions_of_unit_triggering_reaction[0]
+                                        del self.reactions_needing_resolving[0]
+                                        del self.player_who_resolves_reaction[0]
+                                        await player_exhausting_unit.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
                             if game_update_string[1] != primary_player.get_number():
-                                secondary_player.exhaust_given_pos(planet_pos, unit_pos)
-                                del self.positions_of_unit_triggering_reaction[0]
-                                del self.reactions_needing_resolving[0]
-                                del self.player_who_resolves_reaction[0]
-                                await secondary_player.send_units_at_planet(planet_pos)
+                                can_continue = True
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                                if can_continue:
+                                    secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.reactions_needing_resolving[0]
+                                    del self.player_who_resolves_reaction[0]
+                                    await secondary_player.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Superiority":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
@@ -1684,20 +1695,26 @@ class Game:
                                 player_being_hit = self.p1
                             else:
                                 player_being_hit = self.p2
-                            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
-                                player_being_hit.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
-                                card_name = player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
-                                text = card_name + ", position " + str(planet_pos) \
-                                    + " " + str(unit_pos) + " hit by superiority."
-                                await self.game_sockets[0].receive_game_update(text)
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                                primary_player.aiming_reticle_coords_hand = None
-                                await primary_player.send_discard()
-                                await primary_player.send_hand()
-                                del self.positions_of_unit_triggering_reaction[0]
-                                del self.reactions_needing_resolving[0]
-                                del self.player_who_resolves_reaction[0]
-                                await self.send_info_box()
+                            can_continue = True
+                            if player_being_hit.name_player == secondary_player.name_player:
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                            if can_continue:
+                                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                                    player_being_hit.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
+                                    card_name = player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
+                                    text = card_name + ", position " + str(planet_pos) \
+                                        + " " + str(unit_pos) + " hit by superiority."
+                                    await self.game_sockets[0].receive_game_update(text)
+                                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    await primary_player.send_discard()
+                                    await primary_player.send_hand()
+                                    del self.positions_of_unit_triggering_reaction[0]
+                                    del self.reactions_needing_resolving[0]
+                                    del self.player_who_resolves_reaction[0]
+                                    await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                             if int(primary_player.get_number()) == int(
                                     self.positions_of_unit_triggering_reaction[0][0]):
@@ -1773,33 +1790,50 @@ class Game:
                                     if target_unit_pos == prev_def_pos:
                                         await self.game_sockets[0].receive_game_update("Can't select last defender")
                                     else:
-                                        secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
-                                        secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
-                                                                                    "blue")
-                                        del self.positions_of_unit_triggering_reaction[0]
-                                        del self.reactions_needing_resolving[0]
-                                        del self.player_who_resolves_reaction[0]
-                                        await secondary_player.send_units_at_planet(origin_planet)
+                                        can_continue = True
+                                        if player_owning_card.name_player == secondary_player.name_player:
+                                            if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
+                                                                                                   target_unit_pos):
+                                                can_continue = False
+                                                await self.game_sockets[0].receive_game_update(
+                                                    "Immune to enemy card abilities.")
+                                        if can_continue:
+                                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
+                                            secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
+                                                                                        "blue")
+                                            del self.positions_of_unit_triggering_reaction[0]
+                                            del self.reactions_needing_resolving[0]
+                                            del self.player_who_resolves_reaction[0]
+                                            await secondary_player.send_units_at_planet(origin_planet)
                         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
                             print("Resolve Sicarius's chosen")
                             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
                             target_planet = int(game_update_string[2])
+                            target_pos = int(game_update_string[3])
                             if int(game_update_string[1]) == int(secondary_player.get_number()):
-                                print("test")
                                 if abs(origin_planet - target_planet) == 1:
-                                    print("test")
                                     if secondary_player.cards_in_play[target_planet + 1][
-                                        int(game_update_string[3])].get_card_type() == "Army":
-                                        secondary_player.move_unit_to_planet(target_planet, int(game_update_string[3]),
-                                                                             origin_planet)
-                                        new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
-                                        secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1)
-                                        secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos, "red")
-                                        del self.positions_of_unit_triggering_reaction[0]
-                                        del self.reactions_needing_resolving[0]
-                                        del self.player_who_resolves_reaction[0]
-                                        await secondary_player.send_units_at_planet(origin_planet)
-                                        await secondary_player.send_units_at_planet(target_planet)
+                                            target_pos].get_card_type() == "Army":
+                                        can_continue = True
+                                        if player_owning_card.name_player == secondary_player.name_player:
+                                            if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
+                                                                                                   target_pos):
+                                                can_continue = False
+                                                await self.game_sockets[0].receive_game_update(
+                                                    "Immune to enemy card abilities.")
+                                        if can_continue:
+                                            secondary_player.move_unit_to_planet(target_planet,
+                                                                                 int(game_update_string[3]),
+                                                                                 origin_planet)
+                                            new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
+                                            secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1)
+                                            secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos,
+                                                                                        "red")
+                                            del self.positions_of_unit_triggering_reaction[0]
+                                            del self.reactions_needing_resolving[0]
+                                            del self.player_who_resolves_reaction[0]
+                                            await secondary_player.send_units_at_planet(origin_planet)
+                                            await secondary_player.send_units_at_planet(target_planet)
 
     async def resolve_mobile(self, name, game_update_string):
         if self.player_with_initiative == self.name_1:

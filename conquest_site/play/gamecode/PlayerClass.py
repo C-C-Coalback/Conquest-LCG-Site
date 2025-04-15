@@ -1039,6 +1039,13 @@ class Player:
                 return True
         return False
 
+    def get_immune_to_enemy_card_abilities(self, planet_pos, unit_pos):
+        if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
+            for i in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
+                    return True
+        return False
+
     def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True, ready_relevant=False):
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
