@@ -633,7 +633,7 @@ class Game:
                 await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
                                                                    new_string_list)
                 self.nullify_enabled = True
-            elif self.nullify_context == "Foresight":
+            elif self.nullify_context == "Foresight" or self.nullify_context == "Superiority":
                 self.nullify_enabled = False
                 new_string_list = self.nullify_string.split(sep="/")
                 await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
@@ -1724,6 +1724,8 @@ class Game:
                                     self.choices_available = ["Yes", "No"]
                                     self.name_player_making_choices = secondary_player.name_player
                                     self.choice_context = "Use Nullify?"
+                                    await self.game_sockets[0].receive_game_update(secondary_player.name_player +
+                                                                                   "Counter nullify offered.")
                                     await self.send_search()
                                 else:
                                     await self.complete_nullify()
@@ -2517,6 +2519,9 @@ class Game:
                         await secondary_player.send_units_at_planet(loc_of_mark)
                         i = i - 1
                     i = i + 1
+        print("---\nDEBUG INFO\n---")
+        print(self.reactions_needing_resolving)
+        print(self.choices_available)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 

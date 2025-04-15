@@ -1137,11 +1137,12 @@ class Player:
         return False
 
     def nullify_check(self):
+        print("---\nNullify Check!\n---")
         num_nullifies = 0
         for i in range(len(self.cards)):
             if self.cards[i] == "Nullify":
                 num_nullifies += 1
-        if num_nullifies >= self.num_nullify_played:
+        if num_nullifies > self.num_nullify_played:
             for i in range(len(self.headquarters)):
                 if self.valid_nullify_unit(-2, i):
                     return True
