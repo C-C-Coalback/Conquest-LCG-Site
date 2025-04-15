@@ -619,6 +619,12 @@ class Game:
                 await self.resolve_fury_sicarius(primary_player, secondary_player)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
+            elif self.nullify_context == "Glorious Intervention":
+                primary_player.aiming_reticle_coords_hand = self.pos_shield_card
+                primary_player.aiming_reticle_color = "blue"
+                await primary_player.send_hand()
+                self.effects_waiting_on_resolution.append("Glorious Intervention")
+                self.player_resolving_effect.append(primary_player.name_player)
         else:
             if self.nullified_card_pos != -1:
                 primary_player.discard_card_from_hand(self.nullified_card_pos)
@@ -628,7 +634,7 @@ class Game:
             if self.nullify_context == "The Fury of Sicarius":
                 if self.fury_search(primary_player, secondary_player):
                     await self.send_search()
-            elif self.nullify_context == "Indomitable":
+            elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
                 self.pos_shield_card = -1
         while self.nullify_count > 0:
             if self.first_player_nullifed == self.name_1:
@@ -981,7 +987,20 @@ class Game:
                                 elif primary_player.spend_resources(1):
                                     await self.resolve_indomitable(primary_player, secondary_player)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
-                                if primary_player.spend_resources(1):
+                                if secondary_player.nullify_check():
+                                    await self.game_sockets[0].receive_game_update(
+                                        primary_player.name_player + " wants to play Glorious Intervention; "
+                                                                     "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = self.pos_shield_card
+                                    self.nullified_card_name = "Glorious Intervention"
+                                    self.cost_card_nullified = 1
+                                    self.first_player_nullifed = primary_player.name_player
+                                    self.nullify_context = "Glorious Intervention"
+                                    await self.send_search()
+                                elif primary_player.spend_resources(1):
                                     await primary_player.send_resources()
                                     primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                                     primary_player.aiming_reticle_color = "blue"
@@ -2225,6 +2244,8 @@ class Game:
                                             att_num, att_pla, att_pos = \
                                                 self.positions_attackers_of_units_to_take_damage[0]
                                             secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
+                                            del self.effects_waiting_on_resolution[0]
+                                            del self.player_resolving_effect[0]
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif self.effects_waiting_on_resolution[0] == "No Mercy":
                 if len(game_update_string) == 3:
