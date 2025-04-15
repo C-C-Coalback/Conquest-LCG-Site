@@ -1,4 +1,4 @@
-async def update_game_event_action_hand(self, name, game_update_string):
+async def update_game_event_action_hand(self, name, game_update_string, may_nullify=True):
     if self.player_with_action == self.name_1:
         primary_player = self.p1
         secondary_player = self.p2
@@ -21,7 +21,19 @@ async def update_game_event_action_hand(self, name, game_update_string):
                     primary_player.aiming_reticle_color = "blue"
                     await primary_player.send_hand()
                 elif primary_player.spend_resources(card.get_cost()):
-                    if ability == "Battle Cry":
+                    if may_nullify and secondary_player.nullify_check():
+                        primary_player.add_resources(card.get_cost())
+                        await self.game_sockets[0].receive_game_update(primary_player.name_player + " wants to play " +
+                                                                       ability + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = int(game_update_string[2])
+                        self.cost_card_nullified = card.get_cost()
+                        self.first_player_nullifed = primary_player.name_player
+                        self.nullify_context = "Regular Action"
+                        await self.send_search()
+                    elif ability == "Battle Cry":
                         print("Resolve Battle Cry")
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
                                                                             expiration="EOB")

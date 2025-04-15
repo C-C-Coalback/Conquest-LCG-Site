@@ -166,6 +166,11 @@ class Game:
         self.damage_taken_was_from_attack = []
         self.faction_of_attacker = []
         self.furiable_unit_position = (-1, -1)
+        self.nullified_card_pos = -1
+        self.nullify_context = ""
+        self.nullify_count = 0
+        self.first_player_nullifed = None
+        self.cost_card_nullified = 0
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -594,6 +599,62 @@ class Game:
         self.reset_battle_resolve_attributes()
         self.reset_choices_available()
 
+    async def complete_nullify(self):
+        if self.nullify_count % 2 == 0:
+            if self.nullify_context == "Regular Action":
+                num_player = "1"
+                if self.player_with_action == self.name_2:
+                    num_player = "2"
+                string = ["HAND", num_player, str(self.nullified_card_pos)]
+                await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
+                                                                may_nullify=False)
+        else:
+            if self.nullify_context == "Regular Action":
+                if self.first_player_nullifed == self.name_1:
+                    player = self.p1
+                else:
+                    player = self.p2
+                player.discard_card_from_hand(self.nullified_card_pos)
+                player.spend_resources(self.cost_card_nullified)
+        while self.nullify_count > 0:
+            if self.first_player_nullifed == self.name_1:
+                card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                if self.p2.aiming_reticle_coords_hand is not None:
+                    if self.p2.aiming_reticle_coords_hand > card_pos_discard:
+                        self.p2.aiming_reticle_coords_hand -= 1
+                self.nullify_count -= 1
+                if self.nullify_count > 0:
+                    card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                    if self.p1.aiming_reticle_coords_hand is not None:
+                        if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                            self.p1.aiming_reticle_coords_hand -= 1
+                    self.nullify_count -= 1
+            else:
+                card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                if self.p1.aiming_reticle_coords_hand is not None:
+                    if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                        self.p1.aiming_reticle_coords_hand -= 1
+                self.nullify_count -= 1
+                if self.nullify_count > 0:
+                    card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                    if self.p2.aiming_reticle_coords_hand is not None:
+                        if self.p2.aiming_reticle_coords_hand > card_pos_discard:
+                            self.p2.aiming_reticle_coords_hand -= 1
+                    self.nullify_count -= 1
+        self.nullify_count = 0
+        self.nullify_context = ""
+        self.nullified_card_pos = ""
+        self.cost_card_nullified = 0
+        self.first_player_nullifed = ""
+        self.p1.num_nullify_played = 0
+        self.p2.num_nullify_played = 0
+        await self.p1.send_hand()
+        await self.p2.send_hand()
+        await self.p1.send_resources()
+        await self.p2.send_resources()
+        await self.p1.send_discard()
+        await self.p2.send_discard()
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
             primary_player = self.p1
@@ -682,6 +743,22 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Use Nullify?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            self.reactions_needing_resolving.append("Nullify")
+                            self.player_who_resolves_reaction.append(name)
+                            self.positions_of_unit_triggering_reaction.append([int(primary_player.number), -1, -1])
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            await self.complete_nullify()
+                            self.nullify_count = 0
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1481,6 +1558,8 @@ class Game:
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                         await secondary_player.send_units_at_planet(planet_pos)
+                    if self.reactions_needing_resolving[0] == "Nullify":
+                        await self.complete_nullify()
                     del self.positions_of_unit_triggering_reaction[0]
                     del self.reactions_needing_resolving[0]
                     del self.player_who_resolves_reaction[0]
@@ -1539,9 +1618,9 @@ class Game:
                                 await self.send_info_box()
                                 await primary_player.send_units_at_planet(planet_pos)
                 elif game_update_string[0] == "HQ":
+                    unit_pos = int(game_update_string[2])
                     if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
                         if self.reactions_needing_resolving[0] == "Power from Pain":
-                            unit_pos = int(game_update_string[2])
                             if primary_player.headquarters[unit_pos].get_card_type() == "Army":
                                 primary_player.sacrifice_card_in_hq(unit_pos)
                                 del self.positions_of_unit_triggering_reaction[0]
@@ -1551,9 +1630,23 @@ class Game:
                                 await primary_player.send_hq()
                                 await primary_player.send_discard()
                                 await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Nullify":
+                            if primary_player.valid_nullify_unit(-2, unit_pos):
+                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                self.nullify_count += 1
+                                if secondary_player.nullify_check():
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    await self.send_search()
+                                else:
+                                    await self.complete_nullify()
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                             if not self.cato_stronghold_activated:
-                                unit_pos = int(game_update_string[2])
                                 if primary_player.get_ability_given_pos(-2, unit_pos) == "Alaitoc Shrine":
                                     if primary_player.get_ready_given_pos(-2, unit_pos):
                                         primary_player.exhaust_given_pos(-2, unit_pos)
@@ -1561,14 +1654,12 @@ class Game:
                                         await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
                             if not self.cato_stronghold_activated:
-                                unit_pos = int(game_update_string[2])
                                 if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":
                                     if primary_player.get_ready_given_pos(-2, unit_pos):
                                         primary_player.exhaust_given_pos(-2, unit_pos)
                                         self.cato_stronghold_activated = True
                                         await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Murder Cogitator":
-                            unit_pos = int(game_update_string[2])
                             if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
                                 if primary_player.headquarters[unit_pos].get_ready():
                                     primary_player.exhaust_given_pos(-2, unit_pos)
@@ -1589,7 +1680,6 @@ class Game:
                                         del self.player_who_resolves_reaction[0]
                                     await self.send_info_box()
                         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
-                            unit_pos = int(game_update_string[2])
                             if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
                                 if primary_player.headquarters[unit_pos].get_reaction_available():
                                     if primary_player.spend_resources(1):

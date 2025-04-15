@@ -74,6 +74,7 @@ class Player:
         self.stored_cards_recently_discarded = []
         self.cards_recently_destroyed = []
         self.stored_cards_recently_destroyed = []
+        self.num_nullify_played = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -396,8 +397,8 @@ class Player:
         for i in range(len(self.cards)):
             if self.cards[i] == card_name:
                 self.discard_card_from_hand(i)
-                return True
-        return False
+                return i
+        return -1
 
     def discard_card_from_hand(self, card_pos):
         if len(self.cards) > card_pos:
@@ -1121,6 +1122,34 @@ class Player:
                     discounts_available += 1
                     automatic_discounts += 1
         return discounts_available, automatic_discounts
+
+    def valid_nullify_unit(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_faction() == "Eldar" and self.headquarters[unit_pos].get_is_unit() and \
+                    self.headquarters[unit_pos].get_unique() and self.headquarters[unit_pos].get_ready():
+                return True
+            return False
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_faction() == "Eldar" and \
+                self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit() and \
+                self.cards_in_play[planet_pos + 1][unit_pos].get_unique() and \
+                self.cards_in_play[planet_pos + 1][unit_pos].get_ready():
+            return True
+        return False
+
+    def nullify_check(self):
+        num_nullifies = 0
+        for i in range(len(self.cards)):
+            if self.cards[i] == "Nullify":
+                num_nullifies += 1
+        if num_nullifies >= self.num_nullify_played:
+            for i in range(len(self.headquarters)):
+                if self.valid_nullify_unit(-2, i):
+                    return True
+            for planet_pos in range(7):
+                for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                    if self.valid_nullify_unit(planet_pos, unit_pos):
+                        return True
+        return False
 
     def search_hand_for_card(self, card_name):
         print("Looking for", card_name)
