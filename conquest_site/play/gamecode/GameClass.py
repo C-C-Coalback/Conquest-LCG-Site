@@ -171,6 +171,7 @@ class Game:
         self.nullify_count = 0
         self.first_player_nullifed = None
         self.cost_card_nullified = 0
+        self.nullified_card_name = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -600,6 +601,12 @@ class Game:
         self.reset_choices_available()
 
     async def complete_nullify(self):
+        if self.first_player_nullifed == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
         if self.nullify_count % 2 == 0:
             if self.nullify_context == "Regular Action":
                 num_player = "1"
@@ -608,14 +615,17 @@ class Game:
                 string = ["HAND", num_player, str(self.nullified_card_pos)]
                 await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
                                                                 may_nullify=False)
+            elif self.nullify_context == "The Fury of Sicarius":
+                await self.resolve_fury_sicarius(primary_player, secondary_player)
         else:
-            if self.nullify_context == "Regular Action":
-                if self.first_player_nullifed == self.name_1:
-                    player = self.p1
-                else:
-                    player = self.p2
-                player.discard_card_from_hand(self.nullified_card_pos)
-                player.spend_resources(self.cost_card_nullified)
+            if self.nullified_card_pos != -1:
+                primary_player.discard_card_from_hand(self.nullified_card_pos)
+            elif self.nullified_card_name != "":
+                primary_player.discard_card_name_from_hand(self.nullified_card_name)
+            primary_player.spend_resources(self.cost_card_nullified)
+            if self.nullify_context == "The Fury of Sicarius":
+                if self.fury_search(primary_player, secondary_player):
+                    await self.send_search()
         while self.nullify_count > 0:
             if self.first_player_nullifed == self.name_1:
                 card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
@@ -643,7 +653,8 @@ class Game:
                     self.nullify_count -= 1
         self.nullify_count = 0
         self.nullify_context = ""
-        self.nullified_card_pos = ""
+        self.nullified_card_pos = -1
+        self.nullified_card_name = ""
         self.cost_card_nullified = 0
         self.first_player_nullifed = ""
         self.p1.num_nullify_played = 0
@@ -654,6 +665,17 @@ class Game:
         await self.p2.send_resources()
         await self.p1.send_discard()
         await self.p2.send_discard()
+
+    async def resolve_fury_sicarius(self, primary_player, secondary_player):
+        primary_player.spend_resources(2)
+        primary_player.discard_card_name_from_hand("The Fury of Sicarius")
+        await primary_player.send_hand()
+        await primary_player.send_discard()
+        planet_pos, unit_pos = self.furiable_unit_position
+        secondary_player.set_damage_given_pos(planet_pos, unit_pos, 999)
+        await self.destroy_check_all_cards()
+        await secondary_player.send_units_at_planet(planet_pos)
+        await primary_player.send_units_at_planet(planet_pos)
 
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
@@ -889,15 +911,21 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
-                            primary_player.spend_resources(2)
-                            primary_player.discard_card_name_from_hand("The Fury of Sicarius")
-                            await primary_player.send_hand()
-                            await primary_player.send_discard()
-                            planet_pos, unit_pos = self.furiable_unit_position
-                            secondary_player.set_damage_given_pos(planet_pos, unit_pos, 999)
-                            await self.destroy_check_all_cards()
-                            await secondary_player.send_units_at_planet(planet_pos)
-                            await primary_player.send_units_at_planet(planet_pos)
+                            if secondary_player.nullify_check():
+                                await self.game_sockets[0].receive_game_update(
+                                    primary_player.name_player + " wants to play The Fury of Sicarius; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "The Fury of Sicarius"
+                                self.cost_card_nullified = 2
+                                self.first_player_nullifed = primary_player.name_player
+                                self.nullify_context = "The Fury of Sicarius"
+                                await self.send_search()
+                            else:
+                                await self.resolve_fury_sicarius(primary_player, secondary_player)
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -1634,6 +1662,7 @@ class Game:
                             if primary_player.valid_nullify_unit(-2, unit_pos):
                                 primary_player.exhaust_given_pos(-2, unit_pos)
                                 self.nullify_count += 1
+                                primary_player.num_nullify_played += 1
                                 if secondary_player.nullify_check():
                                     self.choices_available = ["Yes", "No"]
                                     self.name_player_making_choices = secondary_player.name_player
@@ -1710,6 +1739,24 @@ class Game:
                                     await primary_player.send_units_at_planet(planet_pos)
                                     await primary_player.send_discard()
                                     await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Nullify":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.valid_nullify_unit(planet_pos, unit_pos):
+                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                primary_player.num_nullify_played += 1
+                                self.nullify_count += 1
+                                if secondary_player.nullify_check():
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    await self.send_search()
+                                else:
+                                    await self.complete_nullify()
+                                del self.positions_of_unit_triggering_reaction[0]
+                                del self.reactions_needing_resolving[0]
+                                del self.player_who_resolves_reaction[0]
+                                await primary_player.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Soul Grinder":
                             if primary_player.get_number() == game_update_string[1]:
                                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
@@ -2195,6 +2242,23 @@ class Game:
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
 
+    def fury_search(self, player_with_cato, player_without_cato):
+        if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
+            print("Has fury")
+            if player_with_cato.resources > 1:
+                print("Has resources")
+                if player_without_cato.get_card_type_given_pos(
+                        self.recently_damaged_units[0][1],
+                        self.recently_damaged_units[0][2]) != "Warlord":
+                    print("Not warlord")
+                    self.choice_context = "Use The Fury of Sicarius?"
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = player_with_cato.name_player
+                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
+                                                   self.recently_damaged_units[0][2])
+                    return True
+        return False
+
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         del self.positions_of_units_to_take_damage[0]
         del self.damage_on_units_list_before_new_damage[0]
@@ -2220,21 +2284,9 @@ class Game:
                         else:
                             player_with_cato = self.p1
                             player_without_cato = self.p2
-                        if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
-                            print("Has fury")
-                            if player_with_cato.resources > 1:
-                                print("Has resources")
-                                if player_without_cato.get_card_type_given_pos(
-                                        self.recently_damaged_units[0][1],
-                                        self.recently_damaged_units[0][2]) != "Warlord":
-                                    print("Not warlord")
-                                    fury_of_cato_check = True
-                                    self.choice_context = "Use The Fury of Sicarius?"
-                                    self.choices_available = ["Yes", "No"]
-                                    self.name_player_making_choices = player_with_cato.name_player
-                                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
-                                                                   self.recently_damaged_units[0][2])
-                                    await self.send_search()
+                        if self.fury_search(player_with_cato, player_without_cato):
+                            fury_of_cato_check = True
+                            await self.send_search()
             if not fury_of_cato_check:
                 await self.destroy_check_all_cards()
                 if self.reactions_needing_resolving:
