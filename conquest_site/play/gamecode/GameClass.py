@@ -639,6 +639,13 @@ class Game:
                 await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
                                                                      new_string_list)
                 self.nullify_enabled = True
+            elif self.nullify_context == "No Mercy":
+                self.choices_available = []
+                self.choice_context = ""
+                self.name_player_making_choices = ""
+                await self.send_search()
+                self.effects_waiting_on_resolution.append("No Mercy")
+                self.player_resolving_effect.append(self.first_player_nullified)
         else:
             if self.nullified_card_pos != -1:
                 primary_player.discard_card_from_hand(self.nullified_card_pos)
@@ -826,12 +833,27 @@ class Game:
                             self.nullify_count = 0
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            await self.send_search()
-                            self.effects_waiting_on_resolution.append("No Mercy")
-                            self.player_resolving_effect.append(name)
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.game_sockets[0].receive_game_update(
+                                    primary_player.name_player + " wants to play No Mercy; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "No Mercy"
+                                self.cost_card_nullified = 1
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "No Mercy"
+                                await self.send_search()
+                            else:
+                                self.choices_available = []
+                                self.choice_context = ""
+                                self.name_player_making_choices = ""
+                                await self.send_search()
+                                self.effects_waiting_on_resolution.append("No Mercy")
+                                self.player_resolving_effect.append(name)
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
