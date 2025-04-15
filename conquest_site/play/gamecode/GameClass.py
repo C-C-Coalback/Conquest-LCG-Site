@@ -172,6 +172,8 @@ class Game:
         self.first_player_nullifed = None
         self.cost_card_nullified = 0
         self.nullified_card_name = ""
+        self.nullify_enabled = True
+        self.nullify_string = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -625,9 +627,16 @@ class Game:
                 await primary_player.send_hand()
                 self.effects_waiting_on_resolution.append("Glorious Intervention")
                 self.player_resolving_effect.append(primary_player.name_player)
+            elif self.nullify_context == "Bigga Is Betta":
+                self.nullify_enabled = False
+                await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullifed,
+                                                                   self.nullify_string)
+                self.nullify_enabled = True
         else:
             if self.nullified_card_pos != -1:
                 primary_player.discard_card_from_hand(self.nullified_card_pos)
+                if self.card_pos_to_deploy > self.nullified_card_pos:
+                    self.card_pos_to_deploy -= 1
             elif self.nullified_card_name != "":
                 primary_player.discard_card_name_from_hand(self.nullified_card_name)
             primary_player.spend_resources(self.cost_card_nullified)
@@ -661,8 +670,11 @@ class Game:
                         if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                             self.p2.aiming_reticle_coords_hand -= 1
                     self.nullify_count -= 1
+        if self.card_pos_to_deploy != -1:
+            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
         self.nullify_count = 0
         self.nullify_context = ""
+        self.nullify_string = ""
         self.nullified_card_pos = -1
         self.nullified_card_name = ""
         self.cost_card_nullified = 0

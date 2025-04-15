@@ -50,25 +50,42 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         if self.card_type_of_selected_card_in_hand == "Army":
                             if self.number_with_deploy_turn == "1":
                                 player = self.p1
+                                secondary_player = self.p2
                             else:
                                 player = self.p2
+                                secondary_player = self.p1
                             discount_received, damage = player.perform_discount_at_pos_hand(
                                 int(game_update_string[2]),
                                 self.faction_of_card_to_play
                             )
                             if discount_received > 0:
-                                self.discounts_applied += discount_received
-                                player.discard_card_from_hand(int(game_update_string[2]))
-                                if self.card_pos_to_deploy > int(game_update_string[2]):
-                                    self.card_pos_to_deploy -= 1
-                                if damage > 0:
-                                    self.damage_for_unit_to_take_on_play.append(damage)
-                                if self.discounts_applied >= self.available_discounts:
-                                    await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
-                                                              discounts=self.discounts_applied)
+                                if secondary_player.nullify_check() and self.nullify_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        player.name_player + " wants to play Bigga Is Betta; "
+                                                             "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = int(game_update_string[2])
+                                    self.nullified_card_name = "Bigga Is Betta"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullifed = player.name_player
+                                    self.nullify_context = "Bigga Is Betta"
+                                    await self.send_search()
                                 else:
-                                    await player.send_hand()
-                                    await player.send_discard()
+                                    self.discounts_applied += discount_received
+                                    player.discard_card_from_hand(int(game_update_string[2]))
+                                    if self.card_pos_to_deploy > int(game_update_string[2]):
+                                        self.card_pos_to_deploy -= 1
+                                    if damage > 0:
+                                        self.damage_for_unit_to_take_on_play.append(damage)
+                                    if self.discounts_applied >= self.available_discounts:
+                                        await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                                                                  discounts=self.discounts_applied)
+                                    else:
+                                        await player.send_hand()
+                                        await player.send_discard()
             elif self.mode == "Normal":
                 if name == self.player_with_deploy_turn:
                     print(game_update_string[1] == self.number_with_deploy_turn)
