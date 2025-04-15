@@ -617,6 +617,8 @@ class Game:
                                                                 may_nullify=False)
             elif self.nullify_context == "The Fury of Sicarius":
                 await self.resolve_fury_sicarius(primary_player, secondary_player)
+            elif self.nullify_context == "Indomitable":
+                await self.resolve_indomitable(primary_player, secondary_player)
         else:
             if self.nullified_card_pos != -1:
                 primary_player.discard_card_from_hand(self.nullified_card_pos)
@@ -626,6 +628,8 @@ class Game:
             if self.nullify_context == "The Fury of Sicarius":
                 if self.fury_search(primary_player, secondary_player):
                     await self.send_search()
+            elif self.nullify_context == "Indomitable":
+                self.pos_shield_card = -1
         while self.nullify_count > 0:
             if self.first_player_nullifed == self.name_1:
                 card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
@@ -676,6 +680,20 @@ class Game:
         await self.destroy_check_all_cards()
         await secondary_player.send_units_at_planet(planet_pos)
         await primary_player.send_units_at_planet(planet_pos)
+
+    async def resolve_indomitable(self, primary_player, secondary_player):
+        pos_holder = self.positions_of_units_to_take_damage[0]
+        player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+        await primary_player.send_resources()
+        primary_player.discard_card_from_hand(self.pos_shield_card)
+        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+        self.pos_shield_card = -1
+        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+        if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                self.damage_on_units_list_before_new_damage[0]:
+            primary_player.set_damage_given_pos(planet_pos, unit_pos,
+                                                self.damage_on_units_list_before_new_damage[0])
+        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
@@ -946,21 +964,22 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
-                            pos_holder = self.positions_of_units_to_take_damage[0]
-                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
                             if primary_player.cards[self.pos_shield_card] == "Indomitable":
-                                if primary_player.spend_resources(1):
-                                    await primary_player.send_resources()
-                                    primary_player.discard_card_from_hand(self.pos_shield_card)
-                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                    self.pos_shield_card = -1
-                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                                    if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                            self.damage_on_units_list_before_new_damage[0]:
-                                        primary_player.set_damage_given_pos(planet_pos, unit_pos,
-                                                                            self.damage_on_units_list_before_new_damage[
-                                                                                0])
-                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                if secondary_player.nullify_check():
+                                    await self.game_sockets[0].receive_game_update(
+                                        primary_player.name_player + " wants to play Indomitable; "
+                                                                     "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = self.pos_shield_card
+                                    self.nullified_card_name = "Indomitable"
+                                    self.cost_card_nullified = 1
+                                    self.first_player_nullifed = primary_player.name_player
+                                    self.nullify_context = "Indomitable"
+                                    await self.send_search()
+                                elif primary_player.spend_resources(1):
+                                    await self.resolve_indomitable(primary_player, secondary_player)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
                                 if primary_player.spend_resources(1):
                                     await primary_player.send_resources()
