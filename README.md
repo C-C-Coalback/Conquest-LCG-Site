@@ -3,11 +3,11 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-THERE IS A SINGLE CARD LEFT!
+ALL CARDS HAVE BEEN ADDED!
 
-Communications Relay is a massive prick. However, having now had 
-the displeasure of implementing Nullify, the experience should help
-me get through this last card.
+There are a select few things to add: prevent some effects from
+being shielded, but allowing others; minor Bigga Is Betta fix;
+Better info box support; better debugging tools.
 
 # What is this?
 
@@ -23,8 +23,8 @@ Currently we have: async chat rooms; login/logout; deck-building; async lobbies.
 Current game progress: Everything, except:
 
 - ~~shielding~~
-- card text (See the spreadsheet)
-- action windows (getting there, added them to the deploy phase)
+- ~~card text~~ (See the spreadsheet)
+- ~~action windows~~
 - ~~attachment support~~
 - a victory/loss screen
 - ~~some targeting follicles so that players can see what planets/units are being targeted~~

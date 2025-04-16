@@ -786,6 +786,8 @@ class Game:
                     await self.send_search()
                 await secondary_player.send_discard()
                 await secondary_player.send_hand()
+            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+                await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
             self.choices_available = []
             self.choice_context = ""
@@ -810,6 +812,13 @@ class Game:
             primary_player = self.p2
             secondary_player = self.p1
         if name == self.name_player_making_choices:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    if self.choice_context == "Shadowsun attachment from discard:":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.resolving_search_box = False
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
                     if self.choice_context == "Resolve Battle Ability?":
@@ -1263,21 +1272,59 @@ class Game:
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         if game_update_string[1] == "1":
-                            if self.p1.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)]. \
+                            if self.p1.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]. \
                                     get_card_type != "Warlord":
-                                self.p1.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
-                                await self.p1.send_hq()
-                                await self.p1.send_units_at_planet(int(game_update_string[2]))
-                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                     game_update_string)
+                                can_continue = True
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if self.player_resolving_battle_ability != self.p1.name_player:
+                                    if self.p1.communications_relay_check(planet_pos, unit_pos) and \
+                                         self.communications_relay_enabled:
+                                        await self.game_sockets[0].receive_game_update(
+                                            "Communications Relay may be used.")
+                                        can_continue = False
+                                        self.choices_available = ["Yes", "No"]
+                                        self.name_player_making_choices = self.p1.name_player
+                                        self.choice_context = "Use Communications Relay?"
+                                        self.nullified_card_name = "Ferrin"
+                                        self.cost_card_nullified = 0
+                                        self.nullify_string = "/".join(game_update_string)
+                                        self.first_player_nullified = self.p2.name_player
+                                        self.nullify_context = "Ferrin"
+                                        await self.send_search()
+                                if can_continue:
+                                    self.p1.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
+                                    await self.p1.send_hq()
+                                    await self.p1.send_units_at_planet(int(game_update_string[2]))
+                                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                         game_update_string)
                         elif game_update_string[1] == "2":
-                            if self.p2.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string)]. \
+                            if self.p2.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])]. \
                                     get_card_type != "Warlord":
-                                self.p2.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
-                                await self.p2.send_hq()
-                                await self.p2.send_units_at_planet(int(game_update_string[2]))
-                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                     game_update_string)
+                                can_continue = True
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if self.player_resolving_battle_ability != self.p2.name_player:
+                                    if self.p2.communications_relay_check(planet_pos, unit_pos) and \
+                                            self.communications_relay_enabled:
+                                        await self.game_sockets[0].receive_game_update(
+                                            "Communications Relay may be used.")
+                                        can_continue = False
+                                        self.choices_available = ["Yes", "No"]
+                                        self.name_player_making_choices = self.p2.name_player
+                                        self.choice_context = "Use Communications Relay?"
+                                        self.nullified_card_name = "Ferrin"
+                                        self.cost_card_nullified = 0
+                                        self.nullify_string = "/".join(game_update_string)
+                                        self.first_player_nullified = self.p1.name_player
+                                        self.nullify_context = "Ferrin"
+                                        await self.send_search()
+                                if can_continue:
+                                    self.p2.rout_unit(int(game_update_string[2]), int(game_update_string[3]))
+                                    await self.p2.send_hq()
+                                    await self.p2.send_units_at_planet(int(game_update_string[2]))
+                                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                         game_update_string)
             elif self.battle_ability_to_resolve == "Carnath":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -1290,27 +1337,103 @@ class Game:
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         if game_update_string[1] == "1":
-                            self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
-                            await self.p1.send_units_at_planet(int(game_update_string[2]))
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                 game_update_string)
+                            can_continue = True
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if self.player_resolving_battle_ability != self.p1.name_player:
+                                if self.p1.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Communications Relay may be used.")
+                                    can_continue = False
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = self.p1.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = "Iridial"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = self.p2.name_player
+                                    self.nullify_context = "Iridial"
+                                    await self.send_search()
+                            if can_continue:
+                                self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                                await self.p1.send_units_at_planet(int(game_update_string[2]))
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
                         elif game_update_string[1] == "2":
-                            self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
-                            await self.p2.send_units_at_planet(int(game_update_string[2]))
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                 game_update_string)
+                            can_continue = True
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if self.player_resolving_battle_ability != self.p2.name_player:
+                                if self.p2.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Communications Relay may be used.")
+                                    can_continue = False
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = self.p2.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = "Iridial"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = self.p1.name_player
+                                    self.nullify_context = "Iridial"
+                                    await self.send_search()
+                            if can_continue:
+                                self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                                await self.p2.send_units_at_planet(int(game_update_string[2]))
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
                 elif len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == "1":
-                            self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
-                            await self.p1.send_hq()
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                 game_update_string)
+                            can_continue = True
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if self.player_resolving_battle_ability != self.p1.name_player:
+                                if self.p1.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Communications Relay may be used.")
+                                    can_continue = False
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = self.p1.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = "Iridial"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = self.p2.name_player
+                                    self.nullify_context = "Iridial"
+                                    await self.send_search()
+                            if can_continue:
+                                self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                                await self.p1.send_hq()
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
                         elif game_update_string[1] == "2":
-                            self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
-                            await self.p2.send_hq()
-                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                                 game_update_string)
+                            can_continue = True
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if self.player_resolving_battle_ability != self.p2.name_player:
+                                if self.p2.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Communications Relay may be used.")
+                                    can_continue = False
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = self.p2.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = "Iridial"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = self.p1.name_player
+                                    self.nullify_context = "Iridial"
+                                    await self.send_search()
+                            if can_continue:
+                                self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                                await self.p2.send_hq()
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
             elif self.battle_ability_to_resolve == "Plannum":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -2355,6 +2478,15 @@ class Game:
         if name == self.player_resolving_effect[0]:
             if self.effects_waiting_on_resolution[0] == "Commander Shadowsun":
                 if self.shadowsun_chose_hand:
+                    if len(game_update_string) == 1:
+                        if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                            primary_player.aiming_reticle_coords_hand = None
+                            del self.effects_waiting_on_resolution[0]
+                            del self.player_resolving_effect[0]
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
                     if len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
                             if game_update_string[1] == primary_player.get_number():
