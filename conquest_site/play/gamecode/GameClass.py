@@ -178,6 +178,7 @@ class Game:
         self.nullify_string = ""
         self.communications_relay_enabled = True
         self.bigga_is_betta_active = False
+        self.last_info_box_string = ""
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -210,39 +211,92 @@ class Game:
             card_string = "GAME_INFO/SEARCH/"
             await self.game_sockets[0].receive_game_update(card_string)
 
-    async def send_info_box(self):
+    async def send_info_box(self, force=False):
         info_string = "GAME_INFO/INFO_BOX/"
-        if self.phase == "DEPLOY":
-            if self.mode == "SHIELD":
-                info_string += self.player_who_is_shielding + "/"
+        if self.phase == "SETUP":
+            info_string += "Unspecified/"
+        elif self.cards_in_search_box:
+            info_string += self.name_player_who_is_searching + "/"
+        elif self.effects_waiting_on_resolution:
+            info_string += self.player_resolving_effect[0] + "/"
+        elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+            info_string += "Unspecified/"
+        elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
+            info_string += self.player_with_action + "/"
+        elif self.choices_available:
+            info_string += self.name_player_making_choices + "/"
+        elif self.reactions_needing_resolving:
+            info_string += self.player_who_resolves_reaction[0] + "/"
+        elif self.positions_of_units_to_take_damage:
+            if self.positions_of_units_to_take_damage[0][0] == 1:
+                info_string += self.name_1 + "/"
             else:
-                info_string += self.player_with_deploy_turn + "/"
+                info_string += self.name_2 + "/"
+        elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
+            info_string += "Unspecified/" + "Mobile"
+        elif self.battle_ability_to_resolve:
+            info_string += self.player_resolving_battle_ability + "/"
+        elif self.phase == "DEPLOY":
+            info_string += self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
-            if self.mode == "SHIELD":
-                info_string += self.player_who_is_shielding + "/"
-            else:
-                info_string += self.player_with_combat_turn + "/"
+            info_string += self.player_with_combat_turn + "/"
         else:
             info_string += "Unspecified/"
         info_string += "Phase: " + self.phase + "/"
         info_string += "Mode: " + self.mode + "/"
-        if self.phase == "DEPLOY":
-            if self.mode == "SHIELD":
-                info_string += "Active: " + self.player_who_is_shielding + "/"
+        if self.phase == "SETUP":
+            info_string += "Setup/"
+        elif self.cards_in_search_box:
+            info_string += "Searching: " + self.what_to_do_with_searched_card + "/"
+            info_string += "User: " + self.name_player_who_is_searching + "/"
+        elif self.effects_waiting_on_resolution:
+            info_string += "Effect: " + self.effects_waiting_on_resolution[0] + "/"
+            info_string += "User: " + self.player_resolving_effect[0] + "/"
+        elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+            info_string += "Indirect damage " + str(self.p1.total_indirect_damage) + \
+                           str(self.p2.total_indirect_damage) + "/"
+        elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
+            info_string += "Ambush discounts/God help you/"
+            info_string += self.player_with_action + "/"
+        elif self.choices_available:
+            info_string += "Choice: " + self.choice_context + "/"
+            info_string += "User: " + self.name_player_making_choices + "/"
+        elif self.reactions_needing_resolving:
+            info_string += "Reaction: " + self.reactions_needing_resolving[0] + "/"
+            info_string += "User: " + self.player_who_resolves_reaction[0] + "/"
+        elif self.positions_of_units_to_take_damage:
+            if self.positions_of_units_to_take_damage[0][0] == 1:
+                info_string += "Shield: " + self.name_1 + "/"
             else:
-                info_string += "Active: " + self.player_with_deploy_turn + "/"
+                info_string += "Shield: " + self.name_2 + "/"
+        elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
+            info_string += "Mobile window/"
+        elif self.battle_ability_to_resolve:
+            info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
+            info_string += self.player_resolving_battle_ability + "/"
+        elif self.phase == "DEPLOY":
+            info_string += "Active: " + self.player_with_deploy_turn + "/"
+        elif self.phase == "COMMAND":
+            if self.committing_warlords:
+                info_string += "Commit Warlords/"
+            elif self.before_command_struggle:
+                info_string += "Before command struggle/"
+            elif self.after_command_struggle:
+                info_string += "After command struggle/"
+            else:
+                info_string += "??????/"
         elif self.phase == "COMBAT":
             if self.ranged_skirmish_active:
-                if self.mode == "SHIELD":
-                    info_string += "Active (RANGED): " + self.player_who_is_shielding + "/"
-                else:
-                    info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
+                info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
-                if self.mode == "SHIELD":
-                    info_string += "Active: " + self.player_who_is_shielding + "/"
-                else:
-                    info_string += "Active: " + self.player_with_combat_turn + "/"
-        await self.game_sockets[0].receive_game_update(info_string)
+                info_string += "Active: " + self.player_with_combat_turn + "/"
+        else:
+            info_string += "??????/"
+        if self.last_info_box_string != info_string:
+            await self.game_sockets[0].receive_game_update(info_string)
+            self.last_info_box_string = info_string
+        elif force:
+            await self.game_sockets[0].receive_game_update(info_string)
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
@@ -2717,6 +2771,7 @@ class Game:
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
+        resolved_subroutine = False
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
@@ -2753,6 +2808,7 @@ class Game:
                 await CommandPhase.update_game_event_command_section(self, name, game_update_string)
             elif self.phase == "COMBAT":
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
+            resolved_subroutine = True
         if self.cards_in_search_box:
             await self.send_search()
         if self.positions_of_units_to_take_damage:
@@ -2862,6 +2918,8 @@ class Game:
                         await secondary_player.send_units_at_planet(loc_of_mark)
                         i = i - 1
                     i = i + 1
+        if resolved_subroutine:
+            await self.send_info_box()
         print("---\nDEBUG INFO\n---")
         print(self.reactions_needing_resolving)
         print(self.choices_available)
