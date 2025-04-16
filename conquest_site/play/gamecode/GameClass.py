@@ -745,12 +745,14 @@ class Game:
             self.name_player_making_choices = ""
             await self.send_search()
             primary_player.exhaust_card_in_hq_given_name("Communications Relay")
+            await primary_player.send_hq()
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
                 secondary_player.aiming_reticle_coords_hand_2 = None
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
+                self.amount_spend_for_tzeentch_firestorm = 0
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
                 await secondary_player.send_discard()
                 await secondary_player.send_hand()
@@ -760,6 +762,10 @@ class Game:
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
+                if self.nullified_card_name == "Zarathur's Flamers":
+                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                    await secondary_player.send_discard()
                 await secondary_player.send_units_at_planet(self.position_of_actioned_card[0])
                 self.position_of_actioned_card = (-1, -1)
         elif game_update_string[1] == "1":

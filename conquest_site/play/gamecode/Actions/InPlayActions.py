@@ -106,7 +106,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.choices_available = ["Yes", "No"]
                 self.name_player_making_choices = secondary_player.name_player
                 self.choice_context = "Use Communications Relay?"
-                self.nullified_card_pos = int(game_update_string[2])
                 self.nullified_card_name = self.action_chosen
                 self.cost_card_nullified = 0
                 self.nullify_string = "/".join(game_update_string)
@@ -211,9 +210,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
+                await self.send_search()
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
@@ -250,9 +262,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 1
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
+                await self.send_search()
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_limited():
                 player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
@@ -354,6 +379,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                        self.communications_relay_enabled:
+                    can_continue = False
+                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Communications Relay?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                    await self.send_search()
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False)
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -389,9 +427,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                    if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                         can_continue = False
                         await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                    elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                            self.communications_relay_enabled:
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Communications Relay?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                        await self.send_search()
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
@@ -434,6 +485,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                            self.communications_relay_enabled:
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Communications Relay?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "In Play Action"
+                        await self.send_search()
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
@@ -449,7 +513,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.number_with_deploy_turn = secondary_player.get_number()
                         await primary_player.send_units_at_planet(planet_pos)
                         await player_owning_card.send_units_at_planet(planet_pos)
-
     elif self.action_chosen == "Craftworld Gate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -559,8 +622,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.choices_available = ["Yes", "No"]
                 self.name_player_making_choices = secondary_player.name_player
                 self.choice_context = "Use Communications Relay?"
-                self.nullified_card_pos = int(game_update_string[2])
-                self.nullified_card_name = "Archon's Terror"
+                self.nullified_card_name = self.action_chosen
                 self.cost_card_nullified = 2
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
@@ -597,6 +659,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
+                await self.send_search()
         if can_continue:
             if planet_pos == self.position_of_actioned_card[0]:
                 hitting_self = False
@@ -636,9 +711,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
+                await self.send_search()
         if can_continue:
             card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
             if card.get_card_type() == "Army":
