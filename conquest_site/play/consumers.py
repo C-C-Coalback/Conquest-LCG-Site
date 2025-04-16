@@ -287,6 +287,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                             num_times = int(message[3])
                         except:
                             pass
+                    if num_times > 50:
+                        num_times = 50
                     for i in range(num_times):
                         active_games[self.game_position].p1.draw_card()
                     await active_games[self.game_position].p1.send_hand()
@@ -297,6 +299,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                             num_times = int(message[3])
                         except:
                             pass
+                    if num_times > 50:
+                        num_times = 50
                     for i in range(num_times):
                         active_games[self.game_position].p2.draw_card()
                     await active_games[self.game_position].p2.send_hand()
