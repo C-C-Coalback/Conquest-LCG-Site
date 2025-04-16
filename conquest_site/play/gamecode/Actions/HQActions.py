@@ -195,6 +195,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.set_blanked_given_pos(-2, unit_pos, exp="EOP")
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
+                await self.game_sockets[0].receive_game_update(
+                    "Twisted Laboratory used on " + player_being_hit.headquarters[unit_pos].get_name()
+                    + ", located at HQ, position " + str(unit_pos))
                 self.position_of_actioned_card = (-1, -1)
                 self.action_chosen = ""
                 self.player_with_action = ""
@@ -414,6 +417,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if player_receiving_buff.check_is_unit_at_pos(-2, int(game_update_string[2])):
             player_receiving_buff.increase_attack_of_unit_at_pos(-2, int(game_update_string[2]), 2,
                                                                  expiration="NEXT")
+            await self.game_sockets[0].receive_game_update(
+                "Catachan Outpost used on " + player_receiving_buff.headquarters[int(game_update_string[2])]
+                .get_name() + ", located at HQ, position " + game_update_string[2])
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
             self.position_of_actioned_card = (-1, -1)

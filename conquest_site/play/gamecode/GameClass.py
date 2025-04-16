@@ -648,6 +648,7 @@ class Game:
                 self.choice_context = ""
                 self.name_player_making_choices = ""
                 await self.send_search()
+                await self.game_sockets[0].receive_game_update("No Mercy window offered")
                 self.effects_waiting_on_resolution.append("No Mercy")
                 self.player_resolving_effect.append(self.first_player_nullified)
             elif self.nullify_context == "Fall Back":
