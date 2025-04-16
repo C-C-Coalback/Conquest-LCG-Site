@@ -1152,6 +1152,20 @@ class Player:
                         return True
         return False
 
+    def communications_relay_check(self, planet_pos, unit_pos):
+        print("---\nCommunications Relay Check!\n---")
+        communications_permitted = False
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_is_unit():
+                if self.headquarters[unit_pos].get_attachments():
+                    communications_permitted = True
+        elif self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
+            communications_permitted = True
+        if communications_permitted:
+            if self.search_card_in_hq("Communications Relay", ready_relevant=True):
+                return True
+        return False
+
     def search_hand_for_card(self, card_name):
         print("Looking for", card_name)
         for i in range(len(self.cards)):

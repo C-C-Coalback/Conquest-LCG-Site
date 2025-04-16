@@ -535,9 +535,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-            if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_pos = int(game_update_string[2])
+                self.nullified_card_name = "Archon's Terror"
+                self.cost_card_nullified = 2
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
+                await self.send_search()
         if can_continue:
             if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                 player_being_routed.rout_unit(planet_pos, unit_pos)

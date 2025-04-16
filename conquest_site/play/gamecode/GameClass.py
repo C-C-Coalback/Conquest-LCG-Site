@@ -174,6 +174,7 @@ class Game:
         self.nullified_card_name = ""
         self.nullify_enabled = True
         self.nullify_string = ""
+        self.communications_relay_enabled = True
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -737,6 +738,32 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0])
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
+    async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
+        if game_update_string[1] == "0":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            await self.send_search()
+            primary_player.exhaust_card_in_hq_given_name("Communications Relay")
+            if self.nullify_context == "Event Action":
+                secondary_player.aiming_reticle_coords_hand = None
+                secondary_player.aiming_reticle_coords_hand_2 = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+                await secondary_player.send_discard()
+                await secondary_player.send_hand()
+        elif game_update_string[1] == "1":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            self.communications_relay_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list)
+            self.communications_relay_enabled = True
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
             primary_player = self.p1
@@ -841,6 +868,9 @@ class Game:
                             await self.send_search()
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "Use Communications Relay?":
+                        await self.resolve_communications_relay(name, game_update_string,
+                                                                primary_player, secondary_player)
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
