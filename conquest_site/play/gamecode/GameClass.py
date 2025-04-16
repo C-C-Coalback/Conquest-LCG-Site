@@ -786,7 +786,7 @@ class Game:
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             await self.send_search()
             self.communications_relay_enabled = True
 
@@ -2545,8 +2545,9 @@ class Game:
         await primary_player.send_hand()
         await primary_player.send_discard()
 
-    async def update_game_event(self, name, game_update_string):
-        self.condition_main_game.acquire()
+    async def update_game_event(self, name, game_update_string, same_thread=False):
+        if not same_thread:
+            self.condition_main_game.acquire()
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
@@ -2695,8 +2696,9 @@ class Game:
         print("---\nDEBUG INFO\n---")
         print(self.reactions_needing_resolving)
         print(self.choices_available)
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
+        if not same_thread:
+            self.condition_main_game.notify_all()
+            self.condition_main_game.release()
 
     def reset_combat_positions(self):
         self.defender_position = -1
