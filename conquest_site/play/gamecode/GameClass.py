@@ -779,6 +779,13 @@ class Game:
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
                 await secondary_player.send_hq()
                 await secondary_player.send_discard()
+            elif self.nullify_context == "The Fury of Sicarius":
+                secondary_player.spend_resources(2)
+                secondary_player.discard_card_name_from_hand("The Fury of Sicarius")
+                if self.fury_search(secondary_player, primary_player):
+                    await self.send_search()
+                await secondary_player.send_discard()
+                await secondary_player.send_hand()
         elif game_update_string[1] == "1":
             self.choices_available = []
             self.choice_context = ""
@@ -786,7 +793,12 @@ class Game:
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            if self.nullified_card_name == "The Fury of Sicarius":
+                self.nullify_enabled = False
+                await self.resolve_fury_sicarius(secondary_player, primary_player)
+                self.nullify_enabled = True
+            else:
+                await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             await self.send_search()
             self.communications_relay_enabled = True
 
@@ -1052,6 +1064,7 @@ class Game:
                             self.resolving_search_box = False
                             await self.send_search()
                     elif self.choice_context == "Use The Fury of Sicarius?":
+                        planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":
                             self.choices_available = []
                             self.choice_context = ""
@@ -1067,6 +1080,19 @@ class Game:
                                 self.nullified_card_pos = -1
                                 self.nullified_card_name = "The Fury of Sicarius"
                                 self.cost_card_nullified = 2
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "The Fury of Sicarius"
+                                await self.send_search()
+                            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                                    self.communications_relay_enabled:
+                                await self.game_sockets[0].receive_game_update(
+                                    "Communications Relay may be used.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Communications Relay?"
+                                self.nullified_card_name = "The Fury of Sicarius"
+                                self.cost_card_nullified = 0
+                                self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "The Fury of Sicarius"
                                 await self.send_search()
