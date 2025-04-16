@@ -95,6 +95,7 @@ class Game:
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
         self.damage_can_be_shielded = []
+        self.amount_that_can_be_removed_by_shield = []
         self.card_type_of_selected_card_in_hand = ""
         self.cards_in_search_box = []
         self.name_player_who_is_searching = ""
@@ -176,6 +177,7 @@ class Game:
         self.nullify_enabled = True
         self.nullify_string = ""
         self.communications_relay_enabled = True
+        self.bigga_is_betta_active = False
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
@@ -1765,7 +1767,6 @@ class Game:
                                             await self.send_search()
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
-                            print(self.damage_can_be_shielded)
                             if self.damage_can_be_shielded[0]:
                                 no_mercy_possible = False
                                 if can_no_mercy:
@@ -1779,6 +1780,7 @@ class Game:
                                     self.name_player_making_choices = secondary_player.name_player
                                     await self.send_search()
                                 else:
+                                    shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                     took_damage = True
                                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                                     if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \

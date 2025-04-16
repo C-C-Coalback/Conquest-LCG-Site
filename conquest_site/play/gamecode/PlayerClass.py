@@ -730,6 +730,7 @@ class Player:
         return True
 
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
+        damage_on_play = damage_to_take
         if card is None and position_hand is None:
             return "ERROR/play_card function called incorrectly", -1
         if card is not None and position_hand is not None:
@@ -773,7 +774,12 @@ class Player:
                                 print("Played card to planet", position)
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
                                 if damage_to_take > 0:
-                                    self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                    if self.game.bigga_is_betta_active:
+                                        while damage_on_play > 0:
+                                            self.assign_damage_to_pos(position, location_of_unit, 1)
+                                            damage_on_play -= 1
+                                    else:
+                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 return "SUCCESS", location_of_unit
                         else:
                             return "FAIL/Limited already played", -1
@@ -785,7 +791,12 @@ class Player:
                             print(card.get_ability())
                             location_of_unit = len(self.cards_in_play[position + 1]) - 1
                             if damage_to_take > 0:
-                                self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                if self.game.bigga_is_betta_active:
+                                    while damage_on_play > 0:
+                                        self.assign_damage_to_pos(position, location_of_unit, 1)
+                                        damage_on_play -= 1
+                                else:
+                                    self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.discard_card_at_random_from_opponent(self.number)
                             if card.get_ability() == "Kith's Khymeramasters":
@@ -1435,7 +1446,8 @@ class Player:
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
-        self.game.damage_on_units_list_before_new_damage.append(self.cards_in_play[planet_id + 1][unit_id].get_damage())
+        prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
+        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                        "Zarathur, High Sorcerer",
                                                                        bloodied_relevant=True)
@@ -1452,12 +1464,14 @@ class Player:
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
+        total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1)
         if damage_on_card_after > damage_on_card_before:
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
             self.game.damage_can_be_shielded.append(can_shield)
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
+            self.game.amount_that_can_be_removed_by_shield.append(total_damage_that_can_be_blocked)
         return damage_too_great
 
     def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
@@ -1474,11 +1488,15 @@ class Player:
         return False
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
-        self.game.damage_on_units_list_before_new_damage.append(self.headquarters[unit_id].get_damage())
+        prior_damage = self.headquarters[unit_id].get_damage()
+        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
+        afterwards_damage = self.headquarters[unit_id].get_damage()
+        total_that_can_be_blocked = afterwards_damage - prior_damage
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
         self.game.damage_can_be_shielded.append(can_shield)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
+        self.game.amount_that_can_be_removed_by_shield.append()
         return damage_too_great
 
     def suffer_area_effect(self, planet_id, amount):

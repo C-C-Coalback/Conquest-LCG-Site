@@ -222,10 +222,12 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     damage_to_take = sum(self.damage_for_unit_to_take_on_play)
     print("position hand of unit: ", self.card_pos_to_deploy)
     print("Damage to take: ", damage_to_take)
+    self.bigga_is_betta_active = True
     played_card, position_of_unit = primary_player.play_card(int(planet_pos),
                                                              position_hand=self.card_pos_to_deploy,
                                                              discounts=discounts,
                                                              damage_to_take=damage_to_take)
+    self.bigga_is_betta_active = False
     if played_card == "SUCCESS":
         self.mode = "Normal"
         if secondary_player.search_card_at_planet(int(planet_pos), "Syren Zythlex"):

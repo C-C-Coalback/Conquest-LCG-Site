@@ -6,7 +6,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 ALL CARDS HAVE BEEN ADDED!
 
 There are a select few things to add: ~~prevent some effects from
-being shielded, but allowing others~~; minor Bigga Is Betta fix;
+being shielded, but allowing others; minor Bigga Is Betta fix;~~
 Better info box support; better debugging tools.
 
 # What is this?
