@@ -248,13 +248,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                        self.attacker_position])
                                     self.player_who_resolves_reaction.append(primary_player.name_player)
                                     self.last_defender_pos = (self.defender_planet, self.defender_position)
+                                can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                        self.attacker_position)
                                 unit_dead = secondary_player.assign_damage_to_pos(self.defender_planet,
                                                                                   self.defender_position,
                                                                                   damage=attack_value,
-                                                                                  att_pos=self.attacker_location)
+                                                                                  att_pos=self.attacker_location,
+                                                                                  can_shield=can_shield)
                                 self.damage_from_attack = True
-                                armorbane_check = primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                         self.attacker_position)
                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                             self.defender_position, "red")
                             else:

@@ -1456,6 +1456,7 @@ class Player:
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1)
         if damage_on_card_after > damage_on_card_before:
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
+            self.game.damage_can_be_shielded.append(can_shield)
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
         return damage_too_great
 
@@ -1476,6 +1477,7 @@ class Player:
         self.game.damage_on_units_list_before_new_damage.append(self.headquarters[unit_id].get_damage())
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
+        self.game.damage_can_be_shielded.append(can_shield)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
         return damage_too_great
 
