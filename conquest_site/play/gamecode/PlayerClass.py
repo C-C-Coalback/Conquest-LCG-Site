@@ -170,51 +170,52 @@ class Player:
             await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_planet(self, planet_id):
-        if planet_id == -2:
-            await self.send_hq()
-        else:
-            if self.cards_in_play[planet_id + 1]:
-                print("Need to send units")
-                card_strings = []
-                for i in range(len(self.cards_in_play[planet_id + 1])):
-                    current_card = self.cards_in_play[planet_id + 1][i]
-                    single_card_string = current_card.get_name()
-                    single_card_string = single_card_string + "|"
-                    if current_card.ready:
-                        single_card_string += "R|"
-                    else:
-                        single_card_string += "E|"
-                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
-                    single_card_string += "|"
-                    if current_card.get_card_type() == "Warlord":
-                        if current_card.get_bloodied():
-                            single_card_string += "B"
+        if planet_id != -1:
+            if planet_id == -2:
+                await self.send_hq()
+            else:
+                if self.cards_in_play[planet_id + 1]:
+                    print("Need to send units")
+                    card_strings = []
+                    for i in range(len(self.cards_in_play[planet_id + 1])):
+                        current_card = self.cards_in_play[planet_id + 1][i]
+                        single_card_string = current_card.get_name()
+                        single_card_string = single_card_string + "|"
+                        if current_card.ready:
+                            single_card_string += "R|"
+                        else:
+                            single_card_string += "E|"
+                        single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                        single_card_string += "|"
+                        if current_card.get_card_type() == "Warlord":
+                            if current_card.get_bloodied():
+                                single_card_string += "B"
+                            else:
+                                single_card_string += "H"
                         else:
                             single_card_string += "H"
-                    else:
-                        single_card_string += "H"
-                    single_card_string += "|"
-                    if current_card.aiming_reticle_color is not None:
-                        single_card_string += current_card.aiming_reticle_color
-                    attachments_list = current_card.get_attachments()
-                    for a in range(len(attachments_list)):
-                        print("Adding attachments")
-                        print(attachments_list[a].get_name())
                         single_card_string += "|"
-                        single_card_string += attachments_list[a].get_name()
-                        single_card_string += "+"
-                        if attachments_list[a].get_ready():
-                            single_card_string += "R"
-                        else:
-                            single_card_string += "E"
-                    card_strings.append(single_card_string)
-                joined_string = "/".join(card_strings)
-                joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
-                print(joined_string)
-                await self.game.game_sockets[0].receive_game_update(joined_string)
-            else:
-                joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
-                await self.game.game_sockets[0].receive_game_update(joined_string)
+                        if current_card.aiming_reticle_color is not None:
+                            single_card_string += current_card.aiming_reticle_color
+                        attachments_list = current_card.get_attachments()
+                        for a in range(len(attachments_list)):
+                            print("Adding attachments")
+                            print(attachments_list[a].get_name())
+                            single_card_string += "|"
+                            single_card_string += attachments_list[a].get_name()
+                            single_card_string += "+"
+                            if attachments_list[a].get_ready():
+                                single_card_string += "R"
+                            else:
+                                single_card_string += "E"
+                        card_strings.append(single_card_string)
+                    joined_string = "/".join(card_strings)
+                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
+                    print(joined_string)
+                    await self.game.game_sockets[0].receive_game_update(joined_string)
+                else:
+                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
+                    await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def send_units_at_all_planets(self):
         for i in range(7):
@@ -388,10 +389,13 @@ class Player:
             self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = color
 
     def reset_aiming_reticle_in_play(self, planet_id, unit_id):
+        if planet_id == -1 or unit_id == -1:
+            return None
         if planet_id == -2:
             self.headquarters[unit_id].aiming_reticle_color = None
         else:
             self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
+        return None
 
     def discard_card_name_from_hand(self, card_name):
         for i in range(len(self.cards)):

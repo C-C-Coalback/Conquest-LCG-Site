@@ -754,6 +754,14 @@ class Game:
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
                 await secondary_player.send_discard()
                 await secondary_player.send_hand()
+            elif self.nullify_context == "In Play Action":
+                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                await secondary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                self.position_of_actioned_card = (-1, -1)
         elif game_update_string[1] == "1":
             self.choices_available = []
             self.choice_context = ""
@@ -762,6 +770,7 @@ class Game:
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
             await self.update_game_event(secondary_player.name_player, new_string_list)
+            await self.send_search()
             self.communications_relay_enabled = True
 
     async def resolve_choice(self, name, game_update_string):
