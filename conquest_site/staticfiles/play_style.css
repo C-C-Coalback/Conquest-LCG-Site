@@ -14,7 +14,7 @@ h4 {
     position: absolute;
     top: 0%;
     right: 0%;
-    height:20vh;
+    height:25vh;
     width:15vw;
 }
 
@@ -342,16 +342,16 @@ summary:focus {
 
 #info-box {
     position: absolute;
-    width: 10vw;
-    max-width: 10vw;
-    height: 10vh;
-    max-height: 10vh;
-    top: 53%;
+    width: 15vw;
+    max-width: 15vw;
+    min-height: 4vh;
+    max-height: 20vh;
+    top: 40%;
     border: 5px solid blue;
     right: 0;
     margin: auto;
     overflow-x:hidden;
-    overflow-y:scroll;
+    overflow-y:hidden;
     white-space:nowrap;
     display: flex;
     flex-direction: column;
