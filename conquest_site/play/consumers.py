@@ -253,69 +253,71 @@ class GameConsumer(AsyncWebsocketConsumer):
             if current_game_id != -1:
                 await active_games[current_game_id].update_game_event(self.name, message[1:])
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
-            if message[1] == "PLANETS":
-                print("Need to load planets")
-                for i in range(len(active_games)):
-                    if active_games[i].game_id == self.room_name:
-                        await active_games[i].send_planet_array()
-            elif (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
-                deck_name = message[2]
-                print(deck_name)
-                path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name
-                print(path_to_player_decks)
-                if os.path.exists(path_to_player_decks):
-                    print("Success")
-                    with open(path_to_player_decks, 'r') as f:
-                        deck_content = f.read()
-                    print(deck_content)
+            del message[0]
+            if message[0] == "":
+                if message[1] == "PLANETS":
+                    print("Need to load planets")
                     for i in range(len(active_games)):
                         if active_games[i].game_id == self.room_name:
-                            print("In correct room")
-                            if active_games[i].name_1 == self.name:
-                                print("Need to load player one's deck")
-                                if not active_games[i].p1.deck_loaded:
-                                    await active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
-                            elif active_games[i].name_2 == self.name:
-                                print("Need to load player two's deck")
-                                if not active_games[i].p2.deck_loaded:
-                                    await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
-            elif message[1] == "DRAW" and len(message) > 2:
-                if message[2] == "1":
-                    num_times = 1
-                    if len(message) == 4:
-                        try:
-                            num_times = int(message[3])
-                        except:
-                            pass
-                    if num_times > 50:
-                        num_times = 50
-                    for i in range(num_times):
-                        active_games[self.game_position].p1.draw_card()
-                    await active_games[self.game_position].p1.send_hand()
-                elif message[2] == "2":
-                    num_times = 1
-                    if len(message) == 4:
-                        try:
-                            num_times = int(message[3])
-                        except:
-                            pass
-                    if num_times > 50:
-                        num_times = 50
-                    for i in range(num_times):
-                        active_games[self.game_position].p2.draw_card()
-                    await active_games[self.game_position].p2.send_hand()
-            elif message[1] == "DISCARD" and len(message) > 3:
-                hand_pos = int(message[3])
-                if message[2] == "1":
-                    active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
-                    await active_games[self.game_position].p1.send_hand()
-                    await active_games[self.game_position].p1.send_discard()
-                elif message[2] == "2":
-                    active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
-                    await active_games[self.game_position].p2.send_hand()
-                    await active_games[self.game_position].p2.send_discard()
+                            await active_games[i].send_planet_array()
+                elif (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
+                    deck_name = message[2]
+                    print(deck_name)
+                    path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name
+                    print(path_to_player_decks)
+                    if os.path.exists(path_to_player_decks):
+                        print("Success")
+                        with open(path_to_player_decks, 'r') as f:
+                            deck_content = f.read()
+                        print(deck_content)
+                        for i in range(len(active_games)):
+                            if active_games[i].game_id == self.room_name:
+                                print("In correct room")
+                                if active_games[i].name_1 == self.name:
+                                    print("Need to load player one's deck")
+                                    if not active_games[i].p1.deck_loaded:
+                                        await active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
+                                elif active_games[i].name_2 == self.name:
+                                    print("Need to load player two's deck")
+                                    if not active_games[i].p2.deck_loaded:
+                                        await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
+                elif message[1] == "DRAW" and len(message) > 2:
+                    if message[2] == "1":
+                        num_times = 1
+                        if len(message) == 4:
+                            try:
+                                num_times = int(message[3])
+                            except:
+                                pass
+                        if num_times > 50:
+                            num_times = 50
+                        for i in range(num_times):
+                            active_games[self.game_position].p1.draw_card()
+                        await active_games[self.game_position].p1.send_hand()
+                    elif message[2] == "2":
+                        num_times = 1
+                        if len(message) == 4:
+                            try:
+                                num_times = int(message[3])
+                            except:
+                                pass
+                        if num_times > 50:
+                            num_times = 50
+                        for i in range(num_times):
+                            active_games[self.game_position].p2.draw_card()
+                        await active_games[self.game_position].p2.send_hand()
+                elif message[1] == "DISCARD" and len(message) > 3:
+                    hand_pos = int(message[3])
+                    if message[2] == "1":
+                        active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
+                        await active_games[self.game_position].p1.send_hand()
+                        await active_games[self.game_position].p1.send_discard()
+                    elif message[2] == "2":
+                        active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
+                        await active_games[self.game_position].p2.send_hand()
+                        await active_games[self.game_position].p2.send_discard()
             else:
-                message = self.name + ": " + message[1]
+                message = self.name + ": " + message[0]
                 print("receive:", message)
                 chat_messages[0].append(self.room_name)
                 chat_messages[1].append(message)
