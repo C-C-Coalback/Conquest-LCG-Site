@@ -350,7 +350,7 @@ summary:focus {
     border: 5px solid blue;
     right: 0;
     margin: auto;
-    overflow-x:hidden;
+    overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
