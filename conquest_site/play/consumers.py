@@ -4,7 +4,7 @@ import string
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamecode import GameClass
 import os
-from .gamecode import Initfunctions
+from .gamecode import Initfunctions, FindCard
 import threading
 
 card_array = Initfunctions.init_player_cards()
@@ -255,12 +255,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
             if message[0] == "":
-                if message[1] == "PLANETS":
+                if message[1] == "planets":
                     print("Need to load planets")
                     for i in range(len(active_games)):
                         if active_games[i].game_id == self.room_name:
                             await active_games[i].send_planet_array()
-                elif (message[1] == "LOAD DECK" or message[1] == "LOADDECK") and len(message) > 2:
+                elif (message[1] == "loaddeck" or message[1] == "LOADDECK") and len(message) > 2:
                     deck_name = message[2]
                     print(deck_name)
                     path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name
@@ -281,7 +281,17 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     print("Need to load player two's deck")
                                     if not active_games[i].p2.deck_loaded:
                                         await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
-                elif message[1] == "DRAW" and len(message) > 2:
+                elif message[1] == "addcard" and len(message) > 3:
+                    card_name = message[3]
+                    card = FindCard.find_card(card_name, active_games[self.game_position].card_array)
+                    if card.get_shields() != "FINAL CARD":
+                        if message[2] == "1":
+                            active_games[self.game_position].p1.cards.append(card_name)
+                            await active_games[self.game_position].p1.send_hand()
+                        elif message[2] == "2":
+                            active_games[self.game_position].p2.cards.append(card_name)
+                            await active_games[self.game_position].p2.send_hand()
+                elif message[1] == "draw" and len(message) > 2:
                     if message[2] == "1":
                         num_times = 1
                         if len(message) == 4:
@@ -306,7 +316,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                         for i in range(num_times):
                             active_games[self.game_position].p2.draw_card()
                         await active_games[self.game_position].p2.send_hand()
-                elif message[1] == "DISCARD" and len(message) > 3:
+                elif message[1] == "discard" and len(message) > 3:
                     hand_pos = int(message[3])
                     if message[2] == "1":
                         active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
@@ -316,7 +326,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                         await active_games[self.game_position].p2.send_hand()
                         await active_games[self.game_position].p2.send_discard()
-                elif message[1] == "SET-DAMAGE":
+                elif message[1] == "set-damage" and len(message) > 3:
                     unit_position = message[2:]
                     unit_position = unit_position[:-1]
                     damage = message[-1]
