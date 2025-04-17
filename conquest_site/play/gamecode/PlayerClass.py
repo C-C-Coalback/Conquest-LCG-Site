@@ -452,16 +452,9 @@ class Player:
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
         elif self.headquarters[last_element_index].get_ability() == "Swordwind Farseer":
-            if len(self.deck) > 5:
-                self.number_cards_to_search = 6
-                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
-                self.game.name_player_who_is_searching = self.name_player
-                self.game.number_who_is_searching = str(self.number)
-                self.game.what_to_do_with_searched_card = "DRAW"
-                self.game.traits_of_searched_card = None
-                self.game.card_type_of_searched_card = None
-                self.game.faction_of_searched_card = None
-                self.game.no_restrictions_on_chosen_card = True
+            self.game.reactions_needing_resolving.append("Swordwind Farseer")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+            self.game.player_who_resolves_reaction.append(self.name_player)
         elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
             i = len(self.discard) - 1
             while i > -1:
@@ -472,16 +465,9 @@ class Player:
                     return None
                 i = i - 1
         elif self.headquarters[last_element_index].get_ability() == "Earth Caste Technician":
-            if len(self.deck) > 5:
-                self.number_cards_to_search = 6
-                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
-                self.game.name_player_who_is_searching = self.name_player
-                self.game.number_who_is_searching = str(self.number)
-                self.game.what_to_do_with_searched_card = "DRAW"
-                self.game.traits_of_searched_card = "Drone"
-                self.game.card_type_of_searched_card = "Attachment"
-                self.game.faction_of_searched_card = None
-                self.game.no_restrictions_on_chosen_card = False
+            self.game.reactions_needing_resolving.append("Earth Caste Technician")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
+            self.game.player_who_resolves_reaction.append(self.name_player)
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):

@@ -193,7 +193,7 @@ class Game:
         await self.p2.send_resources()
         await self.p1.send_discard()
         await self.p2.send_discard()
-        await self.send_info_box()
+        await self.send_info_box(force=True)
         await self.send_search()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
@@ -558,6 +558,8 @@ class Game:
                             self.p1.number_cards_to_search -= 1
                             self.p1.bottom_remaining_cards()
                             self.reset_search_values()
+                            if self.resolving_search_box:
+                                self.resolving_search_box = False
                             if self.battle_ability_to_resolve == "Elouith":
                                 await self.resolve_battle_conclusion(name, game_update_string)
                                 self.reset_battle_resolve_attributes()
@@ -597,6 +599,8 @@ class Game:
                             self.p2.number_cards_to_search -= 1
                             self.p2.bottom_remaining_cards()
                             self.reset_search_values()
+                            if self.resolving_search_box:
+                                self.resolving_search_box = False
                             if self.battle_ability_to_resolve == "Elouith":
                                 await self.resolve_battle_conclusion(name, game_update_string)
                                 self.reset_battle_resolve_attributes()
@@ -2855,6 +2859,56 @@ class Game:
                     del self.player_who_resolves_reaction[0]
                     await self.send_search()
                     await self.send_info_box()
+                elif self.reactions_needing_resolving[0] == "Swordwind Farseer":
+                    if self.player_who_resolves_reaction[0] == self.name_1:
+                        self.p1.number_cards_to_search = 6
+                        if len(self.p1.deck) > 5:
+                            self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    else:
+                        self.p2.number_cards_to_search = 6
+                        if len(self.p2.deck) > 5:
+                            self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.resolving_search_box = True
+                    self.name_player_who_is_searching = self.name_player
+                    self.number_who_is_searching = str(self.number)
+                    self.what_to_do_with_searched_card = "DRAW"
+                    self.traits_of_searched_card = None
+                    self.card_type_of_searched_card = None
+                    self.faction_of_searched_card = None
+                    self.no_restrictions_on_chosen_card = True
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                elif self.reactions_needing_resolving[0] == "Earth Caste Technician":
+                    if self.player_who_resolves_reaction[0] == self.name_1:
+                        self.p1.number_cards_to_search = 6
+                        if len(self.p1.deck) > 5:
+                            self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    else:
+                        self.p2.number_cards_to_search = 6
+                        if len(self.p2.deck) > 5:
+                            self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.resolving_search_box = True
+                    self.name_player_who_is_searching = self.name_player
+                    self.number_who_is_searching = str(self.number)
+                    self.what_to_do_with_searched_card = "DRAW"
+                    self.traits_of_searched_card = "Drone"
+                    self.card_type_of_searched_card = "Attachment"
+                    self.faction_of_searched_card = None
+                    self.no_restrictions_on_chosen_card = False
+                    del self.reactions_needing_resolving[0]
+                    del self.positions_of_unit_triggering_reaction[0]
+                    del self.player_who_resolves_reaction[0]
+                    await self.send_search()
                 elif self.reactions_needing_resolving[0] == "Shrine of Warpflame":
                     self.resolving_search_box = True
                     self.choices_available = ["Yes", "No"]
