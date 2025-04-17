@@ -1,0 +1,364 @@
+h4 {
+    color: blue;
+}
+
+.box {
+    position: relative;
+    height: 88vh;
+    width: 97vw;
+    border: 5px solid blue;
+    overflow: hidden;
+}
+
+#LargeHelperCard {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    height:25vh;
+    width:15vw;
+}
+
+#victory-display-player-1 {
+    position: absolute;
+    top: 4vh;
+    right: 15vw;
+    height: 10vh;
+    width: 10vw;
+    border: 5px solid yellow;
+}
+
+#victory-display-player-2 {
+    position: absolute;
+    bottom: 0vh;
+    right: 15vw;
+    height: 10vh;
+    width: 10vw;
+    border: 5px solid yellow;
+}
+
+.Card-div {
+    position: relative;
+    height:8vh;
+    width:auto;
+}
+
+.Card-div + .Card-div {
+    margin-left:0vw;
+}
+
+.Card {
+    position: relative;
+    height:8vh;
+    width:5vw;
+}
+
+.Damage {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.Attachment-Card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8vh;
+    width: 5vw;
+}
+
+.Attachment-Card + .Attachment-Card {
+    margin-left: 1vw;
+}
+
+.aiming-reticle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8vh;
+    width: 5vw;
+    pointer-events: none;
+}
+
+.large-aiming-reticle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 10vh;
+    width: 10vw;
+    pointer-events: none;
+}
+
+.planet {
+    position: relative;
+    height: 10vh;
+    width: 10vw;
+}
+
+.planet-div {
+    position: relative;
+    margin-left:1vw;
+    float:left;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+}
+
+.planet-in-victory-display-1 {
+    position:relative;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+    margin: -4vh;
+    float: down;
+}
+
+.planet-in-victory-display-2 {
+    position:relative;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+    margin: -4vh;
+    float: down;
+}
+
+#player-1-cards-in-play {
+    position:absolute;
+    top:26%;
+    border: 5px solid yellow;
+    width:80vw;
+    max-width:80vw;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: none;
+    background: transparent;
+}
+
+#player-2-cards-in-play {
+    position:absolute;
+    bottom:26%;
+    border: 5px solid yellow;
+    width:80vw;
+    max-width:80vw;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: none;
+    background: transparent;
+}
+
+.player-1-in-play {
+    margin-left:1vw;
+    float:left;
+    width: 10vw;
+    max-width:10vw;
+    max-height: 8vh;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display:flex;
+    flex-direction:row;
+    pointer-events: auto;
+}
+
+.player-2-in-play {
+    margin-left:1vw;
+    float:left;
+    width: 10vw;
+    max-width:10vw;
+    max-height: 8vh;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display:flex;
+    flex-direction:row;
+    pointer-events: auto;
+}
+
+#headquarters-player-2 {
+    position:absolute;
+    bottom:11vh;
+    border: 5px solid red;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    left: 100px;
+    pointer-events: auto;
+}
+
+#headquarters-player-1 {
+    position:absolute;
+    top:11vh;
+    border: 5px solid green;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    left: 100px;
+    pointer-events: auto;
+}
+
+#resources-player-2 {
+    position:absolute;
+    bottom:calc(13% + 20px);
+}
+
+#resources-player-1 {
+    position:absolute;
+    top:calc(13% + 10px);
+}
+
+#pass-player-1 {
+    position:absolute;
+    top:calc(13% + 0px);
+}
+
+#pass-player-2 {
+    position:absolute;
+    bottom:calc(13% + 0px);
+}
+
+#request-action-div {
+    position: absolute;
+    right:0;
+    bottom: calc(45px + 20vh);
+    width: auto;
+    height: 15px;
+}
+
+#chat-message-submit {
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
+#chat-message-input {
+    position:absolute;
+    bottom:0;
+    right:40px;
+    height: 15px;
+    width: calc(10vw - 10px);
+}
+
+#chat-log {
+    position:absolute;
+    bottom:30px;
+    right:0;
+    width: calc(10vw + 30px);
+    height: 20vh;
+}
+
+#current-hand-player-1 {
+    position:absolute;
+    top:0;
+    left: 10vw;
+    margin: auto;
+    border: 5px solid green;
+    max-width: 60vw;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+#current-deck-player-1 {
+    position:absolute;
+    top:0;
+    left: 5vw;
+}
+
+#search-collapse {
+    position: absolute;
+    right: 0;
+    top: 30vh;
+    border: 5px solid red;
+    max-width: 20vw;
+    overflow-y:hidden;
+    overflow-x:scroll;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+summary::-webkit-details-marker {
+  color: blue;
+}
+summary:focus {
+  outline-style: none;
+}
+
+#current-discard-player-1 {
+    position:absolute;
+    top:0;
+}
+
+#current-hand-player-2 {
+    position:absolute;
+    bottom:0;
+    left: 10vw;
+    margin: auto;
+    border: 5px solid red;
+    max-width: 60vw;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+#current-deck-player-2 {
+    position:absolute;
+    bottom:0;
+    left: 5vw;
+}
+
+#current-discard-player-2 {
+    position:absolute;
+    bottom:0;
+}
+
+#planets-in-play {
+    position:absolute;
+    width: 80vw;
+    max-width: 80vw;
+    top:43%;
+    border: 5px solid blue;
+    margin: auto;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+    background: transparent;
+}
+
+#info-box {
+    position: absolute;
+    width: 15vw;
+    max-width: 15vw;
+    min-height: 4vh;
+    max-height: 20vh;
+    top: 40%;
+    border: 5px solid blue;
+    right: 0;
+    margin: auto;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    background: transparent;
+}
+
+.info-box-sub {
+    margin-bottom: -5px;
+}
