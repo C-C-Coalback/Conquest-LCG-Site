@@ -35,22 +35,15 @@ Current game progress: Everything, except:
 
 # How can I run it myself?
 
+Don't.
+
 First run "py -m pip install -r requirements.txt" to install dependencies.
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
 
-If you are wanting to run this for development purposes, I recommend navigating
-to settings.py in the conquest_site app and adding
-"IPAddr = 127.0.0.1" just before the CHANNEL_LAYERS assignment.
-You can now open a second console, navigate to the manage.py file, and simply run
+If you are wanting to run this for development purposes,
+navigate to the manage.py file, and simply run
 "py manage.py runserver", and it should work.
-
-If you want to run this on a LAN/similar, no need to change anything. Open a second console,
-navigate to the manage.py file and run 
-'daphne -b {YOUR_IP_HERE} -p 8080 conquest_site.asgi:application'.
-You will need to allow python through your firewall on the private network.
-Then others can connect to the site using a web browser and heading
-to "http://{YOUR_IP_HERE}:8080".
 
 # Disclaimer
 

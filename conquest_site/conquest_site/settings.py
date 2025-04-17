@@ -28,8 +28,8 @@ SECRET_KEY = 'django-insecure-k8sq_8=t^^ld8j#ujxo9+ac(!nn6a9!)bfsl+&z__!90paljdp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['.awsapprunner.com']
+ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['.awsapprunner.com']
 
 
 # Application definition
@@ -142,15 +142,15 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
-hostname = socket.gethostname()
-IPAddr = socket.gethostbyname(hostname)
+# hostname = socket.gethostname()
+# IPAddr = socket.gethostbyname(hostname)
 
 ASGI_APPLICATION = "conquest_site.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(IPAddr, 6379)],
+            "hosts": [("0.0.0.0", 6379)],
         },
     },
 }
