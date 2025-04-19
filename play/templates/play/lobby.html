@@ -19,8 +19,10 @@
     <p></p>
 </div>
 <script>
+	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         const lobbySocket = new WebSocket(
-            'ws://'
+            ws_scheme
+	    + '://'
             + window.location.host
             + '/ws/play/'
         );

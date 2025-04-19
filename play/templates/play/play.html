@@ -118,9 +118,10 @@
 {{ game_id|json_script:"game-id" }}
 <script>
         const roomName = JSON.parse(document.getElementById('game-id').textContent);
-
+	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         const gameSocket = new WebSocket(
-            'ws://'
+	    ws_scheme
+            + '://'
             + window.location.host
             + '/ws/play/'
             + roomName

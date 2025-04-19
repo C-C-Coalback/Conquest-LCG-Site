@@ -132,6 +132,10 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://34.205.139.124'
+]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = None
