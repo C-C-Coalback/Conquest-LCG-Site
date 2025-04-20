@@ -133,7 +133,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://34.205.139.124'
+    'https://34.205.139.124', "https://www.iridial.net"
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
