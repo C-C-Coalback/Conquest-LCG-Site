@@ -446,6 +446,24 @@ class Player:
     def shuffle_deck(self):
         shuffle(self.deck)
 
+    def search_for_existing_relic(self):
+        print("performing relic search")
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].check_for_a_trait("Relic"):
+                return True
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[j].check_for_a_trait("Relic"):
+                    return True
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Relic"):
+                    return True
+                for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                            check_for_a_trait("Relic"):
+                        return True
+        return False
+
     def search_for_unique_card(self, name):
         print("performing uniques search")
         for i in range(len(self.headquarters)):
@@ -606,6 +624,9 @@ class Player:
                                         army_unit_as_attachment=False):
         if card.get_unique():
             if self.search_for_unique_card(card.name):
+                return False
+        if card.check_for_a_trait("Relic"):
+            if self.search_for_existing_relic():
                 return False
         if army_unit_as_attachment:
             if not_own_attachment:
