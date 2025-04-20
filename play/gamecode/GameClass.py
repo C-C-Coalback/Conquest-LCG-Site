@@ -961,6 +961,24 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.send_search()
+                    elif self.choice_context == "Retreat Warlord?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                            primary_player.retreat_unit(self.attacker_planet, self.attacker_position)
+                            await primary_player.send_hq()
+                            await primary_player.send_units_at_planet(self.attacker_planet)
+                            self.reset_combat_positions()
+                            self.number_with_combat_turn = secondary_player.get_number()
+                            self.player_with_combat_turn = secondary_player.get_name_player()
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
