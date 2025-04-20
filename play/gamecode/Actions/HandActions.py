@@ -270,17 +270,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):
-                primary_player.add_card_to_planet(card, self.position_of_actioned_card[0])
-                primary_player.remove_card_from_hand(int(game_update_string[2]))
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                await primary_player.send_hand()
-                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
-                await primary_player.send_resources()
-                self.position_of_actioned_card = (-1, -1)
+                if primary_player.add_card_to_planet(card, self.position_of_actioned_card[0]) != -1:
+                    primary_player.remove_card_from_hand(int(game_update_string[2]))
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    await primary_player.send_hand()
+                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+                    await primary_player.send_resources()
+                    self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Infernal Gateway":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

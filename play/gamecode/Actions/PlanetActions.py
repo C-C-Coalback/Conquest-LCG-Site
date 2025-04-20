@@ -81,19 +81,20 @@ async def update_game_event_action_planet(self, name, game_update_string):
             pos_planet = int(game_update_string[1])
             card = FindCard.find_card(primary_player.cards[pos_hand], self.card_array)
             unit_pos = primary_player.add_card_to_planet(card, pos_planet)
-            primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
-            primary_player.aiming_reticle_coords_hand = None
-            primary_player.aiming_reticle_coords_hand_2 = None
-            primary_player.discard_card_from_hand(pos_hand)
-            if pos_hand < self.card_pos_to_deploy:
-                self.card_pos_to_deploy -= 1
-            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-            self.mode = "Normal"
-            self.action_chosen = ""
-            self.player_with_action = ""
-            await primary_player.send_hand()
-            await primary_player.send_units_at_planet(pos_planet)
-            await primary_player.send_discard()
+            if unit_pos != -1:
+                primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
+                primary_player.aiming_reticle_coords_hand = None
+                primary_player.aiming_reticle_coords_hand_2 = None
+                primary_player.discard_card_from_hand(pos_hand)
+                if pos_hand < self.card_pos_to_deploy:
+                    self.card_pos_to_deploy -= 1
+                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                self.mode = "Normal"
+                self.action_chosen = ""
+                self.player_with_action = ""
+                await primary_player.send_hand()
+                await primary_player.send_units_at_planet(pos_planet)
+                await primary_player.send_discard()
     elif self.action_chosen == "Khymera Den":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -224,22 +225,22 @@ async def update_game_event_action_planet(self, name, game_update_string):
             card = primary_player.get_card_in_discard(i)
             if card.get_is_unit() and card.get_faction() == "Eldar":
                 card_found = True
-                primary_player.add_card_to_planet(card, chosen_planet, sacrifice_end_of_phase=True)
-                del discard[i]
-                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                primary_player.aiming_reticle_color = None
-                primary_player.aiming_reticle_coords_hand = None
-                self.card_pos_to_deploy = -1
-                self.player_with_action = ""
-                self.action_chosen = ""
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.number
-                self.mode = "Normal"
-                await primary_player.send_hand()
-                await primary_player.send_discard()
-                await primary_player.send_units_at_planet(chosen_planet)
-                await self.send_info_box()
+                if primary_player.add_card_to_planet(card, chosen_planet, sacrifice_end_of_phase=True) != -1:
+                    del discard[i]
+                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                    primary_player.aiming_reticle_color = None
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.card_pos_to_deploy = -1
+                    self.player_with_action = ""
+                    self.action_chosen = ""
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                    self.mode = "Normal"
+                    await primary_player.send_hand()
+                    await primary_player.send_discard()
+                    await primary_player.send_units_at_planet(chosen_planet)
+                    await self.send_info_box()
                 i = -1
             i = i - 1
         if not card_found:

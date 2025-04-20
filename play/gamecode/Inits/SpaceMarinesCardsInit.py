@@ -116,7 +116,7 @@ def space_marines_cards_init():
                                                                         "Reaction: After attached unit is assigned "
                                                                         "damage by an attack, exhaust this attachment "
                                                                         "to prevent all of that damage.",
-                                                           "Relic. Wargear.", 3, faction, "Loyal", 2, False,
+                                                           "Relic. Wargear.", 3, faction, "Loyal", 2, True,
                                                            unit_must_be_unique=True),
                                 CardClasses.SupportCard("Fortress-Monastery", "Limited.\nInterrupt: When you deploy"
                                                                               " a Space Marines unit, exhaust this "

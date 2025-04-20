@@ -349,8 +349,8 @@ class Player:
             print("??? TRYING TO PLAY A CARD FROM DECK DESPITE DECK EMPTY ???")
         else:
             if len(self.deck) > deck_pos:
-                self.add_card_to_planet(card, planet_pos)
-                del self.deck[deck_pos]
+                if self.add_card_to_planet(card, planet_pos) != -1:
+                    del self.deck[deck_pos]
 
     def discard_card_from_deck(self, deck_pos):
         if not self.deck:
@@ -446,7 +446,27 @@ class Player:
     def shuffle_deck(self):
         shuffle(self.deck)
 
+    def search_for_unique_card(self, name):
+        print("performing uniques search")
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].name == name:
+                return True
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[j].name == name:
+                    return True
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.cards_in_play[planet_pos + 1][unit_pos].name == name:
+                    return True
+                for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name == name:
+                        return True
+        return False
+
     def add_to_hq(self, card_object):
+        if card_object.get_unique():
+            if self.search_for_unique_card(card_object.name):
+                return False
         self.headquarters.append(copy.deepcopy(card_object))
         last_element_index = len(self.headquarters) - 1
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
@@ -468,6 +488,7 @@ class Player:
             self.game.reactions_needing_resolving.append("Earth Caste Technician")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
             self.game.player_who_resolves_reaction.append(self.name_player)
+        return True
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):
@@ -583,6 +604,9 @@ class Player:
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
                                         army_unit_as_attachment=False):
+        if card.get_unique():
+            if self.search_for_unique_card(card.name):
+                return False
         if army_unit_as_attachment:
             if not_own_attachment:
                 if self.attach_card(card, planet, position, army_unit_as_attachment=army_unit_as_attachment):
@@ -612,6 +636,9 @@ class Player:
         return False
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False):
+        if card.get_unique():
+            if self.search_for_unique_card(card.name):
+                return -1
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         if sacrifice_end_of_phase:
@@ -729,21 +756,25 @@ class Player:
                 if card.get_limited():
                     if self.can_play_limited:
                         if self.spend_resources(cost):
-                            self.add_to_hq(card)
-                            self.cards.remove(card.get_name())
-                            self.set_can_play_limited(False)
-                            print("Played card to HQ")
-                            return "SUCCESS", -1
+                            if self.add_to_hq(card):
+                                self.cards.remove(card.get_name())
+                                self.set_can_play_limited(False)
+                                print("Played card to HQ")
+                                return "SUCCESS", -1
+                            self.add_resources(cost)
+                            return "FAIL/Unique already in play", -1
                     else:
                         return "FAIL/Limited already played", -1
                 else:
                     if self.spend_resources(cost):
-                        self.add_to_hq(card)
-                        self.cards.remove(card.get_name())
-                        print("Played card to HQ")
-                        if card.get_ability() == "Murder of Razorwings":
-                            self.game.discard_card_at_random_from_opponent(self.number)
-                        return "SUCCESS", -1
+                        if self.add_to_hq(card):
+                            self.cards.remove(card.get_name())
+                            print("Played card to HQ")
+                            if card.get_ability() == "Murder of Razorwings":
+                                self.game.discard_card_at_random_from_opponent(self.number)
+                            return "SUCCESS", -1
+                        self.add_resources(cost)
+                        return "Fail/Unique already in play", -1
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources", -1
         if position_hand is not None:
@@ -754,10 +785,29 @@ class Player:
                     if card.get_limited():
                         if self.can_play_limited:
                             if self.spend_resources(cost):
-                                self.add_card_to_planet(card, position)
+                                if self.add_card_to_planet(card, position) != -1:
+                                    self.cards.remove(card.get_name())
+                                    self.set_can_play_limited(False)
+                                    print("Played card to planet", position)
+                                    location_of_unit = len(self.cards_in_play[position + 1]) - 1
+                                    if damage_to_take > 0:
+                                        if self.game.bigga_is_betta_active:
+                                            while damage_on_play > 0:
+                                                self.assign_damage_to_pos(position, location_of_unit, 1)
+                                                damage_on_play -= 1
+                                        else:
+                                            self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                    return "SUCCESS", location_of_unit
+                                self.add_resources(cost)
+                                return "FAIL/Unique already in play", -1
+                        else:
+                            return "FAIL/Limited already played", -1
+                    else:
+                        if self.spend_resources(cost):
+                            if self.add_card_to_planet(card, position) != -1:
                                 self.cards.remove(card.get_name())
-                                self.set_can_play_limited(False)
                                 print("Played card to planet", position)
+                                print(card.get_ability())
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
@@ -766,28 +816,13 @@ class Player:
                                             damage_on_play -= 1
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                if card.get_ability() == "Murder of Razorwings":
+                                    self.game.discard_card_at_random_from_opponent(self.number)
+                                if card.get_ability() == "Kith's Khymeramasters":
+                                    self.summon_token_at_planet("Khymera", position)
                                 return "SUCCESS", location_of_unit
-                        else:
-                            return "FAIL/Limited already played", -1
-                    else:
-                        if self.spend_resources(cost):
-                            self.add_card_to_planet(card, position)
-                            self.cards.remove(card.get_name())
-                            print("Played card to planet", position)
-                            print(card.get_ability())
-                            location_of_unit = len(self.cards_in_play[position + 1]) - 1
-                            if damage_to_take > 0:
-                                if self.game.bigga_is_betta_active:
-                                    while damage_on_play > 0:
-                                        self.assign_damage_to_pos(position, location_of_unit, 1)
-                                        damage_on_play -= 1
-                                else:
-                                    self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
-                            if card.get_ability() == "Murder of Razorwings":
-                                self.game.discard_card_at_random_from_opponent(self.number)
-                            if card.get_ability() == "Kith's Khymeramasters":
-                                self.summon_token_at_planet("Khymera", position)
-                            return "SUCCESS", location_of_unit
+                            self.add_resources(cost)
+                            return "FAIL/Unique already in play", -1
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources", -1
         return "FAIL/Invalid card", -1

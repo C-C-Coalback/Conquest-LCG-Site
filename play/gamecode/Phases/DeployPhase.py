@@ -229,7 +229,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              damage_to_take=damage_to_take)
     self.bigga_is_betta_active = False
     if played_card == "SUCCESS":
-        self.mode = "Normal"
         if secondary_player.search_card_at_planet(int(planet_pos), "Syren Zythlex"):
             primary_player.exhaust_given_pos(int(planet_pos), position_of_unit)
         if damage_to_take > 0:
@@ -242,10 +241,10 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         await primary_player.send_units_at_planet(int(planet_pos))
         await secondary_player.send_units_at_planet(int(planet_pos))
         await primary_player.send_resources()
-        if not secondary_player.has_passed:
-            self.player_with_deploy_turn = secondary_player.get_name_player()
-            self.number_with_deploy_turn = secondary_player.get_number()
-            await self.send_info_box()
+    self.mode = "Normal"
+    if not secondary_player.has_passed:
+        self.player_with_deploy_turn = secondary_player.get_name_player()
+        self.number_with_deploy_turn = secondary_player.get_number()
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     primary_player.aiming_reticle_color = None
