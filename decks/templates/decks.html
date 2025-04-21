@@ -5,11 +5,13 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'decks_style.css' %}">
-<h2>Decks</h2>
-<h1>Either use conquestdb.com to create decks and paste them in the text box,</h1>
-<h1>or configure decks manually. Use "Ally/{Faction}" and "Name/{Deck_Name}"</h1>
-<h1>to set the deck's ally faction and the name.</h1>
-<h1>Note that card names are case-sensitive.</h1>
+<div id="foreword" class="box">
+    <h1>Either use conquestdb.com to create decks and paste them in the text box,</h1>
+    <h1>or configure decks manually. Use "Ally/{Faction}" and "Name/{Deck_Name}"</h1>
+    <h1>to set the deck's ally faction and the name.</h1>
+    <h1>Note that card names are case-sensitive.</h1>
+</div>
+
 <textarea id="chat-log" cols="100" rows="20"></textarea><br>
 <input id="chat-message-input" type="search" list="card_list" size="100"><br>
 <datalist id="card_list">
@@ -201,6 +203,12 @@
 <div id="add_to_me">
     <p></p>
 </div>
+<div id="existing-decks">
+    <p>Your current decks:</p>
+    <div id="deck-lists">
+        <p>You have no saved decks</p>
+    </div>
+</div>
 <script>
     var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
     const decksSocket = new WebSocket(
@@ -252,6 +260,23 @@
                 document.getElementById("add_to_me")
                 .innerHTML =
                 `<h3>` + split_data[1] + `</h3>`;
+            } else if (split_data[0] === "Load deck") {
+                document.querySelector('#chat-log').value = split_data[1];
+            } else if (split_data[0] === "saved_deck") {
+                if (document.getElementById("deck-lists").innerHTML === `<p>You have no saved decks</p>`) {
+                    document.getElementById("deck-lists").innerHTML = ``;
+                }
+                var message = "";
+                message = `<div class=saved-deck-box>`;
+                message += `<p>` + split_data[1] + `: ` + split_data[2] + `</p>`;
+                message += `</div>`;
+                message += `<button id=` + split_data[1].split(' ').join('-') + ` onclick="loadSavedDeck(this.id)">
+                Load Deck
+                </button>`;
+                document.getElementById("deck-lists").innerHTML += message;
+                console.log(split_data[1]);
+                console.log(split_data[2]);
+
             } else if (split_data[0] === "Warlord") {
                 split_chat_holder[2] = split_data[1];
                 split_chat_holder[3] = split_data[2];
@@ -477,6 +502,16 @@
                 document.querySelector('#chat-log').value += (data.message + '\n');
             }
         };
+
+    function addSavedDeck() {
+
+    }
+
+    function loadSavedDeck(deck_name) {
+        decksSocket.send(JSON.stringify({
+                'message': ("LOAD DECK/" + deck_name.split('-').join(' '))
+        }));
+    }
 
     function sendDeck() {
         var chat_holder = document.querySelector('#chat-log').value;

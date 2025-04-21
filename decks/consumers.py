@@ -24,6 +24,12 @@ def second_part_deck_validation(deck):
     global cards_array
     remaining_signature_squad = []
     print("Size should be fine")
+    name = deck[0]
+    res = name != '' and all(c.isalnum() or c.isspace() for c in name)
+    if len(name) > 27:
+        return "Name too long"
+    elif not res:
+        return "Name contains non-alphanumeric characters"
     warlord_card = FindCard.find_card(deck[1], cards_array)
     if warlord_card.get_card_type() != "Warlord":
         print("Card in Warlord position is not a warlord")
@@ -136,6 +142,21 @@ class DecksConsumer(AsyncWebsocketConsumer):
         await self.accept()
         print(self.room_name)
         print(self.name)
+        await self.send_stored_decks()
+
+    async def send_stored_decks(self):
+        if not os.path.isdir("decks/DeckStorage/" + self.name):
+            print("Path does not exist")
+        elif self.name == "":
+            print("Not logged in")
+        else:
+            for filename in os.listdir("decks/DeckStorage/" + self.name):
+                with open("decks/DeckStorage/" + self.name + "/" + filename, "r") as file:
+                    content = file.readlines()
+                print("Name:", content[0].replace('\n', ''))
+                print("Warlord:", content[2].replace('\n', ''))
+                message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
+                await self.send(text_data=json.dumps({"message": message}))
 
     async def receive(self, text_data): # noqa
         global cards_array
@@ -211,7 +232,14 @@ class DecksConsumer(AsyncWebsocketConsumer):
 
         elif len(split_message) == 2:
             if split_message[0] == "Name":
-                print("Need to set name to: ", split_message[1])
+                s = split_message[1]
+                res = s != '' and all(c.isalnum() or c.isspace() for c in s)
+                if len(split_message[1]) > 27:
+                    message = "Feedback/Name too long"
+                elif not res:
+                    message = "Feedback/Name contains non-alphanumeric characters"
+                else:
+                    print("Need to set name to: ", split_message[1])
                 await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "Ally":
                 print("Trying to set ally faction to:", split_message[1])
@@ -232,6 +260,27 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 print(self.main_faction, self.ally_faction)
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
+            elif split_message[0] == "LOAD DECK":
+                deck_name = split_message[1]
+                if os.path.isdir("decks/DeckStorage/" + self.name):
+                    path_to_deck = os.getcwd() + "/decks/DeckStorage/" + self.name + "/" + deck_name
+                    if os.path.exists(path_to_deck):
+                        with open(path_to_deck, 'r') as f:
+                            deck_content = f.read()
+                        deck_list_content = deck_content.split(sep="\n")
+                        message = "Load deck/" + deck_content
+                        deck_name = deck_list_content[0]
+                        warlord = deck_list_content[2]
+                        factions = deck_list_content[3]
+                        factions = factions.split(sep=" (")
+                        for i in range(len(factions)):
+                            factions[i] = factions[i].replace(")", "")
+                            if i == 0:
+                                self.main_faction = factions[i]
+                            elif i == 1:
+                                self.ally_faction = factions[i]
+                        print("Sending: ", deck_name, warlord, factions, sep="\n")
+                        await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "SEND DECK":
                 message_to_send = ""
                 deck = clean_sent_deck(split_message[1])
