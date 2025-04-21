@@ -1,15 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+        .box {
+            top: 80px;
+            margin-left:auto;
+            margin-right:auto;
+            width: 30vw;
+            height: auto;
+            background-color: lightblue;
+            opacity:0.8;
+            border: 2px solid blue;
+        }
+        .greetings {
+            position:absolute;
+            top: 80px;
+            left: 20px;
+        }
+</style>
+<div class="box">
+  <p>Welcome to Iridial.net!</p>
+  <p>This is a site dedicated to the Warhammer 40,000: Conquest Living Card Game.</p>
+  <p>For information about how to play the game, please see the links below.</p>
+  <p><a href="https://images-cdn.fantasyflightgames.com/ffg_content/warhammer-40k-conquest/support/Learn-to-Play-web.pdf">FFG Learn to Play</a></p>
+  <p><a href="https://images-cdn.fantasyflightgames.com/ffg_content/warhammer-40k-conquest/support/Rules-Reference-web.pdf">FFG Rules Reference</a></p>
+  <p>If you would rather watch a video, you can find a tutorial by The Hive Tyrant <a href="https://www.youtube.com/watch?v=NE8NL9PfjXU">here</a>.</p>
+  <p>There is a discord group, but I shall not link to them here without permission.</p>
+  <h1>DISCLAIMER</h1>
+  <p>Warhammer 40,000: Conquest is a trademark of Fantasy Flight Publishing, Inc. and/or Games Workshop Group. </p>
+  <p>This website is not affiliated with either Fantasy Flight Games or Games Workshop Group.</p>
+</div>
 {% if user.is_authenticated %}
-<p>Hi {{ user.username }}!</p>
-<p><a href="{% url 'password_change' %}">Password Change</a></p>
-<form action="{% url 'logout' %}" method="post">
-  {% csrf_token %}
-  <button type="submit">Log Out</button>
-</form>
+<div class="greetings">
+  <p>Hi {{ user.username }}!</p>
+  <p><a href="{% url 'password_change' %}">Password Change</a></p>
+  <form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Log Out</button>
+  </form>
+</div>
 {% else %}
-<p>You are not logged in</p>
-<a href="{% url 'login' %}">Log In</a>
+<div class="greetings">
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+</div>
 {% endif %}
 {% endblock %}
