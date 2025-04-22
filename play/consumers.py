@@ -6,6 +6,7 @@ from .gamecode import GameClass
 import os
 from .gamecode import Initfunctions, FindCard
 import threading
+import logging
 
 card_array = Initfunctions.init_player_cards()
 planet_array = Initfunctions.init_planet_cards()
@@ -251,7 +252,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                     print("Found room")
                     current_game_id = i
             if current_game_id != -1:
-                await active_games[current_game_id].update_game_event(self.name, message[1:])
+                try:
+                    await active_games[current_game_id].update_game_event(self.name, message[1:])
+                except:
+                    await self.receive_game_update(
+                        "An error has occurred on the server side. Your game may become unstable or unplayable."
+                    )
+                    logging.exception('..')
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
             try:
