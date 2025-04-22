@@ -1771,6 +1771,24 @@ class Game:
                     self.reactions_needing_resolving.append("Shrine of Warpflame")
                     self.player_who_resolves_reaction.append(self.name_2)
                     self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+        if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
+            await self.game_sockets[0].receive_game_update(
+                "----GAME END----"
+                "Victory for " + self.name_2 + "; sufficient icons on captured planets."
+                "----GAME END----"
+            )
+        elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
+            await self.game_sockets[0].receive_game_update(
+                "----GAME END----"
+                "Victory for " + self.name_1 + "; sufficient icons on captured planets."
+                "----GAME END----"
+            )
+        elif self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
+            await self.game_sockets[0].receive_game_update(
+                "----GAME END----"
+                "Both warlords just died. I guess it is a draw?"
+                "----GAME END----"
+            )
         await self.p1.send_resources()
         await self.p2.send_resources()
         await self.p1.send_discard()
@@ -3213,6 +3231,8 @@ class Game:
         elif self.round_number == 1:
             self.planets_in_play_array[6] = True
         self.round_number += 1
+        if self.round_number > 6:
+            self.phase = "FIN/IF WINNER UNDECIDED,/PLAYER WHO WON LAST/BATTLE IS THE WINNER/GO HOME."
         self.swap_initiative()
 
     def swap_initiative(self):

@@ -75,6 +75,7 @@ class Player:
         self.cards_recently_destroyed = []
         self.stored_cards_recently_destroyed = []
         self.num_nullify_played = 0
+        self.warlord_just_got_destroyed = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -267,6 +268,13 @@ class Player:
         else:
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number)
             await self.game.game_sockets[0].receive_game_update(joined_string)
+        total_icons = self.get_icons_on_captured()
+        if total_icons[0] > 2 or total_icons[1] > 2 or total_icons[2] > 2:
+            await self.game.game_sockets[0].receive_game_update(
+                "----GAME END----"
+                "Victory for " + self.name_player + "; sufficient icons on captured planets."
+                "----GAME END----"
+            )
 
     async def send_discard(self):
         top_card = self.get_top_card_discard()
@@ -1588,6 +1596,7 @@ class Player:
                 self.headquarters[card_pos].bloody_warlord()
             else:
                 self.add_card_in_hq_to_discard(card_pos)
+                self.warlord_just_got_destroyed = True
         else:
             if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
@@ -1645,6 +1654,7 @@ class Player:
                 self.warlord_just_got_bloodied = True
             else:
                 self.add_card_in_play_to_discard(planet_num, card_pos)
+                self.warlord_just_got_destroyed = True
         else:
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                            "Captain Cato Sicarius",
@@ -1898,6 +1908,17 @@ class Player:
         print("Cards in victory display:")
         for i in range(len(self.victory_display)):
             print(self.victory_display[i].get_name())
+
+    def get_icons_on_captured(self):
+        total_icons = [0, 0, 0]
+        for i in range(len(self.victory_display)):
+            if self.victory_display[i].get_red():
+                total_icons[0] += 1
+            if self.victory_display[i].get_blue():
+                total_icons[1] += 1
+            if self.victory_display[i].get_green():
+                total_icons[2] += 1
+        return total_icons
 
     def print_icons_on_captured(self):
         total_icons = [0, 0, 0]
