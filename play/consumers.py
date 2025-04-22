@@ -254,12 +254,28 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await active_games[current_game_id].update_game_event(self.name, message[1:])
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
-            if message[0] == "":
+            if message[0] == "" and len(message) > 1:
                 if message[1] == "planets":
                     print("Need to load planets")
                     for i in range(len(active_games)):
                         if active_games[i].game_id == self.room_name:
                             await active_games[i].send_planet_array()
+                elif message[1] == "force-quit-reactions":
+                    await self.receive_game_update("FORCEFULLY QUITTING REACTIONS")
+                    active_games[self.game_position].reset_reactions_data()
+                    await active_games[self.game_position].send_info_box()
+                elif message[1] == "force-quit-effects":
+                    await self.receive_game_update("FORCEFULLY QUITTING REACTIONS")
+                    active_games[self.game_position].reset_effects_data()
+                    await active_games[self.game_position].send_info_box()
+                elif message[1] == "force-quit-damage":
+                    await self.receive_game_update("FORCEFULLY QUITTING DAMAGE")
+                    active_games[self.game_position].reset_damage_data()
+                    await active_games[self.game_position].send_info_box()
+                elif message[1] == "force-quit-action":
+                    await self.receive_game_update("FORCEFULLY QUITTING ACTION")
+                    active_games[self.game_position].reset_action_data()
+                    await active_games[self.game_position].send_info_box()
                 elif (message[1] == "loaddeck" or message[1] == "LOADDECK") and len(message) > 2:
                     deck_name = message[2]
                     print(deck_name)
@@ -326,6 +342,34 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                         await active_games[self.game_position].p2.send_hand()
                         await active_games[self.game_position].p2.send_discard()
+                elif message[1] == "clear-reticle" and len(message) > 3:
+                    unit_position = message[2:]
+                    if active_games[self.game_position].validate_received_game_string(unit_position):
+                        try:
+                            if unit_position[1] == "1":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p1.reset_aiming_reticle_in_play(
+                                        -2, int(unit_position[2]))
+                                    await active_games[self.game_position].p1.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p1.reset_aiming_reticle_in_play(
+                                        int(unit_position[2]), int(unit_position[3]))
+                                    await active_games[self.game_position].p1.send_units_at_planet(
+                                        int(unit_position[2]))
+                            elif unit_position[1] == "2":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p2.reset_aiming_reticle_in_play(
+                                        -2, int(unit_position[2]))
+                                    await active_games[self.game_position].p2.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p2.reset_aiming_reticle_in_play(
+                                        int(unit_position[2]), int(unit_position[3]))
+                                    await active_games[self.game_position].p2.send_units_at_planet(
+                                        int(unit_position[2]))
+                        except:
+                            await self.channel_layer.group_send(
+                                self.room_group_name, {"type": "chat.message", "message": "Incorrect clear usage"}
+                            )
                 elif message[1] == "ready-card" and len(message) > 3:
                     unit_position = message[2:]
                     if active_games[self.game_position].validate_received_game_string(unit_position):
@@ -350,7 +394,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                                         int(unit_position[2]))
                         except:
                             await self.channel_layer.group_send(
-                                self.room_group_name, {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                                self.room_group_name, {"type": "chat.message", "message": "Incorrect ready usage"}
                             )
                 elif message[1] == "exhaust-card" and len(message) > 3:
                     unit_position = message[2:]
@@ -376,7 +420,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                                         int(unit_position[2]))
                         except:
                             await self.channel_layer.group_send(
-                                self.room_group_name, {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                                self.room_group_name, {"type": "chat.message", "message": "Incorrect exhaust usage"}
                             )
                 elif message[1] == "set-damage" and len(message) > 3:
                     unit_position = message[2:]

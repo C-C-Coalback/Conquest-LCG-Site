@@ -180,6 +180,34 @@ class Game:
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
 
+    def reset_action_data(self):
+        self.action_chosen = ""
+        self.player_with_action = ""
+        self.position_of_actioned_card = (-1, -1)
+
+    def reset_damage_data(self):
+        self.damage_on_units_list_before_new_damage = []
+        self.positions_of_units_to_take_damage = []
+        self.positions_attackers_of_units_to_take_damage = []
+        self.amount_that_can_be_removed_by_shield = []
+        self.damage_can_be_shielded = []
+        self.damage_taken_was_from_attack = []
+        self.damage_from_atrox = False
+        self.units_damaged_by_attack = []
+        self.units_damaged_by_attack_from_sm = []
+        self.mode = self.stored_mode
+        self.furiable_unit_position = (-1, -1)
+
+    def reset_effects_data(self):
+        self.effects_waiting_on_resolution = []
+        self.player_resolving_effect = []
+        self.active_effects = []
+
+    def reset_reactions_data(self):
+        self.reactions_needing_resolving = []
+        self.player_who_resolves_reaction = []
+        self.positions_of_unit_triggering_reaction = []
+
     def get_actions_allowed(self):
         if self.mode != "Normal":
             return False
