@@ -33,7 +33,7 @@ class Game:
         self.stored_deck_2 = None
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, self)
-        self.phase = "DEPLOY"
+        self.phase = "SETUP"
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
@@ -2797,7 +2797,7 @@ class Game:
         print(game_update_string)
         if self.phase == "SETUP":
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
-        if self.validate_received_game_string(game_update_string):
+        elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
             if self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)

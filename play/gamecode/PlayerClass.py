@@ -98,6 +98,9 @@ class Player:
         await self.send_hq()
         await self.send_units_at_all_planets()
         await self.send_resources()
+        if self.game.p1.deck_loaded and self.game.p2.deck_loaded:
+            self.game.phase = "DEPLOY"
+            await self.game.game_sockets[0].receive_game_update("Both players setup, good luck and have fun!")
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
 
