@@ -246,14 +246,16 @@ class Game:
     async def send_search(self):
         if self.cards_in_search_box and self.name_player_who_is_searching:
             card_string = "/".join(self.cards_in_search_box)
-            card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/" + card_string
+            card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/"\
+                          + self.what_to_do_with_searched_card + "/" + card_string
             await self.game_sockets[0].receive_game_update(card_string)
         elif self.choices_available and self.name_player_making_choices:
             card_string = "/".join(self.choices_available)
-            card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/" + card_string
+            card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/"\
+                          + self.choice_context + "/" + card_string
             await self.game_sockets[0].receive_game_update(card_string)
         else:
-            card_string = "GAME_INFO/SEARCH/"
+            card_string = "GAME_INFO/SEARCH//Nothing here"
             await self.game_sockets[0].receive_game_update(card_string)
 
     async def send_info_box(self, force=False):

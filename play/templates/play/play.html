@@ -302,28 +302,28 @@
                         document.getElementById(target_headquarters).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    var full_string = `<details><summary>Choices</summary>`
+                    var full_string = `<details><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
-                        for (var i = 3; i < split_data.length; i++) {
-                            full_string += `<input id="CHOICE/` + (i-3).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);">`
+                        for (var i = 4; i < split_data.length; i++) {
+                            full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);">`
                         }
                     }
                     full_string += `</details>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "SEARCH") {
-                    var full_string = `<details><summary>Search for card</summary>`
+                    var full_string = `<details><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
-                        for (var i = 3; i < split_data.length; i++) {
+                        for (var i = 4; i < split_data.length; i++) {
                             var card_name = split_data[i];
-                            var string_id = (i-3).toString();
+                            var string_id = (i-4).toString();
                             string_id = "SEARCH/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                         }
                     } else {
-                        for (var i = 3; i < split_data.length; i++) {
-                            var string_id = (i-3).toString();
+                        for (var i = 4; i < split_data.length; i++) {
+                            var string_id = (i-4).toString();
                             var route_text = "/static/images/Cardback.jpg";
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
