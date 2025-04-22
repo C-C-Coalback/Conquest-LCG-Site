@@ -3,11 +3,11 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-ALL CARDS HAVE BEEN ADDED!
+Guess we're done! Well, done with the Core Set anyway.
 
-There are a select few things to add: ~~prevent some effects from
-being shielded, but allowing others; minor Bigga Is Betta fix;
-Better info box support;~~ better debugging tools.
+Next I will be adding all cards from The Great Devourer;
+the cards from Legions of Death will come after that.
+Then the individual card packs will added.
 
 # What is this?
 
@@ -34,8 +34,6 @@ Current game progress: Everything, except:
 - and more!
 
 # How can I run it myself?
-
-Don't.
 
 First run "py -m pip install -r requirements.txt" to install dependencies.
 
