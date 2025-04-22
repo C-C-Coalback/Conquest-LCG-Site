@@ -108,7 +108,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                 elif name == self.name_2:
                     self.p2.has_passed = True
             if game_update_string[0] == "action-button":
-                if self.actions_allowed and self.mode != "ACTION":
+                if self.get_actions_allowed():
                     self.stored_mode = self.mode
                     self.mode = "ACTION"
                     self.player_with_action = name

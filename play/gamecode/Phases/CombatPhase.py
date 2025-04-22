@@ -3,7 +3,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
         await self.update_game_event_action(name, game_update_string)
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":
-            if self.actions_allowed and self.mode != "ACTION":
+            if self.get_actions_allowed():
                 print("Need to run action code")
                 self.stored_mode = self.mode
                 self.mode = "ACTION"

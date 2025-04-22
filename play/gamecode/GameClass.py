@@ -180,6 +180,23 @@ class Game:
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
 
+    def get_actions_allowed(self):
+        if self.mode != "Normal":
+            return False
+        elif self.reactions_needing_resolving:
+            return False
+        elif self.effects_waiting_on_resolution:
+            return False
+        elif self.positions_of_units_to_take_damage:
+            return False
+        elif self.cards_in_search_box:
+            return False
+        elif self.choices_available:
+            return False
+        elif self.attacker_position != -1:
+            return False
+        return True
+
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
         await self.p1.send_hand()
