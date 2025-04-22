@@ -240,6 +240,8 @@ class Game:
         await self.p2.send_discard()
         await self.send_info_box(force=True)
         await self.send_search()
+        await self.p1.send_victory_display()
+        await self.p2.send_victory_display()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 

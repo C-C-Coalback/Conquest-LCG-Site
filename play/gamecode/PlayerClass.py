@@ -1550,7 +1550,7 @@ class Player:
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
         self.game.damage_can_be_shielded.append(can_shield)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
-        self.game.amount_that_can_be_removed_by_shield.append()
+        self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
     def suffer_area_effect(self, planet_id, amount):
