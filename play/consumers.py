@@ -326,6 +326,58 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                         await active_games[self.game_position].p2.send_hand()
                         await active_games[self.game_position].p2.send_discard()
+                elif message[1] == "ready-card" and len(message) > 3:
+                    unit_position = message[2:]
+                    if active_games[self.game_position].validate_received_game_string(unit_position):
+                        try:
+                            if unit_position[1] == "1":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p1.ready_given_pos(-2, int(unit_position[2]))
+                                    await active_games[self.game_position].p1.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p1.ready_given_pos(int(unit_position[2]),
+                                                                                        int(unit_position[3]))
+                                    await active_games[self.game_position].p1.send_units_at_planet(
+                                        int(unit_position[2]))
+                            elif unit_position[1] == "2":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p2.ready_given_pos(-2, int(unit_position[2]))
+                                    await active_games[self.game_position].p2.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p2.ready_given_pos(int(unit_position[2]),
+                                                                                        int(unit_position[3]))
+                                    await active_games[self.game_position].p2.send_units_at_planet(
+                                        int(unit_position[2]))
+                        except:
+                            await self.channel_layer.group_send(
+                                self.room_group_name, {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                            )
+                elif message[1] == "exhaust-card" and len(message) > 3:
+                    unit_position = message[2:]
+                    if active_games[self.game_position].validate_received_game_string(unit_position):
+                        try:
+                            if unit_position[1] == "1":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p1.exhaust_given_pos(-2, int(unit_position[2]))
+                                    await active_games[self.game_position].p1.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p1.exhaust_given_pos(int(unit_position[2]),
+                                                                                        int(unit_position[3]))
+                                    await active_games[self.game_position].p1.send_units_at_planet(
+                                        int(unit_position[2]))
+                            elif unit_position[1] == "2":
+                                if unit_position[0] == "HQ":
+                                    active_games[self.game_position].p2.exhaust_given_pos(-2, int(unit_position[2]))
+                                    await active_games[self.game_position].p2.send_hq()
+                                elif unit_position[0] == "IN_PLAY":
+                                    active_games[self.game_position].p2.exhaust_given_pos(int(unit_position[2]),
+                                                                                        int(unit_position[3]))
+                                    await active_games[self.game_position].p2.send_units_at_planet(
+                                        int(unit_position[2]))
+                        except:
+                            await self.channel_layer.group_send(
+                                self.room_group_name, {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                            )
                 elif message[1] == "set-damage" and len(message) > 3:
                     unit_position = message[2:]
                     unit_position = unit_position[:-1]
