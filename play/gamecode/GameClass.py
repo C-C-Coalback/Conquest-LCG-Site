@@ -2956,6 +2956,13 @@ class Game:
                 primary_player.add_resources(1)
                 self.delete_reaction()
                 await primary_player.send_resources()
+            elif self.reactions_needing_resolving[0] == "Cadian Mortar Squad":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.cards_in_play[planet_pos + 1][i].get_ability() == "Cadian Mortar Squad":
+                        primary_player.ready_given_pos(planet_pos, i)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Carnivore Pack":
                 primary_player.add_resources(3)
                 await primary_player.send_resources()
