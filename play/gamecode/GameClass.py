@@ -2908,6 +2908,22 @@ class Game:
                 self.faction_of_searched_card = None
                 self.no_restrictions_on_chosen_card = True
                 self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Packmaster Kith":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.summon_token_at_planet("Khymera", planet_pos)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Xavaes Split-Tongue":
+                primary_player.summon_token_at_hq("Cultist")
+                self.delete_reaction()
+                await primary_player.send_hq()
+            elif self.reactions_needing_resolving[0] == "Captain Cato Sicarius":
+                primary_player.add_resources(1)
+                self.delete_reaction()
+                await primary_player.send_resources()
+            elif self.reactions_needing_resolving[0] == "Carnivore Pack":
+                primary_player.add_resources(3)
+                await primary_player.send_resources()
             elif self.reactions_needing_resolving[0] == "Kith's Khymeramasters":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.summon_token_at_planet("Khymera", planet_pos)

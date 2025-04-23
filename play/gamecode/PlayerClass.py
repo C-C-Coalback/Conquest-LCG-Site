@@ -965,9 +965,10 @@ class Player:
             for i in range(len(headquarters_list)):
                 if headquarters_list[i].get_card_type() == "Warlord":
                     print(headquarters_list[i].get_name())
-                    summon_khymera = False
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
-                        summon_khymera = True
+                        self.game.reactions_needing_resolving.append("Packmaster Kith")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
@@ -977,8 +978,6 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
-                    if summon_khymera:
-                        self.summon_token_at_planet("Khymera", planet_pos - 1)
                     return True
             return False
         else:
@@ -1721,15 +1720,25 @@ class Player:
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
             if cato_check:
-                self.game.add_resources_to_opponent(self.number, 1)
-                self.game.resources_need_sending_outside_normal_sends = True
+                self.game.reactions_needing_resolving.append("Captain Cato Sicarius")
+                if self.number == "1":
+                    self.game.player_who_resolves_reaction.append(self.game.p2.name_player)
+                else:
+                    self.game.player_who_resolves_reaction.append(self.game.p1.name_player)
+                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
             xavaes_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                              "Xavaes Split-Tongue")
             if xavaes_check:
-                self.game.summon_enemy_token_at_hq(self.number, "Cultist", 1)
-                self.game.hqs_need_sending_outside_normal_sends = True
+                self.game.reactions_needing_resolving.append("Xavaes Split-Tongue")
+                if self.number == "1":
+                    self.game.player_who_resolves_reaction.append(self.game.p2.name_player)
+                else:
+                    self.game.player_who_resolves_reaction.append(self.game.p1.name_player)
+                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
-                self.add_resources(3)
+                self.game.reactions_needing_resolving.append("Carnivore Pack")
+                self.game.player_who_resolves_reaction.append(self.name_player)
+                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
                 self.game.reactions_needing_resolving.append("Shrouded Harlequin")
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
@@ -1777,15 +1786,24 @@ class Player:
         if card.get_card_type() == "Army":
             for i in range(len(self.cards_in_play[planet_num + 1])):
                 if self.cards_in_play[planet_num + 1][i].get_ability() == "Cadian Mortar Squad":
-                    self.ready_given_pos(planet_num, i)
+                    already_cadian_mortar_squad = False
+                    for j in range(len(self.game.reactions_needing_resolving)):
+                        if self.game.reactions_needing_resolving[j] == "Cadian Mortar Squad":
+                            if self.game.player_who_resolves_reaction[j] == self.name_player:
+                                already_cadian_mortar_squad = True
+                    if not already_cadian_mortar_squad:
+                        self.game.reactions_needing_resolving.append("Cadian Mortar Squad")
+                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.positions_of_unit_triggering_reaction((int(self.number), -1, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                self.draw_card()
-                self.draw_card()
-                self.draw_card()
-                self.game.cards_need_sending_outside_normal_sends = True
+                self.game.reactions_needing_resolving.append("Straken's Cunning")
+                self.game.player_who_resolves_reaction.append(self.name_player)
+                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
-            self.summon_token_at_planet("Guardsman", planet_num)
+            self.game.reactions_needing_resolving.append("Straken's Command Squad")
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
         if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
             self.game.reactions_needing_resolving.append("Mark of Chaos")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
