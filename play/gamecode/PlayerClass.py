@@ -1513,7 +1513,6 @@ class Player:
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                        "Zarathur, High Sorcerer",
                                                                        bloodied_relevant=True)
@@ -1523,22 +1522,33 @@ class Player:
         if att_pos is not None:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if i != unit_id:
-                    if self.search_attachments_at_pos(planet_id, i, "Bodyguard"):
-                        if damage > 0:
-                            damage = damage - 1
-                            bodyguard_damage_list.append(i)
+                    print("Get attachments")
+                    for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
+                        print("Bodyguard check")
+                        if self.cards_in_play[planet_id + 1][i].get_attachments()[j].get_ability() == "Bodyguard":
+                            print("Bodyguard found")
+                            if damage > 0:
+                                damage = damage - 1
+                                bodyguard_damage_list.append(i)
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        damage_too_great = self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
+        self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1)
+            if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
+                self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "red")
+            else:
+                self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
+        print("after:", damage_on_card_after, "before:", damage_on_card_before)
         if damage_on_card_after > damage_on_card_before:
+            self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
             self.game.damage_can_be_shielded.append(can_shield)
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
             self.game.amount_that_can_be_removed_by_shield.append(total_damage_that_can_be_blocked)
-        return damage_too_great
+            return True, len(bodyguard_damage_list)
+        return False, len(bodyguard_damage_list)
 
     def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
         if planet_pos == -2:
