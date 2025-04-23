@@ -185,6 +185,12 @@ class Game:
         self.last_search_string = ""
         self.asking_which_reaction = True
         self.stored_reaction_indexes = []
+        self.manual_bodyguard_resolution = False
+        self.name_player_manual_bodyguard = ""
+        self.num_bodyguards = 0
+        self.body_guard_positions = []
+        self.damage_bodyguard = 0
+        self.planet_bodyguard = -1
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -216,7 +222,9 @@ class Game:
         self.already_resolving_reaction = False
 
     def get_actions_allowed(self):
-        if self.mode != "Normal":
+        if self.manual_bodyguard_resolution:
+            return False
+        elif self.mode != "Normal":
             return False
         elif self.reactions_needing_resolving:
             return False
@@ -272,6 +280,8 @@ class Game:
         info_string = "GAME_INFO/INFO_BOX/"
         if self.phase == "SETUP":
             info_string += "Unspecified/"
+        elif self.manual_bodyguard_resolution:
+            info_string += self.name_player_manual_bodyguard
         elif self.cards_in_search_box:
             info_string += self.name_player_who_is_searching + "/"
         elif self.effects_waiting_on_resolution:
@@ -303,6 +313,8 @@ class Game:
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "SETUP":
             info_string += "Setup/"
+        elif self.manual_bodyguard_resolution:
+            info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard
         elif self.cards_in_search_box:
             info_string += "Searching: " + self.what_to_do_with_searched_card + "/"
             info_string += "User: " + self.name_player_who_is_searching + "/"
@@ -1980,6 +1992,8 @@ class Game:
                                         if secondary_player.cards[i] == "No Mercy":
                                             no_mercy_possible = True
                                 if no_mercy_possible:
+                                    no_mercy_possible = secondary_player.search_ready_unique_unit()
+                                if no_mercy_possible:
                                     self.last_shield_string = game_update_string
                                     self.choice_context = "Use No Mercy?"
                                     self.choices_available = ["Yes", "No"]
@@ -3126,6 +3140,40 @@ class Game:
                             self.already_resolving_reaction = True
                             await self.start_resolving_reaction(name, game_update_string)
 
+    async def resolve_manual_bodyguard(self, name, game_update_string):
+        if name == self.name_player_manual_bodyguard:
+            if name == self.name_1:
+                player = self.p1
+                other_play = self.p2
+            else:
+                player = self.p2
+                other_play = self.p1
+            if len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    if game_update_string[1] == player.number:
+                        if int(game_update_string[2]) == self.planet_bodyguard:
+                            selected_unit = int(game_update_string[3])
+                            if selected_unit in self.body_guard_positions:
+                                player.assign_damage_to_pos(self.planet_bodyguard, selected_unit,
+                                                            1, is_reassign=True, can_shield=False)
+                                self.body_guard_positions.remove(selected_unit)
+                                self.damage_bodyguard -= 1
+                                await self.game_sockets[0].receive_game_update(
+                                    "Resolved a Bodyguard. Damage left to resolve: " + str(self.damage_bodyguard)
+                                )
+                                await player.send_units_at_planet(self.planet_bodyguard)
+                                if self.damage_bodyguard <= 0:
+                                    self.manual_bodyguard_resolution = False
+                                    self.body_guard_positions = []
+                                    self.name_player_manual_bodyguard = ""
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Manual Bodyguard resolution completed."
+                                    )
+                                    other_play.reset_all_aiming_reticles_play_hq()
+                                    await other_play.send_units_at_planet(self.planet_bodyguard)
+                                    await player.send_units_at_planet(self.planet_bodyguard)
+                                    self.planet_bodyguard = -1
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -3135,11 +3183,13 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
-            if self.cards_in_search_box:
+            if self.manual_bodyguard_resolution:
+                await self.resolve_manual_bodyguard(name, game_update_string)
+            elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)
                 if not self.cards_in_search_box:
                     await self.send_search()
-            if self.effects_waiting_on_resolution:
+            elif self.effects_waiting_on_resolution:
                 await self.resolve_effect(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
                 await self.apply_indirect_damage(name, game_update_string)

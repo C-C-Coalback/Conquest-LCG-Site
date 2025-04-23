@@ -1547,17 +1547,28 @@ class Player:
                 num_copies += 1
         return num_copies
 
-    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None):
+    def search_ready_unique_unit(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit() and self.headquarters[i].get_ready() and\
+                    self.headquarters[i].get_unique():
+                return True
+        for j in range(7):
+            for k in range(len(self.cards_in_play[j + 1])):
+                if self.cards_in_play[j + 1][k].get_ready() and self.cards_in_play[j + 1][k].get_unique():
+                    return True
+        return False
+
+    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                        "Zarathur, High Sorcerer",
                                                                        bloodied_relevant=True)
-        if zara_check:
-            damage += 1
         bodyguard_damage_list = []
-        if att_pos is not None:
+        og_damage = damage
+        too_many_bodyguards = False
+        if att_pos is not None and not is_reassign:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if i != unit_id:
                     print("Get attachments")
@@ -1568,12 +1579,37 @@ class Player:
                             if damage > 0:
                                 damage = damage - 1
                                 bodyguard_damage_list.append(i)
+                            elif damage <= 0:
+                                bodyguard_damage_list.append(i)
+                                too_many_bodyguards = True
+        if too_many_bodyguards:
+            too_many_bodyguards = False
+            unique_bodyguards = []
+            for i in range(len(bodyguard_damage_list)):
+                already_bodyguard = False
+                for j in range(len(unique_bodyguards)):
+                    if bodyguard_damage_list[i] == unique_bodyguards[j]:
+                        already_bodyguard = True
+                if not already_bodyguard:
+                    unique_bodyguards.append(bodyguard_damage_list[i])
+            if len(unique_bodyguards) > 1:
+                too_many_bodyguards = True
+            self.game.num_bodyguards = len(unique_bodyguards)
+        if too_many_bodyguards:
+            self.game.body_guard_positions = bodyguard_damage_list
+            self.game.name_player_manual_bodyguard = self.name_player
+            self.game.manual_bodyguard_resolution = True
+            self.game.planet_bodyguard = planet_id
+            self.game.damage_bodyguard = og_damage
+            return False, len(bodyguard_damage_list)
+        if zara_check and damage > 0:
+            damage += 1
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
+        self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield, reassign=is_reassign)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         for i in range(len(bodyguard_damage_list)):
-            self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1)
+            self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
             if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "red")
             else:

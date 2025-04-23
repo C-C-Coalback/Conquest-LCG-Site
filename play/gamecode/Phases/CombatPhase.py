@@ -260,15 +260,23 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.defender_planet, self.defender_position, damage=attack_value,
                                     att_pos=self.attacker_location, can_shield=can_shield
                                 )
-                                print(took_damage)
-                                if took_damage:
-                                    if bodyguards == 0:
-                                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                    self.defender_position, "red")
-                                    else:
-                                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                    self.defender_position, "blue")
-                                self.damage_from_attack = True
+                                if self.manual_bodyguard_resolution:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Too many Bodyguards! Proceeding to manual bodyguard reassignment."
+                                    )
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Damage left to reassign: " + str(self.damage_bodyguard)
+                                    )
+                                else:
+                                    print(took_damage)
+                                    if took_damage:
+                                        if bodyguards == 0:
+                                            secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                        self.defender_position, "red")
+                                        else:
+                                            secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                        self.defender_position, "blue")
+                                    self.damage_from_attack = True
                             else:
                                 primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                             self.attacker_position)
