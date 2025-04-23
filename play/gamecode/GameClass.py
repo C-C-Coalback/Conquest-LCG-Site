@@ -547,6 +547,13 @@ class Game:
                     return False
             return True
 
+    async def start_mulligan(self):
+        self.choices_available = ["Yes", "No"]
+        self.choice_context = "Mulligan Opening Hand?"
+        self.name_player_making_choices = self.name_1
+        await self.send_search()
+        await self.send_info_box()
+
     def reset_search_values(self):
         self.what_to_do_with_searched_card = "DRAW"
         self.traits_of_searched_card = None
@@ -1009,6 +1016,31 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            await self.send_search()
+                    elif self.choice_context == "Mulligan Opening Hand?":
+                        if game_update_string[1] == "0":
+                            primary_player.mulligan_done = True
+                            primary_player.mulligan_hand()
+                            await self.game_sockets[0].receive_game_update(
+                                self.name_player_making_choices + " mulligans their opening hand.")
+                            await primary_player.send_hand()
+                        elif game_update_string[1] == "1":
+                            primary_player.mulligan_done = True
+                            await self.game_sockets[0].receive_game_update(
+                                self.name_player_making_choices + " declines to mulligan their opening hand.")
+                        if primary_player.mulligan_done and not secondary_player.mulligan_done:
+                            self.name_player_making_choices = self.name_2
+                            await self.game_sockets[0].receive_game_update(
+                                self.name_player_making_choices + " may mulligan their hand.")
+                            await self.send_search()
+
+                        if primary_player.mulligan_done and secondary_player.mulligan_done:
+                            self.choices_available = ""
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.game_sockets[0].receive_game_update(
+                                "Both players setup, good luck and have fun!")
+                            await self.send_info_box()
                             await self.send_search()
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":

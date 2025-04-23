@@ -76,6 +76,7 @@ class Player:
         self.stored_cards_recently_destroyed = []
         self.num_nullify_played = 0
         self.warlord_just_got_destroyed = False
+        self.mulligan_done = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -100,9 +101,10 @@ class Player:
         await self.send_units_at_all_planets()
         await self.send_resources()
         if self.game.p1.deck_loaded and self.game.p2.deck_loaded:
+            await self.game.start_mulligan()
             self.game.phase = "DEPLOY"
-            await self.game.game_sockets[0].receive_game_update("Both players setup, good luck and have fun!")
-            await self.game.send_info_box()
+            await self.game.game_sockets[0].receive_game_update(
+                self.game.name_1 + " may mulligan their opening hand.")
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
 
@@ -291,6 +293,16 @@ class Player:
                 self.exhaust_given_pos(-2, i)
                 return True
         return False
+
+    def mulligan_hand(self):
+        num_cards = 0
+        while self.cards:
+            num_cards += 1
+            self.deck.append(self.cards[0])
+            del self.cards[0]
+        self.shuffle_deck()
+        for i in range(num_cards):
+            self.draw_card()
 
     def get_headquarters(self):
         return self.headquarters
