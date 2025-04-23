@@ -689,6 +689,10 @@ class Player:
         if sacrifice_end_of_phase:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
+            self.game.reactions_needing_resolving.append("Swordwind Farseer")
+            self.game.positions_of_unit_triggering_reaction([int(self.number), position, last_element_index])
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            """
             if len(self.deck) > 5:
                 self.number_cards_to_search = 6
                 self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
@@ -699,7 +703,12 @@ class Player:
                 self.game.card_type_of_searched_card = None
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
+            """
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
+            self.game.reactions_needing_resolving.append("Coliseum Fighters")
+            self.game.positions_of_unit_triggering_reaction([int(self.number), position, last_element_index])
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            """
             i = len(self.discard) - 1
             while i > -1:
                 card = FindCard.find_card(self.discard[i], self.card_array)
@@ -708,11 +717,16 @@ class Player:
                     del self.discard[i]
                     return None
                 i = i - 1
+            """
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
             self.game.reactions_needing_resolving.append("Sicarius's Chosen")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
             self.game.player_who_resolves_reaction.append(self.name_player)
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
+            self.game.reactions_needing_resolving.append("Weirdboy Maniak")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            """
             no_units_damaged = True
             for i in range(len(self.cards_in_play[position + 1]) - 1):
                 if no_units_damaged:
@@ -737,7 +751,12 @@ class Player:
                     else:
                         self.game.p1.set_aiming_reticle_in_play(position, i, "blue")
                     self.game.p1.assign_damage_to_pos(position, i, 1)
+            """
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
+            self.game.reactions_needing_resolving.append("Earth Caste Technician")
+            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
+            self.game.player_who_resolves_reaction.append(self.name_player)
+            """
             if len(self.deck) > 5:
                 self.number_cards_to_search = 6
                 self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
@@ -748,6 +767,7 @@ class Player:
                 self.game.card_type_of_searched_card = "Attachment"
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = False
+            """
         return last_element_index
 
     async def dark_eldar_event_played(self):
@@ -862,9 +882,17 @@ class Player:
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 if card.get_ability() == "Murder of Razorwings":
-                                    self.game.discard_card_at_random_from_opponent(self.number)
+                                    self.game.reactions_needing_resolving.append("Murder of Razorwings")
+                                    self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
+                                                                                            location_of_unit))
+                                    self.game.player_who_resolves_reaction.append(self.name_player)
+                                    # self.game.discard_card_at_random_from_opponent(self.number)
                                 if card.get_ability() == "Kith's Khymeramasters":
-                                    self.summon_token_at_planet("Khymera", position)
+                                    self.game.reactions_needing_resolving.append("Kith's Khymeramasters")
+                                    self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
+                                                                                            location_of_unit))
+                                    self.game.player_who_resolves_reaction.append(self.name_player)
+                                    # self.summon_token_at_planet("Khymera", position)
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost)
                             return "FAIL/Unique already in play", -1
