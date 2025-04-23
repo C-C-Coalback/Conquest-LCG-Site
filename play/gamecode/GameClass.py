@@ -183,6 +183,8 @@ class Game:
         self.asking_if_reaction = False
         self.already_resolving_reaction = False
         self.last_search_string = ""
+        self.asking_which_reaction = True
+        self.stored_reaction_indexes = []
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -941,7 +943,23 @@ class Game:
                         self.resolving_search_box = False
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
-                    if self.asking_if_reaction:
+                    if self.choice_context == "Choose Which Reaction":
+                        print("\nGot to asking which reaction\n")
+                        self.asking_which_reaction = False
+                        reaction_pos = int(game_update_string[1])
+                        print(reaction_pos)
+                        self.reactions_needing_resolving.insert(
+                            0, self.reactions_needing_resolving.pop(reaction_pos)
+                        )
+                        self.player_who_resolves_reaction.insert(
+                            0, self.player_who_resolves_reaction.pop(reaction_pos)
+                        )
+                        self.positions_of_unit_triggering_reaction.insert(
+                            0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
+                        )
+                        print(self.reactions_needing_resolving)
+                        self.asking_if_reaction = True
+                    elif self.asking_if_reaction:
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
@@ -2809,6 +2827,7 @@ class Game:
         return False
 
     def delete_reaction(self):
+        self.asking_which_reaction = True
         self.already_resolving_reaction = False
         del self.reactions_needing_resolving[0]
         del self.player_who_resolves_reaction[0]
@@ -3039,6 +3058,74 @@ class Game:
                 self.delete_reaction()
                 await secondary_player.send_units_at_planet(loc_of_mark)
 
+    async def update_reactions(self, name, game_update_string, count=0):
+        if count < 10:
+            if self.reactions_needing_resolving and not self.already_resolving_reaction:
+                p_one_count, p_two_count = self.count_number_reactions_for_each_player()
+                if (self.player_with_initiative == self.name_1 and p_one_count > 0) or \
+                        (p_one_count > 0 and p_two_count == 0):
+                    self.stored_reaction_indexes = self.get_positions_of_players_reactions(self.name_1)
+                    if p_one_count > 1:
+                        if self.asking_which_reaction:
+                            self.choices_available = self.get_name_reactions_of_players_reactions(self.name_1)
+                            self.choice_context = "Choose Which Reaction"
+                            self.name_player_making_choices = self.name_1
+                            await self.send_search()
+                        elif not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.reactions_needing_resolving[0]
+                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.asking_if_reaction = True
+                            await self.send_search()
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_reaction = True
+                            await self.start_resolving_reaction(name, game_update_string)
+                            await self.update_reactions(name, game_update_string, count=count+1)
+                    else:
+                        self.asking_which_reaction = False
+                        if not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.reactions_needing_resolving[0]
+                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.asking_if_reaction = True
+                            await self.send_search()
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_reaction = True
+                            await self.start_resolving_reaction(name, game_update_string)
+                else:
+                    self.stored_reaction_indexes = self.get_positions_of_players_reactions(self.name_2)
+                    if p_two_count > 1:
+                        if self.asking_which_reaction:
+                            self.choices_available = self.get_name_reactions_of_players_reactions(self.name_2)
+                            self.choice_context = "Choose Which Reaction"
+                            self.name_player_making_choices = self.name_2
+                            await self.send_search()
+                        elif not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.reactions_needing_resolving[0]
+                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.asking_if_reaction = True
+                            await self.send_search()
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_reaction = True
+                            await self.start_resolving_reaction(name, game_update_string)
+                            await self.update_reactions(name, game_update_string, count=count+1)
+                    else:
+                        self.asking_which_reaction = False
+                        if not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.reactions_needing_resolving[0]
+                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.asking_if_reaction = True
+                            await self.send_search()
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_reaction = True
+                            await self.start_resolving_reaction(name, game_update_string)
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -3080,6 +3167,7 @@ class Game:
             elif self.phase == "COMBAT":
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
             resolved_subroutine = True
+        await self.update_reactions(name, game_update_string)
         if self.cards_in_search_box:
             await self.send_search()
         if self.positions_of_units_to_take_damage:
@@ -3094,17 +3182,7 @@ class Game:
                 self.player_who_is_shielding = self.name_2
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
-        if self.reactions_needing_resolving and not self.already_resolving_reaction:
-            if not self.has_chosen_to_resolve:
-                self.choices_available = ["Yes", "No"]
-                self.choice_context = self.reactions_needing_resolving[0]
-                self.name_player_making_choices = self.player_who_resolves_reaction[0]
-                self.asking_if_reaction = True
-                await self.send_search()
-            elif self.has_chosen_to_resolve:
-                self.has_chosen_to_resolve = False
-                self.already_resolving_reaction = True
-                await self.start_resolving_reaction(name, game_update_string)
+
         if resolved_subroutine:
             await self.send_info_box()
         if self.choices_available or self.cards_in_search_box:
@@ -3115,6 +3193,30 @@ class Game:
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
+
+    def get_name_reactions_of_players_reactions(self, name):
+        reaction_positions_list = []
+        for i in range(len(self.reactions_needing_resolving)):
+            if self.player_who_resolves_reaction[i] == name:
+                reaction_positions_list.append(self.reactions_needing_resolving[i])
+        return reaction_positions_list
+
+    def get_positions_of_players_reactions(self, name):
+        reaction_positions_list = []
+        for i in range(len(self.reactions_needing_resolving)):
+            if self.player_who_resolves_reaction[i] == name:
+                reaction_positions_list.append(i)
+        return reaction_positions_list
+
+    def count_number_reactions_for_each_player(self):
+        count_1 = 0
+        count_2 = 0
+        for i in range(len(self.reactions_needing_resolving)):
+            if self.player_who_resolves_reaction[i] == self.name_1:
+                count_1 += 1
+            else:
+                count_2 += 1
+        return count_1, count_2
 
     def reset_combat_positions(self):
         self.defender_position = -1
