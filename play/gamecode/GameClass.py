@@ -1959,11 +1959,13 @@ class Game:
                                     shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                     took_damage = True
                                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
+                                    """
                                     if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
                                             self.damage_on_units_list_before_new_damage[0]:
                                         primary_player.set_damage_given_pos(
                                             planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
                                         took_damage = False
+                                    """
                                     primary_player.discard_card_from_hand(hand_pos)
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     if took_damage:
