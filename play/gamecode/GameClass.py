@@ -3081,7 +3081,8 @@ class Game:
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
-            if self.reactions_needing_resolving and not self.already_resolving_reaction:
+            if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
+                    self.resolving_search_box and not self.choices_available and not self.effects_waiting_on_resolution:
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
                 if (self.player_with_initiative == self.name_1 and p_one_count > 0) or \
                         (p_one_count > 0 and p_two_count == 0):
