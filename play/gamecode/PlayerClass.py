@@ -690,7 +690,7 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
             self.game.reactions_needing_resolving.append("Swordwind Farseer")
-            self.game.positions_of_unit_triggering_reaction([int(self.number), position, last_element_index])
+            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
             self.game.player_who_resolves_reaction.append(self.name_player)
             """
             if len(self.deck) > 5:
@@ -706,7 +706,7 @@ class Player:
             """
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
             self.game.reactions_needing_resolving.append("Coliseum Fighters")
-            self.game.positions_of_unit_triggering_reaction([int(self.number), position, last_element_index])
+            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
             self.game.player_who_resolves_reaction.append(self.name_player)
             """
             i = len(self.discard) - 1
@@ -720,11 +720,11 @@ class Player:
             """
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
             self.game.reactions_needing_resolving.append("Sicarius's Chosen")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
+            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
             self.game.player_who_resolves_reaction.append(self.name_player)
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
             self.game.reactions_needing_resolving.append("Weirdboy Maniak")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
+            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
             self.game.player_who_resolves_reaction.append(self.name_player)
             """
             no_units_damaged = True

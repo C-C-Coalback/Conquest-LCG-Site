@@ -2889,19 +2889,21 @@ class Game:
             elif self.reactions_needing_resolving[0] == "Swordwind Farseer":
                 if self.player_who_resolves_reaction[0] == self.name_1:
                     self.p1.number_cards_to_search = 6
+                    self.name_player_who_is_searching = self.p1.name_player
+                    self.number_who_is_searching = "1"
                     if len(self.p1.deck) > 5:
                         self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
                     else:
                         self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
                 else:
                     self.p2.number_cards_to_search = 6
+                    self.name_player_who_is_searching = self.p2.name_player
+                    self.number_who_is_searching = "2"
                     if len(self.p2.deck) > 5:
                         self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
                     else:
                         self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
                 self.resolving_search_box = True
-                self.name_player_who_is_searching = self.name_player
-                self.number_who_is_searching = str(self.number)
                 self.what_to_do_with_searched_card = "DRAW"
                 self.traits_of_searched_card = None
                 self.card_type_of_searched_card = None

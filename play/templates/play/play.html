@@ -108,7 +108,7 @@
             <p>P2P6</p>
         </div>
     </div>
-    <div id="search-collapse" draggable="true">
+    <div id="search-collapse" draggable="true" class="draggable">
         <details>
         <summary>This is what you want to show before expanding</summary>
         <input type="image" src="/static/images/Nazdreg.jpg" alt="bugged" id="Search-0" onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
@@ -419,6 +419,26 @@
                 'message': 'BUTTON PRESSED/' + button_id
             }));
         };
+
+        const dragElements = document.querySelectorAll(".draggable");
+
+        function onMouseDrag(event, element) {
+            let leftValue = parseInt(window.getComputedStyle(element).left);
+            let topValue = parseInt(window.getComputedStyle(element).top);
+            element.style.left = `${leftValue + event.movementX}px`;
+            element.style.top = `${topValue + event.movementY}px`;
+        }
+
+        dragElements.forEach((element) => {
+            element.addEventListener("mousedown", (e) => {
+                const onMove = (event) => onMouseDrag(event, element);
+
+                document.addEventListener("mousemove", onMove);
+                document.addEventListener("mouseup", () => {
+                    document.removeEventListener("mousemove", onMove);
+                }, { once: true });
+            });
+        });
 
         function changeDef(image_src) {
             console.log(image_src);
