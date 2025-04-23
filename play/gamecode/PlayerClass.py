@@ -1169,13 +1169,15 @@ class Player:
                         print("faction ok")
                         if self.headquarters[i].get_ready():
                             print("ready")
+                            self.set_aiming_reticle_in_play(-2, i, "green")
                             discounts_available += self.headquarters[i].get_discount_amount()
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
+                    self.set_aiming_reticle_in_play(-2, i, "green")
                 elif self.headquarters[i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
-
+                    self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
     def search_planet_for_discounts(self, planet_pos, traits):
@@ -1184,9 +1186,18 @@ class Player:
             if "Daemon" in traits:
                 if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
                     discounts_available += 1
+                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
                 elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
+                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
         return discounts_available
+
+    def reset_all_aiming_reticles_play_hq(self):
+        for i in range(len(self.headquarters)):
+            self.reset_aiming_reticle_in_play(-2, i)
+        for j in range(7):
+            for i in range(len(self.cards_in_play[j + 1])):
+                self.reset_aiming_reticle_in_play(j, i)
 
     def search_all_planets_for_discounts(self, traits):
         discounts_available = 0

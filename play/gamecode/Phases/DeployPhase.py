@@ -163,12 +163,19 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     self.discounts_applied = 0
                     self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
                                                                               self.traits_of_card_to_play)
-                    self.available_discounts += player.search_hand_for_discounts(self.faction_of_card_to_play)
+                    hand_disc = player.search_hand_for_discounts(self.faction_of_card_to_play)
+                    self.available_discounts += hand_disc
+                    if hand_disc > 0:
+                        await self.game_sockets[0].receive_game_update(
+                            "Bigga Is Betta detected, may be used as a discount."
+                        )
                     temp_av_disc, temp_auto_disc = player. \
                         search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
                     self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
                     self.available_discounts += temp_av_disc
                     self.discounts_applied += temp_auto_disc
+                    await player.send_units_at_all_planets()
+                    await player.send_hq()
                     if self.available_discounts > self.discounts_applied:
                         self.stored_mode = self.mode
                         self.mode = "DISCOUNT"
@@ -219,6 +226,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         else:
             primary_player = self.p2
             secondary_player = self.p1
+    primary_player.reset_all_aiming_reticles_play_hq()
     damage_to_take = sum(self.damage_for_unit_to_take_on_play)
     print("position hand of unit: ", self.card_pos_to_deploy)
     print("Damage to take: ", damage_to_take)
@@ -238,7 +246,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         await secondary_player.send_hand()
         await primary_player.send_discard()
         await secondary_player.send_discard()
-        await primary_player.send_units_at_planet(int(planet_pos))
+        await primary_player.send_units_at_all_planets()
         await secondary_player.send_units_at_planet(int(planet_pos))
         await primary_player.send_resources()
     self.mode = "Normal"
