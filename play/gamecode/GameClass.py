@@ -3443,6 +3443,8 @@ class Game:
         self.p2.draw_card()
         self.p1.retreat_warlord()
         self.p2.retreat_warlord()
+        self.p1.move_synapse_to_hq()
+        self.p2.move_synapse_to_hq()
         self.p1.ready_all_in_play()
         self.p2.ready_all_in_play()
         i = 0

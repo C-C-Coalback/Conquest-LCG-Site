@@ -58,7 +58,9 @@ class Player:
         self.extra_text = "No advice"
         self.deck_loaded = False
         self.committed_warlord = False
+        self.committed_synapse = True
         self.warlord_commit_location = -1
+        self.synapse_commit_location = -1
         self.warlord_just_got_bloodied = False
         self.condition_player_main = threading.Condition()
         self.condition_player_sub = threading.Condition()
@@ -77,12 +79,23 @@ class Player:
         self.num_nullify_played = 0
         self.warlord_just_got_destroyed = False
         self.mulligan_done = False
+        self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
+                             "Stalking Lictor", "Venomthrope Polluter"]
+        self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord"]
+        self.synapse_name = ""
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array)))
         self.deck = deck_list[1:]
+        if deck_list[0] in self.tyranid_warlord_list:
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.synapse_list:
+                    self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array)))
+                    del self.deck[i]
+                i = i + 1
         self.shuffle_deck()
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
@@ -107,6 +120,13 @@ class Player:
                 self.game.name_1 + " may mulligan their opening hand.")
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
+
+    def search_synapse_in_hq(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_card_type() == "Synapse":
+                self.synapse_name = self.headquarters[i].get_name()
+                return True
+        return False
 
     def get_can_play_limited(self):
         return self.can_play_limited
@@ -956,6 +976,22 @@ class Player:
                 if summon_khymera:
                     self.summon_token_at_planet("Khymera", dest_planet)
             i += 1
+
+    def move_synapse_to_hq(self):
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_card_type() == "Synapse":
+                    self.move_unit_at_planet_to_hq(i, j)
+                    return None
+        return None
+
+    def commit_synapse_to_planet(self):
+        if self.synapse_commit_location != -1:
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_card_type() == "Synapse":
+                    self.move_unit_to_planet(-2, i, self.synapse_commit_location)
+                    return None
+        return None
 
     def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
@@ -1928,9 +1964,10 @@ class Player:
                     print(self.cards_in_play[0])
                     print(len(self.cards_in_play[i + 1]))
                     if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
-                        self.retreat_unit(i, j)
-                        j = j - 1
+                        self.move_unit_at_planet_to_hq(i, j)
+                        return None
                     j = j + 1
+        return None
 
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))

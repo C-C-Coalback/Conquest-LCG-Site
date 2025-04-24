@@ -14,15 +14,57 @@ async def update_game_event_command_section(self, name, game_update_string):
                     if not self.p1.committed_warlord:
                         self.p1.warlord_commit_location = int(game_update_string[1])
                         self.p1.committed_warlord = True
+                        await self.game_sockets[0].receive_game_update(self.name_1 + " has chosen a planet to commit "
+                                                                                     "their warlord.")
+                        if self.p1.search_synapse_in_hq():
+                            await self.game_sockets[0].receive_game_update(self.name_1 + " has a synapse; please"
+                                                                                         " commit this as well")
+                            self.p1.committed_synapse = False
+                            self.p1.synapse_commit_location = -1
+                    elif not self.p1.committed_synapse:
+                        self.p1.synapse_commit_location = int(game_update_string[1])
+                        self.p1.committed_synapse = True
+                        if self.p1.synapse_name == "Savage Warrior Prime" and\
+                                self.p1.warlord_commit_location == self.p1.synapse_commit_location:
+                            self.p1.synapse_commit_location = -1
+                            self.p1.committed_synapse = False
+                            await self.game_sockets[0].receive_game_update(
+                                "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
+                        else:
+                            await self.game_sockets[0].receive_game_update(
+                                self.name_1 + " has chosen a planet to commit their synapse.")
+
                 else:
                     if not self.p2.committed_warlord:
                         self.p2.warlord_commit_location = int(game_update_string[1])
                         self.p2.committed_warlord = True
-                if self.p1.committed_warlord and self.p2.committed_warlord:
+                        await self.game_sockets[0].receive_game_update(self.name_2 + " has chosen a planet to commit "
+                                                                                     "their warlord.")
+                        if self.p2.search_synapse_in_hq():
+                            await self.game_sockets[0].receive_game_update(self.name_2 + " has a synapse; please"
+                                                                                         " commit this as well")
+                            self.p2.committed_synapse = False
+                            self.p2.synapse_commit_location = -1
+                    elif not self.p2.committed_synapse:
+                        self.p2.synapse_commit_location = int(game_update_string[1])
+                        self.p2.committed_synapse = True
+                        if self.p2.synapse_name == "Savage Warrior Prime" and\
+                                self.p2.warlord_commit_location == self.p2.synapse_commit_location:
+                            self.p2.synapse_commit_location = -1
+                            self.p2.committed_synapse = False
+                            await self.game_sockets[0].receive_game_update(
+                                "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
+                        else:
+                            await self.game_sockets[0].receive_game_update(
+                                self.name_2 + " has chosen a planet to commit their synapse.")
+                if self.p1.committed_warlord and self.p2.committed_warlord and \
+                        self.p1.committed_synapse and self.p2.committed_synapse:
                     print("Both warlords need to be committed.")
                     print(self.p1.warlord_commit_location, self.p2.warlord_commit_location)
                     self.p1.commit_warlord_to_planet()
                     self.p2.commit_warlord_to_planet()
+                    self.p1.commit_synapse_to_planet()
+                    self.p2.commit_synapse_to_planet()
                     await self.p1.send_hq()
                     await self.p2.send_hq()
                     await self.send_planet_array()
