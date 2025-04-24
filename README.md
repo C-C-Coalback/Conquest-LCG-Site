@@ -3,11 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-Guess we're done! Well, done with the Core Set anyway.
 
-Next I will be adding all cards from The Great Devourer;
-the cards from Legions of Death will come after that.
-Then the individual card packs will added.
 
 # What is this?
 
