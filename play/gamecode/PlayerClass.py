@@ -989,9 +989,21 @@ class Player:
         if self.synapse_commit_location != -1:
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_card_type() == "Synapse":
+                    if self.headquarters[i].get_ability() == "Gravid Tervigon":
+                        self.game.reactions_needing_resolving.append("Gravid Tervigon")
+                        self.game.positions_of_unit_triggering_reaction.append(
+                            [int(self.number), self.synapse_commit_location, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, self.synapse_commit_location)
                     return None
         return None
+
+    def ready_unit_by_name(self, name, planet):
+        for i in range(len(self.cards_in_play[planet + 1])):
+            if self.cards_in_play[planet + 1][i].get_ability() == name:
+                self.ready_given_pos(planet, i)
+                return True
+        return False
 
     def commit_warlord_to_planet(self, planet_pos=None, only_warlord=False):
         headquarters_list = self.get_headquarters()
@@ -1025,10 +1037,18 @@ class Player:
                     if card_type != "Warlord":
                         headquarters_list[i].exhaust_card()
                         if headquarters_list[i].get_ability() == "Experimental Devilfish":
-                            headquarters_list[i].ready_card()
-                    summon_khymera = False
+                            self.game.reactions_needing_resolving.append("Experimental Devilfish")
+                            self.game.positions_of_unit_triggering_reaction.append(
+                                [int(self.number), planet_pos - 1, -1])
+                            self.game.player_who_resolves_reaction.append(self.name_player)
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
+                        self.game.reactions_needing_resolving.append("The Swarmlord")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
-                        summon_khymera = True
+                        self.game.reactions_needing_resolving.append("Packmaster Kith")
+                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
+                        self.game.player_who_resolves_reaction.append(self.name_player)
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.reactions_needing_resolving.append("Eldorath Starbane")
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
@@ -1038,8 +1058,6 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
-                    if summon_khymera:
-                        self.summon_token_at_planet("Khymera", planet_pos - 1)
                     i -= 1
                 i += 1
         return None

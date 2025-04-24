@@ -2957,9 +2957,30 @@ class Game:
                 self.faction_of_searched_card = None
                 self.no_restrictions_on_chosen_card = True
                 self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Experimental Devilfish":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "The Swarmlord":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                planet_1 = planet_pos - 1
+                planet_2 = planet_pos + 1
+                if 7 > planet_1 > -1:
+                    primary_player.summon_token_at_planet("Termagant", planet_1)
+                    await primary_player.send_units_at_planet(planet_1)
+                if 7 > planet_2 > -1:
+                    primary_player.summon_token_at_planet("Termagant", planet_2)
+                    await primary_player.send_units_at_planet(planet_2)
+                self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Packmaster Kith":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.summon_token_at_planet("Khymera", planet_pos)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Gravid Tervigon":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Xavaes Split-Tongue":
