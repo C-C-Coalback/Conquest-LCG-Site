@@ -171,7 +171,7 @@ class UnitCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
-                 mobile=False, ambush=False):
+                 mobile=False, ambush=False, hive_mind=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited)
@@ -204,6 +204,10 @@ class UnitCard(Card):
         self.ambush = ambush
         self.reaction_available = True
         self.hit_by_superiority = False
+        self.has_hive_mind = hive_mind
+
+    def get_has_hive_mind(self):
+        return self.hive_mind
 
     def get_reaction_available(self):
         return self.reaction_available
@@ -502,6 +506,11 @@ class WarlordCard(UnitCard):
                   self.bloodied_health, "Health")
 
 
+class SynapseCard(UnitCard):
+    def __init__(self, name, text, traits, attack, health, command, unique):
+        super().__init__(name, text, traits, -1, "Tyranids", "Loyal", "Synapse", attack, health, command, unique)
+
+
 class ArmyCard(UnitCard):
     def __init__(self, name, text, traits, cost, faction, loyalty, attack, health, command, unique,
                  image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
@@ -509,7 +518,7 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False):
+                 ambush=False, hive_mind=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -517,7 +526,7 @@ class ArmyCard(UnitCard):
                          wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
-                         ambush=ambush)
+                         ambush=ambush, hive_mind=hive_mind)
 
     def print_info(self):
         if self.unique:

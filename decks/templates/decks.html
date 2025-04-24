@@ -328,9 +328,21 @@
                 var route_text = "/static/images/" + card_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML +=
                 `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
-
-
-
+            } else if (split_data[0] === "Synapse"){
+                var arrayLength = split_chat_holder.length;
+                var card_name = split_data[1];
+                for (var i = 0; i < arrayLength; i++) {
+                    if (split_chat_holder[i] === "Synapse") {
+                        var endIndex = i + 1;
+                        split_chat_holder[endIndex] = "1x " + card_name;
+                    }
+                }
+                chat_holder = split_chat_holder.join("\n");
+                document.querySelector('#chat-log').value = chat_holder;
+                card_name = card_name.split(' ').join('_');
+                var route_text = "/static/images/" + card_name + ".jpg";
+                document.getElementById('current-warlord').innerHTML +=
+                `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
             } else if (split_data[0] === "Army"){
                 var arrayLength = split_chat_holder.length;
                 for (var i = 0; i < arrayLength; i++) {

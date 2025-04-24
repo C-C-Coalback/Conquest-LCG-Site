@@ -1,17 +1,27 @@
+import copy
+
+
 class Card:
     def __init__(self, name, text, traits, cost, faction, loyalty, shields, card_type, unique, image_name="",
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
+                 limited=False):
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name = name
+        self.ability = name
         self.text = text
+        self.blanked_eop = False
         self.traits = traits
         self.cost = cost
         self.faction = faction
         self.loyalty = loyalty
         self.shields = shields
         self.card_type = card_type
+        self.is_unit = False
+        if self.card_type == "Army" or self.card_type == "Warlord"\
+                or self.card_type == "Token" or self.card_type == "Synapse":
+            self.is_unit = True
         self.unique = unique
         self.ready = True
         self.image_name = image_name
@@ -23,9 +33,66 @@ class Card:
         self.has_action_while_in_play = action_in_play
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
+        self.aiming_reticle_color = None
+        self.bloodied = False
+        self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
+        self.limited = limited
+        self.counter = 0
+        self.sacrifice_end_of_phase = False
+
+    def get_ambush(self):
+        return False
+
+    def set_sacrifice_end_of_phase(self, new_val):
+        self.sacrifice_end_of_phase = new_val
+
+    def get_sacrifice_end_of_phase(self):
+        return self.sacrifice_end_of_phase
+
+    def get_is_unit(self):
+        return self.is_unit
+
+    def set_available_mobile(self, new_val):
+        return None
+
+    def get_counter(self):
+        return self.counter
+
+    def set_counter(self, new_val):
+        self.counter = new_val
+
+    def increment_counter(self):
+        self.counter += 1
+
+    def decrement_counter(self):
+        self.counter -= 1
+
+    def get_limited(self):
+        return self.limited
 
     def get_name(self):
         return self.name
+
+    def get_ability(self, bloodied_relevant=False):
+        if self.blanked_eop:
+            return "BLANKED"
+        if bloodied_relevant:
+            if self.bloodied:
+                return "BLOODIED"
+        return self.ability
+
+    def set_blanked(self, new_val, exp="EOP"):
+        if exp == "EOP":
+            self.blanked_eop = new_val
+
+    def reset_blanked_eop(self):
+        self.blanked_eop = False
+
+    def get_blanked(self):
+        return self.blanked_eop
+
+    def get_is_faction_limited_unique_discounter(self):
+        return self.is_faction_limited_unique_discounter
 
     def get_once_per_phase_used(self):
         return self.once_per_phase_used
@@ -99,22 +166,183 @@ class Card:
 
 class UnitCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, card_type, attack, health, command,
-                 unique, image_name="", brutal=False, flying=False, armorbane=False, applies_discounts=None,
-                 action_in_hand=False, allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 unique, image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
+                 applies_discounts=None, action_in_hand=False
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
+                 additional_resources_command_struggle=0, additional_cards_command_struggle=0,
+                 mobile=False, ambush=False, hive_mind=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play)
+                         action_in_play, allowed_phases_in_play, limited)
         self.attack = attack
         self.health = health
         self.damage = 0
+        self.not_yet_assigned_damage = 0
         self.command = command
+        self.attachments = []
         self.by_base_brutal = brutal
         self.brutal = brutal
         self.by_base_flying = flying
         self.flying = flying
         self.by_base_armorbane = armorbane
         self.armorbane = armorbane
+        self.by_base_mobile = mobile
+        self.mobile = mobile
+        self.available_mobile = False
+        self.by_base_area_effect = area_effect
+        self.area_effect = area_effect
         self.extra_attack_until_end_of_battle = 0
+        self.extra_attack_until_next_attack = 0
+        self.extra_attack_until_end_of_phase = 0
+        self.by_base_ranged = ranged
+        self.ranged = ranged
+        self.wargear_attachments_permitted = wargear_attachments_permitted
+        self.no_attachments = no_attachments
+        self.additional_resources_command_struggle = additional_resources_command_struggle
+        self.additional_cards_command_struggle = additional_cards_command_struggle
+        self.ambush = ambush
+        self.reaction_available = True
+        self.hit_by_superiority = False
+        self.has_hive_mind = hive_mind
+
+    def get_has_hive_mind(self):
+        return self.hive_mind
+
+    def get_reaction_available(self):
+        return self.reaction_available
+
+    def set_reaction_available(self, new_val):
+        self.reaction_available = new_val
+
+    def get_indirect_damage(self):
+        return self.not_yet_assigned_damage
+
+    def increase_not_yet_assigned_damage(self, amount):
+        self.not_yet_assigned_damage += amount
+
+    def reset_indirect_damage(self):
+        self.not_yet_assigned_damage = 0
+
+    def get_ambush(self):
+        return self.ambush
+
+    def get_extra_attack_until_end_of_phase(self):
+        return self.extra_attack_until_end_of_phase
+
+    def increase_extra_attack_until_end_of_phase(self, amount):
+        self.extra_attack_until_end_of_phase += amount
+
+    def reset_extra_attack_until_end_of_phase(self):
+        self.extra_attack_until_end_of_phase = 0
+
+    def get_extra_attack_until_next_attack(self):
+        return self.extra_attack_until_next_attack
+
+    def increase_extra_attack_until_next_attack(self, amount):
+        self.extra_attack_until_next_attack += amount
+
+    def reset_extra_attack_until_next_attack(self):
+        self.extra_attack_until_next_attack = 0
+
+    def get_available_mobile(self):
+        return self.available_mobile
+
+    def set_available_mobile(self, new_val):
+        self.available_mobile = new_val
+
+    def get_by_base_mobile(self):
+        return self.by_base_mobile
+
+    def get_mobile(self):
+        if self.blanked_eop:
+            return False
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Mobility":
+                return True
+        return self.mobile
+
+    def get_additional_resources_command_struggle(self):
+        if self.blanked_eop:
+            return 0
+        return self.additional_resources_command_struggle
+
+    def get_additional_cards_command_struggle(self):
+        if self.blanked_eop:
+            return 0
+        return self.additional_cards_command_struggle
+
+    def get_no_attachments(self):
+        return self.no_attachments
+
+    def get_wargear_attachments_permitted(self):
+        return self.wargear_attachments_permitted
+
+    def get_attachments(self):
+        return self.attachments
+
+    def add_attachment(self, attachment_card):
+        print("Adding attachment to:", self.name)
+        print(attachment_card.name)
+        self.attachments.append(copy.deepcopy(attachment_card))
+        for i in range(len(self.attachments)):
+            print(self.attachments[i].get_name())
+
+    def set_ranged(self, new_val):
+        self.ranged = new_val
+
+    def get_ranged(self):
+        if self.blanked_eop:
+            return False
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Rokkit Launcha":
+                return True
+        return self.ranged
+
+    def get_ignores_flying(self):
+        if self.blanked_eop:
+            return False
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Godwyn Pattern Bolter":
+                return True
+        return False
+
+    def reset_ranged(self):
+        self.ranged = self.by_base_ranged
+
+    def get_by_base_armorbane(self):
+        return self.by_base_armorbane
+
+    def get_armorbane(self):
+        if self.blanked_eop:
+            return False
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
+                return True
+        return self.armorbane
+
+    def get_by_base_area_effect(self):
+        return self.by_base_area_effect
+
+    def get_area_effect(self):
+        if self.blanked_eop:
+            return 0
+        area_effect = self.area_effect
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Gun Drones":
+                area_effect += 2
+        return area_effect
+
+    def get_by_base_flying(self):
+        return self.by_base_flying
+
+    def get_flying(self):
+        if self.blanked_eop:
+            return False
+        return self.flying
+
+    def set_flying(self, new_val):
+        self.flying = new_val
 
     def get_by_base_brutal(self):
         return self.by_base_brutal
@@ -134,6 +362,8 @@ class UnitCard(Card):
             self.damage = 0
 
     def get_brutal(self):
+        if self.blanked_eop:
+            return False
         return self.brutal
 
     def set_brutal(self, new_val):
@@ -143,23 +373,48 @@ class UnitCard(Card):
         self.brutal = self.by_base_brutal
 
     def get_attack(self):
-        return self.attack
+        attack = self.attack
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_card_type() == "Attachment":
+                attack += self.attachments[i].get_extra_attack()
+            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
+                attack += 2
+        if self.get_ability() == "Fire Warrior Strike Team":
+            attack += len(self.attachments)
+        return attack
 
     def get_health(self):
-        return self.health
+        health = self.health
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_card_type() == "Attachment":
+                health += self.attachments[i].get_extra_health()
+            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
+                health += 2
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Cybork Body":
+                health = 2 * health
+        return health
 
     def get_damage(self):
         return self.damage
 
-    def get_command(self):
-        if self.name == "Bad Dok" and self.damage > 0:
-            return self.command + 3
-        return self.command
+    def set_damage(self, amount):
+        self.damage = amount
 
-    def damage_card(self, player, amount, can_shield=True):
-        if can_shield:
-            amount = self.shield_window(player, amount)
-        self.assign_damage(amount)
+    def get_command(self):
+        command = self.command
+        if self.hit_by_superiority:
+            self.hit_by_superiority = False
+            return 0
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_card_type() == "Attachment":
+                command += self.attachments[i].get_extra_command()
+        if self.get_ability() == "Bad Dok" and self.damage > 0:
+            command = command + 3
+        return command
+
+    def damage_card(self, player, amount, can_shield=True, reassign=False):
+        self.assign_damage(amount, reassign=reassign)
         if self.check_health():
             print("Card still standing")
             return 0
@@ -167,53 +422,16 @@ class UnitCard(Card):
             print("Damage exceeds health")
             return 1
 
-    def shield_window(self, player, amount):
-        print(self.get_name(), "taking", amount, "damage.")
-        print("GOT HERE")
-        player.set_turn(True)
-        player.extra_text = "Shield window"
-        player.position_activated = []
-        while True:
-            pygame.time.wait(500)
-            player.c.acquire()
-            player.c.notify_all()
-            current_active = player.position_activated
-            player.c.release()
-            if len(current_active) > 0:
-                if current_active[0] == "PASS":
-                    print("No shields used")
-                    player.set_turn(False)
-                    return amount
-                if len(current_active) > 1:
-                    print("GOT HERE + :", current_active)
-                    if current_active[1] == "Hand" and int((current_active[0])[1]) == player.number:
-                        if int(current_active[2]) < len(player.cards):
-                            print("Attempting to shield")
-                            print("Position of card: Player", current_active[0], "Hand pos:", current_active[2])
-                            position = int(current_active[2])
-                            if position == -1:
-                                print("No shields used")
-                                return amount
-                            shield = player.get_shields_given_pos(position)
-                            if shield == -1:
-                                input("Card somehow found in hand but not in database.")
-                            elif shield == 0:
-                                print("Card has no shields on it. Use something else.")
-                            else:
-                                player.discard_card_from_hand(position)
-                                print("shield value:", shield)
-                                amount = int(amount)
-                                shield = int(shield)
-                                amount = amount - shield
-                                if amount < 0:
-                                    amount = 0
-                                return amount
-
-    def assign_damage(self, amount):
+    def assign_damage(self, amount, reassign=False):
+        if amount > 0:
+            if self.get_ability() == "Blood Angels Veterans":
+                if not reassign:
+                    if self.get_ready():
+                        amount = amount - 1
         self.damage = self.damage + amount
 
     def check_health(self):
-        if self.health > self.damage:
+        if self.get_health() > self.damage:
             return 1
         else:
             return 0
@@ -222,12 +440,17 @@ class UnitCard(Card):
 class WarlordCard(UnitCard):
     def __init__(self, name, text, traits, faction, attack, health, bloodied_attack, bloodied_health, bloodied_text,
                  starting_resources, starting_cards, signature_squad, image_name="", brutal=False, flying=False,
-                 armorbane=False,
+                 armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 action_in_play=False, allowed_phases_in_play=None, ranged=False,
+                 wargear_attachments_permitted=True, no_attachments=False, mobile=False):
         super().__init__(name, text, traits, -1, faction, "Signature", "Warlord", attack, health, 999,
-                         True, image_name, brutal, flying, armorbane, applies_discounts,
-                         action_in_hand, allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         True, image_name, brutal, flying, armorbane, area_effect,
+                         applies_discounts, action_in_hand, allowed_phases_in_hand,
+                         action_in_play, allowed_phases_in_play, ranged=ranged,
+                         wargear_attachments_permitted=wargear_attachments_permitted,
+                         no_attachments=no_attachments, additional_cards_command_struggle=0,
+                         additional_resources_command_struggle=0, mobile=mobile)
         self.bloodied = False
         self.bloodied_attack = bloodied_attack
         self.bloodied_health = bloodied_health
@@ -283,15 +506,27 @@ class WarlordCard(UnitCard):
                   self.bloodied_health, "Health")
 
 
+class SynapseCard(UnitCard):
+    def __init__(self, name, text, traits, attack, health, command, unique):
+        super().__init__(name, text, traits, -1, "Tyranids", "Loyal", "Synapse", attack, health, command, unique)
+
+
 class ArmyCard(UnitCard):
     def __init__(self, name, text, traits, cost, faction, loyalty, attack, health, command, unique,
-                 image_name="", brutal=False, flying=False, applies_discounts=None, action_in_hand=False,
-                 armorbane=False,
-                 allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 image_name="", brutal=False, flying=False, armorbane=False, area_effect=0,
+                 applies_discounts=None, action_in_hand=False,
+                 allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
+                 additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
+                 ambush=False, hive_mind=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
-                         unique, image_name, brutal, flying, armorbane,
+                         unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play)
+                         action_in_play, allowed_phases_in_play, limited, ranged=ranged,
+                         wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
+                         additional_cards_command_struggle=additional_cards_command_struggle,
+                         additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
+                         ambush=ambush, hive_mind=hive_mind)
 
     def print_info(self):
         if self.unique:
@@ -309,10 +544,12 @@ class ArmyCard(UnitCard):
 class EventCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
-                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Event", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
+                         limited=limited)
 
     def print_info(self):
         if self.unique:
@@ -331,10 +568,34 @@ class EventCard(Card):
 class AttachmentCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
-                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None):
+                 , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                 limited=False, type_of_units_allowed_for_attachment="Army/Token/Warlord/Synapse",
+                 unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
+                 must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
+                 extra_command=0):
         super().__init__(name, text, traits, cost, faction, loyalty,
-                         shields, "Attachment", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         shields, "Attachment", unique, applies_discounts=applies_discounts,
+                         action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
+                         action_in_play=action_in_play, allowed_phases_in_play=allowed_phases_in_play,
+                         limited=limited)
+        self.type_of_units_allowed_for_attachment = type_of_units_allowed_for_attachment
+        self.unit_must_be_unique = unit_must_be_unique
+        self.unit_must_match_faction = unit_must_match_faction
+        self.must_be_own_unit = must_be_own_unit
+        self.must_be_enemy_unit = must_be_enemy_unit
+        self.limit_one_per_unit = limit_one_per_unit
+        self.extra_attack = extra_attack
+        self.extra_health = extra_health
+        self.extra_command = extra_command
+
+    def get_extra_command(self):
+        return self.extra_command
+
+    def get_extra_attack(self):
+        return self.extra_attack
+
+    def get_extra_health(self):
+        return self.extra_health
 
     def print_info(self):
         if self.unique:
@@ -353,10 +614,15 @@ class AttachmentCard(Card):
 class SupportCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty, unique, image_name="", applies_discounts=None
                  , action_in_hand=False, allowed_phases_in_hand=None,
-                 action_in_play=False, allowed_phases_in_play=None):
+                 action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
+                 limited=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          0, "Support", unique, image_name, applies_discounts, action_in_hand
-                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play)
+                         , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
+                         is_faction_limited_unique_discounter, limited)
+
+    def get_attachments(self):
+        return []
 
     def print_info(self):
         if self.unique:
@@ -373,10 +639,13 @@ class SupportCard(Card):
 
 
 class TokenCard(UnitCard):
-    def __init__(self, name, text, traits, faction, attack, health, image_name="", applies_discounts=None):
+    def __init__(self, name, text, traits, faction, attack, health, applies_discounts=None,
+                 no_attachments=False):
         super().__init__(name, text, traits, -1, faction, "Common", "Token",
-                         attack, health, 0, False, image_name, applies_discounts, action_in_hand=False
-                         , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None)
+                         attack, health, 0, False, applies_discounts=applies_discounts, action_in_hand=False,
+                         allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
+                         ranged=False, wargear_attachments_permitted=True, no_attachments=no_attachments,
+                         additional_resources_command_struggle=0, additional_cards_command_struggle=0, mobile=False)
 
     def print_info(self):
         print("Name:", self.name)

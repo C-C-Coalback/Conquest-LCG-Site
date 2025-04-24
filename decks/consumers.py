@@ -86,6 +86,10 @@ def deck_validation(deck, remaining_signature_squad, factions):
         current_index += 1
     if len(remaining_signature_squad) > 0:
         return "Missing something from signature squad"
+    synapse_needed = False
+    has_synapse = False
+    if factions[0] == "Tyranids":
+        synapse_needed = True
     current_index += 1
     card_count = 0
     skippers = ["Support", "Attachment", "Event", "Synapse"]
@@ -107,12 +111,24 @@ def deck_validation(deck, remaining_signature_squad, factions):
             if card_result.get_loyalty() == "Signature":
                 print("Signature card found")
                 return "Signature card found: " + current_name
+            if card_result.get_card_type() == "Synapse":
+                if synapse_needed:
+                    if has_synapse:
+                        return "Too many Synapse units given"
+                    else:
+                        if current_amount != "1":
+                            return "Wrong number for synapse unit"
+                        has_synapse = True
+                else:
+                    return "Synapse units not allowed in this deck"
             faction_check_passed = False
             if card_result.get_faction() == factions[0]:
                 faction_check_passed = True
             elif card_result.get_faction() == factions[1] and card_result.get_loyalty() == "Common":
                 faction_check_passed = True
             elif card_result.get_faction() == "Neutral":
+                if factions[0] == "Tyranids" and card_result.get_card_type() == "Army":
+                    return "Tyranids may not have Neutral Army Units in their deck"
                 faction_check_passed = True
             if not faction_check_passed:
                 print("Faction check not passed", factions[0], factions[1], card_result.get_faction())
@@ -121,6 +137,8 @@ def deck_validation(deck, remaining_signature_squad, factions):
         current_index += 1
         while deck[current_index] in skippers:
             current_index += 1
+    if synapse_needed and not has_synapse:
+        return "No Synapse Unit Given"
     if card_count < 42:
         print("Too few cards")
         return "Too few cards: " + str(card_count)
@@ -179,57 +197,17 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     if self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
                         await self.send(text_data=json.dumps({"message": message}))
                     if card_object.get_faction() == "Neutral":
-                        await self.send(text_data=json.dumps({"message": message}))
-                if card_object.get_name() == "Nazdreg":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Nazdreg's Flash Gitz"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Bigga Is Betta"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Bigga Is Betta"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Kraktoof Hall"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Cybork Body"}))
-                elif card_object.get_name() == "Zarathur, High Sorcerer":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Zarathur's Flamers"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Infernal Gateway"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Shrine of Warpflame"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Mark of Chaos"}))
-                elif card_object.get_name() == "Captain Cato Sicarius":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Sicarius's Chosen"}))
-                    await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
-                    await self.send(text_data=json.dumps({"message": "SS/The Fury of Sicarius"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Cato's Stronghold"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Tallassarian Tempest Blade"}))
-                elif card_object.get_name() == "Colonel Straken":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Straken's Command Squad"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Glorious Intervention"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Omega Zero Command"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Straken's Cunning"}))
-                elif card_object.get_name() == "Packmaster Kith":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Kith's Khymeramasters"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Pact of the Haemonculi"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Pact of the Haemonculi"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Khymera Den"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Agonizer of Bren"}))
-                elif card_object.get_name() == "Eldorath Starbane":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Starbane's Council"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Foresight"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Foresight"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Alaitoc Shrine"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Mobility"}))
-                elif card_object.get_name() == "Commander Shadowsun":
-                    for i in range(4):
-                        await self.send(text_data=json.dumps({"message": "SS/Shadowsun's Stealth Cadre"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Squadron Redeployment"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Squadron Redeployment"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Communications Relay"}))
-                    await self.send(text_data=json.dumps({"message": "SS/Command-Link Drone"}))
-
+                        if self.main_faction != "Tyranids":
+                            await self.send(text_data=json.dumps({"message": message}))
+                        elif card_type != "Army":
+                            await self.send(text_data=json.dumps({"message": message}))
+                if card_type == "Warlord":
+                    sig_squad = card_object.signature_squad
+                    for i in range(len(sig_squad)):
+                        num_copies = int(sig_squad[i][0])
+                        card_name = sig_squad[i][3:]
+                        for _ in range(num_copies):
+                            await self.send(text_data=json.dumps({"message": "SS/" + card_name}))
         elif len(split_message) == 2:
             if split_message[0] == "Name":
                 s = split_message[1]
