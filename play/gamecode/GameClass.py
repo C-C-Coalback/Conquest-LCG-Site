@@ -938,6 +938,19 @@ class Game:
             await self.send_search()
             self.communications_relay_enabled = True
 
+    def move_reaction_to_front(self, reaction_pos):
+        self.reactions_needing_resolving.insert(
+            0, self.reactions_needing_resolving.pop(reaction_pos)
+        )
+        self.player_who_resolves_reaction.insert(
+            0, self.player_who_resolves_reaction.pop(reaction_pos)
+        )
+        self.positions_of_unit_triggering_reaction.insert(
+            0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
+        )
+        print(self.reactions_needing_resolving)
+        self.asking_if_reaction = True
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
             primary_player = self.p1
@@ -960,17 +973,7 @@ class Game:
                         self.asking_which_reaction = False
                         reaction_pos = int(game_update_string[1])
                         print(reaction_pos)
-                        self.reactions_needing_resolving.insert(
-                            0, self.reactions_needing_resolving.pop(reaction_pos)
-                        )
-                        self.player_who_resolves_reaction.insert(
-                            0, self.player_who_resolves_reaction.pop(reaction_pos)
-                        )
-                        self.positions_of_unit_triggering_reaction.insert(
-                            0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
-                        )
-                        print(self.reactions_needing_resolving)
-                        self.asking_if_reaction = True
+                        self.move_reaction_to_front(reaction_pos)
                     elif self.asking_if_reaction:
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
@@ -3105,6 +3108,8 @@ class Game:
                             await self.start_resolving_reaction(name, game_update_string)
                             await self.update_reactions(name, game_update_string, count=count+1)
                     else:
+                        reaction_pos = self.stored_reaction_indexes[0]
+                        self.move_reaction_to_front(reaction_pos)
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
@@ -3136,6 +3141,8 @@ class Game:
                             await self.start_resolving_reaction(name, game_update_string)
                             await self.update_reactions(name, game_update_string, count=count+1)
                     else:
+                        reaction_pos = self.stored_reaction_indexes[0]
+                        self.move_reaction_to_front(reaction_pos)
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
