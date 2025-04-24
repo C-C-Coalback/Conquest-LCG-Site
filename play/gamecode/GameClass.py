@@ -191,6 +191,7 @@ class Game:
         self.body_guard_positions = []
         self.damage_bodyguard = 0
         self.planet_bodyguard = -1
+        self.last_player_who_resolved_reaction = ""
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -972,8 +973,10 @@ class Game:
                         print("\nGot to asking which reaction\n")
                         self.asking_which_reaction = False
                         reaction_pos = int(game_update_string[1])
+                        reaction_pos = self.stored_reaction_indexes[reaction_pos]
                         print(reaction_pos)
                         self.move_reaction_to_front(reaction_pos)
+                        self.has_chosen_to_resolve = False
                     elif self.asking_if_reaction:
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
@@ -1224,6 +1227,9 @@ class Game:
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array)
                                 if card.check_for_a_trait("Tzeentch"):
                                     self.choices_available.append(card.get_name())
+                            if not self.choices_available:
+                                await self.game_sockets[0].receive_game_update("No valid targets for Shrine of Warpflame")
+                                self.resolving_search_box = False
                             await self.send_search()
                         elif game_update_string[1] == "1":
                             self.choices_available = []
@@ -1769,21 +1775,7 @@ class Game:
                         return True
         return False
 
-    async def destroy_check_all_cards(self):
-        self.recently_damaged_units = []
-        self.damage_taken_was_from_attack = []
-        self.faction_of_attacker = []
-        self.furiable_unit_position = (-1, -1)
-        self.p1.cards_recently_discarded = []
-        self.p2.cards_recently_discarded = []
-        self.p1.cards_recently_destroyed = []
-        self.p2.cards_recently_destroyed = []
-        print("All units have been damaged. Move to destruction")
-        for i in range(7):
-            await self.destroy_check_cards_at_planet(self.p1, i)
-            await self.destroy_check_cards_at_planet(self.p2, i)
-        await self.destroy_check_cards_in_hq(self.p1)
-        await self.destroy_check_cards_in_hq(self.p2)
+    async def complete_destruction_checks(self):
         self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
         self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
         self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
@@ -1854,13 +1846,13 @@ class Game:
             await self.game_sockets[0].receive_game_update(
                 "----GAME END----"
                 "Victory for " + self.name_2 + "; sufficient icons on captured planets."
-                "----GAME END----"
+                                               "----GAME END----"
             )
         elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
             await self.game_sockets[0].receive_game_update(
                 "----GAME END----"
                 "Victory for " + self.name_1 + "; sufficient icons on captured planets."
-                "----GAME END----"
+                                               "----GAME END----"
             )
         elif self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
             await self.game_sockets[0].receive_game_update(
@@ -1872,6 +1864,24 @@ class Game:
         await self.p2.send_resources()
         await self.p1.send_discard()
         await self.p2.send_discard()
+
+    async def destroy_check_all_cards(self):
+        self.recently_damaged_units = []
+        self.damage_taken_was_from_attack = []
+        self.faction_of_attacker = []
+        self.furiable_unit_position = (-1, -1)
+        self.p1.cards_recently_discarded = []
+        self.p2.cards_recently_discarded = []
+        self.p1.cards_recently_destroyed = []
+        self.p2.cards_recently_destroyed = []
+        print("All units have been damaged. Move to destruction")
+        for i in range(7):
+            await self.destroy_check_cards_at_planet(self.p1, i)
+            await self.destroy_check_cards_at_planet(self.p2, i)
+        await self.destroy_check_cards_in_hq(self.p1)
+        await self.destroy_check_cards_in_hq(self.p2)
+        await self.complete_destruction_checks()
+
 
     def advance_damage_aiming_reticle(self):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -2846,6 +2856,7 @@ class Game:
     def delete_reaction(self):
         self.asking_which_reaction = True
         self.already_resolving_reaction = False
+        self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
         del self.reactions_needing_resolving[0]
         del self.player_who_resolves_reaction[0]
         del self.positions_of_unit_triggering_reaction[0]
@@ -3084,13 +3095,20 @@ class Game:
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
+            print(self.already_resolving_reaction)
+            print(self.resolving_search_box)
+            print(self.effects_waiting_on_resolution)
             if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
-                    self.resolving_search_box and not self.choices_available and not self.effects_waiting_on_resolution:
+                    self.resolving_search_box and not self.effects_waiting_on_resolution:
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
-                if (self.player_with_initiative == self.name_1 and p_one_count > 0) or \
+                print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
+                if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
+                    self.last_player_who_resolved_reaction != self.name_1) or \
                         (p_one_count > 0 and p_two_count == 0):
+                    print("\n\nREACTION UPDATE P1\n\n")
                     self.stored_reaction_indexes = self.get_positions_of_players_reactions(self.name_1)
                     if p_one_count > 1:
+
                         if self.asking_which_reaction:
                             self.choices_available = self.get_name_reactions_of_players_reactions(self.name_1)
                             self.choice_context = "Choose Which Reaction"
@@ -3233,6 +3251,8 @@ class Game:
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
             resolved_subroutine = True
         await self.update_reactions(name, game_update_string)
+        if not self.reactions_needing_resolving:
+            self.last_player_who_resolved_reaction = ""
         if self.cards_in_search_box:
             await self.send_search()
         if self.positions_of_units_to_take_damage:

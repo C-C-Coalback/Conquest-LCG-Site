@@ -319,10 +319,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                         card = FindCard.find_card(card_name, active_games[self.game_position].card_array)
                         if card.get_shields() != "FINAL CARD":
                             if message[2] == "1":
-                                active_games[self.game_position].p1.cards.append(card_name)
+                                active_games[self.game_position].p1.cards.append(card.get_name())
                                 await active_games[self.game_position].p1.send_hand()
                             elif message[2] == "2":
-                                active_games[self.game_position].p2.cards.append(card_name)
+                                active_games[self.game_position].p2.cards.append(card.get_name())
                                 await active_games[self.game_position].p2.send_hand()
                     elif message[1] == "draw" and len(message) > 2:
                         if message[2] == "1":

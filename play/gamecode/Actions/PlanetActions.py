@@ -54,6 +54,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=False)
             secondary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=True)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+            await self.complete_destruction_checks()
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
             self.card_pos_to_deploy = -1
