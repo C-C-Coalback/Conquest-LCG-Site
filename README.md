@@ -3,7 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-
+Work has begun on implementing the cards from The Great Devourer.
 
 # What is this?
 

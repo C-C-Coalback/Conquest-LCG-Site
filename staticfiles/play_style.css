@@ -226,7 +226,12 @@ h4 {
     right:0;
     bottom: calc(45px + 20vh);
     width: auto;
-    height: 15px;
+    height: 35px;
+}
+
+#action-button {
+    width: calc(10vw + 30px);
+    height: 35px;
 }
 
 #chat-message-submit {
