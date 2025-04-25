@@ -3702,6 +3702,9 @@ class Game:
             if self.planets_in_play_array[i]:
                 p1_has_warlord = self.p1.check_for_warlord(i)
                 p2_has_warlord = self.p2.check_for_warlord(i)
+                if not p1_has_warlord and not p2_has_warlord:
+                    p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
+                    p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
                 if p1_has_warlord or p2_has_warlord:
                     self.last_planet_checked_for_battle = i
                     self.begin_combat_round()
@@ -3717,6 +3720,9 @@ class Game:
     def set_battle_initiative(self):
         self.p1_has_warlord = self.p1.check_for_warlord(self.last_planet_checked_for_battle)
         self.p2_has_warlord = self.p2.check_for_warlord(self.last_planet_checked_for_battle)
+        if not self.p1_has_warlord and not self.p2_has_warlord:
+            self.p1_has_warlord = self.p1.check_savage_warrior_prime_present(self.last_planet_checked_for_battle)
+            self.p2_has_warlord = self.p2.check_savage_warrior_prime_present(self.last_planet_checked_for_battle)
         if self.p1_has_warlord == self.p2_has_warlord:
             self.number_with_combat_turn = self.number_with_initiative
             self.player_with_combat_turn = self.player_with_initiative
@@ -3743,6 +3749,14 @@ class Game:
             self.ranged_skirmish_active = True
             return 1
         elif self.p2.check_for_warlord(planet_id):
+            print("p2 warlord present. Battle at ", planet_id)
+            self.ranged_skirmish_active = True
+            return 1
+        elif self.p1.check_savage_warrior_prime_present(planet_id):
+            print("p1 warlord present. Battle at ", planet_id)
+            self.ranged_skirmish_active = True
+            return 1
+        elif self.p2.check_savage_warrior_prime_present(planet_id):
             print("p2 warlord present. Battle at ", planet_id)
             self.ranged_skirmish_active = True
             return 1

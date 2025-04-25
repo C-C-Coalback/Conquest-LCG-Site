@@ -992,6 +992,12 @@ class Player:
                     return None
         return None
 
+    def check_savage_warrior_prime_present(self, planet):
+        for i in range(len(self.cards_in_play[planet + 1])):
+            if self.cards_in_play[planet + 1][i].get_ability() == "Savage Warrior Prime":
+                return True
+        return False
+
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
             for i in range(len(self.headquarters)):
