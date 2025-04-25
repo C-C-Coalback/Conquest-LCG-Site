@@ -167,6 +167,7 @@ class Game:
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
         self.faction_of_attacker = []
+        self.on_kill_effects_of_attacker = []
         self.furiable_unit_position = (-1, -1)
         self.nullified_card_pos = -1
         self.nullify_context = ""
@@ -1863,6 +1864,22 @@ class Game:
         if self.damage_from_atrox:
             await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
 
+    async def resolve_on_kill_effects(self, i):
+        print("--------\nON KILL EFFECTS\n--------")
+        num, planet, pos = self.recently_damaged_units[i]
+        if num == 1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if primary_player.check_if_card_is_destroyed(planet, pos):
+            if self.on_kill_effects_of_attacker[i]:
+                for j in range(len(self.on_kill_effects_of_attacker[i])):
+                    if self.on_kill_effects_of_attacker[i][j] == "Bone Sabres":
+                        self.create_reaction("Bone Sabres", secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
+
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
         while i < len(player.cards_in_play[planet_num + 1]):
@@ -2010,9 +2027,13 @@ class Game:
         await self.p2.send_discard()
 
     async def destroy_check_all_cards(self):
+        print("\n\nABOUT TO EXECUTE:", self.on_kill_effects_of_attacker)
+        for i in range(len(self.recently_damaged_units)):
+            await self.resolve_on_kill_effects(i)
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
         self.faction_of_attacker = []
+        self.on_kill_effects_of_attacker = []
         self.furiable_unit_position = (-1, -1)
         self.p1.cards_recently_discarded = []
         self.p2.cards_recently_discarded = []
@@ -2100,6 +2121,9 @@ class Game:
                         self.damage_taken_was_from_attack.append(True)
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
+                        self.on_kill_effects_of_attacker.append(
+                            secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
+                        print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
                             if att_num == 1:
                                 self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
@@ -2113,6 +2137,7 @@ class Game:
                     else:
                         self.damage_taken_was_from_attack.append(False)
                         self.faction_of_attacker.append("")
+                        self.on_kill_effects_of_attacker.append([])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
@@ -2182,6 +2207,8 @@ class Game:
                                             self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
                                                 att_pla, att_pos
                                             ))
+                                            self.on_kill_effects_of_attacker.append(
+                                                secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                         "Repulsor Impact Field"):
                                                 if att_num == 1:
@@ -2198,6 +2225,7 @@ class Game:
                                         else:
                                             self.damage_taken_was_from_attack.append(False)
                                             self.faction_of_attacker.append("")
+                                            self.on_kill_effects_of_attacker.append([])
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
                                 await self.game_sockets[0].receive_game_update("This damage can not be shielded!")
@@ -3116,6 +3144,7 @@ class Game:
             print(self.recently_damaged_units)
             print(self.damage_taken_was_from_attack)
             print(self.faction_of_attacker)
+            print(self.on_kill_effects_of_attacker)
             for i in range(len(self.recently_damaged_units)):
                 if self.damage_taken_was_from_attack[i]:
                     print("Damage was from attack")
@@ -3274,6 +3303,11 @@ class Game:
             elif self.reactions_needing_resolving[0] == "Packmaster Kith":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.summon_token_at_planet("Khymera", planet_pos)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Bone Sabres":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Gravid Tervigon":

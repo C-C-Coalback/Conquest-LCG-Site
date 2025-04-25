@@ -796,6 +796,17 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
 
+    def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos):
+        print("\nGetting on kill effects\n")
+        on_kill_effects = []
+        if planet_pos == -2:
+            return on_kill_effects
+        for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
+                on_kill_effects.append("Bone Sabres")
+                print("\nBone Sabres detected\n")
+        return on_kill_effects
+
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()
         for i in range(len(self.headquarters)):
