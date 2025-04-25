@@ -2149,6 +2149,10 @@ class Game:
                                                 planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
+    def combat_reset_eocr_values(self):
+        self.p1.reset_eocr_values()
+        self.p2.reset_eocr_values()
+
     async def resolve_reaction(self, name, game_update_string):
         if name == self.player_who_resolves_reaction[0]:
             if name == self.name_1:
@@ -3587,6 +3591,7 @@ class Game:
                     await winner.send_victory_display()
 
     async def check_combat_end(self, name):
+        self.combat_reset_eocr_values()
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
         p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
         if p1_has_units and p2_has_units:

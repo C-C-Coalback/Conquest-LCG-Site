@@ -1846,6 +1846,13 @@ class Player:
         else:
             self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
+    def reset_eocr_values(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].reset_own_eocr_values()
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].reset_own_eocr_values()
+
     def perform_own_reactions_on_phase_change(self, phase):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":

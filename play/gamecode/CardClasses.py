@@ -212,6 +212,7 @@ class UnitCard(Card):
         self.reaction_available = True
         self.hit_by_superiority = False
         self.has_hive_mind = hive_mind
+        self.brutal_eocr = False
 
     def get_has_hive_mind(self):
         return self.hive_mind
@@ -368,9 +369,14 @@ class UnitCard(Card):
         if self.damage < 0:
             self.damage = 0
 
+    def reset_own_eocr_values(self):
+        self.brutal_eocr = False
+
     def get_brutal(self):
         if self.blanked_eop:
             return False
+        if self.brutal_eocr:
+            return True
         return self.brutal
 
     def set_brutal(self, new_val):

@@ -307,7 +307,23 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.send_hq()
                 await primary_player.send_hand()
-                await primary_player.send_resources()
+                await primary_player.send_discard()
+    elif self.action_chosen == "Ferocious Strength":
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = -2
+            unit_pos = int(game_update_string[2])
+            if primary_player.headquarters[unit_pos].get_card_type() == "Synapse" or \
+                    primary_player.headquarters[unit_pos].get_card_type() == "Warlord":
+                primary_player.headquarters[unit_pos].brutal_eocr = True
+                card_name = primary_player.headquarters[unit_pos].get_name()
+                await self.game_sockets[0].receive_game_update("Made " + card_name + " Brutal for one combat round.")
+                self.action_chosen = ""
+                self.mode = "Normal"
+                self.player_with_action = ""
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                await primary_player.send_hq()
+                await primary_player.send_hand()
                 await primary_player.send_discard()
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
