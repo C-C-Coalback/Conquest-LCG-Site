@@ -192,6 +192,7 @@ class Game:
         self.damage_bodyguard = 0
         self.planet_bodyguard = -1
         self.last_player_who_resolved_reaction = ""
+        self.infested_planets = [False, True, False, False, False, False, False]
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -376,6 +377,10 @@ class Game:
                     planet_string += self.planet_array[i]
                 else:
                     planet_string += "CardbackRotated"
+                if self.infested_planets[i]:
+                    planet_string += "|I"
+                else:
+                    planet_string += "|N"
                 if i != 6:
                     planet_string += "/"
             await self.game_sockets[0].receive_game_update(planet_string)
@@ -385,6 +390,10 @@ class Game:
                     planet_string += self.planet_array[i]
                 else:
                     planet_string += "CardbackRotated"
+                if self.infested_planets[i]:
+                    planet_string += "|I"
+                else:
+                    planet_string += "|N"
                 if self.planet_aiming_reticle_position == i:
                     planet_string += "|red"
                 if i != 6:
@@ -2981,6 +2990,8 @@ class Game:
             elif self.reactions_needing_resolving[0] == "Gravid Tervigon":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
+                if self.infested_planets[planet_pos]:
+                    primary_player.summon_token_at_planet("Termagant", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Xavaes Split-Tongue":
@@ -3145,7 +3156,6 @@ class Game:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_reaction = True
                             await self.start_resolving_reaction(name, game_update_string)
-                            await self.update_reactions(name, game_update_string, count=count+1)
                     else:
                         reaction_pos = self.stored_reaction_indexes[0]
                         self.move_reaction_to_front(reaction_pos)
@@ -3178,7 +3188,6 @@ class Game:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_reaction = True
                             await self.start_resolving_reaction(name, game_update_string)
-                            await self.update_reactions(name, game_update_string, count=count+1)
                     else:
                         reaction_pos = self.stored_reaction_indexes[0]
                         self.move_reaction_to_front(reaction_pos)
@@ -3271,6 +3280,7 @@ class Game:
             elif self.phase == "COMBAT":
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
             resolved_subroutine = True
+        await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
             self.last_player_who_resolved_reaction = ""

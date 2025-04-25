@@ -147,8 +147,13 @@
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         var full_string = `<div class="planet-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                        if (card_data_split.length === 2) {
-                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                        if (card_data_split.length >= 2) {
+                            if (card_data_split[1] === "I") {
+                                full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
+                            }
+                        }
+                        if (card_data_split.length === 3) {
+                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
                         }
                         full_string += `</div>`;
                         document.getElementById('planets-in-play').innerHTML += full_string;

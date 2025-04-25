@@ -88,6 +88,15 @@ h4 {
     pointer-events: none;
 }
 
+.infestation-token {
+    position: absolute;
+    top: 3vh;
+    left: 3vw;
+    height: 4vh;
+    width: 4vw;
+    pointer-events: none;
+}
+
 .planet {
     position: relative;
     height: 10vh;
