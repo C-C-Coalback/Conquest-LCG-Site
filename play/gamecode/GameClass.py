@@ -199,6 +199,7 @@ class Game:
         self.name_of_card_to_play = ""
         self.damage_moved_to_old_one_eye = 0
         self.old_one_eye_pos = (-1, -1)
+        self.misc_target_choice = -1
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -994,7 +995,7 @@ class Game:
                         print(reaction_pos)
                         self.move_reaction_to_front(reaction_pos)
                         self.has_chosen_to_resolve = False
-                    elif self.asking_if_reaction and self.reactions_needing_resolving:
+                    elif self.asking_if_reaction and self.reactions_needing_resolving and not self.resolving_search_box:
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
@@ -1203,14 +1204,44 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Target Leviathan Hive Ship:":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        primary_player.exhaust_card_in_hq_given_name("Leviathan Hive Ship")
+                        self.choices_available = ["0", "1", "2", "3", "4", "5", "6"]
+                        self.choice_context = "Planet Target Leviathan Hive Ship"
+                        await primary_player.send_hq()
+                        await self.send_search()
+                    elif self.choice_context == "Planet Target Leviathan Hive Ship":
+                        chosen_planet = int(game_update_string[1])
+                        if self.planets_in_play_array[chosen_planet]:
+                            card = FindCard.find_card(self.misc_target_choice, self.card_array)
+                            primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
+                            try:
+                                primary_player.discard.remove(self.misc_target_choice)
+                                primary_player.stored_cards_recently_discarded.remove(self.misc_target_choice)
+                                primary_player.stored_cards_recently_destroyed.remove(self.misc_target_choice)
+                            except ValueError:
+                                pass
+                            self.misc_target_choice = -1
+                            await primary_player.send_units_at_planet(chosen_planet)
+                            await primary_player.send_discard()
+                            self.choices_available = []
+                            self.resolving_search_box = False
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.send_search()
+                            self.delete_reaction()
                     elif self.choice_context == "Target Fall Back:":
                         primary_player.spend_resources(1)
                         target = self.choices_available[int(game_update_string[1])]
                         card = FindCard.find_card(target, self.card_array)
                         primary_player.add_to_hq(card)
-                        primary_player.discard.remove(target)
-                        primary_player.stored_cards_recently_discarded.remove(target)
-                        primary_player.stored_cards_recently_destroyed.remove(target)
+                        try:
+                            primary_player.discard.remove(target)
+                            primary_player.stored_cards_recently_discarded.remove(target)
+                            primary_player.stored_cards_recently_destroyed.remove(target)
+                        except ValueError:
+                            pass
                         primary_player.discard_card_name_from_hand("Fall Back!")
                         self.choices_available = []
                         if self.fall_back_check(primary_player):
@@ -1333,6 +1364,23 @@ class Game:
                                                           self.card_array)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            await self.send_search()
+                    elif self.choice_context == "Use Leviathan Hive Ship?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Target Leviathan Hive Ship:"
+                            for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                                card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                                          self.card_array)
+                                if card.get_is_unit():
+                                    if card.has_hive_mind and card.get_cost() < 4:
+                                        self.choices_available.append(card.get_name())
                             await self.send_search()
                         elif game_update_string[1] == "1":
                             self.choices_available = []
@@ -1837,6 +1885,15 @@ class Game:
                     return True
         return False
 
+    def leviathan_hive_ship_check(self, player):
+        if player.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
+            for card_name in player.stored_cards_recently_destroyed:
+                card = FindCard.find_card(card_name, self.card_array)
+                if card.get_is_unit():
+                    if card.has_hive_mind and card.get_cost() < 4:
+                            return True
+        return False
+
     def fall_back_check(self, player):
         if player.search_hand_for_card("Fall Back!"):
             if player.resources > 0:
@@ -1871,6 +1928,22 @@ class Game:
                 self.reactions_needing_resolving.append("Fall Back!")
                 self.player_who_resolves_reaction.append(self.name_2)
                 self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+        if self.leviathan_hive_ship_check(self.p1):
+            already_hive_ship = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
+                    if self.player_who_resolves_reaction[i] == self.name_1:
+                        aready_hive_ship = True
+            if not already_hive_ship:
+                self.create_reaction("Leviathan Hive Ship", self.name_1, (1, -1, -1))
+        if self.leviathan_hive_ship_check(self.p2):
+            already_hive_ship = False
+            for i in range(len(self.reactions_needing_resolving)):
+                if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
+                    if self.player_who_resolves_reaction[i] == self.name_2:
+                        aready_hive_ship = True
+            if not already_hive_ship:
+                self.create_reaction("Leviathan Hive Ship", self.name_2, (2, -1, -1))
         if self.holy_sepulchre_check(self.p1):
             already_sepulchre = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -3317,6 +3390,14 @@ class Game:
                 self.resolving_search_box = True
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Use Fall Back?"
+                self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                self.delete_reaction()
+                await self.send_search()
+                await self.send_info_box()
+            elif self.reactions_needing_resolving[0] == "Leviathan Hive Ship":
+                self.resolving_search_box = True
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Use Leviathan Hive Ship?"
                 self.name_player_making_choices = self.player_who_resolves_reaction[0]
                 self.delete_reaction()
                 await self.send_search()

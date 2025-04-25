@@ -704,7 +704,7 @@ class Player:
                 self.add_resources(cost)
         return False
 
-    def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False):
+    def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False):
         if card.get_unique():
             if self.search_for_unique_card(card.name):
                 return -1
@@ -792,6 +792,8 @@ class Player:
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = False
             """
+        if already_exhausted:
+            self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
 
     async def dark_eldar_event_played(self):
