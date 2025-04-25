@@ -185,6 +185,7 @@ async def update_game_event_command_section(self, name, game_update_string):
             if self.p1.mobile_resolved and self.p2.mobile_resolved:
                 self.check_battle(self.round_number)
                 self.last_planet_checked_for_battle = self.round_number
+                self.begin_combat_round()
                 self.set_battle_initiative()
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle

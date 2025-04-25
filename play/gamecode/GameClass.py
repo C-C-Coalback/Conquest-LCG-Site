@@ -2648,6 +2648,7 @@ class Game:
             await self.game_sockets[0].receive_game_update("mobile complete")
             self.check_battle(self.round_number)
             self.last_planet_checked_for_battle = self.round_number
+            self.begin_combat_round()
             self.set_battle_initiative()
             self.planet_aiming_reticle_active = True
             self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
@@ -3027,6 +3028,11 @@ class Game:
                 for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                     if primary_player.cards_in_play[planet_pos + 1][i].get_ability() == "Termagant Sentry":
                         primary_player.ready_given_pos(planet_pos, i)
+                self.delete_reaction()
+                await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Termagant Horde":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Cadian Mortar Squad":
@@ -3439,7 +3445,7 @@ class Game:
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
         if self.infested_planets[self.last_planet_checked_for_battle] and \
-            self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation:
+                self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation:
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Remove Infestation?"
             self.asking_if_remove_infested_planet = True
@@ -3484,6 +3490,15 @@ class Game:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                 await self.resolve_battle_conclusion(name, ["", ""])
+
+    def create_reaction(self, reaction_name, player_name, unit_tuple):
+        self.reactions_needing_resolving.append(reaction_name)
+        self.player_who_resolves_reaction.append(player_name)
+        self.positions_of_unit_triggering_reaction.append(unit_tuple)
+
+    def begin_combat_round(self):
+        self.p1.resolve_combat_round_begins(self.last_planet_checked_for_battle)
+        self.p2.resolve_combat_round_begins(self.last_planet_checked_for_battle)
 
     def reset_values_for_new_round(self):
         self.p1.has_passed = False
@@ -3563,6 +3578,7 @@ class Game:
                 p2_has_warlord = self.p2.check_for_warlord(i)
                 if p1_has_warlord or p2_has_warlord:
                     self.last_planet_checked_for_battle = i
+                    self.begin_combat_round()
                     self.ranged_skirmish_active = True
                     return True
             i = i + 1

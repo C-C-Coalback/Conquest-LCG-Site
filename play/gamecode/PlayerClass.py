@@ -1797,6 +1797,11 @@ class Player:
                     i = i - 1
                 i = i + 1
 
+    def resolve_combat_round_begins(self, planet_num):
+        for i in range(len(self.cards_in_play[planet_num + 1])):
+            if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
+                self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, -1))
+
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
