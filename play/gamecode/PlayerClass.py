@@ -911,6 +911,9 @@ class Player:
                                                                                             location_of_unit))
                                     self.game.player_who_resolves_reaction.append(self.name_player)
                                     # self.game.discard_card_at_random_from_opponent(self.number)
+                                if card.get_ability() == "Scything Hormagaunts":
+                                    self.game.create_reaction(
+                                        "Scything Hormagaunts", self.name_player, (int(self.number), position, -1))
                                 if card.get_ability() == "Kith's Khymeramasters":
                                     self.game.reactions_needing_resolving.append("Kith's Khymeramasters")
                                     self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,

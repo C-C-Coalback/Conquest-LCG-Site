@@ -82,7 +82,7 @@ def tyranids_cards_init():
                                                     "enemy unit at this planet and infest this plant.",
                              "Creature. Drone.", 2, faction, "Common", 0, 1, 1, False, action_in_play=True,
                              allowed_phases_in_play="COMBAT"),
-        CardClasses.ArmyCard("Scything Hormagaunt", "Reaction: After you deploy this unit, infest this planet.",
+        CardClasses.ArmyCard("Scything Hormagaunts", "Reaction: After you deploy this unit, infest this planet.",
                              "Creature. Leviathan.", 2, faction, "Common", 2, 2, 1, False),
         CardClasses.ArmyCard("Toxic Venomthrope", "Reaction: After you win a command struggle at this planet, "
                                                   "infest it. If it was already infested, either gain 1 resource "
