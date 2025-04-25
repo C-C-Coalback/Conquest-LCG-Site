@@ -1544,6 +1544,10 @@ class Player:
     def get_attack_given_pos(self, planet_id, unit_id):
         card = self.cards_in_play[planet_id + 1][unit_id]
         attack_value = card.get_attack()
+        if card.get_name() == "Termagant":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
+                    attack_value += 1
         if card.get_ability() != "Nazdreg":
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
