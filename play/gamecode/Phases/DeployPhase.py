@@ -143,7 +143,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         if self.card_type_of_selected_card_in_hand == "Army":
                             discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
                                                                                   self.faction_of_card_to_play,
-                                                                                  self.traits_of_card_to_play)
+                                                                                  self.traits_of_card_to_play,
+                                                                                  self.planet_aiming_reticle_position)
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                                 await player.send_hq()
@@ -161,8 +162,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     else:
                         player = self.p2
                     self.discounts_applied = 0
+                    planet_chosen = int(game_update_string[1])
                     self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
-                                                                              self.traits_of_card_to_play)
+                                                                              self.traits_of_card_to_play,
+                                                                              planet_chosen=planet_chosen)
                     hand_disc = player.search_hand_for_discounts(self.faction_of_card_to_play)
                     self.available_discounts += hand_disc
                     if hand_disc > 0:

@@ -184,7 +184,8 @@ def tyranids_cards_init():
         CardClasses.SupportCard("Digestion Pool", "Limited.\n"
                                                   "Interrupt: When you deploy a Tyranids unit at an infested planet, "
                                                   "exhaust this support to reduce the unit's cost by 2.",
-                                "Upgrade.", 1, faction, "Common", True),
+                                "Upgrade.", 1, faction, "Common", True, limited=True,
+                                applies_discounts=[True, 2, True]),
         CardClasses.SupportCard("Mycetic Spores", "Combat Action: Exhaust this support to move a unit you control with "
                                                   "the Hive Mind specialization to a planet with a Termagant token.",
                                 "Upgrade.", 2, faction, "Common", False,

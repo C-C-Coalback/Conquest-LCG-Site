@@ -270,11 +270,11 @@ class Game:
         card_string = ""
         if self.cards_in_search_box and self.name_player_who_is_searching:
             card_string = "/".join(self.cards_in_search_box)
-            card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/"\
+            card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/" \
                           + self.what_to_do_with_searched_card + "/" + card_string
         elif self.choices_available and self.name_player_making_choices:
             card_string = "/".join(self.choices_available)
-            card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/"\
+            card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/" \
                           + self.choice_context + "/" + card_string
         else:
             card_string = "GAME_INFO/SEARCH//Nothing here"
@@ -425,7 +425,8 @@ class Game:
                         if game_update_string[1] == player.get_number():
                             discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
                                                                                   self.faction_of_card_to_play,
-                                                                                  self.traits_of_card_to_play)
+                                                                                  self.traits_of_card_to_play,
+                                                                                  self.planet_aiming_reticle_position)
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                                 await player.send_hq()
@@ -1248,7 +1249,8 @@ class Game:
                                 if card.check_for_a_trait("Tzeentch"):
                                     self.choices_available.append(card.get_name())
                             if not self.choices_available:
-                                await self.game_sockets[0].receive_game_update("No valid targets for Shrine of Warpflame")
+                                await self.game_sockets[0].receive_game_update(
+                                    "No valid targets for Shrine of Warpflame")
                                 self.resolving_search_box = False
                             await self.send_search()
                         elif game_update_string[1] == "1":
@@ -1524,7 +1526,7 @@ class Game:
                                 unit_pos = int(game_update_string[3])
                                 if self.player_resolving_battle_ability != self.p1.name_player:
                                     if self.p1.communications_relay_check(planet_pos, unit_pos) and \
-                                         self.communications_relay_enabled:
+                                            self.communications_relay_enabled:
                                         await self.game_sockets[0].receive_game_update(
                                             "Communications Relay may be used.")
                                         can_continue = False
@@ -1601,7 +1603,8 @@ class Game:
                                     self.nullify_context = "Iridial"
                                     await self.send_search()
                             if can_continue:
-                                self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                                self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
+                                                               99)
                                 await self.p1.send_units_at_planet(int(game_update_string[2]))
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
@@ -1625,7 +1628,8 @@ class Game:
                                     self.nullify_context = "Iridial"
                                     await self.send_search()
                             if can_continue:
-                                self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99)
+                                self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
+                                                               99)
                                 await self.p2.send_units_at_planet(int(game_update_string[2]))
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
@@ -1915,7 +1919,6 @@ class Game:
         await self.destroy_check_cards_in_hq(self.p2)
         await self.complete_destruction_checks()
 
-
     def advance_damage_aiming_reticle(self):
         pos_holder = self.positions_of_units_to_take_damage[0]
         player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
@@ -2067,7 +2070,7 @@ class Game:
                                         self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                                         if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                             self.damage_taken_was_from_attack.append(True)
-                                            att_num, att_pla, att_pos = self.\
+                                            att_num, att_pla, att_pos = self. \
                                                 positions_attackers_of_units_to_take_damage[0]
                                             self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
                                                 att_pla, att_pos
@@ -2081,7 +2084,7 @@ class Game:
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
                                                         "Black Heart Ravager":
-                                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                                             .get_card_type() != "Warlord":
                                                         primary_player.rout_unit(planet_pos, unit_pos)
                                                         await primary_player.send_hq()
@@ -2132,7 +2135,7 @@ class Game:
                             if int(game_update_string[3]) == planet_pos:
                                 if int(game_update_string[4]) == unit_pos:
                                     attachment_pos = int(game_update_string[5])
-                                    attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                    attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                         .get_attachments()[attachment_pos]
                                     if attachment.get_ability() == "Iron Halo" and attachment.get_ready():
                                         attachment.exhaust_card()
@@ -2372,7 +2375,8 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if planet_pos == planet_pos_sg:
-                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                                    if primary_player.cards_in_play[planet_pos + 1][
+                                        unit_pos].get_card_type() != "Warlord":
                                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                                         secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
                                         await primary_player.send_units_at_planet(planet_pos)
@@ -2481,7 +2485,7 @@ class Game:
                                     player_being_hit.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
                                     card_name = player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
                                     text = card_name + ", position " + str(planet_pos) \
-                                        + " " + str(unit_pos) + " hit by superiority."
+                                           + " " + str(unit_pos) + " hit by superiority."
                                     await self.game_sockets[0].receive_game_update(text)
                                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                                     primary_player.aiming_reticle_coords_hand = None
@@ -2592,7 +2596,7 @@ class Game:
                             if int(game_update_string[1]) == int(secondary_player.get_number()):
                                 if abs(origin_planet - target_planet) == 1:
                                     if secondary_player.cards_in_play[target_planet + 1][
-                                            target_pos].get_card_type() == "Army":
+                                        target_pos].get_card_type() == "Army":
                                         can_continue = True
                                         if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
                                                                                                target_pos):
@@ -2768,7 +2772,7 @@ class Game:
                                     hand_pos = int(game_update_string[2])
                                     card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
                                     if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                         self.location_hand_attachment_shadowsun = hand_pos
                                         primary_player.aiming_reticle_coords_hand = hand_pos
                                         primary_player.aiming_reticle_color = "blue"
@@ -2848,12 +2852,12 @@ class Game:
                             sac_unit_pos = int(game_update_string[3])
                             if sac_planet_pos == planet_pos:
                                 if sac_unit_pos != unit_pos:
-                                    if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos].\
+                                    if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
                                             get_card_type() != "Warlord":
-                                        if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]\
+                                        if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
-                                                primary_player.cards_in_play[sac_planet_pos + 1][unit_pos]\
-                                                .check_for_a_trait("Soldier"):
+                                                primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
+                                                        .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3038,6 +3042,15 @@ class Game:
                 primary_player.draw_card()
                 self.delete_reaction()
                 await primary_player.send_hand()
+            elif self.reactions_needing_resolving[0] == "Shrieking Harpy":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if (secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and not
+                            secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
+                            secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
+                        secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                self.delete_reaction()
+                await secondary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 if not self.infested_planets[planet_pos]:

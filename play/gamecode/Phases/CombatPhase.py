@@ -159,6 +159,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                    self.attacker_planet,
                                                                                    self.attacker_position])
                                 self.player_who_resolves_reaction.append(player.name_player)
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Shrieking Harpy":
+                                if self.infested_planets[self.attacker_planet]:
+                                    self.create_reaction(
+                                        "Shrieking Harpy", player.name_player,
+                                        (int(player.number), self.attacker_planet, self.attacker_position))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
                                                                 "Banshee Power Sword"):
                                 self.reactions_needing_resolving.append("Banshee Power Sword")

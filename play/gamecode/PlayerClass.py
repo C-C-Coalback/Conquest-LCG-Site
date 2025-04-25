@@ -1251,7 +1251,7 @@ class Player:
                 return True
         return False
 
-    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False):
+    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None):
         discounts_available = 0
         if is_attachment:
             for i in range(len(self.headquarters)):
@@ -1269,6 +1269,12 @@ class Player:
                             print("ready")
                             self.set_aiming_reticle_in_play(-2, i, "green")
                             discounts_available += self.headquarters[i].get_discount_amount()
+                elif self.headquarters[i].get_ability() == "Digestion Pool":
+                    if self.headquarters[i].get_ready():
+                        if planet_chosen is not None:
+                            if self.game.infested_planets[planet_chosen]:
+                                discounts_available += 2
+                                self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
@@ -1388,7 +1394,7 @@ class Player:
                 return True
         return False
 
-    def perform_discount_at_pos_hq(self, pos, faction_of_card, traits):
+    def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None):
         discount = 0
         if self.headquarters[pos].get_applies_discounts():
             if self.headquarters[pos].get_is_faction_limited_unique_discounter():
@@ -1396,6 +1402,12 @@ class Player:
                     if self.headquarters[pos].get_ready():
                         self.headquarters[pos].exhaust_card()
                         discount += self.headquarters[pos].get_discount_amount()
+            elif self.headquarters[pos].get_ability() == "Digestion Pool":
+                if self.headquarters[pos].get_ready():
+                    if target_planet is not None:
+                        if self.game.infested_planets[target_planet]:
+                            discount += 2
+                            self.exhaust_given_pos(-2, pos)
         if "Daemon" in traits:
             if self.headquarters[pos].get_ability() == "Cultist":
                 discount += 1
