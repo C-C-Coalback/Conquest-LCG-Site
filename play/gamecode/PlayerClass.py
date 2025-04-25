@@ -1806,6 +1806,18 @@ class Player:
                 self.add_card_in_play_to_discard(planet_num, card_pos)
                 self.warlord_just_got_destroyed = True
         else:
+            if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
+                for i in range(len(self.cards_in_play[planet_num + 1])):
+                    if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":
+                        already_termagant_sentry = False
+                        for j in range(len(self.game.reactions_needing_resolving)):
+                            if self.game.reactions_needing_resolving[j] == "Termagant Sentry":
+                                if self.game.player_who_resolves_reaction[j] == self.name_player:
+                                    already_termagant_sentry = True
+                        if not already_termagant_sentry:
+                            self.game.reactions_needing_resolving.append("Termagant Sentry")
+                            self.game.player_who_resolves_reaction.append(self.name_player)
+                            self.game.positions_of_unit_triggering_reaction((int(self.number), planet_num, -1))
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
