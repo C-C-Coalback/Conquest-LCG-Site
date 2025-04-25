@@ -1957,6 +1957,11 @@ class Game:
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
+        self.create_reactions_phase_begins()
+
+    def create_reactions_phase_begins(self):
+        self.p1.perform_own_reactions_on_phase_change(self.phase)
+        self.p2.perform_own_reactions_on_phase_change(self.phase)
 
     def clear_attacker_aiming_reticle(self):
         player_num, planet_pos, unit_pos = self.attacker_location
@@ -2327,6 +2332,39 @@ class Game:
                                     await self.complete_nullify()
                                 self.delete_reaction()
                                 await primary_player.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Blazing Zoanthrope":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                                if secondary_player.get_number() == game_update_string[1]:
+                                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                        can_continue = True
+                                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                            can_continue = False
+                                            await self.game_sockets[0].receive_game_update(
+                                                "Immune to enemy card abilities.")
+                                        elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                                                self.communications_relay_enabled:
+                                            can_continue = False
+                                            await self.game_sockets[0].receive_game_update(
+                                                "Communications Relay may be used.")
+                                            self.choices_available = ["Yes", "No"]
+                                            self.name_player_making_choices = secondary_player.name_player
+                                            self.choice_context = "Use Communications Relay?"
+                                            self.nullified_card_name = self.action_chosen
+                                            self.cost_card_nullified = 0
+                                            self.nullify_string = "/".join(game_update_string)
+                                            self.first_player_nullified = primary_player.name_player
+                                            self.nullify_context = "Reaction"
+                                            await self.send_search()
+                                        if can_continue:
+                                            if self.infested_planets[planet_pos]:
+                                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                            else:
+                                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                            secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                                            await secondary_player.send_units_at_planet(planet_pos)
+                                            self.delete_reaction()
                         elif self.reactions_needing_resolving[0] == "Soul Grinder":
                             if primary_player.get_number() == game_update_string[1]:
                                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
