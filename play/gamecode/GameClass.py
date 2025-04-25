@@ -2384,8 +2384,8 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if planet_pos == planet_pos_sg:
-                                    if primary_player.cards_in_play[planet_pos + 1][
-                                        unit_pos].get_card_type() != "Warlord":
+                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                            get_card_type() != "Warlord":
                                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                                         secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
                                         await primary_player.send_units_at_planet(planet_pos)
@@ -2502,6 +2502,17 @@ class Game:
                                     await primary_player.send_hand()
                                     self.delete_reaction()
                                     await self.send_info_box()
+                        elif self.reactions_needing_resolving[0] == "Venomthrope Polluter":
+                            if game_update_string[1] == primary_player.number:
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.check_for_warlord(planet_pos):
+                                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                                        dest_planet = self.positions_of_unit_triggering_reaction[0][1]
+                                        primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
+                                        self.delete_reaction()
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                        await primary_player.send_units_at_planet(dest_planet)
                         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                             if int(primary_player.get_number()) == int(
                                     self.positions_of_unit_triggering_reaction[0][0]):

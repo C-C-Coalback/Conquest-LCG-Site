@@ -1001,6 +1001,9 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction.append(
                             [int(self.number), self.synapse_commit_location, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
+                    if self.headquarters[i].get_ability() == "Venomthrope Polluter":
+                        self.game.create_reaction("Venomthrope Polluter", self.name_player,
+                                                  (int(self.number), self.synapse_commit_location, -1))
                     self.move_unit_to_planet(-2, i, self.synapse_commit_location)
                     for j in range(len(self.headquarters)):
                         if self.headquarters[j].get_ability() == "Synaptic Link":
