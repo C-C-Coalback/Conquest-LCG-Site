@@ -1541,6 +1541,14 @@ class Player:
                     self.assign_damage_to_pos(planet_id, unit_id, 1)
         return None
 
+    def get_area_effect_given_pos(self, planet_id, unit_id):
+        area_effect = self.cards_in_play[planet_id + 1][unit_id].get_area_effect()
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Biovore Spore Launcher":
+                    area_effect += 1
+        return area_effect
+
     def get_attack_given_pos(self, planet_id, unit_id):
         card = self.cards_in_play[planet_id + 1][unit_id]
         attack_value = card.get_attack()

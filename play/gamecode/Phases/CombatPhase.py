@@ -64,8 +64,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             else:
                                 primary_player = self.p2
                                 secondary_player = self.p1
-                            amount_aoe = primary_player.cards_in_play[chosen_planet + 1][
-                                self.attacker_position].get_area_effect()
+                            amount_aoe = primary_player.get_area_effect_given_pos(self.attacker_planet,
+                                                                                  self.attacker_position)
                             if amount_aoe > 0:
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
