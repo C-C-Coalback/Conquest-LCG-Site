@@ -1371,6 +1371,11 @@ class Player:
         return discounts_available
 
     def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil):
+        if planet_pos == -2:
+            for i in range(len(self.headquarters[unit_pos].get_attachments())):
+                if self.headquarters[unit_pos].get_attachments()[i].get_ability() == card_abil:
+                    return True
+            return False
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == card_abil:
                 return True
@@ -1787,6 +1792,9 @@ class Player:
         return not self.check_damage_too_great_given_pos(planet_id, unit_id)
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
+        if self.search_attachments_at_pos(planet_id, unit_id, "Great Scything Talons"):
+            self.game.create_reaction("Great Scything Talons", self.name_player, (int(self.number), planet_id, unit_id))
+            self.game.great_scything_talons_value = amount
         if planet_id == -2:
             self.headquarters[unit_id].remove_damage(amount)
         else:

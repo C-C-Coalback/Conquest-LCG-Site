@@ -195,6 +195,7 @@ class Game:
         self.infested_planets = [False, False, False, False, False, False, False]
         self.asking_if_remove_infested_planet = False
         self.already_asked_remove_infestation = False
+        self.great_scything_talons_value = 0
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -3017,6 +3018,13 @@ class Game:
                     await self.send_search()
                     await self.send_info_box()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Great Scything Talons":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, self.great_scything_talons_value,
+                                                              expiration="NEXT")
+                self.delete_reaction()
+                await self.game_sockets[0].receive_game_update("Old One Eye attack increased by " +
+                                                               str(self.great_scything_talons_value))
             elif self.reactions_needing_resolving[0] == "Old One Eye":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)

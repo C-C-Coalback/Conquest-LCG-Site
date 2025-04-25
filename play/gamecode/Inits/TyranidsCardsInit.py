@@ -24,7 +24,7 @@ def tyranids_cards_init():
                                                             "gets +X ATK for its next attack this phase. "
                                                             "X is the amount of damage removed.", "Wargear. Biomorph.",
                                    1, faction, "Signature", 3, False,
-                                   type_of_units_allowed_for_attachment="Warlord"),
+                                   type_of_units_allowed_for_attachment="Warlord", extra_health=1),
         CardClasses.WarlordCard("The Swarmlord", "Reaction: After this warlord commits to a planet, put 1 Termagant"
                                                  " token into play at each adjacent planet.", "Creature. Behemoth.",
                                 faction, 2, 6, 2, 5, "Bloodied.", 6, 6,
@@ -47,7 +47,7 @@ def tyranids_cards_init():
                                                   "Reaction: After attached unit destroys an enemy army unit by an"
                                                   " attack, put 1 Termagant token into play at this planet.",
                                    "Biomorph. Wargear.", 1, faction, "Signature", 3, True,
-                                   type_of_units_allowed_for_attachment="Warlord"),
+                                   type_of_units_allowed_for_attachment="Warlord", extra_attack=1),
         CardClasses.SynapseCard("Savage Warrior Prime", "This unit must commit to a "
                                                         "different planet than your warlord, if able.\n"
                                                         "While checking for a battle and determining initiative at "
