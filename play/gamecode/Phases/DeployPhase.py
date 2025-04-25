@@ -101,6 +101,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             secondary_player = self.p1
                         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
                         self.faction_of_card_to_play = card.get_faction()
+                        self.name_of_card_to_play = card.get_name()
                         self.traits_of_card_to_play = card.get_traits()
                         if card.get_card_type() == "Support":
                             played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
@@ -174,6 +175,11 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         )
                     temp_av_disc, temp_auto_disc = player. \
                         search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
+                    num_termagants = 0
+                    if self.name_of_card_to_play == "Burrowing Trygon":
+                        num_termagants = player.get_most_termagants_at_single_planet()
+                        self.discounts_applied += num_termagants
+                    self.available_discounts += num_termagants
                     self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
                     self.available_discounts += temp_av_disc
                     self.discounts_applied += temp_auto_disc
@@ -265,6 +271,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     self.discounts_applied = 0
     self.available_discounts = 0
     self.faction_of_card_to_play = ""
+    self.name_of_card_to_play = ""
     await primary_player.send_hand()
     await primary_player.send_hq()
     await self.send_planet_array()
@@ -348,4 +355,5 @@ async def deploy_card_routine_attachment(self, name, game_update_string):
                 self.mode = "Normal"
                 self.card_type_of_selected_card_in_hand = ""
                 self.faction_of_card_to_play = ""
+                self.name_of_card_to_play = ""
 

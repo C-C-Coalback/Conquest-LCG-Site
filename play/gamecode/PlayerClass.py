@@ -1628,6 +1628,15 @@ class Player:
         attack_value += card.get_extra_attack_until_end_of_phase()
         return attack_value
 
+    def get_most_termagants_at_single_planet(self):
+        num_copies = 0
+        current_num = 0
+        for i in range(7):
+            current_num = self.count_copies_at_planet(i, "Termagant")
+            if current_num > num_copies:
+                num_copies = current_num
+        return num_copies
+
     def count_copies_in_play(self, card_name):
         num_copies = 0
         for i in range(7):

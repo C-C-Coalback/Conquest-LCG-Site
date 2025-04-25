@@ -14,6 +14,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
             self.traits_of_card_to_play = card.get_traits()
             self.faction_of_card_to_play = card.get_faction()
+            self.name_of_card_to_play = card.get_name()
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
@@ -21,7 +22,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
             in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits())
             same_planet_dis, same_planet_auto_dis = \
                 primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
-            self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+            num_termagants = 0
+            if card.get_name() == "Burrowing Trygon":
+                num_termagants = primary_player.get_most_termagants_at_single_planet()
+                self.discounts_applied += num_termagants
+            self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis + num_termagants
             print("Discounts", hq_dis, in_play_dis, same_planet_dis, hand_dis)
             self.discounts_applied += same_planet_auto_dis
             if self.available_discounts > self.discounts_applied:

@@ -196,6 +196,7 @@ class Game:
         self.asking_if_remove_infested_planet = False
         self.already_asked_remove_infestation = False
         self.great_scything_talons_value = 0
+        self.name_of_card_to_play = ""
 
     def reset_action_data(self):
         self.action_chosen = ""
