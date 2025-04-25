@@ -41,6 +41,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.mode = "Normal"
                         self.player_with_action = ""
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
                         await primary_player.send_units_at_all_planets()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
