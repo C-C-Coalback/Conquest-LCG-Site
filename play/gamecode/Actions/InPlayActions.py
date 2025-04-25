@@ -516,6 +516,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.number_with_deploy_turn = secondary_player.get_number()
                         await primary_player.send_units_at_planet(planet_pos)
                         await player_owning_card.send_units_at_planet(planet_pos)
+    elif self.action_chosen == "Awakening Cavern":
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                primary_player.ready_given_pos(planet_pos, unit_pos)
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_chosen = ""
+                self.mode = "Normal"
+                self.player_with_action = ""
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                await primary_player.send_hq()
+                await primary_player.send_units_at_planet(planet_pos)
+                self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Craftworld Gate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

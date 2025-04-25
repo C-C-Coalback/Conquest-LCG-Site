@@ -1,12 +1,12 @@
 async def update_game_event_action_hq(self, name, game_update_string):
+    if self.player_with_action == self.name_1:
+        primary_player = self.p1
+        secondary_player = self.p2
+    else:
+        primary_player = self.p2
+        secondary_player = self.p1
     if not self.action_chosen:
         self.position_of_actioned_card = (-2, int(game_update_string[2]))
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if int(game_update_string[1]) == int(primary_player.get_number()):
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
             ability = card.get_ability()
@@ -17,6 +17,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     if card.get_ability() == "Catachan Outpost":
                         if card.get_ready():
                             self.action_chosen = "Catachan Outpost"
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
+                    elif ability == "Awakening Cavern":
+                        if card.get_ready():
+                            self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
@@ -282,13 +288,23 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
                     await self.send_info_box()
+    elif self.action_chosen == "Awakening Cavern":
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = -2
+            unit_pos = int(game_update_string[2])
+            if primary_player.headquarters[unit_pos].get_is_unit():
+                primary_player.ready_given_pos(planet_pos, unit_pos)
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = secondary_player.name_player
+                    self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_chosen = ""
+                self.mode = "Normal"
+                self.player_with_action = ""
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                await primary_player.send_hq()
+                self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Craftworld Gate":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2
             unit_pos = int(game_update_string[2])
