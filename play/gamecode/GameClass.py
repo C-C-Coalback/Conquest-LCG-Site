@@ -211,7 +211,8 @@ class Game:
         self.damage_from_atrox = False
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
-        self.mode = self.stored_mode
+        if self.stored_mode:
+            self.mode = self.stored_mode
         self.furiable_unit_position = (-1, -1)
 
     def reset_effects_data(self):
@@ -2980,6 +2981,16 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Old One Eye":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                if damage % 2 == 1:
+                    damage += 1
+                damage = int(damage / 2)
+                primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+                await primary_player.send_units_at_planet(planet_pos)
+                self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "The Swarmlord":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 planet_1 = planet_pos - 1
@@ -3518,6 +3529,8 @@ class Game:
             i = i + 1
         self.p1.set_can_play_limited(True)
         self.p2.set_can_play_limited(True)
+        self.p1.refresh_all_once_per_round()
+        self.p2.refresh_all_once_per_round()
         if self.round_number == 0:
             self.planets_in_play_array[5] = True
         elif self.round_number == 1:

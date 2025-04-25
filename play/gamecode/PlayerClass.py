@@ -2015,7 +2015,7 @@ class Player:
 
     def ready_all_in_headquarters(self):
         for i in range(len(self.headquarters)):
-            self.headquarters[i].ready_card()
+            self.ready_given_pos(-2, i)
             if self.game.phase == "HEADQUARTERS":
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].ready_card()
@@ -2032,11 +2032,46 @@ class Player:
                 for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
                     self.cards_in_play[planet_id + 1][i].get_attachments()[j].ready_card()
 
+    def set_once_per_round_used_given_pos(self, planet_id, unit_id, new_val):
+        if planet_id == -2:
+            self.headquarters[unit_id].set_once_per_round_used(new_val)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].set_once_per_round_used(new_val)
+        return None
+
+    def refresh_all_once_per_round(self):
+        for i in range(len(self.headquarters)):
+            self.set_once_per_round_used_given_pos(-2, i, True)
+        for j in range(7):
+            for i in range(len(self.cards_in_play[j + 1])):
+                self.set_once_per_round_used_given_pos(j, i, True)
+
     def ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
+            was_ready = self.headquarters[unit_id].get_ready()
             self.headquarters[unit_id].ready_card()
+            is_ready = self.headquarters[unit_id].get_ready()
+            print(was_ready, is_ready)
+            if not was_ready and is_ready:
+                print("check if old one eye")
+                if self.headquarters[unit_id].get_ability(bloodied_relevant=True) == "Old One Eye":
+                    print("is old one")
+                    if not self.headquarters[unit_id].get_once_per_round_used():
+                        if self.headquarters[unit_id].get_damage() > 0:
+                            self.game.reactions_needing_resolving.append("Old One Eye")
+                            self.game.player_who_resolves_reaction.append(self.name_player)
+                            self.game.positions_of_unit_triggering_reaction((int(self.number), planet_id, unit_id))
             return None
+        was_ready = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].ready_card()
+        is_ready = self.cards_in_play[planet_id + 1][unit_id].get_ready()
+        if not was_ready and is_ready:
+            if self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=True) == "Old One Eye":
+                if not self.cards_in_play[planet_id + 1][unit_id].get_once_per_round_used():
+                    if self.cards_in_play[planet_id + 1][unit_id].get_damage() > 0:
+                        self.game.reactions_needing_resolving.append("Old One Eye")
+                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.positions_of_unit_triggering_reaction.append((int(self.number), planet_id, unit_id))
         return None
 
     def check_if_units_present(self, planet_id):

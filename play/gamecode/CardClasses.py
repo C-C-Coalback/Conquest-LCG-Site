@@ -33,12 +33,19 @@ class Card:
         self.has_action_while_in_play = action_in_play
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
+        self.once_per_round_used = False
         self.aiming_reticle_color = None
         self.bloodied = False
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
         self.limited = limited
         self.counter = 0
         self.sacrifice_end_of_phase = False
+
+    def get_once_per_round_used(self):
+        return self.once_per_round_used
+
+    def set_once_per_round_used(self, new_val):
+        self.once_per_round_used = new_val
 
     def get_ambush(self):
         return False
