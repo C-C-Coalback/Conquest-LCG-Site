@@ -1632,6 +1632,9 @@ class Player:
         for i in range(len(attachments)):
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
+            if attachments[i].get_ability() == "Noxious Fleshborer":
+                if self.game.infested_planets[planet_id]:
+                    attack_value += 1
         card.reset_brutal()
         attack_value += card.get_extra_attack_until_end_of_battle()
         attack_value += card.get_extra_attack_until_next_attack()
@@ -1809,6 +1812,11 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.search_synapse_at_planet(planet_id):
                         health += 2
+        attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
+        for i in range(len(attachments)):
+            if attachments[i].get_ability() == "Noxious Fleshborer":
+                if self.game.infested_planets[planet_id]:
+                    health += 1
         return health
 
     def search_synapse_at_planet(self, planet_pos):

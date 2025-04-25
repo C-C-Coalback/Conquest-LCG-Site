@@ -225,6 +225,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
         resources_won += extra_resources
         cards_won += extra_cards
         ret_val = ["1", resources_won, cards_won]
+        already_noxious = False
         if self.p1.search_card_in_hq("Omega Zero Command"):
             self.p1.summon_token_at_planet("Guardsman", planet_id)
         for i in range(len(self.p1.cards_in_play[planet_id + 1])):
@@ -236,6 +237,12 @@ def resolve_command_struggle_at_planet(self, planet_id):
             if self.p1.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
                 self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.create_reaction("Toxic Venomthrope", self.name_1, ("1", planet_id, i))
+            attachments = self.p1.cards_in_play[planet_id + 1][i].get_attachments()
+            for j in range(len(attachments)):
+                if attachments[i].get_ability() == "Noxious Fleshborer":
+                    if not already_noxious and not self.infested_planets[planet_id]:
+                        already_noxious = True
+                        self.create_reaction("Noxious Fleshborer", self.name_1, ("1", planet_id, i))
         return ret_val
     elif command_p2 > command_p1:
         print("P2 wins command")
@@ -246,6 +253,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
         resources_won += extra_resources
         cards_won += extra_cards
         ret_val = ["2", resources_won, cards_won]
+        already_noxious = False
         if self.p2.search_card_in_hq("Omega Zero Command"):
             self.p2.summon_token_at_planet("Guardsman", planet_id)
         for i in range(len(self.p2.cards_in_play[planet_id + 1])):
@@ -257,6 +265,12 @@ def resolve_command_struggle_at_planet(self, planet_id):
             if self.p2.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
                 self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.create_reaction("Toxic Venomthrope", self.name_2, ("2", planet_id, i))
+            attachments = self.p2.cards_in_play[planet_id + 1][i].get_attachments()
+            for j in range(len(attachments)):
+                if attachments[i].get_ability() == "Noxious Fleshborer":
+                    if not already_noxious and not self.infested_planets[planet_id]:
+                        already_noxious = True
+                        self.create_reaction("Noxious Fleshborer", self.name_2, ("2", planet_id, i))
         return ret_val
     return None
 
