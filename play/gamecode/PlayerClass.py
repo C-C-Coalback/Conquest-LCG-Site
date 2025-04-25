@@ -1723,12 +1723,28 @@ class Player:
     def get_number_of_units_at_planet(self, planet_id):
         return len(self.cards_in_play[planet_id + 1])
 
+    def get_health_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            health = self.headquarters[unit_id].get_health()
+            return health
+        health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
+                    health += 2
+        return health
+
+    def check_damage_too_great_given_pos(self, planet_id, unit_id):
+        if self.get_health_given_pos(planet_id, unit_id) > self.get_damage_given_pos(planet_id, unit_id):
+            return 1
+        return 0
+
     def check_if_card_is_destroyed(self, planet_id, unit_id):
         if planet_id == -2:
             if self.headquarters[unit_id].get_card_type() == "Support":
                 return False
-            return not self.headquarters[unit_id].check_health()
-        return not self.cards_in_play[planet_id + 1][unit_id].check_health()
+            return not self.check_damage_too_great_given_pos(planet_id, unit_id)
+        return not self.check_damage_too_great_given_pos(planet_id, unit_id)
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount):
         if planet_id == -2:
