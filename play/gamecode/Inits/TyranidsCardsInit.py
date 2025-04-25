@@ -11,7 +11,7 @@ def tyranids_cards_init():
                                  "1x Great Scything Talons"]),
         CardClasses.ArmyCard("Lurking Hormagaunt", "Reaction: After this unit is assigned damage, reassign up to 2 of "
                                                    "that damage to your warlord instead.", "Creature. Behemoth.",
-                             3, faction, "Signature", 3, 1, 1, False),
+                             2, faction, "Signature", 3, 1, 1, False),
         CardClasses.SupportCard("Awakening Cavern", "Action: Exhaust this support to ready a target unit you control.",
                                 "Location.", 3, faction, "Signature", False, action_in_play=True,
                                 allowed_phases_in_play="ALL"),

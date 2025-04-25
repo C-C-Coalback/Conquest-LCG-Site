@@ -197,6 +197,8 @@ class Game:
         self.already_asked_remove_infestation = False
         self.great_scything_talons_value = 0
         self.name_of_card_to_play = ""
+        self.damage_moved_to_old_one_eye = 0
+        self.old_one_eye_pos = (-1, -1)
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -1238,6 +1240,37 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Move how much damage to Old One Eye?":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        hurt_planet = self.misc_target_planet
+                        hurt_pos = self.misc_target_unit
+                        old_one_planet, old_one_pos = self.old_one_eye_pos
+                        if game_update_string[1] == "0":
+                            pass
+                        elif game_update_string[1] == "1":
+                            self.damage_moved_to_old_one_eye += 1
+                            primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 1,
+                                                                can_shield=False, is_reassign=True)
+                            primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
+                            self.amount_that_can_be_removed_by_shield[0] -= 1
+                        elif game_update_string[1] == "2":
+                            self.damage_moved_to_old_one_eye += 2
+                            primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 2)
+                            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 2,
+                                                                can_shield=False, is_reassign=True)
+                            primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
+                            self.amount_that_can_be_removed_by_shield[0] -= 2
+                        await self.send_search()
+                        self.misc_target_planet = -1
+                        self.misc_target_unit = -1
+                        await primary_player.send_units_at_planet(hurt_planet)
+                        await primary_player.send_units_at_planet(old_one_planet)
+                        if self.amount_that_can_be_removed_by_shield[0] < 1:
+                            primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                            await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                     elif self.choice_context == "Use Shrine of Warpflame?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -2111,6 +2144,37 @@ class Game:
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                                 else:
                                     await primary_player.send_units_at_planet(planet_pos)
+                        elif primary_player.headquarters[hq_pos].get_name() == "Old One Eye":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
+                                if self.damage_moved_to_old_one_eye == 0:
+                                    self.choices_available = ["0", "1", "2"]
+                                    if self.damage_can_be_shielded[0] == 1:
+                                        self.choices_available = ["0", "1"]
+                                    self.choice_context = "Move how much damage to Old One Eye?"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.misc_target_planet = hurt_planet
+                                    self.misc_target_unit = hurt_pos
+                                    self.old_one_eye_pos = (-2, hq_pos)
+                                    await self.send_search()
+            elif len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    if game_update_string[1] == str(self.number_who_is_shielding):
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
+                                if self.damage_moved_to_old_one_eye == 0:
+                                    self.choices_available = ["0", "1", "2"]
+                                    if self.amount_that_can_be_removed_by_shield[0] == 1:
+                                        self.choices_available = ["0", "1"]
+                                    self.choice_context = "Move how much damage to Old One Eye?"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.misc_target_planet = hurt_planet
+                                    self.misc_target_unit = hurt_pos
+                                    self.old_one_eye_pos = (planet_pos, unit_pos)
+                                    await self.send_search()
             elif len(game_update_string) == 5:
                 if planet_pos == -2:
                     if game_update_string[0] == "ATTACHMENT":
@@ -2958,10 +3022,17 @@ class Game:
         del self.positions_of_unit_triggering_reaction[0]
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
+        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+            player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
+            if player_num == 1:
+                self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            elif player_num == 2:
+                self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
         del self.positions_of_units_to_take_damage[0]
         del self.damage_on_units_list_before_new_damage[0]
         del self.positions_attackers_of_units_to_take_damage[0]
         del self.damage_can_be_shielded[0]
+        self.damage_moved_to_old_one_eye = 0
         if self.positions_of_units_to_take_damage:
             self.advance_damage_aiming_reticle()
         else:
