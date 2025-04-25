@@ -1560,6 +1560,16 @@ class Player:
         if card.get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
+        if card.get_ability() == "Ymgarl Genestealer":
+            if self.check_for_warlord(planet_id):
+                attack_value += 2
+            else:
+                if self.number == "1":
+                    if self.game.p2.check_for_warlord(planet_id):
+                        attack_value += 2
+                elif self.number == "2":
+                    if self.game.p1.check_for_warlord(planet_id):
+                        attack_value += 2
         if card.get_brutal():
             attack_value = attack_value + card.get_damage()
         if card.get_ability() == "Virulent Plague Squad":
@@ -1732,7 +1742,23 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
                     health += 2
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Ymgarl Genestealer":
+            if self.search_synapse_at_planet(planet_id):
+                health += 2
+            else:
+                if self.number == "1":
+                    if self.game.p2.search_synapse_at_planet(planet_id):
+                        health += 2
+                elif self.number == "2":
+                    if self.game.p1.search_synapse_at_planet(planet_id):
+                        health += 2
         return health
+
+    def search_synapse_at_planet(self, planet_pos):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.cards_in_play[planet_pos + 1][i].get_card_type() == "Synapse":
+                return True
+        return False
 
     def check_damage_too_great_given_pos(self, planet_id, unit_id):
         if self.get_health_given_pos(planet_id, unit_id) > self.get_damage_given_pos(planet_id, unit_id):

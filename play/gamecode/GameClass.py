@@ -989,7 +989,7 @@ class Game:
                         print(reaction_pos)
                         self.move_reaction_to_front(reaction_pos)
                         self.has_chosen_to_resolve = False
-                    elif self.asking_if_reaction:
+                    elif self.asking_if_reaction and self.choice_context != "Retreat Warlord?":
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
