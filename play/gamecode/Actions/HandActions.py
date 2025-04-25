@@ -34,6 +34,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Regular Action"
                         await self.send_search()
+                    elif ability == "Spawn Termagants":
+                        for i in range(7):
+                            if self.planets_in_play_array[i]:
+                                primary_player.summon_token_at_planet("Termagant", i)
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.mode = "Normal"
+                        self.player_with_action = ""
+                        await primary_player.send_units_at_all_planets()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await primary_player.send_resources()
                     elif ability == "Battle Cry":
                         print("Resolve Battle Cry")
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
