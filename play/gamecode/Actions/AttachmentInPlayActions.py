@@ -11,9 +11,11 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
     if game_update_string[2] == "1":
         card_chosen = self.p1.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
         player_owning_card = self.p1
+        other_player = self.p2
     else:
         card_chosen = self.p2.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
         player_owning_card = self.p2
+        other_player = self.p1
     if not self.action_chosen:
         print("action not chosen")
         if card_chosen.get_has_action_while_in_play():
@@ -31,6 +33,18 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             await self.game_sockets[0].receive_game_update(ability + " activated")
                             await player_owning_card.send_units_at_planet(planet_pos)
                             await primary_player.send_resources()
+                elif ability == "Regeneration":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                            card_chosen.exhaust_card()
+                            if self.phase == "DEPLOY":
+                                self.player_with_deploy_turn = other_player.name_player
+                                self.number_with_deploy_turn = other_player.number
+                            self.action_chosen = ""
+                            self.mode = "Normal"
+                            self.player_with_action = ""
+                            await player_owning_card.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()

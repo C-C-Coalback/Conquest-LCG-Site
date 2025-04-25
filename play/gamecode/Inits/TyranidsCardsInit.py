@@ -148,7 +148,8 @@ def tyranids_cards_init():
                                                    "Action: Exhaust this attachment to remove 2 "
                                                    "damage from attached unit.", "Condition.",
                                    1, faction, "Common", 1, False, limit_one_per_unit=True,
-                                   type_of_units_allowed_for_attachment="Army", extra_health=2),
+                                   type_of_units_allowed_for_attachment="Army", extra_health=2,
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.AttachmentCard("Noxious Fleshborer", "Attach to an army unit.\n"
                                                          "Attached unit gets +1 ATK and +1 HP while it "
                                                          "is at an infested planet.\n"

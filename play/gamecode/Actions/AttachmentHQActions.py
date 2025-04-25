@@ -29,6 +29,18 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.game_sockets[0].receive_game_update(ability + " activated")
                             await player_owning_card.send_units_at_planet(planet_pos)
+                elif ability == "Regeneration":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                            card_chosen.exhaust_card()
+                            if self.phase == "DEPLOY":
+                                self.player_with_deploy_turn = other_player.name_player
+                                self.number_with_deploy_turn = other_player.number
+                            self.action_chosen = ""
+                            self.mode = "Normal"
+                            self.player_with_action = ""
+                            await player_owning_card.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()
