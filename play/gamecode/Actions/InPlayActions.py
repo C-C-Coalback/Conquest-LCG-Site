@@ -50,6 +50,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             await player_owning_card.send_units_at_planet(planet_pos)
+                elif ability == "Hunter Gargoyles":
+                    if not card_chosen.get_once_per_phase_used():
+                        card_chosen.set_once_per_phase_used(True)
+                        self.action_chosen = ability
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        await primary_player.send_units_at_planet(planet_pos)
                 elif ability == "Veteran Brother Maxos":
                     if player_owning_card.name_player == name:
                         self.action_chosen = ability

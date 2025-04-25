@@ -68,6 +68,18 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.p1.send_units_at_planet(chosen_planet)
             await self.p2.send_units_at_planet(chosen_planet)
             await self.send_info_box()
+    elif self.action_chosen == "Hunter Gargoyles":
+        if self.infested_planets[chosen_planet]:
+            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
+            primary_player.move_unit_to_planet(
+                self.position_of_actioned_card[0], self.position_of_actioned_card[1], chosen_planet)
+            self.mode = "Normal"
+            self.action_chosen = ""
+            self.player_with_action = ""
+            await primary_player.send_units_at_planet(chosen_planet)
+            await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
+            self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Infernal Gateway":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
