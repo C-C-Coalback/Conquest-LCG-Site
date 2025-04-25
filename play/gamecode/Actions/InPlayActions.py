@@ -554,6 +554,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 await primary_player.send_hq()
                 await primary_player.send_units_at_planet(planet_pos)
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Dark Cunning":
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = int(game_update_string[2])
+            unit_pos = int(game_update_string[3])
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                primary_player.ready_given_pos(planet_pos, unit_pos)
+                if self.infested_planets[planet_pos]:
+                    primary_player.add_resources(1)
+                self.action_chosen = ""
+                self.mode = "Normal"
+                self.player_with_action = ""
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                await primary_player.send_units_at_planet(planet_pos)
+                await primary_player.send_hand()
+                await primary_player.send_resources()
+                await primary_player.send_discard()
     elif self.action_chosen == "Craftworld Gate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
