@@ -1002,6 +1002,9 @@ class Player:
                             [int(self.number), self.synapse_commit_location, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                     self.move_unit_to_planet(-2, i, self.synapse_commit_location)
+                    for j in range(len(self.headquarters)):
+                        if self.headquarters[j].get_ability() == "Synaptic Link":
+                            self.game.create_reaction("Synaptic Link", self.name_player, (int(self.number), -1, -1))
                     return None
         return None
 

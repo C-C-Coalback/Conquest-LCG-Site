@@ -2995,6 +2995,10 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Synaptic Link":
+                primary_player.draw_card()
+                self.delete_reaction()
+                await primary_player.send_hand()
             elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 if not self.infested_planets[planet_pos]:
