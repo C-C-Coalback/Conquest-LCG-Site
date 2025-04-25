@@ -2200,6 +2200,10 @@ class Game:
                             primary_player.aiming_reticle_coords_hand = None
                             await primary_player.send_hand()
                             await primary_player.send_discard()
+                    elif self.reactions_needing_resolving[0] == "Spore Chimney":
+                        self.infested_planets[int(game_update_string[1])] = True
+                        self.delete_reaction()
+                        await self.send_planet_array()
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if game_update_string[1] == primary_player.get_number():

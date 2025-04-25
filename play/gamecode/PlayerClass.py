@@ -1847,11 +1847,16 @@ class Player:
             self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
     def perform_own_reactions_on_phase_change(self, phase):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Spore Chimney":
+                if phase == "HEADQUARTERS":
+                    self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
-                    self.game.create_reaction("Blazing Zoanthrope", self.name_player,
-                                              (int(self.number), i, j))
+                    if phase == "COMBAT":
+                        self.game.create_reaction("Blazing Zoanthrope", self.name_player,
+                                                  (int(self.number), i, j))
 
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
