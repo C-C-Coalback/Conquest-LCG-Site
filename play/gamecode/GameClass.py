@@ -192,7 +192,9 @@ class Game:
         self.damage_bodyguard = 0
         self.planet_bodyguard = -1
         self.last_player_who_resolved_reaction = ""
-        self.infested_planets = [False, True, False, False, False, False, False]
+        self.infested_planets = [False, False, False, False, False, False, False]
+        self.asking_if_remove_infested_planet = False
+        self.already_asked_remove_infestation = False
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -996,6 +998,13 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         await self.send_search()
+                    elif self.asking_if_remove_infested_planet:
+                        if game_update_string[1] == "0":
+                            self.infested_planets[self.last_planet_checked_for_battle] = False
+                            await self.send_planet_array()
+                        self.asking_if_remove_infested_planet = False
+                        self.already_asked_remove_infestation = True
+                        await self.resolve_winning_combat(primary_player, secondary_player)
                     elif self.choice_context == "Resolve Battle Ability?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             print("Wants to resolve battle ability")
@@ -3411,26 +3420,37 @@ class Game:
 
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
-        print("Resolve battle ability of:", planet_name)
-        self.need_to_resolve_battle_ability = True
-        self.battle_ability_to_resolve = planet_name
-        self.player_resolving_battle_ability = winner.name_player
-        self.number_resolving_battle_ability = str(winner.number)
-        self.choices_available = ["Yes", "No"]
-        self.choice_context = "Resolve Battle Ability?"
-        self.name_player_making_choices = winner.name_player
-        await self.game_sockets[0].receive_game_update(winner.name_player + " has the right to use"
-                                                                            " the battle ability of " + planet_name)
-        await self.send_search()
-        if not self.need_to_resolve_battle_ability:
-            if self.round_number == self.last_planet_checked_for_battle:
-                winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
-                await winner.send_hq()
-                await winner.send_units_at_planet(self.last_planet_checked_for_battle)
-                winner.capture_planet(self.last_planet_checked_for_battle,
-                                      self.planet_cards_array)
-                self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                await winner.send_victory_display()
+        if self.infested_planets[self.last_planet_checked_for_battle] and \
+            self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation:
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Remove Infestation?"
+            self.asking_if_remove_infested_planet = True
+            self.name_player_making_choices = winner.name_player
+            await self.game_sockets[0].receive_game_update(
+                winner.name_player + " has the right to clear infestation from " + planet_name)
+            await self.send_search()
+        else:
+            self.already_asked_remove_infestation = False
+            print("Resolve battle ability of:", planet_name)
+            self.need_to_resolve_battle_ability = True
+            self.battle_ability_to_resolve = planet_name
+            self.player_resolving_battle_ability = winner.name_player
+            self.number_resolving_battle_ability = str(winner.number)
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Resolve Battle Ability?"
+            self.name_player_making_choices = winner.name_player
+            await self.game_sockets[0].receive_game_update(winner.name_player + " has the right to use"
+                                                                                " the battle ability of " + planet_name)
+            await self.send_search()
+            if not self.need_to_resolve_battle_ability:
+                if self.round_number == self.last_planet_checked_for_battle:
+                    winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
+                    await winner.send_hq()
+                    await winner.send_units_at_planet(self.last_planet_checked_for_battle)
+                    winner.capture_planet(self.last_planet_checked_for_battle,
+                                          self.planet_cards_array)
+                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    await winner.send_victory_display()
 
     async def check_combat_end(self, name):
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
