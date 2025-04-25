@@ -989,7 +989,7 @@ class Game:
                         print(reaction_pos)
                         self.move_reaction_to_front(reaction_pos)
                         self.has_chosen_to_resolve = False
-                    elif self.asking_if_reaction and self.choice_context != "Retreat Warlord?":
+                    elif self.asking_if_reaction:
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
@@ -1395,6 +1395,19 @@ class Game:
                                     await primary_player.send_hand()
                                     self.effects_waiting_on_resolution.append("Glorious Intervention")
                                     self.player_resolving_effect.append(primary_player.name_player)
+                    elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        print("Got to toxic venomthrope gain")
+                        if game_update_string[1] == "0":
+                            primary_player.draw_card()
+                            await primary_player.send_hand()
+                        elif game_update_string[1] == "1":
+                            primary_player.add_resources(1)
+                            await primary_player.send_resources()
+                        self.delete_reaction()
+                        await self.send_search()
                     elif self.choice_context == "Shadowsun plays attachment from hand or discard?":
                         self.choices_available = []
                         self.choice_context = ""
@@ -2982,6 +2995,24 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if not self.infested_planets[planet_pos]:
+                    self.infested_planets[planet_pos] = True
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.delete_reaction()
+                    await self.send_planet_array()
+                else:
+                    await self.game_sockets[0].receive_game_update("Resolve Toxic venomthrope gains")
+                    self.resolving_search_box = True
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.choices_available = ["Card", "Resource"]
+                    self.choice_context = "Toxic Venomthrope: Gain Card or Resource?"
+                    self.asking_if_reaction = False
+                    self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                    await self.send_search()
+                    await self.send_info_box()
+                await primary_player.send_units_at_planet(planet_pos)
             elif self.reactions_needing_resolving[0] == "Old One Eye":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
@@ -3089,6 +3120,8 @@ class Game:
                     else:
                         secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                     secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+                await primary_player.send_units_at_planet(planet_pos)
+                await secondary_player.send_units_at_planet(planet_pos)
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Earth Caste Technician":
                 if self.player_who_resolves_reaction[0] == self.name_1:
@@ -3339,8 +3372,7 @@ class Game:
 
         if resolved_subroutine:
             await self.send_info_box()
-        if self.choices_available or self.cards_in_search_box:
-            await self.send_search()
+        await self.send_search()
         print("---\nDEBUG INFO\n---")
         print(self.reactions_needing_resolving)
         print(self.choices_available)
