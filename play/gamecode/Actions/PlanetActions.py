@@ -73,6 +73,27 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.p1.send_units_at_planet(chosen_planet)
             await self.p2.send_units_at_planet(chosen_planet)
             await self.send_info_box()
+    elif self.action_chosen == "Predation":
+        adj_1 = chosen_planet - 1
+        adj_2 = chosen_planet + 1
+        adj_1_infested = False
+        adj_2_infested = False
+        if -1 < adj_1 < 7:
+            if self.infested_planets[adj_1]:
+                adj_1_infested = True
+        if -1 < adj_2 < 7:
+            if self.infested_planets[adj_2]:
+                adj_2_infested = True
+        if adj_1_infested or adj_2_infested:
+            self.infested_planets[chosen_planet] = True
+            await self.send_planet_array()
+            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+            self.mode = "Normal"
+            self.action_chosen = ""
+            self.player_with_action = ""
+            primary_player.aiming_reticle_coords_hand = None
+            await primary_player.send_hand()
+            await primary_player.send_discard()
     elif self.action_chosen == "Hunter Gargoyles":
         if self.infested_planets[chosen_planet]:
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
@@ -82,6 +103,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.mode = "Normal"
             self.action_chosen = ""
             self.player_with_action = ""
+            if self.phase == "DEPLOY":
+                self.player_with_deploy_turn = secondary_player.name_player
+                self.number_with_deploy_turn = secondary_player.number
             await primary_player.send_units_at_planet(chosen_planet)
             await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
             self.position_of_actioned_card = (-1, -1)

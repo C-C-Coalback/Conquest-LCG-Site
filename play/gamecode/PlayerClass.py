@@ -1072,13 +1072,23 @@ class Player:
                 i += 1
         return None
 
+    def get_command_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_command()
+        command = self.cards_in_play[planet_id + 1][unit_id].get_command()
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
+            command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Brood Warriors":
+                    command += 1
+        return command
+
     def count_command_at_planet(self, planet_id):
         counted_command = 0
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ready_given_pos(planet_id, i):
-                counted_command += self.cards_in_play[planet_id + 1][i].get_command()
-                if self.cards_in_play[planet_id + 1][i].get_ability() == "Iron Hands Techmarine":
-                    counted_command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+                counted_command += self.get_command_given_pos(planet_id, i)
         return counted_command
 
     def count_tyranid_units_at_planet(self, planet_id):
