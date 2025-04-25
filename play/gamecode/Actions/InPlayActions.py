@@ -34,6 +34,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await player_owning_card.send_resources()
                             await self.game_sockets[0].receive_game_update("Haemonculus buffed")
                             await self.send_info_box()
+                elif ability == "Virulent Spore Sacs":
+                    if player_owning_card.name_player == name:
+                        player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
+                        self.infested_planets[planet_pos] = True
+                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                            secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
+                            if i == 0:
+                                secondary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
+                            secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+                        self.player_with_action = ""
+                        self.action_chosen = ""
+                        self.mode = "Normal"
+                        await player_owning_card.send_units_at_planet(planet_pos)
+                        await secondary_player.send_units_at_planet(planet_pos)
                 elif ability == "Captain Markis":
                     if not card_chosen.get_once_per_phase_used():
                         card_chosen.set_once_per_phase_used(True)
