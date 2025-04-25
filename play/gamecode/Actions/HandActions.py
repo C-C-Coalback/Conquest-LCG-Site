@@ -84,6 +84,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Indescribable Horror":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Even the Odds":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
