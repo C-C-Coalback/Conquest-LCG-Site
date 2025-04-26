@@ -2238,6 +2238,13 @@ class Player:
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 
+    def reset_can_retreat_values(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].can_retreat = True
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].can_retreat = True
+
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
@@ -2245,6 +2252,8 @@ class Player:
                                                                                    "Umbral Preacher")
             if own_umbral_check or enemy_umbral_check:
                 return False
+        if not self.cards_in_play[planet_id + 1][unit_id].can_retreat:
+            return False
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_hq = len(self.headquarters) - 1
         if exhaust:

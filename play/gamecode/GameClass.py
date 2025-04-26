@@ -2219,11 +2219,12 @@ class Game:
                                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
                                                      (int(secondary_player.number), att_pla, att_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                            if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
-                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                                if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
                                     self.create_reaction("Black Heart Ravager", secondary_player.name_player,
                                                          (int(primary_player.number), planet_pos, unit_pos))
-                                    await primary_player.send_hq()
+                                if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
+                                    self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
                     else:
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
@@ -2315,14 +2316,19 @@ class Game:
                                                                          primary_player.name_player,
                                                                          (int(secondary_player.number), att_pla, att_pos))
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
-                                                        "Black Heart Ravager":
-                                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
-                                                            .get_card_type() != "Warlord":
+                                                if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
+                                                        .get_card_type() != "Warlord":
+                                                    if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
+                                                            "Black Heart Ravager":
                                                         self.create_reaction("Black Heart Ravager",
                                                                              secondary_player.name_player,
                                                                              (int(primary_player.number), planet_pos,
                                                                               unit_pos))
+                                                    if secondary_player.search_attachments_at_pos(att_pla, att_pos,
+                                                                                                  "Pincer Tail"):
+                                                        self.create_reaction("Pincer Tail",
+                                                                             secondary_player.name_player,
+                                                                             pos_holder)
                                         else:
                                             self.damage_taken_was_from_attack.append(False)
                                             self.positions_of_attacker_of_unit_that_took_damage.append(None)
@@ -3416,6 +3422,14 @@ class Game:
                 self.infested_planets[planet_pos] = True
                 self.delete_reaction()
                 await self.send_planet_array()
+            elif self.reactions_needing_resolving[0] == "Pincer Tail":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if num == 1:
+                    self.p1.cards_in_play[planet_pos + 1][unit_pos].can_retreat = False
+                elif num == 2:
+                    self.p2.cards_in_play[planet_pos + 1][unit_pos].can_retreat = False
+                await self.game_sockets[0].receive_game_update("Defender can no longer retreat!")
+                self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Synaptic Link":
                 primary_player.draw_card()
                 self.delete_reaction()

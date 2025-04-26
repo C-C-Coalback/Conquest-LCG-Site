@@ -9,6 +9,7 @@ class Card:
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name_owner = ""
+        self.can_retreat = True
         self.name = name
         self.ability = name
         self.text = text

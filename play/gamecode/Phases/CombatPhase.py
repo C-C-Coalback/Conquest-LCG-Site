@@ -45,6 +45,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     elif self.mode == "RETREAT":
                         self.p1.has_passed = False
                         self.p2.has_passed = False
+                        self.p1.reset_can_retreat_values()
+                        self.p2.reset_can_retreat_values()
                         self.reset_combat_turn()
                         self.mode = "Normal"
                         self.begin_combat_round()
