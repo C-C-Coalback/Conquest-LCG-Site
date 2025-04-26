@@ -126,6 +126,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         await self.send_search()
                                     print("Unit ready, can be used")
                                     valid_unit = True
+                                    player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
                                     player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
                                 else:
                                     print("Unit not ready")

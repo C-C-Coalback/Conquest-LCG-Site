@@ -41,6 +41,7 @@ class Card:
         self.counter = 0
         self.sacrifice_end_of_phase = False
         self.has_hive_mind = False
+        self.resolving_attack = False
 
     def get_once_per_round_used(self):
         return self.once_per_round_used

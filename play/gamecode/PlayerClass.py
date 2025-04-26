@@ -810,6 +810,13 @@ class Player:
             return self.headquarters[unit_id].get_cost()
         return self.cards_in_play[planet_id + 1][unit_id].get_cost()
 
+    def reset_resolving_attack_attribute_own(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].resolving_attack = False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].resolving_attack = False
+
     def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos):
         print("\nGetting on kill effects\n")
         on_kill_effects = []

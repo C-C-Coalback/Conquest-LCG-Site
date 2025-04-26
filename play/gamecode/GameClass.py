@@ -204,6 +204,7 @@ class Game:
         self.misc_target_choice = -1
         self.resolve_destruction_checks_after_reactions = False
         self.ravenous_haruspex_gain = 0
+        self.reset_resolving_attack_on_units = False
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -1124,6 +1125,8 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                resolving_attack = False
                             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
                             primary_player.retreat_unit(self.attacker_planet, self.attacker_position)
                             await primary_player.send_hq()
@@ -2028,6 +2031,7 @@ class Game:
                 "Both warlords just died. I guess it is a draw?"
                 "----GAME END----"
             )
+        self.reset_resolving_attack_on_units = True
         await self.p1.send_resources()
         await self.p2.send_resources()
         await self.p1.send_discard()
@@ -3311,7 +3315,9 @@ class Game:
             elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_resources(self.ravenous_haruspex_gain)
-                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
+                        primary_player.set_once_per_phase_used_given_pos(planet_pos, i, True)
                 await primary_player.send_resources()
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
@@ -3741,6 +3747,9 @@ class Game:
             if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage:
                 self.resolve_destruction_checks_after_reactions = False
                 await self.destroy_check_all_cards()
+        if self.reset_resolving_attack_on_units:
+            self.reset_resolving_attack_on_units = False
+
         if resolved_subroutine:
             await self.send_info_box()
         await self.send_search()
