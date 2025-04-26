@@ -2110,12 +2110,13 @@ class Game:
             )
 
     def advance_damage_aiming_reticle(self):
-        pos_holder = self.positions_of_units_to_take_damage[0]
-        player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
-        if player_num == 1:
-            self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
-        elif player_num == 2:
-            self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+        if self.positions_of_units_to_take_damage:
+            pos_holder = self.positions_of_units_to_take_damage[0]
+            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+            if player_num == 1:
+                self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+            elif player_num == 2:
+                self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
 
     async def change_phase(self, new_val, refresh_abilities=True):
         self.p1.has_passed = False
@@ -3363,6 +3364,19 @@ class Game:
                     if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
                         primary_player.set_once_per_phase_used_given_pos(planet_pos, i, True)
                 await primary_player.send_resources()
+                self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Parasitic Infection":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if num == 1:
+                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    self.advance_damage_aiming_reticle()
+                elif num == 2:
+                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    self.advance_damage_aiming_reticle()
+                if planet_pos != -2:
+                    primary_player.summon_token_at_planet("Termagant", planet_pos)
+                await primary_player.send_units_at_planet(planet_pos)
+                await secondary_player.send_units_at_planet(planet_pos)
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

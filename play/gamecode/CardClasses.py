@@ -8,6 +8,7 @@ class Card:
                  limited=False):
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
+        self.name_owner = ""
         self.name = name
         self.ability = name
         self.text = text

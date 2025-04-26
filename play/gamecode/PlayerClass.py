@@ -605,6 +605,7 @@ class Player:
                 target_attachment.get_ability() == "Shadowsun's Stealth Cadre":
             army_unit_as_attachment = True
         if self.attach_card(card=target_attachment, planet=destination_planet, position=destination_position,
+                            not_own_attachment=False,
                             army_unit_as_attachment=army_unit_as_attachment):
             self.remove_attachment_from_pos(origin_planet, origin_position, origin_attachment_position)
             return True
@@ -625,7 +626,7 @@ class Player:
                 self.discard.append(card.get_name())
             del card.get_attachments()[attachment_position]
 
-    def attach_card(self, card, planet, position, army_unit_as_attachment=False):
+    def attach_card(self, card, planet, position, not_own_attachment, army_unit_as_attachment=False):
         if planet == -2:
             target_card = self.headquarters[position]
         else:
@@ -670,6 +671,13 @@ class Player:
             if not target_card.get_wargear_attachments_permitted():
                 print("Unit may not have wargear")
                 return False
+        name_owner = self.name_player
+        if not_own_attachment:
+            if self.number == "1":
+                name_owner = self.game.p2.name_player
+            elif self.number == "2":
+                name_owner = self.game.p1.name_player
+        card.name_owner = name_owner
         target_card.add_attachment(card)
         return True
 
@@ -683,12 +691,14 @@ class Player:
                 return False
         if army_unit_as_attachment:
             if not_own_attachment:
-                if self.attach_card(card, planet, position, army_unit_as_attachment=army_unit_as_attachment):
+                if self.attach_card(card, planet, position, not_own_attachment,
+                                    army_unit_as_attachment=army_unit_as_attachment):
                     return True
                 return False
             cost = card.get_cost() - discounts
             if self.spend_resources(cost):
-                if self.attach_card(card, planet, position, army_unit_as_attachment=army_unit_as_attachment):
+                if self.attach_card(card, planet, position, not_own_attachment,
+                                    army_unit_as_attachment=army_unit_as_attachment):
                     return True
                 self.add_resources(cost)
         else:
@@ -699,12 +709,12 @@ class Player:
                 print("Must be enemy unit, but is not")
                 return False
             if not_own_attachment:
-                if self.attach_card(card, planet, position):
+                if self.attach_card(card, planet, position, not_own_attachment):
                     return True
                 return False
             cost = card.get_cost() - discounts
             if self.spend_resources(cost):
-                if self.attach_card(card, planet, position):
+                if self.attach_card(card, planet, position, not_own_attachment):
                     return True
                 self.add_resources(cost)
         return False
@@ -1922,12 +1932,22 @@ class Player:
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
                     self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if phase == "COMBAT":
+                    if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
+                        name_owner = self.headquarters[i].get_attachments()[j].name_owner
+                        self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
                                                   (int(self.number), i, j))
+                for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
+                    if phase == "COMBAT":
+                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
+                            name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
+                            self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), i, j))
 
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
