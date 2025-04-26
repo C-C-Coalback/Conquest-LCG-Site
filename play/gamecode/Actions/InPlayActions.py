@@ -675,6 +675,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await primary_player.send_units_at_planet(planet_pos)
         else:
             await self.game_sockets[0].receive_game_update("Already selected unit to move")
+    elif self.action_chosen == "Mycetic Spores":
+        if self.unit_to_move_position == [-1, -1]:
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            if game_update_string[1] == primary_player.get_number():
+                planet_pos = int(game_update_string[2])
+                unit_pos = int(game_update_string[3])
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].has_hive_mind:
+                    self.unit_to_move_position = [planet_pos, unit_pos]
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    await primary_player.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Indescribable Horror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

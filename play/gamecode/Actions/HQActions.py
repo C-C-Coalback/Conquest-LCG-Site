@@ -32,6 +32,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    elif ability == "Mycetic Spores":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            await primary_player.send_hq()
+                            self.unit_to_move_position = [-1, -1]
                     elif ability == "Twisted Laboratory":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -438,6 +445,19 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         await primary_player.send_hq()
         else:
             await self.game_sockets[0].receive_game_update("Already selected unit to move")
+    elif self.action_chosen == "Mycetic Spores":
+        if self.unit_to_move_position == [-1, -1]:
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            if game_update_string[1] == primary_player.get_number():
+                planet_pos = -2
+                unit_pos = int(game_update_string[2])
+                if primary_player.headquarters[unit_pos].has_hive_mind:
+                    self.unit_to_move_position = [planet_pos, unit_pos]
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    await primary_player.send_hq()
     elif self.action_chosen == "Deception":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
