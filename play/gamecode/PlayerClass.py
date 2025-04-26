@@ -83,11 +83,13 @@ class Player:
                              "Stalking Lictor", "Venomthrope Polluter"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord"]
         self.synapse_name = ""
+        self.warlord_faction = ""
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array)))
+        self.warlord_faction = self.headquarters[0].get_faction()
         self.deck = deck_list[1:]
         if deck_list[0] in self.tyranid_warlord_list:
             i = 0

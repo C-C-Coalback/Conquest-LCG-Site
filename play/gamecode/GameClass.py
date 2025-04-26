@@ -3842,7 +3842,8 @@ class Game:
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
         if self.infested_planets[self.last_planet_checked_for_battle] and \
-                self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation:
+                self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation\
+                and winner.warlord_faction != "Tyranids":
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Remove Infestation?"
             self.asking_if_remove_infested_planet = True
