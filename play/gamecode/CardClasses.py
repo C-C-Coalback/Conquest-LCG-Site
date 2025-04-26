@@ -215,6 +215,8 @@ class UnitCard(Card):
         self.hit_by_superiority = False
         self.has_hive_mind = hive_mind
         self.brutal_eocr = False
+        self.armorbane_eop = False
+        self.area_effect_eop = 0
 
     def get_has_hive_mind(self):
         return self.hive_mind
@@ -326,6 +328,8 @@ class UnitCard(Card):
     def get_armorbane(self):
         if self.blanked_eop:
             return False
+        if self.armorbane_eop:
+            return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
                 return True
@@ -338,6 +342,7 @@ class UnitCard(Card):
         if self.blanked_eop:
             return 0
         area_effect = self.area_effect
+        area_effect += self.area_effect_eop
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Gun Drones":
                 area_effect += 2
@@ -587,7 +592,7 @@ class AttachmentCard(Card):
                  limited=False, type_of_units_allowed_for_attachment="Army/Token/Warlord/Synapse",
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
-                 extra_command=0):
+                 extra_command=0, required_traits=""):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
@@ -602,6 +607,7 @@ class AttachmentCard(Card):
         self.extra_attack = extra_attack
         self.extra_health = extra_health
         self.extra_command = extra_command
+        self.required_traits = required_traits
 
     def get_extra_command(self):
         return self.extra_command

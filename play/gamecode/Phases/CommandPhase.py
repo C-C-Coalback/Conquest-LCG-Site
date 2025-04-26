@@ -239,7 +239,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 self.create_reaction("Toxic Venomthrope", self.name_1, ("1", planet_id, i))
             attachments = self.p1.cards_in_play[planet_id + 1][i].get_attachments()
             for j in range(len(attachments)):
-                if attachments[i].get_ability() == "Noxious Fleshborer":
+                if attachments[j].get_ability() == "Noxious Fleshborer":
                     if not already_noxious and not self.infested_planets[planet_id]:
                         already_noxious = True
                         self.create_reaction("Noxious Fleshborer", self.name_1, ("1", planet_id, i))
@@ -267,7 +267,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 self.create_reaction("Toxic Venomthrope", self.name_2, ("2", planet_id, i))
             attachments = self.p2.cards_in_play[planet_id + 1][i].get_attachments()
             for j in range(len(attachments)):
-                if attachments[i].get_ability() == "Noxious Fleshborer":
+                if attachments[j].get_ability() == "Noxious Fleshborer":
                     if not already_noxious and not self.infested_planets[planet_id]:
                         already_noxious = True
                         self.create_reaction("Noxious Fleshborer", self.name_2, ("2", planet_id, i))

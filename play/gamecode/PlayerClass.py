@@ -650,6 +650,9 @@ class Player:
         if type_of_card not in allowed_types:
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
+        if card.required_traits not in target_card.get_traits():
+            print("Wrong traits.")
+            return False
         if card.unit_must_be_unique:
             if not target_card.get_unique():
                 print("Must be a unique unit, but is not")
@@ -1577,9 +1580,13 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].reset_ranged()
+                self.headquarters[i].area_effect_eop = 0
+                self.headquarters[i].armorbane_eop = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
+                self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
+                self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):

@@ -1331,6 +1331,50 @@ class Game:
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
                             await self.send_search()
+                    elif self.choice_context == "Heavy Venom Cannon":
+                        planet, unit, att = self.misc_target_attachment
+                        self.choice_context = ""
+                        self.choices_available = []
+                        self.name_player_making_choices = ""
+                        if game_update_string[1] == "0":
+                            if planet == -2:
+                                primary_player.headquarters[unit].armorbane_eop = True
+                                primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
+                                name = primary_player.headquarters[unit].get_name()
+                                await primary_player.send_hq()
+                                await self.game_sockets[0].receive_game_update(
+                                    name + " gained armorbane from Heavy Venom Cannon!"
+                                )
+                            else:
+                                primary_player.cards_in_play[planet + 1][unit].armorbane_eop = True
+                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att].set_once_per_phase_used(True)
+                                name = primary_player.cards_in_play[planet + 1][unit].get_name()
+                                await primary_player.send_units_at_planet(planet)
+                                await self.game_sockets[0].receive_game_update(
+                                    name + " gained armorbane from Heavy Venom Cannon!"
+                                )
+                        elif game_update_string[1] == "1":
+                            if planet == -2:
+                                primary_player.headquarters[unit].area_effect_eop += 2
+                                primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
+                                name = primary_player.headquarters[unit].get_name()
+                                await primary_player.send_hq()
+                                await self.game_sockets[0].receive_game_update(
+                                    name + " gained area effect (2) from Heavy Venom Cannon!"
+                                )
+                            else:
+                                primary_player.cards_in_play[planet + 1][unit].area_effect_eop += 2
+                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att].\
+                                    set_once_per_phase_used(True)
+                                name = primary_player.cards_in_play[planet + 1][unit].get_name()
+                                await primary_player.send_units_at_planet(planet)
+                                await self.game_sockets[0].receive_game_update(
+                                    name + " gained area effect (2) from Heavy Venom Cannon!"
+                                )
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                        self.action_chosen = ""
+                        await self.send_search()
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:

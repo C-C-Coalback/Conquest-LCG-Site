@@ -175,7 +175,8 @@ def tyranids_cards_init():
                                                          "gain either (choose one): Area Effect (2) or Armorbane. "
                                                          "(Limit once per phase.)", "Wargear. Biomorph.",
                                    3, faction, "Common", 2, False, type_of_units_allowed_for_attachment="Army",
-                                   extra_attack=2, action_in_play=True, allowed_phases_in_play="COMBAT"),
+                                   extra_attack=2, action_in_play=True, allowed_phases_in_play="COMBAT",
+                                   required_traits="Elite"),
         CardClasses.SupportCard("Brood Chamber", "Combat Action: Exhaust this support to give a target army unit you "
                                                  "control a keyword (and all associated values) printed on a "
                                                  "target enemy unit at that planet until the end of the phase.",
