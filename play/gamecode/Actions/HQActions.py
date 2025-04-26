@@ -308,6 +308,47 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 await primary_player.send_hq()
                 await primary_player.send_hand()
                 await primary_player.send_discard()
+    elif self.action_chosen == "Clogged with Corpses":
+        planet_pos = -2
+        unit_pos = int(game_update_string[2])
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
+                primary_player.sacrifice_card_in_hq(unit_pos)
+                self.misc_counter += 1
+                await primary_player.send_hq()
+            elif primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+                if primary_player.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
+                    primary_player.destroy_card_in_hq(unit_pos)
+                    self.action_chosen = ""
+                    self.mode = "Normal"
+                    self.player_with_action = ""
+                    if self.phase == "DEPLOY":
+                        if not secondary_player.has_passed:
+                            self.player_with_deploy_turn = secondary_player.name_player
+                            self.number_with_deploy_turn = secondary_player.number
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.send_hq()
+                    await primary_player.send_hand()
+                    await primary_player.send_discard()
+                    self.misc_counter = 0
+        else:
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+                if secondary_player.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
+                    secondary_player.destroy_card_in_hq(unit_pos)
+                    self.action_chosen = ""
+                    self.mode = "Normal"
+                    self.player_with_action = ""
+                    if self.phase == "DEPLOY":
+                        if not secondary_player.has_passed:
+                            self.player_with_deploy_turn = secondary_player.name_player
+                            self.number_with_deploy_turn = secondary_player.number
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
+                    await secondary_player.send_hq()
+                    await primary_player.send_hand()
+                    await primary_player.send_discard()
+                    self.misc_counter = 0
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2

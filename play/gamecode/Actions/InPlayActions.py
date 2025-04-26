@@ -571,6 +571,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 await primary_player.send_hand()
                 await primary_player.send_resources()
                 await primary_player.send_discard()
+    elif self.action_chosen == "Clogged with Corpses":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
+                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                self.misc_counter += 1
+                await primary_player.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
