@@ -3309,7 +3309,9 @@ class Game:
                     await self.p2.send_units_at_planet(planet_pos)
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_resources(self.ravenous_haruspex_gain)
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
                 await primary_player.send_resources()
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
