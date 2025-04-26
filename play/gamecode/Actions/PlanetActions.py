@@ -1,3 +1,6 @@
+from .. import FindCard
+
+
 async def update_game_event_action_planet(self, name, game_update_string):
     chosen_planet = int(game_update_string[1])
     if self.player_with_action == self.name_1:
@@ -276,6 +279,21 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await primary_player.send_units_at_planet(dest_planet)
             await primary_player.send_discard()
             await primary_player.send_hq()
+    elif self.action_chosen == "Spore Burst":
+        if self.infested_planets[chosen_planet]:
+            primary_player.discard.remove(self.misc_target_choice)
+            card = FindCard.find_card(self.misc_target_choice, self.card_array)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            self.player_with_deploy_turn = secondary_player.name_player
+            self.number_with_deploy_turn = secondary_player.get_number()
+            await primary_player.send_hand()
+            await primary_player.send_discard()
+            await primary_player.send_units_at_planet(chosen_planet)
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
     elif self.action_chosen == "Ork Kannon":
         self.location_of_indirect = "PLANET"
         self.planet_of_indirect = int(game_update_string[1])

@@ -1331,6 +1331,12 @@ class Game:
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
                             await self.send_search()
+                    elif self.choice_context == "Spore Burst":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        await self.send_search()
                     elif self.choice_context == "Heavy Venom Cannon":
                         planet, unit, att = self.misc_target_attachment
                         self.choice_context = ""

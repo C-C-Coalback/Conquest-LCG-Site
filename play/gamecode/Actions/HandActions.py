@@ -1,3 +1,6 @@
+from .. import FindCard
+
+
 async def update_game_event_action_hand(self, name, game_update_string, may_nullify=True):
     if self.player_with_action == self.name_1:
         primary_player = self.p1
@@ -103,6 +106,37 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         await primary_player.send_hand()
                         await primary_player.send_resources()
                         self.misc_counter = 0
+                    elif ability == "Spore Burst":
+                        any_infested = False
+                        for i in range(len(self.infested_planets)):
+                            if self.infested_planets and self.planets_in_play_array:
+                                any_infested = True
+                        if any_infested:
+                            choices = []
+                            for i in range(len(primary_player.discard)):
+                                c = FindCard.find_card(primary_player.discard[i], primary_player.card_array)
+                                if c.get_cost() < 4 and c.get_card_type() == "Army":
+                                    choices.append(c.get_name())
+                            if choices:
+                                self.action_chosen = ability
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                                self.choices_available = choices
+                                self.choice_context = "Spore Burst"
+                                self.name_player_making_choices = primary_player.name_player
+                                await primary_player.send_hand()
+                                await primary_player.send_resources()
+                                await self.send_search()
+                            else:
+                                primary_player.add_resources(2)
+                                await self.game_sockets[0].receive_game_update(
+                                    "No valid targets in discard for spore burst."
+                                )
+                        else:
+                            primary_player.add_resources(2)
+                            await self.game_sockets[0].receive_game_update(
+                                "No valid planets for spore burst."
+                            )
                     elif ability == "Ferocious Strength":
                         if self.phase == "COMBAT":
                             self.action_chosen = ability
