@@ -205,6 +205,7 @@ class Game:
         self.resolve_destruction_checks_after_reactions = False
         self.ravenous_haruspex_gain = 0
         self.reset_resolving_attack_on_units = False
+        self.resolving_consumption = False
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -295,6 +296,8 @@ class Game:
         info_string = "GAME_INFO/INFO_BOX/"
         if self.phase == "SETUP":
             info_string += "Unspecified/"
+        elif self.resolving_consumption:
+            info_string += "Unspecified/"
         elif self.manual_bodyguard_resolution:
             info_string += self.name_player_manual_bodyguard
         elif self.cards_in_search_box:
@@ -328,6 +331,19 @@ class Game:
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "SETUP":
             info_string += "Setup/"
+        elif self.resolving_consumption:
+            info_string += "P1:"
+            for i in range(len(self.p1.consumption_sacs_list)):
+                if self.p1.consumption_sacs_list[i]:
+                    info_string += "True,"
+                else:
+                    info_string += "False,"
+            info_string += "/P2:"
+            for i in range(len(self.p2.consumption_sacs_list)):
+                if self.p2.consumption_sacs_list[i]:
+                    info_string += "True,"
+                else:
+                    info_string += "False,"
         elif self.manual_bodyguard_resolution:
             info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard
         elif self.cards_in_search_box:
@@ -3746,6 +3762,44 @@ class Game:
                                     await player.send_units_at_planet(self.planet_bodyguard)
                                     self.planet_bodyguard = -1
 
+    async def consumption_resolution(self, name, game_update_string):
+        if len(game_update_string) == 1:
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                if name == self.name_1:
+                    self.p1.consumption_sacs_list = [True, True, True, True, True, True, True]
+                    await self.game_sockets[0].receive_game_update(
+                        self.name_2 + " stops sacrificing units for consumption."
+                    )
+                elif name == self.name_2:
+                    self.p2.consumption_sacs_list = [True, True, True, True, True, True, True]
+                    await self.game_sockets[0].receive_game_update(
+                        self.name_1 + " stops sacrificing units for consumption."
+                    )
+        if len(game_update_string) == 4:
+            if name == self.name_1 and game_update_string[1] == "1":
+                if not self.p1.consumption_sacs_list[int(game_update_string[2])]:
+                    if self.p1.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
+                        self.p1.consumption_sacs_list[int(game_update_string[2])] = True
+                        await self.p1.send_units_at_planet(int(game_update_string[2]))
+            elif name == self.name_2 and game_update_string[1] == "2":
+                if not self.p2.consumption_sacs_list[int(game_update_string[2])]:
+                    if self.p2.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
+                        self.p2.consumption_sacs_list[int(game_update_string[2])] = True
+                        await self.p2.send_units_at_planet(int(game_update_string[2]))
+        if self.p1.consumption_sacs_list == [True, True, True, True, True, True, True] and \
+                self.p2.consumption_sacs_list == [True, True, True, True, True, True, True]:
+            self.resolving_consumption = False
+            await self.game_sockets[0].receive_game_update("Consumption Finished")
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            if self.player_with_deploy_turn == self.name_1:
+                self.player_with_deploy_turn = self.name_2
+                self.number_with_deploy_turn = "2"
+            elif self.player_with_deploy_turn == self.name_2:
+                self.player_with_deploy_turn = self.name_1
+                self.number_with_deploy_turn = "1"
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -3755,7 +3809,9 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
-            if self.manual_bodyguard_resolution:
+            if self.resolving_consumption:
+                await self.consumption_resolution(name, game_update_string)
+            elif self.manual_bodyguard_resolution:
                 await self.resolve_manual_bodyguard(name, game_update_string)
             elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)

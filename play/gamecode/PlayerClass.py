@@ -84,6 +84,7 @@ class Player:
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord"]
         self.synapse_name = ""
         self.warlord_faction = ""
+        self.consumption_sacs_list = [True, True, True, True, True, True, True]
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
