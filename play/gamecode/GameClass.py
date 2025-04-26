@@ -166,6 +166,7 @@ class Game:
         self.pos_shield_card = -1
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
+        self.positions_of_attacker_of_unit_that_took_damage = []
         self.faction_of_attacker = []
         self.on_kill_effects_of_attacker = []
         self.furiable_unit_position = (-1, -1)
@@ -201,6 +202,7 @@ class Game:
         self.damage_moved_to_old_one_eye = 0
         self.old_one_eye_pos = (-1, -1)
         self.misc_target_choice = -1
+        self.resolve_destruction_checks_after_reactions = False
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -2027,25 +2029,32 @@ class Game:
         await self.p2.send_discard()
 
     async def destroy_check_all_cards(self):
-        print("\n\nABOUT TO EXECUTE:", self.on_kill_effects_of_attacker)
-        for i in range(len(self.recently_damaged_units)):
-            await self.resolve_on_kill_effects(i)
-        self.recently_damaged_units = []
-        self.damage_taken_was_from_attack = []
-        self.faction_of_attacker = []
-        self.on_kill_effects_of_attacker = []
-        self.furiable_unit_position = (-1, -1)
-        self.p1.cards_recently_discarded = []
-        self.p2.cards_recently_discarded = []
-        self.p1.cards_recently_destroyed = []
-        self.p2.cards_recently_destroyed = []
-        print("All units have been damaged. Move to destruction")
-        for i in range(7):
-            await self.destroy_check_cards_at_planet(self.p1, i)
-            await self.destroy_check_cards_at_planet(self.p2, i)
-        await self.destroy_check_cards_in_hq(self.p1)
-        await self.destroy_check_cards_in_hq(self.p2)
-        await self.complete_destruction_checks()
+        if not self.reactions_needing_resolving:
+            print("\n\nABOUT TO EXECUTE:", self.on_kill_effects_of_attacker)
+            for i in range(len(self.recently_damaged_units)):
+                await self.resolve_on_kill_effects(i)
+            self.recently_damaged_units = []
+            self.damage_taken_was_from_attack = []
+            self.positions_of_attacker_of_unit_that_took_damage = []
+            self.faction_of_attacker = []
+            self.on_kill_effects_of_attacker = []
+            self.furiable_unit_position = (-1, -1)
+            self.p1.cards_recently_discarded = []
+            self.p2.cards_recently_discarded = []
+            self.p1.cards_recently_destroyed = []
+            self.p2.cards_recently_destroyed = []
+            print("All units have been damaged. Move to destruction")
+            for i in range(7):
+                await self.destroy_check_cards_at_planet(self.p1, i)
+                await self.destroy_check_cards_at_planet(self.p2, i)
+            await self.destroy_check_cards_in_hq(self.p1)
+            await self.destroy_check_cards_in_hq(self.p2)
+            await self.complete_destruction_checks()
+        else:
+            self.resolve_destruction_checks_after_reactions = True
+            await self.game_sockets[0].receive_game_update(
+                "Some damage/destruction reactions need to be resolved before actual destruction is done."
+            )
 
     def advance_damage_aiming_reticle(self):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -2119,23 +2128,29 @@ class Game:
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         self.damage_taken_was_from_attack.append(True)
+                        self.positions_of_attacker_of_unit_that_took_damage.append(
+                            self.positions_attackers_of_units_to_take_damage[0])
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
                         self.on_kill_effects_of_attacker.append(
                             secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
-                            if att_num == 1:
-                                self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
-                            else:
-                                self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
+                            self.create_reaction("Repulsor Impact Field", primary_player.name_player,
+                                                 (int(secondary_player.number), att_pla, att_pos))
+                        if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
+                                self.create_reaction("Volatile Pyrovore", primary_player.name_player,
+                                                     (int(secondary_player.number), att_pla, att_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
                                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                                    primary_player.rout_unit(planet_pos, unit_pos)
+                                    self.create_reaction("Black Heart Ravager", secondary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
                                     await primary_player.send_hq()
                     else:
                         self.damage_taken_was_from_attack.append(False)
+                        self.positions_of_attacker_of_unit_that_took_damage.append(None)
                         self.faction_of_attacker.append("")
                         self.on_kill_effects_of_attacker.append([])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
@@ -2202,6 +2217,9 @@ class Game:
                                         self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                                         if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                             self.damage_taken_was_from_attack.append(True)
+                                            self.positions_of_attacker_of_unit_that_took_damage.append(
+                                                self.positions_attackers_of_units_to_take_damage[0]
+                                            )
                                             att_num, att_pla, att_pos = self. \
                                                 positions_attackers_of_units_to_take_damage[0]
                                             self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
@@ -2211,19 +2229,27 @@ class Game:
                                                 secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                         "Repulsor Impact Field"):
-                                                if att_num == 1:
-                                                    self.p1.assign_damage_to_pos(att_pla, att_pos, 2)
-                                                else:
-                                                    self.p2.assign_damage_to_pos(att_pla, att_pos, 2)
+                                                self.create_reaction("Repulsor Impact Field",
+                                                                     primary_player.name_player,
+                                                                     (int(secondary_player.number), att_pla, att_pos))
+                                            if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                if primary_player.get_ability_given_pos(
+                                                        planet_pos, unit_pos) == "Volatile Pyrovore":
+                                                    self.create_reaction("Volatile Pyrovore",
+                                                                         primary_player.name_player,
+                                                                         (int(secondary_player.number), att_pla, att_pos))
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
                                                         "Black Heart Ravager":
                                                     if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                                             .get_card_type() != "Warlord":
-                                                        primary_player.rout_unit(planet_pos, unit_pos)
-                                                        await primary_player.send_hq()
+                                                        self.create_reaction("Black Heart Ravager",
+                                                                             secondary_player.name_player,
+                                                                             (int(primary_player.number), planet_pos,
+                                                                              unit_pos))
                                         else:
                                             self.damage_taken_was_from_attack.append(False)
+                                            self.positions_of_attacker_of_unit_that_took_damage.append(None)
                                             self.faction_of_attacker.append("")
                                             self.on_kill_effects_of_attacker.append([])
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
@@ -3143,6 +3169,7 @@ class Game:
             print("\n---FURY CHECK---\n")
             print(self.recently_damaged_units)
             print(self.damage_taken_was_from_attack)
+            print(self.positions_of_attacker_of_unit_that_took_damage)
             print(self.faction_of_attacker)
             print(self.on_kill_effects_of_attacker)
             for i in range(len(self.recently_damaged_units)):
@@ -3161,6 +3188,7 @@ class Game:
                             await self.send_search()
             if not fury_of_cato_check:
                 await self.destroy_check_all_cards()
+
         await primary_player.send_units_at_planet(planet_pos)
         await secondary_player.send_units_at_planet(planet_pos)
         await primary_player.send_hand()
@@ -3231,6 +3259,39 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Repulsor Impact Field":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if num == 1:
+                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                    self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    await self.p1.send_units_at_planet(planet_pos)
+                elif num == 2:
+                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                    self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    await self.p2.send_units_at_planet(planet_pos)
+                self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Volatile Pyrovore":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if num == 1:
+                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                    self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    await self.p1.send_units_at_planet(planet_pos)
+                elif num == 2:
+                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                    self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    await self.p2.send_units_at_planet(planet_pos)
+                self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                if num == 1:
+                    self.p1.rout_unit(planet_pos, unit_pos)
+                    await self.p1.send_units_at_planet(planet_pos)
+                    await self.p1.send_hq()
+                elif num == 2:
+                    self.p2.rout_unit(planet_pos, unit_pos)
+                    await self.p2.send_units_at_planet(planet_pos)
+                    await self.p2.send_hq()
+                self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Noxious Fleshborer":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 self.infested_planets[planet_pos] = True
@@ -3643,7 +3704,10 @@ class Game:
                 self.player_who_is_shielding = self.name_2
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
-
+        if self.resolve_destruction_checks_after_reactions:
+            if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage:
+                self.resolve_destruction_checks_after_reactions = False
+                await self.destroy_check_all_cards()
         if resolved_subroutine:
             await self.send_info_box()
         await self.send_search()
