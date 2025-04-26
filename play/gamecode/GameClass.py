@@ -203,6 +203,7 @@ class Game:
         self.old_one_eye_pos = (-1, -1)
         self.misc_target_choice = -1
         self.resolve_destruction_checks_after_reactions = False
+        self.ravenous_haruspex_gain = 0
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -1881,6 +1882,10 @@ class Game:
                     if self.on_kill_effects_of_attacker[i][j] == "Bone Sabres":
                         self.create_reaction("Bone Sabres", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))
+                    if self.on_kill_effects_of_attacker[i][j] == "Ravenous Haruspex":
+                        self.create_reaction("Ravenous Haruspex", secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
+                        self.ravenous_haruspex_gain = primary_player.get_cost_given_pos(planet, pos)
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
@@ -3302,6 +3307,10 @@ class Game:
                     self.p2.assign_damage_to_pos(planet_pos, unit_pos, 3)
                     self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                     await self.p2.send_units_at_planet(planet_pos)
+                self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
+                primary_player.add_resources(self.ravenous_haruspex_gain)
+                await primary_player.send_resources()
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

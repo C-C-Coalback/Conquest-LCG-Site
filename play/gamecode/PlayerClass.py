@@ -798,11 +798,20 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
 
+    def get_cost_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_cost()
+        return self.cards_in_play[planet_id + 1][unit_id].get_cost()
+
     def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos):
         print("\nGetting on kill effects\n")
         on_kill_effects = []
         if planet_pos == -2:
             return on_kill_effects
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
+            if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
+                on_kill_effects.append("Ravenous Haruspex")
+
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
