@@ -387,6 +387,14 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 await self.channel_layer.group_send(
                                     self.room_group_name, {"type": "chat.message", "message": "Incorrect clear usage"}
                                 )
+                    elif message[1] == "infest-planet" and len(message) > 2:
+                        planet_pos = int(message[2])
+                        active_games[self.game_position].infested_planets[planet_pos] = True
+                        await active_games[self.game_position].send_planet_array()
+                    elif message[1] == "clear-infestation" and len(message) > 2:
+                        planet_pos = int(message[2])
+                        active_games[self.game_position].infested_planets[planet_pos] = False
+                        await active_games[self.game_position].send_planet_array()
                     elif message[1] == "ready-card" and len(message) > 3:
                         unit_position = message[2:]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
