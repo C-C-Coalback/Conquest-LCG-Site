@@ -2276,7 +2276,7 @@ class Game:
                             if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
                                 if self.damage_moved_to_old_one_eye == 0:
                                     self.choices_available = ["0", "1", "2"]
-                                    if self.damage_can_be_shielded[0] == 1:
+                                    if self.amount_that_can_be_removed_by_shield[0] == 1:
                                         self.choices_available = ["0", "1"]
                                     self.choice_context = "Move how much damage to Old One Eye?"
                                     self.name_player_making_choices = primary_player.name_player
@@ -2284,6 +2284,16 @@ class Game:
                                     self.misc_target_unit = hurt_pos
                                     self.old_one_eye_pos = (-2, hq_pos)
                                     await self.send_search()
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Adamant Hive Guard":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or\
+                                    primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
+                                damage = self.amount_that_can_be_removed_by_shield[0]
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
+                                primary_player.assign_damage_to_pos_hq(hq_pos, damage, can_shield=False)
+                                primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                                await primary_player.send_hq()
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     if game_update_string[1] == str(self.number_who_is_shielding):
@@ -2302,6 +2312,18 @@ class Game:
                                     self.misc_target_unit = hurt_pos
                                     self.old_one_eye_pos = (planet_pos, unit_pos)
                                     await self.send_search()
+                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                .get_ability() == "Adamant Hive Guard":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or\
+                                    primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
+                                damage = self.amount_that_can_be_removed_by_shield[0]
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
+                                primary_player.assign_damage_to_pos(planet_pos, unit_pos, damage,
+                                                                    can_shield=False, is_reassign=True)
+                                primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                                await primary_player.send_hq()
             elif len(game_update_string) == 5:
                 if planet_pos == -2:
                     if game_update_string[0] == "ATTACHMENT":

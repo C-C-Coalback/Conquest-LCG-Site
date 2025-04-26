@@ -1187,6 +1187,16 @@ class Player:
             return self.headquarters[unit_id].get_faction()
         return self.cards_in_play[planet_id + 1][unit_id].get_faction()
 
+    def get_name_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_name()
+        return self.cards_in_play[planet_id + 1][unit_id].get_name()
+
+    def get_has_hive_mind_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].has_hive_mind
+        return self.cards_in_play[planet_id + 1][unit_id].has_hive_mind
+
     def get_ability_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_ability()

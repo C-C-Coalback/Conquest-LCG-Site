@@ -40,6 +40,7 @@ class Card:
         self.limited = limited
         self.counter = 0
         self.sacrifice_end_of_phase = False
+        self.has_hive_mind = False
 
     def get_once_per_round_used(self):
         return self.once_per_round_used
