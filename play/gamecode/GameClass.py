@@ -206,6 +206,7 @@ class Game:
         self.ravenous_haruspex_gain = 0
         self.reset_resolving_attack_on_units = False
         self.resolving_consumption = False
+        self.stored_area_effect_value = 0
 
     def reset_action_data(self):
         self.action_chosen = ""
@@ -1294,6 +1295,12 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Keyword copied from Brood Chamber":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        await self.send_search()
                     elif self.choice_context == "Move how much damage to Old One Eye?":
                         self.choices_available = []
                         self.choice_context = ""

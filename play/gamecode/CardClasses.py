@@ -45,6 +45,9 @@ class Card:
         self.has_hive_mind = False
         self.resolving_attack = False
 
+    def reset_own_eocr_values(self):
+        pass
+
     def get_once_per_round_used(self):
         return self.once_per_round_used
 
@@ -219,6 +222,10 @@ class UnitCard(Card):
         self.brutal_eocr = False
         self.armorbane_eop = False
         self.area_effect_eop = 0
+        self.brutal_eop = False
+        self.ranged_eop = False
+        self.mobile_eop = False
+        self.flying_eop = False
 
     def get_has_hive_mind(self):
         return self.hive_mind
@@ -271,6 +278,8 @@ class UnitCard(Card):
     def get_mobile(self):
         if self.blanked_eop:
             return False
+        if self.mobile_eop:
+            return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Mobility":
                 return True
@@ -308,6 +317,8 @@ class UnitCard(Card):
     def get_ranged(self):
         if self.blanked_eop:
             return False
+        if self.ranged_eop:
+            return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Rokkit Launcha":
                 return True
@@ -356,6 +367,8 @@ class UnitCard(Card):
     def get_flying(self):
         if self.blanked_eop:
             return False
+        if self.flying_eop:
+            return True
         return self.flying
 
     def set_flying(self, new_val):
@@ -385,6 +398,8 @@ class UnitCard(Card):
         if self.blanked_eop:
             return False
         if self.brutal_eocr:
+            return True
+        if self.brutal_eop:
             return True
         return self.brutal
 

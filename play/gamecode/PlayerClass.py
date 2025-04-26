@@ -1593,11 +1593,19 @@ class Player:
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].area_effect_eop = 0
                 self.headquarters[i].armorbane_eop = False
+                self.headquarters[i].ranged_eop = False
+                self.headquarters[i].mobile_eop = False
+                self.headquarters[i].flying_eop = False
+                self.headquarters[i].brutal_eop = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):
@@ -1923,7 +1931,8 @@ class Player:
 
     def reset_eocr_values(self):
         for i in range(len(self.headquarters)):
-            self.headquarters[i].reset_own_eocr_values()
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].reset_own_eocr_values()
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].reset_own_eocr_values()
@@ -2237,6 +2246,25 @@ class Player:
         self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
+
+    def get_keywords_given_pos(self, planet_pos, unit_pos):
+        keywords = []
+        if planet_pos == -2:
+            return keywords
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_brutal:
+            keywords.append("Brutal")
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_flying:
+            keywords.append("Flying")
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_armorbane:
+            keywords.append("Armorbane")
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_mobile:
+            keywords.append("Mobile")
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect > 0:
+            keywords.append("Area Effect")
+            self.game.stored_area_effect_value = self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect
+        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_ranged:
+            keywords.append("Ranged")
+        return keywords
 
     def reset_can_retreat_values(self):
         for i in range(len(self.headquarters)):

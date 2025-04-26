@@ -675,6 +675,57 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await primary_player.send_units_at_planet(planet_pos)
         else:
             await self.game_sockets[0].receive_game_update("Already selected unit to move")
+    elif self.action_chosen == "Brood Chamber":
+        if not self.chosen_first_card:
+            if secondary_player.get_number() == game_update_string[1]:
+                choices = secondary_player.get_keywords_given_pos(planet_pos, unit_pos)
+                if choices:
+                    self.misc_target_planet = planet_pos
+                    if len(choices) == 1:
+                        self.misc_target_choice = choices[0]
+                        await self.game_sockets[0].receive_game_update(
+                            "Only one keyword: skipping asking which one to take."
+                        )
+                    else:
+                        self.choices_available = choices
+                        self.name_player_making_choices = primary_player.name_player
+                        self.choice_context = "Keyword copied from Brood Chamber"
+                    self.chosen_first_card = True
+                    await self.send_search()
+                else:
+                    await self.game_sockets[0].receive_game_update(
+                        "Target has no keywords to copy."
+                    )
+        else:
+            if primary_player.get_number() == game_update_string[1]:
+                if planet_pos == self.misc_target_planet:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if self.misc_target_choice == "Brutal":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = True
+                        if self.misc_target_choice == "Armorbane":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = True
+                        if self.misc_target_choice == "Flying":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
+                        if self.misc_target_choice == "Mobile":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = True
+                        if self.misc_target_choice == "Ranged":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = True
+                        if self.misc_target_choice == "Area Effect":
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = \
+                                self.stored_area_effect_value
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                        if self.misc_target_choice == "Area Effect":
+                            self.misc_target_choice += " (" + str(self.stored_area_effect_value) + ")"
+                        await primary_player.send_hq()
+                        await self.game_sockets[0].receive_game_update(
+                            name + " gained " + self.misc_target_choice + "."
+                        )
+                        self.mode = "Normal"
+                        self.player_with_action = ""
+                        self.action_chosen = ""
+                        self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Mycetic Spores":
         if self.unit_to_move_position == [-1, -1]:
             if self.player_with_action == self.name_1:
