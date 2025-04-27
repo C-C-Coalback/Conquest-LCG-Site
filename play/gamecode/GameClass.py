@@ -2236,6 +2236,10 @@ class Game:
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
                             self.create_reaction("Repulsor Impact Field", primary_player.name_player,
                                                  (int(secondary_player.number), att_pla, att_pos))
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
+                            if not secondary_player.get_flying_given_pos(att_pla, att_pos):
+                                self.create_reaction("Solarite Avetys", primary_player.name_player,
+                                                     (int(secondary_player.number), planet_pos, unit_pos))
                         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
@@ -3448,16 +3452,16 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
-            elif self.reactions_needing_resolving[0] == "Repulsor Impact Field":
+            elif self.reactions_needing_resolving[0] == "Repulsor Impact Field" or \
+                    self.reactions_needing_resolving[0] == "Solarite Avetys":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 if num == 1:
                     self.p1.assign_damage_to_pos(planet_pos, unit_pos, 2)
-                    self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                     await self.p1.send_units_at_planet(planet_pos)
                 elif num == 2:
                     self.p2.assign_damage_to_pos(planet_pos, unit_pos, 2)
-                    self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                     await self.p2.send_units_at_planet(planet_pos)
+                self.advance_damage_aiming_reticle()
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Volatile Pyrovore":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

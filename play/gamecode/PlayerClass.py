@@ -2156,11 +2156,9 @@ class Player:
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
         # self.discard_object(card_object)
-        self.discard_attachments_from_card(planet_num, card_pos)
         del self.cards_in_play[planet_num + 1][card_pos]
 
     def remove_card_from_hq(self, card_pos):
-        self.discard_attachments_from_card(planet_num, card_pos)
         del self.headquarters[card_pos]
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
@@ -2228,6 +2226,7 @@ class Player:
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
         self.discard.append(card_name)
         self.cards_recently_discarded.append(card_name)
+        self.discard_attachments_from_card(planet_num, card_pos)
         self.remove_card_from_play(planet_num, card_pos)
 
     def add_card_in_hq_to_discard(self, card_pos):
@@ -2259,6 +2258,7 @@ class Player:
             self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
         self.discard.append(card_name)
         self.cards_recently_discarded.append(card_name)
+        self.discard_attachments_from_card(-2, card_pos)
         self.remove_card_from_hq(card_pos)
 
     def retreat_warlord(self):
