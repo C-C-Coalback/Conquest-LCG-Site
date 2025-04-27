@@ -92,6 +92,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.choice_context = "Autarch Celachia"
                             self.name_player_making_choices = primary_player.name_player
                             await self.send_search()
+                elif ability == "Pathfinder Shi Or'es":
+                    if not card_chosen.get_once_per_phase_used():
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        await player_owning_card.send_units_at_planet(planet_pos)
+                        card_chosen.set_once_per_phase_used(True)
                 elif ability == "Veteran Brother Maxos":
                     if player_owning_card.name_player == name:
                         self.action_chosen = ability

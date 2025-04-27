@@ -71,6 +71,23 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
         await player_owning_card.send_hq()
         await primary_player.send_hand()
         await primary_player.send_discard()
+    elif self.action_chosen == "Pathfinder Shi Or'es":
+        if game_update_string[2] == primary_player.get_number():
+            if planet_pos == self.position_of_actioned_card[0]:
+                if unit_pos == self.position_of_actioned_card[1]:
+                    player_owning_card.discard.append(card_chosen.get_name())
+                    del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
+                    player_owning_card.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                    self.position_of_actioned_card = (-1, -1)
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    if self.phase == "DEPLOY":
+                        self.player_with_deploy_turn = secondary_player.name_player
+                        self.number_with_deploy_turn = secondary_player.number
+                    await player_owning_card.send_hq()
+                    await player_owning_card.send_discard()
     elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

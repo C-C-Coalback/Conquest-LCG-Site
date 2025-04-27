@@ -96,6 +96,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ""
                             self.player_with_action = ""
                             self.mode = "Normal"
+                    elif ability == "Pathfinder Shi Or'es":
+                        if not card_chosen.get_once_per_phase_used():
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            self.position_of_actioned_card = (-2, int(game_update_string[2]))
+                            await player_owning_card.send_units_at_planet(-2)
+                            card_chosen.set_once_per_phase_used(True)
                     elif ability == "Kraktoof Hall":
                         if card.get_ready():
                             self.action_chosen = ability
