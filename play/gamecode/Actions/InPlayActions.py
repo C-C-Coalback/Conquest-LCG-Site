@@ -92,6 +92,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.choice_context = "Autarch Celachia"
                             self.name_player_making_choices = primary_player.name_player
                             await self.send_search()
+                            await primary_player.send_resources()
                 elif ability == "Pathfinder Shi Or'es":
                     if not card_chosen.get_once_per_phase_used():
                         self.action_chosen = ability

@@ -1293,6 +1293,14 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Repair Bay":
+                        card_name = self.choices_available[int(game_update_string[1])]
+                        primary_player.deck.insert(0, card_name)
+                        primary_player.discard.remove(card_name)
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        await primary_player.send_discard()
                     elif self.choice_context == "Target Leviathan Hive Ship:":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         primary_player.exhaust_card_in_hq_given_name("Leviathan Hive Ship")
