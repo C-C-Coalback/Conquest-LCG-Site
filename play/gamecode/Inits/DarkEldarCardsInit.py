@@ -121,7 +121,7 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Solarite Avetys", "Flying.\n"
                                                 "Reaction: After this unit takes damage by an attack "
                                                 "from a non-flying unit, deal 2 damage to the attacker.", "Warrior.",
-                             4, faction, "Loyal", 2, 4, 1, True),
+                             4, faction, "Loyal", 2, 4, 1, True, flying=True),
         CardClasses.EventCard("Dark Possession", "Action: As your next Action this phase, you may play an event card "
                                                  "in your opponent's discard pile as if it were in your hand. "
                                                  "(You pay its costs, choose its targets, "
