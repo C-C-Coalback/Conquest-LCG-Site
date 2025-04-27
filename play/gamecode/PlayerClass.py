@@ -744,6 +744,9 @@ class Player:
                 self.game.faction_of_searched_card = None
                 self.game.no_restrictions_on_chosen_card = True
             """
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
+            self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
+                                                                            last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
             self.game.reactions_needing_resolving.append("Coliseum Fighters")
             self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))

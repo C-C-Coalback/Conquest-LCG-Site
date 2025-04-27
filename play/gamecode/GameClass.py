@@ -2613,6 +2613,8 @@ class Game:
                                         await primary_player.send_resources()
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
+                    planet_pos = int(game_update_string[2])
+                    unit_pos = int(game_update_string[3])
                     print("Check what player")
                     print(self.player_who_resolves_reaction)
                     if name == self.player_who_resolves_reaction[0]:
@@ -2646,6 +2648,42 @@ class Game:
                                     await self.complete_nullify()
                                 self.delete_reaction()
                                 await primary_player.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
+                            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                                if game_update_string[1] == "1":
+                                    player_being_hit = self.p1
+                                else:
+                                    player_being_hit = self.p2
+                                faction = player_being_hit.get_faction_given_pos(planet_pos, unit_pos)
+                                if faction not in ["Chaos", "Astra Militarum", "Space Marines"]:
+                                    can_continue = True
+                                    if player_being_hit.number == secondary_player.number:
+                                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                            can_continue = False
+                                            await self.game_sockets[0].receive_game_update(
+                                                "Immune to enemy card abilities.")
+                                        elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                                                self.communications_relay_enabled:
+                                            can_continue = False
+                                            await self.game_sockets[0].receive_game_update(
+                                                "Communications Relay may be used.")
+                                            self.choices_available = ["Yes", "No"]
+                                            self.name_player_making_choices = secondary_player.name_player
+                                            self.choice_context = "Use Communications Relay?"
+                                            self.nullified_card_name = self.action_chosen
+                                            self.cost_card_nullified = 0
+                                            self.nullify_string = "/".join(game_update_string)
+                                            self.first_player_nullified = primary_player.name_player
+                                            self.nullify_context = "Reaction"
+                                            await self.send_search()
+                                    if can_continue:
+                                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                        self.advance_damage_aiming_reticle()
+                                        await secondary_player.send_units_at_planet(planet_pos)
+                                        self.delete_reaction()
+                                else:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Forbidden faction for Veteran Barbrus.")
                         elif self.reactions_needing_resolving[0] == "Blazing Zoanthrope":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
