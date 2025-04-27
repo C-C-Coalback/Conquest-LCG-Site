@@ -279,6 +279,24 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await primary_player.send_units_at_planet(dest_planet)
             await primary_player.send_discard()
             await primary_player.send_hq()
+    elif self.action_chosen == "Ecstatic Seizures":
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            primary_player.discard_attachments_from_card(chosen_planet, i)
+        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+            secondary_player.discard_attachments_from_card(chosen_planet, i)
+        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+        primary_player.aiming_reticle_coords_hand = None
+        if self.phase == "DEPLOY":
+            self.player_with_deploy_turn = secondary_player.name_player
+            self.number_with_deploy_turn = secondary_player.get_number()
+        await primary_player.send_discard()
+        await primary_player.send_hand()
+        await primary_player.send_units_at_planet(chosen_planet)
+        await secondary_player.send_units_at_planet(chosen_planet)
+        await secondary_player.send_discard()
+        self.action_chosen = ""
+        self.player_with_action = ""
+        self.mode = "Normal"
     elif self.action_chosen == "Spore Burst":
         if self.infested_planets[chosen_planet]:
             primary_player.discard.remove(self.misc_target_choice)

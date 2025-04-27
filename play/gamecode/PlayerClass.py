@@ -1842,6 +1842,17 @@ class Player:
             return True, len(bodyguard_damage_list)
         return False, len(bodyguard_damage_list)
 
+    def discard_attachments_from_card(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            while self.headquarters[unit_pos].get_attachments():
+                self.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                del self.headquarters[unit_pos].get_attachments()[0]
+            return None
+        while self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
+            self.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+            del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0]
+        return None
+
     def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
         if planet_pos == -2:
             if self.headquarters[card_pos].get_is_unit():

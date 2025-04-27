@@ -162,39 +162,41 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p1
                     else:
                         player = self.p2
-                    self.discounts_applied = 0
-                    planet_chosen = int(game_update_string[1])
-                    self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
-                                                                              self.traits_of_card_to_play,
-                                                                              planet_chosen=planet_chosen)
-                    hand_disc = player.search_hand_for_discounts(self.faction_of_card_to_play)
-                    self.available_discounts += hand_disc
-                    if hand_disc > 0:
-                        await self.game_sockets[0].receive_game_update(
-                            "Bigga Is Betta detected, may be used as a discount."
-                        )
-                    temp_av_disc, temp_auto_disc = player. \
-                        search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
-                    num_termagants = 0
-                    if self.name_of_card_to_play == "Burrowing Trygon":
-                        num_termagants = player.get_most_termagants_at_single_planet()
-                        self.discounts_applied += num_termagants
-                    self.available_discounts += num_termagants
-                    self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
-                    self.available_discounts += temp_av_disc
-                    self.discounts_applied += temp_auto_disc
-                    await player.send_units_at_all_planets()
-                    await player.send_hq()
-                    if self.available_discounts > self.discounts_applied:
-                        self.stored_mode = self.mode
-                        self.mode = "DISCOUNT"
-                        self.planet_aiming_reticle_position = int(game_update_string[1])
-                        self.planet_aiming_reticle_active = True
-                        await self.send_planet_array()
-                        await self.send_info_box()
-                    else:
-                        await deploy_card_routine(self, name, game_update_string[1],
-                                                  discounts=self.discounts_applied)
+                    card = player.get_card_in_hand(self.card_pos_to_deploy)
+                    if card.get_card_type() == "Army":
+                        self.discounts_applied = 0
+                        planet_chosen = int(game_update_string[1])
+                        self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
+                                                                                  self.traits_of_card_to_play,
+                                                                                  planet_chosen=planet_chosen)
+                        hand_disc = player.search_hand_for_discounts(self.faction_of_card_to_play)
+                        self.available_discounts += hand_disc
+                        if hand_disc > 0:
+                            await self.game_sockets[0].receive_game_update(
+                                "Bigga Is Betta detected, may be used as a discount."
+                            )
+                        temp_av_disc, temp_auto_disc = player. \
+                            search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
+                        num_termagants = 0
+                        if self.name_of_card_to_play == "Burrowing Trygon":
+                            num_termagants = player.get_most_termagants_at_single_planet()
+                            self.discounts_applied += num_termagants
+                        self.available_discounts += num_termagants
+                        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
+                        self.available_discounts += temp_av_disc
+                        self.discounts_applied += temp_auto_disc
+                        await player.send_units_at_all_planets()
+                        await player.send_hq()
+                        if self.available_discounts > self.discounts_applied:
+                            self.stored_mode = self.mode
+                            self.mode = "DISCOUNT"
+                            self.planet_aiming_reticle_position = int(game_update_string[1])
+                            self.planet_aiming_reticle_active = True
+                            await self.send_planet_array()
+                            await self.send_info_box()
+                        else:
+                            await deploy_card_routine(self, name, game_update_string[1],
+                                                      discounts=self.discounts_applied)
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":
