@@ -1845,11 +1845,17 @@ class Player:
     def discard_attachments_from_card(self, planet_pos, unit_pos):
         if planet_pos == -2:
             while self.headquarters[unit_pos].get_attachments():
-                self.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                if self.headquarters[unit_pos].get_attachments()[0].name_owner == self.game.name_1:
+                    self.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                else:
+                    self.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
                 del self.headquarters[unit_pos].get_attachments()[0]
             return None
         while self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
-            self.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].name_owner == self.game.name_1:
+                self.p1.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+            else:
+                self.p2.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
             del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0]
         return None
 
@@ -2150,9 +2156,11 @@ class Player:
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
         # self.discard_object(card_object)
+        self.discard_attachments_from_card(planet_num, card_pos)
         del self.cards_in_play[planet_num + 1][card_pos]
 
     def remove_card_from_hq(self, card_pos):
+        self.discard_attachments_from_card(planet_num, card_pos)
         del self.headquarters[card_pos]
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
