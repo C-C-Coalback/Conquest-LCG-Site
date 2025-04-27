@@ -119,7 +119,7 @@ def chaos_cards_init():
         CardClasses.ArmyCard("Roghrax Bloodhand", "Brutal.\n"
                                                   "BLOODTHIRST - During a combat round in which 1 or more units "
                                                   "have been destroyed at this planet, double this unit's ATK.",
-                             "Warrior. Khorne. World Eaters.", 4, "Chaos", "Loyal", 2, 5, 1, True),
+                             "Warrior. Khorne. World Eaters.", 4, "Chaos", "Loyal", 2, 5, 1, True, brutal=True),
         CardClasses.EventCard("Ecstatic Seizures", "Action: Discard each attachment from "
                                                    "each unit at a target planet.", "Power. Slaanesh.",
                               2, "Chaos", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")

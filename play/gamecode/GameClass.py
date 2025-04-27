@@ -43,6 +43,7 @@ class Game:
         random.shuffle(self.planet_array)
         self.planet_array = self.planet_array[:7]
         self.planets_in_play_array = [True, True, True, True, True, False, False]
+        self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
@@ -1988,6 +1989,7 @@ class Game:
                 i = i - 1
             i = i + 1
         if destroyed_something:
+            self.bloodthirst_active[planet_num] = True
             await player.send_units_at_planet(planet_num)
 
     def holy_sepulchre_check(self, player):
@@ -4148,6 +4150,7 @@ class Game:
         self.positions_of_unit_triggering_reaction.append(unit_tuple)
 
     def begin_combat_round(self):
+        self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.p1.resolve_combat_round_begins(self.last_planet_checked_for_battle)
         self.p2.resolve_combat_round_begins(self.last_planet_checked_for_battle)
 
