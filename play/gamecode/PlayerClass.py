@@ -2032,6 +2032,11 @@ class Player:
                 i = i + 1
 
     def resolve_combat_round_begins(self, planet_num):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Holy Fusillade":
+                if self.headquarters[i].get_ready():
+                    if not self.game.ranged_skirmish_active:
+                        self.game.create_reaction("Holy Fusillade", self.name_player, (int(self.number), -2, i))
         for i in range(len(self.cards_in_play[planet_num + 1])):
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, -1))
