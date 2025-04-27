@@ -81,6 +81,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         await primary_player.send_units_at_planet(planet_pos)
+                elif ability == "Autarch Celachia":
+                    if not card_chosen.once_per_round_used:
+                        if primary_player.spend_resources(1):
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            if self.phase == "DEPLOY":
+                                self.player_with_deploy_turn = secondary_player.name_player
+                                self.number_with_deploy_turn = secondary_player.number
+                            self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
+                            self.choice_context = "Autarch Celachia"
+                            self.name_player_making_choices = primary_player.name_player
+                            await self.send_search()
                 elif ability == "Veteran Brother Maxos":
                     if player_owning_card.name_player == name:
                         self.action_chosen = ability

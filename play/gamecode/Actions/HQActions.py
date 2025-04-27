@@ -57,6 +57,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    elif ability == "Autarch Celachia":
+                        if not card.once_per_round_used:
+                            if primary_player.spend_resources(1):
+                                self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
+                                self.choice_context = "Autarch Celachia"
+                                if self.phase == "DEPLOY":
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                self.name_player_making_choices = primary_player.name_player
+                                await self.send_search()
                     elif ability == "Brood Chamber":
                         if card.get_ready():
                             self.action_chosen = ability

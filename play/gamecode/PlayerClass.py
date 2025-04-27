@@ -1505,6 +1505,36 @@ class Player:
                 self.sacrifice_card_in_hq(pos)
         return discount
 
+    def increase_eor_value(self, eor_name, value, planet_pos, unit_pos):
+        if planet_pos == -2:
+            if "Area Effect" in eor_name:
+                self.headquarters[unit_pos].area_effect_eor += value
+            elif eor_name == "Armorbane":
+                self.headquarters[unit_pos].armorbane_eor = True
+            elif eor_name == "Mobile":
+                self.headquarters[unit_pos].mobile_eor = True
+            return None
+        if "Area Effect" in eor_name:
+            self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eor += value
+        elif eor_name == "Armorbane":
+            self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eor = True
+        elif eor_name == "Mobile":
+            self.cards_in_play[planet_pos + 1][unit_pos].mobile_eor = True
+        return None
+
+
+    def round_ends_reset_values(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].area_effect_eor = 0
+                self.headquarters[i].armorbane_eor = False
+                self.headquarters[i].mobile_eor = False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].area_effect_eor = 0
+                self.cards_in_play[i + 1][j].armorbane_eor = False
+                self.cards_in_play[i + 1][j].mobile_eor = False
+
     def check_is_unit_at_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             if self.headquarters[unit_pos].get_is_unit():

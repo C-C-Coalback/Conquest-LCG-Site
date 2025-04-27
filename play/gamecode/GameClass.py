@@ -1360,6 +1360,31 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Autarch Celachia":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                        planet_pos, unit_pos = self.position_of_actioned_card
+                        primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+                        if game_update_string[1] == "0":
+                            primary_player.increase_eor_value("Area Effect", 1, planet_pos, unit_pos)
+                            await self.game_sockets[0].receive_game_update(
+                                "Autarch Celachia gained Area Effect (1)."
+                            )
+                        if game_update_string[1] == "1":
+                            primary_player.increase_eor_value("Armorbane", 1, planet_pos, unit_pos)
+                            await self.game_sockets[0].receive_game_update(
+                                "Autarch Celachia gained Armorbane."
+                            )
+                        if game_update_string[1] == "2":
+                            primary_player.increase_eor_value("Mobile", 1, planet_pos, unit_pos)
+                            await self.game_sockets[0].receive_game_update(
+                                "Autarch Celachia gained Mobile."
+                            )
+                        self.position_of_actioned_card = (-1, -1)
                     elif self.choice_context == "Keyword copied from Brood Chamber":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = []
@@ -4232,6 +4257,8 @@ class Game:
         self.p1.has_passed = False
         self.p2.has_passed = False
         self.mode = "Normal"
+        self.p1.round_ends_reset_values()
+        self.p2.round_ends_reset_values()
         self.p1.committed_warlord = False
         self.p2.committed_warlord = False
         if self.player_with_initiative == self.name_1:

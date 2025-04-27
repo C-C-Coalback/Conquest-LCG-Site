@@ -226,6 +226,9 @@ class UnitCard(Card):
         self.ranged_eop = False
         self.mobile_eop = False
         self.flying_eop = False
+        self.area_effect_eor = 0
+        self.mobile_eor = False
+        self.armorbane_eor = False
 
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
@@ -282,6 +285,8 @@ class UnitCard(Card):
         if self.blanked_eop:
             return False
         if self.mobile_eop:
+            return True
+        if self.mobile_eor:
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Mobility":
@@ -346,6 +351,8 @@ class UnitCard(Card):
             return False
         if self.armorbane_eop:
             return True
+        if self.armorbane_eor:
+            return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
                 return True
@@ -359,6 +366,7 @@ class UnitCard(Card):
             return 0
         area_effect = self.area_effect
         area_effect += self.area_effect_eop
+        area_effect += self.area_effect_eor
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Gun Drones":
                 area_effect += 2
