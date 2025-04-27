@@ -3467,6 +3467,11 @@ class Game:
                 self.infested_planets[planet_pos] = True
                 self.delete_reaction()
                 await self.send_planet_array()
+            elif self.reactions_needing_resolving[0] == "Straken's Command Squad":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.summon_token_at_planet("Guardsman", planet_pos)
+                await primary_player.send_units_at_planet(planet_pos)
+                self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Pincer Tail":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 if num == 1:

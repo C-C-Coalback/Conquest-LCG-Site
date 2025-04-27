@@ -2133,18 +2133,15 @@ class Player:
                             if self.game.player_who_resolves_reaction[j] == self.name_player:
                                 already_cadian_mortar_squad = True
                     if not already_cadian_mortar_squad:
-                        self.game.reactions_needing_resolving.append("Cadian Mortar Squad")
-                        self.game.player_who_resolves_reaction.append(self.name_player)
-                        self.game.positions_of_unit_triggering_reaction((int(self.number), planet_num, -1))
+                        self.game.create_reaction("Cadian Mortar Squad", self.name_player, (int(self.number),
+                                                                                            planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                 self.game.reactions_needing_resolving.append("Straken's Cunning")
                 self.game.player_who_resolves_reaction.append(self.name_player)
                 self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
-            self.game.reactions_needing_resolving.append("Straken's Command Squad")
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
+            self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
             self.game.reactions_needing_resolving.append("Mark of Chaos")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
