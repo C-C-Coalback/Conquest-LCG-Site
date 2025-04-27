@@ -261,6 +261,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "SEND DECK":
                 message_to_send = ""
+                split_message[1] = split_message[1].replace("\"", "")
                 deck = clean_sent_deck(split_message[1])
                 print(deck)
                 deck_name = deck[0]
