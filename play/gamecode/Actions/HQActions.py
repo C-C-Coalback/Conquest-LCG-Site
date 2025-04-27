@@ -323,6 +323,27 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
                     await self.send_info_box()
+    elif self.action_chosen == "Subdual":
+        if game_update_string[1] == "1":
+            target_player = self.p1
+        else:
+            target_player = self.p2
+        planet_pos = -2
+        unit_pos = int(game_update_string[2])
+        if target_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+            target_player.deck.insert(0, target_player.get_name_given_pos(planet_pos, unit_pos))
+            target_player.remove_card_from_hq(unit_pos)
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            if self.phase == "DEPLOY":
+                self.player_with_deploy_turn = secondary_player.name_player
+                self.number_with_deploy_turn = secondary_player.number
+            await target_player.send_hq()
+            await primary_player.send_hand()
+            await primary_player.send_discard()
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2

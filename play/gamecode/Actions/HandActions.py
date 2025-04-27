@@ -125,6 +125,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         await primary_player.send_hand()
                         await primary_player.send_discard()
                         await primary_player.send_resources()
+                    elif ability == "Subdual":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        await primary_player.send_hand()
+                        await primary_player.send_resources()
                     elif ability == "Consumption":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

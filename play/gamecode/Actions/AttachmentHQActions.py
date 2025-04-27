@@ -57,6 +57,20 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
             await player_owning_card.send_hq()
+    elif self.action_chosen == "Subdual":
+        player_owning_card.deck.insert(0, card_chosen.get_name())
+        del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
+        self.action_chosen = ""
+        self.player_with_action = ""
+        self.mode = "Normal"
+        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+        primary_player.aiming_reticle_coords_hand = None
+        if self.phase == "DEPLOY":
+            self.player_with_deploy_turn = secondary_player.name_player
+            self.number_with_deploy_turn = secondary_player.number
+        await player_owning_card.send_hq()
+        await primary_player.send_hand()
+        await primary_player.send_discard()
     elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
