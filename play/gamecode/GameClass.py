@@ -208,6 +208,16 @@ class Game:
         self.reset_resolving_attack_on_units = False
         self.resolving_consumption = False
         self.stored_area_effect_value = 0
+        self.valid_targets_for_dark_possession = [
+            "Drop Pod Assault", "Exterminatus", "Preemptive Barrage", "Suppressive Fire",
+            "Battle Cry", "Snotling Attack", "Squig Bombin'", "Infernal Gateway",
+            "Warpstorm", "Tzeentch's Firestorm", "Promise of Glory", "Pact of the Haemonculi",
+            "Power from Pain", "Archon's Terror", "Raid", "Doom", "Gift of Isha",
+            "Squadron Redeployment", "Even the Odds", "Calculated Strike",
+            "Deception", "Ferocious Strength", "Indescribable Horror", "Clogged with Corpses",
+            "Predation", "Spawn Termagants", "Spore Burst", "Dark Cunning", "Consumption",
+            "Subdual", "Ecstatic Seizures", "Dark Possession", "Subdual"
+        ]
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -480,6 +490,12 @@ class Game:
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.player_with_action:
+            if name == self.name_1:
+                if self.p1.force_due_to_dark_possession:
+                    game_update_string = ["HAND", "1", str(self.p1.pos_card_dark_possession)]
+            elif name == self.name_2:
+                if self.p2.force_due_to_dark_possession:
+                    game_update_string = ["HAND", "2", str(self.p2.pos_card_dark_possession)]
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.action_chosen == "":
@@ -510,6 +526,22 @@ class Game:
                 if game_update_string[0] == "ATTACHMENT" and game_update_string[1] == "IN_PLAY":
                     await AttachmentInPlayActions.update_game_event_action_attachment_in_play(self, name,
                                                                                               game_update_string)
+        if self.p1.force_due_to_dark_possession:
+            self.p1.dark_possession_remove_after_play = True
+        if self.p2.force_due_to_dark_possession:
+            self.p2.dark_possession_remove_after_play = True
+        if not self.action_chosen and self.p1.dark_possession_remove_after_play:
+            if self.p1.discard:
+                del self.p1.discard[-1]
+            self.p1.dark_possession_remove_after_play = False
+            await self.p1.send_discard()
+        if not self.action_chosen and self.p2.dark_possession_remove_after_play:
+            if self.p2.discard:
+                del self.p2.discard[-1]
+            self.p2.dark_possession_remove_after_play = False
+            await self.p2.send_discard()
+        self.p1.force_due_to_dark_possession = False
+        self.p2.force_due_to_dark_possession = False
 
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:
@@ -1158,6 +1190,37 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            await self.send_search()
+                    elif self.choice_context == "Target Dark Possession:":
+                        primary_player.force_due_to_dark_possession = True
+                        primary_player.cards.append(self.choices_available[int(game_update_string[1])])
+                        primary_player.pos_card_dark_possession = len(primary_player.cards) - 1
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        await self.update_game_event_action(name, game_update_string)
+                    elif self.choice_context == "Use Dark Possession?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Target Dark Possession:"
+                            for i in range(len(secondary_player.discard)):
+                                if secondary_player.discard[i] in self.valid_targets_for_dark_possession and\
+                                        secondary_player.discard[i] not in self.choices_available:
+                                    self.choices_available.append(secondary_player.discard[i])
+                            if not self.choices_available:
+                                await self.game_sockets[0].receive_game_update(
+                                    "No Valid Targets for Dark Possession!"
+                                )
+                                self.choices_available = []
+                                self.choice_context = ""
+                                self.name_player_making_choices = ""
+                                primary_player.dark_possession_active = False
+                            await self.send_search()
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            primary_player.dark_possession_active = False
                             await self.send_search()
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":

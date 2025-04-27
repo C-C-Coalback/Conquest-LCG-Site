@@ -155,6 +155,16 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.mode = "ACTION"
                     self.player_with_action = name
                     await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+                    if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
+                        self.choices_available = ["Dark Possession", "Regular Action"]
+                        self.choice_context = "Use Dark Possession?"
+                        self.name_player_making_choices = self.player_with_action
+                        await self.send_search()
+                    elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
+                        self.choices_available = ["Dark Possession", "Regular Action"]
+                        self.choice_context = "Use Dark Possession?"
+                        self.name_player_making_choices = self.player_with_action
+                        await self.send_search()
     if self.p1.has_passed and self.p2.has_passed:
         print("Both passed")
         if self.before_command_struggle:

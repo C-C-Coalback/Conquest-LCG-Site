@@ -112,6 +112,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await primary_player.send_hand()
                         await primary_player.send_resources()
+                    elif ability == "Dark Possession":
+                        self.action_chosen = ""
+                        self.name_player_with_action = ""
+                        self.mode = "Normal"
+                        primary_player.dark_possession_active = True
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        if self.phase == "DEPLOY":
+                            self.player_with_deploy_turn = secondary_player.name_player
+                            self.number_with_deploy_turn = secondary_player.number
+                        await primary_player.dark_eldar_event_played()
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        await primary_player.send_resources()
                     elif ability == "Consumption":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

@@ -85,6 +85,10 @@ class Player:
         self.synapse_name = ""
         self.warlord_faction = ""
         self.consumption_sacs_list = [True, True, True, True, True, True, True]
+        self.dark_possession_active = False
+        self.force_due_to_dark_possession = False
+        self.pos_card_dark_possession = -1
+        self.dark_possession_remove_after_play = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1591,6 +1595,7 @@ class Player:
         return sacrificed_locations
 
     def reset_extra_abilities_eop(self):
+        self.dark_possession_active = False
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].reset_ranged()
