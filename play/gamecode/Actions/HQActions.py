@@ -65,6 +65,27 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             await primary_player.send_hq()
                             self.misc_target_planet = -1
                             self.chosen_first_card = False
+                    elif ability == "Ork Landa":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            primary_player.discard_top_card_deck()
+                            card = primary_player.get_card_top_discard()
+                            if card.get_faction() == "Orks" and card.get_cost() % 2 == 1:
+                                await self.game_sockets[0].receive_game_update(
+                                    "Ork Landa hit an odd Orks card!"
+                                )
+                                self.location_of_indirect = "ALL"
+                                secondary_player.indirect_damage_applied = 0
+                                secondary_player.total_indirect_damage = card.get_cost()
+                            else:
+                                await self.game_sockets[0].receive_game_update(
+                                    "Ork Landa missed"
+                                )
+                            await primary_player.send_discard()
+                            await primary_player.send_hq()
+                            self.action_chosen = ""
+                            self.player_with_action = ""
+                            self.mode = "Normal"
                     elif ability == "Kraktoof Hall":
                         if card.get_ready():
                             self.action_chosen = ability

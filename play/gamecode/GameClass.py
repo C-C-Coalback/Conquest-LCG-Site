@@ -1935,12 +1935,16 @@ class Game:
 
     async def destroy_check_cards_in_hq(self, player):
         i = 0
+        destroyed_something = False
         while i < len(player.headquarters):
             if player.headquarters[i].get_card_type != "Support":
                 if player.check_if_card_is_destroyed(-2, i):
                     player.destroy_card_in_hq(i)
+                    destroyed_something = True
                     i = i - 1
             i = i + 1
+        if destroyed_something:
+            await player.send_hq()
         if self.damage_from_atrox:
             await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
 
@@ -1970,6 +1974,7 @@ class Game:
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
+        destroyed_something = False
         while i < len(player.cards_in_play[planet_num + 1]):
             if self.attacker_planet == planet_num and self.attacker_position == i:
                 if self.player_with_combat_turn == player.name_player:
@@ -1979,8 +1984,11 @@ class Game:
                     self.attacker_planet = -1
                     self.attacker_position = -1
                 player.destroy_card_in_play(planet_num, i)
+                destroyed_something = True
                 i = i - 1
             i = i + 1
+        if destroyed_something:
+            await player.send_units_at_planet(planet_num)
 
     def holy_sepulchre_check(self, player):
         if player.search_card_in_hq("Holy Sepulchre", ready_relevant=True):
@@ -3104,6 +3112,12 @@ class Game:
             else:
                 player = self.p2
             if player.indirect_damage_applied < player.total_indirect_damage:
+                if len(game_update_string) == 1:
+                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                        player.indirect_damage_applied = 999
+                        await self.game_sockets[0].receive_game_update(
+                            player.name_player + " stops placing indirect damage"
+                        )
                 if self.location_of_indirect == "HQ" or self.location_of_indirect == "ALL":
                     if len(game_update_string) == 3:
                         if game_update_string[0] == "HQ":

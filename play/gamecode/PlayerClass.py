@@ -1845,11 +1845,17 @@ class Player:
     def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
         if planet_pos == -2:
             if self.headquarters[card_pos].get_is_unit():
+                if self.get_health_given_pos(planet_pos, card_pos) <= \
+                        self.headquarters[card_pos].get_indirect_and_direct_damage():
+                    return False
                 self.headquarters[card_pos].increase_not_yet_assigned_damage(amount)
                 self.indirect_damage_applied += 1
                 return True
             return False
         if self.cards_in_play[planet_pos + 1][card_pos].get_is_unit():
+            if self.get_health_given_pos(planet_pos, card_pos) <= \
+                    self.cards_in_play[planet_pos + 1][card_pos].get_indirect_and_direct_damage():
+                return False
             self.cards_in_play[planet_pos + 1][card_pos].increase_not_yet_assigned_damage(amount)
             self.indirect_damage_applied += 1
             return True
@@ -2030,6 +2036,18 @@ class Player:
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 i = i + 1
+
+    def discard_top_card_deck(self):
+        if self.deck:
+            self.discard.append(self.deck[0])
+            del self.deck[0]
+
+    def get_card_top_discard(self):
+        if self.discard:
+            card_name = self.discard[-1]
+            card = FindCard.find_card(card_name, self.card_array)
+            return card
+        return None
 
     def resolve_combat_round_begins(self, planet_num):
         for i in range(len(self.headquarters)):

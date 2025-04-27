@@ -227,6 +227,9 @@ class UnitCard(Card):
         self.mobile_eop = False
         self.flying_eop = False
 
+    def get_indirect_and_direct_damage(self):
+        return self.damage + self.not_yet_assigned_damage
+
     def get_has_hive_mind(self):
         return self.hive_mind
 
