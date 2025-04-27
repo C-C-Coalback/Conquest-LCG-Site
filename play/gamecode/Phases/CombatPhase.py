@@ -153,6 +153,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             else:
                                 player = self.p2
                                 other_player = self.p1
+                            player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":

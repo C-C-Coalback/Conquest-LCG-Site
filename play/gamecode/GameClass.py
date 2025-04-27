@@ -4066,6 +4066,10 @@ class Game:
             elif self.phase == "COMBAT":
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
             resolved_subroutine = True
+        if self.phase == "DEPLOY":
+            if self.p1.has_passed and self.p2.has_passed:
+                print("Both passed, move to warlord movement.")
+                await self.change_phase("COMMAND")
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
