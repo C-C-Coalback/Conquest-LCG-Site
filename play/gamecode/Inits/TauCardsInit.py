@@ -110,6 +110,11 @@ def tau_cards_init():
                              3, faction, "Loyal", 3, 3, 1, True, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.SupportCard("Repair Bay", "Deploy Action: Exhaust this support to place a Drone or Pilot "
                                               "card from your discard pile on top of your deck.", "Location.",
-                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY")
+                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("Air Caste Courier", "While you control a non-Tau warlord, this unit gains Flying.\n"
+                                                  "Combat Action: Exhaust this unit to move an attachment from a unit"
+                                                  " you control at this planet to another eligible unit you control.",
+                             "Scout. Pilot.", 2, faction, "Common", 1, 3, 1, False, action_in_play=True,
+                             allowed_phases_in_play="COMBAT")
     ]
     return tau_cards_array

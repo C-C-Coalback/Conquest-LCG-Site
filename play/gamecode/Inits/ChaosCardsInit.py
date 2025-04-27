@@ -122,6 +122,11 @@ def chaos_cards_init():
                              "Warrior. Khorne. World Eaters.", 4, "Chaos", "Loyal", 2, 5, 1, True, brutal=True),
         CardClasses.EventCard("Ecstatic Seizures", "Action: Discard each attachment from "
                                                    "each unit at a target planet.", "Power. Slaanesh.",
-                              2, "Chaos", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              2, "Chaos", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Venomous Fiend", "While you control a non-Chaos warlord, this unit gains Mobile.\n"
+                                               "Reaction: After this unit moves to a planet, deal X damage to a "
+                                               "target enemy army unit at that planet. X is the number of command "
+                                               "icons the target unit has.", "Daemon. Slaanesh. Elite.",
+                             5, "Chaos", "Common", 3, 5, 2, False)
     ]
     return chaos_card_array

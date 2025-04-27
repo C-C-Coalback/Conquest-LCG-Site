@@ -32,16 +32,16 @@ def tau_cards_init():
                                                          "Action: Pay 1 resource to attach this card "
                                                          "to a different unit.", "Drone.",
                                    0, faction, "Signature", 3, False, action_in_play=True,
-                                   allowed_phases_in_play="ALL"),
+                                   allowed_phases_in_play="ALL", extra_attack=1),
         CardClasses.ArmyCard("Recon Drone", "Limited.", "Drone. Ally.", 0, faction, "Loyal",
-                             0, 1, 2, False),
+                             0, 1, 2, False, limited=True),
         CardClasses.ArmyCard("Vior'la Marksman", "Ranged.", "Scout. Shas'la.", 1, faction, "Common",
-                             1, 2, 1, False),
+                             1, 2, 1, False, ranged=True),
         CardClasses.ArmyCard("Carnivore Pack", "Interrupt: When this unit is destroyed, "
                                                "gain 3 resources.", "Warrior. Kroot.",
                              3, faction, "Common", 3, 3, 0, False),
         CardClasses.ArmyCard("Vash'ya Trailblazer", "Mobile.", "Scout. Pilot.",
-                             2, faction, "Common", 1, 1, 2, False),
+                             2, faction, "Common", 1, 1, 2, False, mobile=True),
         CardClasses.ArmyCard("Fire Warrior Elite", "Interrupt: When an enemy unit would declare an "
                                                    "attack against a unit you control at this planet, "
                                                    "declare this unit as the defender instead.",
@@ -50,7 +50,7 @@ def tau_cards_init():
                                                          "for every attachment on it.",
                              "Soldier. Shas'la.", 4, faction, "Common", 1, 5, 1, False),
         CardClasses.ArmyCard("Crisis Battle Guard", "Mobile.", "Soldier. Pilot. Elite.",
-                             5, faction, "Loyal", 3, 5, 3, False),
+                             5, faction, "Loyal", 3, 5, 3, False, mobile=True),
         CardClasses.ArmyCard("Earth Caste Technician", "Reaction: After this unit enters play, "
                                                        "search the top 6 cards of your deck for an "
                                                        "attachment or Drone card. Reveal it, add it "
@@ -62,14 +62,15 @@ def tau_cards_init():
                                            "Attached unit gains Area Effect (2).\"", "Drone.",
                              2, faction, "Loyal", 2, 2, 1, False),
         CardClasses.ArmyCard("Stingwing Swarm", "Ranged.", "Warrior. Vespid.", 4, faction, "Common",
-                             3, 3, 1, False),
+                             3, 3, 1, False, ranged=True),
         CardClasses.ArmyCard("Fireblade Kais'vre", "Interrupt: When you use a Tau card as a shield card "
                                                    "at this planet, it gains 1 shield icon.",
                              "Solider. Hero.", 3, faction, "Loyal", 2, 3, 2, True),
         CardClasses.ArmyCard("Experimental Devilfish", "No Wargear Attachments.\n"
                                                        "Reaction: After this unit commits to a "
                                                        "planet, ready it.", "Vehicle. Transport.",
-                             3, faction, "Common", 4, 2, 1, False),
+                             3, faction, "Common", 4, 2, 1, False,
+                             wargear_attachments_permitted=False),
         CardClasses.EventCard("Even the Odds", "Action: Move a target attachment to another eligible "
                                                "unit controlled by the same player.", "Tactic.",
                               1, faction, "Common", 1, False, action_in_hand=True,
@@ -86,15 +87,18 @@ def tau_cards_init():
                                                             "Reaction: After attached unit is damaged "
                                                             "by an attack, deal 2 damage to the "
                                                             "attacker.", "Wargear.",
-                                   2, faction, "Loyal", 2, False),
+                                   2, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army", limit_one_per_unit=True),
         CardClasses.AttachmentCard("Ion Rifle", "Attach to an army unit.\n"
                                                 "Attached unit gets +3 ATK.", "Wargear. Weapon.",
-                                   1, faction, "Common", 1, False),
+                                   1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", extra_attack=3),
         CardClasses.SupportCard("Frontline Launch Bay", "Limited.\n"
                                                         "Interrupt: When you deploy a Tau unit, exhaust "
                                                         "this support to reduce that unit's cost by 1.",
                                 "Location.", 1, faction, "Common", True,
-                                applies_discounts=[True, 1, True]),
+                                applies_discounts=[True, 1, True],
+                                is_faction_limited_unique_discounter=True, limited=True),
         CardClasses.SupportCard("Ambush Platform", "Interrupt: When you deploy an attachment, "
                                                    "reduce its cost by 1.\n"
                                                    "Combat Action: Exhaust this support to deploy "
@@ -106,6 +110,11 @@ def tau_cards_init():
                              3, faction, "Loyal", 3, 3, 1, True, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.SupportCard("Repair Bay", "Deploy Action: Exhaust this support to place a Drone or Pilot "
                                               "card from your discard pile on top of your deck.", "Location.",
-                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY")
+                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("Air Caste Courier", "While you control a non-Tau warlord, this unit gains Flying.\n"
+                                                  "Combat Action: Exhaust this unit to move an attachment from a unit"
+                                                  " you control at this planet to another eligible unit you control.",
+                             "Scout. Pilot.", 2, faction, "Common", 1, 3, 1, False, action_in_play=True,
+                             allowed_phases_in_play="COMBAT")
     ]
     return tau_cards_array

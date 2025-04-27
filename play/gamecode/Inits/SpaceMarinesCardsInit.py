@@ -138,6 +138,12 @@ def space_marines_cards_init():
                              action_in_hand=True, allowed_phases_in_hand="COMBAT", ambush=True),
         CardClasses.EventCard("Vengeance!", "Reaction: After a unit you control is destroyed by an attack, ready a "
                                             "target Space Marines army unit you control at that planet.", "Tactic.",
-                              1, faction, "Common", 1, False)
+                              1, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Ravenwing Escort", "While you control a non-Space Marines warlord, "
+                                                 "this unit gains Mobile.\n"
+                                                 "Combat Action: Exhaust this unit to move an army unit you "
+                                                 "control at this planet to another planet.", "Scout. Dark Angels.",
+                             4, faction, "Common", 2, 3, 1, False, action_in_play=True,
+                             allowed_phases_in_play="COMBAT")
     ]
     return space_marines_card_array

@@ -21,28 +21,34 @@ def eldar_cards_init():
                               1, faction, "Signature", 1, False),
         CardClasses.AttachmentCard("Mobility", "Attach to an army unit.\n"
                                                "Attached unit gains Mobile.", "Skill.",
-                                   0, faction, "Signature", 3, False),
+                                   0, faction, "Signature", 3, False,
+                                   type_of_units_allowed_for_attachment="Army"),
         CardClasses.ArmyCard("Biel-Tan Guardians", "", "Warrior. Biel-Tan. Ally.",
                              1, faction, "Loyal", 1, 1, 2, False),
         CardClasses.ArmyCard("Altansar Rangers", "Ranged.", "Scout. Altansar.", 3, faction,
-                             "Common", 2, 2, 2, False),
+                             "Common", 2, 2, 2, False, ranged=True),
         CardClasses.ArmyCard("Eldar Survivalist", "+1 resource and +1 card when command struggle"
                                                   "is won at this planet."
-                             , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False),
+                             , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False,
+                             additional_resources_command_struggle=1,
+                             additional_cards_command_struggle=1),
         CardClasses.ArmyCard("Wildrider Squadron", "No Wargear Attachments.\n"
                                                    "Combat Action: Move this unit to an adjacent"
                                                    " planet. (Limit once per phase.)",
                              "Vehicle. Saim-Hann.", 4, faction, "Common", 3, 4, 1, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+                             action_in_play=True, allowed_phases_in_play="COMBAT",
+                             wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Soaring Falcon", "No Wargear Attachments.\n"
                                                "Mobile.", "Vehicle.",
-                             3, faction, "Common", 1, 5, 2, False),
+                             3, faction, "Common", 1, 5, 2, False,
+                             wargear_attachments_permitted=False, mobile=True),
         CardClasses.ArmyCard("Wailing Wraithfighter", "No Wargear Attachments.\n"
                                                       "Flying.\n"
                                                       "Reaction: After this unit is declared as an "
                                                       "attacker, your opponent must choose and "
                                                       "discard 1 card from his hand, if able.",
-                             "Vehicle. Spirit. Elite.", 6, faction, "Loyal", 3, 5, 2, False),
+                             "Vehicle. Spirit. Elite.", 6, faction, "Loyal", 3, 5, 2, False,
+                             wargear_attachments_permitted=False, flying=True),
         CardClasses.ArmyCard("Iyanden Wraithguard", "Armorbane.", "Drone. Spirit. Iyanden.",
                              3, faction, "Loyal", 4, 2, 1, False, armorbane=True),
         CardClasses.ArmyCard("Shrouded Harlequin", "Interrupt: When this unit is destroyed, exhaust "
@@ -89,13 +95,15 @@ def eldar_cards_init():
                                                           "attack against a non-warlord unit, discard "
                                                           "X cards from your hand to give attached "
                                                           "unit +X ATK for that attack.",
-                                   "Wargear, Weapon.", 1, faction, "Common", 1, False),
+                                   "Wargear, Weapon.", 1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", extra_attack=1),
         CardClasses.SupportCard("Corsair Trading Port", "Limited.\n"
                                                         "Interrupt: When you deploy an Eldar unit, "
                                                         "exhaust this support to reduce that "
                                                         "unit's cost by 1.",
                                 "Location.", 1, faction, "Common", True,
-                                applies_discounts=[True, 1, True]),
+                                applies_discounts=[True, 1, True],
+                                is_faction_limited_unique_discounter=True, limited=True),
         CardClasses.SupportCard("Craftworld Gate", "Action: Exhaust this support to return a target "
                                                    "army unit you control to your hand.",
                                 "Location.", 1, faction, "Loyal", False,
@@ -108,6 +116,11 @@ def eldar_cards_init():
         CardClasses.EventCard("Subdual", "Action: Place a target support card or "
                                          "attachment on top of its owner's deck.",
                               "Power.", 2, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Nightshade Interceptor", "Flying.\n"
+                                                       "No Wargear Attachments.\n"
+                                                       "While you control a non-Eldar warlord, "
+                                                       "this unit gains Area Effect (2).", "Vehicle. Elite.",
+                             6, faction, "Common", 4, 4, 2, False)
     ]
     return eldar_cards_array

@@ -105,6 +105,10 @@ def orks_cards_init():
                                              "your deck. If it is an Orks card with an odd printed cost, "
                                              "your opponent deals X indirect damage among units he controls. "
                                              "X is the printed cost of the discarded card.", "Upgrade.",
-                                2, "Orks", "Common", True, action_in_play=True, allowed_phases_in_play="COMBAT")
+                                2, "Orks", "Common", True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Goff Brawlers", "While you control a non-Orks warlord, this unit gains 1 command icon.\n"
+                                              "Reaction: After this unit readies, each player deals 1 indirect damage "
+                                              "among units he controls at this planet.", "Warrior. Boyz.",
+                             2, "Orks", "Common", 2, 3, 0, False)
     ]
     return orks_card_array

@@ -147,6 +147,12 @@ def astra_militarum_cards_init():
         CardClasses.SupportCard("Holy Fusillade", "Reaction: After a combat round begins, "
                                                   "exhaust this support to resolve a "
                                                   "ranged skirmish at this battle.",
-                                "Upgrade. Ecclesiarchy.", 1, faction, "Common", False)
+                                "Upgrade. Ecclesiarchy.", 1, faction, "Common", False),
+        CardClasses.ArmyCard("Standard Bearer", "While you control a non-Astra Militarum warlord, you may deploy this "
+                                                "unit from your hand as if it had Ambush.\n"
+                                                "Reaction: After this unit enters play, ready an army "
+                                                "unit you control at this planet.", "Soldier.",
+                             3, faction, "Common", 2, 2, 1, False, action_in_hand=True,
+                             allowed_phases_in_hand="COMBAT", ambush=True)
     ]
     return astra_militarum_cards_array

@@ -10,7 +10,8 @@ def astra_militarum_cards_init():
                                 faction, 2, 6, 2, 5,
                                 "Bloodied.", 7, 7,
                                 ["4x Straken's Command Squad", "2x Glorious Intervention",
-                                 "1x Omega Zero Command", "1x Straken's Cunning"]),
+                                 "1x Omega Zero Command", "1x Straken's Cunning"]
+                                ),
         CardClasses.ArmyCard("Straken's Command Squad", "Interrupt: When this unit leaves "
                                                         "play, put a Guardsman token "
                                                         "into play at the same planet.",
@@ -32,34 +33,38 @@ def astra_militarum_cards_init():
                                                         "Attached unit gets +1 ATK.\n"
                                                         "Interrupt: When attached unit "
                                                         "leaves play, draw 3 cards.",
-                                   "Skill.", 1, faction, "Signature", 3, False),
+                                   "Skill.", 1, faction, "Signature", 3, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   extra_attack=1),
         CardClasses.ArmyCard("Ratling Deadeye", "Ranged. (This unit attacks during the "
                                                 "ranged skirmish at the beginning of"
                                                 " a battle.)", "Scout. Abhuman.", 1,
-                             faction, "Common", 1, 1, 1, False),
+                             faction, "Common", 1, 1, 1, False, ranged=True),
         CardClasses.ArmyCard("Cadian Mortar Squad", "Ranged. (This unit attacks during the "
                                                     "ranged skirmish at the beginning of"
                                                     " a battle.)\n"
                                                     "Reaction: After an army unit you "
                                                     "control at this planet leaves play, "
                                                     "ready this unit.", "Soldier. Cadia.",
-                             3, faction, "Loyal", 1, 3, 2, False),
+                             3, faction, "Loyal", 1, 3, 2, False, ranged=True),
         CardClasses.ArmyCard("Sanctioned Psyker", "", "Psyker.", 2, faction, "Common",
                              0, 4, 2, False),
         CardClasses.ArmyCard("Leman Russ Battle Tank", "No Wargear Attachments.",
                              "Vehicle. Tank. Elite.", 5, faction, "Loyal",
-                             4, 6, 4, False),
+                             4, 6, 4, False, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Mordian Hellhound", "No Wargear Attachments.\n"
                                                   "Area Effect (1). (When this unit "
                                                   "attacks it may instead deal its "
                                                   "Area Effect damage to each enemy "
                                                   "unit at this planet.",
                              "Vehicle. Tank. Mordian.", 4, faction, "Common",
-                             3, 3, 2, False),
+                             3, 3, 2, False, area_effect=1,
+                             wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Assault Valkyrie", "No Wargear Attachments.\n Flying. (This "
                                                  "unit takes half damage from non-Flying "
                                                  "units.", "Vehicle. Transport.",
-                             4, faction, "Common", 4, 4, 1, False),
+                             4, faction, "Common", 4, 4, 1, False,
+                             wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Stalwart Ogryn", "Immune to enemy events.",
                              "Warrior. Abhuman.", 2, faction, "Common",
                              2, 2, 1, False),
@@ -104,20 +109,25 @@ def astra_militarum_cards_init():
                               allowed_phases_in_hand="COMBAT"),
         CardClasses.AttachmentCard("Hostile Environment Gear", "Attach to an army unit.\n"
                                                                "Attached unit gets +3 HP.",
-                                   "Wargear. Armor.", 1, faction, "Common", 1, False),
+                                   "Wargear. Armor.", 1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   extra_health=3),
         CardClasses.AttachmentCard("Bodyguard", "Attach to an army unit you control.\n"
                                                 "Forced Reaction: After a unit you control "
                                                 "is assigned damage by an attack at this "
                                                 "planet, reassign 1 of that damage to "
                                                 "attached unit.", "Condition.", 0,
-                                   faction, "Loyal", 2, False),
+                                   faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True),
         CardClasses.SupportCard("Imperial Bunker", "Limited. (Limit one Limited card "
                                                    "per round.)\n"
                                                    "Interrupt: When you deploy an Astra "
                                                    "Militarum unit, exhaust this support "
                                                    "to reduce that unit's cost by 1.",
                                 "Location.", 1, faction, "Common", True,
-                                applies_discounts=[True, 1, True]),
+                                applies_discounts=[True, 1, True],
+                                is_faction_limited_unique_discounter=True, limited=True),
         CardClasses.SupportCard("Rockcrete Bunker", "If this card has 4 or more damage on "
                                                     "it, sacrifice it.\n"
                                                     "Reaction: After damage is assigned to "
@@ -137,6 +147,12 @@ def astra_militarum_cards_init():
         CardClasses.SupportCard("Holy Fusillade", "Reaction: After a combat round begins, "
                                                   "exhaust this support to resolve a "
                                                   "ranged skirmish at this battle.",
-                                "Upgrade. Ecclesiarchy.", 1, faction, "Common", False)
+                                "Upgrade. Ecclesiarchy.", 1, faction, "Common", False),
+        CardClasses.ArmyCard("Standard Bearer", "While you control a non-Astra Militarum warlord, you may deploy this "
+                                                "unit from your hand as if it had Ambush.\n"
+                                                "Reaction: After this unit enters play, ready an army "
+                                                "unit you control at this planet.", "Soldier.",
+                             3, faction, "Common", 2, 2, 1, False, action_in_hand=True,
+                             allowed_phases_in_hand="COMBAT", ambush=True)
     ]
     return astra_militarum_cards_array

@@ -126,6 +126,11 @@ def dark_eldar_cards_init():
                                                  "in your opponent's discard pile as if it were in your hand. "
                                                  "(You pay its costs, choose its targets, "
                                                  "and follow all restrictions.)", "Tactic. Torture.",
-                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Treacherous Lhamaean", "While you control a non-Dark Eldar"
+                                                     " warlord, this unit gains Armorbane.\n"
+                                                     "Forced Interrupt: When this unit is destroyed, "
+                                                     "sacrifice another army unit at this planet.", "Warrior.",
+                             2, faction, "Common", 4, 1, 0, False)
     ]
     return dark_eldar_cards_array

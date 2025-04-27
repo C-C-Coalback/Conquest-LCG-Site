@@ -116,6 +116,11 @@ def eldar_cards_init():
         CardClasses.EventCard("Subdual", "Action: Place a target support card or "
                                          "attachment on top of its owner's deck.",
                               "Power.", 2, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Nightshade Interceptor", "Flying.\n"
+                                                       "No Wargear Attachments.\n"
+                                                       "While you control a non-Eldar warlord, "
+                                                       "this unit gains Area Effect (2).", "Vehicle. Elite.",
+                             6, faction, "Common", 4, 4, 2, False)
     ]
     return eldar_cards_array

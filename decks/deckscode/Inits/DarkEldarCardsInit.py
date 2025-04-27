@@ -28,11 +28,12 @@ def dark_eldar_cards_init():
         CardClasses.AttachmentCard("Agonizer of Bren", "Attach to an army unit.\n"
                                                        "Attached unit gets +1 ATK for each "
                                                        "Khymera token you control.",
-                                   "Wargear. Weapon.", 1, faction, "Signature", 3, False),
+                                   "Wargear. Weapon.", 1, faction, "Signature", 3, False,
+                                   type_of_units_allowed_for_attachment="Army"),
         CardClasses.ArmyCard("Sybarite Marksman", "Ranged. (This unit attacks during the "
                                                   "ranged skirmish at the beginning of"
                                                   " a battle.)", "Warrior. Kabalite.",
-                             1, faction, "Common", 2, 1, 0, False),
+                             1, faction, "Common", 2, 1, 0, False, ranged=True),
         CardClasses.ArmyCard("Incubus Warrior", "", "Warrior.", 2, faction,
                              "Common", 3, 1, 2, False),
         CardClasses.ArmyCard("Haemonculus Tormentor", "Action: Pay 1 resource to give this "
@@ -50,22 +51,24 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Baleful Mandrake", "Ranged. (This unit attacks during the "
                                                  "ranged skirmish at the beginning of"
                                                  " a battle.)", "Warrior.",
-                             3, faction, "Common", 3, 2, 1, False),
+                             3, faction, "Common", 3, 2, 1, False, ranged=True),
         CardClasses.ArmyCard("Vile Raider", "No Wargear Attachments.\n"
                                             "Mobile. (At the beginning of the combat phase, "
                                             "this unit may move to an adjacent planet.",
-                             "Vehicle. Transport.", 4, faction, "Common", 2, 4, 2, False),
+                             "Vehicle. Transport.", 4, faction, "Common", 2, 4, 2, False,
+                             wargear_attachments_permitted=False, mobile=True),
         CardClasses.ArmyCard("Black Heart Ravager", "No Wargear Attachments.\n"
                                                     "Flying. (This unit takes half damage from "
                                                     "non-Flying units.)\n"
                                                     "Reaction: After this unit damages a "
                                                     "non-warlord unit, rout that unit.",
-                             "Vehicle. Tank. Elite.", 6, faction, "Loyal", 2, 5, 2, False),
+                             "Vehicle. Tank. Elite.", 6, faction, "Loyal", 2, 5, 2, False,
+                             wargear_attachments_permitted=False, flying=True),
         CardClasses.ArmyCard("Murder of Razorwings", "No Attachments.\n"
                                                      "Reaction: After you deploy this unit, "
                                                      "discard 1 card at random from your "
                                                      "opponent's hand.", "Creature. Ally.",
-                             1, faction, "Loyal", 1, 1, 0, False),
+                             1, faction, "Loyal", 1, 1, 0, False, no_attachments=True),
         CardClasses.ArmyCard("Coliseum Fighters", "Reaction: After this unit enters play, "
                                                   "return the topmost event card from your "
                                                   "discard pile to your hand.",
@@ -74,7 +77,8 @@ def dark_eldar_cards_init():
                                                       "attacks it may instead deal its "
                                                       "Area Effect damage to each enemy "
                                                       "unit at this planet.",
-                             "Warrior. Kabalite.", 2, faction, "Common", 2, 2, 0, False),
+                             "Warrior. Kabalite.", 2, faction, "Common", 2, 2, 0, False,
+                             area_effect=1),
         CardClasses.ArmyCard("Syren Zythlex", "Reaction: After an enemy unit is deployed at "
                                               "this planet, exhaust it.",
                              "Warrior. Wych.", 3, faction, "Loyal", 2, 3, 2, True),
@@ -89,21 +93,25 @@ def dark_eldar_cards_init():
                                       "Action: Take 1 resource from your opponent if he has "
                                       "more resources than you.", "Tactic.",
                               0, faction, "Loyal", 2, False, action_in_hand=True,
-                              allowed_phases_in_hand="ALL"),
+                              allowed_phases_in_hand="ALL", limited=True),
         CardClasses.AttachmentCard("Suffering", "Attach to an army unit.\n"
                                                 "Attached unit gets -2 ATK.",
-                                   "Condition. Torture.", 1, faction, "Loyal", 2, False),
+                                   "Condition. Torture.", 1, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   extra_attack=-2),
         CardClasses.AttachmentCard("Hypex Injector", "Attach to an army unit.\n"
                                                      "Reaction: After you play a Dark Eldar "
                                                      "event card, ready attached unit.",
-                                   "Wargear.", 0, faction, "Common", 1, False),
+                                   "Wargear.", 0, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army"),
         CardClasses.SupportCard("Altar of Torment", "Limited. (Limit one Limited card per "
                                                     "round.)\n"
                                                     "Interrupt: When you deploy a Dark Eldar "
                                                     "unit, exhaust this support to reduce "
                                                     "that unit's cost by 1.",
                                 "Location.", 1, faction, "Common", True, "",
-                                applies_discounts=[True, 1, True]),
+                                applies_discounts=[True, 1, True],
+                                is_faction_limited_unique_discounter=True, limited=True),
         CardClasses.SupportCard("Twisted Laboratory", "Action: Exhaust this support to treat the "
                                                       "printed text box of a target army unit "
                                                       "as if it were blank (except for Traits) "
@@ -113,11 +121,16 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Solarite Avetys", "Flying.\n"
                                                 "Reaction: After this unit takes damage by an attack "
                                                 "from a non-flying unit, deal 2 damage to the attacker.", "Warrior.",
-                             4, faction, "Loyal", 2, 4, 1, True),
+                             4, faction, "Loyal", 2, 4, 1, True, flying=True),
         CardClasses.EventCard("Dark Possession", "Action: As your next Action this phase, you may play an event card "
                                                  "in your opponent's discard pile as if it were in your hand. "
                                                  "(You pay its costs, choose its targets, "
                                                  "and follow all restrictions.)", "Tactic. Torture.",
-                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Treacherous Lhamaean", "While you control a non-Dark Eldar"
+                                                     " warlord, this unit gains Armorbane.\n"
+                                                     "Forced Interrupt: When this unit is destroyed, "
+                                                     "sacrifice another army unit at this planet.", "Warrior.",
+                             2, faction, "Common", 4, 1, 0, False)
     ]
     return dark_eldar_cards_array

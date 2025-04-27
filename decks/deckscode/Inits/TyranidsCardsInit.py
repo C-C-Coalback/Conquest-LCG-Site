@@ -11,7 +11,7 @@ def tyranids_cards_init():
                                  "1x Great Scything Talons"]),
         CardClasses.ArmyCard("Lurking Hormagaunt", "Reaction: After this unit is assigned damage, reassign up to 2 of "
                                                    "that damage to your warlord instead.", "Creature. Behemoth.",
-                             3, faction, "Signature", 3, 1, 1, False),
+                             2, faction, "Signature", 3, 1, 1, False),
         CardClasses.SupportCard("Awakening Cavern", "Action: Exhaust this support to ready a target unit you control.",
                                 "Location.", 3, faction, "Signature", False, action_in_play=True,
                                 allowed_phases_in_play="ALL"),
@@ -24,7 +24,7 @@ def tyranids_cards_init():
                                                             "gets +X ATK for its next attack this phase. "
                                                             "X is the amount of damage removed.", "Wargear. Biomorph.",
                                    1, faction, "Signature", 3, False,
-                                   type_of_units_allowed_for_attachment="Warlord"),
+                                   type_of_units_allowed_for_attachment="Warlord", extra_health=1),
         CardClasses.WarlordCard("The Swarmlord", "Reaction: After this warlord commits to a planet, put 1 Termagant"
                                                  " token into play at each adjacent planet.", "Creature. Behemoth.",
                                 faction, 2, 6, 2, 5, "Bloodied.", 6, 6,
@@ -47,7 +47,7 @@ def tyranids_cards_init():
                                                   "Reaction: After attached unit destroys an enemy army unit by an"
                                                   " attack, put 1 Termagant token into play at this planet.",
                                    "Biomorph. Wargear.", 1, faction, "Signature", 3, True,
-                                   type_of_units_allowed_for_attachment="Warlord"),
+                                   type_of_units_allowed_for_attachment="Warlord", extra_attack=1),
         CardClasses.SynapseCard("Savage Warrior Prime", "This unit must commit to a "
                                                         "different planet than your warlord, if able.\n"
                                                         "While checking for a battle and determining initiative at "
@@ -148,7 +148,8 @@ def tyranids_cards_init():
                                                    "Action: Exhaust this attachment to remove 2 "
                                                    "damage from attached unit.", "Condition.",
                                    1, faction, "Common", 1, False, limit_one_per_unit=True,
-                                   type_of_units_allowed_for_attachment="Army", extra_health=2),
+                                   type_of_units_allowed_for_attachment="Army", extra_health=2,
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.AttachmentCard("Noxious Fleshborer", "Attach to an army unit.\n"
                                                          "Attached unit gets +1 ATK and +1 HP while it "
                                                          "is at an infested planet.\n"
@@ -183,7 +184,8 @@ def tyranids_cards_init():
         CardClasses.SupportCard("Digestion Pool", "Limited.\n"
                                                   "Interrupt: When you deploy a Tyranids unit at an infested planet, "
                                                   "exhaust this support to reduce the unit's cost by 2.",
-                                "Upgrade.", 1, faction, "Common", True),
+                                "Upgrade.", 1, faction, "Common", True, limited=True,
+                                applies_discounts=[True, 2, True]),
         CardClasses.SupportCard("Mycetic Spores", "Combat Action: Exhaust this support to move a unit you control with "
                                                   "the Hive Mind specialization to a planet with a Termagant token.",
                                 "Upgrade.", 2, faction, "Common", False,
@@ -193,6 +195,10 @@ def tyranids_cards_init():
                                 2, faction, "Common", False),
         CardClasses.SupportCard("Synaptic Link", "Reaction: After a synapse unit you control commits "
                                                  "to a planet, draw 1 card.", "Upgrade.",
-                                2, faction, "Common", False)
+                                2, faction, "Common", False),
+        CardClasses.ArmyCard("Swarmling Termagants", "Interrupt: When this unit is destroyed, put X Termagant tokens "
+                                                     "into play at this planet. X is the number of factions among "
+                                                     "enemy units at this planet.", "Creature. Leviathan. Termagant.",
+                             2, faction, "Common", 1, 1, 1, False)
     ]
     return tyranids_card_array

@@ -196,6 +196,10 @@ def tyranids_cards_init():
                                 2, faction, "Common", False),
         CardClasses.SupportCard("Synaptic Link", "Reaction: After a synapse unit you control commits "
                                                  "to a planet, draw 1 card.", "Upgrade.",
-                                2, faction, "Common", False)
+                                2, faction, "Common", False),
+        CardClasses.ArmyCard("Swarmling Termagants", "Interrupt: When this unit is destroyed, put X Termagant tokens "
+                                                     "into play at this planet. X is the number of factions among "
+                                                     "enemy units at this planet.", "Creature. Leviathan. Termagant.",
+                             2, faction, "Common", 1, 1, 1, False)
     ]
     return tyranids_card_array
