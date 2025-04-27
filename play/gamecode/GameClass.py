@@ -1962,6 +1962,10 @@ class Game:
                         self.create_reaction("Ravenous Haruspex", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))
                         self.ravenous_haruspex_gain = primary_player.get_cost_given_pos(planet, pos)
+            if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
+                if primary_player.search_hand_for_card("Vengeance!"):
+                    self.create_reaction("Vengeance!", primary_player.name_player,
+                                         (int(primary_player.number), planet, pos))
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
@@ -2648,6 +2652,19 @@ class Game:
                                     await self.complete_nullify()
                                 self.delete_reaction()
                                 await primary_player.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Vengeance!":
+                            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                                if primary_player.number == game_update_string[1]:
+                                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines"\
+                                            and primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                        primary_player.spend_resources(1)
+                                        primary_player.discard_card_name_from_hand("Vengeance!")
+                                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                                        await primary_player.send_hand()
+                                        await primary_player.send_units_at_planet(planet_pos)
+                                        await primary_player.send_discard()
+                                        await primary_player.send_resources()
+                                        self.delete_reaction()
                         elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
                             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                                 if game_update_string[1] == "1":
@@ -3430,6 +3447,10 @@ class Game:
                     self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                     await self.p2.send_units_at_planet(planet_pos)
                 self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Vengeance!":
+                if primary_player.resources < 1:
+                    await self.game_sockets[0].receive_game_update("Insufficient resources")
+                    self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_resources(self.ravenous_haruspex_gain)
