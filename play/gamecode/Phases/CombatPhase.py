@@ -155,6 +155,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.reactions_needing_resolving.append("Wailing Wraithfighter")
                                 self.positions_of_unit_triggering_reaction.append([-1, -1, -1])
                                 self.player_who_resolves_reaction.append(other_player.name_player)
+                            if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
+                                    == "Seraphim Superior Allegra":
+                                self.create_reaction("Seraphim Superior Allegra", player.name_player,
+                                                     (int(player.number), -1, -1))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Spiritseer Erathal":
                                 self.reactions_needing_resolving.append("Spiritseer Erathal")

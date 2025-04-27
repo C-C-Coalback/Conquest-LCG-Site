@@ -2573,8 +2573,14 @@ class Game:
                                     await self.complete_nullify()
                                 self.delete_reaction()
                                 await primary_player.send_hq()
+                        elif self.reactions_needing_resolving[0] == "Seraphim Superior Allegra":
+                            if game_update_string[1] == primary_player.number:
+                                if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+                                    primary_player.ready_given_pos(-2, unit_pos)
+                                    await primary_player.send_hq()
+                                    self.delete_reaction()
                         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
-                            if not self.cato_stronghold_activated:
+                            if not self.alaitoc_shrine_activated:
                                 if primary_player.get_ability_given_pos(-2, unit_pos) == "Alaitoc Shrine":
                                     if primary_player.get_ready_given_pos(-2, unit_pos):
                                         primary_player.exhaust_given_pos(-2, unit_pos)
