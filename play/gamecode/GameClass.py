@@ -209,6 +209,7 @@ class Game:
         self.stored_area_effect_value = 0
 
     def reset_action_data(self):
+        self.mode = "Normal"
         self.action_chosen = ""
         self.player_with_action = ""
         self.position_of_actioned_card = (-1, -1)

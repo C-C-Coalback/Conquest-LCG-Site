@@ -64,6 +64,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             await player_owning_card.send_units_at_planet(planet_pos)
+                elif ability == "Boss Zugnog":
+                    if not card_chosen.get_once_per_phase_used():
+                        if self.planets_in_play_array[self.round_number]:
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            await primary_player.send_units_at_planet(planet_pos)
+                            self.misc_target_planet = planet_pos
+                            self.misc_counter = 0
                 elif ability == "Hunter Gargoyles":
                     if not card_chosen.get_once_per_phase_used():
                         card_chosen.set_once_per_phase_used(True)
@@ -216,6 +226,31 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await player_owning_card.send_units_at_planet(origin_planet)
                     else:
                         await self.game_sockets[0].receive_game_update("Invalid attachment movement.")
+    elif self.action_chosen == "Boss Zugnog":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and\
+                    primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                self.misc_counter += 1
+                await primary_player.send_units_at_planet(planet_pos)
+            if self.misc_counter >= 2:
+                i = 0
+                while i < len(primary_player.cards_in_play[planet_pos + 1]):
+                    if primary_player.cards_in_play[planet_pos + 1][i].aiming_reticle_color == "blue":
+                        primary_player.move_unit_to_planet(planet_pos, i, self.round_number)
+                        i = i - 1
+                    i = i + 1
+                for j in range(len(primary_player.cards_in_play[self.round_number + 1])):
+                    if primary_player.cards_in_play[self.round_number + 1][j].aiming_reticle_color == "blue":
+                        primary_player.assign_damage_to_pos(self.round_number, j, 1)
+                self.advance_damage_aiming_reticle()
+                self.misc_counter = 0
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                await primary_player.send_units_at_planet(self.round_number)
+                await primary_player.send_units_at_planet(planet_pos)
+
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
