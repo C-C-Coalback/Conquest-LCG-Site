@@ -1726,6 +1726,8 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 card.set_brutal(True)
+        if card.get_ability() == "Destroyer Cultist":
+            attack_value += self.count_non_necron_factions()
         if card.get_ability() != "Colonel Straken":
             straken_check = self.search_card_at_planet(planet_id, "Colonel Straken", bloodied_relevant=True)
             if straken_check:
