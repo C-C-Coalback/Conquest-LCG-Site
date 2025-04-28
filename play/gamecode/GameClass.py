@@ -2956,8 +2956,12 @@ class Game:
                                         self.delete_reaction()
                                         await player_exhausting_unit.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Nahumekh":
+                            if game_update_string[1] == "1":
+                                player_being_hit = self.p1
+                            else:
+                                player_being_hit = self.p2
+                            can_continue = True
                             if game_update_string[1] != primary_player.get_number():
-                                can_continue = True
                                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                     can_continue = False
                                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
@@ -2974,9 +2978,14 @@ class Game:
                                     self.first_player_nullified = primary_player.name_player
                                     self.nullify_context = "Reaction"
                                     await self.send_search()
-                                if can_continue:
+                            if can_continue:
+                                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                     secondary_player.apply_negative_health_eop(planet_pos, unit_pos,
                                                                                primary_player.nahumekh_value)
+                                    name = secondary_player.get_name_given_pos(planet_pos, unit_pos)
+                                    await self.game_sockets[0].receive_game_update(
+                                        name + " received -" + str(primary_player.nahumekh_value) + " HP."
+                                    )
                                     self.delete_reaction()
                         elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
                             planet_pos = int(game_update_string[2])

@@ -2040,7 +2040,7 @@ class Player:
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
                                                   (int(self.number), i, j))
-                if self.cards_in_play[i + 1][j].get_ability() == "Nahumkeh":
+                if self.cards_in_play[i + 1][j].get_ability() == "Nahumekh":
                     if phase == "COMBAT":
                         self.nahumekh_value = self.count_non_necron_factions()
                         if self.nahumekh_value > 0:
