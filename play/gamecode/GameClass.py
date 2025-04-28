@@ -1013,6 +1013,18 @@ class Game:
             await self.send_search()
             self.communications_relay_enabled = True
 
+    def action_cleanup(self):
+        self.action_chosen = ""
+        self.player_with_action = ""
+        self.mode = "Normal"
+        if self.phase == "DEPLOY":
+            if self.number_with_deploy_turn == "1":
+                self.player_with_deploy_turn = self.name_2
+                self.number_with_deploy_turn = "2"
+            elif self.number_with_deploy_turn == "2":
+                self.player_with_deploy_turn = self.name_1
+                self.number_with_deploy_turn = "1"
+
     def move_reaction_to_front(self, reaction_pos):
         self.reactions_needing_resolving.insert(
             0, self.reactions_needing_resolving.pop(reaction_pos)

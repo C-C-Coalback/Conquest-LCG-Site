@@ -33,6 +33,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             await self.game_sockets[0].receive_game_update(ability + " activated")
                             await player_owning_card.send_units_at_planet(planet_pos)
                             await primary_player.send_resources()
+                elif ability == "The Staff of Command":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            card_chosen.exhaust_card()
+                            await primary_player.send_units_at_planet(planet_pos)
+                            await self.create_necrons_wheel_choice(primary_player)
+                            self.action_cleanup()
                 elif ability == "Regeneration":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
