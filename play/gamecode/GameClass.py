@@ -1027,6 +1027,7 @@ class Game:
         self.asking_if_reaction = True
 
     async def create_necrons_wheel_choice(self, player):
+        self.resolving_search_box = True
         self.choices_available = ["Space Marines", "Tau", "Eldar", "Dark Eldar",
                                   "Chaos", "Orks", "Astra Militarum"]
         self.name_player_making_choices = player.name_player
@@ -1186,6 +1187,7 @@ class Game:
                         chosen_faction = self.choices_available[int(game_update_string[1])]
                         primary_player.chosen_enslaved_faction = True
                         primary_player.enslaved_faction = chosen_faction
+                        self.resolving_search_box = False
                         await self.game_sockets[0].receive_game_update(
                             primary_player.name_player + " enslaved the " + chosen_faction + "!"
                         )
