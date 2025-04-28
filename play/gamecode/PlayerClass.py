@@ -1726,6 +1726,8 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 card.set_brutal(True)
+        if card.get_ability() == "Pyrrhian Eternals":
+            attack_value += self.discard.count("Pyrrhian Eternals")
         if card.get_ability() == "Destroyer Cultist":
             attack_value += self.count_non_necron_factions()
         if card.get_ability() != "Colonel Straken":
@@ -1953,6 +1955,8 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
                     health += 2
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Pyrrhian Eternals":
+            health += self.discard.count("Pyrrhian Eternals")
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Ymgarl Genestealer":
             if self.search_synapse_at_planet(planet_id):
                 health += 2
