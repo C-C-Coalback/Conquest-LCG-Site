@@ -284,6 +284,19 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update("FORCEFULLY QUITTING ACTION")
                         active_games[self.game_position].reset_action_data()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "show-discard" and len(message) == 3:
+                        if message[2] == "1":
+                            discard = active_games[self.game_position].p1.discard
+                            new_message = ", ".join(discard)
+                            await self.receive_game_update(
+                                "Current discard of P1 is: " + new_message
+                            )
+                        elif message[2] == "2":
+                            discard = active_games[self.game_position].p2.discard
+                            new_message = ", ".join(discard)
+                            await self.receive_game_update(
+                                "Current discard of P2 is: " + new_message
+                            )
                     elif message[1] == "set-resources" and len(message) == 4:
                         player_num = message[2]
                         resources = int(message[3])
