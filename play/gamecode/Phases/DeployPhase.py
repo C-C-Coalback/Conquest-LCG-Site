@@ -129,10 +129,13 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     await self.send_info_box()
                             self.card_pos_to_deploy = -1
                         elif card.get_card_type() == "Army":
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                            self.card_type_of_selected_card_in_hand = "Army"
-                            await primary_player.send_hand()
+                            if (primary_player.warlord_faction == "Necrons" and
+                                    card.get_faction() == primary_player.enslaved_faction or
+                                    card.get_faction() == "Neutral") or primary_player.warlord_faction != "Necrons":
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                self.card_type_of_selected_card_in_hand = "Army"
+                                await primary_player.send_hand()
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy

@@ -813,7 +813,7 @@ class Game:
             await self.send_info_box()
         self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
-        self.reset_choices_available()
+        # self.reset_choices_available()
 
     async def complete_nullify(self):
         if self.first_player_nullified == self.name_1:
@@ -1026,6 +1026,13 @@ class Game:
         print(self.reactions_needing_resolving)
         self.asking_if_reaction = True
 
+    async def create_necrons_wheel_choice(self, player):
+        self.choices_available = ["Space Marines", "Tau", "Eldar", "Dark Eldar",
+                                  "Chaos", "Orks", "Astra Militarum"]
+        self.name_player_making_choices = player.name_player
+        self.choice_context = "Choose Enslaved Faction:"
+        await self.send_search()
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
             primary_player = self.p1
@@ -1164,13 +1171,32 @@ class Game:
                             await self.send_search()
 
                         if primary_player.mulligan_done and secondary_player.mulligan_done:
-                            self.choices_available = ""
+                            self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             await self.game_sockets[0].receive_game_update(
                                 "Both players setup, good luck and have fun!")
                             await self.send_info_box()
                             await self.send_search()
+                            if self.p1.warlord_faction == "Necrons":
+                                await self.create_necrons_wheel_choice(self.p1)
+                            elif self.p2.warlord_faction == "Necrons":
+                                await self.create_necrons_wheel_choice(self.p2)
+                    elif self.choice_context == "Choose Enslaved Faction:":
+                        chosen_faction = self.choices_available[int(game_update_string[1])]
+                        primary_player.chosen_enslaved_faction = True
+                        primary_player.enslaved_faction = chosen_faction
+                        await self.game_sockets[0].receive_game_update(
+                            primary_player.name_player + " enslaved the " + chosen_faction + "!"
+                        )
+                        if not secondary_player.chosen_enslaved_faction and \
+                                secondary_player.warlord_faction == "Necrons":
+                            await self.create_necrons_wheel_choice(secondary_player)
+                        else:
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                        await self.send_search()
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -2261,6 +2287,7 @@ class Game:
     async def change_phase(self, new_val, refresh_abilities=True):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        last_phase = self.phase
         self.phase = new_val
         if self.phase == "COMMAND":
             self.committing_warlords = True
@@ -2291,6 +2318,15 @@ class Game:
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
+        print("\nDEBUG NECRONS\n", self.phase, last_phase, "\n\n")
+        if self.phase == "DEPLOY" and last_phase != "SETUP":
+            print("resetting necrons enslaved factions")
+            self.p1.chosen_enslaved_faction = False
+            self.p2.chosen_enslaved_faction = False
+            if self.p1.warlord_faction == "Necrons":
+                await self.create_necrons_wheel_choice(self.p1)
+            elif self.p2.warlord_faction == "Necrons":
+                await self.create_necrons_wheel_choice(self.p2)
         self.create_reactions_phase_begins()
 
     def create_reactions_phase_begins(self):

@@ -89,6 +89,8 @@ class Player:
         self.force_due_to_dark_possession = False
         self.pos_card_dark_possession = -1
         self.dark_possession_remove_after_play = False
+        self.enslaved_faction = ""
+        self.chosen_enslaved_faction = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
