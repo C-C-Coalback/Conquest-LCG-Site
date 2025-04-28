@@ -240,6 +240,52 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 await player_being_hit.send_hq()
                 await primary_player.send_hand()
                 await primary_player.send_discard()
+    elif self.action_chosen == "Hate":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        can_continue = False
+        if primary_player.resources >= player_being_hit.get_cost_given_pos(-2, unit_pos) and \
+                primary_player.enslaved_faction == player_being_hit.get_faction_given_pos(-2, unit_pos):
+            can_continue = True
+            if player_being_hit.name_player == secondary_player.name_player:
+                if secondary_player.communications_relay_check(-2, unit_pos) and \
+                        self.communications_relay_enabled:
+                    can_continue = False
+                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Communications Relay?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                    await self.send_search()
+        if can_continue:
+            primary_player.spend_resources(player_being_hit.get_cost_given_pos(-2, unit_pos))
+            player_being_hit.destroy_card_in_hq(unit_pos)
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            self.player_with_deploy_turn = secondary_player.name_player
+            self.number_with_deploy_turn = secondary_player.get_number()
+            await self.send_info_box()
+            await primary_player.send_hand()
+            await primary_player.send_discard()
+            await primary_player.send_resources()
+            await player_being_hit.send_discard()
+            await player_being_hit.send_hq()
     elif self.action_chosen == "Twisted Laboratory":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
