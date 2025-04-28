@@ -2955,6 +2955,29 @@ class Game:
                                         player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
                                         self.delete_reaction()
                                         await player_exhausting_unit.send_units_at_planet(planet_pos)
+                        elif self.reactions_needing_resolving[0] == "Nahumekh":
+                            if game_update_string[1] != primary_player.get_number():
+                                can_continue = True
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    can_continue = False
+                                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = self.action_chosen
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = primary_player.name_player
+                                    self.nullify_context = "Reaction"
+                                    await self.send_search()
+                                if can_continue:
+                                    secondary_player.apply_negative_health_eop(planet_pos, unit_pos,
+                                                                               primary_player.nahumekh_value)
+                                    self.delete_reaction()
                         elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
@@ -3840,8 +3863,8 @@ class Game:
                     else:
                         self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
                 self.resolving_search_box = True
-                self.name_player_who_is_searching = self.name_player
-                self.number_who_is_searching = str(self.number)
+                self.name_player_who_is_searching = primary_player.name_player
+                self.number_who_is_searching = primary_player.number
                 self.what_to_do_with_searched_card = "DRAW"
                 self.traits_of_searched_card = "Drone"
                 self.card_type_of_searched_card = "Attachment"

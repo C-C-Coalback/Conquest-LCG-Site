@@ -91,6 +91,7 @@ class Player:
         self.dark_possession_remove_after_play = False
         self.enslaved_faction = ""
         self.chosen_enslaved_faction = False
+        self.nahumekh_value = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1630,6 +1631,7 @@ class Player:
         self.dark_possession_active = False
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
+                self.headquarters[i].negative_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].area_effect_eop = 0
                 self.headquarters[i].armorbane_eop = False
@@ -1639,6 +1641,7 @@ class Player:
                 self.headquarters[i].brutal_eop = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
@@ -2000,6 +2003,27 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].reset_own_eocr_values()
 
+    def count_non_necron_factions(self):
+        faction_list = []
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_faction() != "Necrons" and self.headquarters[i].get_faction() != "Neutral":
+                if self.headquarters[i].get_faction() not in faction_list:
+                    faction_list.append(self.headquarters[i].get_faction())
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_faction() != "Necrons" and \
+                        self.cards_in_play[i + 1][j].get_faction() != "Neutral":
+                    if self.cards_in_play[i + 1][j].get_faction() not in faction_list:
+                        faction_list.append(self.cards_in_play[i + 1][j].get_faction())
+        return len(faction_list)
+
+    def apply_negative_health_eop(self, planet_pos, unit_pos, value):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].negative_hp_until_eop += value
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += value
+        return None
+
     def perform_own_reactions_on_phase_change(self, phase):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":
@@ -2016,6 +2040,12 @@ class Player:
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
                                                   (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Nahumkeh":
+                    if phase == "COMBAT":
+                        self.nahumekh_value = self.count_non_necron_factions()
+                        if self.nahumekh_value > 0:
+                            self.game.create_reaction("Nahumekh", self.name_player,
+                                                      (int(self.number), i, j))
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     if phase == "COMBAT":
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":

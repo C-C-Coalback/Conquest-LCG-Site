@@ -229,6 +229,7 @@ class UnitCard(Card):
         self.area_effect_eor = 0
         self.mobile_eor = False
         self.armorbane_eor = False
+        self.negative_hp_until_eop = 0
 
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
@@ -433,6 +434,7 @@ class UnitCard(Card):
 
     def get_health(self):
         health = self.health
+        health -= self.negative_hp_until_eop
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 health += self.attachments[i].get_extra_health()
