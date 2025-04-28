@@ -93,6 +93,12 @@ def necrons_cards_init():
                                                 " your enslaved faction.", "Soldier. Sautekh.",
                              4, faction, "Common", 4, 4, 1, False, action_in_play=True,
                              allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Harbinger of Eternity", "You may play each event card from your discard pile "
+                                                      "as if it were in your hand.\n"
+                                                      "FORCED REACTION: After you play a event card from your"
+                                                      " discard pile, remove that card from the game.",
+                             "Scholar. Elite.", 5, faction, "Common", 3, 5, 3, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Praetorian Ancient", "While you have 6 or more units in your discard pile, "
                                                    "this unit gets +2 ATK and gains Armorbane.", "Soldier.",
                              4, faction, "Common", 3, 4, 1, False),

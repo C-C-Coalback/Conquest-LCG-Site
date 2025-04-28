@@ -126,6 +126,9 @@ def deck_validation(deck, remaining_signature_squad, factions):
                 faction_check_passed = True
             elif card_result.get_faction() == factions[1] and card_result.get_loyalty() == "Common":
                 faction_check_passed = True
+            elif factions[0] == "Necrons" and card_result.get_faction() != "Tyranids" and \
+                    card_result.get_loyalty() == "Common" and card_result.get_card_type() == "Army":
+                faction_check_passed = True
             elif card_result.get_faction() == "Neutral":
                 if factions[0] == "Tyranids" and card_result.get_card_type() == "Army":
                     return "Tyranids may not have Neutral Army Units in their deck"
@@ -194,9 +197,12 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 if card_loyalty != "Signature" or card_type == "Warlord":
                     if self.main_faction == card_object.get_faction():
                         await self.send(text_data=json.dumps({"message": message}))
-                    if self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
+                    elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
                         await self.send(text_data=json.dumps({"message": message}))
-                    if card_object.get_faction() == "Neutral":
+                    elif self.main_faction == "Necrons" and card_object.get_faction() != "Tyranids" and\
+                            card_loyalty == "Common" and card_type == "Army":
+                        await self.send(text_data=json.dumps({"message": message}))
+                    elif card_object.get_faction() == "Neutral":
                         if self.main_faction != "Tyranids":
                             await self.send(text_data=json.dumps({"message": message}))
                         elif card_type != "Army":
