@@ -2663,6 +2663,15 @@ class Game:
                             primary_player.aiming_reticle_coords_hand = None
                             await primary_player.send_hand()
                             await primary_player.send_discard()
+                    elif self.reactions_needing_resolving[0] == "Obedience":
+                        if self.chosen_first_card:
+                            origin_planet, origin_pos = self.misc_target_unit
+                            new_planet = int(game_update_string[1])
+                            primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                            primary_player.move_unit_to_planet(origin_planet, origin_pos, new_planet)
+                            await primary_player.send_units_at_planet(origin_planet)
+                            await primary_player.send_units_at_planet(new_planet)
+                            self.delete_reaction()
                     elif self.reactions_needing_resolving[0] == "Spore Chimney":
                         self.infested_planets[int(game_update_string[1])] = True
                         self.delete_reaction()
@@ -2726,6 +2735,14 @@ class Game:
                                     await self.complete_nullify()
                                 self.delete_reaction()
                                 await primary_player.send_hq()
+                        elif self.reactions_needing_resolving[0] == "Obedience":
+                            if game_update_string[1] == primary_player.number:
+                                if primary_player.headquarters[unit_pos].get_is_unit():
+                                    if primary_player.get_faction_given_pos(-2, unit_pos) != "Necrons":
+                                        self.chosen_first_card = True
+                                        self.misc_target_unit = (-2, unit_pos)
+                                        primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                                        await primary_player.send_hq()
                         elif self.reactions_needing_resolving[0] == "Seraphim Superior Allegra":
                             if game_update_string[1] == primary_player.number:
                                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
@@ -2893,6 +2910,14 @@ class Game:
                                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                                             await secondary_player.send_units_at_planet(planet_pos)
                                             self.delete_reaction()
+                        elif self.reactions_needing_resolving[0] == "Obedience":
+                            if game_update_string[1] == primary_player.number:
+                                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) != "Necrons":
+                                        self.chosen_first_card = True
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                        await primary_player.send_units_at_planet(planet_pos)
                         elif self.reactions_needing_resolving[0] == "Soul Grinder":
                             if primary_player.get_number() == game_update_string[1]:
                                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
@@ -3622,6 +3647,16 @@ class Game:
                 primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
                 self.delete_reaction()
                 await primary_player.send_units_at_planet(planet_pos)
+            elif self.reactions_needing_resolving[0] == "Obedience":
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                self.chosen_first_card = False
+                self.misc_target_unit = (-1, -1)
+                self.choices_available = []
+                self.choice_context = ""
+                self.name_player_making_choices = ""
+                await self.send_search()
+                await primary_player.send_hq()
             elif self.reactions_needing_resolving[0] == "Repulsor Impact Field" or \
                     self.reactions_needing_resolving[0] == "Solarite Avetys":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
