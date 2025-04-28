@@ -184,11 +184,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         "Shrieking Harpy", player.name_player,
                                         (int(player.number), self.attacker_planet, self.attacker_position))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
+                                                                "Pyrrhian Warscythe"):
+                                self.create_reaction("Pyrrhian Warscythe", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
+                            if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
                                                                 "Banshee Power Sword"):
                                 self.reactions_needing_resolving.append("Banshee Power Sword")
-                                self.positions_of_unit_triggering_reaction.append([int(player.number),
+                                self.positions_of_unit_triggering_reaction.append((int(player.number),
                                                                                    self.attacker_planet,
-                                                                                   self.attacker_position])
+                                                                                   self.attacker_position))
                                 self.player_who_resolves_reaction.append(player.name_player)
                             await player.send_units_at_planet(chosen_planet)
                 elif self.defender_position == -1:

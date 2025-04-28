@@ -1063,6 +1063,17 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.resolving_search_box = False
+                    if self.choice_context == "Awake the Sleepers":
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.choices_available = []
+                        self.resolving_search_box = False
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        await primary_player.send_hand()
+                        await primary_player.send_discard()
+                        primary_player.shuffle_deck()
+                        self.action_cleanup()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
                     if self.choice_context == "Choose Which Reaction":
@@ -1760,6 +1771,25 @@ class Game:
                                     await primary_player.send_hand()
                                     self.effects_waiting_on_resolution.append("Glorious Intervention")
                                     self.player_resolving_effect.append(primary_player.name_player)
+                    elif self.choice_context == "Awake the Sleepers":
+                        target_name = self.choices_available[int(game_update_string[1])]
+                        primary_player.deck.append(target_name)
+                        primary_player.discard.remove(target_name)
+                        del self.choices_available[int(game_update_string[1])]
+                        if not self.choices_available:
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            primary_player.aiming_reticle_coords_hand = None
+                            await self.game_sockets[0].receive_game_update(
+                                "No valid targets for Awake the Sleepers"
+                            )
+                            await primary_player.send_hand()
+                            primary_player.shuffle_deck()
+                            self.action_cleanup()
+                        await primary_player.send_discard()
+                        await self.send_search()
                     elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?":
                         self.choices_available = []
                         self.choice_context = ""
@@ -3765,6 +3795,11 @@ class Game:
                 self.ranged_skirmish_active = True
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                 await primary_player.send_hq()
+                self.delete_reaction()
+            elif self.reactions_needing_resolving[0] == "Pyrrhian Warscythe":
+                primary_player.discard_top_card_deck()
+                primary_player.discard_top_card_deck()
+                await primary_player.send_discard()
                 self.delete_reaction()
             elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
