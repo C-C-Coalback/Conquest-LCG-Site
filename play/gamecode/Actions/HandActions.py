@@ -387,6 +387,16 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     await primary_player.send_hand()
         else:
             await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
+    elif self.action_chosen == "Slumbering Tomb":
+        primary_player.discard_card_from_hand(int(game_update_string[2]))
+        self.misc_counter += 1
+        if self.misc_counter >= 2:
+            self.action_cleanup()
+            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
+            await primary_player.send_hq()
+        await primary_player.send_discard()
+        await primary_player.send_hand()
     elif self.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):
