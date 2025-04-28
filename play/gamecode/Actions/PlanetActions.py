@@ -279,6 +279,32 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await primary_player.send_units_at_planet(dest_planet)
             await primary_player.send_discard()
             await primary_player.send_hq()
+    elif self.action_chosen == "Anrakyr the Traveller":
+        if self.anrakyr_unit_position != -1:
+            disc = 0
+            if self.anrakyr_deck_choice == primary_player.name_player:
+                card = FindCard.find_card(primary_player.discard[self.anrakyr_unit_position], self.card_array)
+            else:
+                card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array)
+            self.available_discounts = 0  # TODO: Add discount support for Anrakyr
+            self.discounts_applied = 0
+            if self.discounts_applied >= self.available_discounts:
+                added_card_to_planet = False
+                if primary_player.spend_resources(card.get_cost() - self.discounts_applied):
+                    if primary_player.add_card_to_planet(card, chosen_planet) != -1:
+                        added_card_to_planet = True
+                if added_card_to_planet:
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_cleanup()
+                    await primary_player.send_hq()
+                    if self.anrakyr_deck_choice == primary_player.name_player:
+                        del primary_player.discard[self.anrakyr_unit_position]
+                        await primary_player.send_discard()
+                    else:
+                        del secondary_player.discard[self.anrakyr_unit_position]
+                        await secondary_player.send_discard()
+            await primary_player.send_units_at_planet(chosen_planet)
     elif self.action_chosen == "Ecstatic Seizures":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             primary_player.discard_attachments_from_card(chosen_planet, i)

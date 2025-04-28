@@ -60,6 +60,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             await primary_player.send_hq()
+                    elif ability == "Anrakyr the Traveller":
+                        if not card.get_once_per_phase_used():
+                            self.action_chosen = ability
+                            self.choices_available = ["Own Discard", "Enemy Discard"]
+                            self.choice_context = "Anrakyr: Select which discard:"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.anrakyr_unit_position = -1
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            card.set_once_per_phase_used(True)
+                            await primary_player.send_hq()
                     elif ability == "Autarch Celachia":
                         if not card.once_per_round_used:
                             if primary_player.spend_resources(1):

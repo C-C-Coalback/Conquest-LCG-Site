@@ -218,6 +218,8 @@ class Game:
             "Predation", "Spawn Termagants", "Spore Burst", "Dark Cunning", "Consumption",
             "Subdual", "Ecstatic Seizures", "Dark Possession", "Subdual"
         ]
+        self.anrakyr_unit_position = -1
+        self.anrakyr_deck_choice = self.name_1
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -1333,6 +1335,66 @@ class Game:
                         await primary_player.send_hq()
                         await primary_player.send_hand()
                         await primary_player.send_discard()
+                    elif self.choice_context == "Anrakyr: Select which discard:":
+                        found_card = False
+                        can_play_card = False
+                        card_name = ""
+                        if game_update_string[1] == "0":
+                            self.anrakyr_deck_choice = primary_player.name_player
+                            i = len(primary_player.discard) - 1
+                            while i > -1 and not found_card:
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                if card.get_is_unit():
+                                    name = card.get_name()
+                                    found_card = True
+                                    self.anrakyr_unit_position = i
+                                    if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
+                                            card.get_faction() == primary_player.enslaved_faction:
+                                        if card.get_cost() > primary_player.resources:
+                                            can_play_card = False
+                                        else:
+                                            can_play_card = True
+                                i -= 1
+                        else:
+                            self.anrakyr_deck_choice = secondary_player.name_player
+                            i = len(secondary_player.discard) - 1
+                            while i > -1 and not found_card:
+                                card = FindCard.find_card(secondary_player.discard[i], self.card_array)
+                                if card.get_is_unit():
+                                    name = card.get_name()
+                                    found_card = True
+                                    self.anrakyr_unit_position = i
+                                    if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
+                                            card.get_faction() == primary_player.enslaved_faction:
+                                        if card.get_cost() > primary_player.resources:
+                                            can_play_card = False
+                                        else:
+                                            can_play_card = True
+                                i -= 1
+                        if found_card:
+                            if not can_play_card:
+                                await self.game_sockets[0].receive_game_update(
+                                    "Can not play the topmost unit in that discard pile!"
+                                )
+                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                            self.position_of_actioned_card[1])
+                                self.action_cleanup()
+                                await primary_player.send_hq()
+                            else:
+                                await self.game_sockets[0].receive_game_update(
+                                    "Anrakyr is playing: " + name
+                                )
+                        else:
+                            await self.game_sockets[0].receive_game_update(
+                                "Did not find a valid card!"
+                            )
+                            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                        self.position_of_actioned_card[1])
+                            self.action_cleanup()
+                            await primary_player.send_hq()
+                        self.name_player_making_choices = ""
+                        self.choices_available = []
+                        self.choice_context = ""
                     elif self.choice_context == "Repair Bay":
                         card_name = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.insert(0, card_name)
