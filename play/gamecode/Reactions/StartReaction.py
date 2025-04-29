@@ -103,6 +103,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.discard_top_card_deck()
             primary_player.discard_top_card_deck()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Deathmark Assassins":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.discard_top_card_deck():
+                last_card_discard = len(primary_player.discard) - 1
+                card = FindCard.find_card(primary_player.discard[last_card_discard], self.card_array)
+                cost = card.get_cost()
+                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Patrolling Wraith":
             await secondary_player.reveal_hand()
             i = 0

@@ -2060,11 +2060,18 @@ class Player:
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
+                    elif self.headquarters[i].get_ability() == "Deathmark Assassins":
+                        self.game.create_reaction("Deathmark Assassins", self.name_player,
+                                                  (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
+                                                  (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Deathmark Assassins":
+                    if phase == "COMBAT":
+                        self.game.create_reaction("Deathmark Assassins", self.name_player,
                                                   (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Nahumekh":
                     if phase == "COMBAT":
@@ -2151,6 +2158,8 @@ class Player:
         if self.deck:
             self.discard.append(self.deck[0])
             del self.deck[0]
+            return True
+        return False
 
     def get_card_top_discard(self):
         if self.discard:
