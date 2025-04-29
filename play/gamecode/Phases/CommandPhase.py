@@ -65,11 +65,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.commit_warlord_to_planet()
                     self.p1.commit_synapse_to_planet()
                     self.p2.commit_synapse_to_planet()
-                    await self.p1.send_hq()
-                    await self.p2.send_hq()
                     await self.send_planet_array()
-                    await self.p1.send_units_at_all_planets()
-                    await self.p2.send_units_at_all_planets()
                     self.p1.has_passed = False
                     self.p2.has_passed = False
                     self.committing_warlords = False
@@ -108,7 +104,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Foresight"
-                            await self.send_search()
                         else:
                             warlord_planet = primary_player.warlord_commit_location
                             self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
@@ -117,7 +112,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.player_who_resolves_reaction.append(primary_player.name_player)
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            await primary_player.send_hand()
                     elif primary_player.cards[hand_pos] == "Superiority":
                         if secondary_player.nullify_check() and self.nullify_enabled:
                             await self.game_sockets[0].receive_game_update(
@@ -132,7 +126,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Superiority"
-                            await self.send_search()
                         elif primary_player.spend_resources(1):
                             self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
                                                                                -1, -1])
@@ -140,7 +133,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.player_who_resolves_reaction.append(primary_player.name_player)
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            await primary_player.send_hand()
     elif self.after_command_struggle:
         print("After command struggle")
         if len(game_update_string) == 1:
@@ -159,22 +151,14 @@ async def update_game_event_command_section(self, name, game_update_string):
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
                         self.name_player_making_choices = self.player_with_action
-                        await self.send_search()
                     elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
                         self.name_player_making_choices = self.player_with_action
-                        await self.send_search()
     if self.p1.has_passed and self.p2.has_passed:
         print("Both passed")
         if self.before_command_struggle:
             resolve_command_struggle(self)
-            await self.p1.send_hand()
-            await self.p2.send_hand()
-            await self.p1.send_resources()
-            await self.p2.send_resources()
-            await self.p1.send_units_at_all_planets()
-            await self.p2.send_units_at_all_planets()
             self.before_command_struggle = False
             self.after_command_struggle = True
             self.p1.has_passed = False
@@ -202,8 +186,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                 await self.send_planet_array()
                 self.p1.has_passed = False
                 self.p2.has_passed = False
-                await self.send_info_box()
-
 
 def resolve_command_struggle(self):
     storage_command_struggle = [None, None, None, None, None, None, None]

@@ -92,6 +92,11 @@ class Player:
         self.enslaved_faction = ""
         self.chosen_enslaved_faction = False
         self.nahumekh_value = 0
+        self.last_hand_string = ""
+        self.last_hq_string = ""
+        self.last_planet_strings = ["", "", "", "", "", "", ""]
+        self.last_resources_string = ""
+        self.last_discard_string = ""
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -144,7 +149,8 @@ class Player:
     def set_can_play_limited(self, new_val):
         self.can_play_limited = new_val
 
-    async def send_hand(self):
+    async def send_hand(self, force=False):
+        card_string = ""
         if self.cards:
             card_array = self.cards.copy()
             if self.aiming_reticle_color is None:
@@ -155,12 +161,14 @@ class Player:
                         card_array[i] = card_array[i] + "|" + self.aiming_reticle_color
             card_string = "/".join(card_array)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
-            await self.game.game_sockets[0].receive_game_update(card_string)
         else:
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player
+        if card_string != self.last_hand_string or force:
+            self.last_hand_string = card_string
             await self.game.game_sockets[0].receive_game_update(card_string)
 
-    async def send_hq(self):
+    async def send_hq(self, force=False):
+        joined_string = ""
         if self.headquarters:
             card_strings = []
             for i in range(len(self.headquarters)):
@@ -188,8 +196,6 @@ class Player:
                     single_card_string += current_card.aiming_reticle_color
                 attachments_list = current_card.get_attachments()
                 for a in range(len(attachments_list)):
-                    print("Adding attachments")
-                    print(attachments_list[a].get_name())
                     single_card_string += "|"
                     single_card_string += attachments_list[a].get_name()
                     single_card_string += "+"
@@ -200,19 +206,19 @@ class Player:
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
-            print(joined_string)
-            await self.game.game_sockets[0].receive_game_update(joined_string)
         else:
             joined_string = "GAME_INFO/HQ/" + str(self.number)
+        if self.last_hq_string != joined_string or force:
+            self.last_hq_string = joined_string
             await self.game.game_sockets[0].receive_game_update(joined_string)
 
-    async def send_units_at_planet(self, planet_id):
+    async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
             if planet_id == -2:
                 await self.send_hq()
             else:
+                joined_string = ""
                 if self.cards_in_play[planet_id + 1]:
-                    print("Need to send units")
                     card_strings = []
                     for i in range(len(self.cards_in_play[planet_id + 1])):
                         current_card = self.cards_in_play[planet_id + 1][i]
@@ -236,8 +242,6 @@ class Player:
                             single_card_string += current_card.aiming_reticle_color
                         attachments_list = current_card.get_attachments()
                         for a in range(len(attachments_list)):
-                            print("Adding attachments")
-                            print(attachments_list[a].get_name())
                             single_card_string += "|"
                             single_card_string += attachments_list[a].get_name()
                             single_card_string += "+"
@@ -248,19 +252,21 @@ class Player:
                         card_strings.append(single_card_string)
                     joined_string = "/".join(card_strings)
                     joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
-                    print(joined_string)
-                    await self.game.game_sockets[0].receive_game_update(joined_string)
                 else:
                     joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
+                if self.last_planet_strings[planet_id] != joined_string or force:
+                    self.last_planet_strings[planet_id] = joined_string
                     await self.game.game_sockets[0].receive_game_update(joined_string)
 
-    async def send_units_at_all_planets(self):
+    async def send_units_at_all_planets(self, force=False):
         for i in range(7):
-            await self.send_units_at_planet(i)
+            await self.send_units_at_planet(i, force=force)
 
-    async def send_resources(self):
+    async def send_resources(self, force=False):
         joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
-        await self.game.game_sockets[0].receive_game_update(joined_string)
+        if joined_string != self.last_resources_string or force:
+            self.last_resources_string = joined_string
+            await self.game.game_sockets[0].receive_game_update(joined_string)
 
     async def transform_indirect_into_damage(self):
         for i in range(len(self.headquarters)):
@@ -273,7 +279,6 @@ class Player:
                     if self.game.first_card_damaged:
                         self.game.first_card_damaged = False
                         self.set_aiming_reticle_in_play(-2, i, "red")
-                await self.send_hq()
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_is_unit():
@@ -286,7 +291,6 @@ class Player:
                         if self.game.first_card_damaged:
                             self.game.first_card_damaged = False
                             self.set_aiming_reticle_in_play(i, j, "red")
-                    await self.send_units_at_planet(i)
 
     async def send_victory_display(self):
         if self.victory_display:
@@ -295,7 +299,6 @@ class Player:
                 card_strings.append(self.victory_display[i].get_name())
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number) + "/" + joined_string
-            print(joined_string)
             await self.game.game_sockets[0].receive_game_update(joined_string)
         else:
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number)
@@ -308,13 +311,15 @@ class Player:
                 "----GAME END----"
             )
 
-    async def send_discard(self):
+    async def send_discard(self, force=False):
+        joined_string = ""
         top_card = self.get_top_card_discard()
         if top_card is None:
             joined_string = "GAME_INFO/DISCARD/" + str(self.number)
-            await self.game.game_sockets[0].receive_game_update(joined_string)
         else:
             joined_string = "GAME_INFO/DISCARD/" + str(self.number) + "/" + top_card
+        if joined_string != self.last_discard_string or force:
+            self.last_discard_string = joined_string
             await self.game.game_sockets[0].receive_game_update(joined_string)
 
     def exhaust_card_in_hq_given_name(self, card_name):
@@ -864,12 +869,8 @@ class Player:
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -2, i])
                 self.player_who_resolves_reaction.append(self.name_player)
             for attach in self.headquarters[i].get_attachments():
-                found_any = False
                 if attach.get_ability() == "Hypex Injector":
                     self.ready_given_pos(-2, i)
-                    found_any = True
-                if found_any:
-                    await self.send_hq()
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Beasthunter Wyches":
@@ -877,12 +878,8 @@ class Player:
                     self.game.positions_of_unit_triggering_reaction.append([int(self.number), i, j])
                     self.game.player_who_resolves_reaction.append(self.name_player)
                 for attach in self.cards_in_play[i + 1][j].get_attachments():
-                    found_any = False
                     if attach.get_ability() == "Hypex Injector":
                         self.ready_given_pos(i, j)
-                        found_any = True
-                    if found_any:
-                        await self.send_units_at_planet(i)
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
         card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))

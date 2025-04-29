@@ -16,9 +16,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     self.delete_reaction()
                     await secondary_player.dark_eldar_event_played()
-                    await primary_player.send_units_at_planet(planet_pos)
-                    await primary_player.send_discard()
-                    await self.send_info_box()
         elif self.reactions_needing_resolving[0] == "Nullify":
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
@@ -32,11 +29,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choice_context = "Use Nullify?"
                     await self.game_sockets[0].receive_game_update(secondary_player.name_player +
                                                                    " counter nullify offered.")
-                    await self.send_search()
                 else:
                     await self.complete_nullify()
                 self.delete_reaction()
-                await primary_player.send_units_at_planet(planet_pos)
         elif self.reactions_needing_resolving[0] == "Vengeance!":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:
@@ -45,10 +40,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.spend_resources(1)
                         primary_player.discard_card_name_from_hand("Vengeance!")
                         primary_player.ready_given_pos(planet_pos, unit_pos)
-                        await primary_player.send_hand()
-                        await primary_player.send_units_at_planet(planet_pos)
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -77,11 +68,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
-                            await self.send_search()
                     if can_continue:
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2)
                         self.advance_damage_aiming_reticle()
-                        await secondary_player.send_units_at_planet(planet_pos)
                         self.delete_reaction()
                 else:
                     await self.game_sockets[0].receive_game_update(
@@ -110,14 +99,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
-                            await self.send_search()
                         if can_continue:
                             if self.infested_planets[planet_pos]:
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
                             else:
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
-                            await secondary_player.send_units_at_planet(planet_pos)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
             if game_update_string[1] == primary_player.number:
@@ -126,7 +113,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        await primary_player.send_units_at_planet(planet_pos)
         elif self.reactions_needing_resolving[0] == "Soul Grinder":
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
@@ -138,8 +124,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             get_card_type() != "Warlord":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                         secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
-                        await primary_player.send_units_at_planet(planet_pos)
-                        await secondary_player.send_units_at_planet(planet_pos)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
@@ -155,7 +139,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, game_update_string)
                         self.delete_reaction()
-                        await self.send_info_box()
         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
             print("Reached Starbane code")
             planet_pos = int(game_update_string[2])
@@ -181,14 +164,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
-                    await self.send_search()
             if can_continue:
                 if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
                     if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
                             get_card_type() != "Warlord":
                         player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
                         self.delete_reaction()
-                        await player_exhausting_unit.send_units_at_planet(planet_pos)
         elif self.reactions_needing_resolving[0] == "Nahumekh":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -211,7 +192,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
-                    await self.send_search()
             if can_continue:
                 if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     secondary_player.apply_negative_health_eop(planet_pos, unit_pos,
@@ -241,11 +221,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
-                    await self.send_search()
                 if can_continue:
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos)
                     self.delete_reaction()
-                    await secondary_player.send_units_at_planet(planet_pos)
         elif self.reactions_needing_resolving[0] == "Superiority":
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
@@ -270,20 +248,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction Event"
-                    await self.send_search()
             if can_continue:
                 if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                     player_being_hit.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
                     card_name = player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
                     text = card_name + ", position " + str(planet_pos) \
-                           + " " + str(unit_pos) + " hit by superiority."
+                        + " " + str(unit_pos) + " hit by superiority."
                     await self.game_sockets[0].receive_game_update(text)
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
-                    await primary_player.send_discard()
-                    await primary_player.send_hand()
                     self.delete_reaction()
-                    await self.send_info_box()
         elif self.reactions_needing_resolving[0] == "Venomthrope Polluter":
             if game_update_string[1] == primary_player.number:
                 planet_pos = int(game_update_string[2])
@@ -293,8 +267,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         dest_planet = self.positions_of_unit_triggering_reaction[0][1]
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
                         self.delete_reaction()
-                        await primary_player.send_units_at_planet(planet_pos)
-                        await primary_player.send_units_at_planet(dest_planet)
         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
@@ -309,8 +281,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
                             self.alaitoc_shrine_activated = False
                             self.allowed_units_alaitoc_shrine = []
-                            await primary_player.send_units_at_planet(planet_pos)
-                            await self.send_info_box()
                         else:
                             await self.game_sockets[0].receive_game_update("Unit already ready")
         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
@@ -325,8 +295,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
                             self.allowed_planets_cato_stronghold = []
                             self.cato_stronghold_activated = False
-                            await primary_player.send_units_at_planet(planet_pos)
-                            await self.send_info_box()
                         else:
                             await self.game_sockets[0].receive_game_update("Unit already ready")
         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
@@ -341,9 +309,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 set_reaction_available(False)
                             primary_player.summon_token_at_hq("Khymera", 1)
                             self.delete_reaction()
-                            await self.send_info_box()
-                            await primary_player.send_hq()
-                            await primary_player.send_resources()
         elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos = int(game_update_string[2])
@@ -351,8 +316,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if self.attacker_planet == int(game_update_string[2]):
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
-                    await self.send_info_box()
-                    await primary_player.send_units_at_planet(planet_pos)
         elif self.reactions_needing_resolving[0] == "Burna Boyz":
             if primary_player.get_number() != game_update_string[1]:
                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]
@@ -383,13 +346,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
-                            await self.send_search()
                         if can_continue:
                             secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
                             secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
                                                                         "blue")
                             self.delete_reaction()
-                            await secondary_player.send_units_at_planet(origin_planet)
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
@@ -419,7 +380,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
-                            await self.send_search()
                         if can_continue:
                             secondary_player.move_unit_to_planet(target_planet,
                                                                  int(game_update_string[3]),
@@ -429,5 +389,3 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos,
                                                                         "red")
                             self.delete_reaction()
-                            await secondary_player.send_units_at_planet(origin_planet)
-                            await secondary_player.send_units_at_planet(target_planet)

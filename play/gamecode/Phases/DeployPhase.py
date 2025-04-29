@@ -18,12 +18,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
                         self.name_player_making_choices = self.player_with_action
-                        await self.send_search()
                     elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
                         self.name_player_making_choices = self.player_with_action
-                        await self.send_search()
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             print("Need to pass")
             if name == self.player_with_deploy_turn:
@@ -51,7 +49,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
             if self.p1.has_passed and self.p2.has_passed:
                 print("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
-            await self.send_info_box()
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
             if self.mode == "DISCOUNT":
@@ -82,7 +79,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.nullify_string = "/".join(game_update_string)
                                     self.first_player_nullified = player.name_player
                                     self.nullify_context = "Bigga Is Betta"
-                                    await self.send_search()
                                 else:
                                     self.discounts_applied += discount_received
                                     player.discard_card_from_hand(int(game_update_string[2]))
@@ -93,9 +89,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     if self.discounts_applied >= self.available_discounts:
                                         await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                                   discounts=self.discounts_applied)
-                                    else:
-                                        await player.send_hand()
-                                        await player.send_discard()
             elif self.mode == "Normal":
                 if name == self.player_with_deploy_turn:
                     print(game_update_string[1] == self.number_with_deploy_turn)
@@ -120,13 +113,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = -1
                             print(played_support)
                             if played_support == "SUCCESS":
-                                await primary_player.send_hand()
-                                await primary_player.send_hq()
-                                await primary_player.send_resources()
                                 if not secondary_player.has_passed:
                                     self.player_with_deploy_turn = secondary_player.get_name_player()
                                     self.number_with_deploy_turn = secondary_player.get_number()
-                                    await self.send_info_box()
                             self.card_pos_to_deploy = -1
                         elif card.get_card_type() == "Army":
                             if (primary_player.warlord_faction == "Necrons" and (
@@ -136,12 +125,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 primary_player.aiming_reticle_color = "blue"
                                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                 self.card_type_of_selected_card_in_hand = "Army"
-                                await primary_player.send_hand()
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             self.card_type_of_selected_card_in_hand = "Attachment"
-                            await primary_player.send_hand()
                         else:
                             self.card_type_of_selected_card_in_hand = ""
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
@@ -162,7 +149,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                                                                   self.planet_aiming_reticle_position)
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
-                                await player.send_hq()
                             if self.discounts_applied >= self.available_discounts:
                                 await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                           discounts=self.discounts_applied)
@@ -199,15 +185,12 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
                         self.available_discounts += temp_av_disc
                         self.discounts_applied += temp_auto_disc
-                        await player.send_units_at_all_planets()
-                        await player.send_hq()
                         if self.available_discounts > self.discounts_applied:
                             self.stored_mode = self.mode
                             self.mode = "DISCOUNT"
                             self.planet_aiming_reticle_position = int(game_update_string[1])
                             self.planet_aiming_reticle_active = True
                             await self.send_planet_array()
-                            await self.send_info_box()
                         else:
                             await deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
@@ -228,7 +211,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                                                                    self.traits_of_card_to_play)
                         if discount_received > 0:
                             self.discounts_applied += discount_received
-                            await player.send_units_at_planet(int(game_update_string[2]))
                         if self.discounts_applied >= self.available_discounts:
                             await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                       discounts=self.discounts_applied)
@@ -267,13 +249,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
             primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
-        await primary_player.send_hand()
-        await secondary_player.send_hand()
-        await primary_player.send_discard()
-        await secondary_player.send_discard()
-        await primary_player.send_units_at_all_planets()
-        await secondary_player.send_units_at_planet(int(planet_pos))
-        await primary_player.send_resources()
     self.mode = "Normal"
     if not secondary_player.has_passed:
         self.player_with_deploy_turn = secondary_player.get_name_player()
@@ -288,8 +263,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     self.available_discounts = 0
     self.faction_of_card_to_play = ""
     self.name_of_card_to_play = ""
-    await primary_player.send_hand()
-    await primary_player.send_hq()
     await self.send_planet_array()
     print("Finished deploying card")
 
@@ -350,23 +323,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string):
                 primary_player.remove_card_from_hand(self.card_pos_to_deploy)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1
-                await primary_player.send_hand()
-                if enemy_card:
-                    if game_update_string[2] == "-2":
-                        await secondary_player.send_hq()
-                    else:
-                        await secondary_player.send_units_at_planet(int(game_update_string[2]))
-                else:
-                    if game_update_string[2] == "-2":
-                        await primary_player.send_hq()
-                    else:
-                        await primary_player.send_units_at_planet(int(game_update_string[2]))
-                await primary_player.send_resources()
                 if not secondary_player.has_passed:
                     if self.phase == "DEPLOY":
                         self.player_with_deploy_turn = secondary_player.get_name_player()
                         self.number_with_deploy_turn = secondary_player.get_number()
-                    await self.send_info_box()
                 self.card_pos_to_deploy = -1
                 self.mode = "Normal"
                 self.card_type_of_selected_card_in_hand = ""

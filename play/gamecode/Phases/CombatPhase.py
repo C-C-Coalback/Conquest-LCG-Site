@@ -14,12 +14,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.choices_available = ["Dark Possession", "Regular Action"]
                     self.choice_context = "Use Dark Possession?"
                     self.name_player_making_choices = self.player_with_action
-                    await self.send_search()
                 elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
                     self.choices_available = ["Dark Possession", "Regular Action"]
                     self.choice_context = "Use Dark Possession?"
                     self.name_player_making_choices = self.player_with_action
-                    await self.send_search()
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             if name == self.player_with_combat_turn:
                 if self.number_with_combat_turn == "1":
@@ -40,7 +38,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p2.has_passed = False
                             self.reset_combat_turn()
                             self.ranged_skirmish_active = False
-                            await self.send_info_box()
                         else:
                             print("Both players passed, need to run combat round end.")
                             self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
@@ -48,8 +45,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p1.has_passed = False
                             self.p2.has_passed = False
                             self.reset_combat_turn()
-                            await self.p1.send_units_at_planet(self.last_planet_checked_for_battle)
-                            await self.p2.send_units_at_planet(self.last_planet_checked_for_battle)
                             self.mode = "RETREAT"
                             await self.check_combat_end(name)
                     elif self.mode == "RETREAT":
@@ -61,8 +56,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         self.mode = "Normal"
                         self.begin_combat_round()
                         await self.check_combat_end(name)
-                else:
-                    await self.send_info_box()
     elif len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if self.mode == "Normal":
@@ -108,8 +101,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             else:
                                 player = self.p2
                             player.retreat_unit(chosen_planet, chosen_unit, exhaust=True)
-                            await player.send_units_at_planet(self.last_planet_checked_for_battle)
-                            await player.send_hq()
                 elif self.attacker_position == -1:
                     if game_update_string[1] == self.number_with_combat_turn:
                         chosen_planet = int(game_update_string[2])
@@ -135,7 +126,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.choices_available = ["Yes", "No"]
                                         self.choice_context = "Retreat Warlord?"
                                         self.name_player_making_choices = player.name_player
-                                        await self.send_search()
                                     print("Unit ready, can be used")
                                     valid_unit = True
                                     player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
@@ -160,7 +150,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.choices_available = ["Own deck", "Enemy deck"]
                                 self.name_player_making_choices = player.name_player
                                 self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
-                                await self.send_search()
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
                                     == "Wailing Wraithfighter":
                                 self.reactions_needing_resolving.append("Wailing Wraithfighter")
@@ -195,7 +184,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                    self.attacker_planet,
                                                                                    self.attacker_position))
                                 self.player_who_resolves_reaction.append(player.name_player)
-                            await player.send_units_at_planet(chosen_planet)
                 elif self.defender_position == -1:
                     if game_update_string[1] != self.number_with_combat_turn:
                         armorbane_check = False
@@ -234,7 +222,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             self.last_defender_position = (self.defender_planet, self.defender_position)
                                             secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                         self.defender_position, "red")
-                                            await secondary_player.send_units_at_planet(self.defender_planet)
                         if can_continue:
                             if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                     self.attacker_position) == "Starbane's Council":
@@ -315,9 +302,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                             self.attacker_position)
 
-                                await primary_player.send_units_at_planet(self.attacker_planet)
-                            if not armorbane_check or attack_value < 1:
-                                await secondary_player.send_units_at_planet(self.defender_planet)
                             self.reset_combat_positions()
                             self.number_with_combat_turn = secondary_player.get_number()
                             self.player_with_combat_turn = secondary_player.get_name_player()

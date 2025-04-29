@@ -31,9 +31,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             if self.phase == "DEPLOY":
                                 self.player_with_deploy_turn = secondary_player.name_player
                                 self.number_with_deploy_turn = secondary_player.get_number()
-                            await player_owning_card.send_resources()
                             await self.game_sockets[0].receive_game_update("Haemonculus buffed")
-                            await self.send_info_box()
                 elif ability == "Virulent Spore Sacs":
                     if player_owning_card.name_player == name:
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -46,8 +44,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.player_with_action = ""
                         self.action_chosen = ""
                         self.mode = "Normal"
-                        await player_owning_card.send_units_at_planet(planet_pos)
-                        await secondary_player.send_units_at_planet(planet_pos)
                 elif ability == "Captain Markis":
                     if not card_chosen.get_once_per_phase_used():
                         card_chosen.set_once_per_phase_used(True)
@@ -56,14 +52,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.chosen_second_card = False
                         self.chosen_first_card = False
-                        await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Wildrider Squadron":
                     if not card_chosen.get_once_per_phase_used():
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
-                            await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Boss Zugnog":
                     if not card_chosen.get_once_per_phase_used():
                         if self.planets_in_play_array[self.round_number]:
@@ -71,7 +65,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            await primary_player.send_units_at_planet(planet_pos)
                             self.misc_target_planet = planet_pos
                             self.misc_counter = 0
                 elif ability == "Hunter Gargoyles":
@@ -80,7 +73,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        await primary_player.send_units_at_planet(planet_pos)
                 elif ability == "Autarch Celachia":
                     if not card_chosen.once_per_round_used:
                         if primary_player.spend_resources(1):
@@ -91,33 +83,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
                             self.choice_context = "Autarch Celachia"
                             self.name_player_making_choices = primary_player.name_player
-                            await self.send_search()
-                            await primary_player.send_resources()
                 elif ability == "Pathfinder Shi Or'es":
                     if not card_chosen.get_once_per_phase_used():
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
-                        await player_owning_card.send_units_at_planet(planet_pos)
                         card_chosen.set_once_per_phase_used(True)
                 elif ability == "Veteran Brother Maxos":
                     if player_owning_card.name_player == name:
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
-                        await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Zarathur's Flamers":
                     if player_owning_card.name_player == name:
                         self.action_chosen = "Zarathur's Flamers"
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
-                        await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Ravenous Flesh Hounds":
                     if player_owning_card.name_player == name:
                         self.action_chosen = "Ravenous Flesh Hounds"
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
-                        await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Nazdreg's Flash Gitz":
                     if not card_chosen.get_once_per_phase_used():
                         if player_owning_card.name_player == name:
@@ -130,7 +116,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.player_with_action = ""
                                 self.action_chosen = ""
                                 self.mode = "Normal"
-                                await player_owning_card.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Twisted Laboratory":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -161,7 +146,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
-                await self.send_search()
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                 player_being_hit.set_blanked_given_pos(planet_pos, unit_pos, exp="EOP")
@@ -178,8 +162,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
-                await self.send_info_box()
-                await primary_player.send_hq()
     elif self.action_chosen == "Hate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -210,7 +192,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "In Play Action"
-                    await self.send_search()
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(planet_pos, unit_pos))
             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
@@ -221,12 +202,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.get_number()
-            await self.send_info_box()
-            await primary_player.send_hand()
-            await primary_player.send_discard()
-            await primary_player.send_resources()
-            await player_being_hit.send_discard()
-            await player_being_hit.send_units_at_planet()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if self.number_with_deploy_turn == "1":
@@ -250,11 +225,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.number_with_deploy_turn = secondary_player.number
                 self.mode = self.stored_mode
                 await primary_player.dark_eldar_event_played()
-                await primary_player.send_hand()
-                await secondary_player.send_hand()
-                await secondary_player.send_discard()
-                await primary_player.send_discard()
-                await primary_player.send_units_at_planet(int(game_update_string[2]))
     elif self.action_chosen == "Even the Odds":
         if self.chosen_first_card:
             if self.misc_player_storage == game_update_string[1]:
@@ -286,10 +256,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.misc_player_storage = ""
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await player_owning_card.send_units_at_planet(dest_planet)
-                        await player_owning_card.send_units_at_planet(origin_planet)
                     else:
                         await self.game_sockets[0].receive_game_update("Invalid attachment movement.")
     elif self.action_chosen == "Boss Zugnog":
@@ -298,7 +264,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.misc_counter += 1
-                await primary_player.send_units_at_planet(planet_pos)
             if self.misc_counter >= 2:
                 i = 0
                 while i < len(primary_player.cards_in_play[planet_pos + 1]):
@@ -314,8 +279,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
-                await primary_player.send_units_at_planet(self.round_number)
-                await primary_player.send_units_at_planet(planet_pos)
 
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
@@ -350,7 +313,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-                await self.send_search()
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
@@ -365,10 +327,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
-                await self.send_info_box()
-                await player_being_hit.send_units_at_planet(planet_pos)
-                await primary_player.send_hand()
-                await primary_player.send_discard()
     elif self.action_chosen == "Calculated Strike":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -402,7 +360,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-                await self.send_search()
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_limited():
                 player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
@@ -415,11 +372,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
-                await self.send_info_box()
-                await primary_player.send_hand()
-                await primary_player.send_discard()
-                await player_being_hit.send_discard()
-                await player_being_hit.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Command-Link Drone":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -438,15 +390,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.player_with_action = ""
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
-                    await primary_player.send_units_at_planet(planet_pos)
-                    await primary_player.send_units_at_planet(self.position_of_selected_attachment[0])
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.position_of_actioned_card = (-1, -1)
                     if self.phase == "DEPLOY":
                         if not secondary_player.has_passed:
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
-                    await self.send_info_box()
     elif self.action_chosen == "Preemptive Barrage":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -473,9 +422,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.mode = "Normal"
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
-                    await primary_player.send_hand()
-                    await primary_player.send_hq()
-                    await primary_player.send_discard()
     elif self.action_chosen == "Kraktoof Hall":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -493,7 +439,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     self.misc_target_planet = planet_pos
-                    await primary_player.send_units_at_planet(planet_pos)
         elif self.misc_target_planet == planet_pos:
             if game_update_string[1] == "1":
                 player_owning_card = self.p1
@@ -516,7 +461,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "In Play Action"
-                    await self.send_search()
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False)
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -527,9 +471,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
-                await primary_player.send_hq()
-                await primary_player.send_units_at_planet(planet_pos)
-                await player_owning_card.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Suppressive Fire":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -544,7 +485,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                 self.chosen_first_card = True
                 self.misc_target_planet = planet_pos
-                await primary_player.send_units_at_planet(planet_pos)
         else:
             if planet_pos == self.misc_target_planet:
                 can_continue = True
@@ -567,7 +507,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Event Action"
-                        await self.send_search()
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
@@ -578,9 +517,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.player_with_action = ""
                         self.mode = "Normal"
                         self.misc_target_planet = -1
-                        await player_owning_card.send_units_at_planet(planet_pos)
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
     elif self.action_chosen == "Captain Markis":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -602,8 +538,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                               self.position_of_actioned_card[1] - 1)
                         self.chosen_first_card = True
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-                        await primary_player.send_units_at_planet(planet_pos)
-                        await primary_player.send_discard()
             else:
                 can_continue = True
                 if player_owning_card.name_player == secondary_player.name_player:
@@ -622,7 +556,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "In Play Action"
-                        await self.send_search()
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
@@ -636,8 +569,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if self.phase == "DEPLOY":
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
-                        await primary_player.send_units_at_planet(planet_pos)
-                        await player_owning_card.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
@@ -652,8 +583,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
-                await primary_player.send_hq()
-                await primary_player.send_units_at_planet(planet_pos)
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Dark Cunning":
         if primary_player.get_number() == game_update_string[1]:
@@ -668,16 +597,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                await primary_player.send_units_at_planet(planet_pos)
-                await primary_player.send_hand()
-                await primary_player.send_resources()
-                await primary_player.send_discard()
     elif self.action_chosen == "Clogged with Corpses":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                 self.misc_counter += 1
-                await primary_player.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
@@ -692,9 +616,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                await primary_player.send_hq()
-                await primary_player.send_hand()
-                await primary_player.send_discard()
     elif self.action_chosen == "Craftworld Gate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -715,11 +636,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.number_with_deploy_turn = secondary_player.number
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
-                await primary_player.send_hq()
-                await primary_player.send_units_at_planet(planet_pos)
                 self.position_of_actioned_card = (-1, -1)
-                await primary_player.send_hand()
-                await self.send_info_box()
     elif self.action_chosen == "Khymera Den":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -731,7 +648,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Khymera":
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                await primary_player.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -755,10 +671,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if self.phase == "DEPLOY":
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.number
-                await primary_player.send_units_at_planet(planet_pos)
-                await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
                 self.position_of_actioned_card = (-1, -1)
-                await self.send_info_box()
     elif self.action_chosen == "Squadron Redeployment":
         if self.unit_to_move_position == [-1, -1]:
             if self.player_with_action == self.name_1:
@@ -773,7 +686,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.unit_to_move_position = [planet_pos, unit_pos]
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        await primary_player.send_units_at_planet(planet_pos)
         else:
             await self.game_sockets[0].receive_game_update("Already selected unit to move")
     elif self.action_chosen == "Brood Chamber":
@@ -792,7 +704,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.name_player_making_choices = primary_player.name_player
                         self.choice_context = "Keyword copied from Brood Chamber"
                     self.chosen_first_card = True
-                    await self.send_search()
                 else:
                     await self.game_sockets[0].receive_game_update(
                         "Target has no keywords to copy."
@@ -819,7 +730,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                         if self.misc_target_choice == "Area Effect":
                             self.misc_target_choice += " (" + str(self.stored_area_effect_value) + ")"
-                        await primary_player.send_hq()
                         await self.game_sockets[0].receive_game_update(
                             name + " gained " + self.misc_target_choice + "."
                         )
@@ -839,7 +749,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].has_hive_mind:
                     self.unit_to_move_position = [planet_pos, unit_pos]
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                    await primary_player.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Indescribable Horror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -877,7 +786,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-                await self.send_search()
         if can_continue:
             if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                 player_being_routed.rout_unit(planet_pos, unit_pos)
@@ -887,10 +795,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.dark_eldar_event_played()
-                await primary_player.send_discard()
-                await primary_player.send_hand()
-                await player_being_routed.send_hq()
-                await player_being_routed.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Archon's Terror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -926,7 +830,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-                await self.send_search()
         if can_continue:
             if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                 player_being_routed.rout_unit(planet_pos, unit_pos)
@@ -936,10 +839,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.dark_eldar_event_played()
-                await primary_player.send_discard()
-                await primary_player.send_hand()
-                await player_being_routed.send_hq()
-                await player_being_routed.send_units_at_planet(planet_pos)
     elif self.action_chosen == "Zarathur's Flamers":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -970,7 +869,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
-                await self.send_search()
         if can_continue:
             if planet_pos == self.position_of_actioned_card[0]:
                 hitting_self = False
@@ -989,9 +887,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.mode = "Normal"
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.get_number()
-                    await primary_player.send_units_at_planet(planet_pos)
-                    await secondary_player.send_units_at_planet(planet_pos)
-                    await self.send_info_box()
     elif self.action_chosen == "Deception":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
@@ -1025,7 +920,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-                await self.send_search()
         if can_continue:
             card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
             if card.get_card_type() == "Army":
@@ -1040,10 +934,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.number
                     self.mode = self.stored_mode
-                    await player_returning.send_hand()
-                    await player_returning.send_units_at_planet(planet_pos)
-                    await primary_player.send_hand()
-                    await primary_player.send_discard()
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -1091,13 +981,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card[0],
                     self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
-                await primary_player.send_hand()
-                if enemy_card:
-                    await player_receiving_attachment.send_units_at_planet(planet_pos)
-                else:
-                    await primary_player.send_units_at_planet(planet_pos)
-                await primary_player.send_hq()
-                await primary_player.send_resources()
     elif self.action_chosen == "Catachan Outpost":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -1126,8 +1009,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
-            await primary_player.send_hq()
-            await self.send_info_box()
     elif self.action_chosen == "Tellyporta Pad":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -1147,6 +1028,3 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.action_chosen = ""
                     self.player_with_action = ""
                     self.mode = "Normal"
-                    await primary_player.send_hq()
-                    await primary_player.send_units_at_planet(planet_pos)
-                    await primary_player.send_units_at_planet(self.round_number)

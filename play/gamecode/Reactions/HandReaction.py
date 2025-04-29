@@ -7,15 +7,10 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
             self.delete_reaction()
-            await primary_player.send_discard()
-            await primary_player.send_hand()
-            await self.send_info_box()
         elif self.reactions_needing_resolving[0] == "Banshee Power Sword":
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
             self.banshee_power_sword_extra_attack += 1
-            await primary_player.send_discard()
-            await primary_player.send_hand()
         elif self.reactions_needing_resolving[0] == "Elysian Assault Team":
             hand_pos = int(game_update_string[2])
             if primary_player.cards[hand_pos] == "Elysian Assault Team":
@@ -29,6 +24,3 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                         more = True
                 if not more:
                     self.delete_reaction()
-                await primary_player.send_hand()
-                await self.send_info_box()
-                await primary_player.send_units_at_planet(planet_pos)

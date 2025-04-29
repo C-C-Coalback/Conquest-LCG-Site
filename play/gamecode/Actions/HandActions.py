@@ -22,7 +22,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.action_chosen = "Ambush"
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                     primary_player.aiming_reticle_color = "blue"
-                    await primary_player.send_hand()
                 elif primary_player.spend_resources(card.get_cost()):
                     if may_nullify and secondary_player.nullify_check():
                         primary_player.add_resources(card.get_cost())
@@ -36,7 +35,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.cost_card_nullified = card.get_cost()
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Regular Action"
-                        await self.send_search()
                     elif ability == "Spawn Termagants":
                         for i in range(7):
                             if self.planets_in_play_array[i]:
@@ -46,10 +44,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                        await primary_player.send_units_at_all_planets()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
                     elif ability == "Battle Cry":
                         print("Resolve Battle Cry")
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
@@ -57,10 +51,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.mode = "Normal"
                         self.player_with_action = ""
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
                     elif ability == "Power from Pain":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.reactions_needing_resolving.append(ability)
@@ -69,55 +59,37 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                                            -1, -1))
                         self.mode = "Normal"
                         self.player_with_action = ""
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
-                        await primary_player.send_discard()
-                        await self.send_info_box()
                     elif ability == "Suppressive Fire":
                         self.chosen_first_card = False
                         self.chosen_second_card = False
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Calculated Strike":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Indescribable Horror":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Predation":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Clogged with Corpses":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                         self.misc_counter = 0
                     elif ability == "Ecstatic Seizures":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Awake the Sleepers":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                         self.name_player_making_choices = primary_player.name_player
                         self.choices_available = []
                         self.choice_context = "Awake the Sleepers"
@@ -135,14 +107,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.game_sockets[0].receive_game_update(
                                 "No valid targets for Awake the Sleepers"
                             )
-                            await primary_player.send_hand()
-                            await primary_player.send_discard()
                             self.action_cleanup()
                         else:
                             await self.game_sockets[0].receive_game_update(
                                 "Press the pass button to stop shuffling any more cards in."
                             )
-                        await self.send_search()
                     elif ability == "Dark Possession":
                         self.action_chosen = ""
                         self.name_player_with_action = ""
@@ -153,26 +122,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.number
                         await primary_player.dark_eldar_event_played()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
                     elif ability == "Hate":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Subdual":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Consumption":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                         self.resolving_consumption = True
                         primary_player.consumption_sacs_list = self.planets_in_play_array
                         secondary_player.consumption_sacs_list = self.planets_in_play_array
@@ -194,9 +154,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.choices_available = choices
                                 self.choice_context = "Spore Burst"
                                 self.name_player_making_choices = primary_player.name_player
-                                await primary_player.send_hand()
-                                await primary_player.send_resources()
-                                await self.send_search()
                             else:
                                 primary_player.add_resources(2)
                                 await self.game_sockets[0].receive_game_update(
@@ -212,16 +169,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            await primary_player.send_hand()
-                            await primary_player.send_resources()
                         else:
                             primary_player.add_resources(card.get_cost())
                     elif ability == "Dark Cunning":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Even the Odds":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -230,20 +183,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.chosen_first_card = False
                         self.misc_target_attachment = (-1, -1, -1)
                         self.misc_player_storage = ""
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Squig Bombin'":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Archon's Terror":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Drop Pod Assault":
                         if self.last_planet_checked_for_battle != -1:
                             self.action_chosen = "Drop Pod Assault"
@@ -262,9 +209,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.max_cost_of_searched_card = 3
                             self.all_conditions_searched_card_required = True
                             self.no_restrictions_on_chosen_card = False
-                            await self.send_search()
-                            await primary_player.send_hand()
-                            await primary_player.send_resources()
                         else:
                             primary_player.add_resources(card.get_cost())
                             await self.game_sockets[0].receive_game_update("No battle taking place")
@@ -272,33 +216,25 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = "Squadron Redeployment"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Warpstorm":
                         print("Resolve Warpstorm")
                         self.action_chosen = "Warpstorm"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Tzeentch's Firestorm":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
                         self.choices_available = []
                         for i in range(primary_player.resources + 1):
                             self.choices_available.append(str(i))
                         self.name_player_making_choices = primary_player.name_player
                         self.choice_context = "Amount to spend for Tzeentch's Firestorm:"
                         self.amount_spend_for_tzeentch_firestorm = -1
-                        await self.send_search()
                     elif ability == "Infernal Gateway":
                         self.action_chosen = "Infernal Gateway"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)
@@ -307,11 +243,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                        await primary_player.send_hq()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
                     elif ability == "Doom":
                         print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
@@ -321,54 +252,36 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                        await primary_player.send_hq()
-                        await secondary_player.send_hq()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
                     elif ability == "Pact of the Haemonculi":
                         print("Resolve PotH")
                         self.action_chosen = "Pact of the Haemonculi"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Gift of Isha":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Deception":
                         self.action_chosen = "Deception"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Exterminatus":
                         print("Resolve Exterminatus")
                         self.action_chosen = "Exterminatus"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Snotling Attack":
                         print("Resolve Snotling Attack")
                         self.action_chosen = "Snotling Attack"
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.misc_counter = 4
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Preemptive Barrage":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.misc_target_planet = -1
                         self.misc_counter = 3
-                        await primary_player.send_hand()
-                        await primary_player.send_resources()
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)
@@ -377,11 +290,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                        await primary_player.send_hq()
-                        await primary_player.send_hand()
-                        await primary_player.send_discard()
-                        await primary_player.send_resources()
-                        await self.send_info_box()
                     elif ability == "Raid":
                         if primary_player.can_play_limited:
                             if primary_player.resources < secondary_player.resources:
@@ -394,11 +302,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     self.player_with_deploy_turn = secondary_player.name_player
                                     self.number_with_deploy_turn = secondary_player.number
                                     await primary_player.dark_eldar_event_played()
-                                    await primary_player.send_hand()
-                                    await primary_player.send_discard()
-                                    await primary_player.send_resources()
-                                    await secondary_player.send_resources()
-                                    await self.send_info_box()
                     else:
                         primary_player.add_resources(card.get_cost())
                         await self.game_sockets[0].receive_game_update(card.get_name() + " not "
@@ -415,7 +318,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 if not card.get_limited() or primary_player.can_play_limited:
                     primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
-                    await primary_player.send_hand()
         else:
             await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
     elif self.action_chosen == "Slumbering Tomb":
@@ -425,9 +327,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             self.action_cleanup()
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
-            await primary_player.send_hq()
-        await primary_player.send_discard()
-        await primary_player.send_hand()
     elif self.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):
@@ -438,9 +337,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.action_chosen = ""
                     self.player_with_action = ""
                     self.mode = "Normal"
-                    await primary_player.send_hand()
-                    await primary_player.send_units_at_planet(self.position_of_actioned_card[0])
-                    await primary_player.send_resources()
                     self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Infernal Gateway":
         if self.player_with_action == self.name_1:
@@ -454,6 +350,5 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     if card.get_cost() <= 3:
                         primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
-                        await primary_player.send_hand()
         else:
             await self.game_sockets[0].receive_game_update("already chosen a valid unit for infernal gateway")

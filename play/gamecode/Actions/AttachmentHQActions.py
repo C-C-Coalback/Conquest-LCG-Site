@@ -28,12 +28,10 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.game_sockets[0].receive_game_update(ability + " activated")
-                            await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "The Staff of Command":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
                             card_chosen.exhaust_card()
-                            await primary_player.send_hq()
                             await self.create_necrons_wheel_choice(primary_player)
                             self.action_cleanup()
                 elif ability == "Regeneration":
@@ -47,7 +45,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.action_chosen = ""
                             self.mode = "Normal"
                             self.player_with_action = ""
-                            await player_owning_card.send_units_at_planet(planet_pos)
                 elif ability == "Heavy Venom Cannon":
                     if not card_chosen.get_once_per_phase_used():
                         if primary_player.get_name_player() == self.player_with_action:
@@ -55,7 +52,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.choices_available = ["Armorbane", "Area Effect (2)"]
                             self.name_player_making_choices = primary_player.get_name_player()
                             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
-                            await self.send_search()
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()
@@ -63,7 +59,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             await self.game_sockets[0].receive_game_update(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
-            await player_owning_card.send_hq()
     elif self.action_chosen == "Subdual":
         player_owning_card.deck.insert(0, card_chosen.get_name())
         del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
@@ -75,9 +70,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
         if self.phase == "DEPLOY":
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.number
-        await player_owning_card.send_hq()
-        await primary_player.send_hand()
-        await primary_player.send_discard()
     elif self.action_chosen == "Pathfinder Shi Or'es":
         if game_update_string[2] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:
@@ -93,8 +85,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                     if self.phase == "DEPLOY":
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
-                    await player_owning_card.send_hq()
-                    await player_owning_card.send_discard()
     elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -111,8 +101,3 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                 if not secondary_player.has_passed:
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.get_number()
-            await self.send_info_box()
-            await primary_player.send_hand()
-            await primary_player.send_discard()
-            await player_being_hit.send_discard()
-            await player_being_hit.send_units_at_planet(planet_pos)
