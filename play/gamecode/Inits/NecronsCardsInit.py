@@ -46,7 +46,7 @@ def necrons_cards_init():
                                    type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
         CardClasses.ArmyCard("Canoptek Scarab Swarm", "Interrupt: When this unit is destroyed, return a target Necrons "
                                                       "unit from your discard pile to your hand.", "Drone.",
-                             1, faction, "Common", 1, 1, 0, False),
+                             1, faction, "Common", 2, 2, 0, False),
         CardClasses.ArmyCard("Warriors of Gidrim", "This unit gains 1 command icon while you have 2 or more non-Necrons"
                                                    " factions among units you control.", "Warrior. Sautekh.",
                              1, faction, "Common", 1, 1, 1, False),
