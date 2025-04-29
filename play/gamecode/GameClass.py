@@ -221,6 +221,7 @@ class Game:
         ]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
+        self.name_of_attacked_unit = ""
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -2027,6 +2028,10 @@ class Game:
                         self.create_reaction("Ravenous Haruspex", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))
                         self.ravenous_haruspex_gain = primary_player.get_cost_given_pos(planet, pos)
+                    if self.on_kill_effects_of_attacker[i][j] == "Patrolling Wraith":
+                        self.create_reaction("Patrolling Wraith", secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
+                        self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
                 if primary_player.search_hand_for_card("Vengeance!"):
                     self.create_reaction("Vengeance!", primary_player.name_player,

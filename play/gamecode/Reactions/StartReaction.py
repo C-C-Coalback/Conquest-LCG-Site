@@ -103,6 +103,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.discard_top_card_deck()
             primary_player.discard_top_card_deck()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Patrolling Wraith":
+            await secondary_player.reveal_hand()
+            i = 0
+            while i < len(secondary_player.cards):
+                if secondary_player.cards[i] == self.name_of_attacked_unit:
+                    secondary_player.discard_card_from_hand(i)
+                    i = i - 1
+                i = i + 1
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.add_resources(self.ravenous_haruspex_gain)

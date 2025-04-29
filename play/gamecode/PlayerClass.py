@@ -856,12 +856,18 @@ class Player:
         if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
             if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
                 on_kill_effects.append("Ravenous Haruspex")
-
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Patrolling Wraith":
+            on_kill_effects.append("Patrolling Wraith")
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
                 print("\nBone Sabres detected\n")
         return on_kill_effects
+
+    async def reveal_hand(self):
+        string_sent = "; ".join(self.cards)
+        string_sent = self.name_player + " reveals their hand: " + string_sent
+        await self.game.game_sockets[0].receive_game_update(string_sent)
 
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()
