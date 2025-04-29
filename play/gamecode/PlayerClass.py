@@ -1152,6 +1152,9 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Brood Warriors":
                     command += 1
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Warriors of Gidrim":
+            if self.count_non_necron_factions() > 1:
+                command += 1
         return command
 
     def count_command_at_planet(self, planet_id):
