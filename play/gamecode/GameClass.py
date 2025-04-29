@@ -3351,6 +3351,11 @@ class Game:
             if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage:
                 self.resolve_destruction_checks_after_reactions = False
                 await self.destroy_check_all_cards()
+        if not self.resolve_destruction_checks_after_reactions and not self.positions_of_units_to_take_damage and \
+                not self.reactions_needing_resolving and not self.effects_waiting_on_resolution \
+                and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
+                self.mode == "Normal":
+            await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
 
