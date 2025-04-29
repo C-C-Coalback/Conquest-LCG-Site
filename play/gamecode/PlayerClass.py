@@ -1724,6 +1724,10 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
+        if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
+                    attack_value += 1
         if card.get_ability() != "Nazdreg":
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
@@ -1953,6 +1957,11 @@ class Player:
             health = self.headquarters[unit_id].get_health()
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        card = self.cards_in_play[planet_id + 1][unit_id]
+        if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
+                    health += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
