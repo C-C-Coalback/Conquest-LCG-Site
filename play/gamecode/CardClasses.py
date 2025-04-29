@@ -44,6 +44,7 @@ class Card:
         self.sacrifice_end_of_phase = False
         self.has_hive_mind = False
         self.resolving_attack = False
+        self.misc_ability_used = False
 
     def reset_own_eocr_values(self):
         pass

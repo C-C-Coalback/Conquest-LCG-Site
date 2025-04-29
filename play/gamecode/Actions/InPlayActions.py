@@ -73,6 +73,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                elif ability == "Mandragoran Immortals":
+                    if not card_chosen.get_once_per_phase_used():
+                        card_chosen.set_once_per_phase_used(True)
+                        self.action_chosen = ability
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 elif ability == "Autarch Celachia":
                     if not card_chosen.once_per_round_used:
                         if primary_player.spend_resources(1):
@@ -327,6 +333,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Mandragoran Immortals":
+        if game_update_string[1] == primary_player.get_number():
+            if planet_pos == self.position_of_actioned_card[0]:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_faction() != "Necrons" and \
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Soldier"):
+                    primary_player.ready_given_pos(self.position_of_actioned_card[0],
+                                                   self.position_of_actioned_card[1])
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Calculated Strike":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

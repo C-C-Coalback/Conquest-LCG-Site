@@ -139,6 +139,35 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, game_update_string)
                         self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+            if not self.chosen_first_card and not self.chosen_second_card:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Tomb Blade Squadron":
+                        if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+            elif self.chosen_first_card and self.chosen_second_card:
+                current_planet, current_pos = self.misc_target_unit
+                if current_planet == planet_pos:
+                    if game_update_string[1] == "1":
+                        player_being_hit = self.p1
+                    else:
+                        player_being_hit = self.p2
+                    can_continue = True
+                    if player_being_hit.name_player == secondary_player.name_player:
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    if can_continue:
+                        if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                            secondary_player.apply_negative_health_eop(planet_pos, unit_pos, 1)
+                            primary_player.reset_aiming_reticle_in_play(current_planet, current_pos)
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
+                            self.chosen_second_card = False
+                            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
             print("Reached Starbane code")
             planet_pos = int(game_update_string[2])

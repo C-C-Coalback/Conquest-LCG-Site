@@ -103,6 +103,20 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.discard_top_card_deck()
             primary_player.discard_top_card_deck()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+            self.chosen_first_card = False
+            self.chosen_second_card = False
+            self.need_to_reset_tomb_blade_squadron = True
+            """
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.headquarters[i].get_ability() == "Tomb Blade Squadron":
+                    primary_player.headquarters[i].misc_ability_used = False
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
+                        primary_player.cards_in_play[i + 1][j].misc_ability_used = False
+            """
+            self.misc_target_unit = (-1, -1)
         elif self.reactions_needing_resolving[0] == "Deathmark Assassins":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.discard_top_card_deck():

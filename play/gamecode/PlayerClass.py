@@ -986,13 +986,28 @@ class Player:
                                     self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
                                                                                             location_of_unit))
                                     self.game.player_who_resolves_reaction.append(self.name_player)
-                                    # self.summon_token_at_planet("Khymera", position)
+                                if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
+                                    for i in range(7):
+                                        for j in range(len(self.cards_in_play[i + 1])):
+                                            if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
+                                                if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
+                                                    self.game.create_reaction("Tomb Blade Squadron", self.name_player,
+                                                                              (int(self.number), -1, -1))
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost)
                             return "FAIL/Unique already in play", -1
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources", -1
         return "FAIL/Invalid card", -1
+
+    def reset_card_name_misc_ability(self, card_name):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == card_name:
+                self.headquarters[i].misc_ability_used = False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == card_name:
+                    self.cards_in_play[i + 1][j].misc_ability_used = False
 
     def return_card_to_hand(self, planet_pos, unit_pos):
         if planet_pos == -2:

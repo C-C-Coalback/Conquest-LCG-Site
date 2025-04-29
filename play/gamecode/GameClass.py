@@ -222,6 +222,7 @@ class Game:
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
+        self.need_to_reset_tomb_blade_squadron = False
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -2550,6 +2551,9 @@ class Game:
                                                    str(current_unit)]
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, last_game_update_string)
+                    if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+                        planet_pos, unit_pos = self.misc_target_unit
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.reactions_needing_resolving[0] == "Soul Grinder":
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]
@@ -3116,12 +3120,25 @@ class Game:
                 not self.reactions_needing_resolving and not self.effects_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal":
+            if self.need_to_reset_tomb_blade_squadron:
+                self.need_to_reset_tomb_blade_squadron = False
+                self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
+                self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
             await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         print("---\nDEBUG INFO\n---")
         print(self.reactions_needing_resolving)
         print(self.choices_available)
+        if self.phase == "DEPLOY":
+            if self.number_with_deploy_turn == "1":
+                if self.p1.has_passed:
+                    self.number_with_deploy_turn = "2"
+                    self.player_with_deploy_turn = self.name_2
+            elif self.number_with_deploy_turn == "2":
+                if self.p2.has_passed:
+                    self.number_with_deploy_turn = "1"
+                    self.player_with_deploy_turn = self.name_1
         await self.send_search()
         await self.send_info_box()
         await self.p1.send_units_at_all_planets()

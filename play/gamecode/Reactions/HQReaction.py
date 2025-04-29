@@ -62,6 +62,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
                     if not more:
                         self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+            if not self.chosen_first_card and not self.chosen_second_card:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.headquarters[unit_pos].get_ability() == "Tomb Blade Squadron":
+                        if not primary_player.headquarters[unit_pos].misc_ability_used:
+                            primary_player.headquarters[unit_pos].misc_ability_used = True
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (-2, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
                 if primary_player.headquarters[unit_pos].get_reaction_available():
