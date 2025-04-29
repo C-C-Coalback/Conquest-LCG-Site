@@ -408,11 +408,9 @@ class Game:
                 info_string += "Active: " + self.player_with_combat_turn + "/"
         else:
             info_string += "??????/"
-        if self.last_info_box_string != info_string:
+        if self.last_info_box_string != info_string or force:
             await self.game_sockets[0].receive_game_update(info_string)
             self.last_info_box_string = info_string
-        elif force:
-            await self.game_sockets[0].receive_game_update(info_string)
 
     async def send_planet_array(self):
         planet_string = "GAME_INFO/PLANETS/"
@@ -1375,6 +1373,14 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.resolving_search_box = False
+                    elif self.choice_context == "Choose target for Canoptek Scarab Swarm:":
+                        target = self.choices_available[int(game_update_string[1])]
+                        primary_player.cards.append(target)
+                        primary_player.discard.remove(target)
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.delete_reaction()
                     elif self.choice_context == "Autarch Celachia":
                         self.choices_available = []
                         self.choice_context = ""

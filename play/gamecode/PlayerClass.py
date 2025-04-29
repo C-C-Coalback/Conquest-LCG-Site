@@ -130,6 +130,8 @@ class Player:
         await self.send_resources()
         if self.game.p1.deck_loaded and self.game.p2.deck_loaded:
             await self.game.start_mulligan()
+            await self.game.send_search()
+            await self.game.send_info_box()
             self.game.phase = "DEPLOY"
             await self.game.game_sockets[0].receive_game_update(
                 self.game.name_1 + " may mulligan their opening hand.")
@@ -2197,6 +2199,9 @@ class Player:
                 self.game.reactions_needing_resolving.append("Shrouded Harlequin")
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                 self.game.player_who_resolves_reaction.append(self.name_player)
+            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
+                self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
+                                          (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
 

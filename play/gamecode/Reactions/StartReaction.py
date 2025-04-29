@@ -302,6 +302,28 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use Shrine of Warpflame?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Canoptek Scarab Swarm":
+            seen_a_canoptek = False
+            allowed_cards = []
+            for i in range(len(primary_player.discard)):
+                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                if card.get_faction() == "Necrons" and card.get_card_type() == "Army":
+                    if card.get_name() != "Canoptek Scarab Swarm":
+                        allowed_cards.append(card.get_name())
+                    else:
+                        if not seen_a_canoptek:
+                            seen_a_canoptek = True
+                        else:
+                            allowed_cards.append(card.get_name())
+            if allowed_cards:
+                self.choices_available = allowed_cards
+                self.name_player_making_choices = primary_player.name_player
+                self.choice_context = "Choose target for Canoptek Scarab Swarm:"
+            else:
+                await self.game_sockets[0].receive_game_update(
+                    "No valid targets for Canoptek Scarab Swarm!"
+                )
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Fall Back!":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]
