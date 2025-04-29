@@ -319,6 +319,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choices_available = allowed_cards
                 self.name_player_making_choices = primary_player.name_player
                 self.choice_context = "Choose target for Canoptek Scarab Swarm:"
+                self.resolving_search_box = True
             else:
                 await self.game_sockets[0].receive_game_update(
                     "No valid targets for Canoptek Scarab Swarm!"

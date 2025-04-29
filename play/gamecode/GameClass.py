@@ -1381,6 +1381,7 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.delete_reaction()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Autarch Celachia":
                         self.choices_available = []
                         self.choice_context = ""
