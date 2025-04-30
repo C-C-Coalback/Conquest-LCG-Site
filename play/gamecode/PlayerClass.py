@@ -1210,6 +1210,11 @@ class Player:
         return extra_resources, extra_cards
 
     def check_for_warlord(self, planet_id):
+        if planet_id == -2:
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_card_type() == "Warlord":
+                    return 1
+            return 0
         print("Looking for warlord at:", self.cards_in_play[0][planet_id])
         if not self.cards_in_play[planet_id + 1]:
             pass
@@ -2183,13 +2188,24 @@ class Player:
             return card
         return None
 
+    def get_planet_of_warlord(self):
+        if self.check_for_warlord(-2) == 1:
+            return -2
+        for i in range(7):
+            if self.check_for_warlord(i) == 1:
+                return i
+        return -1
+
     def resolve_combat_round_begins(self, planet_num):
+        self.get_planet_of_warlord()
         for i in range(len(self.headquarters)):
+            self.headquarters[i].once_per_combat_round_used = False
             if self.headquarters[i].get_ability() == "Holy Fusillade":
                 if self.headquarters[i].get_ready():
                     if not self.game.ranged_skirmish_active:
                         self.game.create_reaction("Holy Fusillade", self.name_player, (int(self.number), -2, i))
         for i in range(len(self.cards_in_play[planet_num + 1])):
+            self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, -1))
 

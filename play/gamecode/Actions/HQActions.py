@@ -105,6 +105,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ""
                             self.player_with_action = ""
                             self.mode = "Normal"
+                    elif ability == "Immortal Legion":
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if card_chosen.get_ready():
+                            if secondary_player.warlord_faction == primary_player.enslaved_faction:
+                                target_planet = secondary_player.get_planet_of_warlord()
+                                if target_planet != -2 and target_planet != -1:
+                                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                    primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
+                                    self.action_cleanup()
                     elif ability == "Pathfinder Shi Or'es":
                         if not card_chosen.get_once_per_phase_used():
                             self.action_chosen = ability
