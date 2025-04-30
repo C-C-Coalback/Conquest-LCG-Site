@@ -1667,6 +1667,7 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].negative_hp_until_eop = 0
+                self.headquarters[i].positive_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].area_effect_eop = 0
                 self.headquarters[i].armorbane_eop = False
@@ -1677,6 +1678,7 @@ class Player:
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
+                self.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
