@@ -127,6 +127,30 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.game_sockets[0].receive_game_update(
                                 "Press the pass button to stop shuffling any more cards in."
                             )
+                    elif ability == "Drudgery":
+                        if primary_player.can_play_limited:
+                            primary_player.can_play_limited = False
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.name_player_making_choices = primary_player.name_player
+                            self.choices_available = []
+                            self.choice_context = ability
+                            for i in range(len(primary_player.discard)):
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                if card.get_is_unit() and card.get_faction() != "Necrons" and card.get_cost() < 4:
+                                    self.choices_available.append(card.get_name())
+                            self.resolving_search_box = True
+                            if not self.choices_available:
+                                self.choice_context = ""
+                                self.name_player_making_choices = ""
+                                self.resolving_search_box = False
+                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                primary_player.aiming_reticle_coords_hand = None
+                                await self.game_sockets[0].receive_game_update(
+                                    "No valid targets for Drudgery"
+                                )
+                                self.action_cleanup()
                     elif ability == "Dark Possession":
                         self.action_chosen = ""
                         self.name_player_with_action = ""
