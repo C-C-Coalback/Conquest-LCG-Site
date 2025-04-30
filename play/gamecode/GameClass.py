@@ -1218,6 +1218,17 @@ class Game:
                         self.choices_available = []
                         self.choice_context = ""
                         self.name_player_making_choices = ""
+                    elif self.choice_context == "Target Dread Monolith:":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        planet, pos = self.position_of_actioned_card
+                        primary_player.reset_aiming_reticle_in_play(planet, pos)
+                        card = FindCard.find_card(target_choice, self.card_array)
+                        primary_player.add_card_to_planet(card, planet)
+                        primary_player.discard.remove(target_choice)
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.action_cleanup()
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":
                             self.choices_available = []

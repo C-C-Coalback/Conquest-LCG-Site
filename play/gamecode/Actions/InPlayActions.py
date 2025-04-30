@@ -1,3 +1,6 @@
+from .. import FindCard
+
+
 async def update_game_event_action_in_play(self, name, game_update_string):
     if name == self.name_1:
         primary_player = self.p1
@@ -105,6 +108,31 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                 self.action_cleanup()
+                elif ability == "Dread Monolith":
+                    if not card_chosen.once_per_round_used:
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].set_once_per_round_used(True)
+                        self.action_chosen = ability
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        cards_discard = []
+                        for _ in range(3):
+                            if primary_player.discard_top_card_deck():
+                                last_element = len(primary_player.discard) - 1
+                                cards_discard.append(primary_player.discard[last_element])
+                        self.choices_available = []
+                        for i in range(len(cards_discard)):
+                            card = FindCard.find_card(cards_discard[i], self.card_array)
+                            if card.get_is_unit() and card.get_faction() == "Necrons":
+                                if not card.check_for_a_trait("Vehicle"):
+                                    self.choices_available.append(card.get_name())
+                        if self.choices_available:
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.choice_context = "Target Dread Monolith:"
+                            self.name_player_making_choices = primary_player.name_player
+                        else:
+                            self.game_sockets[0].receive_game_update(
+                                "No valid targets for Dread Monolith; better luck next time!"
+                            )
+                            self.action_cleanup()
                 elif ability == "Pathfinder Shi Or'es":
                     if not card_chosen.get_once_per_phase_used():
                         self.action_chosen = ability
