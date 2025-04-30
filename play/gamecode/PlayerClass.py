@@ -1556,7 +1556,6 @@ class Player:
             self.cards_in_play[planet_pos + 1][unit_pos].mobile_eor = True
         return None
 
-
     def round_ends_reset_values(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
@@ -1987,6 +1986,9 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
+                if self.count_units_in_discard() > 5:
+                    health += 4
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -2000,6 +2002,9 @@ class Player:
                     health += 2
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Pyrrhian Eternals":
             health += self.discard.count("Pyrrhian Eternals")
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Lychguard Sentinel":
+            if self.count_units_in_discard() > 5:
+                health += 4
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Ymgarl Genestealer":
             if self.search_synapse_at_planet(planet_id):
                 health += 2

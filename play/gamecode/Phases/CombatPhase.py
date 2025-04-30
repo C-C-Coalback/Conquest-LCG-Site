@@ -209,6 +209,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if secondary_player.cards_in_play[self.defender_planet + 1][i] \
                                         .get_ability() != "Honored Librarian":
                                     can_continue = False
+                        if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
+                                .get_ability() != "Lychguard Sentinel" or\
+                                not secondary_player.get_ready_given_pos(self.defender_planet, self.defender_position):
+                            for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                if secondary_player.cards_in_play[self.defender_planet + 1][i] \
+                                        .get_ability() == "Lychguard Sentinel" and \
+                                        secondary_player.get_ready_given_pos(self.defender_planet, i):
+                                    can_continue = False
                         if self.may_move_defender:
                             for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                 if i != self.defender_position:
