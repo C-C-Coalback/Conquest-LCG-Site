@@ -320,6 +320,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_color = "blue"
         else:
             await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
+    elif self.action_chosen == "Canoptek Spyder":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_card_type() == "Army":
+                primary_player.discard_card_from_hand(int(game_update_string[2]))
+                self.chosen_first_card = True
     elif self.action_chosen == "Slumbering Tomb":
         primary_player.discard_card_from_hand(int(game_update_string[2]))
         self.misc_counter += 1

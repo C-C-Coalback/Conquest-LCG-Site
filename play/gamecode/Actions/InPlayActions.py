@@ -73,6 +73,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                elif ability == "Canoptek Spyder":
+                    if not card_chosen.once_per_combat_round_used:
+                        if planet_pos == self.last_planet_checked_for_battle:
+                            card_chosen.once_per_combat_round_used = True
+                            self.action_chosen = ability
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.chosen_first_card = False
                 elif ability == "Mandragoran Immortals":
                     if not card_chosen.get_once_per_phase_used():
                         card_chosen.set_once_per_phase_used(True)
@@ -208,6 +216,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Canoptek Spyder":
+        if self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if self.position_of_actioned_card[0] == planet_pos:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and \
+                            primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.action_cleanup()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if self.number_with_deploy_turn == "1":

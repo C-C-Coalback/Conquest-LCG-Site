@@ -36,6 +36,7 @@ class Card:
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
         self.once_per_round_used = False
+        self.once_per_combat_round_used = False
         self.aiming_reticle_color = None
         self.bloodied = False
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
