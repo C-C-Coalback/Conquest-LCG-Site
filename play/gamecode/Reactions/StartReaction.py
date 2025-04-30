@@ -202,6 +202,24 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choice_context = "Toxic Venomthrope: Gain Card or Resource?"
                 self.asking_if_reaction = False
                 self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif self.reactions_needing_resolving[0] == "Doom Scythe Invader":
+            self.choices_available = []
+            for i in range(len(primary_player.discard)):
+                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                if card.get_is_unit():
+                    if card.check_for_a_trait("Vehicle"):
+                        if not card.check_for_a_trait("Elite"):
+                            self.choices_available.append(card.get_name())
+            if self.choices_available:
+                self.choice_context = "Target Doom Scythe Invader:"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                self.choices_available = []
+                await self.game_sockets[0].receive_game_update(
+                    "No valid targets for Doom Scythe Invader!"
+                )
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Great Scything Talons":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, self.great_scything_talons_value,

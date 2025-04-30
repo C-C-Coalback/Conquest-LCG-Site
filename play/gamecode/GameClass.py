@@ -1207,6 +1207,17 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             primary_player.dark_possession_active = False
+                    elif self.choice_context == "Target Doom Scythe Invader:":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                        self.resolving_search_box = False
+                        card = FindCard.find_card(target_choice, self.card_array)
+                        primary_player.add_card_to_planet(card, pla)
+                        primary_player.discard.remove(target_choice)
+                        self.delete_reaction()
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
