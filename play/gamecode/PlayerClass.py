@@ -1254,6 +1254,9 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eop()
 
     def get_armorbane_given_pos(self, planet_id, unit_id):
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
+            if self.count_units_in_discard() > 5:
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
     def get_ignores_flying_given_pos(self, planet_id, unit_id):
@@ -1758,6 +1761,9 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 card.set_brutal(True)
+        if card.get_ability() == "Praetorian Ancient":
+            if self.count_units_in_discard() > 5:
+                attack_value += 2
         if card.get_ability() == "Pyrrhian Eternals":
             attack_value += self.discard.count("Pyrrhian Eternals")
         if card.get_ability() == "Destroyer Cultist":
