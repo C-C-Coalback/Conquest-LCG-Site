@@ -467,32 +467,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if not secondary_player.has_passed:
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Reanimation Protocol":
+        if primary_player.get_number() == game_update_string[1]:
+            if card_chosen.get_faction() == "Necrons" and card_chosen.get_is_unit():
+                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Preemptive Barrage":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
-        if self.misc_target_planet == -1:
-            if card_chosen.get_faction() == "Astra Militarum":
-                card_chosen.set_ranged(True)
-                self.misc_target_planet = planet_pos
-                self.misc_counter -= 1
-                await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
-        elif self.misc_target_planet == planet_pos:
-            if card_chosen.get_faction() == "Astra Militarum":
-                card_chosen.set_ranged(True)
-                self.misc_counter -= 1
-                await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
-                if self.misc_counter == 0:
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
-                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                    primary_player.aiming_reticle_coords_hand = None
+        if game_update_string[1] == primary_player.get_number():
+            if self.misc_target_planet == -1:
+                if card_chosen.get_faction() == "Astra Militarum":
+                    card_chosen.set_ranged(True)
+                    self.misc_target_planet = planet_pos
+                    self.misc_counter -= 1
+                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+            elif self.misc_target_planet == planet_pos:
+                if card_chosen.get_faction() == "Astra Militarum":
+                    card_chosen.set_ranged(True)
+                    self.misc_counter -= 1
+                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+                    if self.misc_counter == 0:
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Kraktoof Hall":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

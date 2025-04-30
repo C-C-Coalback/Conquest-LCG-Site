@@ -3418,6 +3418,8 @@ class Game:
         self.actions_allowed = True
         self.p1.add_resources(4)
         self.p2.add_resources(4)
+        self.p1.used_reanimation_protocol = False
+        self.p2.used_reanimation_protocol = False
         self.p1.draw_card()
         self.p1.draw_card()
         self.p2.draw_card()

@@ -97,6 +97,7 @@ class Player:
         self.last_planet_strings = ["", "", "", "", "", "", ""]
         self.last_resources_string = ""
         self.last_discard_string = ""
+        self.used_reanimation_protocol = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()

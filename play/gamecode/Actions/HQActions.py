@@ -492,6 +492,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Reanimation Protocol":
+        if primary_player.get_number() == game_update_string[1]:
+            unit_pos = int(game_update_string[2])
+            if primary_player.get_faction_given_pos(-2, unit_pos) == "Necrons" and\
+                    primary_player.headquarters[unit_pos].get_is_unit():
+                primary_player.remove_damage_from_pos(-2, unit_pos, 2)
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Khymera Den":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

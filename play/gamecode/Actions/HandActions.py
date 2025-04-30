@@ -82,6 +82,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.misc_counter = 0
+                    elif ability == "Reanimation Protocol":
+                        if not primary_player.used_reanimation_protocol:
+                            primary_player.used_reanimation_protocol = True
+                            self.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Ecstatic Seizures":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
