@@ -88,6 +88,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Recycle":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        self.misc_counter = 0
                     elif ability == "Ecstatic Seizures":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -350,6 +355,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.player_with_action = ""
                     self.mode = "Normal"
                     self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Recycle":
+        if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
+            if primary_player.aiming_reticle_coords_hand > int(game_update_string[2]):
+                primary_player.aiming_reticle_coords_hand -= 1
+            self.misc_counter += 1
+            if self.misc_counter > 1:
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                for _ in range(3):
+                    primary_player.draw_card()
+                self.action_cleanup()
     elif self.action_chosen == "Infernal Gateway":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
