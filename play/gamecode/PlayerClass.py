@@ -1747,6 +1747,8 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Biovore Spore Launcher":
                     area_effect += 1
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Doomsday Ark":
+            area_effect += self.count_non_necron_factions()
         return area_effect
 
     def get_attack_given_pos(self, planet_id, unit_id):
