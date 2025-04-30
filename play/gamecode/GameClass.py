@@ -223,6 +223,8 @@ class Game:
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
         self.need_to_reset_tomb_blade_squadron = False
+        self.resolve_kill_effects = True
+        self.asked_if_resolve_effect = False
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -1149,6 +1151,17 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                    elif self.choice_context == "Use Reanimating Warriors?":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        if game_update_string[1] == "0":
+                            self.chosen_first_card = False
+                            self.asked_if_resolve_effect = True
+                            self.misc_target_unit = (-1, -1)
+                        if game_update_string[1] == "1":
+                            del self.effects_waiting_on_resolution[0]
+                            del self.player_resolving_effect[0]
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -2186,7 +2199,7 @@ class Game:
         self.reset_resolving_attack_on_units = True
 
     async def destroy_check_all_cards(self):
-        if not self.reactions_needing_resolving:
+        if not self.reactions_needing_resolving and not self.effects_waiting_on_resolution:
             print("\n\nABOUT TO EXECUTE:", self.on_kill_effects_of_attacker)
             for i in range(len(self.recently_damaged_units)):
                 await self.resolve_on_kill_effects(i)
@@ -2209,9 +2222,9 @@ class Game:
             await self.complete_destruction_checks()
         else:
             self.resolve_destruction_checks_after_reactions = True
-            await self.game_sockets[0].receive_game_update(
-                "Some damage/destruction reactions need to be resolved before actual destruction is done."
-            )
+            # await self.game_sockets[0].receive_game_update(
+            #     "Some damage/destruction reactions need to be resolved before actual destruction is done."
+            # )
 
     def advance_damage_aiming_reticle(self):
         if self.positions_of_units_to_take_damage:
@@ -2278,6 +2291,10 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Reanimating Warriors" \
+                            and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
+                        self.effects_waiting_on_resolution.append("Reanimating Warriors")
+                        self.player_resolving_effect.append(primary_player.name_player)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         self.damage_taken_was_from_attack.append(True)
                         self.positions_of_attacker_of_unit_that_took_damage.append(
@@ -2381,6 +2398,12 @@ class Game:
                                             ))
                                             self.on_kill_effects_of_attacker.append(
                                                 secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
+                                            if primary_player.cards_in_play[planet_pos + 1][
+                                                unit_pos].get_ability() == "Reanimating Warriors" \
+                                                    and not primary_player.cards_in_play[planet_pos + 1][
+                                                    unit_pos].once_per_phase_used:
+                                                self.effects_waiting_on_resolution.append("Reanimating Warriors")
+                                                self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                         "Repulsor Impact Field"):
                                                 self.create_reaction("Repulsor Impact Field",
@@ -2697,8 +2720,47 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
+        print("Resolving effect")
         if name == self.player_resolving_effect[0]:
-            if self.effects_waiting_on_resolution[0] == "Commander Shadowsun":
+            print("name check ok")
+            if self.effects_waiting_on_resolution[0] == "Reanimating Warriors":
+                print("reanimating warriors")
+                if not self.asked_if_resolve_effect:
+                    self.choices_available = ["Yes", "No"]
+                    self.choice_context = "Use Reanimating Warriors?"
+                    self.name_player_making_choices = name
+                else:
+                    if len(game_update_string) == 2 and self.chosen_first_card:
+                        print("planets")
+                        if game_update_string[0] == "PLANETS":
+                            print("planets 2")
+                            origin_planet, origin_pos = self.misc_target_unit
+                            target_planet = int(game_update_string[1])
+                            if abs(origin_planet - target_planet) == 1:
+                                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                                primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
+                                del self.effects_waiting_on_resolution[0]
+                                del self.player_resolving_effect[0]
+                                self.asked_if_resolve_effect = False
+                                self.chosen_first_card = False
+                    elif len(game_update_string) == 4 and not self.chosen_first_card:
+                        print("in play")
+                        if game_update_string[0] == "IN_PLAY":
+                            print("in play 2")
+                            if game_update_string[1] == primary_player.number:
+                                print("in play 3")
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors"\
+                                        and not primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                        .once_per_phase_used:
+                                    if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
+                                        self.chosen_first_card = True
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                                        primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            elif self.effects_waiting_on_resolution[0] == "Commander Shadowsun":
                 if self.shadowsun_chose_hand:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -3064,8 +3126,6 @@ class Game:
                 await self.resolve_manual_bodyguard(name, game_update_string)
             elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)
-            elif self.effects_waiting_on_resolution:
-                await self.resolve_effect(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
                 await self.apply_indirect_damage(name, game_update_string)
             elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
@@ -3073,6 +3133,8 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.effects_waiting_on_resolution:
+                await self.resolve_effect(name, game_update_string)
             elif self.reactions_needing_resolving:
                 print("Resolve reaction")
                 print(self.reactions_needing_resolving[0])
