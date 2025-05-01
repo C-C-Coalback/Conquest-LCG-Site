@@ -1194,6 +1194,9 @@ class Player:
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
+            if self.warlord_faction != "Orks":
+                command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Brood Warriors":
@@ -1268,6 +1271,9 @@ class Player:
         rokkitboy_present = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id, "Rokkitboy")
         if rokkitboy_present:
             return False
+        if self.get_ability_given_pos(planet_id, unit_id) == "Air Caste Courier":
+            if self.warlord_faction != "Tau":
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
     def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
@@ -1287,6 +1293,9 @@ class Player:
     def get_armorbane_given_pos(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Treacherous Lhamaean":
+            if self.warlord_faction != "Dark Eldar":
                 return True
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
@@ -1319,9 +1328,18 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
     def get_ambush_of_card(self, card):
+        if card.get_ability() == "Standard Bearer":
+            if self.warlord_faction != "Astra Militarum":
+                return True
         return card.get_ambush()
 
     def get_mobile_given_pos(self, planet_id, unit_id):
+        if self.get_ability_given_pos(planet_id, unit_id) == "Ravenwing Escort":
+            if self.warlord_faction != "Space Marines":
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Venomous Fiend":
+            if self.warlord_faction != "Chaos":
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()
 
     def get_available_mobile_given_pos(self, planet_id, unit_id):
@@ -1788,6 +1806,9 @@ class Player:
                     area_effect += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Doomsday Ark":
             area_effect += self.count_non_necron_factions()
+        if self.get_ability_given_pos(planet_id, unit_id) == "Nightshade Interceptor":
+            if self.warlord_faction != "Eldar":
+                area_effect += 2
         return area_effect
 
     def get_attack_given_pos(self, planet_id, unit_id):
