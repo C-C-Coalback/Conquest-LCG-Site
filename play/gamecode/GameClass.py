@@ -1704,7 +1704,15 @@ class Game:
                         self.choices_available = []
                         self.choice_context = ""
                         self.name_player_making_choices = ""
-                        print("Got to toxic venomthrope gain")
+                        if game_update_string[1] == "0":
+                            primary_player.draw_card()
+                        elif game_update_string[1] == "1":
+                            primary_player.add_resources(1)
+                        self.delete_reaction()
+                    elif self.choice_context == "Sautekh Complex: Gain Card or Resource?":
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
                         if game_update_string[1] == "0":
                             primary_player.draw_card()
                         elif game_update_string[1] == "1":

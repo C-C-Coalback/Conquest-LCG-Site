@@ -64,8 +64,8 @@ def necrons_cards_init():
                                                        "discard pile at a planet.", "Warrior.",
                              2, faction, "Common", 2, 2, 0, False),
         CardClasses.ArmyCard("Deathmark Assassins", "Reaction: After the combat phase begins, discard the top card of"
-                                                   " your deck. This unit gets +X ATK until the end of the phase. "
-                                                   "X is the printed cost of the discarded card.", "Scout.",
+                                                    " your deck. This unit gets +X ATK until the end of the phase. "
+                                                    "X is the printed cost of the discarded card.", "Scout.",
                              3, faction, "Common", 2, 3, 0, False),
         CardClasses.ArmyCard("Mandragoran Immortals", "Ranged.\n"
                                                       "Action: Sacrifice a non-Necrons Soldier unit at this planet to "
@@ -182,10 +182,10 @@ def necrons_cards_init():
         CardClasses.SupportCard("Eternity Gate", "Action: Exhaust this support to choose a card in a target player's "
                                                  "discard pile and place it on top of that discard pile.", "Upgrade.",
                                 1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
-        CardClasses.SupportCard("Sautekh Complex", "Location.", "Limited.\n"
-                                                                "Reaction: After you deploy a unit from a non-Necrons "
-                                                                "faction, if you control no other units from that "
-                                                                "faction, gain 1 resource or draw 1 card.",
+        CardClasses.SupportCard("Sautekh Complex", "Limited.\n"
+                                                   "Reaction: After you deploy a unit from a non-Necrons "
+                                                   "faction, if you control no other units from that "
+                                                   "faction, gain 1 resource or draw 1 card.",
                                 "Location.", 1, faction, "Common", False, limited=True),
         CardClasses.SupportCard("Master Program", "Action: Exhaust this support and sacrifice a Drone card to remove "
                                                   "all damage from target army unit you control and ready it.",

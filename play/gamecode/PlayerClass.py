@@ -1000,12 +1000,30 @@ class Player:
                                                 if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
                                                     self.game.create_reaction("Tomb Blade Squadron", self.name_player,
                                                                               (int(self.number), -1, -1))
+                                if card.get_faction() != "Necrons":
+                                    if self.count_units_of_faction(card.get_faction()) == 1:
+                                        for i in range(len(self.headquarters)):
+                                            if self.headquarters[i].get_ability() == "Sautekh Complex":
+                                                self.game.create_reaction("Sautekh Complex", self.name_player,
+                                                                          (int(self.number), -2, i))
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost)
                             return "FAIL/Unique already in play", -1
                     print("Insufficient resources")
                     return "FAIL/Insufficient resources", -1
         return "FAIL/Invalid card", -1
+
+    def count_units_of_faction(self, faction):
+        count = 0
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_faction() == faction and self.headquarters[i].get_is_unit():
+                count += 1
+        for planet in range(7):
+            for i in range(len(self.cards_in_play[planet + 1])):
+                if self.cards_in_play[planet + 1][i].get_faction() == faction and \
+                        self.cards_in_play[planet + 1][i].get_is_unit():
+                    count += 1
+        return count
 
     def reset_card_name_misc_ability(self, card_name):
         for i in range(len(self.headquarters)):
