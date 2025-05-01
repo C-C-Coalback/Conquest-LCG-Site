@@ -152,6 +152,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             if planet_pos != -2:
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Royal Phylactery":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:

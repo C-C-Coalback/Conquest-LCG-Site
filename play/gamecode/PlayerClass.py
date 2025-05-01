@@ -2095,14 +2095,17 @@ class Player:
             if self.headquarters[i].get_ability() == "Obedience":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Deathmark Assassins":
+                self.game.create_reaction("Deathmark Assassins", self.name_player, (int(self.number), -2, i))
             for j in range(len(self.headquarters[i].get_attachments())):
                 if phase == "COMBAT":
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
-                    elif self.headquarters[i].get_ability() == "Deathmark Assassins":
-                        self.game.create_reaction("Deathmark Assassins", self.name_player,
-                                                  (int(self.number), -2, i))
+                    if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
+                        if self.headquarters[i].get_damage() > 0:
+                            self.game.create_reaction("Royal Phylactery", self.name_player, (int(self.number), -2, i))
+
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
@@ -2124,6 +2127,10 @@ class Player:
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
                             name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
                             self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), i, j))
+                    if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Royal Phylactery":
+                        if self.cards_in_play[i + 1][j].get_damage() > 0:
+                            self.game.create_reaction("Royal Phylactery", self.name_player,
+                                                      (int(self.number), i, j))
 
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
@@ -2228,6 +2235,11 @@ class Player:
             self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, -1))
+            for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
+                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Royal Phylactery":
+                    if self.cards_in_play[planet_num + 1][i].get_damage() > 0:
+                        self.game.create_reaction("Royal Phylactery", self.name_player,
+                                                  (int(self.number), planet_num, i))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
