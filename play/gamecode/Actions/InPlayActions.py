@@ -568,6 +568,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Master Program":
+        if primary_player.get_number() == game_update_string[1]:
+            if not self.chosen_first_card:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Drone"):
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        self.chosen_first_card = True
+            else:
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        self.action_cleanup()
     elif self.action_chosen == "Hyperphase Sword":
         print("cool sword")
         if self.chosen_first_card:

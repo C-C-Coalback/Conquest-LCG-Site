@@ -151,6 +151,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.misc_target_planet = -1
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Master Program":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            self.misc_target_planet = -1
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Craftworld Gate":
                         if card.get_ready():
                             self.action_chosen = "Craftworld Gate"
@@ -360,13 +366,21 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Master Program":
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = -2
+            unit_pos = int(game_update_string[2])
+            if not self.chosen_first_card:
+                if primary_player.headquarters[unit_pos].check_for_a_trait("Drone"):
+                    if primary_player.sacrifice_card_in_hq(unit_pos):
+                        self.chosen_first_card = True
+            else:
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2
             unit_pos = int(game_update_string[2])
