@@ -1203,11 +1203,17 @@ class Player:
                 command += 1
         return command
 
-    def count_command_at_planet(self, planet_id):
+    def count_command_at_planet(self, planet_id, fbk=False):
         counted_command = 0
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ready_given_pos(planet_id, i):
-                counted_command += self.get_command_given_pos(planet_id, i)
+                count_unit_command = True
+                if fbk:
+                    if self.get_card_type_given_pos(planet_id, i) == "Army":
+                        if self.get_cost_given_pos(planet_id, i) < 3:
+                            count_unit_command = False
+                if count_unit_command:
+                    counted_command += self.get_command_given_pos(planet_id, i)
         return counted_command
 
     def count_tyranid_units_at_planet(self, planet_id):

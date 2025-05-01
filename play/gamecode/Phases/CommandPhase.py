@@ -206,8 +206,10 @@ def resolve_command_struggle(self):
 
 
 def resolve_command_struggle_at_planet(self, planet_id):
-    command_p1 = self.p1.count_command_at_planet(planet_id)
-    command_p2 = self.p2.count_command_at_planet(planet_id)
+    fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
+    fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
+    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2)
+    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1)
     if command_p1 > command_p2:
         print("P1 wins command")
         chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
