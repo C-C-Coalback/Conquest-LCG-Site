@@ -1,7 +1,7 @@
 import copy
 from . import PlayerClass
 import random
-from .Phases import DeployPhase, CommandPhase, CombatPhase
+from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
 from . import FindCard
 import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, InPlayActions, PlanetActions
@@ -410,6 +410,8 @@ class Game:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
                 info_string += "Active: " + self.player_with_combat_turn + "/"
+        elif self.phase == "HEADQUARTERS":
+            info_string += "HQ action & reaction window/"
         else:
             info_string += "??????/"
         if self.last_info_box_string != info_string or force:
@@ -782,10 +784,9 @@ class Game:
             await self.send_planet_array()
         else:
             await self.change_phase("HEADQUARTERS")
-            self.automated_headquarters_phase()
-            await self.change_phase("DEPLOY")
-            self.reset_values_for_new_round()
-            await self.send_planet_array()
+            await self.game_sockets[0].receive_game_update(
+                "Window provided for reactions and actions during HQ phase."
+            )
         self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
         # self.reset_choices_available()
@@ -2926,7 +2927,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                        .check_for_a_trait("Soldier"):
+                                                .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3221,6 +3222,8 @@ class Game:
                 await CommandPhase.update_game_event_command_section(self, name, game_update_string)
             elif self.phase == "COMBAT":
                 await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
+            elif self.phase == "HEADQUARTERS":
+                await HeadquartersPhase.update_game_event_headquarters_section(self, name, game_update_string)
             resolved_subroutine = True
         if self.phase == "DEPLOY":
             if self.p1.has_passed and self.p2.has_passed:
