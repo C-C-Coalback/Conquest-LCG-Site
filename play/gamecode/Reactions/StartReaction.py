@@ -165,6 +165,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                     primary_player.add_card_to_planet(card, planet_pos)
                     del primary_player.discard[-1]
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Weight of the Aeons":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            primary_player.discard_top_card_deck()
+            primary_player.discard_top_card_deck()
+            secondary_player.discard_top_card_deck()
+            secondary_player.discard_top_card_deck()
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
