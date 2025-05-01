@@ -568,6 +568,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Hyperphase Sword":
+        print("cool sword")
+        if self.chosen_first_card:
+            print("already discarded")
+            origin_pla, origin_pos, origin_att = self.misc_target_attachment
+            if origin_pla == planet_pos and origin_pos != unit_pos:
+                print("ok planet and pos")
+                if primary_player.move_attachment_card(origin_pla, origin_pos, origin_att,
+                                                       planet_pos, unit_pos):
+                    primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Suppressive Fire":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

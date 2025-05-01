@@ -387,6 +387,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.player_with_action = ""
                     self.mode = "Normal"
                     self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Hyperphase Sword":
+        if not self.chosen_first_card:
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
+            self.chosen_first_card = True
     elif self.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
             primary_player.discard_card_from_hand(int(game_update_string[2]))

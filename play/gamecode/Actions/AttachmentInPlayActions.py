@@ -40,6 +40,15 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.game_sockets[0].receive_game_update(ability + " activated")
+                elif ability == "Hyperphase Sword":
+                    if primary_player.get_name_player() == self.player_with_action:
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                        await self.game_sockets[0].receive_game_update(ability + " activated")
+                        self.chosen_first_card = False
+                        self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
                 elif ability == "The Staff of Command":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:

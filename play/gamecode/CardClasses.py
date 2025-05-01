@@ -360,6 +360,8 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
                 return True
+            if self.attachments[i].get_ability() == "Hyperphase Sword":
+                return True
         return self.armorbane
 
     def get_by_base_area_effect(self):
