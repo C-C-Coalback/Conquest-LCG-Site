@@ -170,7 +170,7 @@ def necrons_cards_init():
                                                           "enslaved faction, exhaust this attachment to gain control "
                                                           "of attached unit until the end of the phase.", "Drone.",
                                    3, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
-                                   action_in_play=True, allowed_phases_in_play="ALL"),
+                                   action_in_play=True, allowed_phases_in_play="ALL", forbidden_traits="Elite"),
         CardClasses.SupportCard("Timeworn Stasis-Crypt", "Limited.\n"
                                                          "Interrupt: When you deploy a Necrons card, exhaust this "
                                                          "support to reduce the card's cost by 1.", "Location.",

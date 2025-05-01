@@ -670,6 +670,8 @@ class Player:
         if card.required_traits not in target_card.get_traits():
             print("Wrong traits.")
             return False
+        if card.forbidden_traits in target_card.get_traits():
+            return False
         if card.unit_must_be_unique:
             if not target_card.get_unique():
                 print("Must be a unique unit, but is not")

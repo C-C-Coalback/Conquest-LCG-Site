@@ -34,6 +34,21 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             card_chosen.exhaust_card()
                             await self.create_necrons_wheel_choice(primary_player)
                             self.action_cleanup()
+                elif ability == "Mind Shackle Scarab":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            if primary_player.get_number() != player_owning_card.get_number():
+                                if secondary_player.get_faction_given_pos(planet_pos, unit_pos) \
+                                        == primary_player.enslaved_faction:
+                                    card_chosen.exhaust_card()
+                                    self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+                                    last_el = len(primary_player.headquarters) - 1
+                                    primary_player.headquarters[last_el].mind_shackle_scarab_effect = True
+                            else:
+                                self.game_sockets[0].receive_game_update(
+                                    "Mind Shackle Scarab on own unit not supported"
+                                )
+                            self.action_cleanup()
                 elif ability == "Regeneration":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:

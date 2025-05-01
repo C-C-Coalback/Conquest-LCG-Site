@@ -49,6 +49,21 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         await self.game_sockets[0].receive_game_update(ability + " activated")
                         self.chosen_first_card = False
                         self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                elif ability == "Mind Shackle Scarab":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            if primary_player.get_number() != player_owning_card.get_number():
+                                if secondary_player.get_faction_given_pos(planet_pos, unit_pos) \
+                                        == primary_player.enslaved_faction:
+                                    card_chosen.exhaust_card()
+                                    self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+                                    last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                                    primary_player.cards_in_play[planet_pos + 1][last_el].mind_shackle_scarab_effect = True
+                            else:
+                                self.game_sockets[0].receive_game_update(
+                                    "Mind Shackle Scarab on own unit not supported"
+                                )
+                            self.action_cleanup()
                 elif ability == "The Staff of Command":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:

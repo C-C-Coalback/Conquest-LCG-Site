@@ -2263,6 +2263,37 @@ class Game:
             elif player_num == 2:
                 self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
 
+    def conclude_mind_shackle_scarab(self):
+        i = 0
+        while i < len(self.p1.headquarters):
+            if self.p1.headquarters[i].mind_shackle_scarab_effect:
+                self.p1.headquarters[i].mind_shackle_scarab_effect = False
+                self.take_control_of_card(self.p2, self.p1, -2, i)
+                i -= 1
+            i += 1
+        i = 0
+        while i < len(self.p2.headquarters):
+            if self.p2.headquarters[i].mind_shackle_scarab_effect:
+                self.p2.headquarters[i].mind_shackle_scarab_effect = False
+                self.take_control_of_card(self.p1, self.p2, -2, i)
+                i -= 1
+            i += 1
+        for planet_pos in range(7):
+            i = 0
+            while i < len(self.p1.cards_in_play[planet_pos + 1]):
+                if self.p1.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect:
+                    self.p1.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect = False
+                    self.take_control_of_card(self.p2, self.p1, planet_pos, i)
+                    i -= 1
+                i += 1
+            i = 0
+            while i < len(self.p2.cards_in_play[planet_pos + 1]):
+                if self.p2.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect:
+                    self.p2.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect = False
+                    self.take_control_of_card(self.p1, self.p2, planet_pos, i)
+                    i -= 1
+                i += 1
+
     async def change_phase(self, new_val, refresh_abilities=True):
         self.p1.has_passed = False
         self.p2.has_passed = False
@@ -2272,6 +2303,7 @@ class Game:
             self.committing_warlords = True
         sacrifice_locations = self.p1.sacrifice_check_eop()
         sacrifice_locations = self.p2.sacrifice_check_eop()
+        self.conclude_mind_shackle_scarab()
         self.p1.reset_extra_attack_eop()
         self.p2.reset_extra_attack_eop()
         self.p1.reset_extra_abilities_eop()
@@ -3400,6 +3432,15 @@ class Game:
         self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.p1.resolve_combat_round_begins(self.last_planet_checked_for_battle)
         self.p2.resolve_combat_round_begins(self.last_planet_checked_for_battle)
+
+    def take_control_of_card(self, primary_player, secondary_player, planet_pos, unit_pos):
+        if planet_pos == -2:
+            primary_player.headquarters.append(secondary_player.headquarters[unit_pos])
+            del secondary_player.headquarters[unit_pos]
+            return None
+        primary_player.cards_in_play[planet_pos + 1].append(secondary_player.cards_in_play[planet_pos + 1][unit_pos])
+        del secondary_player.cards_in_play[planet_pos + 1][unit_pos]
+        return None
 
     def reset_values_for_new_round(self):
         self.p1.has_passed = False
