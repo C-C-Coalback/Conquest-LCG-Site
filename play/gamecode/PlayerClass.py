@@ -1428,6 +1428,11 @@ class Player:
                             if self.game.infested_planets[planet_chosen]:
                                 discounts_available += 2
                                 self.set_aiming_reticle_in_play(-2, i, "green")
+                elif self.headquarters[i].get_ability() == "STC Fragment":
+                    if self.headquarters[i].get_ready():
+                        if "Elite" in traits:
+                            discounts_available += 2
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
@@ -1561,6 +1566,11 @@ class Player:
                         if self.game.infested_planets[target_planet]:
                             discount += 2
                             self.exhaust_given_pos(-2, pos)
+        if "Elite" in traits:
+            if self.headquarters[pos].get_ability() == "STC Fragment":
+                if self.headquarters[pos].get_ready():
+                    self.exhaust_given_pos(-2, pos)
+                    discount += 2
         if "Daemon" in traits:
             if self.headquarters[pos].get_ability() == "Cultist":
                 discount += 1
