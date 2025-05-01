@@ -493,6 +493,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.mode = "Normal"
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Gauss Flayer":
+        if secondary_player.get_number() == game_update_string[1]:
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                        self.communications_relay_enabled:
+                    can_continue = False
+                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Communications Relay?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    secondary_player.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += 2
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.position_of_actioned_card = (-1, -1)
+                    self.position_of_selected_attachment = (-1, -1, -1)
+                    self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

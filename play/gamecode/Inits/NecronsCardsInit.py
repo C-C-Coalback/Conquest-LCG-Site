@@ -139,11 +139,11 @@ def necrons_cards_init():
                                                "gets -3 HP until the end of the phase. You must pass during "
                                                "your next deployment turn.", "Tactic.",
                               5, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
-        CardClasses.AttachmentCard("Guass Flayer", "Attach to a Necrons army unit.\n"
+        CardClasses.AttachmentCard("Gauss Flayer", "Attach to a Necrons army unit.\n"
                                                    "Combat Action: During a battle at this planet, "
                                                    "exhaust attached unit to give a target enemy army unit at this "
                                                    "planet -2 HP until the end of the phase.", "Wargear. Weapon.",
-                                   1, faction, "Common", 1, False, action_in_play=True, allowed_phases_in_hand="COMBAT",
+                                   1, faction, "Common", 1, False, action_in_play=True, allowed_phases_in_play="COMBAT",
                                    type_of_units_allowed_for_attachment="Army",
                                    unit_must_match_faction=True),
         CardClasses.AttachmentCard("Royal Phylactery",

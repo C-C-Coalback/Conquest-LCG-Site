@@ -31,6 +31,15 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.game_sockets[0].receive_game_update(ability + " activated")
+                elif ability == "Gauss Flayer":
+                    if primary_player.get_name_player() == self.player_with_action:
+                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                            await self.game_sockets[0].receive_game_update(ability + " activated")
                 elif ability == "The Staff of Command":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
