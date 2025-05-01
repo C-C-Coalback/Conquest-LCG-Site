@@ -2240,6 +2240,9 @@ class Player:
                     if self.cards_in_play[planet_num + 1][i].get_damage() > 0:
                         self.game.create_reaction("Royal Phylactery", self.name_player,
                                                   (int(self.number), planet_num, i))
+                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Resurrection Orb":
+                    self.game.create_reaction("Resurrection Orb", self.name_player,
+                                              (int(self.number), planet_num, i))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":

@@ -156,6 +156,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Resurrection Orb":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.discard:
+                card = FindCard.find_card(primary_player.discard[-1], self.card_array)
+                if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
+                        not card.check_for_a_trait("Elite"):
+                    primary_player.add_card_to_planet(card, planet_pos)
+                    del primary_player.discard[-1]
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Black Heart Ravager":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
