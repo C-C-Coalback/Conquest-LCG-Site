@@ -106,6 +106,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         if self.phase == "DEPLOY":
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.number
+    elif self.action_chosen == "Air Caste Courier":
+        if game_update_string[2] == primary_player.get_number():
+            if not self.chosen_first_card:
+                if self.position_of_actioned_card[0] == planet_pos:
+                    self.chosen_first_card = True
+                    self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Pathfinder Shi Or'es":
         if game_update_string[2] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:

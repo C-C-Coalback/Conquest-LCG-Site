@@ -55,6 +55,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.chosen_second_card = False
                         self.chosen_first_card = False
+                elif ability == "Air Caste Courier":
+                    if card_chosen.get_ready():
+                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                        self.action_chosen = ability
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.chosen_second_card = False
                 elif ability == "Wildrider Squadron":
                     if not card_chosen.get_once_per_phase_used():
                         if player_owning_card.name_player == name:
@@ -275,6 +281,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
+                        self.action_cleanup()
+    elif self.action_chosen == "Air Caste Courier":
+        print("ACC")
+        if self.chosen_first_card:
+            print("chosen")
+            if game_update_string[1] == primary_player.get_number():
+                print("num")
+                origin_pla, origin_pos, origin_att = self.misc_target_attachment
+                print(origin_pla != planet_pos, origin_pos != unit_pos)
+                if origin_pla != planet_pos or origin_pos != unit_pos:
+                    if primary_player.move_attachment_card(origin_pla, origin_pos, origin_att,
+                                                           planet_pos, unit_pos):
+                        primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
                         self.action_cleanup()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
