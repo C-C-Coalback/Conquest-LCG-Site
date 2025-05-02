@@ -20,6 +20,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 if primary_player.get_ambush_of_card(card):
                     self.card_pos_to_deploy = int(game_update_string[2])
                     self.action_chosen = "Ambush"
+                    self.card_to_deploy = card
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                     primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(card.get_cost()):

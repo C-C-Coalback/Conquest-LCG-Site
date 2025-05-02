@@ -1497,6 +1497,7 @@ class Player:
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if self.cards_in_play[planet_pos + 1][i].get_ability() == "Crushface":
                 if faction_of_card == "Orks":
+                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
                     discounts_available += 1
                     automatic_discounts += 1
         return discounts_available, automatic_discounts
@@ -1776,6 +1777,10 @@ class Player:
 
     def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits):
         discount = 0
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Crushface":
+            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+                self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                discount += 1
         if "Daemon" in traits:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
                 discount += 1

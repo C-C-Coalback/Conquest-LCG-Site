@@ -51,45 +51,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                 await self.change_phase("COMMAND")
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
-            if self.mode == "DISCOUNT":
-                if name == self.player_with_deploy_turn:
-                    if game_update_string[1] == self.number_with_deploy_turn:
-                        if self.card_type_of_selected_card_in_hand == "Army":
-                            if self.number_with_deploy_turn == "1":
-                                player = self.p1
-                                secondary_player = self.p2
-                            else:
-                                player = self.p2
-                                secondary_player = self.p1
-                            discount_received, damage = player.perform_discount_at_pos_hand(
-                                int(game_update_string[2]),
-                                self.faction_of_card_to_play
-                            )
-                            if discount_received > 0:
-                                if secondary_player.nullify_check() and self.nullify_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        player.name_player + " wants to play Bigga Is Betta; "
-                                                             "Nullify window offered.")
-                                    self.choices_available = ["Yes", "No"]
-                                    self.name_player_making_choices = secondary_player.name_player
-                                    self.choice_context = "Use Nullify?"
-                                    self.nullified_card_pos = int(game_update_string[2])
-                                    self.nullified_card_name = "Bigga Is Betta"
-                                    self.cost_card_nullified = 0
-                                    self.nullify_string = "/".join(game_update_string)
-                                    self.first_player_nullified = player.name_player
-                                    self.nullify_context = "Bigga Is Betta"
-                                else:
-                                    self.discounts_applied += discount_received
-                                    player.discard_card_from_hand(int(game_update_string[2]))
-                                    if self.card_pos_to_deploy > int(game_update_string[2]):
-                                        self.card_pos_to_deploy -= 1
-                                    if damage > 0:
-                                        self.damage_for_unit_to_take_on_play.append(damage)
-                                    if self.discounts_applied >= self.available_discounts:
-                                        await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
-                                                                  discounts=self.discounts_applied)
-            elif self.mode == "Normal":
+            if self.mode == "Normal":
                 if name == self.player_with_deploy_turn:
                     print(game_update_string[1] == self.number_with_deploy_turn)
                     if game_update_string[1] == self.number_with_deploy_turn:
@@ -166,25 +128,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     if card.get_card_type() == "Army":
                         self.discounts_applied = 0
                         planet_chosen = int(game_update_string[1])
-                        self.available_discounts = player.search_hq_for_discounts(self.faction_of_card_to_play,
-                                                                                  self.traits_of_card_to_play,
-                                                                                  planet_chosen=planet_chosen)
-                        hand_disc = player.search_hand_for_discounts(self.faction_of_card_to_play)
-                        self.available_discounts += hand_disc
-                        if hand_disc > 0:
-                            await self.game_sockets[0].receive_game_update(
-                                "Bigga Is Betta detected, may be used as a discount."
-                            )
-                        temp_av_disc, temp_auto_disc = player. \
-                            search_same_planet_for_discounts(self.faction_of_card_to_play, int(game_update_string[1]))
-                        num_termagants = 0
-                        if self.name_of_card_to_play == "Burrowing Trygon":
-                            num_termagants = player.get_most_termagants_at_single_planet()
-                            self.discounts_applied += num_termagants
-                        self.available_discounts += num_termagants
-                        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
-                        self.available_discounts += temp_av_disc
-                        self.discounts_applied += temp_auto_disc
+                        await self.calculate_available_discounts_unit(planet_chosen, card, player)
+                        await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
+                        self.card_to_deploy = card
                         if self.available_discounts > self.discounts_applied:
                             self.stored_mode = self.mode
                             self.mode = "DISCOUNT"

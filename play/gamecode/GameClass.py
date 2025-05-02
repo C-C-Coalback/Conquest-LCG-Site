@@ -225,6 +225,7 @@ class Game:
         self.need_to_reset_tomb_blade_squadron = False
         self.resolve_kill_effects = True
         self.asked_if_resolve_effect = False
+        self.card_to_deploy = None
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -449,29 +450,80 @@ class Game:
                     planet_string += "/"
             await self.game_sockets[0].receive_game_update(planet_string)
 
-    async def update_game_event_action_applying_discounts(self, name, game_update_string):
-        if name == self.player_with_action:
-            print("Special apply discounts routine")
-            if len(game_update_string) == 1:
-                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    print("Play card with not all discounts")
-                    await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
-                                                          discounts=self.discounts_applied)
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
-            if len(game_update_string) == 3:
-                if game_update_string[0] == "HQ":
-                    if name == self.player_with_action:
-                        if self.player_with_action == self.name_1:
-                            player = self.p1
-                        else:
-                            player = self.p2
+    async def update_game_event_applying_discounts(self, name, game_update_string):
+        if self.card_to_deploy is not None:
+            if self.player_with_action == self.name_1:
+                player = self.p1
+                secondary_player = self.p2
+            else:
+                player = self.p2
+                secondary_player = self.p1
+            if self.phase == "DEPLOY":
+                if self.number_with_deploy_turn == "1":
+                    player = self.p1
+                    secondary_player = self.p2
+                else:
+                    player = self.p2
+                    secondary_player = self.p1
+            if name == player.name_player:
+                if len(game_update_string) == 1:
+                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                        print("Play card with not all discounts")
+                        await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                                                              discounts=self.discounts_applied)
+                        self.action_chosen = ""
+                        self.player_with_action = ""
+                        self.mode = "Normal"
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
                         if game_update_string[1] == player.get_number():
                             discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
-                                                                                  self.faction_of_card_to_play,
-                                                                                  self.traits_of_card_to_play,
+                                                                                  self.card_to_deploy.get_faction(),
+                                                                                  self.card_to_deploy.get_traits(),
                                                                                   self.planet_aiming_reticle_position)
+                            if discount_received > 0:
+                                self.discounts_applied += discount_received
+                            if self.discounts_applied >= self.available_discounts:
+                                await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                                                                      discounts=self.discounts_applied)
+                                self.mode = "Normal"
+                    elif game_update_string[0] == "HAND":
+                        if self.card_to_deploy.get_card_type() == "Army":
+                            discount_received, damage = player.perform_discount_at_pos_hand(
+                                int(game_update_string[2]),
+                                self.card_to_deploy.get_faction()
+                            )
+                            if discount_received > 0:
+                                if secondary_player.nullify_check() and self.nullify_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        player.name_player + " wants to play Bigga Is Betta; "
+                                                             "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = int(game_update_string[2])
+                                    self.nullified_card_name = "Bigga Is Betta"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = player.name_player
+                                    self.nullify_context = "Bigga Is Betta"
+                                else:
+                                    self.discounts_applied += discount_received
+                                    player.discard_card_from_hand(int(game_update_string[2]))
+                                    if self.card_pos_to_deploy > int(game_update_string[2]):
+                                        self.card_pos_to_deploy -= 1
+                                    if damage > 0:
+                                        self.damage_for_unit_to_take_on_play.append(damage)
+                                    if self.discounts_applied >= self.available_discounts:
+                                        await DeployPhase.deploy_card_routine(self, name,
+                                                                              self.planet_aiming_reticle_position,
+                                                                              discounts=self.discounts_applied)
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if self.card_to_deploy.get_card_type() == "Army":
+                            discount_received = player.perform_discount_at_pos_in_play(int(game_update_string[2]),
+                                                                                       int(game_update_string[3]),
+                                                                                       self.card_to_deploy.get_traits())
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
@@ -1168,7 +1220,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                            primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                 resolving_attack = False
                             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
                             primary_player.retreat_unit(self.attacker_planet, self.attacker_position)
@@ -1192,7 +1244,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = "Target Dark Possession:"
                             for i in range(len(secondary_player.discard)):
-                                if secondary_player.discard[i] in self.valid_targets_for_dark_possession and\
+                                if secondary_player.discard[i] in self.valid_targets_for_dark_possession and \
                                         secondary_player.discard[i] not in self.choices_available:
                                     self.choices_available.append(secondary_player.discard[i])
                             if not self.choices_available:
@@ -1518,7 +1570,8 @@ class Game:
                                 )
                             else:
                                 primary_player.cards_in_play[planet + 1][unit].armorbane_eop = True
-                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att].set_once_per_phase_used(True)
+                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[
+                                    att].set_once_per_phase_used(True)
                                 name = primary_player.cards_in_play[planet + 1][unit].get_name()
                                 await self.game_sockets[0].receive_game_update(
                                     name + " gained armorbane from Heavy Venom Cannon!"
@@ -1533,7 +1586,7 @@ class Game:
                                 )
                             else:
                                 primary_player.cards_in_play[planet + 1][unit].area_effect_eop += 2
-                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att].\
+                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att]. \
                                     set_once_per_phase_used(True)
                                 name = primary_player.cards_in_play[planet + 1][unit].get_name()
                                 await self.game_sockets[0].receive_game_update(
@@ -2333,6 +2386,29 @@ class Game:
                 await self.create_necrons_wheel_choice(self.p2)
         self.create_reactions_phase_begins()
 
+    async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
+        if card.get_ability() == "Burrowing Trygon":
+            num_termagants = player.get_most_termagants_at_single_planet()
+            self.discounts_applied += num_termagants
+
+    async def calculate_available_discounts_unit(self, planet_chosen, card, player):
+        self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
+                                                                  card.get_traits(),
+                                                                  planet_chosen=planet_chosen)
+        hand_disc = player.search_hand_for_discounts(card.get_faction())
+        self.available_discounts += hand_disc
+        if hand_disc > 0:
+            await self.game_sockets[0].receive_game_update(
+                "Bigga Is Betta detected, may be used as a discount."
+            )
+        temp_av_disc, _ = player. \
+            search_same_planet_for_discounts(self.faction_of_card_to_play, planet_pos=planet_chosen)
+        if card.get_ability() == "Burrowing Trygon":
+            num_termagants = player.get_most_termagants_at_single_planet()
+            self.available_discounts += num_termagants
+        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
+        self.available_discounts += temp_av_disc
+
     def create_reactions_phase_begins(self):
         self.p1.perform_own_reactions_on_phase_change(self.phase)
         self.p2.perform_own_reactions_on_phase_change(self.phase)
@@ -2480,7 +2556,7 @@ class Game:
                                             if primary_player.cards_in_play[planet_pos + 1][
                                                 unit_pos].get_ability() == "Reanimating Warriors" \
                                                     and not primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].once_per_phase_used:
+                                                unit_pos].once_per_phase_used:
                                                 self.effects_waiting_on_resolution.append("Reanimating Warriors")
                                                 self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
@@ -2499,7 +2575,8 @@ class Game:
                                                         planet_pos, unit_pos) == "Volatile Pyrovore":
                                                     self.create_reaction("Volatile Pyrovore",
                                                                          primary_player.name_player,
-                                                                         (int(secondary_player.number), att_pla, att_pos))
+                                                                         (int(secondary_player.number), att_pla,
+                                                                          att_pos))
                                                 if planet_pos != -2:
                                                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
                                                             == "Treacherous Lhamaean":
@@ -2562,7 +2639,7 @@ class Game:
                                     self.old_one_eye_pos = (-2, hq_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Adamant Hive Guard":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or\
+                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or \
                                     primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
                                 damage = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
@@ -2586,10 +2663,10 @@ class Game:
                                     self.misc_target_planet = hurt_planet
                                     self.misc_target_unit = hurt_pos
                                     self.old_one_eye_pos = (planet_pos, unit_pos)
-                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                 .get_ability() == "Adamant Hive Guard":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or\
+                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or \
                                     primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
                                 damage = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
@@ -2843,8 +2920,8 @@ class Game:
                                 print("in play 3")
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
-                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors"\
-                                        and not primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
+                                        and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                         .once_per_phase_used:
                                     if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
                                         self.chosen_first_card = True
@@ -2950,7 +3027,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                .check_for_a_trait("Soldier"):
+                                                        .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3220,8 +3297,8 @@ class Game:
                 await self.resolve_card_in_search_box(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
                 await self.apply_indirect_damage(name, game_update_string)
-            elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
-                await self.update_game_event_action_applying_discounts(name, game_update_string)
+            elif self.mode == "DISCOUNT":
+                await self.update_game_event_applying_discounts(name, game_update_string)
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
@@ -3413,7 +3490,7 @@ class Game:
     async def resolve_winning_combat(self, winner, loser):
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
         if self.infested_planets[self.last_planet_checked_for_battle] and \
-                self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation\
+                self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation \
                 and winner.warlord_faction != "Tyranids":
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Remove Infestation?"
