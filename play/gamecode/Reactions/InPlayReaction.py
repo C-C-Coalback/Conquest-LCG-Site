@@ -345,6 +345,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if self.attacker_planet == int(game_update_string[2]):
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Standard Bearer":
+            if primary_player.get_number() == game_update_string[1]:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Burna Boyz":
             if primary_player.get_number() != game_update_string[1]:
                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]

@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def update_game_event_action_planet(self, name, game_update_string):
