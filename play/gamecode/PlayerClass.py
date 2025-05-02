@@ -1073,7 +1073,10 @@ class Player:
         else:
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
                                                                      [origin_position]))
+            new_pos = len(self.cards_in_play[destination + 1]) - 1
             self.remove_card_from_play(origin_planet, origin_position)
+        if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":
+            self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
 
     def commit_warlord_to_planet_from_planet(self, origin_planet, dest_planet):
         self.warlord_commit_location = dest_planet

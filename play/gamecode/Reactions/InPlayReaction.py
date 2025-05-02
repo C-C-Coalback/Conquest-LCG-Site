@@ -357,7 +357,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if int(game_update_string[2]) == origin_planet:
                     prev_def_planet, prev_def_pos = self.last_defender_position
                     target_unit_pos = int(game_update_string[3])
-                    print("\n\nBURNA BOYZ\n\n")
                     if target_unit_pos == prev_def_pos:
                         await self.game_sockets[0].receive_game_update("Can't select last defender")
                     else:
@@ -385,6 +384,37 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
                             secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
                                                                         "blue")
+                            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Venomous Fiend":
+            if primary_player.get_number() != game_update_string[1]:
+                origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                if int(game_update_string[2]) == origin_planet:
+                    target_unit_pos = int(game_update_string[3])
+                    if secondary_player.get_card_type_given_pos(origin_planet, target_unit_pos) == "Army":
+                        can_continue = True
+                        if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
+                                                                               target_unit_pos):
+                            can_continue = False
+                            await self.game_sockets[0].receive_game_update(
+                                "Immune to enemy card abilities.")
+                        elif secondary_player.communications_relay_check(origin_planet,
+                                                                         target_unit_pos) and \
+                                self.communications_relay_enabled:
+                            can_continue = False
+                            await self.game_sockets[0].receive_game_update(
+                                "Communications Relay may be used.")
+                            self.choices_available = ["Yes", "No"]
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Use Communications Relay?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                        if can_continue:
+                            damage = secondary_player.get_command_given_pos(origin_planet, target_unit_pos)
+                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, damage)
+                            secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")

@@ -478,7 +478,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             int(unit_position[2]), int(unit_position[3]), damage)
                                         await active_games[self.game_position].p1.send_units_at_planet(
                                             int(unit_position[2]))
-                                elif unit_position[2] == "2":
+                                elif unit_position[1] == "2":
                                     if unit_position[0] == "HQ":
                                         active_games[self.game_position].p2.set_damage_given_pos(
                                             -2, int(unit_position[2]), damage)
