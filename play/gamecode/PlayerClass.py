@@ -2624,6 +2624,8 @@ class Player:
                         self.game.reactions_needing_resolving.append("Old One Eye")
                         self.game.player_who_resolves_reaction.append(self.name_player)
                         self.game.positions_of_unit_triggering_reaction.append((int(self.number), planet_id, unit_id))
+            if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
+                self.game.create_reaction("Goff Brawlers", self.name_player, (int(self.number), planet_id, unit_id))
         return None
 
     def check_if_units_present(self, planet_id):

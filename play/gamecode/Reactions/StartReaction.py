@@ -214,6 +214,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Sautekh Complex: Gain Card or Resource?"
             self.asking_if_reaction = False
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif self.reactions_needing_resolving[0] == "Goff Brawlers":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            self.p1.total_indirect_damage += 1
+            self.p2.total_indirect_damage += 1
+            self.location_of_indirect = "PLANET"
+            self.planet_of_indirect = planet_pos
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if not self.infested_planets[planet_pos]:

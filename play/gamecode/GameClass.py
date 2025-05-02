@@ -2120,7 +2120,7 @@ class Game:
                 card = FindCard.find_card(card_name, self.card_array)
                 if card.get_is_unit():
                     if card.has_hive_mind and card.get_cost() < 4:
-                            return True
+                        return True
         return False
 
     def fall_back_check(self, player):
