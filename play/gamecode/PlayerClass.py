@@ -906,9 +906,9 @@ class Player:
 
     def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
         damage_on_play = damage_to_take
-        if card is None and position_hand is None:
+        if position_hand is not None:
             return "ERROR/play_card function called incorrectly", -1
-        if card is not None and position_hand is not None:
+        if card is None:
             return "ERROR/play_card function called incorrectly", -1
         if card is not None:
             cost = card.get_cost() - discounts
@@ -939,37 +939,14 @@ class Player:
                         return "Fail/Unique already in play", -1
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources", -1
-        if position_hand is not None:
-            if position_hand != -1:
-                if -1 < position < 7:
-                    card = FindCard.find_card(self.cards[position_hand], self.card_array)
-                    cost = card.get_cost() - discounts
-                    if card.get_limited():
-                        if self.can_play_limited:
-                            if self.spend_resources(cost):
-                                if self.add_card_to_planet(card, position) != -1:
-                                    self.cards.remove(card.get_name())
-                                    self.set_can_play_limited(False)
-                                    print("Played card to planet", position)
-                                    location_of_unit = len(self.cards_in_play[position + 1]) - 1
-                                    if damage_to_take > 0:
-                                        if self.game.bigga_is_betta_active:
-                                            while damage_on_play > 0:
-                                                self.assign_damage_to_pos(position, location_of_unit, 1)
-                                                damage_on_play -= 1
-                                        else:
-                                            self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
-                                    return "SUCCESS", location_of_unit
-                                self.add_resources(cost)
-                                return "FAIL/Unique already in play", -1
-                        else:
-                            return "FAIL/Limited already played", -1
-                    else:
+            else:
+                cost = card.get_cost() - discounts
+                if card.get_limited():
+                    if self.can_play_limited:
                         if self.spend_resources(cost):
                             if self.add_card_to_planet(card, position) != -1:
-                                self.cards.remove(card.get_name())
+                                self.set_can_play_limited(False)
                                 print("Played card to planet", position)
-                                print(card.get_ability())
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
@@ -978,42 +955,60 @@ class Player:
                                             damage_on_play -= 1
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
-                                if card.get_ability() == "Murder of Razorwings":
-                                    self.game.reactions_needing_resolving.append("Murder of Razorwings")
-                                    self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
-                                                                                            location_of_unit))
-                                    self.game.player_who_resolves_reaction.append(self.name_player)
-                                    # self.game.discard_card_at_random_from_opponent(self.number)
-                                if card.get_ability() == "Scything Hormagaunts":
-                                    self.game.create_reaction(
-                                        "Scything Hormagaunts", self.name_player, (int(self.number), position, -1))
-                                if card.get_ability() == "Doom Scythe Invader":
-                                    self.game.create_reaction(
-                                        "Doom Scythe Invader", self.name_player, (int(self.number), position, -1)
-                                    )
-                                if card.get_ability() == "Kith's Khymeramasters":
-                                    self.game.reactions_needing_resolving.append("Kith's Khymeramasters")
-                                    self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
-                                                                                            location_of_unit))
-                                    self.game.player_who_resolves_reaction.append(self.name_player)
-                                if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
-                                    for i in range(7):
-                                        for j in range(len(self.cards_in_play[i + 1])):
-                                            if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
-                                                if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
-                                                    self.game.create_reaction("Tomb Blade Squadron", self.name_player,
-                                                                              (int(self.number), -1, -1))
-                                if card.get_faction() != "Necrons":
-                                    if self.count_units_of_faction(card.get_faction()) == 1:
-                                        for i in range(len(self.headquarters)):
-                                            if self.headquarters[i].get_ability() == "Sautekh Complex":
-                                                self.game.create_reaction("Sautekh Complex", self.name_player,
-                                                                          (int(self.number), -2, i))
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost)
                             return "FAIL/Unique already in play", -1
-                    print("Insufficient resources")
-                    return "FAIL/Insufficient resources", -1
+                    else:
+                        return "FAIL/Limited already played", -1
+                else:
+                    if self.spend_resources(cost):
+                        if self.add_card_to_planet(card, position) != -1:
+                            print("Played card to planet", position)
+                            print(card.get_ability())
+                            location_of_unit = len(self.cards_in_play[position + 1]) - 1
+                            if damage_to_take > 0:
+                                if self.game.bigga_is_betta_active:
+                                    while damage_on_play > 0:
+                                        self.assign_damage_to_pos(position, location_of_unit, 1)
+                                        damage_on_play -= 1
+                                else:
+                                    self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                            if card.get_ability() == "Murder of Razorwings":
+                                self.game.reactions_needing_resolving.append("Murder of Razorwings")
+                                self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
+                                                                                        location_of_unit))
+                                self.game.player_who_resolves_reaction.append(self.name_player)
+                                # self.game.discard_card_at_random_from_opponent(self.number)
+                            if card.get_ability() == "Scything Hormagaunts":
+                                self.game.create_reaction(
+                                    "Scything Hormagaunts", self.name_player, (int(self.number), position, -1))
+                            if card.get_ability() == "Doom Scythe Invader":
+                                self.game.create_reaction(
+                                    "Doom Scythe Invader", self.name_player, (int(self.number), position, -1)
+                                )
+                            if card.get_ability() == "Kith's Khymeramasters":
+                                self.game.reactions_needing_resolving.append("Kith's Khymeramasters")
+                                self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
+                                                                                        location_of_unit))
+                                self.game.player_who_resolves_reaction.append(self.name_player)
+                            if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
+                                for i in range(7):
+                                    for j in range(len(self.cards_in_play[i + 1])):
+                                        if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
+                                            if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
+                                                self.game.create_reaction("Tomb Blade Squadron", self.name_player,
+                                                                          (int(self.number), -1, -1))
+                            if card.get_faction() != "Necrons":
+                                if self.count_units_of_faction(card.get_faction()) == 1:
+                                    for i in range(len(self.headquarters)):
+                                        if self.headquarters[i].get_ability() == "Sautekh Complex":
+                                            self.game.create_reaction("Sautekh Complex", self.name_player,
+                                                                      (int(self.number), -2, i))
+                            return "SUCCESS", location_of_unit
+                        self.add_resources(cost)
+                        return "FAIL/Unique already in play", -1
+                print("Insufficient resources")
+                return "FAIL/Insufficient resources", -1
         return "FAIL/Invalid card", -1
 
     def count_units_of_faction(self, faction):

@@ -282,18 +282,24 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.card_pos_to_deploy = -1
     elif self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_unit_position != -1:
-            disc = 0
             if self.anrakyr_deck_choice == primary_player.name_player:
                 card = FindCard.find_card(primary_player.discard[self.anrakyr_unit_position], self.card_array)
             else:
                 card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array)
-            self.available_discounts = 0  # TODO: Add discount support for Anrakyr
-            self.discounts_applied = 0
+            self.card_to_deploy = card
+            await self.calculate_available_discounts_unit(
+                planet_chosen=chosen_planet, card=card, player=primary_player
+            )
+            await self.calculate_automatic_discounts_unit(
+                planet_chosen=chosen_planet, card=card, player=primary_player
+            )
+            self.mode = "DISCOUNT"
+            self.planet_aiming_reticle_position = int(game_update_string[1])
             if self.discounts_applied >= self.available_discounts:
                 added_card_to_planet = False
-                if primary_player.spend_resources(card.get_cost() - self.discounts_applied):
-                    if primary_player.add_card_to_planet(card, chosen_planet) != -1:
-                        added_card_to_planet = True
+                primary_player.play_card(
+                    chosen_planet, card=self.card_to_deploy
+                )
                 if added_card_to_planet:
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])

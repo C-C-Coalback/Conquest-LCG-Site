@@ -185,9 +185,19 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     print("Damage to take: ", damage_to_take)
     self.bigga_is_betta_active = True
     played_card, position_of_unit = primary_player.play_card(int(planet_pos),
-                                                             position_hand=self.card_pos_to_deploy,
+                                                             card=self.card_to_deploy,
                                                              discounts=discounts,
                                                              damage_to_take=damage_to_take)
+    if played_card:
+        if not self.action_chosen or self.action_chosen == "Ambush":
+            primary_player.cards.remove(self.card_to_deploy.get_name())
+        elif self.action_chosen == "Anrakyr the Traveller":
+            if self.anrakyr_deck_choice == primary_player.name_player:
+                del primary_player.discard[self.anrakyr_unit_position]
+            else:
+                del secondary_player.discard[self.anrakyr_unit_position]
+            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
     self.bigga_is_betta_active = False
     if played_card == "SUCCESS":
         if secondary_player.search_card_at_planet(int(planet_pos), "Syren Zythlex"):
@@ -195,12 +205,10 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
             primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
-    self.mode = "Normal"
-    if not secondary_player.has_passed:
-        self.player_with_deploy_turn = secondary_player.get_name_player()
-        self.number_with_deploy_turn = secondary_player.get_number()
+    self.action_cleanup()
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
+    self.card_to_deploy = None
     primary_player.aiming_reticle_color = None
     primary_player.aiming_reticle_coords_hand = None
     self.planet_aiming_reticle_active = False
