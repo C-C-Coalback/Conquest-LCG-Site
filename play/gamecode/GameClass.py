@@ -2384,6 +2384,9 @@ class Game:
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
                                                      (int(secondary_player.number), att_pla, att_pos))
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
+                                self.create_reaction("Treacherous Lhamaean", primary_player.name_player,
+                                                     (int(primary_player.number), planet_pos, unit_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
@@ -2490,6 +2493,12 @@ class Game:
                                                     self.create_reaction("Volatile Pyrovore",
                                                                          primary_player.name_player,
                                                                          (int(secondary_player.number), att_pla, att_pos))
+                                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                        == "Treacherous Lhamaean":
+                                                    self.create_reaction("Treacherous Lhamaean",
+                                                                         primary_player.name_player,
+                                                                         (int(primary_player.number), planet_pos,
+                                                                          unit_pos))
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                                         .get_card_type() != "Warlord":

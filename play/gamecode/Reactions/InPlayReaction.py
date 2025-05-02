@@ -416,6 +416,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, damage)
                             secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":
+            num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.number == game_update_string[1]:
+                if origin_planet == planet_pos and origin_pos != unit_pos:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
