@@ -169,6 +169,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
+    elif self.action_chosen == "Ravenwing Escort":
+        if self.chosen_first_card:
+            if self.misc_target_planet != chosen_planet:
+                origin_planet, origin_pos = self.misc_target_unit
+                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                self.misc_target_unit = (-1, -1)
+                self.action_cleanup()
     elif self.action_chosen == "Extermination":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) != "Necrons" and \

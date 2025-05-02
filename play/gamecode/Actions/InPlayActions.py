@@ -108,6 +108,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                 self.action_cleanup()
+                elif ability == "Ravenwing Escort":
+                    if card_chosen.get_ready():
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.misc_target_planet = planet_pos
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
                 elif ability == "Dread Monolith":
                     if not card_chosen.once_per_round_used:
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].set_once_per_round_used(True)
@@ -212,6 +218,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Ravenwing Escort":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if self.misc_target_planet == planet_pos:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.chosen_first_card = True
+                        self.misc_target_unit = (planet_pos, unit_pos)
     elif self.action_chosen == "Hate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
