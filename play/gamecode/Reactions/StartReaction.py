@@ -221,6 +221,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.location_of_indirect = "PLANET"
             self.planet_of_indirect = planet_pos
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Swarmling Termagants":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            unique_factions = []
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                new_faction = secondary_player.cards_in_play[planet_pos + 1][i].get_faction()
+                if new_faction not in unique_factions:
+                    unique_factions.append(new_faction)
+            if "Neutral" in unique_factions:
+                unique_factions.remove("Neutral")
+            count = len(unique_factions)
+            for _ in range(count):
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if not self.infested_planets[planet_pos]:
