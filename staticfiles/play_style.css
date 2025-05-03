@@ -38,7 +38,7 @@ h4 {
 
 .Card-div {
     position: relative;
-    height:8vh;
+    height:7vh;
     width:auto;
 }
 
@@ -48,7 +48,7 @@ h4 {
 
 .Card {
     position: relative;
-    height:8vh;
+    height:7vh;
     width:5vw;
 }
 
@@ -62,7 +62,7 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 8vh;
+    height: 7vh;
     width: 5vw;
 }
 
@@ -74,7 +74,7 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 8vh;
+    height: 7vh;
     width: 5vw;
     pointer-events: none;
 }
@@ -163,12 +163,13 @@ h4 {
     float:left;
     width: 10vw;
     max-width:10vw;
-    max-height: 8vh;
+    max-height: 14vh;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
-    display:flex;
-    flex-direction:row;
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
     pointer-events: auto;
 }
 
@@ -177,12 +178,13 @@ h4 {
     float:left;
     width: 10vw;
     max-width:10vw;
-    max-height: 8vh;
+    max-height: 14vh;
     overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
-    display:flex;
-    flex-direction:row;
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
     pointer-events: auto;
 }
 
@@ -345,7 +347,6 @@ summary:focus {
     top:43%;
     border: 5px solid blue;
     margin: auto;
-    overflow-x:scroll;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
