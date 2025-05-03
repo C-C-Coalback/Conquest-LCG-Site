@@ -12,7 +12,71 @@
     <div id="info-box">
         <p class="info-box-sub">Test</p>
     </div>
-
+    <div id="in-play-box">
+        <div id="player-1-cards-planet-0" class="player-1-in-play">
+            <p>P1P0</p>
+        </div>
+        <div id="player-1-cards-planet-1" class="player-1-in-play">
+            <p>P1P1</p>
+        </div>
+        <div id="player-1-cards-planet-2" class="player-1-in-play">
+            <p>P1P2</p>
+        </div>
+        <div id="player-1-cards-planet-3" class="player-1-in-play">
+            <p>P1P3</p>
+        </div>
+        <div id="player-1-cards-planet-4" class="player-1-in-play">
+            <p>P1P4</p>
+        </div>
+        <div id="player-1-cards-planet-5" class="player-1-in-play">
+            <p>P1P5</p>
+        </div>
+        <div id="player-1-cards-planet-6" class="player-1-in-play">
+            <p>P1P6</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/0">
+            <p>PLANET0</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/1">
+            <p>PLANET1</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/2">
+            <p>PLANET2</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/3">
+            <p>PLANET3</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/4">
+            <p>PLANET4</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/5">
+            <p>PLANET5</p>
+        </div>
+        <div class="planet-div" id="div/PLANETS/6">
+            <p>PLANET6</p>
+        </div>
+        <div id="player-2-cards-planet-0" class="player-2-in-play">
+            <p>P2P0</p>
+        </div>
+        <div id="player-2-cards-planet-1" class="player-2-in-play">
+            <p>P2P1</p>
+        </div>
+        <div id="player-2-cards-planet-2" class="player-2-in-play">
+            <p>P2P2</p>
+        </div>
+        <div id="player-2-cards-planet-3" class="player-2-in-play">
+            <p>P2P3</p>
+        </div>
+        <div id="player-2-cards-planet-4" class="player-2-in-play">
+            <p>P2P4</p>
+        </div>
+        <div id="player-2-cards-planet-5" class="player-2-in-play">
+            <p>P2P5</p>
+        </div>
+        <div id="player-2-cards-planet-6" class="player-2-in-play">
+            <p>P2P6</p>
+        </div>
+    </div>
     <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
     <div id="current-hand-player-1">
         <p></p>
@@ -53,60 +117,11 @@
     <div id="request-action-div">
         <input id="action-button" type="button" value="ACTION" onclick="testImageButton(this.id);">
     </div>
-    <div id="planets-in-play">
-        <p>Amogus</p>
-    </div>
     <div id="victory-display-player-1">
         <p></p>
     </div>
     <div id="victory-display-player-2">
         <p></p>
-    </div>
-    <div id="player-1-cards-in-play">
-        <div id="player-1-cards-planet-0" class="player-1-in-play">
-            <p>P1P0</p>
-        </div>
-        <div id="player-1-cards-planet-1" class="player-1-in-play">
-            <p>P1P1</p>
-        </div>
-        <div id="player-1-cards-planet-2" class="player-1-in-play">
-            <p>P1P2</p>
-        </div>
-        <div id="player-1-cards-planet-3" class="player-1-in-play">
-            <p>P1P3</p>
-        </div>
-        <div id="player-1-cards-planet-4" class="player-1-in-play">
-            <p>P1P4</p>
-        </div>
-        <div id="player-1-cards-planet-5" class="player-1-in-play">
-            <p>P1P5</p>
-        </div>
-        <div id="player-1-cards-planet-6" class="player-1-in-play">
-            <p>P1P6</p>
-        </div>
-    </div>
-    <div id="player-2-cards-in-play">
-        <div id="player-2-cards-planet-0" class="player-2-in-play">
-            <p>P2P0</p>
-        </div>
-        <div id="player-2-cards-planet-1" class="player-2-in-play">
-            <p>P2P1</p>
-        </div>
-        <div id="player-2-cards-planet-2" class="player-2-in-play">
-            <p>P2P2</p>
-        </div>
-        <div id="player-2-cards-planet-3" class="player-2-in-play">
-            <p>P2P3</p>
-        </div>
-        <div id="player-2-cards-planet-4" class="player-2-in-play">
-            <p>P2P4</p>
-        </div>
-        <div id="player-2-cards-planet-5" class="player-2-in-play">
-            <p>P2P5</p>
-        </div>
-        <div id="player-2-cards-planet-6" class="player-2-in-play">
-            <p>P2P6</p>
-        </div>
     </div>
     <div id="search-collapse" draggable="true" class="draggable">
         <details>
@@ -138,15 +153,16 @@
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
                 if (split_data[1] === "PLANETS") {
-                    document.getElementById('planets-in-play').innerHTML = ``
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
                         string_id = "PLANETS/" + string_id;
+                        var container_id = "div/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                        var full_string = `<div class="planet-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        document.getElementById(container_id).innerHTML = ``;
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         if (card_data_split.length >= 2) {
                             if (card_data_split[1] === "I") {
                                 full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
@@ -155,8 +171,7 @@
                         if (card_data_split.length === 3) {
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
                         }
-                        full_string += `</div>`;
-                        document.getElementById('planets-in-play').innerHTML += full_string;
+                        document.getElementById(container_id).innerHTML = full_string;
                     }
                 } else if (split_data[1] === "INFO_BOX") {
                     document.getElementById('info-box').innerHTML = ``;
