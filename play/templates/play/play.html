@@ -208,6 +208,7 @@
                         var damage = card_data_split[2];
                         var hale = card_data_split[3];
                         var string_id = (i-4).toString();
+                        var card_class = "Card";
                         string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         if (hale === "B") {
@@ -217,7 +218,8 @@
                         var rotation = "";
                         var full_string = `<div class="Card-div">`;
                         if (is_ready === "E") {
-                            rotation = " style='transform:rotate(90deg);'";
+                            rotation = " style='rotate: 90deg;'";
+                            card_class = "Exhausted-Card";
                         }
                         for (var j = 5; j < card_data_split.length; j++) {
                             console.log(card_data_split[j]);
@@ -225,13 +227,15 @@
                             var attachment_data_split = card_data_split[j].split("+");
                             var attachment_name = attachment_data_split[0];
                             var attachment_ready = attachment_data_split[1];
+                            var attachment_class = "Attachment-Card";
                             attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
                             var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
                             var attachment_rotation = "";
                             if (attachment_ready === "E") {
+                                attachment_class = "Exhausted-Attachment-Card";
                                 attachment_rotation = " style='transform:rotate(90deg);'"
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                         var style_string = "";
                         if (card_data_split.length > 5) {
@@ -241,7 +245,7 @@
                                 style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
                             }
                         }
-                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         if (card_data_split[4] !== "") {
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                         }
@@ -262,6 +266,7 @@
                         var damage = card_data_split[2];
                         var hale = card_data_split[3];
                         var string_id = (i-3).toString();
+                        var card_class = "Card";
                         string_id = "HQ/" + split_data[2] + "/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         if (hale === "B") {
@@ -271,6 +276,7 @@
                         var rotation = "";
                         var full_string = `<div class="Card-div">`;
                         if (is_ready === "E") {
+                            card_class = "Exhausted-Card";
                             rotation = " style='transform:rotate(90deg);'";
                         }
                         for (var j = 5; j < card_data_split.length; j++) {
@@ -279,13 +285,15 @@
                             var attachment_data_split = card_data_split[j].split("+");
                             var attachment_name = attachment_data_split[0];
                             var attachment_ready = attachment_data_split[1];
+                            var attachment_class = "Attachment-Card";
                             attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
                             var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
                             var attachment_rotation = "";
                             if (attachment_ready === "E") {
+                                attachment_class = "Exhausted-Attachment-Card";
                                 attachment_rotation = " style='transform:rotate(90deg);'"
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class="Attachment-Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                         var style_string = "";
                         if (card_data_split.length > 5) {
@@ -295,7 +303,7 @@
                                 style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
                             }
                         }
-                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         if (card_data_split[4] !== "") {
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                         }

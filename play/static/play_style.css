@@ -52,6 +52,12 @@ h4 {
     width:5vw;
 }
 
+.Exhausted-Card {
+    position: relative;
+    width:7vh;
+    height:5vw;
+}
+
 .Damage {
     position: absolute;
     top: 0;
@@ -64,6 +70,26 @@ h4 {
     left: 0;
     height: 7vh;
     width: 5vw;
+}
+
+.Exhausted-Attachment-Card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 7vh;
+    height: 5vw;
+}
+
+.Attachment-Card + .Exhausted-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Attachment-Card + .Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Attachment-Card + .Exhausted-Attachment-Card {
+    margin-left: 1vw;
 }
 
 .Attachment-Card + .Attachment-Card {
