@@ -199,8 +199,8 @@
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
                     document.getElementById(target_discard_pile_id).innerHTML = ``;
-                    if (split_data.length === 4) {
-                        var card_name = split_data[3];
+                    if (split_data.length >= 4) {
+                        var card_name = split_data[split_data.length - 1];
                         var string_id = "DISCARD_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/" + card_name + ".jpg";

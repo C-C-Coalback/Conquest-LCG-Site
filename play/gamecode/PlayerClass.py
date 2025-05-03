@@ -315,12 +315,11 @@ class Player:
             )
 
     async def send_discard(self, force=False):
-        joined_string = ""
+        joined_string = "GAME_INFO/DISCARD/" + str(self.number)
         top_card = self.get_top_card_discard()
-        if top_card is None:
-            joined_string = "GAME_INFO/DISCARD/" + str(self.number)
-        else:
-            joined_string = "GAME_INFO/DISCARD/" + str(self.number) + "/" + top_card
+        if self.discard:
+            for i in range(len(self.discard)):
+                joined_string += "/" + self.discard[i]
         if joined_string != self.last_discard_string or force:
             self.last_discard_string = joined_string
             await self.game.game_sockets[0].receive_game_update(joined_string)
