@@ -90,12 +90,6 @@
     <div id="current-deck-player-2">
         <img src="/static/images/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
     </div>
-    <div id="current-discard-player-1">
-        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card">
-    </div>
-    <div id="current-discard-player-2">
-        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card">
-    </div>
     <div id="headquarters-player-1">
         <p>Test hq p1</p>
     </div>
@@ -122,6 +116,22 @@
     </div>
     <div id="victory-display-player-2">
         <p></p>
+    </div>
+        <div id="current-discard-player-1">
+        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
+    </div>
+    <div id="current-discard-player-2">
+        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
+    </div>
+    <div id="expanded-DISCARD_PILE-1">
+        <div id="expanded-discard-1-settings">
+            <input type="image" id="IN_DISCARD/1/0" src="/static/images/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+        </div>
+    </div>
+    <div id="expanded-DISCARD_PILE-2">
+        <div id="expanded-discard-2-settings">
+            <input type="image" id="IN_DISCARD/2/0" src="/static/images/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+        </div>
     </div>
     <div id="search-collapse" draggable="true" class="draggable">
         <details>
@@ -199,12 +209,23 @@
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
                     document.getElementById(target_discard_pile_id).innerHTML = ``;
+                    var target_expanded_discard = "expanded-DISCARD_PILE-" + split_data[2];
+                    document.getElementById(target_expanded_discard).innerHTML = ``;
                     if (split_data.length >= 4) {
+                        for (var i = 3; i < split_data.length; i++) {
+                            var card_name = split_data[i];
+                            var string_id = (i-3).toString();
+                            string_id = "IN_DISCARD/" + split_data[2] + "/" + string_id;
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
+                            document.getElementById(target_expanded_discard).innerHTML += full_string;
+                        }
                         var card_name = split_data[split_data.length - 1];
                         var string_id = "DISCARD_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/" + card_name + ".jpg";
-                        var full_string = `<img src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
                         document.getElementById(target_discard_pile_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "RESOURCES") {
@@ -475,6 +496,21 @@
 
         function changeDefOut() {
             console.log("mouse left");
+        }
+
+        function showDiscard(discard_id) {
+        console.log("showdiscard function")
+        console.log(discard_id)
+        var target_discard_display = "expanded/" + discard_id;
+        target_discard_display = target_discard_display.split('/').join('-');
+        var x = document.getElementById(target_discard_display);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            console.log("Set to block")
+        } else {
+            x.style.display = "none";
+            console.log("Set to none")
+        }
         }
     </script>
 {% endblock %}

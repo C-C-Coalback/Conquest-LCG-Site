@@ -23,9 +23,9 @@ h4 {
     [col-end] ;
     grid-row-gap: 2vw;
     grid-template-areas:
-    "play10" "play11" "play12" "play13" "play14" "play15" "play16" auto
-    "planet0" "planet1" "planet2" "planet3" "planet4" "planet5" "planet6" auto
-    "play20" "play21" "play22" "play23" "play24" "play25" "play26" auto;
+    "play10 play11 play12 play13 play14 play15 play16" 10vw
+    "planet0 planet1 planet2 planet3 planet4 planet5 planet6" 10vw
+    "play20 play21 play22 play23 play24 play25 play26" 10vw;
 }
 
 #player-1-cards-planet-0 {
@@ -440,6 +440,33 @@ summary:focus {
 #current-discard-player-2 {
     position:absolute;
     bottom:0;
+}
+
+#expanded-DISCARD_PILE-1 {
+    position: absolute;
+    top: 8vh;
+    display:none;
+    border: 5px solid blue;
+}
+
+#expanded-discard-1-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+
+}
+
+#expanded-DISCARD_PILE-2 {
+    position:absolute;
+    bottom: 8vh;
+    display:none;
+    border: 5px solid blue;
+}
+
+#expanded-discard-2-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 #planets-in-play {
