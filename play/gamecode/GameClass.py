@@ -226,6 +226,7 @@ class Game:
         self.resolve_kill_effects = True
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
+        self.saved_planet_string = ""
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -294,6 +295,7 @@ class Game:
         await self.send_search(force=True)
         await self.p1.send_victory_display()
         await self.p2.send_victory_display()
+        await self.send_planet_array(force=True)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -419,7 +421,7 @@ class Game:
             await self.game_sockets[0].receive_game_update(info_string)
             self.last_info_box_string = info_string
 
-    async def send_planet_array(self):
+    async def send_planet_array(self, force=False):
         planet_string = "GAME_INFO/PLANETS/"
         if not self.planet_aiming_reticle_active:
             for i in range(len(self.planet_array)):
@@ -448,6 +450,8 @@ class Game:
                     planet_string += "|red"
                 if i != 6:
                     planet_string += "/"
+        if planet_string != self.saved_planet_string or force:
+            self.saved_planet_string = planet_string
             await self.game_sockets[0].receive_game_update(planet_string)
 
     async def update_game_event_applying_discounts(self, name, game_update_string):
@@ -833,7 +837,6 @@ class Game:
             self.mode = "Normal"
             self.planet_aiming_reticle_active = True
             self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-            await self.send_planet_array()
         else:
             await self.change_phase("HEADQUARTERS")
             await self.game_sockets[0].receive_game_update(
@@ -1091,7 +1094,6 @@ class Game:
                     elif self.asking_if_remove_infested_planet:
                         if game_update_string[1] == "0":
                             self.infested_planets[self.last_planet_checked_for_battle] = False
-                            await self.send_planet_array()
                         self.asking_if_remove_infested_planet = False
                         self.already_asked_remove_infestation = True
                         await self.resolve_winning_combat(primary_player, secondary_player)
@@ -2841,7 +2843,6 @@ class Game:
             self.set_battle_initiative()
             self.planet_aiming_reticle_active = True
             self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-            await self.send_planet_array()
             self.p1.has_passed = False
             self.p2.has_passed = False
 
@@ -3384,6 +3385,7 @@ class Game:
         await self.p2.send_hand()
         await self.p2.send_discard()
         await self.p2.send_resources()
+        await self.send_planet_array()
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()

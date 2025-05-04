@@ -38,7 +38,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.mode = "DISCOUNT"
                 self.planet_aiming_reticle_position = int(game_update_string[1])
                 self.planet_aiming_reticle_active = True
-                await self.send_planet_array()
             else:
                 primary_player.aiming_reticle_coords_hand = None
                 await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
@@ -81,7 +80,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 adj_2_infested = True
         if adj_1_infested or adj_2_infested:
             self.infested_planets[chosen_planet] = True
-            await self.send_planet_array()
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             self.mode = "Normal"
             self.action_chosen = ""

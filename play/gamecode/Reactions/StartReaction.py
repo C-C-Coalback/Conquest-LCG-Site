@@ -184,7 +184,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infested_planets[planet_pos] = True
             self.delete_reaction()
-            await self.send_planet_array()
         elif self.reactions_needing_resolving[0] == "Straken's Command Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
@@ -240,7 +239,6 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.infested_planets[planet_pos] = True
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.delete_reaction()
-                await self.send_planet_array()
             else:
                 await self.game_sockets[0].receive_game_update("Resolve Toxic venomthrope gains")
                 self.resolving_search_box = True
@@ -287,7 +285,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infested_planets[planet_pos] = True
             self.delete_reaction()
-            await self.send_planet_array()
         elif self.reactions_needing_resolving[0] == "The Swarmlord":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             planet_1 = planet_pos - 1

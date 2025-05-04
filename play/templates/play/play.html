@@ -142,7 +142,7 @@
 </div>
 {{ game_id|json_script:"game-id" }}
 <script>
-        const roomName = JSON.parse(document.getElementById('game-id').textContent);
+    const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         const gameSocket = new WebSocket(
 	    ws_scheme
@@ -157,31 +157,131 @@
 
         cardHeight = 100;
         cardWidth = 63;
+        var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
 
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
                 if (split_data[1] === "PLANETS") {
+                    var newPlanetsArray = [];
+                    var had_in_play_planet = "false";
+                    var outOfPlayPlanets = [];
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
+                        if (card_name === "CardbackRotated") {
+                            if (had_in_play_planet === "false") {
+                                outOfPlayPlanets.push(string_id);
+                                newPlanetsArray.push("false");
+                            } else {
+                                newPlanetsArray.push("true");
+                            }
+                        } else {
+                            had_in_play_planet = "true";
+                            newPlanetsArray.push("true");
+                        }
                         var container_id = "div-PLANETS-" + string_id;
                         string_id = "PLANETS/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                        document.getElementById(container_id).innerHTML = ``;
-                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                        if (card_data_split.length >= 2) {
-                            if (card_data_split[1] === "I") {
-                                full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
+                        var element =  document.getElementById(container_id);
+                        if (typeof(element) != 'undefined' && element != null)
+                        {
+                            document.getElementById(container_id).innerHTML = ``;
+                            var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            if (card_data_split.length >= 2) {
+                                if (card_data_split[1] === "I") {
+                                    full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
+                                }
+                            }
+                            if (card_data_split.length === 3) {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                            }
+                            document.getElementById(container_id).innerHTML = full_string;
+                        }
+                    }
+                    var planetsChanged = "false";
+                    for (var i = 0; i < inPlayPlanets.length; i++) {
+                        if (inPlayPlanets[i] != newPlanetsArray[i]) {
+                            planetsChanged = "true";
+                        }
+                    }
+                    if (planetsChanged === "true") {
+                        console.log("trying to change planets");
+                        var new_grid_template_areas = `
+                        "play10 play11 play12 play13 play14 play15 play16"
+                        "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
+                        "play20 play21 play22 play23 play24 play25 play26"`;
+                        var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr 1fr`;
+                        var encountered_in_play_planet = "false";
+                        var first_pos_in_play = -1;
+                        for (var i = 0; i < newPlanetsArray.length; i++) {
+                            if (newPlanetsArray[i] === "true") {
+                                encountered_in_play_planet = "true";
+                                if (first_pos_in_play === -1) {
+                                    first_pos_in_play = i;
+                                }
+                            } else {
+                                if (encountered_in_play_planet === "false") {
+                                    if (i !== 6) {
+                                        var element = document.getElementById("div-PLANETS-" + (i).toString());
+                                        if (typeof(element) != 'undefined' && element != null)
+                                        {
+                                            document.getElementById("player-1-cards-planet-" + (i).toString()).remove()
+                                            document.getElementById("player-2-cards-planet-" + (i).toString()).remove()
+                                            document.getElementById("div-PLANETS-" + (i).toString()).remove()
+                                        }
+                                    }
+                                }
                             }
                         }
-                        if (card_data_split.length === 3) {
-                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                        if (first_pos_in_play === -1) {
+                            first_pos_in_play = 6;
                         }
-                        document.getElementById(container_id).innerHTML = full_string;
+                        if (first_pos_in_play === 1) {
+                            var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr`;
+                            new_grid_template_areas = `
+                            "play11 play12 play13 play14 play15 play16"
+                            "planet1 planet2 planet3 planet4 planet5 planet6"
+                            "play21 play22 play23 play24 play25 play26"`;
+                        } else if (first_pos_in_play === 2) {
+                            var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr`;
+                            new_grid_template_areas = `
+                            "play12 play13 play14 play15 play16"
+                            "planet2 planet3 planet4 planet5 planet6"
+                            "play22 play23 play24 play25 play26"`;
+                        } else if (first_pos_in_play === 3) {
+                            var new_grid_template_columns = `1fr 1fr 1fr 1fr`;
+                            new_grid_template_areas = `
+                            "play13 play14 play15 play16"
+                            "planet3 planet4 planet5 planet6"
+                            "play23 play24 play25 play26"`;
+                        } else if (first_pos_in_play === 4) {
+                            var new_grid_template_columns = `1fr 1fr 1fr`;
+                            new_grid_template_areas = `
+                            "play14 play15 play16"
+                            "planet4 planet5 planet6"
+                            "play24 play25 play26"`;
+                        } else if (first_pos_in_play === 5) {
+                            var new_grid_template_columns = `1fr 1fr`;
+                            new_grid_template_areas = `
+                            "play15 play16"
+                            "planet5 planet6"
+                            "play25 play26"`;
+                        } else if (first_pos_in_play === 6) {
+                            var new_grid_template_columns = `1fr`;
+                            new_grid_template_areas = `
+                            "play16"
+                            "planet6"
+                            "play26"`;
+                        }
+                        inPlayPlanets = newPlanetsArray;
+                        console.log("about to apply");
+                        document.getElementById("in-play-box").style.gridTemplateColumns = new_grid_template_columns;
+                        document.getElementById("in-play-box").style.gridTemplateAreas = new_grid_template_areas;
+                        console.log("Hopefully changed planets");
                     }
                 } else if (split_data[1] === "INFO_BOX") {
                     document.getElementById('info-box').innerHTML = ``;
@@ -236,61 +336,65 @@
                     }
                 } else if (split_data[1] === "IN_PLAY") {
                     var target_planet_id = "player-" + split_data[2] + "-cards-planet-" + split_data[3];
-                    document.getElementById(target_planet_id).innerHTML = ``;
-                    for (var i = 4; i < split_data.length; i++) {
-                        var card_data_split = split_data[i].split("|");
-                        var card_name = card_data_split[0];
-                        var is_ready = card_data_split[1];
-                        var damage = card_data_split[2];
-                        var hale = card_data_split[3];
-                        var string_id = (i-4).toString();
-                        var card_class = "Card";
-                        string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
-                        card_name = card_name.split(' ').join('_');
-                        if (hale === "B") {
-                            card_name += "_bloodied";
-                        }
-                        var route_text = "/static/images/" + card_name + ".jpg";
-                        var rotation = "";
-                        var full_string = `<div class="Card-div">`;
-                        if (is_ready === "E") {
-                            rotation = " style='rotate: 90deg;'";
-                            card_class = "Exhausted-Card";
-                        }
-                        for (var j = 5; j < card_data_split.length; j++) {
-                            console.log(card_data_split[j]);
-                            var attachment_string_id = (j-5).toString();
-                            var attachment_data_split = card_data_split[j].split("+");
-                            var attachment_name = attachment_data_split[0];
-                            var attachment_ready = attachment_data_split[1];
-                            var attachment_class = "Attachment-Card";
-                            attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
-                            var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
-                            var attachment_rotation = "";
-                            if (attachment_ready === "E") {
-                                attachment_class = "Exhausted-Attachment-Card";
-                                attachment_rotation = " style='transform:rotate(90deg);'"
+                    var element =  document.getElementById(target_planet_id);
+                    if (typeof(element) != 'undefined' && element != null)
+                    {
+                        document.getElementById(target_planet_id).innerHTML = ``;
+                        for (var i = 4; i < split_data.length; i++) {
+                            var card_data_split = split_data[i].split("|");
+                            var card_name = card_data_split[0];
+                            var is_ready = card_data_split[1];
+                            var damage = card_data_split[2];
+                            var hale = card_data_split[3];
+                            var string_id = (i-4).toString();
+                            var card_class = "Card";
+                            string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
+                            card_name = card_name.split(' ').join('_');
+                            if (hale === "B") {
+                                card_name += "_bloodied";
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                        }
-                        var style_string = "";
-                        if (card_data_split.length > 5) {
-                            if (rotation === "") {
-                                style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var rotation = "";
+                            var full_string = `<div class="Card-div">`;
+                            if (is_ready === "E") {
+                                rotation = " style='rotate: 90deg;'";
+                                card_class = "Exhausted-Card";
+                            }
+                            for (var j = 5; j < card_data_split.length; j++) {
+                                console.log(card_data_split[j]);
+                                var attachment_string_id = (j-5).toString();
+                                var attachment_data_split = card_data_split[j].split("+");
+                                var attachment_name = attachment_data_split[0];
+                                var attachment_ready = attachment_data_split[1];
+                                var attachment_class = "Attachment-Card";
+                                attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
+                                var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                var attachment_rotation = "";
+                                if (attachment_ready === "E") {
+                                    attachment_class = "Exhausted-Attachment-Card";
+                                    attachment_rotation = " style='transform:rotate(90deg);'"
+                                }
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            }
+                            var style_string = "";
+                            if (card_data_split.length > 5) {
+                                if (rotation === "") {
+                                    style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                } else {
+                                    style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                }
+                            }
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            if (card_data_split[4] !== "") {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            }
+                            if (damage === "0") {
+                                full_string += `</div>`
                             } else {
-                                style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
                             }
+                            document.getElementById(target_planet_id).innerHTML += full_string;
                         }
-                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                        if (card_data_split[4] !== "") {
-                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
-                        }
-                        if (damage === "0") {
-                            full_string += `</div>`
-                        } else {
-                            full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="bugged" class="Damage"></img></div>`;
-                        }
-                        document.getElementById(target_planet_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "HQ") {
                     var target_headquarters = "headquarters-player-" + split_data[2];
@@ -499,8 +603,6 @@
         }
 
         function showDiscard(discard_id) {
-        console.log("showdiscard function")
-        console.log(discard_id)
         var target_discard_display = "expanded/" + discard_id;
         target_discard_display = target_discard_display.split('/').join('-');
         var x = document.getElementById(target_discard_display);

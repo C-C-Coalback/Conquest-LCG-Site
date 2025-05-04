@@ -136,7 +136,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.mode = "DISCOUNT"
                             self.planet_aiming_reticle_position = int(game_update_string[1])
                             self.planet_aiming_reticle_active = True
-                            await self.send_planet_array()
                         else:
                             await deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
@@ -217,7 +216,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     self.available_discounts = 0
     self.faction_of_card_to_play = ""
     self.name_of_card_to_play = ""
-    await self.send_planet_array()
     print("Finished deploying card")
 
 

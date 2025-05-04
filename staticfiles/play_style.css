@@ -18,9 +18,8 @@ h4 {
     border: 10px solid green;
     overflow: hidden;
     display: grid;
-    grid-template-columns: [col-start] 1fr
-    [col-2] 1fr [col-3] 1fr [col-4] 1fr
-    [col-5] 1fr [col-6] 1fr [col-end] ;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     grid-template-areas:
     "play10 play11 play12 play13 play14 play15 play16"
     "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
@@ -155,6 +154,7 @@ h4 {
 
 .Exhausted-Card {
     position: relative;
+    top:-1vh;
     width:7vh;
     height:5vw;
 }
@@ -292,6 +292,7 @@ h4 {
     bottom:11vh;
     border: 5px solid red;
     overflow-y:hidden;
+    overflow-x:scroll;
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -304,6 +305,7 @@ h4 {
     top:11vh;
     border: 5px solid green;
     overflow-y:hidden;
+    overflow-x:scroll;
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -444,13 +446,13 @@ summary:focus {
     top: 8vh;
     display:none;
     border: 5px solid blue;
+    background-color: lightblue;
 }
 
 #expanded-discard-1-settings {
     max-width: 30vw;
     display: flex;
     flex-wrap: wrap;
-
 }
 
 #expanded-DISCARD_PILE-2 {
@@ -458,6 +460,7 @@ summary:focus {
     bottom: 8vh;
     display:none;
     border: 5px solid blue;
+    background-color: lightblue;
 }
 
 #expanded-discard-2-settings {

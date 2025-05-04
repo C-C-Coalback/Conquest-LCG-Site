@@ -27,7 +27,6 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
                 self.automated_headquarters_phase()
                 await self.change_phase("DEPLOY")
                 self.reset_values_for_new_round()
-                await self.send_planet_array()
 
 
 def headquarters_phase(p_one, p_two, round_number):
