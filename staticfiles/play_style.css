@@ -17,15 +17,14 @@ h4 {
     width: 80vw;
     border: 10px solid green;
     overflow: hidden;
+    display: grid;
     grid-template-columns: [col-start] 1fr
     [col-2] 1fr [col-3] 1fr [col-4] 1fr
-    [col-5] 1fr [col-6] 1fr [col-7] 1fr
-    [col-end] ;
-    grid-row-gap: 2vw;
+    [col-5] 1fr [col-6] 1fr [col-end] ;
     grid-template-areas:
-    "play10 play11 play12 play13 play14 play15 play16" 10vw
-    "planet0 planet1 planet2 planet3 planet4 planet5 planet6" 10vw
-    "play20 play21 play22 play23 play24 play25 play26" 10vw;
+    "play10 play11 play12 play13 play14 play15 play16"
+    "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
+    "play20 play21 play22 play23 play24 play25 play26";
 }
 
 #player-1-cards-planet-0 {
@@ -84,31 +83,31 @@ h4 {
     grid-area:play26;
 }
 
-#div/PLANETS/0 {
+#div-PLANETS-0 {
     grid-area:planet0;
 }
 
-#div/PLANETS/1 {
+#div-PLANETS-1 {
     grid-area:planet1;
 }
 
-#div/PLANETS/2 {
+#div-PLANETS-2 {
     grid-area:planet2;
 }
 
-#div/PLANETS/3 {
+#div-PLANETS-3 {
     grid-area:planet3;
 }
 
-#div/PLANETS/4 {
+#div-PLANETS-4 {
     grid-area:planet4;
 }
 
-#div/PLANETS/5 {
+#div-PLANETS-5 {
     grid-area:planet5;
 }
 
-#div/PLANETS/6 {
+#div-PLANETS-6 {
     grid-area:planet6;
 }
 
@@ -246,7 +245,6 @@ h4 {
     height: 10vh;
     width: 10vw;
     margin: -4vh;
-    float: down;
 }
 
 .planet-in-victory-display-2 {
@@ -255,7 +253,6 @@ h4 {
     height: 10vh;
     width: 10vw;
     margin: -4vh;
-    float: down;
 }
 
 .player-1-in-play {

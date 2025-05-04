@@ -34,25 +34,25 @@
         <div id="player-1-cards-planet-6" class="player-1-in-play">
             <p>P1P6</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/0">
+        <div class="planet-div" id="div-PLANETS-0">
             <p>PLANET0</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/1">
+        <div class="planet-div" id="div-PLANETS-1">
             <p>PLANET1</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/2">
+        <div class="planet-div" id="div-PLANETS-2">
             <p>PLANET2</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/3">
+        <div class="planet-div" id="div-PLANETS-3">
             <p>PLANET3</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/4">
+        <div class="planet-div" id="div-PLANETS-4">
             <p>PLANET4</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/5">
+        <div class="planet-div" id="div-PLANETS-5">
             <p>PLANET5</p>
         </div>
-        <div class="planet-div" id="div/PLANETS/6">
+        <div class="planet-div" id="div-PLANETS-6">
             <p>PLANET6</p>
         </div>
         <div id="player-2-cards-planet-0" class="player-2-in-play">
@@ -167,8 +167,8 @@
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
+                        var container_id = "div-PLANETS-" + string_id;
                         string_id = "PLANETS/" + string_id;
-                        var container_id = "div/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         document.getElementById(container_id).innerHTML = ``;
