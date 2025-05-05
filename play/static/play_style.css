@@ -233,6 +233,7 @@ h4 {
 .planet-div {
     position: relative;
     margin-left:1vw;
+    margin:auto;
     float:left;
     pointer-events: auto;
     height: 10vh;
@@ -257,8 +258,8 @@ h4 {
 
 .player-1-in-play {
     margin-left:1vw;
+    margin:auto;
     float:left;
-    width: 10vw;
     max-width:10vw;
     height:14vh;
     max-height: 14vh;
@@ -273,8 +274,8 @@ h4 {
 
 .player-2-in-play {
     margin-left:1vw;
+    margin:auto;
     float:left;
-    width: 10vw;
     max-width:10vw;
     height:14vh;
     max-height: 14vh;
