@@ -13,9 +13,11 @@ h4 {
 #in-play-box {
     position: absolute;
     top: 25%;
-    height: 40vh;
+    height: calc(40vh + 30px);
     width: 80vw;
-    border: 10px solid green;
+    border-width: 10px;
+    border-style: dashed;
+    border-color: green;
     overflow: hidden;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -261,6 +263,12 @@ h4 {
     margin:auto;
     float:left;
     max-width:10vw;
+    min-width:10vw;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    background-color: darkblue;
+    opacity: 0.3;
     height:14vh;
     max-height: 14vh;
     overflow-x:scroll;
@@ -277,6 +285,12 @@ h4 {
     margin:auto;
     float:left;
     max-width:10vw;
+    min-width:10vw;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    background-color: darkblue;
+    opacity: 0.3;
     height:14vh;
     max-height: 14vh;
     overflow-x:scroll;
