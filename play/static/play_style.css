@@ -140,7 +140,7 @@ h4 {
 
 .Card-div {
     position: relative;
-    height:7vh;
+    height:6vh;
     width:auto;
 }
 
@@ -150,15 +150,15 @@ h4 {
 
 .Card {
     position: relative;
-    height:7vh;
+    height:6vh;
     width:5vw;
 }
 
 .Exhausted-Card {
     position: relative;
     top:-1vh;
-    width:7vh;
-    height:5vw;
+    width:6vh;
+    height:4.3vw;
 }
 
 .Damage {
@@ -171,16 +171,16 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 7vh;
-    width: 5vw;
+    height: 6vh;
+    width: 4.3vw;
 }
 
 .Exhausted-Attachment-Card {
     position: absolute;
     top: 0;
     left: 0;
-    width: 7vh;
-    height: 5vw;
+    width: 6vh;
+    height: 4.3vw;
 }
 
 .Attachment-Card + .Exhausted-Attachment-Card {
@@ -203,8 +203,8 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 7vh;
-    width: 5vw;
+    height: 6vh;
+    width: 4.3vw;
     pointer-events: none;
 }
 
@@ -267,11 +267,10 @@ h4 {
     border-width: 6px;
     border-style: double;
     border-color: lightblue;
-    background-color: darkblue;
-    opacity: 0.3;
+    background: rgba(47, 40, 153, 0.3);
     height:14vh;
     max-height: 14vh;
-    overflow-x:scroll;
+    overflow-x:auto;
     overflow-y:hidden;
     white-space:nowrap;
     display:grid;
@@ -289,11 +288,10 @@ h4 {
     border-width: 6px;
     border-style: double;
     border-color: lightblue;
-    background-color: darkblue;
-    opacity: 0.3;
+    background: rgba(47, 40, 153, 0.3);
     height:14vh;
     max-height: 14vh;
-    overflow-x:scroll;
+    overflow-x:auto;
     overflow-y:hidden;
     white-space:nowrap;
     display:grid;
@@ -307,7 +305,8 @@ h4 {
     bottom:11vh;
     border: 5px solid red;
     overflow-y:hidden;
-    overflow-x:scroll;
+    overflow-x:auto;
+    background: rgba(47, 40, 153, 0.3);
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -320,7 +319,8 @@ h4 {
     top:11vh;
     border: 5px solid green;
     overflow-y:hidden;
-    overflow-x:scroll;
+    overflow-x:auto;
+    background: rgba(47, 40, 153, 0.3);
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -390,8 +390,9 @@ h4 {
     margin: auto;
     border: 5px solid green;
     max-width: 60vw;
-    overflow-x:scroll;
+    overflow-x:auto;
     overflow-y:hidden;
+    background: rgba(47, 40, 153, 0.3);
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -411,7 +412,7 @@ h4 {
     border: 5px solid red;
     max-width: 20vw;
     overflow-y:hidden;
-    overflow-x:scroll;
+    overflow-x:auto;
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -437,8 +438,9 @@ summary:focus {
     margin: auto;
     border: 5px solid red;
     max-width: 60vw;
-    overflow-x:scroll;
+    overflow-x:auto;
     overflow-y:hidden;
+    background: rgba(47, 40, 153, 0.3);
     white-space:nowrap;
     display: flex;
     flex-direction: row;
@@ -521,7 +523,7 @@ legend {
     border: 5px solid blue;
     right: 0;
     margin: auto;
-    overflow-x:scroll;
+    overflow-x:auto;
     overflow-y:hidden;
     white-space:nowrap;
     display: flex;
