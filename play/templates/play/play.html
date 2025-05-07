@@ -78,12 +78,12 @@
         </div>
     </div>
     <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
-    <div id="current-hand-player-1">
-        <p></p>
-    </div>
-    <div id="current-hand-player-2">
-        <p></p>
-    </div>
+    <fieldset id="current-hand-player-1">
+        <legend>CARDS P1: 0 CARDS</legend>
+    </fieldset>
+    <fieldset id="current-hand-player-2">
+        <legend>CARDS P2: 0 CARDS</legend>
+    </fieldset>
     <div id="current-deck-player-1">
         <img src="/static/images/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
     </div>
@@ -527,7 +527,9 @@
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "HAND") {
                     if (split_data[2] === "1") {
-                        document.getElementById('current-hand-player-1').innerHTML = ``
+                        document.getElementById('current-hand-player-1').innerHTML = ``;
+                        var current_card_count = `<legend>CARDS P1: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
+                        document.getElementById('current-hand-player-1').innerHTML = current_card_count;
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
                                 var card_data_split = split_data[i].split("|");
@@ -554,7 +556,9 @@
                             }
                         }
                     } else if (split_data[2] === "2") {
-                        document.getElementById('current-hand-player-2').innerHTML = ``
+                        document.getElementById('current-hand-player-2').innerHTML = ``;
+                        var current_card_count = `<legend>CARDS P2: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
+                        document.getElementById('current-hand-player-2').innerHTML = current_card_count;
                         if (split_data[3] === "{{ user.username }}") {
                             for (var i = 4; i < split_data.length; i++) {
                                 var card_data_split = split_data[i].split("|");

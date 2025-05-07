@@ -499,6 +499,18 @@ summary:focus {
     background: transparent;
 }
 
+fieldset {
+    padding: 0px;
+    margin: 0px;
+    min-width: 0px;
+}
+
+legend {
+    padding: 0px;
+    margin: 0px;
+    min-width: 0px;
+}
+
 #info-box {
     position: absolute;
     width: 15vw;
