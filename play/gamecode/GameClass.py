@@ -1030,6 +1030,8 @@ class Game:
         self.action_chosen = ""
         self.player_with_action = ""
         self.mode = "Normal"
+        self.p1.harbinger_of_eternity_active = False
+        self.p2.harbinger_of_eternity_active = False
         if self.phase == "DEPLOY":
             if self.number_with_deploy_turn == "1":
                 self.player_with_deploy_turn = self.name_2

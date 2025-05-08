@@ -276,8 +276,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(-2, unit_pos))
             player_being_hit.destroy_card_in_hq(unit_pos)
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
+            if not primary_player.harbinger_of_eternity_active:
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
@@ -512,8 +513,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if primary_player.get_faction_given_pos(-2, unit_pos) == "Necrons" and\
                     primary_player.headquarters[unit_pos].get_is_unit():
                 primary_player.remove_damage_from_pos(-2, unit_pos, 2)
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
+                if not primary_player.harbinger_of_eternity_active:
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
     elif self.action_chosen == "Khymera Den":
         if self.player_with_action == self.name_1:

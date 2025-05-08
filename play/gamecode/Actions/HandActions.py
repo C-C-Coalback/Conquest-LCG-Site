@@ -122,8 +122,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
-                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                            primary_player.aiming_reticle_coords_hand = None
+                            if not primary_player.harbinger_of_eternity_active:
+                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                primary_player.aiming_reticle_coords_hand = None
                             await self.game_sockets[0].receive_game_update(
                                 "No valid targets for Awake the Sleepers"
                             )
@@ -399,8 +400,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.aiming_reticle_coords_hand -= 1
             self.misc_counter += 1
             if self.misc_counter > 1:
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
+                if not primary_player.harbinger_of_eternity_active:
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
                 for _ in range(3):
                     primary_player.draw_card()
                 self.action_cleanup()

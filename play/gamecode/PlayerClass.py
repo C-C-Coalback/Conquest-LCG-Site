@@ -100,6 +100,8 @@ class Player:
         self.last_resources_string = ""
         self.last_discard_string = ""
         self.used_reanimation_protocol = False
+        self.harbinger_of_eternity_active = False
+        self.position_discard_of_card = -1
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -327,6 +329,15 @@ class Player:
         if joined_string != self.last_discard_string or force:
             self.last_discard_string = joined_string
             await self.game.game_sockets[0].receive_game_update(joined_string)
+
+    def search_for_card_everywhere(self, card_name, ability=True):
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == card_name:
+                return True
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ability_given_pos(i, j) == card_name:
+                    return True
 
     def exhaust_card_in_hq_given_name(self, card_name):
         for i in range(len(self.headquarters)):

@@ -193,8 +193,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
                 primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
-        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-        primary_player.aiming_reticle_coords_hand = None
+        if not primary_player.harbinger_of_eternity_active:
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
     elif self.action_chosen == "Ravenwing Escort":
         if self.chosen_first_card:
@@ -214,16 +215,18 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     not secondary_player.cards_in_play[chosen_planet + 1][i].get_unique() and \
                     secondary_player.get_ability_given_pos(chosen_planet, i) != "Stalwart Ogryn":
                 secondary_player.cards_in_play[chosen_planet + 1][i].negative_hp_until_eop += 3
-        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-        primary_player.aiming_reticle_coords_hand = None
+        if not primary_player.harbinger_of_eternity_active:
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
         primary_player.has_passed = True
         self.action_cleanup()
     elif self.action_chosen == "Drudgery":
         card = FindCard.find_card(self.misc_target_choice, self.card_array)
         primary_player.add_card_to_planet(card, chosen_planet)
         primary_player.discard.remove(self.misc_target_choice)
-        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-        primary_player.aiming_reticle_coords_hand = None
+        if not primary_player.harbinger_of_eternity_active:
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
     elif self.action_chosen == "Warpstorm":
         if self.player_with_action == self.name_1:

@@ -265,8 +265,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(planet_pos, unit_pos))
             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
+            if not primary_player.harbinger_of_eternity_active:
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
@@ -504,8 +505,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if primary_player.get_number() == game_update_string[1]:
             if card_chosen.get_faction() == "Necrons" and card_chosen.get_is_unit():
                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
+                if not primary_player.harbinger_of_eternity_active:
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
     elif self.action_chosen == "Preemptive Barrage":
         if game_update_string[1] == primary_player.get_number():
