@@ -91,8 +91,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
-                            self.misc_target_planet = -1
-                            self.chosen_first_card = False
+                    elif ability == "Particle Whip":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.misc_counter = 0
                     elif ability == "Ork Landa":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
@@ -208,6 +212,41 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.number_with_deploy_turn = secondary_player.number
                 self.mode = self.stored_mode
                 await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "Particle Whip":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        can_continue = True
+        if player_being_hit.name_player == secondary_player.name_player:
+            if secondary_player.communications_relay_check(-2, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = self.amount_spend_for_tzeentch_firestorm
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
+        if can_continue:
+            if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
+                if player_being_hit.headquarters[unit_pos].check_for_a_trait("Elite"):
+                    player_being_hit.assign_damage_to_pos(-2, unit_pos, self.misc_counter)
+                    player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.misc_counter = 0
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -244,13 +283,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Hate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

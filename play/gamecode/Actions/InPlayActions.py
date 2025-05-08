@@ -373,7 +373,45 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
-
+    elif self.action_chosen == "Particle Whip":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        planet_pos = int(game_update_string[2])
+        unit_pos = int(game_update_string[3])
+        can_continue = True
+        if player_being_hit.name_player == secondary_player.name_player:
+            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                    self.communications_relay_enabled:
+                can_continue = False
+                await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Communications Relay?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
+        if can_continue:
+            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                if not player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Elite"):
+                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                    player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.misc_counter = 0
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -414,13 +452,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Mandragoran Immortals":
         if game_update_string[1] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:

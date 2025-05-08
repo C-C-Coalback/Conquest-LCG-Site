@@ -128,3 +128,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
         self.action_cleanup()
+    elif self.action_chosen == "Particle Whip":
+        if chosen_discard == int(primary_player.number):
+            card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array)
+            if card.get_is_unit():
+                primary_player.shuffle_card_in_discard_into_deck(pos_discard)
+                self.misc_counter += 1

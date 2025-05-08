@@ -349,6 +349,10 @@ class Player:
     def move_to_top_of_discard(self, position):
         self.discard.append(self.discard.pop(position))
 
+    def shuffle_card_in_discard_into_deck(self, position):
+        self.deck.append(self.discard.pop(position))
+        self.shuffle_deck()
+
     def mulligan_hand(self):
         num_cards = 0
         while self.cards:
