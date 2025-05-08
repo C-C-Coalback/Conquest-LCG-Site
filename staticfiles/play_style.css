@@ -470,6 +470,7 @@ summary:focus {
     max-width: 30vw;
     display: flex;
     flex-wrap: wrap;
+    flex-direction: row;
 }
 
 #expanded-DISCARD_PILE-2 {
@@ -484,6 +485,7 @@ summary:focus {
     max-width: 30vw;
     display: flex;
     flex-wrap: wrap;
+    flex-direction: row;
 }
 
 #planets-in-play {

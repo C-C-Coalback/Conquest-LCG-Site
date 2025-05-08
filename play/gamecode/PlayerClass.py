@@ -67,6 +67,8 @@ class Player:
         self.aiming_reticle_color = "blue"
         self.aiming_reticle_coords_hand = None
         self.aiming_reticle_coords_hand_2 = None
+        self.aiming_reticle_coords_discard = -1
+        self.aiming_reticle_color_discard = "blue"
         self.can_play_limited = True
         self.number_cards_to_search = 0
         self.mobile_resolved = True
@@ -319,7 +321,9 @@ class Player:
         top_card = self.get_top_card_discard()
         if self.discard:
             for i in range(len(self.discard)):
-                joined_string += "/" + self.discard[i]
+                joined_string += "/" + self.discard[i] + "|"
+                if self.aiming_reticle_coords_discard == i:
+                    joined_string += self.aiming_reticle_color_discard
         if joined_string != self.last_discard_string or force:
             self.last_discard_string = joined_string
             await self.game.game_sockets[0].receive_game_update(joined_string)

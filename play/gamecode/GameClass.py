@@ -4,7 +4,8 @@ import random
 from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase
 from . import FindCard
 import threading
-from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, InPlayActions, PlanetActions
+from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
+    InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction
 
 
@@ -576,6 +577,8 @@ class Game:
                         await HandActions.update_game_event_action_hand(self, name, game_update_string)
                 elif game_update_string[0] == "HQ":
                     await HQActions.update_game_event_action_hq(self, name, game_update_string)
+                elif game_update_string[0] == "IN_DISCARD":
+                    await DiscardActions.update_game_event_action_discard(self, name, game_update_string)
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayActions.update_game_event_action_in_play(self, name, game_update_string)
@@ -620,6 +623,13 @@ class Game:
                         return True
                 elif game_update_string[1] == "2":
                     if len(self.p2.headquarters) > int(game_update_string[2]):
+                        return True
+            elif game_update_string[0] == "IN_DISCARD":
+                if game_update_string[1] == "1":
+                    if len(self.p1.discard) > int(game_update_string[2]):
+                        return True
+                elif game_update_string[2] == "2":
+                    if len(self.p2.discard) > int(game_update_string[2]):
                         return True
             elif game_update_string[0] == "HAND":
                 if game_update_string[1] == "1":

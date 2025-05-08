@@ -47,6 +47,34 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.mode = "Normal"
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
+    elif self.action_chosen == "Decaying Warrior Squad":
+        self.planet_pos_to_deploy = int(game_update_string[1])
+        card = FindCard.find_card("Decaying Warrior Squad", self.card_array)
+        self.card_to_deploy = card
+        self.traits_of_card_to_play = card.get_traits()
+        self.faction_of_card_to_play = card.get_faction()
+        self.name_of_card_to_play = card.get_name()
+        print("Trying to discount: ", card.get_name())
+        self.discounts_applied = 0
+        hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
+        hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits())
+        in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits())
+        same_planet_dis, same_planet_auto_dis = \
+            primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+        self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+        if self.available_discounts > self.discounts_applied:
+            self.stored_mode = self.mode
+            self.mode = "DISCOUNT"
+            self.planet_aiming_reticle_position = int(game_update_string[1])
+            self.planet_aiming_reticle_active = True
+        else:
+            await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                  discounts=self.discounts_applied)
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            self.card_pos_to_deploy = -1
+            self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Exterminatus":
         if self.round_number != chosen_planet:
             if self.number_with_deploy_turn == "1":

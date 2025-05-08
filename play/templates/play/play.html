@@ -351,19 +351,25 @@
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
                     document.getElementById(target_discard_pile_id).innerHTML = ``;
-                    var target_expanded_discard = "expanded-DISCARD_PILE-" + split_data[2];
+                    var target_expanded_discard = "expanded-discard-" + split_data[2] + "-settings";
                     document.getElementById(target_expanded_discard).innerHTML = ``;
                     if (split_data.length >= 4) {
                         for (var i = 3; i < split_data.length; i++) {
-                            var card_name = split_data[i];
+                            var card_data_split = split_data[i].split("|");
+                            var card_name = card_data_split[0];
                             var string_id = (i-3).toString();
                             string_id = "IN_DISCARD/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/" + card_name + ".jpg";
-                            var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
+                            var full_string = `<div class="Card-div">`;
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
+                            if (card_data_split[1] !== "") {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            }
+                            full_string += `</div>`;
                             document.getElementById(target_expanded_discard).innerHTML += full_string;
                         }
-                        var card_name = split_data[split_data.length - 1];
+                        var card_name = split_data[split_data.length - 1].split("|")[0];
                         var string_id = "DISCARD_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/" + card_name + ".jpg";

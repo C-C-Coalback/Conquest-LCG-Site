@@ -190,6 +190,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card:
         if not self.action_chosen or self.action_chosen == "Ambush":
             primary_player.cards.remove(self.card_to_deploy.get_name())
+        elif self.action_chosen == "Decaying Warrior Squad":
+            del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+            primary_player.aiming_reticle_coords_discard = -1
         elif self.action_chosen == "Anrakyr the Traveller":
             if self.anrakyr_deck_choice == primary_player.name_player:
                 del primary_player.discard[self.anrakyr_unit_position]
