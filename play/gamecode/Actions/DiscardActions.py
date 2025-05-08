@@ -11,8 +11,8 @@ async def update_game_event_action_discard(self, name, game_update_string):
         primary_player = self.p2
         secondary_player = self.p1
     ability = primary_player.discard[pos_discard]
-    if chosen_discard == int(primary_player.number):
-        if not self.action_chosen:
+    if not self.action_chosen:
+        if chosen_discard == int(primary_player.number):
             if ability == "Decaying Warrior Squad":
                 if self.phase == "COMBAT":
                     primary_player.aiming_reticle_coords_discard = pos_discard
@@ -120,3 +120,11 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         primary_player.harbinger_of_eternity_active = True
                         del primary_player.discard[pos_discard]
                         primary_player.used_reanimation_protocol = True
+    elif self.action_chosen == "Eternity Gate":
+        if chosen_discard == int(primary_player.number):
+            primary_player.move_to_top_of_discard(pos_discard)
+        else:
+            secondary_player.move_to_top_of_discard(pos_discard)
+        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                    self.position_of_actioned_card[1])
+        self.action_cleanup()

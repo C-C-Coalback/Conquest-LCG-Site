@@ -346,6 +346,9 @@ class Player:
                 return True
         return False
 
+    def move_to_top_of_discard(self, position):
+        self.discard.append(self.discard.pop(position))
+
     def mulligan_hand(self):
         num_cards = 0
         while self.cards:
