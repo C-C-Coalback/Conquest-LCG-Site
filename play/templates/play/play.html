@@ -190,15 +190,59 @@
                         if (typeof(element) != 'undefined' && element != null)
                         {
                             document.getElementById(container_id).innerHTML = ``;
-                            var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             if (card_data_split.length >= 2) {
                                 if (card_data_split[1] === "I") {
                                     full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
                                 }
                             }
-                            if (card_data_split.length === 3) {
-                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                            if (card_data_split.length >= 3) {
+                                if (card_data_split[2] !== "") {
+                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                                }
                             }
+                            full_string += `<div class="attachments-planet-1">`;
+                            var attachments_p1 = card_data_split[3];
+                            if (attachments_p1 !== "") {
+                                attachments_p1_data = attachments_p1.split("_")
+                                for (var j = 0; j < attachments_p1_data.length; j++) {
+                                    var attachment_string_id = (j).toString();
+                                    var attachment_data_split = attachments_p1_data[j].split(">");
+                                    var attachment_name = attachment_data_split[0];
+                                    var attachment_ready = attachment_data_split[1];
+                                    var attachment_class = "Planet-Attachment-Card";
+                                    attachment_string_id = "ATTACHMENT/PLANETS/1/" + (i-2).toString() + "/" + attachment_string_id;
+                                    var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                    var attachment_rotation = "";
+                                    if (attachment_ready === "E") {
+                                        attachment_class = "Exhausted-Planet-Attachment-Card";
+                                        attachment_rotation = " style='transform:rotate(90deg);'"
+                                    }
+                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                }
+                            }
+                            // <input type="image" src="/static/images/Defense_Battery.jpg" alt="bugged" class="Planet-Attachment-Card">
+                            full_string += `</div><div class="attachments-planet-2">`;
+                            var attachments_p2 = card_data_split[4];
+                            if (attachments_p2 !== "") {
+                                attachments_p2_data = attachments_p2.split("_")
+                                for (var j = 0; j < attachments_p2_data.length; j++) {
+                                    var attachment_string_id = (j).toString();
+                                    var attachment_data_split = attachments_p2_data[j].split(">");
+                                    var attachment_name = attachment_data_split[0];
+                                    var attachment_ready = attachment_data_split[1];
+                                    var attachment_class = "Planet-Attachment-Card";
+                                    attachment_string_id = "ATTACHMENT/PLANETS/2/" + (i-2).toString() + "/" + attachment_string_id;
+                                    var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                    var attachment_rotation = "";
+                                    if (attachment_ready === "E") {
+                                        attachment_class = "Exhausted-Planet-Attachment-Card";
+                                        attachment_rotation = " style='transform:rotate(90deg);'"
+                                    }
+                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                }
+                            }
+                            full_string += `</div></div>`;
                             document.getElementById(container_id).innerHTML = full_string;
                         }
                     }
@@ -409,7 +453,6 @@
                                 card_class = "Exhausted-Card";
                             }
                             for (var j = 5; j < card_data_split.length; j++) {
-                                console.log(card_data_split[j]);
                                 var attachment_string_id = (j-5).toString();
                                 var attachment_data_split = card_data_split[j].split("+");
                                 var attachment_name = attachment_data_split[0];

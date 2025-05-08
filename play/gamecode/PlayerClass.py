@@ -102,6 +102,7 @@ class Player:
         self.used_reanimation_protocol = False
         self.harbinger_of_eternity_active = False
         self.position_discard_of_card = -1
+        self.attachments_at_planet = [[], [], [], [], [], [], []]
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -140,6 +141,7 @@ class Player:
             self.game.phase = "DEPLOY"
             await self.game.game_sockets[0].receive_game_update(
                 self.game.name_1 + " may mulligan their opening hand.")
+        card = FindCard.find_card("Defense Battery", self.card_array)
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
 
@@ -149,6 +151,9 @@ class Player:
                 self.synapse_name = self.headquarters[i].get_name()
                 return True
         return False
+
+    def add_attachment_to_planet(self, planet_pos, card):
+        self.attachments_at_planet[planet_pos].append(copy.deepcopy(card))
 
     def get_can_play_limited(self):
         return self.can_play_limited

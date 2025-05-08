@@ -285,7 +285,6 @@ class Game:
         await self.p2.send_hand(force=True)
         await self.p1.send_hq(force=True)
         await self.p2.send_hq(force=True)
-        await self.send_planet_array()
         await self.p1.send_units_at_all_planets(force=True)
         await self.p2.send_units_at_all_planets(force=True)
         await self.p1.send_resources(force=True)
@@ -424,33 +423,40 @@ class Game:
 
     async def send_planet_array(self, force=False):
         planet_string = "GAME_INFO/PLANETS/"
-        if not self.planet_aiming_reticle_active:
-            for i in range(len(self.planet_array)):
-                if self.planets_in_play_array[i]:
-                    planet_string += self.planet_array[i]
+        for i in range(len(self.planet_array)):
+            if self.planets_in_play_array[i]:
+                planet_string += self.planet_array[i]
+            else:
+                planet_string += "CardbackRotated"
+            if self.infested_planets[i]:
+                planet_string += "|I"
+            else:
+                planet_string += "|N"
+            if self.planet_aiming_reticle_position == i:
+                planet_string += "|red|"
+            else:
+                planet_string += "||"
+            for j in range(len(self.p1.attachments_at_planet[i])):
+                planet_string += self.p1.attachments_at_planet[i][j].get_name()
+                planet_string += ">"
+                if self.p1.attachments_at_planet[i][j].get_ready():
+                    planet_string += "R"
                 else:
-                    planet_string += "CardbackRotated"
-                if self.infested_planets[i]:
-                    planet_string += "|I"
+                    planet_string += "E"
+                if j != len(self.p1.attachments_at_planet[i]) - 1:
+                    planet_string += "_"
+            planet_string += "|"
+            for j in range(len(self.p2.attachments_at_planet[i])):
+                planet_string += self.p2.attachments_at_planet[i][j].get_name()
+                planet_string += ">"
+                if self.p2.attachments_at_planet[i][j].get_ready():
+                    planet_string += "R"
                 else:
-                    planet_string += "|N"
-                if i != 6:
-                    planet_string += "/"
-            await self.game_sockets[0].receive_game_update(planet_string)
-        else:
-            for i in range(len(self.planet_array)):
-                if self.planets_in_play_array[i]:
-                    planet_string += self.planet_array[i]
-                else:
-                    planet_string += "CardbackRotated"
-                if self.infested_planets[i]:
-                    planet_string += "|I"
-                else:
-                    planet_string += "|N"
-                if self.planet_aiming_reticle_position == i:
-                    planet_string += "|red"
-                if i != 6:
-                    planet_string += "/"
+                    planet_string += "E"
+                if j != len(self.p2.attachments_at_planet[i]) - 1:
+                    planet_string += "_"
+            if i != 6:
+                planet_string += "/"
         if planet_string != self.saved_planet_string or force:
             self.saved_planet_string = planet_string
             await self.game_sockets[0].receive_game_update(planet_string)
