@@ -51,18 +51,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if faction not in ["Chaos", "Astra Militarum", "Space Marines"]:
                     can_continue = True
                     if player_being_hit.number == secondary_player.number:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.game_sockets[0].receive_game_update(
                                 "Immune to enemy card abilities.")
-                        elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                                self.communications_relay_enabled:
+                        elif possible_interrupts:
                             can_continue = False
-                            await self.game_sockets[0].receive_game_update(
-                                "Communications Relay may be used.")
-                            self.choices_available = ["Yes", "No"]
+                            await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Communications Relay?"
+                            self.choice_context = "Interrupt Effect?"
                             self.nullified_card_name = self.action_chosen
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
@@ -82,18 +82,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.game_sockets[0].receive_game_update(
                                 "Immune to enemy card abilities.")
-                        elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                                self.communications_relay_enabled:
+                        elif possible_interrupts:
                             can_continue = False
-                            await self.game_sockets[0].receive_game_update(
-                                "Communications Relay may be used.")
-                            self.choices_available = ["Yes", "No"]
+                            await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Communications Relay?"
+                            self.choice_context = "Interrupt Effect?"
                             self.nullified_card_name = self.action_chosen
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
@@ -178,16 +178,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_exhausting_unit = self.p2
             can_continue = True
             if player_exhausting_unit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                        self.communications_relay_enabled:
+                elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
-                    self.choices_available = ["Yes", "No"]
+                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Use Communications Relay?"
+                    self.choice_context = "Interrupt Effect?"
                     self.nullified_card_name = self.action_chosen
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
@@ -206,16 +207,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_being_hit = self.p2
             can_continue = True
             if game_update_string[1] != primary_player.get_number():
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                        self.communications_relay_enabled:
+                elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
-                    self.choices_available = ["Yes", "No"]
+                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Use Communications Relay?"
+                    self.choice_context = "Interrupt Effect?"
                     self.nullified_card_name = self.action_chosen
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
@@ -235,16 +237,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             unit_pos = int(game_update_string[3])
             if game_update_string[1] != primary_player.get_number():
                 can_continue = True
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                        self.communications_relay_enabled:
+                elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
-                    self.choices_available = ["Yes", "No"]
+                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Use Communications Relay?"
+                    self.choice_context = "Interrupt Effect?"
                     self.nullified_card_name = self.action_chosen
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
@@ -262,16 +265,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_being_hit = self.p2
             can_continue = True
             if player_being_hit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                        self.communications_relay_enabled:
+                elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Communications Relay may be used.")
-                    self.choices_available = ["Yes", "No"]
+                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Use Communications Relay?"
+                    self.choice_context = "Interrupt Effect?"
                     self.nullified_card_name = self.action_chosen
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
@@ -361,20 +365,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         await self.game_sockets[0].receive_game_update("Can't select last defender")
                     else:
                         can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
                                                                                target_unit_pos):
                             can_continue = False
                             await self.game_sockets[0].receive_game_update(
                                 "Immune to enemy card abilities.")
-                        elif secondary_player.communications_relay_check(origin_planet,
-                                                                         target_unit_pos) and \
-                                self.communications_relay_enabled:
+                        elif possible_interrupts:
                             can_continue = False
-                            await self.game_sockets[0].receive_game_update(
-                                "Communications Relay may be used.")
-                            self.choices_available = ["Yes", "No"]
+                            await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Communications Relay?"
+                            self.choice_context = "Interrupt Effect?"
                             self.nullified_card_name = self.action_chosen
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
@@ -392,20 +395,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     target_unit_pos = int(game_update_string[3])
                     if secondary_player.get_card_type_given_pos(origin_planet, target_unit_pos) == "Army":
                         can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
                                                                                target_unit_pos):
                             can_continue = False
                             await self.game_sockets[0].receive_game_update(
                                 "Immune to enemy card abilities.")
-                        elif secondary_player.communications_relay_check(origin_planet,
-                                                                         target_unit_pos) and \
-                                self.communications_relay_enabled:
+                        elif possible_interrupts:
                             can_continue = False
-                            await self.game_sockets[0].receive_game_update(
-                                "Communications Relay may be used.")
-                            self.choices_available = ["Yes", "No"]
+                            await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Communications Relay?"
+                            self.choice_context = "Interrupt Effect?"
                             self.nullified_card_name = self.action_chosen
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
@@ -440,20 +442,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.cards_in_play[target_planet + 1][
                             target_pos].get_card_type() == "Army":
                         can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
                                                                                target_pos):
                             can_continue = False
                             await self.game_sockets[0].receive_game_update(
                                 "Immune to enemy card abilities.")
-                        elif secondary_player.communications_relay_check(target_planet,
-                                                                         target_pos) and \
-                                self.communications_relay_enabled:
+                        elif possible_interrupts:
                             can_continue = False
-                            await self.game_sockets[0].receive_game_update(
-                                "Communications Relay may be used.")
-                            self.choices_available = ["Yes", "No"]
+                            await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Communications Relay?"
+                            self.choice_context = "Interrupt Effect?"
                             self.nullified_card_name = self.action_chosen
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)

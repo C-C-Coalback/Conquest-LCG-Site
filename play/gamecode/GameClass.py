@@ -182,6 +182,7 @@ class Game:
         self.nullify_enabled = True
         self.nullify_string = ""
         self.communications_relay_enabled = True
+        self.backlash_enabled = True
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
         self.has_chosen_to_resolve = False
@@ -1037,9 +1038,12 @@ class Game:
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
             if self.nullified_card_name == "The Fury of Sicarius":
+                pass
+                """
                 self.nullify_enabled = False
                 await self.resolve_fury_sicarius(secondary_player, primary_player)
                 self.nullify_enabled = True
+                """
             else:
                 await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             self.communications_relay_enabled = True
@@ -1210,7 +1214,6 @@ class Game:
                             self.name_player_making_choices = self.name_2
                             await self.game_sockets[0].receive_game_update(
                                 self.name_player_making_choices + " may mulligan their hand.")
-
                         if primary_player.mulligan_done and secondary_player.mulligan_done:
                             self.choices_available = []
                             self.choice_context = ""
@@ -1328,6 +1331,22 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "Interrupt Effect?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "No Interrupt":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.communications_relay_enabled = False
+                            self.backlash_enabled = False
+                            new_string_list = self.nullify_string.split(sep="/")
+                            await self.update_game_event(secondary_player.name_player, new_string_list,
+                                                         same_thread=True)
+                            self.communications_relay_enabled = True
+                            self.backlash_enabled = True
+                        elif chosen_choice == "Communications Relay":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Communications Relay?"
                     elif self.choice_context == "Use Communications Relay?":
                         await self.resolve_communications_relay(name, game_update_string,
                                                                 primary_player, secondary_player)
@@ -1702,18 +1721,20 @@ class Game:
                                 self.cost_card_nullified = 2
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "The Fury of Sicarius"
-                            elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                                    self.communications_relay_enabled:
-                                await self.game_sockets[0].receive_game_update(
-                                    "Communications Relay may be used.")
-                                self.choices_available = ["Yes", "No"]
-                                self.name_player_making_choices = secondary_player.name_player
-                                self.choice_context = "Use Communications Relay?"
-                                self.nullified_card_name = "The Fury of Sicarius"
-                                self.cost_card_nullified = 0
-                                self.nullify_string = "/".join(game_update_string)
-                                self.first_player_nullified = primary_player.name_player
-                                self.nullify_context = "The Fury of Sicarius"
+                                """
+                                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
+                                        self.communications_relay_enabled:
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Communications Relay may be used.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Communications Relay?"
+                                    self.nullified_card_name = "The Fury of Sicarius"
+                                    self.cost_card_nullified = 0
+                                    self.nullify_string = "/".join(game_update_string)
+                                    self.first_player_nullified = primary_player.name_player
+                                    self.nullify_context = "The Fury of Sicarius"
+                                """
                             else:
                                 await self.resolve_fury_sicarius(primary_player, secondary_player)
                         elif game_update_string[1] == "1":
@@ -1910,14 +1931,15 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if self.player_resolving_battle_ability != self.p1.name_player:
-                                    if self.p1.communications_relay_check(planet_pos, unit_pos) and \
-                                            self.communications_relay_enabled:
-                                        await self.game_sockets[0].receive_game_update(
-                                            "Communications Relay may be used.")
+                                    possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                    if possible_interrupts:
                                         can_continue = False
-                                        self.choices_available = ["Yes", "No"]
+                                        await self.game_sockets[0].receive_game_update(
+                                            "Some sort of interrupt may be used.")
+                                        self.choices_available = possible_interrupts
+                                        self.choices_available.insert(0, "No Interrupt")
                                         self.name_player_making_choices = self.p1.name_player
-                                        self.choice_context = "Use Communications Relay?"
+                                        self.choice_context = "Interrupt Effect?"
                                         self.nullified_card_name = "Ferrin"
                                         self.cost_card_nullified = 0
                                         self.nullify_string = "/".join(game_update_string)
@@ -1934,14 +1956,15 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if self.player_resolving_battle_ability != self.p2.name_player:
-                                    if self.p2.communications_relay_check(planet_pos, unit_pos) and \
-                                            self.communications_relay_enabled:
-                                        await self.game_sockets[0].receive_game_update(
-                                            "Communications Relay may be used.")
+                                    possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                    if possible_interrupts:
                                         can_continue = False
-                                        self.choices_available = ["Yes", "No"]
+                                        await self.game_sockets[0].receive_game_update(
+                                            "Some sort of interrupt may be used.")
+                                        self.choices_available = possible_interrupts
+                                        self.choices_available.insert(0, "No Interrupt")
                                         self.name_player_making_choices = self.p2.name_player
-                                        self.choice_context = "Use Communications Relay?"
+                                        self.choice_context = "Interrupt Effect?"
                                         self.nullified_card_name = "Ferrin"
                                         self.cost_card_nullified = 0
                                         self.nullify_string = "/".join(game_update_string)
@@ -1966,14 +1989,15 @@ class Game:
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
                             if self.player_resolving_battle_ability != self.p1.name_player:
-                                if self.p1.communications_relay_check(planet_pos, unit_pos) and \
-                                        self.communications_relay_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        "Communications Relay may be used.")
+                                possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                if possible_interrupts:
                                     can_continue = False
-                                    self.choices_available = ["Yes", "No"]
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Some sort of interrupt may be used.")
+                                    self.choices_available = possible_interrupts
+                                    self.choices_available.insert(0, "No Interrupt")
                                     self.name_player_making_choices = self.p1.name_player
-                                    self.choice_context = "Use Communications Relay?"
+                                    self.choice_context = "Interrupt Effect?"
                                     self.nullified_card_name = "Iridial"
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)
@@ -1989,14 +2013,15 @@ class Game:
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
                             if self.player_resolving_battle_ability != self.p2.name_player:
-                                if self.p2.communications_relay_check(planet_pos, unit_pos) and \
-                                        self.communications_relay_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        "Communications Relay may be used.")
+                                possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                if possible_interrupts:
                                     can_continue = False
-                                    self.choices_available = ["Yes", "No"]
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Some sort of interrupt may be used.")
+                                    self.choices_available = possible_interrupts
+                                    self.choices_available.insert(0, "No Interrupt")
                                     self.name_player_making_choices = self.p2.name_player
-                                    self.choice_context = "Use Communications Relay?"
+                                    self.choice_context = "Interrupt Effect?"
                                     self.nullified_card_name = "Iridial"
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)
@@ -2014,14 +2039,15 @@ class Game:
                             planet_pos = -2
                             unit_pos = int(game_update_string[2])
                             if self.player_resolving_battle_ability != self.p1.name_player:
-                                if self.p1.communications_relay_check(planet_pos, unit_pos) and \
-                                        self.communications_relay_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        "Communications Relay may be used.")
+                                possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                if possible_interrupts:
                                     can_continue = False
-                                    self.choices_available = ["Yes", "No"]
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Some sort of interrupt may be used.")
+                                    self.choices_available = possible_interrupts
+                                    self.choices_available.insert(0, "No Interrupt")
                                     self.name_player_making_choices = self.p1.name_player
-                                    self.choice_context = "Use Communications Relay?"
+                                    self.choice_context = "Interrupt Effect?"
                                     self.nullified_card_name = "Iridial"
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)
@@ -2036,14 +2062,15 @@ class Game:
                             planet_pos = -2
                             unit_pos = int(game_update_string[2])
                             if self.player_resolving_battle_ability != self.p2.name_player:
-                                if self.p2.communications_relay_check(planet_pos, unit_pos) and \
-                                        self.communications_relay_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        "Communications Relay may be used.")
+                                possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                if possible_interrupts:
                                     can_continue = False
-                                    self.choices_available = ["Yes", "No"]
+                                    await self.game_sockets[0].receive_game_update(
+                                        "Some sort of interrupt may be used.")
+                                    self.choices_available = possible_interrupts
+                                    self.choices_available.insert(0, "No Interrupt")
                                     self.name_player_making_choices = self.p2.name_player
-                                    self.choice_context = "Use Communications Relay?"
+                                    self.choice_context = "Interrupt Effect?"
                                     self.nullified_card_name = "Iridial"
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)

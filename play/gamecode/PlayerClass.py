@@ -529,6 +529,8 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ranged()
 
     def check_for_trait_given_pos(self, planet_id, unit_id, trait):
+        if planet_id == -2:
+            return self.headquarters[unit_id].check_for_a_trait(trait)
         return self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait(trait)
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
@@ -1567,6 +1569,33 @@ class Player:
                         return True
         return False
 
+    def interrupt_cancel_target_check(self, planet_pos, unit_pos):
+        possible_interrupts = []
+        if self.game.communications_relay_enabled:
+            if self.communications_relay_check(planet_pos, unit_pos):
+                possible_interrupts.append("Communications Relay")
+        if self.game.backlash_enabled:
+            if self.backlash_check(planet_pos, unit_pos):
+                possible_interrupts.append("Backlash")
+        return possible_interrupts
+
+    def backlash_check(self, planet_pos, unit_pos):
+        print("---\nBacklash Check!\n---")
+        backlash_permitted = False
+        if planet_pos == -2:
+            if self.headquarters[unit_pos].get_is_unit():
+                if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    backlash_permitted = True
+        elif self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+            if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                backlash_permitted = True
+        if backlash_permitted:
+            if self.resources > 0:
+                if self.search_hand_for_card("Backlash"):
+                    return True
+        return False
+
+
     def communications_relay_check(self, planet_pos, unit_pos):
         print("---\nCommunications Relay Check!\n---")
         communications_permitted = False
@@ -2040,16 +2069,16 @@ class Player:
         if planet_pos == -2:
             while self.headquarters[unit_pos].get_attachments():
                 if self.headquarters[unit_pos].get_attachments()[0].name_owner == self.game.name_1:
-                    self.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                    self.game.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
                 else:
-                    self.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                    self.game.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
                 del self.headquarters[unit_pos].get_attachments()[0]
             return None
         while self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].name_owner == self.game.name_1:
-                self.p1.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+                self.game.p1.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
             else:
-                self.p2.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+                self.game.p2.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
             del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0]
         return None
 
