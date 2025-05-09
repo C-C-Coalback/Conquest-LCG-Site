@@ -229,6 +229,7 @@ class Game:
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
+        self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz"]
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -996,6 +997,46 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0])
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
+    async def resolve_backlash(self, name, game_update_string, primary_player, secondary_player):
+        if game_update_string[1] == "0":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            primary_player.spend_resources(1)
+            primary_player.discard_card_name_from_hand("Backlash")
+            print(self.nullified_card_name)
+            if self.nullify_context == "Event Action":
+                secondary_player.aiming_reticle_coords_hand = None
+                secondary_player.aiming_reticle_coords_hand_2 = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                self.amount_spend_for_tzeentch_firestorm = 0
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "In Play Action":
+                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.nullified_card_name == "Zarathur's Flamers":
+                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                if self.nullified_card_name in self.dies_to_backlash:
+                    secondary_player.destroy_card_in_play(self.position_of_actioned_card[0],
+                                                          self.position_of_actioned_card[1])
+                self.position_of_actioned_card = (-1, -1)
+            elif self.nullify_context == "Reaction":
+                if self.nullified_card_name in self.dies_to_backlash:
+                    secondary_player.destroy_card_in_play(self.positions_of_unit_triggering_reaction[0][1],
+                                                          self.positions_of_unit_triggering_reaction[0][2])
+                self.delete_reaction()
+            elif self.nullify_context == "Reaction Event":
+                self.delete_reaction()
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+                await self.resolve_battle_conclusion(secondary_player, game_string="")
+
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
             self.choices_available = []
@@ -1025,9 +1066,11 @@ class Game:
             elif self.nullify_context == "Reaction Event":
                 self.delete_reaction()
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "The Fury of Sicarius":
-                secondary_player.spend_resources(2)
-                secondary_player.discard_card_name_from_hand("The Fury of Sicarius")
+                """
+                elif self.nullify_context == "The Fury of Sicarius":
+                    secondary_player.spend_resources(2)
+                    secondary_player.discard_card_name_from_hand("The Fury of Sicarius")
+                """
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
@@ -1090,6 +1133,7 @@ class Game:
             primary_player = self.p2
             secondary_player = self.p1
         if name == self.name_player_making_choices:
+            print("Choice context:", self.choice_context)
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.choice_context == "Shadowsun attachment from discard:":
@@ -1116,7 +1160,48 @@ class Game:
                         print(reaction_pos)
                         self.move_reaction_to_front(reaction_pos)
                         self.has_chosen_to_resolve = False
-                    elif self.asking_if_reaction and self.reactions_needing_resolving and not self.resolving_search_box:
+                    elif self.choice_context == "Use Nullify?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.reactions_needing_resolving.append("Nullify")
+                            self.player_who_resolves_reaction.append(name)
+                            self.positions_of_unit_triggering_reaction.append([int(primary_player.number), -1, -1])
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.complete_nullify()
+                            self.nullify_count = 0
+                    elif self.choice_context == "Interrupt Effect?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        print("Choice chosen:", chosen_choice)
+                        if chosen_choice == "No Interrupt":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.communications_relay_enabled = False
+                            self.backlash_enabled = False
+                            new_string_list = self.nullify_string.split(sep="/")
+                            await self.update_game_event(secondary_player.name_player, new_string_list,
+                                                         same_thread=True)
+                            self.communications_relay_enabled = True
+                            self.backlash_enabled = True
+                        elif chosen_choice == "Communications Relay":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Communications Relay?"
+                        elif chosen_choice == "Backlash":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Backlash?"
+                    elif self.choice_context == "Use Backlash?":
+                        await self.resolve_backlash(name, game_update_string, primary_player, secondary_player)
+                    elif self.choice_context == "Use Communications Relay?":
+                        await self.resolve_communications_relay(name, game_update_string,
+                                                                primary_player, secondary_player)
+                    elif self.asking_if_reaction and self.reactions_needing_resolving \
+                            and not self.resolving_search_box:
+                        print("Asking if reaction")
                         self.asking_if_reaction = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
@@ -1317,39 +1402,6 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.action_cleanup()
-                    elif self.choice_context == "Use Nullify?":
-                        if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.reactions_needing_resolving.append("Nullify")
-                            self.player_who_resolves_reaction.append(name)
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.number), -1, -1])
-                        elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            await self.complete_nullify()
-                            self.nullify_count = 0
-                    elif self.choice_context == "Interrupt Effect?":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
-                        if chosen_choice == "No Interrupt":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.communications_relay_enabled = False
-                            self.backlash_enabled = False
-                            new_string_list = self.nullify_string.split(sep="/")
-                            await self.update_game_event(secondary_player.name_player, new_string_list,
-                                                         same_thread=True)
-                            self.communications_relay_enabled = True
-                            self.backlash_enabled = True
-                        elif chosen_choice == "Communications Relay":
-                            self.choices_available = ["Yes", "No"]
-                            self.choice_context = "Use Communications Relay?"
-                    elif self.choice_context == "Use Communications Relay?":
-                        await self.resolve_communications_relay(name, game_update_string,
-                                                                primary_player, secondary_player)
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:

@@ -63,7 +63,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -94,7 +94,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -189,7 +189,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -218,7 +218,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -248,7 +248,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -276,7 +276,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -378,7 +378,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -408,7 +408,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -455,7 +455,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
