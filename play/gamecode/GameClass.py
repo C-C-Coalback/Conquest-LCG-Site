@@ -229,7 +229,7 @@ class Game:
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
-        self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz"]
+        self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron"]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
