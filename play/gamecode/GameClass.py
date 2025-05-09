@@ -230,6 +230,9 @@ class Game:
         self.card_to_deploy = None
         self.saved_planet_string = ""
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz"]
+        self.nullifying_backlash = ""
+        self.choosing_unit_for_nullify = False
+        self.name_player_using_nullify = ""
 
     def reset_action_data(self):
         self.mode = "Normal"
@@ -883,99 +886,104 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
-        if self.nullify_count % 2 == 0:
-            if self.nullify_context == "Regular Action":
-                num_player = "1"
-                if self.player_with_action == self.name_2:
-                    num_player = "2"
-                string = ["HAND", num_player, str(self.nullified_card_pos)]
-                await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
-                                                                may_nullify=False)
-            elif self.nullify_context == "The Fury of Sicarius":
-                await self.resolve_fury_sicarius(primary_player, secondary_player)
-            elif self.nullify_context == "Indomitable":
-                await self.resolve_indomitable(primary_player, secondary_player)
-            elif self.nullify_context == "Glorious Intervention":
-                primary_player.aiming_reticle_coords_hand = self.pos_shield_card
-                primary_player.aiming_reticle_color = "blue"
-                self.effects_waiting_on_resolution.append("Glorious Intervention")
-                self.player_resolving_effect.append(primary_player.name_player)
-            elif self.nullify_context == "Bigga Is Betta":
-                self.nullify_enabled = False
-                new_string_list = self.nullify_string.split(sep="/")
-                await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
-                                                                   new_string_list)
-                self.nullify_enabled = True
-            elif self.nullify_context == "Foresight" or self.nullify_context == "Superiority":
-                self.nullify_enabled = False
-                new_string_list = self.nullify_string.split(sep="/")
-                await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
-                                                                     new_string_list)
-                self.nullify_enabled = True
-            elif self.nullify_context == "No Mercy":
-                self.choices_available = []
-                self.choice_context = ""
-                self.name_player_making_choices = ""
-                await self.game_sockets[0].receive_game_update("No Mercy window offered")
-                self.effects_waiting_on_resolution.append("No Mercy")
-                self.player_resolving_effect.append(self.first_player_nullified)
-            elif self.nullify_context == "Fall Back":
-                self.choices_available = []
-                self.name_player_making_choices = self.first_player_nullified
-                self.choice_context = "Target Fall Back:"
-                for i in range(len(primary_player.stored_cards_recently_destroyed)):
-                    card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                              self.card_array)
-                    if card.check_for_a_trait("Elite") and card.get_is_unit():
-                        self.choices_available.append(card.get_name())
+        if self.nullifying_backlash:
+            pass
         else:
-            if self.nullified_card_pos != -1:
-                primary_player.discard_card_from_hand(self.nullified_card_pos)
-                if self.card_pos_to_deploy > self.nullified_card_pos:
-                    self.card_pos_to_deploy -= 1
-            elif self.nullified_card_name != "":
-                primary_player.discard_card_name_from_hand(self.nullified_card_name)
-            primary_player.spend_resources(self.cost_card_nullified)
-            if self.nullify_context == "The Fury of Sicarius":
-                pass
-            elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
-                self.pos_shield_card = -1
-        while self.nullify_count > 0:
-            if self.first_player_nullified == self.name_1:
-                card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
-                if self.p2.aiming_reticle_coords_hand is not None:
-                    if self.p2.aiming_reticle_coords_hand > card_pos_discard:
-                        self.p2.aiming_reticle_coords_hand -= 1
-                self.nullify_count -= 1
-                if self.nullify_count > 0:
-                    card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
-                    if self.p1.aiming_reticle_coords_hand is not None:
-                        if self.p1.aiming_reticle_coords_hand > card_pos_discard:
-                            self.p1.aiming_reticle_coords_hand -= 1
-                    self.nullify_count -= 1
+            if self.nullify_count % 2 == 0:
+                if self.nullify_context == "Regular Action":
+                    num_player = "1"
+                    if self.player_with_action == self.name_2:
+                        num_player = "2"
+                    string = ["HAND", num_player, str(self.nullified_card_pos)]
+                    await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
+                                                                    may_nullify=False)
+                elif self.nullify_context == "The Fury of Sicarius":
+                    await self.resolve_fury_sicarius(primary_player, secondary_player)
+                elif self.nullify_context == "Indomitable":
+                    await self.resolve_indomitable(primary_player, secondary_player)
+                elif self.nullify_context == "Glorious Intervention":
+                    primary_player.aiming_reticle_coords_hand = self.pos_shield_card
+                    primary_player.aiming_reticle_color = "blue"
+                    self.effects_waiting_on_resolution.append("Glorious Intervention")
+                    self.player_resolving_effect.append(primary_player.name_player)
+                elif self.nullify_context == "Bigga Is Betta":
+                    self.nullify_enabled = False
+                    new_string_list = self.nullify_string.split(sep="/")
+                    await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
+                                                                       new_string_list)
+                    self.nullify_enabled = True
+                elif self.nullify_context == "Foresight" or self.nullify_context == "Superiority":
+                    self.nullify_enabled = False
+                    new_string_list = self.nullify_string.split(sep="/")
+                    await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
+                                                                         new_string_list)
+                    self.nullify_enabled = True
+                elif self.nullify_context == "No Mercy":
+                    self.choices_available = []
+                    self.choice_context = ""
+                    self.name_player_making_choices = ""
+                    await self.game_sockets[0].receive_game_update("No Mercy window offered")
+                    self.effects_waiting_on_resolution.append("No Mercy")
+                    self.player_resolving_effect.append(self.first_player_nullified)
+                elif self.nullify_context == "Fall Back":
+                    self.choices_available = []
+                    self.name_player_making_choices = self.first_player_nullified
+                    self.choice_context = "Target Fall Back:"
+                    for i in range(len(primary_player.stored_cards_recently_destroyed)):
+                        card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                                  self.card_array)
+                        if card.check_for_a_trait("Elite") and card.get_is_unit():
+                            self.choices_available.append(card.get_name())
             else:
-                card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
-                if self.p1.aiming_reticle_coords_hand is not None:
-                    if self.p1.aiming_reticle_coords_hand > card_pos_discard:
-                        self.p1.aiming_reticle_coords_hand -= 1
-                self.nullify_count -= 1
-                if self.nullify_count > 0:
+                if self.nullified_card_pos != -1:
+                    primary_player.discard_card_from_hand(self.nullified_card_pos)
+                    if self.card_pos_to_deploy > self.nullified_card_pos:
+                        self.card_pos_to_deploy -= 1
+                elif self.nullified_card_name != "":
+                    primary_player.discard_card_name_from_hand(self.nullified_card_name)
+                primary_player.spend_resources(self.cost_card_nullified)
+                if self.nullify_context == "The Fury of Sicarius":
+                    pass
+                elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
+                    self.pos_shield_card = -1
+                primary_player.aiming_reticle_coords_hand = None
+                primary_player.aiming_reticle_coords_hand_2 = None
+            while self.nullify_count > 0:
+                if self.first_player_nullified == self.name_1:
                     card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
                     if self.p2.aiming_reticle_coords_hand is not None:
                         if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                             self.p2.aiming_reticle_coords_hand -= 1
                     self.nullify_count -= 1
-            if self.card_pos_to_deploy != -1:
-                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-        self.nullify_count = 0
-        self.nullify_context = ""
-        self.nullify_string = ""
-        self.nullified_card_pos = -1
-        self.nullified_card_name = ""
-        self.cost_card_nullified = 0
-        self.first_player_nullified = ""
-        self.p1.num_nullify_played = 0
-        self.p2.num_nullify_played = 0
+                    if self.nullify_count > 0:
+                        card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                        if self.p1.aiming_reticle_coords_hand is not None:
+                            if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                                self.p1.aiming_reticle_coords_hand -= 1
+                        self.nullify_count -= 1
+                else:
+                    card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                    if self.p1.aiming_reticle_coords_hand is not None:
+                        if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                            self.p1.aiming_reticle_coords_hand -= 1
+                    self.nullify_count -= 1
+                    if self.nullify_count > 0:
+                        card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                        if self.p2.aiming_reticle_coords_hand is not None:
+                            if self.p2.aiming_reticle_coords_hand > card_pos_discard:
+                                self.p2.aiming_reticle_coords_hand -= 1
+                        self.nullify_count -= 1
+                if self.card_pos_to_deploy != -1 and self.nullify_context == "Bigga Is Betta":
+                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+            self.nullify_count = 0
+            self.nullify_context = ""
+            self.nullify_string = ""
+            self.nullified_card_pos = -1
+            self.nullified_card_name = ""
+            self.cost_card_nullified = 0
+            self.first_player_nullified = ""
+            self.p1.num_nullify_played = 0
+            self.p2.num_nullify_played = 0
 
     async def resolve_fury_sicarius(self, primary_player, secondary_player):
         primary_player.spend_resources(2)
@@ -999,43 +1007,55 @@ class Game:
 
     async def resolve_backlash(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
+            if secondary_player.nullify_check():
+                self.nullifying_backlash = True
+            else:
+                self.choices_available = []
+                self.choice_context = ""
+                self.name_player_making_choices = ""
+                primary_player.spend_resources(1)
+                primary_player.discard_card_name_from_hand("Backlash")
+                print(self.nullified_card_name)
+                if self.nullify_context == "Event Action":
+                    secondary_player.aiming_reticle_coords_hand = None
+                    secondary_player.aiming_reticle_coords_hand_2 = None
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    self.amount_spend_for_tzeentch_firestorm = 0
+                    secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+                elif self.nullify_context == "In Play Action":
+                    secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                  self.position_of_actioned_card[1])
+                    self.action_chosen = ""
+                    self.player_with_action = ""
+                    self.mode = "Normal"
+                    if self.nullified_card_name == "Zarathur's Flamers":
+                        secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    if self.nullified_card_name in self.dies_to_backlash:
+                        secondary_player.destroy_card_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                    self.position_of_actioned_card = (-1, -1)
+                elif self.nullify_context == "Reaction":
+                    if self.nullified_card_name in self.dies_to_backlash:
+                        secondary_player.destroy_card_in_play(self.positions_of_unit_triggering_reaction[0][1],
+                                                              self.positions_of_unit_triggering_reaction[0][2])
+                    self.delete_reaction()
+                elif self.nullify_context == "Reaction Event":
+                    self.delete_reaction()
+                    secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+                elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+                    await self.resolve_battle_conclusion(secondary_player, game_string="")
+        elif game_update_string[1] == "1":
             self.choices_available = []
             self.choice_context = ""
             self.name_player_making_choices = ""
-            primary_player.spend_resources(1)
-            primary_player.discard_card_name_from_hand("Backlash")
-            print(self.nullified_card_name)
-            if self.nullify_context == "Event Action":
-                secondary_player.aiming_reticle_coords_hand = None
-                secondary_player.aiming_reticle_coords_hand_2 = None
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                self.amount_spend_for_tzeentch_firestorm = 0
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.nullified_card_name == "Zarathur's Flamers":
-                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                if self.nullified_card_name in self.dies_to_backlash:
-                    secondary_player.destroy_card_in_play(self.position_of_actioned_card[0],
-                                                          self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
-            elif self.nullify_context == "Reaction":
-                if self.nullified_card_name in self.dies_to_backlash:
-                    secondary_player.destroy_card_in_play(self.positions_of_unit_triggering_reaction[0][1],
-                                                          self.positions_of_unit_triggering_reaction[0][2])
-                self.delete_reaction()
-            elif self.nullify_context == "Reaction Event":
-                self.delete_reaction()
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
-                await self.resolve_battle_conclusion(secondary_player, game_string="")
+            self.communications_relay_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.communications_relay_enabled = True
 
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
@@ -1080,15 +1100,7 @@ class Game:
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
-            if self.nullified_card_name == "The Fury of Sicarius":
-                pass
-                """
-                self.nullify_enabled = False
-                await self.resolve_fury_sicarius(secondary_player, primary_player)
-                self.nullify_enabled = True
-                """
-            else:
-                await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             self.communications_relay_enabled = True
 
     def action_cleanup(self):
@@ -1165,9 +1177,8 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            self.reactions_needing_resolving.append("Nullify")
-                            self.player_who_resolves_reaction.append(name)
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.number), -1, -1])
+                            self.choosing_unit_for_nullify = True
+                            self.name_player_using_nullify = primary_player.name_player
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -3377,6 +3388,48 @@ class Game:
                                     other_play.reset_all_aiming_reticles_play_hq()
                                     self.planet_bodyguard = -1
 
+    async def nullification_unit(self, name, game_update_string):
+        if self.name_player_using_nullify == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if name == self.name_player_using_nullify:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    await self.complete_nullify()
+            elif len(game_update_string) == 3:
+                if game_update_string[0] == "HQ":
+                    if primary_player.number == game_update_string[1]:
+                        if primary_player.valid_nullify_unit(-2, int(game_update_string[2])):
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            primary_player.num_nullify_played += 1
+                            self.nullify_count += 1
+                            if secondary_player.nullify_check():
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                await self.game_sockets[0].receive_game_update(secondary_player.name_player +
+                                                                               " counter nullify offered.")
+                            else:
+                                await self.complete_nullify()
+            elif len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    if primary_player.number == game_update_string[1]:
+                        if primary_player.valid_nullify_unit(int(game_update_string[2]), int(game_update_string[3])):
+                            primary_player.exhaust_given_pos(int(game_update_string[2]), int(game_update_string[3]))
+                            primary_player.num_nullify_played += 1
+                            self.nullify_count += 1
+                            if secondary_player.nullify_check():
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                await self.game_sockets[0].receive_game_update(secondary_player.name_player +
+                                                                               " counter nullify offered.")
+                            else:
+                                await self.complete_nullify()
+
     async def consumption_resolution(self, name, game_update_string):
         if len(game_update_string) == 1:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -3422,6 +3475,8 @@ class Game:
             await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
         elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
+            if self.choosing_unit_for_nullify:
+                await self.nullification_unit(name, game_update_string)
             if self.resolving_consumption:
                 await self.consumption_resolution(name, game_update_string)
             elif self.manual_bodyguard_resolution:
