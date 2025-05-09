@@ -47,6 +47,7 @@ class Card:
         self.resolving_attack = False
         self.misc_ability_used = False
         self.mind_shackle_scarab_effect = False
+        self.valid_defense_battery_target = False
 
     def reset_own_eocr_values(self):
         pass
@@ -629,7 +630,8 @@ class AttachmentCard(Card):
                  limited=False, type_of_units_allowed_for_attachment="Army/Token/Warlord/Synapse",
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
-                 extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS"):
+                 extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS",
+                 planet_attachment=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
@@ -646,6 +648,8 @@ class AttachmentCard(Card):
         self.extra_command = extra_command
         self.required_traits = required_traits
         self.forbidden_traits = forbidden_traits
+        self.planet_attachment = planet_attachment
+        self.defense_battery_activated = False
 
     def get_extra_command(self):
         return self.extra_command

@@ -71,6 +71,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                             self.chosen_first_card = True
                             self.misc_target_unit = (-2, unit_pos)
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+        elif self.reactions_needing_resolving[0] == "Defense Battery":
+            if self.chosen_first_card:
+                if game_update_string[1] == secondary_player.get_number():
+                    if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                        if secondary_player.headquarters[unit_pos].valid_defense_battery_target:
+                            secondary_player.assign_damage_to_pos(-2, unit_pos, 2)
+                            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
                 if primary_player.headquarters[unit_pos].get_reaction_available():

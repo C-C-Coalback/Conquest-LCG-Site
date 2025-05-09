@@ -92,7 +92,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             self.card_type_of_selected_card_in_hand = "Attachment"
                         else:
-                            self.card_type_of_selected_card_in_hand = ""
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
         elif game_update_string[0] == "HQ":
             if name == self.player_with_deploy_turn:
@@ -124,10 +123,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p1
                     else:
                         player = self.p2
+                    planet_chosen = int(game_update_string[1])
                     card = player.get_card_in_hand(self.card_pos_to_deploy)
                     if card.get_card_type() == "Army":
                         self.discounts_applied = 0
-                        planet_chosen = int(game_update_string[1])
                         await self.calculate_available_discounts_unit(planet_chosen, card, player)
                         await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
                         self.card_to_deploy = card
@@ -139,6 +138,18 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         else:
                             await deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
+                    elif card.get_card_type() == "Attachment":
+                        if card.planet_attachment:
+                            cost = card.get_cost()
+                            discounts = player.search_hq_for_discounts("", "", is_attachment=True)
+                            cost = cost - discounts
+                            if player.spend_resources(cost):
+                                player.add_attachment_to_planet(planet_chosen, card)
+                                player.remove_card_from_hand(self.card_pos_to_deploy)
+                                self.card_pos_to_deploy = -1
+                                self.planet_pos_to_deploy = -1
+                                player.aiming_reticle_coords_hand = None
+                                self.action_cleanup()
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":

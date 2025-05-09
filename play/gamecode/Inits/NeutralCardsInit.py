@@ -39,7 +39,7 @@ def neutral_cards_init():
         CardClasses.AttachmentCard("Defense Battery", "Attach to a planet.\n"
                                                       "Action: After an enemy army unit moves to or from attached "
                                                       "planet, exhaust this attachment to deal 2 damage to that unit.",
-                                   "Artillery.", 1, "Neutral", "Common", 1, False),
+                                   "Artillery.", 1, "Neutral", "Common", 1, False, planet_attachment=True),
         CardClasses.SupportCard("STC Fragment", "Limited.\n"
                                                 "Interrupt: When you deploy an Elite unit, exhaust this support "
                                                 "to reduce the cost of that unit by 2.", "Relic.",

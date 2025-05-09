@@ -285,6 +285,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infested_planets[planet_pos] = True
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Defense Battery":
+            self.chosen_first_card = False
         elif self.reactions_needing_resolving[0] == "The Swarmlord":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             planet_1 = planet_pos - 1

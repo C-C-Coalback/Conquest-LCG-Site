@@ -1074,9 +1074,21 @@ class Player:
             print(pos)
             self.discard_card_from_hand(pos)
 
+    def reset_defense_batteries(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].valid_defense_battery_target = False
+        for i in range(7):
+            for j in range(len(self.attachments_at_planet[i])):
+                self.attachments_at_planet[i][j].defense_battery_activated = False
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].valid_defense_battery_target = False
+
     def move_unit_to_planet(self, origin_planet, origin_position, destination):
         if origin_planet == -2:
             headquarters_list = self.headquarters
+            if self.headquarters[origin_position].get_card_type() == "Army":
+                if self.defense_battery_check(destination):
+                    self.headquarters[origin_position].valid_defense_battery_target = True
             self.cards_in_play[destination + 1].append(copy.deepcopy(headquarters_list[origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
@@ -1092,6 +1104,9 @@ class Player:
                         self.game.allowed_units_alaitoc_shrine.append([int(self.number), destination, new_pos])
             self.remove_card_from_hq(origin_position)
         else:
+            if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
+                if self.defense_battery_check(origin_planet) or self.defense_battery_check(destination):
+                    self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
                                                                      [origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
@@ -2541,11 +2556,17 @@ class Player:
         return None
 
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
+        if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.defense_battery_check(planet_id):
+                self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 
     def rout_unit(self, planet_id, unit_id):
+        if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.defense_battery_check(planet_id):
+                self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_hq = len(self.headquarters) - 1
         self.exhaust_given_pos(-2, last_element_hq)
@@ -2578,6 +2599,26 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].can_retreat = True
 
+    def defense_battery_check(self, planet_id):
+        if self.number == "1":
+            enemy_player = self.game.p2
+        else:
+            enemy_player = self.game.p1
+        for i in range(len(enemy_player.attachments_at_planet[planet_id])):
+            if enemy_player.attachments_at_planet[planet_id][i].get_name() == "Defense Battery":
+                if enemy_player.attachments_at_planet[planet_id][i].get_ready():
+                    enemy_player.attachments_at_planet[planet_id][i].defense_battery_activated = True
+                    already_defense_battery = False
+                    for k in range(len(self.game.reactions_needing_resolving)):
+                        if self.game.reactions_needing_resolving[k] == "Defense Battery":
+                            if self.game.player_who_resolves_reaction[k] == enemy_player.name_player:
+                                already_defense_battery = True
+                    if not already_defense_battery:
+                        self.game.create_reaction("Defense Battery", enemy_player.name_player,
+                                                  (int(self.number), planet_id, -1))
+                    return True
+        return False
+
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
@@ -2587,6 +2628,9 @@ class Player:
                 return False
         if not self.cards_in_play[planet_id + 1][unit_id].can_retreat:
             return False
+        if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.defense_battery_check(planet_id):
+                self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_hq = len(self.headquarters) - 1
         if exhaust:

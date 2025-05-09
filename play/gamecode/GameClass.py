@@ -667,6 +667,18 @@ class Game:
                             card = self.p2.headquarters[pos_unit]
                             if len(card.get_attachments()) > pos_attachment:
                                 return True
+                elif game_update_string[1] == "PLANETS":
+                    player_num = int(game_update_string[2])
+                    pos_planet = int(game_update_string[3])
+                    pos_attachment = int(game_update_string[4])
+                    if player_num == 1:
+                        if -1 < pos_planet < 7:
+                            if len(self.p1.attachments_at_planet[pos_planet]) > pos_attachment:
+                                return True
+                    elif player_num == 2:
+                        if -1 < pos_planet < 7:
+                            if len(self.p2.attachments_at_planet[pos_planet]) > pos_attachment:
+                                return True
         if len(game_update_string) == 6:
             if game_update_string[0] == "ATTACHMENT":
                 if game_update_string[1] == "IN_PLAY":
@@ -2788,6 +2800,26 @@ class Game:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,
                                                                   primary_player, secondary_player)
+            elif len(game_update_string) == 5:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "PLANETS":
+                        player_num = int(game_update_string[2])
+                        planet_pos = int(game_update_string[3])
+                        attachment_pos = int(game_update_string[4])
+                        if int(primary_player.number) == player_num:
+                            if self.reactions_needing_resolving[0] == "Defense Battery":
+                                if not self.chosen_first_card:
+                                    if primary_player.attachments_at_planet[planet_pos][attachment_pos].get_ability() \
+                                            == "Defense Battery":
+                                        if primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                                defense_battery_activated:
+                                            if primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                                    get_ready():
+                                                primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                                    exhaust_card()
+                                                self.chosen_first_card = True
+                                                primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
+                                                    defense_battery_activated = False
 
     async def resolve_mobile(self, name, game_update_string):
         if self.player_with_initiative == self.name_1:
@@ -3119,6 +3151,9 @@ class Game:
         del self.reactions_needing_resolving[0]
         del self.player_who_resolves_reaction[0]
         del self.positions_of_unit_triggering_reaction[0]
+        if not self.reactions_needing_resolving:
+            self.p1.reset_defense_batteries()
+            self.p2.reset_defense_batteries()
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
