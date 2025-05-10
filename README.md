@@ -37,6 +37,8 @@ First run "py -m pip install -r requirements.txt" to install dependencies.
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
 
+To run tests, navigate to the all_tests.py file and run "py all_tests.py".
+
 If you are wanting to run this for development purposes,
 navigate to the manage.py file, and simply run
 "py manage.py runserver", and it should work.
