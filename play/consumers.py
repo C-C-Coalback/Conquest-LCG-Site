@@ -7,11 +7,13 @@ import os
 from .gamecode import Initfunctions, FindCard
 import threading
 import logging
+import datetime
 
 card_array = Initfunctions.init_player_cards()
 planet_array = Initfunctions.init_planet_cards()
 
 active_lobbies = [[], []]
+spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
 
 condition_lobby = threading.Condition()
@@ -23,6 +25,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         global active_lobbies
         global condition_lobby
+        global spectator_games
         self.room_name = "lobby"
         self.room_group_name = "lobby"
         self.user = self.scope["user"]
@@ -38,6 +41,21 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
             await self.chat_message({"type": "chat.message", "message": message})
+        i = 0
+        print("CURRENT SPEC")
+        print(spectator_games)
+        while i < len(spectator_games):
+            if spectator_games[i][3] < datetime.datetime.now():
+                del spectator_games[i]
+                i = i - 1
+            i = i + 1
+        message = "Delete spec"
+        print("CURRENT SPEC")
+        print(spectator_games)
+        await self.chat_message({"type": "chat.message", "message": message})
+        for i in range(len(spectator_games)):
+            message = "Create spec/" + spectator_games[i][0] + "/" + spectator_games[i][1] + "/" + spectator_games[i][2]
+            await self.chat_message({"type": "chat.message", "message": message})
         condition_lobby.notify_all()
         condition_lobby.release()
 
@@ -46,6 +64,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         global active_games
         global condition_lobby
         global condition_games
+        global spectator_games
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
@@ -118,6 +137,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         first_name = active_lobbies[0][i]
                         second_name = active_lobbies[1][i]
                 game_id = self.create_game(first_name, second_name, game_id)
+                if message[2] == "false":
+                    current_time = datetime.datetime.now()
+                    time_change = datetime.timedelta(minutes=60)
+                    end_time = current_time + time_change
+                    spectator_games.append((first_name, second_name, game_id, end_time))
+                    print("End game time:")
+                    print(end_time)
                 message = "Move to game/" + game_id + "/" + first_name + "/" + second_name
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
@@ -129,9 +155,6 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         del active_lobbies[1][i]
                         i += -1
                     i += 1
-                await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "chat.message", "message": message}
-                )
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
                     await self.channel_layer.group_send(
@@ -211,6 +234,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({"message": chat_messages[1][i]}))
         if room_already_exists:
             await active_games[game_id_if_exists].joined_requests_graphics(self.name)
+            await self.receive_game_update(self.name + " joined the lobby")
         condition_games.notify_all()
         condition_games.release()
 

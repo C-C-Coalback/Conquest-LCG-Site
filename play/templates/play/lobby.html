@@ -11,21 +11,80 @@
             border: 2px solid blue;
             padding: 10px;
             margin: 10px;
+            display:flex;
+            justify-content:center;
+        }
+        #lobby-container {
+            position:absolute;
+            top:20%;
+            left:20%;
+            margin:auto;
+            border-style: double;
+            border-color: lightblue;
+            border-width: 5px;
+            background: rgba(47, 40, 153, 0.3);
+            width:300px;
+            max-width:300px;
+            min-height:10vh;
+        }
+        #game-settings-container {
+            position:absolute;
+            top:20%;
+            left:calc(20% + 350px);
+            margin:auto;
+            border-style: double;
+            border-color: lightblue;
+            border-width: 5px;
+            background: rgba(47, 40, 153, 0.3);
+            width:200px;
+            max-width:200px;
+            min-height:10vh;
+        }
+        #add_to_me {
+            position:relative;
+            top:20%;
+            left:20%;
+            margin:auto;
+        }
+        #create-lobby-submit {
+            position:absolute;
+            left:20%;
+            margin:auto;
+        }
+        #available {
+            position:relative;
+            margin:auto;
         }
 </style>
 <h2>Lobby</h2>
 <input id="create-lobby-submit" type="button" value="Create lobby">
-<div id="add_to_me">
-    <p></p>
+<div id="lobby-container">
+    <h2 id="available">Available Lobbies</h2>
+    <div id="add_to_me">
+        <p></p>
+    </div>
+    <h2 id="active">Active Games</h2>
+    <div id="add_spec_to_me">
+        <p></p>
+    </div>
+</div>
+<div id="game-settings-container">
+    <h2>Game Settings</h2>
+    <input id="cb" type="checkbox" style="float: left; margin-top: 5px;>">
+    <div style="margin-left: 25px;">
+     Private
+    </div>
 </div>
 <script>
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         const lobbySocket = new WebSocket(
             ws_scheme
-	    + '://'
+	        + '://'
             + window.location.host
             + '/ws/play/'
         );
+
+        var spec_count = 0;
 
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
@@ -39,6 +98,10 @@
                 deleteLobby()
             } else if (split_string[0] === "Move to game") {
                 moveToGame(split_string[1], split_string[2], split_string[3])
+            } else if (split_string[0] == "Delete spec") {
+                deleteSpec()
+            } else if (split_string[0] == "Create spec") {
+                addSpec(split_string[1], split_string[2], split_string[3]);
             } else {
                 addLobby(split_string[1], split_string[2])
             }
@@ -57,8 +120,9 @@
         }
 
         function startGame(clicked_id) {
+            const checked = document.getElementById("cb").checked
             lobbySocket.send(JSON.stringify({
-                'message': "Start game/" + clicked_id
+                'message': "Start game/" + clicked_id + "/" + checked.toString()
             }));
         }
 
@@ -69,15 +133,29 @@
             }
         }
 
+        function joinGame(game_id) {
+            target = "/play/" + game_id;
+            location.href = target;
+        }
+
         function removeLobby() {
             lobbySocket.send(JSON.stringify({
                 'message': "Remove lobby"
             }));
         }
 
+        function addSpec(nameOfPlayerOne, nameOfPlayerTwo, gameID) {
+            document.getElementById("add_spec_to_me").innerHTML +=
+                `<div class="box">` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `</div>`;
+            document.getElementById("add_spec_to_me").innerHTML +=
+                    `<button id=` + gameID + ` onclick="joinGame(this.id)">
+                    Join Lobby
+                    </button>`;
+        }
+
         function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
             document.getElementById("add_to_me").innerHTML +=
-                `<div class="box">Lobby: ` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
+                `<div class="box">` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
                 </div>`;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
@@ -107,6 +185,12 @@
 
         function deleteLobby() {
             document.getElementById("add_to_me")
+                .innerHTML =
+                `<h3></h3>`;
+        }
+
+        function deleteSpec() {
+            document.getElementById("add_spec_to_me")
                 .innerHTML =
                 `<h3></h3>`;
         }
