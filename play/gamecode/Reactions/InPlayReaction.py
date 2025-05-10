@@ -198,6 +198,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 get_card_type() != "Warlord":
                             player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
                             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Blackmane Sentinel":
+            if game_update_string[1] == primary_player.get_number():
+                warlord_pla = primary_player.find_warlord_planet()
+                if warlord_pla != planet_pos and warlord_pla != -1:
+                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blackmane Sentinel":
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Ragnar Blackmane":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == secondary_player.get_number():

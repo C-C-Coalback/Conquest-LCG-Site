@@ -1133,6 +1133,12 @@ class Player:
                     self.game.create_reaction("Ragnar Blackmane", self.name_player,
                                               [int(self.number), dest_planet, -1])
                 self.move_unit_to_planet(origin_planet, i, dest_planet)
+                for j in range(7):
+                    if j != dest_planet:
+                        for k in range(len(self.cards_in_play[j + 1])):
+                            if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
+                                self.game.create_reaction("Blackmane Sentinel", self.name_player,
+                                                          (int(self.number), j, k))
                 if summon_khymera:
                     self.summon_token_at_planet("Khymera", dest_planet)
             i += 1
@@ -1198,6 +1204,12 @@ class Player:
                         self.game.create_reaction("Ragnar Blackmane", self.name_player,
                                                   [int(self.number), planet_pos - 1, -1])
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
+                    for j in range(7):
+                        if j != planet_pos - 1:
+                            for k in range(len(self.cards_in_play[j + 1])):
+                                if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
+                                    self.game.create_reaction("Blackmane Sentinel", self.name_player,
+                                                              (int(self.number), j, k))
                     return True
             return False
         else:
@@ -1229,6 +1241,12 @@ class Player:
                         self.game.create_reaction("Ragnar Blackmane", self.name_player,
                                                   [int(self.number), planet_pos - 1, -1])
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
+                    for j in range(7):
+                        if j != planet_pos - 1:
+                            for k in range(len(self.cards_in_play[j + 1])):
+                                if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
+                                    self.game.create_reaction("Blackmane Sentinel", self.name_player,
+                                                              (int(self.number), j, k))
                     i -= 1
                 i += 1
         return None
@@ -1287,6 +1305,12 @@ class Player:
             extra_resources += self.cards_in_play[planet_id + 1][i].get_additional_resources_command_struggle()
             extra_cards += self.cards_in_play[planet_id + 1][i].get_additional_cards_command_struggle()
         return extra_resources, extra_cards
+
+    def find_warlord_planet(self):
+        for i in range(7):
+            if self.check_for_warlord(i):
+                return i
+        return -1
 
     def check_for_warlord(self, planet_id):
         if planet_id == -2:
