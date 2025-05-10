@@ -287,6 +287,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Defense Battery":
             self.chosen_first_card = False
+        elif self.reactions_needing_resolving[0] == "Ragnar Blackmane":
+            planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+            if not secondary_player.check_for_warlord(planet_pos):
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "The Swarmlord":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             planet_1 = planet_pos - 1

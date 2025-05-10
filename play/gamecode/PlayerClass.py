@@ -1126,10 +1126,12 @@ class Player:
                 summon_khymera = False
                 if self.cards_in_play[origin_planet + 1][i].get_ability() == "Packmaster Kith":
                     summon_khymera = True
-                if self.cards_in_play[origin_planet + 1][i].get_ability() == "Eldorath Starbane":
-                    self.game.reactions_needing_resolving.append("Eldorath Starbane")
-                    self.game.positions_of_unit_triggering_reaction.append([int(self.number), dest_planet, -1])
-                    self.game.player_who_resolves_reaction.append(self.name_player)
+                if self.cards_in_play[origin_planet + 1][i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
+                    self.game.create_reaction("Eldorath Starbane", self.name_player,
+                                              [int(self.number), dest_planet, -1])
+                if self.cards_in_play[origin_planet + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
+                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                              [int(self.number), dest_planet, -1])
                 self.move_unit_to_planet(origin_planet, i, dest_planet)
                 if summon_khymera:
                     self.summon_token_at_planet("Khymera", dest_planet)
@@ -1184,17 +1186,17 @@ class Player:
                 if headquarters_list[i].get_card_type() == "Warlord":
                     print(headquarters_list[i].get_name())
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
-                        self.game.reactions_needing_resolving.append("Packmaster Kith")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Packmaster Kith", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
-                        self.game.reactions_needing_resolving.append("Eldorath Starbane")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Eldorath Starbane", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
-                        self.game.reactions_needing_resolving.append("Commander Shadowsun")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Commander Shadowsun", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
+                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
                     return True
             return False
@@ -1212,21 +1214,20 @@ class Player:
                                 [int(self.number), planet_pos - 1, -1])
                             self.game.player_who_resolves_reaction.append(self.name_player)
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
-                        self.game.reactions_needing_resolving.append("The Swarmlord")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("The Swarmlord", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
-                        self.game.reactions_needing_resolving.append("Packmaster Kith")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Packmaster Kith", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
-                        self.game.reactions_needing_resolving.append("Eldorath Starbane")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Eldorath Starbane", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
-                        self.game.reactions_needing_resolving.append("Commander Shadowsun")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_pos - 1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Commander Shadowsun", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
+                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                                  [int(self.number), planet_pos - 1, -1])
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
                     i -= 1
                 i += 1

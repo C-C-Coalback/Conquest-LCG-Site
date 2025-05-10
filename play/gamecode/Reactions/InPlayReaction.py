@@ -169,36 +169,57 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.chosen_second_card = False
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
-            print("Reached Starbane code")
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
-            if game_update_string[1] == "1":
-                player_exhausting_unit = self.p1
-            else:
-                player_exhausting_unit = self.p2
-            can_continue = True
-            if player_exhausting_unit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Reaction"
-            if can_continue:
-                if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
-                    if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
-                            get_card_type() != "Warlord":
-                        player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == "1":
+                    player_exhausting_unit = self.p1
+                else:
+                    player_exhausting_unit = self.p2
+                can_continue = True
+                if player_exhausting_unit.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
+                if can_continue:
+                    if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                        if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
+                                get_card_type() != "Warlord":
+                            player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+                            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Ragnar Blackmane":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == secondary_player.get_number():
+                    can_continue = True
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
+                    if can_continue:
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Nahumekh":
             if game_update_string[1] == "1":
