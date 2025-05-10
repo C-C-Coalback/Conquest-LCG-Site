@@ -2528,10 +2528,10 @@ class Player:
                 self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
+            self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
-            self.game.reactions_needing_resolving.append("Mark of Chaos")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, card_pos])
-            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.create_reaction("Mark of Chaos", self.name_player, (int(self.number), planet_num, -1))
         if card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier"):
             for i in range(len(self.cards)):
                 if self.cards[i] == "Elysian Assault Team":
