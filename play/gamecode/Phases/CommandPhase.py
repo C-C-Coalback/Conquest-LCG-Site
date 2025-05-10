@@ -103,11 +103,33 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Foresight"
-                        else:
+                        elif primary_player.spend_resources(1):
                             warlord_planet = primary_player.warlord_commit_location
                             self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
                                                                                warlord_planet, -1])
                             self.reactions_needing_resolving.append("Foresight")
+                            self.player_who_resolves_reaction.append(primary_player.name_player)
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif primary_player.cards[hand_pos] == "Blackmane's Hunt":
+                        if secondary_player.nullify_check() and self.nullify_enabled:
+                            await self.game_sockets[0].receive_game_update(
+                                primary_player.name_player + " wants to play Blackmane's Hunt; "
+                                                             "Nullify window offered.")
+                            self.choices_available = ["Yes", "No"]
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Use Nullify?"
+                            self.nullified_card_pos = int(game_update_string[2])
+                            self.nullified_card_name = "Blackmane's Hunt"
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Blackmane's Hunt"
+                        else:
+                            warlord_planet = primary_player.warlord_commit_location
+                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
+                                                                               warlord_planet, -1])
+                            self.reactions_needing_resolving.append("Blackmane's Hunt")
                             self.player_who_resolves_reaction.append(primary_player.name_player)
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])

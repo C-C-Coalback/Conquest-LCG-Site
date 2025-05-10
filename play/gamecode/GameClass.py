@@ -921,7 +921,8 @@ class Game:
                 await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
                                                                    new_string_list)
                 self.nullify_enabled = True
-            elif self.nullify_context == "Foresight" or self.nullify_context == "Superiority":
+            elif self.nullify_context == "Foresight" or self.nullify_context == "Superiority" or \
+                    self.nullify_context == "Blackmane's Hunt":
                 self.nullify_enabled = False
                 new_string_list = self.nullify_string.split(sep="/")
                 await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,

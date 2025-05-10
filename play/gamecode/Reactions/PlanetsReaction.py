@@ -3,10 +3,18 @@ from .. import FindCard
 
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
     chosen_planet = int(game_update_string[1])
-    if self.reactions_needing_resolving[0] == "Foresight":
+    if self.reactions_needing_resolving[0] == "Blackmane's Hunt":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])
         if abs(warlord_planet - new_planet) == 1:
+            primary_player.commit_warlord_to_planet_from_planet(warlord_planet, new_planet)
+            self.delete_reaction()
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+    elif self.reactions_needing_resolving[0] == "Foresight":
+        warlord_planet = primary_player.warlord_commit_location
+        new_planet = int(game_update_string[1])
+        if warlord_planet != new_planet:
             primary_player.commit_warlord_to_planet_from_planet(warlord_planet, new_planet)
             self.delete_reaction()
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
