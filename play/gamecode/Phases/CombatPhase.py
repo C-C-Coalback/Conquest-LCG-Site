@@ -267,6 +267,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
                                                                                               self.attacker_position
                                                                                               )
+                                if primary_player.check_for_trait_given_pos(self.attacker_planet,
+                                                                            self.attacker_position, "Space Wolves"):
+                                    if primary_player.search_card_in_hq("Ragnar's Warcamp"):
+                                        if primary_player.check_for_warlord(self.attacker_planet):
+                                            if secondary_player.get_card_type_given_pos(
+                                                    self.defender_planet, self.defender_position) == "Warlord":
+                                                attack_value = attack_value * 2
                                 if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                               self.defender_position, "Vehicle"):
                                     if primary_player.get_ability_given_pos(self.attacker_planet,
