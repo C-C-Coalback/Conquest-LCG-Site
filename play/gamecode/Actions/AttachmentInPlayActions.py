@@ -30,7 +30,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                            await self.game_sockets[0].receive_game_update(ability + " activated")
+                            await self.send_update_message(ability + " activated")
                 elif ability == "Gauss Flayer":
                     if primary_player.get_name_player() == self.player_with_action:
                         if primary_player.get_ready_given_pos(planet_pos, unit_pos):
@@ -39,14 +39,14 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                            await self.game_sockets[0].receive_game_update(ability + " activated")
+                            await self.send_update_message(ability + " activated")
                 elif ability == "Hyperphase Sword":
                     if primary_player.get_name_player() == self.player_with_action:
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                        await self.game_sockets[0].receive_game_update(ability + " activated")
+                        await self.send_update_message(ability + " activated")
                         self.chosen_first_card = False
                         self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
                 elif ability == "Mind Shackle Scarab":
@@ -60,7 +60,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                     last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
                                     primary_player.cards_in_play[planet_pos + 1][last_el].mind_shackle_scarab_effect = True
                             else:
-                                self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Mind Shackle Scarab on own unit not supported"
                                 )
                             self.action_cleanup()
@@ -92,7 +92,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()
             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-            await self.game_sockets[0].receive_game_update(card_chosen.get_name() + " chosen")
+            await self.send_update_message(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
     elif self.action_chosen == "Subdual":

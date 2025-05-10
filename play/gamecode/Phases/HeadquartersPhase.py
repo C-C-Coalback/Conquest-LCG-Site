@@ -9,7 +9,7 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
                 self.mode = "ACTION"
                 self.player_with_action = name
                 print("Special HQ action")
-                await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+                await self.send_update_message(name + " wants to take an action.")
                 if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
                     self.choices_available = ["Dark Possession", "Regular Action"]
                     self.choice_context = "Use Dark Possession?"

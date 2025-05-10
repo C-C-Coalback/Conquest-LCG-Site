@@ -130,7 +130,7 @@ class Player:
         self.print_headquarters()
         await self.send_hand()
         for i in range(len(self.game.game_sockets)):
-            await self.game.game_sockets[i].receive_game_update("Setup of " + self.name_player + " finished.")
+            await self.game.send_update_message("Setup of " + self.name_player + " finished.")
         await self.send_hq()
         await self.send_units_at_all_planets()
         await self.send_resources()
@@ -139,7 +139,7 @@ class Player:
             await self.game.send_search()
             await self.game.send_info_box()
             self.game.phase = "DEPLOY"
-            await self.game.game_sockets[0].receive_game_update(
+            await self.game.send_update_message(
                 self.game.name_1 + " may mulligan their opening hand.")
         card = FindCard.find_card("Defense Battery", self.card_array)
         self.condition_player_main.notify_all()
@@ -177,7 +177,7 @@ class Player:
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player
         if card_string != self.last_hand_string or force:
             self.last_hand_string = card_string
-            await self.game.game_sockets[0].receive_game_update(card_string)
+            await self.game.send_update_message(card_string)
 
     async def send_hq(self, force=False):
         joined_string = ""
@@ -222,7 +222,7 @@ class Player:
             joined_string = "GAME_INFO/HQ/" + str(self.number)
         if self.last_hq_string != joined_string or force:
             self.last_hq_string = joined_string
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+            await self.game.send_update_message(joined_string)
 
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
@@ -268,7 +268,7 @@ class Player:
                     joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
                 if self.last_planet_strings[planet_id] != joined_string or force:
                     self.last_planet_strings[planet_id] = joined_string
-                    await self.game.game_sockets[0].receive_game_update(joined_string)
+                    await self.game.send_update_message(joined_string)
 
     async def send_units_at_all_planets(self, force=False):
         for i in range(7):
@@ -278,7 +278,7 @@ class Player:
         joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
         if joined_string != self.last_resources_string or force:
             self.last_resources_string = joined_string
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+            await self.game.send_update_message(joined_string)
 
     async def transform_indirect_into_damage(self):
         for i in range(len(self.headquarters)):
@@ -311,13 +311,13 @@ class Player:
                 card_strings.append(self.victory_display[i].get_name())
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number) + "/" + joined_string
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+            await self.game.send_update_message(joined_string)
         else:
             joined_string = "GAME_INFO/VICTORY_DISPLAY/" + str(self.number)
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+            await self.game.send_update_message(joined_string)
         total_icons = self.get_icons_on_captured()
         if total_icons[0] > 2 or total_icons[1] > 2 or total_icons[2] > 2:
-            await self.game.game_sockets[0].receive_game_update(
+            await self.game.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_player + "; sufficient icons on captured planets."
                 "----GAME END----"
@@ -333,7 +333,7 @@ class Player:
                     joined_string += self.aiming_reticle_color_discard
         if joined_string != self.last_discard_string or force:
             self.last_discard_string = joined_string
-            await self.game.game_sockets[0].receive_game_update(joined_string)
+            await self.game.send_update_message(joined_string)
 
     def search_for_card_everywhere(self, card_name, ability=True):
         for i in range(len(self.headquarters)):
@@ -403,11 +403,11 @@ class Player:
 
     async def reveal_top_card_deck(self):
         if not self.deck:
-            await self.game.game_sockets[0].receive_game_update("No cards left!")
+            await self.game.send_update_message("No cards left!")
         else:
             card_name = self.deck[0]
             text = self.name_player + " reveals a " + card_name
-            await self.game.game_sockets[0].receive_game_update(text)
+            await self.game.send_update_message(text)
 
     def get_top_card_deck(self):
         if not self.deck:
@@ -901,7 +901,7 @@ class Player:
     async def reveal_hand(self):
         string_sent = "; ".join(self.cards)
         string_sent = self.name_player + " reveals their hand: " + string_sent
-        await self.game.game_sockets[0].receive_game_update(string_sent)
+        await self.game.send_update_message(string_sent)
 
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()

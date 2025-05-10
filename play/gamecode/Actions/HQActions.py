@@ -103,14 +103,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.discard_top_card_deck()
                             card = primary_player.get_card_top_discard()
                             if card.get_faction() == "Orks" and card.get_cost() % 2 == 1:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Ork Landa hit an odd Orks card!"
                                 )
                                 self.location_of_indirect = "ALL"
                                 secondary_player.indirect_damage_applied = 0
                                 secondary_player.total_indirect_damage = card.get_cost()
                             else:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Ork Landa missed"
                                 )
                             self.action_chosen = ""
@@ -145,7 +145,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No valid target for Repair Bay."
                                 )
                                 self.choice_context = ""
@@ -189,7 +189,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                                 primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             else:
-                                await self.game_sockets[0].receive_game_update("First planet not in play")
+                                await self.send_update_message("First planet not in play")
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if self.number_with_deploy_turn == "1":
@@ -229,7 +229,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -265,10 +265,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -306,7 +306,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
                 if possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
@@ -344,7 +344,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -359,7 +359,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.set_blanked_given_pos(-2, unit_pos, exp="EOP")
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
-                await self.game_sockets[0].receive_game_update(
+                await self.send_update_message(
                     "Twisted Laboratory used on " + player_being_hit.headquarters[unit_pos].get_name()
                     + ", located at HQ, position " + str(unit_pos))
                 self.position_of_actioned_card = (-1, -1)
@@ -387,10 +387,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -531,7 +531,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.headquarters[unit_pos].get_card_type() == "Warlord":
                 primary_player.headquarters[unit_pos].brutal_eocr = True
                 card_name = primary_player.headquarters[unit_pos].get_name()
-                await self.game_sockets[0].receive_game_update("Made " + card_name + " Brutal for one combat round.")
+                await self.send_update_message("Made " + card_name + " Brutal for one combat round.")
                 self.action_chosen = ""
                 self.mode = "Normal"
                 self.player_with_action = ""
@@ -610,7 +610,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.unit_to_move_position = [planet_pos, unit_pos]
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         else:
-            await self.game_sockets[0].receive_game_update("Already selected unit to move")
+            await self.send_update_message("Already selected unit to move")
     elif self.action_chosen == "Mycetic Spores":
         if self.unit_to_move_position == [-1, -1]:
             if self.player_with_action == self.name_1:
@@ -640,10 +640,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -678,7 +678,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if player_receiving_buff.check_is_unit_at_pos(-2, int(game_update_string[2])):
             player_receiving_buff.increase_attack_of_unit_at_pos(-2, int(game_update_string[2]), 2,
                                                                  expiration="NEXT")
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "Catachan Outpost used on " + player_receiving_buff.headquarters[int(game_update_string[2])]
                 .get_name() + ", located at HQ, position " + game_update_string[2])
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],

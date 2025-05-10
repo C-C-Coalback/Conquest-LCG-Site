@@ -20,7 +20,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                     self.action_chosen = ability
             elif ability == "Hate":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
-                    await self.game_sockets[0].receive_game_update(
+                    await self.send_update_message(
                         name + " is playing a " + ability + " from the discard; card removed."
                     )
                     self.action_chosen = ability
@@ -29,7 +29,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
             elif ability == "Awake the Sleepers":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " is playing a " + ability + " from the discard; card removed."
                         )
                         primary_player.discard.remove("Awake the Sleepers")
@@ -47,19 +47,19 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "No valid targets for Awake the Sleepers"
                             )
                             self.action_cleanup()
                         else:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Press the pass button to stop shuffling any more cards in."
                             )
             elif ability == "Drudgery":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.can_play_limited:
                         if primary_player.spend_resources(2):
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 name + " is playing a " + ability + " from the discard; card removed."
                             )
                             primary_player.can_play_limited = False
@@ -78,14 +78,14 @@ async def update_game_event_action_discard(self, name, game_update_string):
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
                                 self.resolving_search_box = False
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No valid targets for Drudgery"
                                 )
                                 self.action_cleanup()
             elif ability == "Recycle":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " is playing a " + ability + " from the discard; card removed."
                         )
                         self.action_chosen = ability
@@ -95,7 +95,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
             elif ability == "Extermination":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(5):
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " is playing a " + ability + " from the discard; card removed."
                         )
                         self.action_chosen = ability
@@ -104,7 +104,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
             elif ability == "Mechanical Enhancement":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(2):
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " is playing a " + ability + " from the discard; card removed."
                         )
                         self.action_chosen = ability
@@ -113,7 +113,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
             elif ability == "Reanimation Protocol":
                 if not primary_player.used_reanimation_protocol:
                     if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " is playing a " + ability + " from the discard; card removed."
                         )
                         self.action_chosen = ability

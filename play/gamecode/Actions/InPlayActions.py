@@ -34,7 +34,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             if self.phase == "DEPLOY":
                                 self.player_with_deploy_turn = secondary_player.name_player
                                 self.number_with_deploy_turn = secondary_player.get_number()
-                            await self.game_sockets[0].receive_game_update("Haemonculus buffed")
+                            await self.send_update_message("Haemonculus buffed")
                 elif ability == "Virulent Spore Sacs":
                     if player_owning_card.name_player == name:
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -141,7 +141,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.choice_context = "Target Dread Monolith:"
                             self.name_player_making_choices = primary_player.name_player
                         else:
-                            self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "No valid targets for Dread Monolith; better luck next time!"
                             )
                             self.action_cleanup()
@@ -196,10 +196,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -214,7 +214,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_being_hit.set_blanked_given_pos(planet_pos, unit_pos, exp="EOP")
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
-                await self.game_sockets[0].receive_game_update(
+                await self.send_update_message(
                     "Twisted Laboratory used on " + player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
                     + ", located at planet " + str(planet_pos) + ", position " + str(unit_pos))
                 self.position_of_actioned_card = (-1, -1)
@@ -254,7 +254,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
@@ -335,10 +335,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_owning_card.name_player == secondary_player.name_player:
                     if secondary_player.get_immune_to_enemy_card_abilities(dest_planet, dest_pos):
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                        await self.send_update_message("Immune to enemy card abilities.")
                     if secondary_player.get_immune_to_enemy_events(dest_planet, dest_pos):
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                        await self.send_update_message("Immune to enemy events.")
                 if can_continue:
                     if player_owning_card.move_attachment_card(origin_planet, origin_pos, origin_attach_pos,
                                                                dest_planet, dest_pos):
@@ -353,7 +353,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                     else:
-                        await self.game_sockets[0].receive_game_update("Invalid attachment movement.")
+                        await self.send_update_message("Invalid attachment movement.")
     elif self.action_chosen == "Boss Zugnog":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and\
@@ -393,10 +393,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -433,13 +433,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -486,13 +486,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -553,12 +553,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     card_chosen.set_ranged(True)
                     self.misc_target_planet = planet_pos
                     self.misc_counter -= 1
-                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+                    await self.send_update_message(str(self.misc_counter) + " uses left")
             elif self.misc_target_planet == planet_pos:
                 if card_chosen.get_faction() == "Astra Militarum":
                     card_chosen.set_ranged(True)
                     self.misc_counter -= 1
-                    await self.game_sockets[0].receive_game_update(str(self.misc_counter) + " uses left")
+                    await self.send_update_message(str(self.misc_counter) + " uses left")
                     if self.misc_counter == 0:
                         self.action_chosen = ""
                         self.player_with_action = ""
@@ -572,10 +572,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 can_continue = True
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    await self.send_update_message("Immune to enemy card abilities.")
                 elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
@@ -619,10 +619,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                    await self.send_update_message("Immune to enemy card abilities.")
                 elif possible_interrupts:
                     can_continue = False
-                    await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                    await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
@@ -686,13 +686,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                        await self.send_update_message("Immune to enemy card abilities.")
                     elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                        await self.send_update_message("Immune to enemy events.")
                     elif possible_interrupts:
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
@@ -739,10 +739,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                        await self.send_update_message("Immune to enemy card abilities.")
                     elif possible_interrupts:
                         can_continue = False
-                        await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
@@ -806,7 +806,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Warlord":
                 primary_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eocr = True
                 card_name = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name()
-                await self.game_sockets[0].receive_game_update("Made " + card_name + " Brutal for one combat round.")
+                await self.send_update_message("Made " + card_name + " Brutal for one combat round.")
                 self.action_chosen = ""
                 self.mode = "Normal"
                 self.player_with_action = ""
@@ -883,7 +883,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.unit_to_move_position = [planet_pos, unit_pos]
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         else:
-            await self.game_sockets[0].receive_game_update("Already selected unit to move")
+            await self.send_update_message("Already selected unit to move")
     elif self.action_chosen == "Brood Chamber":
         if not self.chosen_first_card:
             if secondary_player.get_number() == game_update_string[1]:
@@ -892,7 +892,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_planet = planet_pos
                     if len(choices) == 1:
                         self.misc_target_choice = choices[0]
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             "Only one keyword: skipping asking which one to take."
                         )
                     else:
@@ -901,7 +901,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.choice_context = "Keyword copied from Brood Chamber"
                     self.chosen_first_card = True
                 else:
-                    await self.game_sockets[0].receive_game_update(
+                    await self.send_update_message(
                         "Target has no keywords to copy."
                     )
         else:
@@ -926,7 +926,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                         if self.misc_target_choice == "Area Effect":
                             self.misc_target_choice += " (" + str(self.stored_area_effect_value) + ")"
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             name + " gained " + self.misc_target_choice + "."
                         )
                         self.mode = "Normal"
@@ -967,13 +967,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -1012,13 +1012,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -1055,10 +1055,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -1074,7 +1074,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_receiving_damage.get_number() == primary_player.get_number():
                     if int(game_update_string[3]) == self.position_of_actioned_card[1]:
                         hitting_self = True
-                        await self.game_sockets[0].receive_game_update("Dont hit yourself")
+                        await self.send_update_messagee("Dont hit yourself")
                 if not hitting_self:
                     player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2)
                     player_receiving_damage.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -1104,13 +1104,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy events.")
+                await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Some sort of interrupt may be used.")
+                await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
@@ -1194,12 +1194,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if player_owning_card.name_player == secondary_player.name_player:
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
-                await self.game_sockets[0].receive_game_update("Immune to enemy card abilities.")
+                await self.send_update_message("Immune to enemy card abilities.")
         if can_continue:
             player_receiving_buff.increase_attack_of_unit_at_pos(int(game_update_string[2]),
                                                                  int(game_update_string[3]), 2,
                                                                  expiration="NEXT")
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "Catachan Outpost used on " + player_receiving_buff.cards_in_play[int(game_update_string[2]) + 1]
                 [int(game_update_string[3])].get_name() + ", located at planet " + game_update_string[2] +
                 ", position " + game_update_string[3])

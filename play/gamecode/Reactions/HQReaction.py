@@ -18,8 +18,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     self.choices_available = ["Yes", "No"]
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Use Nullify?"
-                    await self.game_sockets[0].receive_game_update(secondary_player.name_player +
-                                                                   " counter nullify offered.")
+                    await self.send_update_message(secondary_player.name_player +
+                                                   " counter nullify offered.")
                 else:
                     await self.complete_nullify()
                 self.delete_reaction()
@@ -55,10 +55,10 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     card = primary_player.get_top_card_deck()
                     if card is not None:
                         if card.get_is_unit() and card.get_faction() == "Chaos":
-                            await self.game_sockets[0].receive_game_update("Card is drawn")
+                            await self.send_update_message("Card is drawn")
                             primary_player.draw_card()
                         else:
-                            await self.game_sockets[0].receive_game_update("Card is not drawn")
+                            await self.send_update_message("Card is not drawn")
                     more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
                     if not more:
                         self.delete_reaction()

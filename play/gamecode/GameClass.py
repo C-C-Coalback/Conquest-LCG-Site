@@ -235,6 +235,10 @@ class Game:
         self.name_player_using_nullify = ""
         self.name_player_using_backlash = ""
 
+    async def send_update_message(self, message):
+        if self.game_sockets:
+            await self.game_sockets[0].receive_game_update(message)
+
     def reset_action_data(self):
         self.mode = "Normal"
         self.action_chosen = ""
@@ -319,7 +323,7 @@ class Game:
             card_string = "GAME_INFO/SEARCH//Nothing here"
         if card_string != self.last_search_string or force:
             self.last_search_string = card_string
-            await self.game_sockets[0].receive_game_update(card_string)
+            await self.send_update_message(card_string)
 
     async def send_info_box(self, force=False):
         info_string = "GAME_INFO/INFO_BOX/"
@@ -424,7 +428,7 @@ class Game:
         else:
             info_string += "??????/"
         if self.last_info_box_string != info_string or force:
-            await self.game_sockets[0].receive_game_update(info_string)
+            await self.send_update_message(info_string)
             self.last_info_box_string = info_string
 
     async def send_planet_array(self, force=False):
@@ -465,7 +469,7 @@ class Game:
                 planet_string += "/"
         if planet_string != self.saved_planet_string or force:
             self.saved_planet_string = planet_string
-            await self.game_sockets[0].receive_game_update(planet_string)
+            await self.send_update_message(planet_string)
 
     async def update_game_event_applying_discounts(self, name, game_update_string):
         if self.card_to_deploy is not None:
@@ -512,7 +516,7 @@ class Game:
                             )
                             if discount_received > 0:
                                 if secondary_player.nullify_check() and self.nullify_enabled:
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         player.name_player + " wants to play Bigga Is Betta; "
                                                              "Nullify window offered.")
                                     self.choices_available = ["Yes", "No"]
@@ -575,9 +579,9 @@ class Game:
                         self.mode = self.stored_mode
                         self.player_with_action = ""
                         print("Canceled special action")
-                        await self.game_sockets[0].receive_game_update(name + " canceled their action request")
+                        await self.send_update_message(name + " canceled their action request")
                     else:
-                        await self.game_sockets[0].receive_game_update("Too far in; action must be concluded now")
+                        await self.send_update_message("Too far in; action must be concluded now")
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetActions.update_game_event_action_planet(self, name, game_update_string)
@@ -873,7 +877,7 @@ class Game:
             self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
         else:
             await self.change_phase("HEADQUARTERS")
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "Window provided for reactions and actions during HQ phase."
             )
         self.damage_from_atrox = False
@@ -932,7 +936,7 @@ class Game:
                 self.choices_available = []
                 self.choice_context = ""
                 self.name_player_making_choices = ""
-                await self.game_sockets[0].receive_game_update("No Mercy window offered")
+                await self.send_update_message("No Mercy window offered")
                 self.effects_waiting_on_resolution.append("No Mercy")
                 self.player_resolving_effect.append(self.first_player_nullified)
             elif self.nullify_context == "Fall Back":
@@ -1100,7 +1104,7 @@ class Game:
             if secondary_player.nullify_check() and may_nullify:
                 self.nullifying_backlash = True
                 self.name_player_using_backlash = primary_player.name_player
-                await self.game_sockets[0].receive_game_update(
+                await self.send_update_message(
                     primary_player.name_player + " wants to play Backlash; "
                                                  "Nullify window offered.")
                 self.choices_available = ["Yes", "No"]
@@ -1317,7 +1321,7 @@ class Game:
                                     self.max_cost_of_searched_card = None
                                     self.no_restrictions_on_chosen_card = True
                                 else:
-                                    await self.game_sockets[0].receive_game_update("Too few cards in deck for search")
+                                    await self.send_update_message("Too few cards in deck for search")
                                     await self.resolve_battle_conclusion(name, game_update_string)
                             elif self.battle_ability_to_resolve == "Tarrus":
                                 winner_count = winner.count_units_in_play_all()
@@ -1361,21 +1365,21 @@ class Game:
                         if game_update_string[1] == "0":
                             primary_player.mulligan_done = True
                             primary_player.mulligan_hand()
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 self.name_player_making_choices + " mulligans their opening hand.")
                         elif game_update_string[1] == "1":
                             primary_player.mulligan_done = True
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 self.name_player_making_choices + " declines to mulligan their opening hand.")
                         if primary_player.mulligan_done and not secondary_player.mulligan_done:
                             self.name_player_making_choices = self.name_2
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 self.name_player_making_choices + " may mulligan their hand.")
                         if primary_player.mulligan_done and secondary_player.mulligan_done:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Both players setup, good luck and have fun!")
                             if self.p1.warlord_faction == "Necrons":
                                 await self.create_necrons_wheel_choice(self.p1)
@@ -1386,7 +1390,7 @@ class Game:
                         primary_player.chosen_enslaved_faction = True
                         primary_player.enslaved_faction = chosen_faction
                         self.resolving_search_box = False
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             primary_player.name_player + " enslaved the " + chosen_faction + "!"
                         )
                         if not secondary_player.chosen_enslaved_faction and \
@@ -1440,7 +1444,7 @@ class Game:
                                         secondary_player.discard[i] not in self.choices_available:
                                     self.choices_available.append(secondary_player.discard[i])
                             if not self.choices_available:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No Valid Targets for Dark Possession!"
                                 )
                                 self.choices_available = []
@@ -1477,7 +1481,7 @@ class Game:
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     primary_player.name_player + " wants to play No Mercy; "
                                                                  "Nullify window offered.")
                                 self.choices_available = ["Yes", "No"]
@@ -1557,18 +1561,18 @@ class Game:
                                 i -= 1
                         if found_card:
                             if not can_play_card:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Can not play the topmost unit in that discard pile!"
                                 )
                                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                             self.position_of_actioned_card[1])
                                 self.action_cleanup()
                             else:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Anrakyr is playing: " + name
                                 )
                         else:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Did not find a valid card!"
                             )
                             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
@@ -1658,17 +1662,17 @@ class Game:
                         primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
                         if game_update_string[1] == "0":
                             primary_player.increase_eor_value("Area Effect", 1, planet_pos, unit_pos)
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Autarch Celachia gained Area Effect (1)."
                             )
                         if game_update_string[1] == "1":
                             primary_player.increase_eor_value("Armorbane", 1, planet_pos, unit_pos)
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Autarch Celachia gained Armorbane."
                             )
                         if game_update_string[1] == "2":
                             primary_player.increase_eor_value("Mobile", 1, planet_pos, unit_pos)
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Autarch Celachia gained Mobile."
                             )
                         self.position_of_actioned_card = (-1, -1)
@@ -1710,14 +1714,14 @@ class Game:
                             self.choices_available = []
                             self.choice_context = "Target Shrine of Warpflame:"
                             print("\n---IN DISCARD---\n")
-                            await self.game_sockets[0].receive_game_update("Shrine of Warpflame triggered")
+                            await self.send_update_message("Shrine of Warpflame triggered")
                             print(primary_player.discard)
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array)
                                 if card.check_for_a_trait("Tzeentch"):
                                     self.choices_available.append(card.get_name())
                             if not self.choices_available:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No valid targets for Shrine of Warpflame")
                                 self.resolving_search_box = False
                         elif game_update_string[1] == "1":
@@ -1740,7 +1744,7 @@ class Game:
                                 primary_player.headquarters[unit].armorbane_eop = True
                                 primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
                                 name = primary_player.headquarters[unit].get_name()
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     name + " gained armorbane from Heavy Venom Cannon!"
                                 )
                             else:
@@ -1748,7 +1752,7 @@ class Game:
                                 primary_player.cards_in_play[planet + 1][unit].get_attachments()[
                                     att].set_once_per_phase_used(True)
                                 name = primary_player.cards_in_play[planet + 1][unit].get_name()
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     name + " gained armorbane from Heavy Venom Cannon!"
                                 )
                         elif game_update_string[1] == "1":
@@ -1756,7 +1760,7 @@ class Game:
                                 primary_player.headquarters[unit].area_effect_eop += 2
                                 primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
                                 name = primary_player.headquarters[unit].get_name()
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     name + " gained area effect (2) from Heavy Venom Cannon!"
                                 )
                             else:
@@ -1764,7 +1768,7 @@ class Game:
                                 primary_player.cards_in_play[planet + 1][unit].get_attachments()[att]. \
                                     set_once_per_phase_used(True)
                                 name = primary_player.cards_in_play[planet + 1][unit].get_name()
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     name + " gained area effect (2) from Heavy Venom Cannon!"
                                 )
                         self.player_with_action = ""
@@ -1773,7 +1777,7 @@ class Game:
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     primary_player.name_player + " wants to play Fall Back; "
                                                                  "Nullify window offered.")
                                 self.choices_available = ["Yes", "No"]
@@ -1834,7 +1838,7 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             if secondary_player.nullify_check():
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     primary_player.name_player + " wants to play The Fury of Sicarius; "
                                                                  "Nullify window offered.")
                                 self.choices_available = ["Yes", "No"]
@@ -1878,7 +1882,7 @@ class Game:
                             self.name_player_making_choices = ""
                             if primary_player.cards[self.pos_shield_card] == "Indomitable":
                                 if secondary_player.nullify_check():
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         primary_player.name_player + " wants to play Indomitable; "
                                                                      "Nullify window offered.")
                                     self.choices_available = ["Yes", "No"]
@@ -1893,7 +1897,7 @@ class Game:
                                     await self.resolve_indomitable(primary_player, secondary_player)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
                                 if secondary_player.nullify_check():
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         primary_player.name_player + " wants to play Glorious Intervention; "
                                                                      "Nullify window offered.")
                                     self.choices_available = ["Yes", "No"]
@@ -1920,7 +1924,7 @@ class Game:
                             self.resolving_search_box = False
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                             primary_player.aiming_reticle_coords_hand = None
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "No valid targets for Awake the Sleepers"
                             )
                             primary_player.shuffle_deck()
@@ -1958,7 +1962,7 @@ class Game:
                             self.location_hand_attachment_shadowsun = -1
                             self.effects_waiting_on_resolution.append("Commander Shadowsun")
                             self.player_resolving_effect.append(name)
-                            await self.game_sockets[0].receive_game_update("Choose card in hand")
+                            await self.send_update_message("Choose card in hand")
                         else:
                             self.shadowsun_chose_hand = False
                             self.name_attachment_discard_shadowsun = ""
@@ -1967,19 +1971,19 @@ class Game:
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
-                                await self.game_sockets[0].receive_game_update("No valid cards in discard")
+                                await self.send_update_message("No valid cards in discard")
                                 self.resolving_search_box = False
                             else:
-                                await self.game_sockets[0].receive_game_update("Choose card in discard")
+                                await self.send_update_message("Choose card in discard")
                     elif self.choice_context == "Shadowsun attachment from discard:":
                         self.name_attachment_discard_shadowsun = self.choices_available[int(game_update_string[1])]
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             "Selected a " + self.name_attachment_discard_shadowsun)
                         self.choices_available = []
                         self.choice_context = ""
@@ -2009,7 +2013,7 @@ class Game:
                             self.max_cost_of_searched_card = None
                             self.no_restrictions_on_chosen_card = True
                         else:
-                            await self.game_sockets[0].receive_game_update("Too few cards in deck")
+                            await self.send_update_message("Too few cards in deck")
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if self.yvarn_active:
@@ -2017,7 +2021,7 @@ class Game:
                 if not self.p1_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.game_sockets[0].receive_game_update(self.name_1 + " declines y'varn.")
+                            await self.send_update_message(self.name_1 + " declines y'varn.")
                             self.p1_triggered_yvarn = True
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
@@ -2029,7 +2033,7 @@ class Game:
                 if not self.p2_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.game_sockets[0].receive_game_update(self.name_2 + " declines y'varn.")
+                            await self.send_update_message(self.name_2 + " declines y'varn.")
                             self.p2_triggered_yvarn = True
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
@@ -2058,7 +2062,7 @@ class Game:
                                     possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
                                     if possible_interrupts:
                                         can_continue = False
-                                        await self.game_sockets[0].receive_game_update(
+                                        await self.send_update_message(
                                             "Some sort of interrupt may be used.")
                                         self.choices_available = possible_interrupts
                                         self.choices_available.insert(0, "No Interrupt")
@@ -2083,7 +2087,7 @@ class Game:
                                     possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
                                     if possible_interrupts:
                                         can_continue = False
-                                        await self.game_sockets[0].receive_game_update(
+                                        await self.send_update_message(
                                             "Some sort of interrupt may be used.")
                                         self.choices_available = possible_interrupts
                                         self.choices_available.insert(0, "No Interrupt")
@@ -2116,7 +2120,7 @@ class Game:
                                 possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
                                 if possible_interrupts:
                                     can_continue = False
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         "Some sort of interrupt may be used.")
                                     self.choices_available = possible_interrupts
                                     self.choices_available.insert(0, "No Interrupt")
@@ -2140,7 +2144,7 @@ class Game:
                                 possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
                                 if possible_interrupts:
                                     can_continue = False
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         "Some sort of interrupt may be used.")
                                     self.choices_available = possible_interrupts
                                     self.choices_available.insert(0, "No Interrupt")
@@ -2166,7 +2170,7 @@ class Game:
                                 possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
                                 if possible_interrupts:
                                     can_continue = False
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         "Some sort of interrupt may be used.")
                                     self.choices_available = possible_interrupts
                                     self.choices_available.insert(0, "No Interrupt")
@@ -2189,7 +2193,7 @@ class Game:
                                 possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
                                 if possible_interrupts:
                                     can_continue = False
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         "Some sort of interrupt may be used.")
                                     self.choices_available = possible_interrupts
                                     self.choices_available.insert(0, "No Interrupt")
@@ -2243,7 +2247,7 @@ class Game:
                             if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
                                     .get_card_type() != "Warlord" and \
                                     player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                                            .get_card_type() != "Support":
+                                    .get_card_type() != "Support":
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
@@ -2452,19 +2456,19 @@ class Game:
                     self.player_who_resolves_reaction.append(self.name_2)
                     self.positions_of_unit_triggering_reaction.append((2, -1, -1))
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_2 + "; sufficient icons on captured planets."
                                                "----GAME END----"
             )
         elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_1 + "; sufficient icons on captured planets."
                                                "----GAME END----"
             )
         elif self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "----GAME END----"
                 "Both warlords just died. I guess it is a draw?"
                 "----GAME END----"
@@ -2581,7 +2585,7 @@ class Game:
         hand_disc = player.search_hand_for_discounts(card.get_faction())
         self.available_discounts += hand_disc
         if hand_disc > 0:
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 "Bigga Is Betta detected, may be used as a discount."
             )
         temp_av_disc, _ = player. \
@@ -2739,7 +2743,7 @@ class Game:
                                             if primary_player.cards_in_play[planet_pos + 1][
                                                 unit_pos].get_ability() == "Reanimating Warriors" \
                                                     and not primary_player.cards_in_play[planet_pos + 1][
-                                                unit_pos].once_per_phase_used:
+                                                    unit_pos].once_per_phase_used:
                                                 self.effects_waiting_on_resolution.append("Reanimating Warriors")
                                                 self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
@@ -2794,7 +2798,7 @@ class Game:
                                             self.on_kill_effects_of_attacker.append([])
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
-                                await self.game_sockets[0].receive_game_update("This damage can not be shielded!")
+                                await self.send_update_message("This damage can not be shielded!")
                 elif game_update_string[0] == "HQ":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
@@ -2910,7 +2914,7 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.reactions_needing_resolving[0] == "Power from Pain":
-                        await self.game_sockets[0].receive_game_update("No sacrifice for Power from Pain")
+                        await self.send_update_message("No sacrifice for Power from Pain")
                     if self.reactions_needing_resolving[0] == "Cato's Stronghold":
                         self.cato_stronghold_activated = False
                         self.allowed_planets_cato_stronghold = []
@@ -2962,11 +2966,11 @@ class Game:
                                 if not self.chosen_first_card:
                                     if primary_player.attachments_at_planet[planet_pos][attachment_pos].get_ability() \
                                             == "Defense Battery":
-                                        if primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                        if primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                 defense_battery_activated:
-                                            if primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                            if primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     get_ready():
-                                                primary_player.attachments_at_planet[planet_pos][attachment_pos].\
+                                                primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     exhaust_card()
                                                 self.chosen_first_card = True
                                                 primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
@@ -2985,7 +2989,7 @@ class Game:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         primary_player.mobile_resolved = True
                         self.unit_to_move_position = [-1, -1]
-                        await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+                        await self.send_update_message(self.p1.name_player + " finished mobile")
 
                 elif len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -3014,7 +3018,7 @@ class Game:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         secondary_player.mobile_resolved = True
                         self.unit_to_move_position = [-1, -1]
-                        await self.game_sockets[0].receive_game_update(self.p1.name_player + " finished mobile")
+                        await self.send_update_message(self.p1.name_player + " finished mobile")
                 elif len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
                         planet_pos = int(game_update_string[1])
@@ -3037,7 +3041,7 @@ class Game:
                             secondary_player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1], "blue")
         if primary_player.mobile_resolved and secondary_player.mobile_resolved:
-            await self.game_sockets[0].receive_game_update("mobile complete")
+            await self.send_update_message("mobile complete")
             self.check_battle(self.round_number)
             self.last_planet_checked_for_battle = self.round_number
             self.begin_combat_round()
@@ -3057,7 +3061,7 @@ class Game:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         player.indirect_damage_applied = 999
-                        await self.game_sockets[0].receive_game_update(
+                        await self.send_update_message(
                             player.name_player + " stops placing indirect damage"
                         )
                 if self.location_of_indirect == "HQ" or self.location_of_indirect == "ALL":
@@ -3122,7 +3126,8 @@ class Game:
                                 print("in play 3")
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
-                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
+                                        "Reanimating Warriors" \
                                         and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                         .once_per_phase_used:
                                     if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
@@ -3149,7 +3154,7 @@ class Game:
                                     hand_pos = int(game_update_string[2])
                                     card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
                                     if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                         self.location_hand_attachment_shadowsun = hand_pos
                                         primary_player.aiming_reticle_coords_hand = hand_pos
                                         primary_player.aiming_reticle_color = "blue"
@@ -3181,7 +3186,7 @@ class Game:
                                     del self.effects_waiting_on_resolution[0]
                                     del self.player_resolving_effect[0]
                                 else:
-                                    await self.game_sockets[0].receive_game_update("Invalid target")
+                                    await self.send_update_message("Invalid target")
                 else:
                     if len(game_update_string) == 4:
                         if game_update_string[0] == "IN_PLAY":
@@ -3213,7 +3218,7 @@ class Game:
                                     del self.effects_waiting_on_resolution[0]
                                     del self.player_resolving_effect[0]
                                 else:
-                                    await self.game_sockets[0].receive_game_update("Invalid target")
+                                    await self.send_update_message("Invalid target")
             elif self.effects_waiting_on_resolution[0] == "Glorious Intervention":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -3229,7 +3234,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                        .check_for_a_trait("Soldier"):
+                                                .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3436,14 +3441,14 @@ class Game:
                                                             1, is_reassign=True, can_shield=False)
                                 self.body_guard_positions.remove(selected_unit)
                                 self.damage_bodyguard -= 1
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Resolved a Bodyguard. Damage left to resolve: " + str(self.damage_bodyguard)
                                 )
                                 if self.damage_bodyguard <= 0:
                                     self.manual_bodyguard_resolution = False
                                     self.body_guard_positions = []
                                     self.name_player_manual_bodyguard = ""
-                                    await self.game_sockets[0].receive_game_update(
+                                    await self.send_update_message(
                                         "Manual Bodyguard resolution completed."
                                     )
                                     other_play.reset_all_aiming_reticles_play_hq()
@@ -3471,8 +3476,8 @@ class Game:
                                 self.choices_available = ["Yes", "No"]
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Use Nullify?"
-                                await self.game_sockets[0].receive_game_update(secondary_player.name_player +
-                                                                               " counter nullify offered.")
+                                await self.send_update_message(secondary_player.name_player +
+                                                               " counter nullify offered.")
                             else:
                                 await self.complete_nullify()
             elif len(game_update_string) == 4:
@@ -3486,8 +3491,8 @@ class Game:
                                 self.choices_available = ["Yes", "No"]
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Use Nullify?"
-                                await self.game_sockets[0].receive_game_update(secondary_player.name_player +
-                                                                               " counter nullify offered.")
+                                await self.send_update_message(secondary_player.name_player +
+                                                               " counter nullify offered.")
                             else:
                                 await self.complete_nullify()
 
@@ -3496,12 +3501,12 @@ class Game:
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.name_1:
                     self.p1.consumption_sacs_list = [True, True, True, True, True, True, True]
-                    await self.game_sockets[0].receive_game_update(
+                    await self.send_update_message(
                         self.name_2 + " stops sacrificing units for consumption."
                     )
                 elif name == self.name_2:
                     self.p2.consumption_sacs_list = [True, True, True, True, True, True, True]
-                    await self.game_sockets[0].receive_game_update(
+                    await self.send_update_message(
                         self.name_1 + " stops sacrificing units for consumption."
                     )
         if len(game_update_string) == 4:
@@ -3516,7 +3521,7 @@ class Game:
         if self.p1.consumption_sacs_list == [True, True, True, True, True, True, True] and \
                 self.p2.consumption_sacs_list == [True, True, True, True, True, True, True]:
             self.resolving_consumption = False
-            await self.game_sockets[0].receive_game_update("Consumption Finished")
+            await self.send_update_message("Consumption Finished")
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
@@ -3533,7 +3538,7 @@ class Game:
         resolved_subroutine = False
         print(game_update_string)
         if self.phase == "SETUP":
-            await self.game_sockets[0].receive_game_update("Buttons can't be pressed in setup")
+            await self.send_update_message("Buttons can't be pressed in setup")
         elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
             if self.choosing_unit_for_nullify:
@@ -3746,7 +3751,7 @@ class Game:
             self.choice_context = "Remove Infestation?"
             self.asking_if_remove_infested_planet = True
             self.name_player_making_choices = winner.name_player
-            await self.game_sockets[0].receive_game_update(
+            await self.send_update_message(
                 winner.name_player + " has the right to clear infestation from " + planet_name)
         else:
             self.already_asked_remove_infestation = False
@@ -3758,8 +3763,8 @@ class Game:
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = winner.name_player
-            await self.game_sockets[0].receive_game_update(winner.name_player + " has the right to use"
-                                                                                " the battle ability of " + planet_name)
+            await self.send_update_message(winner.name_player + " has the right to use"
+                                                                " the battle ability of " + planet_name)
             if not self.need_to_resolve_battle_ability:
                 if self.round_number == self.last_planet_checked_for_battle:
                     winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)

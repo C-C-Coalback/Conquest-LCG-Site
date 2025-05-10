@@ -27,7 +27,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                            await self.game_sockets[0].receive_game_update(ability + " activated")
+                            await self.send_update_message(ability + " activated")
                 elif ability == "The Staff of Command":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
@@ -45,7 +45,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                                     last_el = len(primary_player.headquarters) - 1
                                     primary_player.headquarters[last_el].mind_shackle_scarab_effect = True
                             else:
-                                self.game_sockets[0].receive_game_update(
+                                await self.game_sockets[0].receive_game_update(
                                     "Mind Shackle Scarab on own unit not supported"
                                 )
                             self.action_cleanup()
@@ -71,7 +71,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()
             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-            await self.game_sockets[0].receive_game_update(card_chosen.get_name() + " chosen")
+            await self.send_update_message(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
     elif self.action_chosen == "Subdual":

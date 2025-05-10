@@ -92,7 +92,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
             if primary_player.resources < 1:
-                await self.game_sockets[0].receive_game_update("Insufficient resources")
+                await self.send_update_message("Insufficient resources")
                 self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Holy Fusillade":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -194,7 +194,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.p1.cards_in_play[planet_pos + 1][unit_pos].can_retreat = False
             elif num == 2:
                 self.p2.cards_in_play[planet_pos + 1][unit_pos].can_retreat = False
-            await self.game_sockets[0].receive_game_update("Defender can no longer retreat!")
+            await self.send_update_message("Defender can no longer retreat!")
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Synaptic Link":
             primary_player.draw_card()
@@ -203,7 +203,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if (secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and not
-                secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
+                        secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
                         secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
@@ -240,7 +240,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.delete_reaction()
             else:
-                await self.game_sockets[0].receive_game_update("Resolve Toxic venomthrope gains")
+                await self.send_update_message("Resolve Toxic venomthrope gains")
                 self.resolving_search_box = True
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.choices_available = ["Card", "Resource"]
@@ -261,7 +261,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.resolving_search_box = True
             else:
                 self.choices_available = []
-                await self.game_sockets[0].receive_game_update(
+                await self.send_update_message(
                     "No valid targets for Doom Scythe Invader!"
                 )
                 self.delete_reaction()
@@ -270,8 +270,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, self.great_scything_talons_value,
                                                           expiration="NEXT")
             self.delete_reaction()
-            await self.game_sockets[0].receive_game_update("Old One Eye attack increased by " +
-                                                           str(self.great_scything_talons_value))
+            await self.send_update_message("Old One Eye attack increased by " +
+                                           str(self.great_scything_talons_value))
         elif self.reactions_needing_resolving[0] == "Old One Eye":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
@@ -420,7 +420,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choice_context = "Choose target for Canoptek Scarab Swarm:"
                 self.resolving_search_box = True
             else:
-                await self.game_sockets[0].receive_game_update(
+                await self.send_update_message(
                     "No valid targets for Canoptek Scarab Swarm!"
                 )
                 self.delete_reaction()
@@ -443,7 +443,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Commander Shadowsun":
-            await self.game_sockets[0].receive_game_update("Resolve shadowsun")
+            await self.send_update_message("Resolve shadowsun")
             self.resolving_search_box = True
             self.choices_available = ["Hand", "Discard"]
             self.choice_context = "Shadowsun plays attachment from hand or discard?"

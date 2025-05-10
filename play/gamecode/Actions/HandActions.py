@@ -26,8 +26,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 elif primary_player.spend_resources(card.get_cost()):
                     if may_nullify and secondary_player.nullify_check():
                         primary_player.add_resources(card.get_cost())
-                        await self.game_sockets[0].receive_game_update(primary_player.name_player + " wants to play " +
-                                                                       ability + "; Nullify window offered.")
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       ability + "; Nullify window offered.")
                         self.choices_available = ["Yes", "No"]
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Use Nullify?"
@@ -125,12 +125,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if not primary_player.harbinger_of_eternity_active:
                                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                                 primary_player.aiming_reticle_coords_hand = None
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "No valid targets for Awake the Sleepers"
                             )
                             self.action_cleanup()
                         else:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Press the pass button to stop shuffling any more cards in."
                             )
                     elif ability == "Drudgery":
@@ -153,7 +153,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.resolving_search_box = False
                                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                                 primary_player.aiming_reticle_coords_hand = None
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No valid targets for Drudgery"
                                 )
                                 self.action_cleanup()
@@ -201,12 +201,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.name_player_making_choices = primary_player.name_player
                             else:
                                 primary_player.add_resources(2)
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "No valid targets in discard for spore burst."
                                 )
                         else:
                             primary_player.add_resources(2)
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "No valid planets for spore burst."
                             )
                     elif ability == "Ferocious Strength":
@@ -256,7 +256,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.no_restrictions_on_chosen_card = False
                         else:
                             primary_player.add_resources(card.get_cost())
-                            await self.game_sockets[0].receive_game_update("No battle taking place")
+                            await self.send_update_message("No battle taking place")
                     elif ability == "Squadron Redeployment":
                         self.action_chosen = "Squadron Redeployment"
                         primary_player.aiming_reticle_color = "blue"
@@ -349,8 +349,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     await primary_player.dark_eldar_event_played()
                     else:
                         primary_player.add_resources(card.get_cost())
-                        await self.game_sockets[0].receive_game_update(card.get_name() + " not "
-                                                                                         "implemented")
+                        await self.send_update_message(card.get_name() + " not "
+                                                                         "implemented")
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -364,7 +364,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
         else:
-            await self.game_sockets[0].receive_game_update("already chosen a valid attachment for ambush platform")
+            await self.send_update_message("already chosen a valid attachment for ambush platform")
     elif self.action_chosen == "Canoptek Spyder":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
@@ -419,4 +419,4 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
         else:
-            await self.game_sockets[0].receive_game_update("already chosen a valid unit for infernal gateway")
+            await self.send_update_message("already chosen a valid unit for infernal gateway")

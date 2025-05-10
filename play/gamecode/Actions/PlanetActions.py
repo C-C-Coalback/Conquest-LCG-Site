@@ -134,7 +134,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player = self.p2
             secondary_player = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is None:
-            await self.game_sockets[0].receive_game_update("Choose a valid unit first")
+            await self.send_update_message("Choose a valid unit first")
         else:
             pos_hand = primary_player.aiming_reticle_coords_hand_2
             pos_planet = int(game_update_string[1])
@@ -397,7 +397,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 i = -1
             i = i - 1
         if not card_found:
-            await self.game_sockets[0].receive_game_update("No valid unit in discard")
+            await self.send_update_message("No valid unit in discard")
     elif self.action_chosen == "Snotling Attack":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1

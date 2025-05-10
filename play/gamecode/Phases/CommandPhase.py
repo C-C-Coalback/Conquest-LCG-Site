@@ -14,48 +14,48 @@ async def update_game_event_command_section(self, name, game_update_string):
                     if not self.p1.committed_warlord:
                         self.p1.warlord_commit_location = int(game_update_string[1])
                         self.p1.committed_warlord = True
-                        await self.game_sockets[0].receive_game_update(self.name_1 + " has chosen a planet to commit "
-                                                                                     "their warlord.")
+                        await self.send_update_message(self.name_1 + " has chosen a planet to commit "
+                                                                     "their warlord.")
                         if self.p1.search_synapse_in_hq():
-                            await self.game_sockets[0].receive_game_update(self.name_1 + " has a synapse; please"
-                                                                                         " commit this as well")
+                            await self.send_update_message(self.name_1 + " has a synapse; please"
+                                                                         " commit this as well")
                             self.p1.committed_synapse = False
                             self.p1.synapse_commit_location = -1
                     elif not self.p1.committed_synapse:
                         self.p1.synapse_commit_location = int(game_update_string[1])
                         self.p1.committed_synapse = True
-                        if self.p1.synapse_name == "Savage Warrior Prime" and\
+                        if self.p1.synapse_name == "Savage Warrior Prime" and \
                                 self.p1.warlord_commit_location == self.p1.synapse_commit_location:
                             self.p1.synapse_commit_location = -1
                             self.p1.committed_synapse = False
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
                         else:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 self.name_1 + " has chosen a planet to commit their synapse.")
 
                 else:
                     if not self.p2.committed_warlord:
                         self.p2.warlord_commit_location = int(game_update_string[1])
                         self.p2.committed_warlord = True
-                        await self.game_sockets[0].receive_game_update(self.name_2 + " has chosen a planet to commit "
-                                                                                     "their warlord.")
+                        await self.send_update_message(self.name_2 + " has chosen a planet to commit "
+                                                                     "their warlord.")
                         if self.p2.search_synapse_in_hq():
-                            await self.game_sockets[0].receive_game_update(self.name_2 + " has a synapse; please"
-                                                                                         " commit this as well")
+                            await self.send_update_message(self.name_2 + " has a synapse; please"
+                                                                         " commit this as well")
                             self.p2.committed_synapse = False
                             self.p2.synapse_commit_location = -1
                     elif not self.p2.committed_synapse:
                         self.p2.synapse_commit_location = int(game_update_string[1])
                         self.p2.committed_synapse = True
-                        if self.p2.synapse_name == "Savage Warrior Prime" and\
+                        if self.p2.synapse_name == "Savage Warrior Prime" and \
                                 self.p2.warlord_commit_location == self.p2.synapse_commit_location:
                             self.p2.synapse_commit_location = -1
                             self.p2.committed_synapse = False
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
                         else:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 self.name_2 + " has chosen a planet to commit their synapse.")
                 if self.p1.committed_warlord and self.p2.committed_warlord and \
                         self.p1.committed_synapse and self.p2.committed_synapse:
@@ -69,8 +69,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.has_passed = False
                     self.committing_warlords = False
                     self.before_command_struggle = True
-                    await self.game_sockets[0].receive_game_update("Both players are given a chance to resolve "
-                                                                   "cards/reactions before the command struggle.")
+                    await self.send_update_message("Both players are given a chance to resolve "
+                                                   "cards/reactions before the command struggle.")
     elif self.before_command_struggle:
         print("Before command struggle")
         if len(game_update_string) == 1:
@@ -91,7 +91,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     hand_pos = int(game_update_string[2])
                     if primary_player.cards[hand_pos] == "Foresight":
                         if secondary_player.nullify_check() and self.nullify_enabled:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 primary_player.name_player + " wants to play Foresight; "
                                                              "Nullify window offered.")
                             self.choices_available = ["Yes", "No"]
@@ -113,7 +113,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif primary_player.cards[hand_pos] == "Blackmane's Hunt":
                         if secondary_player.nullify_check() and self.nullify_enabled:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 primary_player.name_player + " wants to play Blackmane's Hunt; "
                                                              "Nullify window offered.")
                             self.choices_available = ["Yes", "No"]
@@ -135,7 +135,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif primary_player.cards[hand_pos] == "Superiority":
                         if secondary_player.nullify_check() and self.nullify_enabled:
-                            await self.game_sockets[0].receive_game_update(
+                            await self.send_update_message(
                                 primary_player.name_player + " wants to play Superiority; "
                                                              "Nullify window offered.")
                             self.choices_available = ["Yes", "No"]
@@ -167,7 +167,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.stored_mode = self.mode
                     self.mode = "ACTION"
                     self.player_with_action = name
-                    await self.game_sockets[0].receive_game_update(name + " wants to take an action.")
+                    await self.send_update_message(name + " wants to take an action.")
                     if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
@@ -184,7 +184,7 @@ async def update_game_event_command_section(self, name, game_update_string):
             self.after_command_struggle = True
             self.p1.has_passed = False
             self.p2.has_passed = False
-            await self.game_sockets[0].receive_game_update("Window given for actions after command struggle.")
+            await self.send_update_message("Window given for actions after command struggle.")
         elif self.after_command_struggle:
             self.before_command_struggle = False
             self.after_command_struggle = False
@@ -288,4 +288,3 @@ def resolve_command_struggle_at_planet(self, planet_id):
                         self.create_reaction("Noxious Fleshborer", self.name_2, ("2", planet_id, i))
         return ret_val
     return None
-
