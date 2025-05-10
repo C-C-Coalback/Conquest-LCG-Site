@@ -153,6 +153,16 @@ def astra_militarum_cards_init():
                                                 "Reaction: After this unit enters play, ready an army "
                                                 "unit you control at this planet.", "Soldier.",
                              3, faction, "Common", 2, 2, 1, False, action_in_hand=True,
-                             allowed_phases_in_hand="COMBAT", ambush=True)
+                             allowed_phases_in_hand="COMBAT", ambush=True),
+        CardClasses.ArmyCard("Interrogator Acolyte", "Interrupt: When this unit leaves play, draw 2 cards.",
+                             "Soldier. Inquisitor.", 3, faction, "Loyal", 2, 2, 1, False),
+        CardClasses.EventCard("Muster the Guard", "Deploy Action: Exhaust your warlord to reduce the cost of "
+                                                  "each Astra Militarum unit you deploy this phase by 1.",
+                              "Tactic. Maneuver.", 0, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.EventCard("Noble Deed", "Action: Sacrifice an Astra Militarum unit to deal damage equal to its "
+                                            "printed ATK value to a target enemy army unit at the same planet.",
+                              "Tactic.", 1, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return astra_militarum_cards_array

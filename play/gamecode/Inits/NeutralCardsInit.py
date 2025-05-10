@@ -43,6 +43,10 @@ def neutral_cards_init():
         CardClasses.SupportCard("STC Fragment", "Limited.\n"
                                                 "Interrupt: When you deploy an Elite unit, exhaust this support "
                                                 "to reduce the cost of that unit by 2.", "Relic.",
-                                1, "Neutral", "Common", True, limited=True, applies_discounts=[True, 2, False])
+                                1, "Neutral", "Common", True, limited=True, applies_discounts=[True, 2, False]),
+        CardClasses.EventCard("Calamity", "HEADQUARTERS ACTION: Return each army unit with printed cost 2 or "
+                                          "lower to its owner's hand.", "Disaster.",
+                              1, "Neutral", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS")
     ]
     return neutral_card_array

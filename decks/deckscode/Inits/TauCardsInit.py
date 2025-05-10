@@ -115,6 +115,22 @@ def tau_cards_init():
                                                   "Combat Action: Exhaust this unit to move an attachment from a unit"
                                                   " you control at this planet to another eligible unit you control.",
                              "Scout. Pilot.", 2, faction, "Common", 1, 3, 1, False, action_in_play=True,
-                             allowed_phases_in_play="COMBAT")
+                             allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Piranha Hunter", "Mobile.\n"
+                                               "No Wargear Attachments.\n"
+                                               "Reaction: After this unit moves from one planet to another, "
+                                               "draw 1 card.", "Vehicle. Speeder.",
+                             3, faction, "Common", 2, 2, 0, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Aun'ui Prelate", "Ambush.\n"
+                                               "FORCED REACTION: After this unit resolves its attack, "
+                                               "move it to your HQ.\n"
+                                               "Reaction: After you deploy this unit, each other Tau unit \n"
+                                               "you control at this planet gets +1 ATK until the end of the phase.",
+                             "Soldier. Ethereal.", 4, faction, "Loyal", 4, 3, 0, False, ambush=True,
+                             action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.SupportCard("Homing Beacon", "Limited.\n"
+                                                 "Reaction: After a unit you control moves to your HQ, "
+                                                 "exhaust this support to gain 1 or draw 1 card.", "Upgrade.",
+                                1, faction, "Common", False, limited=True)
     ]
     return tau_cards_array

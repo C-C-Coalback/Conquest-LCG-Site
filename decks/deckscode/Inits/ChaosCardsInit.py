@@ -127,6 +127,11 @@ def chaos_cards_init():
                                                "Reaction: After this unit moves to a planet, deal X damage to a "
                                                "target enemy army unit at that planet. X is the number of command "
                                                "icons the target unit has.", "Daemon. Slaanesh. Elite.",
-                             5, "Chaos", "Common", 3, 5, 2, False)
+                             5, "Chaos", "Common", 3, 5, 2, False),
+        CardClasses.ArmyCard("Death Guard Infantry", "", "Warrior. Death Guard. Nurgle.",
+                             3, "Chaos", "Common", 2, 4, 1, False),
+        CardClasses.ArmyCard("Heretek Inventor", "FORCED REACTION: After this unit enters play, your opponent may "
+                                                 "move it to a planet of his choice.", "Scholar.",
+                             1, "Chaos", "Common", 3, 3, 1, False)
     ]
     return chaos_card_array

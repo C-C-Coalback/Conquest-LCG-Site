@@ -144,6 +144,24 @@ def space_marines_cards_init():
                                                  "Combat Action: Exhaust this unit to move an army unit you "
                                                  "control at this planet to another planet.", "Scout. Dark Angels.",
                              4, faction, "Common", 2, 3, 1, False, action_in_play=True,
-                             allowed_phases_in_play="COMBAT")
+                             allowed_phases_in_play="COMBAT"),
+        CardClasses.WarlordCard("Ragnar Blackmane", "Reaction: After your warlord commits to a planet with an enemy "
+                                                    "warlord, deal 2 damage to a target enemy unit at that planet.",
+                                "Soldier. Space Wolves.", faction, 2, 7, 2, 5, "Bloodied.", 7, 7,
+                                ["4x Blackmane Sentinel", "1x Frostfang",
+                                 "1x Ragnar's Warcamp", "2x Blackmane's Hunt"]),
+        CardClasses.ArmyCard("Blackmane Sentinel", "Reaction: After your warlord commits to a planet, "
+                                                   "move this unit to that planet.", "Soldier. Space Wolves.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.AttachmentCard("Frostfang", "Attach to a Space Wolves unit.\n"
+                                                "Attached unit gets +2 ATK and +2 HP while it is at a planet with an "
+                                                "enemy warlord.", "Relic. Wargear. Weapon.",
+                                   2, faction, "Signature", 3, True),
+        CardClasses.SupportCard("Ragnar's Warcamp", "Each Space Wolves unit you control at a planet with your "
+                                                    "warlord deals double damage while attacking an enemy warlord.",
+                                "Location.", 3, faction, "Signature", True),
+        CardClasses.EventCard("Blackmane's Hunt", "Reaction: After your warlord commits to a planet, "
+                                                  "commit your warlord to an adjacent planet.",
+                              "Tactic.", 0, faction, "Signature", 1, False)
     ]
     return space_marines_card_array

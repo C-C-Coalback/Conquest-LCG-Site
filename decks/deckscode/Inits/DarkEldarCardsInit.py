@@ -131,6 +131,19 @@ def dark_eldar_cards_init():
                                                      " warlord, this unit gains Armorbane.\n"
                                                      "Forced Interrupt: When this unit is destroyed, "
                                                      "sacrifice another army unit at this planet.", "Warrior.",
-                             2, faction, "Common", 4, 1, 0, False)
+                             2, faction, "Common", 4, 1, 0, False),
+        CardClasses.ArmyCard("Uber Grotesque", "No Wargear Attachments.\n"
+                                               "Reaction: After you play a Torture event "
+                                               "card, this unit gets +3 ATK until the end of the phase. "
+                                               "(Limit once per phase.)", "Creature. Abomination. Elite.",
+                             5, faction, "Common", 3, 5, 1, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Visions of Agony", "Action: Look at your opponent's hand. Then, choose and "
+                                                  "discard 1 card from that hand.", "Tactic. Torture.",
+                              3, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Archon's Palace", "Interrupt: When your opponent wins a command struggle, exhaust "
+                                                   "this support to cancel either the card bonus or the "
+                                                   "resource bonus of that planet this phase.", "Location.",
+                                2, faction, "Loyal", True)
     ]
     return dark_eldar_cards_array

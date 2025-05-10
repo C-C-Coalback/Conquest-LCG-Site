@@ -109,6 +109,14 @@ def orks_cards_init():
         CardClasses.ArmyCard("Goff Brawlers", "While you control a non-Orks warlord, this unit gains 1 command icon.\n"
                                               "Reaction: After this unit readies, each player deals 1 indirect damage "
                                               "among units he controls at this planet.", "Warrior. Boyz.",
-                             2, "Orks", "Common", 2, 3, 0, False)
+                             2, "Orks", "Common", 2, 3, 0, False),
+        CardClasses.ArmyCard("Deathskull Lootas", "Reaction: After this unit damages an enemy unit by an attack,"
+                                                  " destroy a target enemy support card.", "Warrior.",
+                             4, "Orks", "Common", 2, 3, 2, False),
+        CardClasses.EventCard("Smash 'n Bash", "Combat Action: Deal 1 damage to each unit you control at a target "
+                                               "planet without an enemy warlord to ready up to 3 "
+                                               "units you control at that planet.", "Tactic.",
+                              2, "Orks", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return orks_card_array

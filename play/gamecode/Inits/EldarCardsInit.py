@@ -121,6 +121,19 @@ def eldar_cards_init():
                                                        "No Wargear Attachments.\n"
                                                        "While you control a non-Eldar warlord, "
                                                        "this unit gains Area Effect (2).", "Vehicle. Elite.",
-                             6, faction, "Common", 4, 4, 2, False)
+                             6, faction, "Common", 4, 4, 2, False),
+        CardClasses.ArmyCard("Vaulting Harlequin", "Combat Action: Exhaust this unit to have it gain "
+                                                   "Flying until the end of the phase.", "Warrior. Harlequin.",
+                             3, faction, "Common", 1, 4, 2, False),
+        CardClasses.EventCard("Empower", "Play only during a battle.\n"
+                                         "Combat Action: Each Eldar unit you control at a target planet "
+                                         "gets +1 ATK and +1HP until the end of the battle.", "Power.",
+                              3, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.AttachmentCard("Starcannon", "Attach to an Eldar Vehicle unit.\n"
+                                                 "Attached unit gains Armorbane.", "Hardpoint. Weapon.",
+                                   0, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   unit_must_match_faction=True, required_traits="Vehicle")
     ]
     return eldar_cards_array
