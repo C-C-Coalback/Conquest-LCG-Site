@@ -1969,6 +1969,13 @@ class Player:
             if attachments[i].get_ability() == "Noxious Fleshborer":
                 if self.game.infested_planets[planet_id]:
                     attack_value += 1
+            if attachments[i].get_ability() == "Frostfang":
+                if self.number == "1":
+                    if self.game.p2.check_for_warlord(planet_id):
+                        attack_value += 2
+                elif self.number == "2":
+                    if self.game.p1.check_for_warlord(planet_id):
+                        attack_value += 2
         card.reset_brutal()
         attack_value += card.get_extra_attack_until_end_of_battle()
         attack_value += card.get_extra_attack_until_next_attack()
@@ -2187,6 +2194,13 @@ class Player:
             if attachments[i].get_ability() == "Noxious Fleshborer":
                 if self.game.infested_planets[planet_id]:
                     health += 1
+            if attachments[i].get_ability() == "Frostfang":
+                if self.number == "1":
+                    if self.game.p2.check_for_warlord(planet_id):
+                        health += 2
+                elif self.number == "2":
+                    if self.game.p1.check_for_warlord(planet_id):
+                        health += 2
         return health
 
     def search_synapse_at_planet(self, planet_pos):
