@@ -82,6 +82,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.chosen_first_card = False
+                    elif ability == "Smash 'n Bash":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.chosen_first_card = False
                     elif ability == "Indescribable Horror":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

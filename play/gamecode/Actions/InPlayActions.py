@@ -1172,6 +1172,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                             primary_player.aiming_reticle_coords_hand = None
                             self.action_cleanup()
+    elif self.action_chosen == "Smash 'n Bash":
+        if self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if self.misc_target_planet == planet_pos:
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                    self.misc_counter -= 1
+                    await self.send_update_message(str(self.misc_counter) + " uses of Smash 'n Bash left")
+                    if self.misc_counter < 1:
+                        self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

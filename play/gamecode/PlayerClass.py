@@ -1319,19 +1319,12 @@ class Player:
                 if self.headquarters[i].get_card_type() == "Warlord":
                     return 1
             return 0
-        print("Looking for warlord at:", self.cards_in_play[0][planet_id])
         if not self.cards_in_play[planet_id + 1]:
             pass
         else:
             for j in range(len(self.cards_in_play[planet_id + 1])):
-                print("Card is:", self.cards_in_play[planet_id + 1][j].get_name())
-                print("Check if card is a warlord.")
                 if self.cards_in_play[planet_id + 1][j].get_card_type() == "Warlord":
-                    print("Card is a Warlord")
                     return 1
-                else:
-                    print("Card is not a Warlord")
-        print("Warlord is not present")
         return 0
 
     def check_ready_pos(self, planet_id, unit_id):

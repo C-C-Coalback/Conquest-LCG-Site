@@ -398,6 +398,16 @@ async def update_game_event_action_planet(self, name, game_update_string):
             i = i - 1
         if not card_found:
             await self.send_update_message("No valid unit in discard")
+    elif self.action_chosen == "Smash 'n Bash":
+        if not self.chosen_first_card:
+            if not secondary_player.check_for_warlord(chosen_planet):
+                for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                    primary_player.assign_damage_to_pos(chosen_planet, i, 1)
+                self.misc_counter = 3
+                self.misc_target_planet = chosen_planet
+                self.chosen_first_card = True
+            else:
+                await self.send_update_message("An enemy warlord is present.")
     elif self.action_chosen == "Snotling Attack":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1

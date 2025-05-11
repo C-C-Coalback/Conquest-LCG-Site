@@ -581,6 +581,11 @@ class Game:
                         self.player_with_action = ""
                         print("Canceled special action")
                         await self.send_update_message(name + " canceled their action request")
+                    elif self.action_chosen == "Smash 'n Bash":
+                        print("Try to stop smash n bash")
+                        if self.chosen_first_card:
+                            await self.send_update_message("Stopping Smash 'n Bash early")
+                            self.action_cleanup()
                     else:
                         await self.send_update_message("Too far in; action must be concluded now")
             elif len(game_update_string) == 2:
@@ -2664,7 +2669,7 @@ class Game:
                                                          primary_player.name_player,
                                                          (int(primary_player.number), planet_pos,
                                                           unit_pos))
-                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Deathskull Lootas":
+                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
                             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, unit_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
@@ -2787,8 +2792,8 @@ class Game:
                                                                              primary_player.name_player,
                                                                              (int(primary_player.number), planet_pos,
                                                                               unit_pos))
-                                            if secondary_player.get_ability_given_pos(planet_pos,
-                                                                                      unit_pos) == "Deathskull Lootas":
+                                            if secondary_player.get_ability_given_pos(att_pla, att_pos) \
+                                                    == "Deathskull Lootas":
                                                 self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                                                      (int(secondary_player.number), planet_pos,
                                                                       unit_pos))
