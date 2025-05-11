@@ -1019,6 +1019,7 @@ class Player:
         i = 0
         while i < len(self.headquarters):
             self.headquarters[i].ethereal_movement_active = False
+            i += 1
         for i in range(7):
             j = 0
             while j < len(self.cards_in_play[i + 1]):
@@ -2615,9 +2616,20 @@ class Player:
         return None
 
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
+        print("calling move unit to planet")
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
+        already_homing_beacon = False
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[0] == "Homing Beacon":
+                if self.game.player_who_resolves_reaction[0] == self.name_player:
+                    already_homing_beacon = True
+        if not already_homing_beacon:
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Homing Beacon":
+                    if self.get_ready_given_pos(-2, i):
+                        self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.remove_card_from_play(planet_id, unit_id)
         return True

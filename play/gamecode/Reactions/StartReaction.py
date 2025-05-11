@@ -265,13 +265,20 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.delete_reaction()
             else:
-                await self.send_update_message("Resolve Toxic venomthrope gains")
                 self.resolving_search_box = True
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.choices_available = ["Card", "Resource"]
                 self.choice_context = "Toxic Venomthrope: Gain Card or Resource?"
                 self.asking_if_reaction = False
                 self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif self.reactions_needing_resolving[0] == "Homing Beacon":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.choices_available = ["Card", "Resource"]
+            self.choice_context = "Homing Beacon: Gain Card or Resource?"
+            self.asking_if_reaction = False
+            self.resolving_search_box = True
+            self.name_player_making_choices = self.player_who_resolves_reaction[0]
         elif self.reactions_needing_resolving[0] == "Doom Scythe Invader":
             self.choices_available = []
             for i in range(len(primary_player.discard)):

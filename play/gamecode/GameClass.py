@@ -1969,7 +1969,9 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.resolving_search_box = False
-                    elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?":
+
+                    elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?" or \
+                            self.choice_context == "Homing Beacon: Gain Card or Resource?":
                         self.choices_available = []
                         self.choice_context = ""
                         self.name_player_making_choices = ""
