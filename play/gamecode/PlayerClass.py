@@ -103,6 +103,7 @@ class Player:
         self.harbinger_of_eternity_active = False
         self.position_discard_of_card = -1
         self.attachments_at_planet = [[], [], [], [], [], [], []]
+        self.muster_the_guard_count = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -2397,6 +2398,16 @@ class Player:
             if self.check_for_warlord(i) == 1:
                 return i
         return -1
+
+    def get_location_of_warlord(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_card_type() == "Warlord":
+                return -2, i
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
+                    return i, j
+        return -1, -1
 
     def resolve_combat_round_begins(self, planet_num):
         self.get_planet_of_warlord()

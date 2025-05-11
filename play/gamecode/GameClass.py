@@ -2546,6 +2546,8 @@ class Game:
     async def change_phase(self, new_val, refresh_abilities=True):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.p1.muster_the_guard_count = 0
+        self.p2.muster_the_guard_count = 0
         last_phase = self.phase
         self.phase = new_val
         if self.phase == "COMMAND":
@@ -2577,6 +2579,8 @@ class Game:
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
             self.discounts_applied += num_termagants
+        if card.get_faction() == "Astra Militarum":
+            self.discounts_applied += player.muster_the_guard_count
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
         self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
@@ -2593,6 +2597,8 @@ class Game:
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
             self.available_discounts += num_termagants
+        if card.get_faction() == "Astra Militarum":
+            self.available_discounts += player.muster_the_guard_count
         self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
         self.available_discounts += temp_av_disc
 

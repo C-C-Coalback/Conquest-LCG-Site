@@ -45,6 +45,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
+                    elif ability == "Muster the Guard":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                            primary_player.muster_the_guard_count += 1
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.action_cleanup()
                     elif ability == "Battle Cry":
                         print("Resolve Battle Cry")
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
