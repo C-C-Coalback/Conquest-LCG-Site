@@ -219,7 +219,10 @@ class Game:
             "Squadron Redeployment", "Even the Odds", "Calculated Strike",
             "Deception", "Ferocious Strength", "Indescribable Horror", "Clogged with Corpses",
             "Predation", "Spawn Termagants", "Spore Burst", "Dark Cunning", "Consumption",
-            "Subdual", "Ecstatic Seizures", "Dark Possession", "Subdual"
+            "Subdual", "Ecstatic Seizures", "Dark Possession", "Subdual", "Muster the Guard",
+            "Noble Deed", "Smash 'n Bash", "Visions of Agony", "Empower", "Calamity",
+            "Awake the Sleepers", "Reanimation Protocol", "Recycle", "Mechanical Enhancement",
+            "Drudgery", "Extermination"
         ]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
