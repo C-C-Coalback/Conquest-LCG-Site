@@ -1041,9 +1041,11 @@ class Player:
     def return_card_to_hand(self, planet_pos, unit_pos):
         if planet_pos == -2:
             self.cards.append(self.headquarters[unit_pos].get_name())
+            self.discard_attachments_from_card(planet_pos, unit_pos)
             self.remove_card_from_hq(unit_pos)
             return None
         self.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
+        self.discard_attachments_from_card(planet_pos, unit_pos)
         self.remove_card_from_play(planet_pos, unit_pos)
         return None
 
@@ -2513,9 +2515,7 @@ class Player:
                                                                                             planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                self.game.reactions_needing_resolving.append("Straken's Cunning")
-                self.game.player_who_resolves_reaction.append(self.name_player)
-                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
+                self.game.create_reaction("Straken's Cunning", self.name_player, (int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
@@ -2531,9 +2531,8 @@ class Player:
                             if self.game.player_who_resolves_reaction[j] == self.name_player:
                                 already_queued_elysian_assault_team = True
                     if not already_queued_elysian_assault_team:
-                        self.game.reactions_needing_resolving.append("Elysian Assault Team")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), planet_num, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Elysian Assault Team", self.name_player,
+                                                  (int(self.number), planet_num, -1))
         if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Murder Cogitator":
@@ -2544,9 +2543,7 @@ class Player:
                                 if self.game.player_who_resolves_reaction[j] == self.name_player:
                                     already_using_murder_cogitator = True
                         if not already_using_murder_cogitator:
-                            self.game.reactions_needing_resolving.append("Murder Cogitator")
-                            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-                            self.game.player_who_resolves_reaction.append(self.name_player)
+                            self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
         if self.game.request_search_for_enemy_card_at_planet(self.number, -2, "Cato's Stronghold", ready_relevant=True):
             self.game.reactions_needing_resolving.append("Cato's Stronghold")
             self.game.allowed_planets_cato_stronghold.append(planet_num)

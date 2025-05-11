@@ -307,6 +307,40 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
+                    elif ability == "Calamity":
+                        i = 0
+                        while i < len(primary_player.headquarters):
+                            if primary_player.get_card_type_given_pos(-2, i) == "Army":
+                                if primary_player.get_cost_given_pos(-2, i) < 3:
+                                    primary_player.return_card_to_hand(-2, i)
+                                    i = i - 1
+                            i += 1
+                        i = 0
+                        while i < len(secondary_player.headquarters):
+                            if secondary_player.get_card_type_given_pos(-2, i) == "Army":
+                                if not secondary_player.get_immune_to_enemy_events(-2, i):
+                                    if secondary_player.get_cost_given_pos(-2, i) < 3:
+                                        secondary_player.return_card_to_hand(-2, i)
+                                        i = i - 1
+                            i += 1
+                        for planet_pos in range(7):
+                            i = 0
+                            while i < len(primary_player.cards_in_play[planet_pos + 1]):
+                                if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                                    if primary_player.get_cost_given_pos(planet_pos, i) < 3:
+                                        primary_player.return_card_to_hand(planet_pos, i)
+                                        i = i - 1
+                                i += 1
+                            i = 0
+                            while i < len(secondary_player.cards_in_play[planet_pos + 1]):
+                                if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                                    if not secondary_player.get_immune_to_enemy_events(planet_pos, i):
+                                        if secondary_player.get_cost_given_pos(planet_pos, i) < 3:
+                                            secondary_player.return_card_to_hand(planet_pos, i)
+                                            i = i - 1
+                                i += 1
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_cleanup()
                     elif ability == "Doom":
                         print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
