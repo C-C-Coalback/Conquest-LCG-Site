@@ -77,6 +77,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Noble Deed":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        self.chosen_first_card = False
                     elif ability == "Indescribable Horror":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

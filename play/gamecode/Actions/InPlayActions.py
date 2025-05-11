@@ -1134,6 +1134,45 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.number
                     self.mode = self.stored_mode
+    elif self.action_chosen == "Noble Deed":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                    attack_value = primary_player.cards_in_play[planet_pos + 1][unit_pos].attack
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        self.chosen_first_card = True
+                        self.misc_counter = attack_value
+                        self.misc_target_planet = planet_pos
+        else:
+            if game_update_string[1] == secondary_player.get_number():
+                if self.misc_target_planet == planet_pos:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Event Action"
+                        if can_continue:
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            primary_player.aiming_reticle_coords_hand = None
+                            self.action_cleanup()
+
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

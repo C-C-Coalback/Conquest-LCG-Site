@@ -2613,6 +2613,8 @@ class Player:
             self.game.reactions_needing_resolving.append("Enginseer Augur")
             self.game.player_who_resolves_reaction.append(self.name_player)
             self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
+        if card.get_ability() == "Interrogator Acolyte":
+            self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
         self.discard.append(card_name)
         self.cards_recently_discarded.append(card_name)
         self.discard_attachments_from_card(-2, card_pos)
