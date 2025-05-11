@@ -185,6 +185,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.number
                         await primary_player.dark_eldar_event_played()
+                        primary_player.torture_event_played()
                     elif ability == "Hate":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

@@ -991,7 +991,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mode = "Normal"
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                await primary_player.dark_eldar_event_played()
     elif self.action_chosen == "Archon's Terror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

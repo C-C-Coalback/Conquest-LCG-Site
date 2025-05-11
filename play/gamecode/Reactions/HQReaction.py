@@ -9,6 +9,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 primary_player.sacrifice_card_in_hq(unit_pos)
                 self.delete_reaction()
                 await secondary_player.dark_eldar_event_played()
+                secondary_player.torture_event_played()
         elif self.reactions_needing_resolving[0] == "Nullify":
             if primary_player.valid_nullify_unit(-2, unit_pos):
                 primary_player.exhaust_given_pos(-2, unit_pos)

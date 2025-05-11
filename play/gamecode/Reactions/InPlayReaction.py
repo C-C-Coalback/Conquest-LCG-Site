@@ -16,6 +16,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     self.delete_reaction()
                     await secondary_player.dark_eldar_event_played()
+                    secondary_player.torture_event_played()
         elif self.reactions_needing_resolving[0] == "Nullify":
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])

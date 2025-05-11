@@ -860,25 +860,32 @@ class Player:
         string_sent = self.name_player + " reveals their hand: " + string_sent
         await self.game.send_update_message(string_sent)
 
+    def torture_event_played(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Uber Grotesque":
+                if not self.headquarters[i].once_per_phase_used:
+                    self.game.create_reaction("Uber Grotesque", self.name_player, (int(self.number), -2, i))
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == "Uber Grotesque":
+                    if not self.cards_in_play[i + 1][j].once_per_phase_used:
+                        self.game.create_reaction("Uber Grotesque", self.name_player, (int(self.number), i, j))
+
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Beasthunter Wyches":
-                self.game.reactions_needing_resolving.append("Beasthunter Wyches")
-                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -2, i])
-                self.player_who_resolves_reaction.append(self.name_player)
+                self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), -2, i))
             for attach in self.headquarters[i].get_attachments():
                 if attach.get_ability() == "Hypex Injector":
-                    self.ready_given_pos(-2, i)
+                    self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Beasthunter Wyches":
-                    self.game.reactions_needing_resolving.append("Beasthunter Wyches")
-                    self.game.positions_of_unit_triggering_reaction.append([int(self.number), i, j])
-                    self.game.player_who_resolves_reaction.append(self.name_player)
+                    self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), i, j))
                 for attach in self.cards_in_play[i + 1][j].get_attachments():
                     if attach.get_ability() == "Hypex Injector":
-                        self.ready_given_pos(i, j)
+                        self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), i, j))
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
         card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))
