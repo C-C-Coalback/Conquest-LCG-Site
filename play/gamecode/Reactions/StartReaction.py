@@ -212,6 +212,13 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Piranha Hunter":
             primary_player.draw_card()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Aun'ui Prelate":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if i != unit_pos:
+                    if primary_player.get_faction_given_pos(planet_pos, i) == "Tau":
+                        primary_player.cards_in_play[planet_pos + 1][i].extra_attack_until_end_of_phase += 1
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Uber Grotesque":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")

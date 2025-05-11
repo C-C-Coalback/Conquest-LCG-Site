@@ -48,6 +48,7 @@ class Card:
         self.misc_ability_used = False
         self.mind_shackle_scarab_effect = False
         self.valid_defense_battery_target = False
+        self.ethereal_movement_active = False
 
     def reset_own_eocr_values(self):
         pass

@@ -146,6 +146,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    in self.units_move_hq_attack:
+                                self.unit_will_move_after_attack = True
+                                player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                    ethereal_movement_active = True
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":
                                 self.choices_available = ["Own deck", "Enemy deck"]
                                 self.name_player_making_choices = player.name_player
@@ -324,8 +329,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.reset_combat_positions()
                             self.number_with_combat_turn = secondary_player.get_number()
                             self.player_with_combat_turn = secondary_player.get_name_player()
-                            # if not armorbane_check or attack_value < 1:
-                            #     await self.send_info_box()
+                            if self.unit_will_move_after_attack:
+                                self.need_to_move_to_hq = True
                         else:
                             self.defender_planet = -1
                             self.defender_position = -1

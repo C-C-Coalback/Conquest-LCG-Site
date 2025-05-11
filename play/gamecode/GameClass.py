@@ -237,6 +237,9 @@ class Game:
         self.name_player_using_backlash = ""
         self.canceled_card_bonuses = [False, False, False, False, False, False, False]
         self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
+        self.units_move_hq_attack = ["Aun'ui Prelate"]
+        self.unit_will_move_after_attack = False
+        self.need_to_move_to_hq = False
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -3658,6 +3661,11 @@ class Game:
                 self.need_to_reset_tomb_blade_squadron = False
                 self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
                 self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
+            if self.need_to_move_to_hq:
+                self.p1.ethereal_movement_resolution()
+                self.p2.ethereal_movement_resolution()
+                self.need_to_move_to_hq = False
+                self.unit_will_move_after_attack = False
             await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False

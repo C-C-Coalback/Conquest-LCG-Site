@@ -972,17 +972,17 @@ class Player:
                                 self.game.player_who_resolves_reaction.append(self.name_player)
                                 # self.game.discard_card_at_random_from_opponent(self.number)
                             if card.get_ability() == "Scything Hormagaunts":
-                                self.game.create_reaction(
-                                    "Scything Hormagaunts", self.name_player, (int(self.number), position, -1))
+                                self.game.create_reaction("Scything Hormagaunts", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Aun'ui Prelate":
+                                self.game.create_reaction("Aun'ui Prelate", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Doom Scythe Invader":
-                                self.game.create_reaction(
-                                    "Doom Scythe Invader", self.name_player, (int(self.number), position, -1)
-                                )
+                                self.game.create_reaction("Doom Scythe Invader", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kith's Khymeramasters":
-                                self.game.reactions_needing_resolving.append("Kith's Khymeramasters")
-                                self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
-                                                                                        location_of_unit))
-                                self.game.player_who_resolves_reaction.append(self.name_player)
+                                self.game.create_reaction("Kith's Khymeramasters", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):
@@ -1014,6 +1014,19 @@ class Player:
                         self.cards_in_play[planet + 1][i].get_is_unit():
                     count += 1
         return count
+
+    def ethereal_movement_resolution(self):
+        i = 0
+        while i < len(self.headquarters):
+            self.headquarters[i].ethereal_movement_active = False
+        for i in range(7):
+            j = 0
+            while j < len(self.cards_in_play[i + 1]):
+                if self.cards_in_play[i + 1][j].ethereal_movement_active:
+                    self.cards_in_play[i + 1][j].ethereal_movement_active = False
+                    self.move_unit_at_planet_to_hq(i, j)
+                    j = j - 1
+                j = j + 1
 
     def reset_card_name_misc_ability(self, card_name):
         for i in range(len(self.headquarters)):
