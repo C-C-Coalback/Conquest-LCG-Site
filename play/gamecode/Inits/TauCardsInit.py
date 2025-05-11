@@ -120,7 +120,7 @@ def tau_cards_init():
                                                "No Wargear Attachments.\n"
                                                "Reaction: After this unit moves from one planet to another, "
                                                "draw 1 card.", "Vehicle. Speeder.",
-                             3, faction, "Common", 2, 2, 0, False, wargear_attachments_permitted=False),
+                             3, faction, "Common", 2, 2, 0, False, wargear_attachments_permitted=False, mobile=True),
         CardClasses.ArmyCard("Aun'ui Prelate", "Ambush.\n"
                                                "FORCED REACTION: After this unit resolves its attack, "
                                                "move it to your HQ.\n"
