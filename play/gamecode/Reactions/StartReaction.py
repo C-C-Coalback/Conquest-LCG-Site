@@ -207,6 +207,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
+        elif self.reactions_needing_resolving[0] == "Piranha Hunter":
+            primary_player.draw_card()
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Uber Grotesque":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")

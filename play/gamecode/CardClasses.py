@@ -365,6 +365,8 @@ class UnitCard(Card):
                 return True
             if self.attachments[i].get_ability() == "Hyperphase Sword":
                 return True
+            if self.attachments[i].get_ability() == "Starcannon":
+                return True
         return self.armorbane
 
     def get_by_base_area_effect(self):
