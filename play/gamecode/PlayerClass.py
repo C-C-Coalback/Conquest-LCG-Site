@@ -576,6 +576,15 @@ class Player:
                         return True
         return False
 
+    def adjust_own_reactions(self, planet_pos, unit_pos):
+        for i in range(len(self.game.reactions_needing_resolving)):
+            num, pla, pos = self.game.positions_of_unit_triggering_reaction[i]
+            if num == int(self.number):
+                if pla == planet_pos:
+                    if pos > unit_pos:
+                        pos -= 1
+                        self.game.positions_of_unit_triggering_reaction[i] = (num, pla, pos)
+
     def add_to_hq(self, card_object):
         if card_object.get_unique():
             if self.search_for_unique_card(card_object.name):
@@ -584,6 +593,12 @@ class Player:
         last_element_index = len(self.headquarters) - 1
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
+        elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
+            enemy_name = self.game.name_1
+            if self.name_player == self.game.name_1:
+                enemy_name = self.game.name_2
+            self.game.create_reaction("Heretek Inventor", enemy_name,
+                                      (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Swordwind Farseer":
             self.game.reactions_needing_resolving.append("Swordwind Farseer")
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
@@ -774,22 +789,15 @@ class Player:
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         if sacrifice_end_of_phase:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
+        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Heretek Inventor":
+            enemy_name = self.game.name_1
+            if self.name_player == self.game.name_1:
+                enemy_name = self.game.name_2
+            self.game.create_reaction("Heretek Inventor", enemy_name,
+                                      (int(self.number), position, last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
-            self.game.reactions_needing_resolving.append("Swordwind Farseer")
-            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            """
-            if len(self.deck) > 5:
-                self.number_cards_to_search = 6
-                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
-                self.game.name_player_who_is_searching = self.name_player
-                self.game.number_who_is_searching = str(self.number)
-                self.game.what_to_do_with_searched_card = "DRAW"
-                self.game.traits_of_searched_card = None
-                self.game.card_type_of_searched_card = None
-                self.game.faction_of_searched_card = None
-                self.game.no_restrictions_on_chosen_card = True
-            """
+            self.game.create_reaction("Swordwind Farseer", self.name_player,
+                                      (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
             self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
                                                                             last_element_index))
@@ -797,69 +805,17 @@ class Player:
             self.game.create_reaction("Standard Bearer", self.name_player,
                                       (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
-            self.game.reactions_needing_resolving.append("Coliseum Fighters")
-            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            """
-            i = len(self.discard) - 1
-            while i > -1:
-                card = FindCard.find_card(self.discard[i], self.card_array)
-                if card.get_card_type() == "Event":
-                    self.cards.append(card.get_name())
-                    del self.discard[i]
-                    return None
-                i = i - 1
-            """
+            self.game.create_reaction("Coliseum Fighters", self.name_player,
+                                      (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
-            self.game.reactions_needing_resolving.append("Sicarius's Chosen")
-            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
-            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.create_reaction("Sicarius's Chosen", self.name_player,
+                                      (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
-            self.game.reactions_needing_resolving.append("Weirdboy Maniak")
-            self.game.positions_of_unit_triggering_reaction.append((int(self.number), position, last_element_index))
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            """
-            no_units_damaged = True
-            for i in range(len(self.cards_in_play[position + 1]) - 1):
-                if no_units_damaged:
-                    self.set_aiming_reticle_in_play(position, i, "red")
-                    no_units_damaged = False
-                else:
-                    self.set_aiming_reticle_in_play(position, i, "blue")
-                self.assign_damage_to_pos(position, i, 1)
-            if int(self.number) == 1:
-                for i in range(len(self.game.p2.cards_in_play[position + 1])):
-                    if no_units_damaged:
-                        self.game.p2.set_aiming_reticle_in_play(position, i, "red")
-                        no_units_damaged = False
-                    else:
-                        self.game.p2.set_aiming_reticle_in_play(position, i, "blue")
-                    self.game.p2.assign_damage_to_pos(position, i, 1)
-            else:
-                for i in range(len(self.game.p1.cards_in_play[position + 1])):
-                    if no_units_damaged:
-                        self.game.p1.set_aiming_reticle_in_play(position, i, "red")
-                        no_units_damaged = False
-                    else:
-                        self.game.p1.set_aiming_reticle_in_play(position, i, "blue")
-                    self.game.p1.assign_damage_to_pos(position, i, 1)
-            """
+            self.game.create_reaction("Weirdboy Maniak", self.name_player,
+                                      (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
-            self.game.reactions_needing_resolving.append("Earth Caste Technician")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), position, last_element_index])
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            """
-            if len(self.deck) > 5:
-                self.number_cards_to_search = 6
-                self.game.cards_in_search_box = self.deck[0:self.number_cards_to_search]
-                self.game.name_player_who_is_searching = self.name_player
-                self.game.number_who_is_searching = str(self.number)
-                self.game.what_to_do_with_searched_card = "DRAW"
-                self.game.traits_of_searched_card = "Drone"
-                self.game.card_type_of_searched_card = "Attachment"
-                self.game.faction_of_searched_card = None
-                self.game.no_restrictions_on_chosen_card = False
-            """
+            self.game.create_reaction("Earth Caste Technician", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if already_exhausted:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
@@ -2507,9 +2463,11 @@ class Player:
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
         # self.discard_object(card_object)
         del self.cards_in_play[planet_num + 1][card_pos]
+        self.adjust_own_reactions(planet_num, card_pos)
 
     def remove_card_from_hq(self, card_pos):
         del self.headquarters[card_pos]
+        self.adjust_own_reactions(-2, card_pos)
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
         card = self.cards_in_play[planet_num + 1][card_pos]
@@ -2634,7 +2592,7 @@ class Player:
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
-        del self.cards_in_play[planet_id + 1][unit_id]
+        self.remove_card_from_play(planet_id, unit_id)
         return True
 
     def rout_unit(self, planet_id, unit_id):
