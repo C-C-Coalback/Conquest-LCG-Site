@@ -124,7 +124,8 @@ def eldar_cards_init():
                              6, faction, "Common", 4, 4, 2, False),
         CardClasses.ArmyCard("Vaulting Harlequin", "Combat Action: Exhaust this unit to have it gain "
                                                    "Flying until the end of the phase.", "Warrior. Harlequin.",
-                             3, faction, "Common", 1, 4, 2, False),
+                             3, faction, "Common", 1, 4, 2, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.EventCard("Empower", "Play only during a battle.\n"
                                          "Combat Action: Each Eldar unit you control at a target planet "
                                          "gets +1 ATK and +1HP until the end of the battle.", "Power.",

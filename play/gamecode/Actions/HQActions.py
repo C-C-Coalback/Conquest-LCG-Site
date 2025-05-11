@@ -8,6 +8,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    unit_pos = int(game_update_string[2])
     if not self.action_chosen:
         self.position_of_actioned_card = (-2, int(game_update_string[2]))
         if int(game_update_string[1]) == int(primary_player.get_number()):
@@ -162,6 +163,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.misc_target_planet = -1
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Vaulting Harlequin":
+                        if primary_player.get_ready_given_pos(-2, int(game_update_string[2])):
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            primary_player.headquarters[int(game_update_string[2])].flying_eop = True
+                            self.action_cleanup()
                     elif ability == "Master Program":
                         if card.get_ready():
                             self.action_chosen = ability

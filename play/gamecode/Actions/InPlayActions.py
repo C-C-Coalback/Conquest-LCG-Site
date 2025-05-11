@@ -67,6 +67,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                elif ability == "Vaulting Harlequin":
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
+                        self.action_cleanup()
                 elif ability == "Boss Zugnog":
                     if not card_chosen.get_once_per_phase_used():
                         if self.planets_in_play_array[self.round_number]:
