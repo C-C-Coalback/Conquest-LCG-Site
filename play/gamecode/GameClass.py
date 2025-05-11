@@ -1484,6 +1484,14 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.action_cleanup()
+                    elif self.choice_context == "Visions of Agony Discard:":
+                        secondary_player.discard_card_from_hand(int(game_update_string[1]))
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.choices_available = []
+                        self.choice_context = ""
+                        self.name_player_making_choices = ""
+                        self.action_cleanup()
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:

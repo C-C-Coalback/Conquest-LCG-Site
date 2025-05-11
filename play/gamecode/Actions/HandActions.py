@@ -366,6 +366,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     self.player_with_deploy_turn = secondary_player.name_player
                                     self.number_with_deploy_turn = secondary_player.number
                                     await primary_player.dark_eldar_event_played()
+                    elif ability == "Visions of Agony":
+                        if secondary_player.cards:
+                            self.choices_available = secondary_player.cards
+                            self.choice_context = "Visions of Agony Discard:"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.name_player_making_choices = primary_player.name_player
+                        else:
+                            primary_player.add_resources(card.get_cost())
+                            await self.send_update_message("No cards to look at with Visions of Agony")
                     else:
                         primary_player.add_resources(card.get_cost())
                         await self.send_update_message(card.get_name() + " not "
