@@ -1748,6 +1748,14 @@ class Player:
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_end_of_battle()
 
+    def reset_extra_health_eob(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].reset_extra_health_until_end_of_battle()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_health_until_end_of_battle()
+
     def reset_extra_attack_until_next_attack_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             if self.headquarters[unit_pos].get_is_unit():
@@ -1934,9 +1942,6 @@ class Player:
                     if self.game.p1.check_for_warlord(planet_id):
                         attack_value += 2
         card.reset_brutal()
-        attack_value += card.get_extra_attack_until_end_of_battle()
-        attack_value += card.get_extra_attack_until_next_attack()
-        attack_value += card.get_extra_attack_until_end_of_phase()
         return attack_value
 
     def get_most_termagants_at_single_planet(self):

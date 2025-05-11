@@ -220,6 +220,15 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_coords_hand = None
         primary_player.has_passed = True
         self.action_cleanup()
+    elif self.action_chosen == "Empower":
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+                if primary_player.get_faction_given_pos(chosen_planet, i) == "Eldar":
+                    primary_player.cards_in_play[chosen_planet + 1][i].increase_extra_attack_until_end_of_battle(1)
+                    primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eob += 1
+        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+        primary_player.aiming_reticle_coords_hand = None
+        self.action_cleanup()
     elif self.action_chosen == "Archon's Palace":
         self.misc_target_planet = chosen_planet
         self.choices_available = ["Cards", "Resources"]

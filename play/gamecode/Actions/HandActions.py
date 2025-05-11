@@ -317,8 +317,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
                     elif ability == "Pact of the Haemonculi":
-                        print("Resolve PotH")
-                        self.action_chosen = "Pact of the Haemonculi"
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Empower":
+                        self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Gift of Isha":

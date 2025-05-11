@@ -875,6 +875,8 @@ class Game:
         self.planet_aiming_reticle_position = -1
         self.p1.reset_extra_attack_eob()
         self.p2.reset_extra_attack_eob()
+        self.p1.reset_extra_health_eob()
+        self.p2.reset_extra_health_eob()
         another_battle = self.find_next_planet_for_combat()
         if another_battle:
             self.set_battle_initiative()

@@ -235,6 +235,7 @@ class UnitCard(Card):
         self.armorbane_eor = False
         self.negative_hp_until_eop = 0
         self.positive_hp_until_eop = 0
+        self.positive_hp_until_eob = 0
 
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
@@ -405,6 +406,9 @@ class UnitCard(Card):
     def reset_extra_attack_until_end_of_battle(self):
         self.extra_attack_until_end_of_battle = 0
 
+    def reset_extra_health_until_end_of_battle(self):
+        self.positive_hp_until_eob = 0
+
     def remove_damage(self, amount):
         self.damage = self.damage - amount
         if self.damage < 0:
@@ -430,6 +434,9 @@ class UnitCard(Card):
 
     def get_attack(self):
         attack = self.attack
+        attack += self.get_extra_attack_until_end_of_battle()
+        attack += self.get_extra_attack_until_next_attack()
+        attack += self.get_extra_attack_until_end_of_phase()
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 attack += self.attachments[i].get_extra_attack()
@@ -443,6 +450,7 @@ class UnitCard(Card):
         health = self.health
         health -= self.negative_hp_until_eop
         health += self.positive_hp_until_eop
+        health += self.positive_hp_until_eob
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 health += self.attachments[i].get_extra_health()
