@@ -229,7 +229,8 @@ class Game:
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
-        self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron"]
+        self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
+                                 "Veteran Barbrus"]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
@@ -2663,6 +2664,9 @@ class Game:
                                                          primary_player.name_player,
                                                          (int(primary_player.number), planet_pos,
                                                           unit_pos))
+                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Deathskull Lootas":
+                            self.create_reaction("Deathskull Lootas", secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, unit_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
@@ -2783,6 +2787,11 @@ class Game:
                                                                              primary_player.name_player,
                                                                              (int(primary_player.number), planet_pos,
                                                                               unit_pos))
+                                            if secondary_player.get_ability_given_pos(planet_pos,
+                                                                                      unit_pos) == "Deathskull Lootas":
+                                                self.create_reaction("Deathskull Lootas", secondary_player.name_player,
+                                                                     (int(secondary_player.number), planet_pos,
+                                                                      unit_pos))
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                                         .get_card_type() != "Warlord":
