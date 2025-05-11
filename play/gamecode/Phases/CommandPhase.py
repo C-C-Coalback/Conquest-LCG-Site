@@ -80,6 +80,23 @@ async def update_game_event_command_section(self, name, game_update_string):
                 elif name == self.name_2:
                     self.p2.has_passed = True
         elif len(game_update_string) == 3:
+            if game_update_string[0] == "HQ":
+                if name == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+                if game_update_string[1] == primary_player.get_number():
+                    unit_pos = int(game_update_string[2])
+                    if primary_player.get_ability_given_pos(-2, unit_pos) == "Archon's Palace":
+                        if primary_player.get_ready_given_pos(-2, unit_pos):
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.mode = "ACTION"
+                            self.action_chosen = "Archon's Palace"
+                            self.player_with_action = primary_player.name_player
+                            self.position_of_actioned_card = (-2, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
             if game_update_string[0] == "HAND":
                 if name == self.name_1:
                     primary_player = self.p1
@@ -234,8 +251,14 @@ def resolve_command_struggle_at_planet(self, planet_id):
     if command_p1 > command_p2:
         print("P1 wins command")
         chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-        resources_won = chosen_planet.get_resources()
-        cards_won = chosen_planet.get_cards()
+        if self.canceled_resource_bonuses[planet_id]:
+            resources_won = 0
+        else:
+            resources_won = chosen_planet.get_resources()
+        if self.canceled_card_bonuses[planet_id]:
+            cards_won = 0
+        else:
+            cards_won = chosen_planet.get_cards()
         extra_resources, extra_cards = self.p1.get_bonus_winnings_at_planet(planet_id)
         resources_won += extra_resources
         cards_won += extra_cards
@@ -262,8 +285,14 @@ def resolve_command_struggle_at_planet(self, planet_id):
     elif command_p2 > command_p1:
         print("P2 wins command")
         chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-        resources_won = chosen_planet.get_resources()
-        cards_won = chosen_planet.get_cards()
+        if self.canceled_resource_bonuses[planet_id]:
+            resources_won = 0
+        else:
+            resources_won = chosen_planet.get_resources()
+        if self.canceled_card_bonuses[planet_id]:
+            cards_won = 0
+        else:
+            cards_won = chosen_planet.get_cards()
         extra_resources, extra_cards = self.p2.get_bonus_winnings_at_planet(planet_id)
         resources_won += extra_resources
         cards_won += extra_cards

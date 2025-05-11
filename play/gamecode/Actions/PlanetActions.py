@@ -220,6 +220,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_coords_hand = None
         primary_player.has_passed = True
         self.action_cleanup()
+    elif self.action_chosen == "Archon's Palace":
+        self.misc_target_planet = chosen_planet
+        self.choices_available = ["Cards", "Resources"]
+        self.choice_context = "Archon's Palace"
+        self.name_player_making_choices = primary_player.name_player
     elif self.action_chosen == "Drudgery":
         card = FindCard.find_card(self.misc_target_choice, self.card_array)
         primary_player.add_card_to_planet(card, chosen_planet)

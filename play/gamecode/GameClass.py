@@ -235,6 +235,8 @@ class Game:
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
         self.name_player_using_backlash = ""
+        self.canceled_card_bonuses = [False, False, False, False, False, False, False]
+        self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -1441,6 +1443,17 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         await self.update_game_event_action(name, game_update_string)
+                    elif self.choice_context == "Archon's Palace":
+                        if game_update_string[1] == "0":
+                            self.canceled_card_bonuses[self.misc_target_planet] = True
+                        elif game_update_string[1] == "1":
+                            self.canceled_resource_bonuses[self.misc_target_planet] = True
+                        self.choice_context = ""
+                        self.choices_available = []
+                        self.name_player_making_choices = ""
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.action_cleanup()
                     elif self.choice_context == "Use Dark Possession?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -2575,6 +2588,8 @@ class Game:
         self.p2.reset_extra_abilities_eop()
         self.p1.reset_all_blanked_eop()
         self.p2.reset_all_blanked_eop()
+        self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
+        self.canceled_card_bonuses = [False, False, False, False, False, False, False]
         if refresh_abilities:
             self.p1.refresh_once_per_phase_abilities()
             self.p2.refresh_once_per_phase_abilities()
