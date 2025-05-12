@@ -49,6 +49,8 @@ class Card:
         self.mind_shackle_scarab_effect = False
         self.valid_defense_battery_target = False
         self.ethereal_movement_active = False
+        self.valid_kugath_nurgling_target = False
+        self.damage_from_kugath_nurgling = 0
 
     def reset_own_eocr_values(self):
         pass

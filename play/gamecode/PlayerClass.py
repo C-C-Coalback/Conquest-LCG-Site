@@ -1073,6 +1073,8 @@ class Player:
                     self.headquarters[origin_position].valid_defense_battery_target = True
             self.cards_in_play[destination + 1].append(copy.deepcopy(headquarters_list[origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
+            self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
+            self.game.just_moved_units = True
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
                     alaitoc_shrine_already_present = False
@@ -1092,6 +1094,8 @@ class Player:
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
                                                                      [origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
+            self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
+            self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
                 self.game.create_reaction("Piranha Hunter", self.name_player, (int(self.number), destination, new_pos))
@@ -1978,11 +1982,15 @@ class Player:
         num_copies += self.count_copies_at_hq(card_name)
         return num_copies
 
-    def count_copies_at_planet(self, planet_num, card_name):
+    def count_copies_at_planet(self, planet_num, card_name, ability=False):
         num_copies = 0
         for i in range(len(self.cards_in_play[planet_num + 1])):
-            if self.cards_in_play[planet_num + 1][i].get_name() == card_name:
-                num_copies += 1
+            if ability:
+                if self.cards_in_play[planet_num + 1][i].get_ability() == card_name:
+                    num_copies += 1
+            else:
+                if self.cards_in_play[planet_num + 1][i].get_name() == card_name:
+                    num_copies += 1
         return num_copies
 
     def count_units_in_discard(self):

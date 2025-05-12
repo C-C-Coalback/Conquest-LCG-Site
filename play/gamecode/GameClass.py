@@ -243,6 +243,9 @@ class Game:
         self.units_move_hq_attack = ["Aun'ui Prelate"]
         self.unit_will_move_after_attack = False
         self.need_to_move_to_hq = False
+        self.just_moved_units = False
+        self.resolving_kugath_nurglings = False
+        self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -281,6 +284,8 @@ class Game:
 
     def get_actions_allowed(self):
         if self.manual_bodyguard_resolution:
+            return False
+        elif self.resolving_kugath_nurglings:
             return False
         elif self.mode != "Normal":
             return False
@@ -344,21 +349,26 @@ class Game:
             info_string += self.name_player_manual_bodyguard
         elif self.cards_in_search_box:
             info_string += self.name_player_who_is_searching + "/"
-        elif self.effects_waiting_on_resolution:
-            info_string += self.player_resolving_effect[0] + "/"
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
             info_string += "Unspecified/"
         elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
             info_string += self.player_with_action + "/"
         elif self.choices_available:
             info_string += self.name_player_making_choices + "/"
-        elif self.reactions_needing_resolving:
-            info_string += self.player_who_resolves_reaction[0] + "/"
+        elif self.effects_waiting_on_resolution:
+            info_string += self.player_resolving_effect[0] + "/"
         elif self.positions_of_units_to_take_damage:
             if self.positions_of_units_to_take_damage[0][0] == 1:
                 info_string += self.name_1 + "/"
             else:
                 info_string += self.name_2 + "/"
+        elif self.resolving_kugath_nurglings:
+            if self.p1.has_initiative:
+                info_string += self.name_1 + "/"
+            else:
+                info_string += self.name_2 + "/"
+        elif self.reactions_needing_resolving:
+            info_string += self.player_who_resolves_reaction[0] + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += "Unspecified/" + "Mobile"
         elif self.battle_ability_to_resolve:
@@ -387,13 +397,10 @@ class Game:
                 else:
                     info_string += "False,"
         elif self.manual_bodyguard_resolution:
-            info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard
+            info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard + "/"
         elif self.cards_in_search_box:
             info_string += "Searching: " + self.what_to_do_with_searched_card + "/"
             info_string += "User: " + self.name_player_who_is_searching + "/"
-        elif self.effects_waiting_on_resolution:
-            info_string += "Effect: " + self.effects_waiting_on_resolution[0] + "/"
-            info_string += "User: " + self.player_resolving_effect[0] + "/"
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
             info_string += "Indirect damage " + str(self.p1.total_indirect_damage) + \
                            str(self.p2.total_indirect_damage) + "/"
@@ -403,14 +410,19 @@ class Game:
         elif self.choices_available:
             info_string += "Choice: " + self.choice_context + "/"
             info_string += "User: " + self.name_player_making_choices + "/"
-        elif self.reactions_needing_resolving:
-            info_string += "Reaction: " + self.reactions_needing_resolving[0] + "/"
-            info_string += "User: " + self.player_who_resolves_reaction[0] + "/"
+        elif self.effects_waiting_on_resolution:
+            info_string += "Effect: " + self.effects_waiting_on_resolution[0] + "/"
+            info_string += "User: " + self.player_resolving_effect[0] + "/"
         elif self.positions_of_units_to_take_damage:
             if self.positions_of_units_to_take_damage[0][0] == 1:
                 info_string += "Shield: " + self.name_1 + "/"
             else:
                 info_string += "Shield: " + self.name_2 + "/"
+        elif self.resolving_kugath_nurglings:
+            info_string += "Ku'gath Nurglings resolution/"
+        elif self.reactions_needing_resolving:
+            info_string += "Reaction: " + self.reactions_needing_resolving[0] + "/"
+            info_string += "User: " + self.player_who_resolves_reaction[0] + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += "Mobile window/"
         elif self.battle_ability_to_resolve:
@@ -3587,6 +3599,64 @@ class Game:
                 self.player_with_deploy_turn = self.name_1
                 self.number_with_deploy_turn = "1"
 
+    def check_end_kugath_nurglings(self):
+        for i in range(7):
+            for j in range(len(self.p1.cards_in_play[i + 1])):
+                if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                    if self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
+                            self.calc_kugath_nurgling_triggers_at_planet(i):
+                        return False
+            for j in range(len(self.p2.cards_in_play[i + 1])):
+                if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                    if self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
+                            self.calc_kugath_nurgling_triggers_at_planet(i):
+                        return False
+        self.reset_all_valid_targets_kugath_nurglings()
+        return True
+
+    def calc_kugath_nurgling_triggers_at_planet(self, i):
+        nurg_count = 0
+        nurg_count += self.p1.count_copies_at_planet(i, "Ku'gath's Nurglings", ability=True)
+        nurg_count += self.p2.count_copies_at_planet(i, "Ku'gath's Nurglings", ability=True)
+        self.kugath_nurglings_present_at_planets[i] = nurg_count
+        return nurg_count
+
+    async def resolution_of_kugath_nurglings(self, name, game_update_string):
+        if self.p1.has_initiative:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
+        if name == primary_player.name_player:
+            if len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    num = int(game_update_string[1])
+                    planet_pos = int(game_update_string[2])
+                    unit_pos = int(game_update_string[3])
+                    if num == 1:
+                        if self.p1.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target:
+                            if self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
+                                    self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
+                                self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
+                                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    else:
+                        if self.p2.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target:
+                            if self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
+                                    self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
+                                self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
+                                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+
+    def reset_all_valid_targets_kugath_nurglings(self):
+        self.resolving_kugath_nurglings = False
+        for i in range(7):
+            for j in range(len(self.p1.cards_in_play[i + 1])):
+                self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
+                self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling = 0
+            for j in range(len(self.p2.cards_in_play[i + 1])):
+                self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
+                self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling = 0
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -3613,13 +3683,15 @@ class Game:
                 await self.resolve_choice(name, game_update_string)
             elif self.effects_waiting_on_resolution:
                 await self.resolve_effect(name, game_update_string)
+            elif self.positions_of_units_to_take_damage:
+                print("Using better shield mechanism")
+                await self.better_shield_card_resolution(name, game_update_string)
+            elif self.resolving_kugath_nurglings:
+                await self.resolution_of_kugath_nurglings(name, game_update_string)
             elif self.reactions_needing_resolving:
                 print("Resolve reaction")
                 print(self.reactions_needing_resolving[0])
                 await self.resolve_reaction(name, game_update_string)
-            elif self.positions_of_units_to_take_damage:
-                print("Using better shield mechanism")
-                await self.better_shield_card_resolution(name, game_update_string)
             elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
                 print("Resolve mobile")
                 await self.resolve_mobile(name, game_update_string)
@@ -3638,6 +3710,25 @@ class Game:
             if self.p1.has_passed and self.p2.has_passed:
                 print("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
+        if self.resolving_kugath_nurglings:
+            if self.check_end_kugath_nurglings():
+                await self.send_update_message("Leaving Ku'gath Nurglings")
+        if self.just_moved_units:
+            self.just_moved_units = False
+            if self.p1.search_for_card_everywhere("Ku'gath's Nurglings") or \
+                    self.p2.search_for_card_everywhere("Ku'gath's Nurglings"):
+                self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
+                for i in range(7):
+                    self.calc_kugath_nurgling_triggers_at_planet(i)
+                if not all(x == 0 for x in self.kugath_nurglings_present_at_planets):
+                    self.resolving_kugath_nurglings = True
+                    await self.send_update_message(
+                        "Ku'gath's Nurglings firing against a moved unit. Proceeding to Ku'gath's Nurglings mode."
+                    )
+                else:
+                    self.reset_all_valid_targets_kugath_nurglings()
+            else:
+                self.reset_all_valid_targets_kugath_nurglings()
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
