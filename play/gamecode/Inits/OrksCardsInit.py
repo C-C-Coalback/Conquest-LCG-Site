@@ -2,6 +2,7 @@ from .. import CardClasses
 
 
 def orks_cards_init():
+    faction = "Orks"
     orks_card_array = [
         CardClasses.WarlordCard("Nazdreg",
                                 "Each other unit you control at this planet gains Brutal. ",
@@ -117,6 +118,18 @@ def orks_cards_init():
                                                "planet without an enemy warlord to ready up to 3 "
                                                "units you control at that planet.", "Tactic.",
                               2, "Orks", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Attack Squig Herd", "No Wargear Attachments.", "Creature. Squig.",
+                             4, faction, "Common", 4, 6, 0, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Dakka Dakka Dakka!", "Deploy Action: Exhaust your warlord to"
+                                                    " deal 1 damage to each unit.", "Tactic. Maneuver.",
+                              2, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.SupportCard("Kustom Field Generator", "Reaction: After an Orks unit you control is assigned "
+                                                          "damage by an attack, exhaust this support to prevent "
+                                                          "all of that damage. Then, deal an amount of indirect "
+                                                          "damage equal to the damage prevented among Orks units "
+                                                          "you control at the same planet as the defender.",
+                                "Upgrade.", 2, faction, "Common", False)
     ]
     return orks_card_array

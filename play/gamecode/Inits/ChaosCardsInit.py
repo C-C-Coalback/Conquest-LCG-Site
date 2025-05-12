@@ -2,6 +2,7 @@ from .. import CardClasses
 
 
 def chaos_cards_init():
+    faction = "Chaos"
     chaos_card_array = [
         CardClasses.WarlordCard("Zarathur, High Sorcerer",
                                 "Interrupt: When damage is assigned to an enemy unit at this"
@@ -132,6 +133,32 @@ def chaos_cards_init():
                              3, "Chaos", "Common", 2, 4, 1, False),
         CardClasses.ArmyCard("Heretek Inventor", "FORCED REACTION: After this unit enters play, your opponent may "
                                                  "move it to a planet of his choice.", "Scholar.",
-                             1, "Chaos", "Common", 3, 3, 1, False)
+                             1, "Chaos", "Common", 3, 3, 1, False),
+        CardClasses.WarlordCard("Ku'gath Plaguefather", "Reaction: After this warlord is declared as an attacker, "
+                                                        "move 1 damage from this warlord to another unit "
+                                                        "at this planet.", "Deamon. Nurgle.", "Chaos",
+                                1, 7, 1, 5, "Bloodied.", 7, 7,
+                                ["4x Ku'gath's Nurglings", "1x Vile Laboratory",
+                                 "1x The Plaguefather's Banner", "2x Fetid Haze"]),
+        CardClasses.ArmyCard("Ku'gath's Nurglings", "FORCED REACTION: After a unit moves to this planet, "
+                                                    "deal it 1 damage.", "Daemon. Nurgle.",
+                             2, "Chaos", "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("Vile Laboratory", "Deploy Action: Exhaust this support to have your opponent choose "
+                                                   "and move a non-Vehicle unit he controls from a "
+                                                   "target planet to an adjacent planet of his choice.",
+                                "Location.", 2, faction, "Signature", False,
+                                action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.AttachmentCard("The Plaguefather's Banner", "Attach to a Nurgle unit.\n"
+                                                                "Attached unit gets +1 HP.\n"
+                                                                "Reaction: After attached unit is declared as "
+                                                                "an attacker, move 1 damage from attached unit "
+                                                                "to another unit at this planet.", "Wargear. Standard.",
+                                   1, faction, "Signature", 3, True, required_traits="Nurgle", extra_health=1),
+        CardClasses.EventCard("Fetid Haze", "Combat Action: Remove all damage from a target Nurgle "
+                                            "unit you control. Then, have your opponent deal an amount of "
+                                            "indirect damage equal to the damage removed among army units he "
+                                            "controls at the same planet.", "Power. Nurgle.",
+                              3, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return chaos_card_array

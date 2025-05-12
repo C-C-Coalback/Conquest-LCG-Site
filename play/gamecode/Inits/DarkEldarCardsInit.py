@@ -144,6 +144,21 @@ def dark_eldar_cards_init():
         CardClasses.SupportCard("Archon's Palace", "Interrupt: When your opponent wins a command struggle, exhaust "
                                                    "this support to cancel either the card bonus or the "
                                                    "resource bonus of that planet this phase.", "Location.",
-                                2, faction, "Loyal", True)
+                                2, faction, "Loyal", True),
+        CardClasses.ArmyCard("Klaivex Warleader", "Ambush.\n"
+                                                  "Reaction: After you deploy this unit during the combat phase, "
+                                                  "destroy a target damaged army unit at this planet.", "Warrior.",
+                             4, faction, "Loyal", 3, 3, 2, False, ambush=True,
+                             allowed_phases_in_hand="COMBAT", action_in_hand=True),
+        CardClasses.AttachmentCard("Bladed Lotus Rifle", "Attach to an army unit.\n"
+                                                         "Attached unit gets +1 ATK.\n"
+                                                         "If attached unit is a Kabalite, it gains Ranged.",
+                                   "Wargear. Weapon.", 1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", extra_attack=1),
+        CardClasses.EventCard("Soul Seizure", "Action: Put a target army unit with printed cost X or lower from "
+                                              "your opponent's discard pile into play under your control"
+                                              " at a planet. X is the number of Torture cards in your discard pile.",
+                              "Tactic. Torture.", 5, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return dark_eldar_cards_array

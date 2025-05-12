@@ -163,6 +163,16 @@ def astra_militarum_cards_init():
         CardClasses.EventCard("Noble Deed", "Action: Sacrifice an Astra Militarum unit to deal damage equal to its "
                                             "printed ATK value to a target enemy army unit at the same planet.",
                               "Tactic.", 1, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Iron Guard Recruits", "", "Conscript. Mordian.",
+                             2, faction, "Common", 1, 2, 2, False),
+        CardClasses.AttachmentCard("Dozer Blade", "Attached to a vehicle army unit.\n"
+                                                  "Attached unit gets +2 HP.", "Hardpoint.",
+                                   0, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Vehicle",
+                                   extra_health=2),
+        CardClasses.SupportCard("Inquisitorial Fortress", "Action: Exhaust and sacrifice this support "
+                                                          "to rout a target army unit.", "Location.",
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return astra_militarum_cards_array

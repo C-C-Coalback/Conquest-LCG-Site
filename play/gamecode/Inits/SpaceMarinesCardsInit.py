@@ -162,6 +162,14 @@ def space_marines_cards_init():
                                 "Location.", 3, faction, "Signature", True),
         CardClasses.EventCard("Blackmane's Hunt", "Reaction: After your warlord commits to a planet, "
                                                   "commit your warlord to an adjacent planet.",
-                              "Tactic.", 0, faction, "Signature", 1, False)
+                              "Tactic.", 0, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Morkai Rune Priest", "Forced Interrupt: When a non-Space Wolves unit retreats from this"
+                                                   " planet, deal 1 damage to that unit.", "Psyker. Space Wolves.",
+                             4, faction, "Loyal", 3, 4, 1, False),
+        CardClasses.AttachmentCard("Fenrisian Wolf", "Attach to an army unit.\n"
+                                                     "Reaction: After a battle at this planet begins,"
+                                                     " exhaust attached unit to deal damage equal to its ATK "
+                                                     "value to a target army unit at the same planet.", "Creature.",
+                                   2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army")
     ]
     return space_marines_card_array

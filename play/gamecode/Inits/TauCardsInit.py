@@ -131,6 +131,16 @@ def tau_cards_init():
         CardClasses.SupportCard("Homing Beacon", "Limited.\n"
                                                  "Reaction: After a unit you control moves to your HQ, "
                                                  "exhaust this support to gain 1 or draw 1 card.", "Upgrade.",
-                                1, faction, "Common", False, limited=True)
+                                1, faction, "Common", False, limited=True),
+        CardClasses.ArmyCard("Bork'an Recruits", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Soldier.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.EventCard("Kauyon Strike", "Combat Action: Move 1 or more Ethereal units "
+                                               "you control to a target planet.", "Tactic.",
+                              1, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.AttachmentCard("Blacksun Filter", "Attach to an army unit.\n"
+                                                      "After an enemy warlord commits to the same "
+                                                      "planet as attached unit, gain 1 resource.", "Wargear.",
+                                   0, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army")
     ]
     return tau_cards_array

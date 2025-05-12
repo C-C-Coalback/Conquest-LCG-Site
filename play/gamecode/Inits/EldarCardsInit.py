@@ -135,6 +135,14 @@ def eldar_cards_init():
                                                  "Attached unit gains Armorbane.", "Hardpoint. Weapon.",
                                    0, faction, "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army",
-                                   unit_must_match_faction=True, required_traits="Vehicle")
+                                   unit_must_match_faction=True, required_traits="Vehicle"),
+        CardClasses.ArmyCard("Black Guardians", "", "Warrior. Ulthwe.", 2, faction, "Common", 2, 4, 0, False),
+        CardClasses.EventCard("Death from Above", "Deploy Action: Put a non-Elite mobile unit into play "
+                                                  "from your hand at the last planet.", "Tactic.",
+                              1, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.SupportCard("Dome of Crystal Seers", "Interrupt: When you search your deck, search "
+                                                         "an additional 3 cards.", "Location.",
+                                1, faction, "Loyal", False)
     ]
     return eldar_cards_array
