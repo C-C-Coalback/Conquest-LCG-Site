@@ -1,4 +1,4 @@
-from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
+from play.gamecode.Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     SpaceMarinesCardsInit, EldarCardsInit, AstraMilitarumCardsInit, TauCardsInit, DarkEldarCardsInit, \
     TyranidsCardsInit, NecronsCardsInit
 
