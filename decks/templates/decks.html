@@ -436,7 +436,7 @@
                 document.querySelector('#chat-log').value = chat_holder;
                 var warlord_name = split_data[1];
                 warlord_name = warlord_name.split(' ').join('_');
-                var route_text = "/static/images/" + warlord_name + ".jpg";
+                var route_text = "/static/images/CardImages/" + warlord_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML =
                 `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                 cardCount = 0
@@ -467,7 +467,7 @@
                 document.querySelector('#chat-log').value = chat_holder;
                 var card_name = split_data[1];
                 card_name = card_name.split(' ').join('_');
-                var route_text = "/static/images/" + card_name + ".jpg";
+                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML +=
                 `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
             } else if (split_data[0] === "Synapse"){
@@ -482,7 +482,7 @@
                 chat_holder = split_chat_holder.join("\n");
                 document.querySelector('#chat-log').value = chat_holder;
                 card_name = card_name.split(' ').join('_');
-                var route_text = "/static/images/" + card_name + ".jpg";
+                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                 document.getElementById('current-warlord').innerHTML +=
                 `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
             } else if (split_data[0] === "Army"){
@@ -501,7 +501,7 @@
                                     split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
                                     var card_name = split_data[1];
                                     card_name = card_name.split(' ').join('_');
-                                    var route_text = "/static/images/" + card_name + ".jpg";
+                                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
                                     `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
@@ -515,7 +515,7 @@
                             split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
                             var card_name = split_data[1];
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
                             `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`;
                             cardCount += 1;
@@ -544,7 +544,7 @@
                                     split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
                                     var card_name = split_data[1];
                                     card_name = card_name.split(' ').join('_');
-                                    var route_text = "/static/images/" + card_name + ".jpg";
+                                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
                                     `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
@@ -558,7 +558,7 @@
                             split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
                             var card_name = split_data[1];
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
                             `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
@@ -586,7 +586,7 @@
                                     split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
                                     var card_name = split_data[1];
                                     card_name = card_name.split(' ').join('_');
-                                    var route_text = "/static/images/" + card_name + ".jpg";
+                                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
                                     `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
@@ -600,7 +600,7 @@
                             split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
                             var card_name = split_data[1];
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
                             `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1
@@ -628,7 +628,7 @@
                                     split_chat_holder[k] = amountOfCard.toString() + split_chat_holder[k].slice(1);
                                     var card_name = split_data[1];
                                     card_name = card_name.split(' ').join('_');
-                                    var route_text = "/static/images/" + card_name + ".jpg";
+                                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                     document.getElementById('current-deck').innerHTML +=
                                     `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                                     cardCount += 1
@@ -642,7 +642,7 @@
                             split_chat_holder[i + 1] = ("\n1x " + split_data[1]);
                             var card_name = split_data[1];
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             document.getElementById('current-deck').innerHTML +=
                             `<img src=` + route_text + ` alt=` + route_text + ` class="Card" />`
                             cardCount += 1

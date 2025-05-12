@@ -77,7 +77,7 @@
             <p>P2P6</p>
         </div>
     </div>
-    <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
+    <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
     <fieldset id="current-hand-player-1">
         <legend>CARDS P1: 0 CARDS</legend>
     </fieldset>
@@ -85,10 +85,10 @@
         <legend>CARDS P2: 0 CARDS</legend>
     </fieldset>
     <div id="current-deck-player-1">
-        <img src="/static/images/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
+        <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
     </div>
     <div id="current-deck-player-2">
-        <img src="/static/images/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
+        <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
     </div>
     <div id="headquarters-player-1">
         <p>Test hq p1</p>
@@ -118,25 +118,25 @@
         <p></p>
     </div>
         <div id="current-discard-player-1">
-        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
     </div>
     <div id="current-discard-player-2">
-        <img src="/static/images/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
     </div>
     <div id="expanded-DISCARD_PILE-1">
         <div id="expanded-discard-1-settings">
-            <input type="image" id="IN_DISCARD/1/0" src="/static/images/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            <input type="image" id="IN_DISCARD/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
         </div>
     </div>
     <div id="expanded-DISCARD_PILE-2">
         <div id="expanded-discard-2-settings">
-            <input type="image" id="IN_DISCARD/2/0" src="/static/images/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            <input type="image" id="IN_DISCARD/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
         </div>
     </div>
     <div id="search-collapse" draggable="true" class="draggable">
         <details>
         <summary>This is what you want to show before expanding</summary>
-        <input type="image" src="/static/images/Nazdreg.jpg" alt="bugged" id="Search-0" onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+        <input type="image" src="/static/images/CardImages/Nazdreg.jpg" alt="bugged" id="Search-0" onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
         </details>
     </div>
 </div>
@@ -212,7 +212,7 @@
                                     var attachment_ready = attachment_data_split[1];
                                     var attachment_class = "Planet-Attachment-Card";
                                     attachment_string_id = "ATTACHMENT/PLANETS/1/" + (i-2).toString() + "/" + attachment_string_id;
-                                    var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                    var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
                                     var attachment_rotation = "";
                                     if (attachment_ready === "E") {
                                         attachment_class = "Exhausted-Planet-Attachment-Card";
@@ -221,7 +221,6 @@
                                     full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                                 }
                             }
-                            // <input type="image" src="/static/images/Defense_Battery.jpg" alt="bugged" class="Planet-Attachment-Card">
                             full_string += `</div><div class="attachments-planet-2">`;
                             var attachments_p2 = card_data_split[4];
                             if (attachments_p2 !== "") {
@@ -233,7 +232,7 @@
                                     var attachment_ready = attachment_data_split[1];
                                     var attachment_class = "Planet-Attachment-Card";
                                     attachment_string_id = "ATTACHMENT/PLANETS/2/" + (i-2).toString() + "/" + attachment_string_id;
-                                    var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                    var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
                                     var attachment_rotation = "";
                                     if (attachment_ready === "E") {
                                         attachment_class = "Exhausted-Planet-Attachment-Card";
@@ -404,7 +403,7 @@
                             var string_id = (i-3).toString();
                             string_id = "IN_DISCARD/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             var full_string = `<div class="Card-div">`;
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
                             if (card_data_split[1] !== "") {
@@ -416,7 +415,7 @@
                         var card_name = split_data[split_data.length - 1].split("|")[0];
                         var string_id = "DISCARD_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
-                        var route_text = "/static/images/" + card_name + ".jpg";
+                        var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                         var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
                         document.getElementById(target_discard_pile_id).innerHTML += full_string;
                     }
@@ -445,7 +444,7 @@
                             if (hale === "B") {
                                 card_name += "_bloodied";
                             }
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             var rotation = "";
                             var full_string = `<div class="Card-div">`;
                             if (is_ready === "E") {
@@ -459,7 +458,7 @@
                                 var attachment_ready = attachment_data_split[1];
                                 var attachment_class = "Attachment-Card";
                                 attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
-                                var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                                var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
                                 var attachment_rotation = "";
                                 if (attachment_ready === "E") {
                                     attachment_class = "Exhausted-Attachment-Card";
@@ -503,7 +502,7 @@
                         if (hale === "B") {
                             card_name += "_bloodied";
                         }
-                        var route_text = "/static/images/" + card_name + ".jpg";
+                        var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                         var rotation = "";
                         var full_string = `<div class="Card-div">`;
                         if (is_ready === "E") {
@@ -518,7 +517,7 @@
                             var attachment_ready = attachment_data_split[1];
                             var attachment_class = "Attachment-Card";
                             attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
-                            var attachment_route_text = "/static/images/" + attachment_name.split(' ').join('_') + ".jpg";
+                            var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
                             var attachment_rotation = "";
                             if (attachment_ready === "E") {
                                 attachment_class = "Exhausted-Attachment-Card";
@@ -562,13 +561,13 @@
                             var string_id = (i-4).toString();
                             string_id = "SEARCH/" + string_id;
                             card_name = card_name.split(' ').join('_');
-                            var route_text = "/static/images/" + card_name + ".jpg";
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                         }
                     } else {
                         for (var i = 4; i < split_data.length; i++) {
                             var string_id = (i-4).toString();
-                            var route_text = "/static/images/Cardback.jpg";
+                            var route_text = "/static/images/CardImages/Cardback.jpg";
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     }
@@ -586,7 +585,7 @@
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
                                 card_name = card_name.split(' ').join('_');
-                                var route_text = "/static/images/" + card_name + ".jpg";
+                                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                 var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                                 if (card_data_split.length === 1) {
                                     full_string += `</div>`
@@ -599,7 +598,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
-                                var route_text = "/static/images/Cardback.jpg";
+                                var route_text = "/static/images/CardImages/Cardback.jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
                                 `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
@@ -615,7 +614,7 @@
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
                                 card_name = card_name.split(' ').join('_');
-                                var route_text = "/static/images/" + card_name + ".jpg";
+                                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                                 var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                                 if (card_data_split.length === 1) {
                                     full_string += `</div>`
@@ -628,7 +627,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
-                                var route_text = "/static/images/Cardback.jpg";
+                                var route_text = "/static/images/CardImages/Cardback.jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
                                 `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
