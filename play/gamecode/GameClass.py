@@ -223,7 +223,8 @@ class Game:
             "Subdual", "Ecstatic Seizures", "Dark Possession", "Subdual", "Muster the Guard",
             "Noble Deed", "Smash 'n Bash", "Visions of Agony", "Empower", "Calamity",
             "Awake the Sleepers", "Reanimation Protocol", "Recycle", "Mechanical Enhancement",
-            "Drudgery", "Extermination"
+            "Drudgery", "Extermination", "Fetid Haze", "Dakka Dakka Dakka!", "Soul Seizure",
+            "Death from Above", "Kauyon Strike"
         ]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
@@ -234,7 +235,7 @@ class Game:
         self.card_to_deploy = None
         self.saved_planet_string = ""
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
-                                 "Veteran Barbrus"]
+                                 "Veteran Barbrus", "Klaivex Warleader"]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
