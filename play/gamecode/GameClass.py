@@ -2693,10 +2693,11 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
-                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
-                            and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
-                        self.effects_waiting_on_resolution.append("Reanimating Warriors")
-                        self.player_resolving_effect.append(primary_player.name_player)
+                    if planet_pos != -2:
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
+                                and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
+                            self.effects_waiting_on_resolution.append("Reanimating Warriors")
+                            self.player_resolving_effect.append(primary_player.name_player)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         self.damage_taken_was_from_attack.append(True)
                         self.positions_of_attacker_of_unit_that_took_damage.append(
@@ -2813,12 +2814,13 @@ class Game:
                                             ))
                                             self.on_kill_effects_of_attacker.append(
                                                 secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
-                                            if primary_player.cards_in_play[planet_pos + 1][
-                                                unit_pos].get_ability() == "Reanimating Warriors" \
-                                                    and not primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].once_per_phase_used:
-                                                self.effects_waiting_on_resolution.append("Reanimating Warriors")
-                                                self.player_resolving_effect.append(primary_player.name_player)
+                                            if planet_pos != -2:
+                                                if primary_player.cards_in_play[planet_pos + 1][
+                                                    unit_pos].get_ability() == "Reanimating Warriors" \
+                                                        and not primary_player.cards_in_play[planet_pos + 1][
+                                                        unit_pos].once_per_phase_used:
+                                                    self.effects_waiting_on_resolution.append("Reanimating Warriors")
+                                                    self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                         "Repulsor Impact Field"):
                                                 self.create_reaction("Repulsor Impact Field",
