@@ -780,6 +780,7 @@ class Game:
         self.name_player_making_choices = self.name_1
 
     def reset_search_values(self):
+        self.searching_enemy_deck = False
         self.what_to_do_with_searched_card = "DRAW"
         self.traits_of_searched_card = None
         self.card_type_of_searched_card = None
@@ -800,6 +801,22 @@ class Game:
                     self.cards_in_search_box = []
                     if self.resolving_search_box:
                         self.resolving_search_box = False
+            elif len(game_update_string) == 3:
+                if game_update_string[0] == "HQ":
+                    if self.number_who_is_searching == game_update_string[1]:
+                        if self.number_who_is_searching == "1":
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        if player.get_ability_given_pos(-2, int(game_update_string[2])) == "Dome of Crystal Seers":
+                            if player.get_ready_given_pos(-2, int(game_update_string[2])):
+                                if not self.searching_enemy_deck:
+                                    player.exhaust_given_pos(-2, int(game_update_string[2]))
+                                    player.number_cards_to_search += 3
+                                    if len(player.deck) >= player.number_cards_to_search:
+                                        self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                                    else:
+                                        self.cards_in_search_box = player.deck[0:player.deck]
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
