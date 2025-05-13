@@ -220,6 +220,32 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_coords_hand = None
         primary_player.has_passed = True
         self.action_cleanup()
+    elif self.action_chosen == "Vile Laboratory":
+        if not self.chosen_first_card:
+            valid = False
+            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Vehicle"):
+                    valid = True
+            if valid:
+                self.chosen_first_card = True
+                self.misc_target_planet = chosen_planet
+                planet_name = self.planet_array[chosen_planet]
+                self.player_with_action = secondary_player.name_player
+                await self.send_update_message(
+                    planet_name + " chosen as the target for Vile Laboratory."
+                )
+            else:
+                planet_name = self.planet_array[chosen_planet]
+                await self.send_update_message(
+                    "No valid targets for Vile Laboratory at " + planet_name + "!"
+                )
+        elif self.chosen_first_card and self.chosen_second_card:
+            if abs(chosen_planet - self.misc_target_planet) == 1:
+                primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1], chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Empower":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():

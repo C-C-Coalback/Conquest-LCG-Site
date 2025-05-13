@@ -87,6 +87,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.misc_target_planet = -1
                             self.chosen_first_card = False
+                    elif ability == "Vile Laboratory":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.misc_target_planet = -1
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
+                            self.chosen_second_card = False
                     elif ability == "Eternity Gate":
                         if card.get_ready():
                             self.action_chosen = ability

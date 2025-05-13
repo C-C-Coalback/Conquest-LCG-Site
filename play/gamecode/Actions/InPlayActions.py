@@ -238,6 +238,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
+    elif self.action_chosen == "Vile Laboratory":
+        if self.chosen_first_card and not self.chosen_second_card:
+            if planet_pos == self.misc_target_planet:
+                if not primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    self.chosen_second_card = True
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Hate":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
