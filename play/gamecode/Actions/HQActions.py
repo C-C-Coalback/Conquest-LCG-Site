@@ -178,6 +178,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             primary_player.headquarters[int(game_update_string[2])].flying_eop = True
                             self.action_cleanup()
+                    elif ability == "Inquisitorial Fortress":
+                        if card.get_ready():
+                            if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
+                                self.action_chosen = ability
                     elif ability == "Master Program":
                         if card.get_ready():
                             self.action_chosen = ability
