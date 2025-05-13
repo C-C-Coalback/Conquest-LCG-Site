@@ -2424,10 +2424,16 @@ class Game:
         return False
 
     async def complete_destruction_checks(self):
-        self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
-        self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
-        self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
-        self.p2.stored_cards_recently_destroyed = copy.deepcopy(self.p2.cards_recently_destroyed)
+        if not self.reactions_needing_resolving:
+            self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
+            self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
+            self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
+            self.p2.stored_cards_recently_destroyed = copy.deepcopy(self.p2.cards_recently_destroyed)
+        else:
+            self.p1.stored_cards_recently_discarded += copy.deepcopy(self.p1.cards_recently_discarded)
+            self.p2.stored_cards_recently_discarded += copy.deepcopy(self.p2.cards_recently_discarded)
+            self.p1.stored_cards_recently_destroyed += copy.deepcopy(self.p1.cards_recently_destroyed)
+            self.p2.stored_cards_recently_destroyed += copy.deepcopy(self.p2.cards_recently_destroyed)
         if self.fall_back_check(self.p1):
             already_fall_back = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -2525,6 +2531,8 @@ class Game:
                 "----GAME END----"
             )
         self.reset_resolving_attack_on_units = True
+        if self.resolving_kugath_nurglings:
+            self.set_targeting_icons_kugath_nurglings()
 
     async def destroy_check_all_cards(self):
         if not self.reactions_needing_resolving and not self.effects_waiting_on_resolution:
@@ -3647,6 +3655,19 @@ class Game:
                                 self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
                                 self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
 
+    def set_targeting_icons_kugath_nurglings(self):
+        for i in range(7):
+            for j in range(len(self.p1.cards_in_play[i + 1])):
+                if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                    if self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
+                            self.calc_kugath_nurgling_triggers_at_planet(i):
+                        self.p1.set_aiming_reticle_in_play(i, j, "blue")
+            for j in range(len(self.p2.cards_in_play[i + 1])):
+                if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                    if self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
+                            self.calc_kugath_nurgling_triggers_at_planet(i):
+                        self.p2.set_aiming_reticle_in_play(i, j, "blue")
+
     def reset_all_valid_targets_kugath_nurglings(self):
         self.resolving_kugath_nurglings = False
         for i in range(7):
@@ -3725,6 +3746,7 @@ class Game:
                     await self.send_update_message(
                         "Ku'gath's Nurglings firing against a moved unit. Proceeding to Ku'gath's Nurglings mode."
                     )
+                    self.set_targeting_icons_kugath_nurglings()
                 else:
                     self.reset_all_valid_targets_kugath_nurglings()
             else:
