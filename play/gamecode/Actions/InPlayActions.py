@@ -238,6 +238,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
+    elif self.action_chosen == "Fetid Haze":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Nurgle"):
+                    damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                    self.location_of_indirect = "PLANET"
+                    self.planet_of_indirect = planet_pos
+                    self.valid_targets_for_indirect = ["Army"]
+                    secondary_player.indirect_damage_applied = 0
+                    secondary_player.total_indirect_damage = damage
+                    self.action_cleanup()
     elif self.action_chosen == "Vile Laboratory":
         if self.chosen_first_card and not self.chosen_second_card:
             if planet_pos == self.misc_target_planet:
