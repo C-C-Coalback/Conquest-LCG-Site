@@ -104,6 +104,7 @@ class Player:
         self.position_discard_of_card = -1
         self.attachments_at_planet = [[], [], [], [], [], [], []]
         self.muster_the_guard_count = 0
+        self.soul_seizure_value = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -880,6 +881,14 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == "Uber Grotesque":
                     if not self.cards_in_play[i + 1][j].once_per_phase_used:
                         self.game.create_reaction("Uber Grotesque", self.name_player, (int(self.number), i, j))
+
+    def count_tortures_in_discard(self):
+        count = 0
+        for i in range(len(self.discard)):
+            card = FindCard.find_card(self.discard[i], self.card_array)
+            if card.check_for_a_trait("Torture"):
+                count += 1
+        return count
 
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()

@@ -10,9 +10,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
-    ability = primary_player.discard[pos_discard]
     if not self.action_chosen:
         if chosen_discard == int(primary_player.number):
+            ability = primary_player.discard[pos_discard]
             if ability == "Decaying Warrior Squad":
                 if self.phase == "COMBAT":
                     primary_player.aiming_reticle_coords_discard = pos_discard
@@ -128,6 +128,15 @@ async def update_game_event_action_discard(self, name, game_update_string):
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
         self.action_cleanup()
+    elif self.action_chosen == "Soul Seizure":
+        if not self.chosen_first_card:
+            if chosen_discard == int(secondary_player.number):
+                card = FindCard.find_card(secondary_player.discard[pos_discard], self.card_array)
+                if card.get_card_type() == "Army":
+                    if card.get_cost() <= primary_player.soul_seizure_value:
+                        self.chosen_first_card = True
+                        secondary_player.aiming_reticle_coords_discard = pos_discard
+                        self.anrakyr_unit_position = pos_discard
     elif self.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
             card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array)

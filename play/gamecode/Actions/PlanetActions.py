@@ -415,6 +415,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.mode = "Normal"
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
+    elif self.action_chosen == "Soul Seizure":
+        if self.chosen_first_card:
+            card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            del secondary_player.discard[self.anrakyr_unit_position]
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            self.action_cleanup()
     elif self.action_chosen == "Gift of Isha":
         discard = primary_player.get_discard()
         i = len(discard) - 1

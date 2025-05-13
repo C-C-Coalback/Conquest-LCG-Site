@@ -673,7 +673,7 @@ class Game:
                 if game_update_string[1] == "1":
                     if len(self.p1.discard) > int(game_update_string[2]):
                         return True
-                elif game_update_string[2] == "2":
+                elif game_update_string[1] == "2":
                     if len(self.p2.discard) > int(game_update_string[2]):
                         return True
             elif game_update_string[0] == "HAND":
