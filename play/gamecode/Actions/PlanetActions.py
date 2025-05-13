@@ -173,12 +173,31 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         if unit_pos_2 > unit_pos:
                             unit_pos_2 -= 1
                             self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
-        if self.phase == "DEPLOY":
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.get_number()
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.mode = "Normal"
+        self.action_cleanup()
+    elif self.action_chosen == "Kauyon Strike":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p2
+        if self.chosen_first_card:
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = -1
+            for i in range(len(self.khymera_to_move_positions)):
+                planet_pos, unit_pos = self.khymera_to_move_positions[i]
+                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            for i in range(len(self.khymera_to_move_positions)):
+                planet_pos, unit_pos = self.khymera_to_move_positions[i]
+                if planet_pos != int(game_update_string[1]):
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, int(game_update_string[1]))
+                    for j in range(len(self.khymera_to_move_positions)):
+                        planet_pos_2, unit_pos_2 = self.khymera_to_move_positions[j]
+                        if planet_pos == planet_pos_2:
+                            if unit_pos_2 > unit_pos:
+                                unit_pos_2 -= 1
+                                self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
+            self.action_cleanup()
     elif self.action_chosen == "Wildrider Squadron":
         if abs(chosen_planet - self.position_of_actioned_card[0]) == 1:
             origin_planet, origin_pos = self.position_of_actioned_card

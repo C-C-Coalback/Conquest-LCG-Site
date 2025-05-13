@@ -589,6 +589,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_chosen == "Kauyon Strike":
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+        else:
+            primary_player = self.p2
+        if primary_player.get_number() == game_update_string[1]:
+            planet_pos = -2
+            unit_pos = int(game_update_string[2])
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal"):
+                self.khymera_to_move_positions.append((planet_pos, unit_pos))
+                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                self.chosen_first_card = True
     elif self.action_chosen == "Khymera Den":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
