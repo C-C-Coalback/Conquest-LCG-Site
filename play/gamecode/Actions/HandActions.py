@@ -100,6 +100,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Death from Above":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Calculated Strike":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -476,6 +480,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             self.action_cleanup()
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
+    elif self.action_chosen == "Death from Above":
+        if card.get_is_unit():
+            if card.get_mobile() and not card.check_for_a_trait("Elite"):
+                last_planet = self.determine_last_planet()
+                primary_player.add_card_to_planet(card, last_planet)
+                primary_player.remove_card_from_hand(int(game_update_string[2]))
+                if int(game_update_string[2]) < primary_player.aiming_reticle_coords_hand:
+                    primary_player.aiming_reticle_coords_hand -= 1
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):

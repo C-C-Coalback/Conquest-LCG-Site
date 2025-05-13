@@ -649,6 +649,13 @@ class Game:
         self.p1.force_due_to_dark_possession = False
         self.p2.force_due_to_dark_possession = False
 
+    def determine_last_planet(self):
+        last = -1
+        for i in range(len(self.planets_in_play_array)):
+            if self.planets_in_play_array[i]:
+                last = i
+        return last
+
     def validate_received_game_string(self, game_update_string):
         if len(game_update_string) == 1:
             return True
