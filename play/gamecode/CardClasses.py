@@ -340,6 +340,9 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Rokkit Launcha":
                 return True
+            if self.attachments[i].get_ability() == "Bladed Lotus Rifle":
+                if self.check_for_a_trait("Kabalite"):
+                    return True
         return self.ranged
 
     def get_ignores_flying(self):
