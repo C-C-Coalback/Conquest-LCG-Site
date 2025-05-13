@@ -126,6 +126,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.choices_available = ["Yes", "No"]
                                         self.choice_context = "Retreat Warlord?"
                                         self.name_player_making_choices = player.name_player
+                                        self.resolving_search_box = True
                                     print("Unit ready, can be used")
                                     valid_unit = True
                                     player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
@@ -159,22 +160,26 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
                                     player.discard_top_card_deck()
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Ku'gath Plaguefather":
+                                self.create_reaction("Ku'gath Plaguefather", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
                                     == "Wailing Wraithfighter":
-                                self.reactions_needing_resolving.append("Wailing Wraithfighter")
-                                self.positions_of_unit_triggering_reaction.append((int(player.number), -1, -1))
-                                self.player_who_resolves_reaction.append(player.name_player)
+                                self.create_reaction("Wailing Wraith Fighter", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
                                     == "Seraphim Superior Allegra":
                                 self.create_reaction("Seraphim Superior Allegra", player.name_player,
-                                                     (int(player.number), -1, -1))
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Spiritseer Erathal":
-                                self.reactions_needing_resolving.append("Spiritseer Erathal")
-                                self.positions_of_unit_triggering_reaction.append([int(player.number),
-                                                                                   self.attacker_planet,
-                                                                                   self.attacker_position])
-                                self.player_who_resolves_reaction.append(player.name_player)
+                                self.create_reaction("Spiritseer Erathal", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Shrieking Harpy":
                                 if self.infested_planets[self.attacker_planet]:
@@ -188,11 +193,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                       self.attacker_position))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
                                                                 "Banshee Power Sword"):
-                                self.reactions_needing_resolving.append("Banshee Power Sword")
-                                self.positions_of_unit_triggering_reaction.append((int(player.number),
-                                                                                   self.attacker_planet,
-                                                                                   self.attacker_position))
-                                self.player_who_resolves_reaction.append(player.name_player)
+                                self.create_reaction("Banshee Power Sword", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
+                            if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
+                                                                "The Plaguefather's Banner"):
+                                self.create_reaction("The Plaguefather's Banner", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                 elif self.defender_position == -1:
                     if game_update_string[1] != self.number_with_combat_turn:
                         armorbane_check = False

@@ -33,6 +33,32 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     await self.complete_nullify()
                 self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Ku'gath Plaguefather":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.number == game_update_string[1]:
+                    if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
+                        primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
+                                                              self.positions_of_unit_triggering_reaction[0][2], 1)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                        self.delete_reaction()
+                else:
+                    primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
+                                                          self.positions_of_unit_triggering_reaction[0][2], 1)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                    self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "The Plaguefather's Banner":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.number == game_update_string[1]:
+                    if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
+                        primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
+                                                              self.positions_of_unit_triggering_reaction[0][2], 1)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                        self.delete_reaction()
+                else:
+                    primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
+                                                          self.positions_of_unit_triggering_reaction[0][2], 1)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:

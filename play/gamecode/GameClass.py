@@ -1444,6 +1444,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            self.resolving_search_box = False
                             primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                 resolving_attack = False
                             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
@@ -1455,6 +1456,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            self.resolving_search_box = False
                     elif self.choice_context == "Target Dark Possession:":
                         primary_player.force_due_to_dark_possession = True
                         primary_player.cards.append(self.choices_available[int(game_update_string[1])])
@@ -3432,7 +3434,8 @@ class Game:
             print(self.resolving_search_box)
             print(self.effects_waiting_on_resolution)
             if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
-                    self.resolving_search_box and not self.effects_waiting_on_resolution:
+                    self.resolving_search_box and not self.effects_waiting_on_resolution \
+                    and not self.positions_of_units_to_take_damage:
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
                 if (self.player_with_initiative == self.name_1 and p_one_count > 0 and

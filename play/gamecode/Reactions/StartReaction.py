@@ -212,6 +212,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Piranha Hunter":
             primary_player.draw_card()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Ku'gath Plaguefather":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
+                self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "The Plaguefather's Banner":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Aun'ui Prelate":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
