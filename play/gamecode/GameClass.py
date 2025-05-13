@@ -3413,12 +3413,13 @@ class Game:
         return False
 
     def delete_reaction(self):
-        self.asking_which_reaction = True
-        self.already_resolving_reaction = False
-        self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
-        del self.reactions_needing_resolving[0]
-        del self.player_who_resolves_reaction[0]
-        del self.positions_of_unit_triggering_reaction[0]
+        if self.reactions_needing_resolving:
+            self.asking_which_reaction = True
+            self.already_resolving_reaction = False
+            self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
+            del self.reactions_needing_resolving[0]
+            del self.player_who_resolves_reaction[0]
+            del self.positions_of_unit_triggering_reaction[0]
         if not self.reactions_needing_resolving:
             self.p1.reset_defense_batteries()
             self.p2.reset_defense_batteries()

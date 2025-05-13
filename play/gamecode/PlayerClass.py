@@ -984,6 +984,10 @@ class Player:
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Klaivex Warleader":
+                                if self.game.phase == "COMBAT":
+                                    self.game.create_reaction("Klaivex Warleader", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Aun'ui Prelate":
                                 self.game.create_reaction("Aun'ui Prelate", self.name_player,
                                                           (int(self.number), position, location_of_unit))
