@@ -2707,8 +2707,23 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
+        mork_count = 0
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if self.get_ability_given_pos(planet_id, i) == "Morkai Rune Priest":
+                mork_count += 1
+        if self.number == "1":
+            enemy_player = self.game.p2
+        else:
+            enemy_player = self.game.p1
+        for i in range(len(enemy_player.cards_in_play[planet_id + 1])):
+            if enemy_player.get_ability_given_pos(planet_id, i) == "Morkai Rune Priest":
+                mork_count += 1
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_hq = len(self.headquarters) - 1
+        if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves"):
+            mork_count = 0
+        for i in range(mork_count):
+            self.assign_damage_to_pos(-2, last_element_hq, 1)
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
