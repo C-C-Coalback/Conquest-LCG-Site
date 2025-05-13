@@ -59,6 +59,38 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           self.positions_of_unit_triggering_reaction[0][2], 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
                     self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Fenrisian Wolf":
+            att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+            if att_pla == planet_pos:
+                if game_update_string[1] == "1":
+                    player_being_hit = self.p1
+                else:
+                    player_being_hit = self.p2
+                if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    can_continue = True
+                    if player_being_hit.number == secondary_player.number:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message(
+                                "Immune to enemy card abilities.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                    if can_continue:
+                        att_value = primary_player.get_attack_given_pos(att_pla, att_pos)
+                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value)
+                        self.advance_damage_aiming_reticle()
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:

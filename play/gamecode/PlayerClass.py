@@ -577,13 +577,23 @@ class Player:
         return False
 
     def adjust_own_reactions(self, planet_pos, unit_pos):
-        for i in range(len(self.game.reactions_needing_resolving)):
+        i = 0
+        while i < len(self.game.reactions_needing_resolving):
             num, pla, pos = self.game.positions_of_unit_triggering_reaction[i]
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
                         self.game.positions_of_unit_triggering_reaction[i] = (num, pla, pos)
+                    elif pos == unit_pos:
+                        if i == 0:
+                            self.game.delete_reaction()
+                        else:
+                            del self.reactions_needing_resolving[i]
+                            del self.player_who_resolves_reaction[i]
+                            del self.positions_of_unit_triggering_reaction[i]
+                            i = i - 1
+            i += 1
 
     def add_to_hq(self, card_object):
         if card_object.get_unique():
@@ -2396,8 +2406,13 @@ class Player:
                     return i, j
         return -1, -1
 
+    def resolve_battle_begins(self, planet_num):
+        for i in range(len(self.cards_in_play[planet_num + 1])):
+            if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf"):
+                if self.get_ready_given_pos(planet_num, i):
+                    self.game.create_reaction("Fenrisian Wolf", self.name_player, (int(self.number), planet_num, i))
+
     def resolve_combat_round_begins(self, planet_num):
-        self.get_planet_of_warlord()
         for i in range(len(self.headquarters)):
             self.headquarters[i].once_per_combat_round_used = False
             if self.headquarters[i].get_ability() == "Holy Fusillade":

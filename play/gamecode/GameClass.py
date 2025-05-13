@@ -4066,6 +4066,11 @@ class Game:
             self.player_with_initiative = self.name_1
             self.number_with_initiative = "1"
 
+    def begin_battle(self, planet_pos):
+        self.last_planet_checked_for_battle = planet_pos
+        self.p1.resolve_battle_begins(planet_pos)
+        self.p2.resolve_battle_begins(planet_pos)
+
     def find_next_planet_for_combat(self):
         i = self.last_planet_checked_for_battle + 1
         while i < len(self.planet_array):
@@ -4076,7 +4081,7 @@ class Game:
                     p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
                     p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
                 if p1_has_warlord or p2_has_warlord:
-                    self.last_planet_checked_for_battle = i
+                    self.begin_battle(i)
                     self.begin_combat_round()
                     self.ranged_skirmish_active = True
                     return True

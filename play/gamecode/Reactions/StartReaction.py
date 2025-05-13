@@ -254,6 +254,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
             self.planet_of_indirect = planet_pos
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Fenrisian Wolf":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.misc_target_planet = planet_pos
         elif self.reactions_needing_resolving[0] == "Swarmling Termagants":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             unique_factions = []
