@@ -141,6 +141,7 @@ class Game:
         self.misc_player_storage = ""
         self.last_defender_position = (-1, -1)
         self.location_of_indirect = ""
+        self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.planet_of_indirect = -1
         self.first_card_damaged = True
         self.cato_stronghold_activated = False
@@ -3145,14 +3146,19 @@ class Game:
                     if len(game_update_string) == 3:
                         if game_update_string[0] == "HQ":
                             if game_update_string[1] == player.get_number():
-                                player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
+                                if player.get_card_type_given_pos(-2, int(game_update_string[2])) in \
+                                        self.valid_targets_for_indirect:
+                                    player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
                 if (self.location_of_indirect == "PLANET" and self.planet_of_indirect == int(game_update_string[2])) \
                         or self.location_of_indirect == "ALL":
                     if len(game_update_string) == 4:
                         if game_update_string[0] == "IN_PLAY":
                             if game_update_string[1] == player.get_number():
-                                player.increase_indirect_damage_at_pos(int(game_update_string[2]),
-                                                                       int(game_update_string[3]), 1)
+                                if player.get_card_type_given_pos(
+                                        int(game_update_string[2]), int(game_update_string[3])) \
+                                        in self.valid_targets_for_indirect:
+                                    player.increase_indirect_damage_at_pos(int(game_update_string[2]),
+                                                                           int(game_update_string[3]), 1)
         if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()

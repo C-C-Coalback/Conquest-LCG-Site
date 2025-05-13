@@ -404,6 +404,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.mode = "Normal"
     elif self.action_chosen == "Ork Kannon":
         self.location_of_indirect = "PLANET"
+        self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.planet_of_indirect = int(game_update_string[1])
         self.p1.total_indirect_damage = 1
         self.p2.total_indirect_damage = 1

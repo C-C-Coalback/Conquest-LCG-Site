@@ -251,6 +251,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.p1.total_indirect_damage += 1
             self.p2.total_indirect_damage += 1
             self.location_of_indirect = "PLANET"
+            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
             self.planet_of_indirect = planet_pos
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Swarmling Termagants":

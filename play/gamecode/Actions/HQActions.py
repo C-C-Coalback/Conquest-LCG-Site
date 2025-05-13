@@ -117,6 +117,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     "Ork Landa hit an odd Orks card!"
                                 )
                                 self.location_of_indirect = "ALL"
+                                self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
                                 secondary_player.indirect_damage_applied = 0
                                 secondary_player.total_indirect_damage = card.get_cost()
                             else:
