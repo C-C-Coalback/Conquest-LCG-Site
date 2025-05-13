@@ -1151,6 +1151,10 @@ class Player:
                                                           (int(self.number), j, k))
                 if summon_khymera:
                     self.summon_token_at_planet("Khymera", dest_planet)
+                if self.number == "1":
+                    self.game.p2.resolve_enemy_warlord_committed_to_planet(dest_planet)
+                else:
+                    self.game.p1.resolve_enemy_warlord_committed_to_planet(dest_planet)
             i += 1
 
     def move_synapse_to_hq(self):
@@ -1922,6 +1926,12 @@ class Player:
             if self.warlord_faction != "Eldar":
                 area_effect += 2
         return area_effect
+
+    def resolve_enemy_warlord_committed_to_planet(self, planet_pos):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            for j in range(len(self.cards_in_play[planet_pos + 1][i].get_attachments())):
+                if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":
+                    self.game.create_reaction("Blacksun Filter", self.name_player, (int(self.number), planet_pos, i))
 
     def get_attack_given_pos(self, planet_id, unit_id):
         card = self.cards_in_play[planet_id + 1][unit_id]

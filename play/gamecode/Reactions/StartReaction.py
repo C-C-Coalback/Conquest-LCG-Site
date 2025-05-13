@@ -258,6 +258,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.misc_target_planet = planet_pos
+        elif self.reactions_needing_resolving[0] == "Blacksun Filter":
+            primary_player.add_resources(1)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Swarmling Termagants":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             unique_factions = []

@@ -63,6 +63,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                     print(self.p1.warlord_commit_location, self.p2.warlord_commit_location)
                     self.p1.commit_warlord_to_planet()
                     self.p2.commit_warlord_to_planet()
+                    self.p1.resolve_enemy_warlord_committed_to_planet(self.p2.warlord_commit_location)
+                    self.p2.resolve_enemy_warlord_committed_to_planet(self.p1.warlord_commit_location)
                     self.p1.commit_synapse_to_planet()
                     self.p2.commit_synapse_to_planet()
                     self.p1.has_passed = False
