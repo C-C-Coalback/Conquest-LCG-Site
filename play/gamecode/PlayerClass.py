@@ -105,6 +105,7 @@ class Player:
         self.attachments_at_planet = [[], [], [], [], [], [], []]
         self.muster_the_guard_count = 0
         self.soul_seizure_value = 0
+        self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits"]
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1952,7 +1953,7 @@ class Player:
         if card.get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
-        if card.get_ability() == "Ymgarl Genestealer":
+        if card.get_ability() in self.plus_two_atk_if_warlord:
             if self.check_for_warlord(planet_id):
                 attack_value += 2
             else:
