@@ -142,6 +142,7 @@ class Game:
         self.last_defender_position = (-1, -1)
         self.location_of_indirect = ""
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+        self.faction_of_cards_for_indirect = ""
         self.planet_of_indirect = -1
         self.first_card_damaged = True
         self.cato_stronghold_activated = False
@@ -2889,10 +2890,27 @@ class Game:
                                 print("is ready")
                                 primary_player.exhaust_given_pos(-2, hq_pos)
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                self.amount_that_can_be_removed_by_shield[0] -= 1
                                 if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
                                         self.damage_on_units_list_before_new_damage[0]:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Kustom Field Generator":
+                            if primary_player.headquarters[hq_pos].get_ready():
+                                hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                                if primary_player.get_faction_given_pos(hurt_planet, hurt_pos) == "Orks":
+                                    if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                        primary_player.exhaust_given_pos(-2, hq_pos)
+                                        damage = self.amount_that_can_be_removed_by_shield[0]
+                                        primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        self.location_of_indirect = "PLANET"
+                                        self.planet_of_indirect = hurt_planet
+                                        self.faction_of_cards_for_indirect = "Orks"
+                                        self.valid_targets_for_indirect = ["Army", "Synapse", "Warlord", "Token"]
+                                        primary_player.indirect_damage_applied = 0
+                                        primary_player.total_indirect_damage = damage
+                                        await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif primary_player.headquarters[hq_pos].get_name() == "Old One Eye":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                             if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
@@ -3151,7 +3169,11 @@ class Game:
                             if game_update_string[1] == player.get_number():
                                 if player.get_card_type_given_pos(-2, int(game_update_string[2])) in \
                                         self.valid_targets_for_indirect:
-                                    player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
+                                    if player.get_faction_given_pos(
+                                            -2, int(game_update_string[2])) == \
+                                            self.faction_of_cards_for_indirect or not \
+                                            self.faction_of_cards_for_indirect:
+                                        player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
                 if (self.location_of_indirect == "PLANET" and self.planet_of_indirect == int(game_update_string[2])) \
                         or self.location_of_indirect == "ALL":
                     if len(game_update_string) == 4:
@@ -3160,8 +3182,12 @@ class Game:
                                 if player.get_card_type_given_pos(
                                         int(game_update_string[2]), int(game_update_string[3])) \
                                         in self.valid_targets_for_indirect:
-                                    player.increase_indirect_damage_at_pos(int(game_update_string[2]),
-                                                                           int(game_update_string[3]), 1)
+                                    if player.get_faction_given_pos(
+                                            int(game_update_string[2]), int(game_update_string[3])) == \
+                                            self.faction_of_cards_for_indirect or not \
+                                            self.faction_of_cards_for_indirect:
+                                        player.increase_indirect_damage_at_pos(int(game_update_string[2]),
+                                                                               int(game_update_string[3]), 1)
         if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()

@@ -2085,7 +2085,6 @@ class Player:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "red")
             else:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
-        print("after:", damage_on_card_after, "before:", damage_on_card_before)
         if damage_on_card_after > damage_on_card_before:
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
