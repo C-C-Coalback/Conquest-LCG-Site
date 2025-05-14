@@ -530,6 +530,9 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Termagant Spikers":
                     return True
+        if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
+            if self.check_for_enemy_warlord(planet_id):
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_ranged()
 
     def check_for_trait_given_pos(self, planet_id, unit_id, trait):
@@ -1367,6 +1370,15 @@ class Player:
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eop()
 
+    def check_for_enemy_warlord(self, planet_id):
+        if self.number == "1":
+            enemy_player = self.game.p2
+        else:
+            enemy_player = self.game.p1
+        if enemy_player.check_for_warlord(planet_id):
+            return True
+        return False
+
     def get_armorbane_given_pos(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
@@ -1374,6 +1386,13 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Treacherous Lhamaean":
             if self.warlord_faction != "Dark Eldar":
                 return True
+        if planet_id != -2:
+            if self.get_faction_given_pos(planet_id, unit_id) == "Tau":
+                if self.search_card_at_planet(planet_id, "Aun'shi", bloodied_relevant=True):
+                    return True
+            if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
+                if self.check_for_enemy_warlord(planet_id):
+                    return True
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
     def get_ignores_flying_given_pos(self, planet_id, unit_id):
@@ -1998,6 +2017,12 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.check_for_warlord(planet_id):
                         attack_value += 2
+        if planet_id != -2:
+            if card.get_faction() == "Tau":
+                for i in range(len(self.cards_in_play[planet_id + 1])):
+                    if i != unit_id:
+                        if self.search_attachments_at_pos(planet_id, i, "Honor Blade"):
+                            attack_value += 1
         card.reset_brutal()
         return attack_value
 

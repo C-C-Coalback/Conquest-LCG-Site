@@ -373,6 +373,8 @@ class UnitCard(Card):
                 return True
             if self.attachments[i].get_ability() == "Starcannon":
                 return True
+            if self.attachments[i].get_ability() == "Goff Big Choppa":
+                return True
         return self.armorbane
 
     def get_by_base_area_effect(self):
