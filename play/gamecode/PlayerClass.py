@@ -105,7 +105,8 @@ class Player:
         self.attachments_at_planet = [[], [], [], [], [], [], []]
         self.muster_the_guard_count = 0
         self.soul_seizure_value = 0
-        self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits"]
+        self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits", "White Scars Bikers",
+                                        "Eldritch Corsair"]
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()

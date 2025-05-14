@@ -173,6 +173,16 @@ def astra_militarum_cards_init():
                                    extra_health=2),
         CardClasses.SupportCard("Inquisitorial Fortress", "Action: Exhaust and sacrifice this support "
                                                           "to rout a target army unit.", "Location.",
-                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL")
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Mystic Warden", "FORCED REACTION: After a battle at this planet ends, "
+                                              "sacrifice this unit.", "Psyker.",
+                             0, faction, "Common", 2, 2, 0, False),
+        CardClasses.EventCard("To Arms!", "Action: Ready a target support card.", "Tactic.",
+                              0, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Honorifica Imperialis", "Attach to an army unit.\n"
+                                                            "While at a planet with an enemy warlord attached unit "
+                                                            "gains Armorbane and Ranged.", "Wargear. Award.",
+                                   2, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return astra_militarum_cards_array

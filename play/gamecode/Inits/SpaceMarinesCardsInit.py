@@ -170,6 +170,14 @@ def space_marines_cards_init():
                                                      "Reaction: After a battle at this planet begins,"
                                                      " exhaust attached unit to deal damage equal to its ATK "
                                                      "value to a target army unit at the same planet.", "Creature.",
-                                   2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army")
+                                   2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("White Scars Bikers", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Soldier. White Scars.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.EventCard("Know No Fear", "Deploy Action: Exhaust your warlord to move up to 3 Space Marines units"
+                                              " from your HQ, each to a different planet.", "Tactic. Maneuver.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.EventCard("Crushing Blow", "Reaction: After a Space Marines unit damages an enemy unit, deal 1 "
+                                               "unpreventable damage to that enemy unit.", "Tactic.",
+                              0, faction, "Common", 1, False)
     ]
     return space_marines_card_array

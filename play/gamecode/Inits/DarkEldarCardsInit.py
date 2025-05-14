@@ -159,6 +159,12 @@ def dark_eldar_cards_init():
                                               "your opponent's discard pile into play under your control"
                                               " at a planet. X is the number of Torture cards in your discard pile.",
                               "Tactic. Torture.", 5, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Sslyth Mercenary", "Action: Pay 2 to take control of this unit if it is at a planet. "
+                                                 "Any player may use this ability.", "Warrior.",
+                             1, faction, "Common", 2, 2, 2, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Despise", "Combat Action: Each player must sacrifice an Ally "
+                                         "unit he controls, if able.", "Tactic.",
+                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return dark_eldar_cards_array

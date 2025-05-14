@@ -143,6 +143,14 @@ def eldar_cards_init():
                               action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
         CardClasses.SupportCard("Dome of Crystal Seers", "Interrupt: When you search your deck, search "
                                                          "an additional 3 cards.", "Location.",
-                                1, faction, "Loyal", False)
+                                1, faction, "Loyal", False),
+        CardClasses.ArmyCard("Warlock Destructor", "FORCED REACTION: After the deploy phase begins, pay 1 Resource"
+                                                   " or discard this unit.", "Psyker.",
+                             2, faction, "Common", 3, 4, 1, False),
+        CardClasses.ArmyCard("Eldritch Corsair", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Warrior. Iyanden.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.EventCard("Foretell", "Interrupt: When a Battle ability triggers, exhaust your warlord to cancel "
+                                          "its effects. Then, draw 1 card.", "Power. Maneuver.",
+                              0, faction, "Common", 1, False)
     ]
     return eldar_cards_array

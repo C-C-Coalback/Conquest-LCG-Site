@@ -159,6 +159,18 @@ def chaos_cards_init():
                                             "indirect damage equal to the damage removed among army units he "
                                             "controls at the same planet.", "Power. Nurgle.",
                               3, faction, "Signature", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Rotten Plaguebearers", "Action: Exhaust this unit to deal 1 damage to a target "
+                                                     "unit at this planet.", "Daemon. Nurgle.",
+                             2, faction, "Common", 0, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Nurgling Bomb", "Combat Action: Target a planet. For each non-Nurgle unit at that"
+                                               " planet, its controller must choose to either deal 1 damage "
+                                               "to it or rout it.", "Tactic. Nurgle.",
+                              3, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.SupportCard("Throne of Vainglory", "Action: Exhaust this support to discard the top card of your "
+                                                       "deck. If the printed cost of the discarded card is "
+                                                       "3 or higher, put 2 Cultist tokens into play at your HQ.",
+                                "Upgrade. Slaanesh.", 3, faction, "Loyal", False,
+                                action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return chaos_card_array

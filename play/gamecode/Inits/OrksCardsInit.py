@@ -130,6 +130,18 @@ def orks_cards_init():
                                                           "all of that damage. Then, deal an amount of indirect "
                                                           "damage equal to the damage prevented among Orks units "
                                                           "you control at the same planet as the defender.",
-                                "Upgrade.", 2, faction, "Common", False)
+                                "Upgrade.", 2, faction, "Common", False),
+        CardClasses.ArmyCard("Mekaniak Repair Krew", "Action: Exhaust this unit to ready a target Orks support card "
+                                                     "you control. Then deal 1 damage to this unit.", "Oddboy.",
+                             3, faction, "Loyal", 2, 3, 1, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Goff Big Choppa", "Attach to an army unit.\n"
+                                                      "Attached unit gets +2 ATK and gains Armorbane.",
+                                   "Wargear. Weapon.", 2, faction, "Common", 1, False,
+                                   extra_attack=2, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.SupportCard("Ammo Depot", "Action: Exhaust this support to draw 1 card if you have 3 or "
+                                              "fewer cards in your hand.", "Location.",
+                                1, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return orks_card_array

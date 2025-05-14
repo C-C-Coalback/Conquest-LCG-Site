@@ -141,6 +141,24 @@ def tau_cards_init():
         CardClasses.AttachmentCard("Blacksun Filter", "Attach to an army unit.\n"
                                                       "After an enemy warlord commits to the same "
                                                       "planet as attached unit, gain 1 resource.", "Wargear.",
-                                   0, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army")
+                                   0, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.WarlordCard("Aun'shi", "Each Tau unit you control at this planet gains Armorbane.\n"
+                                           "FORCED REACTION: After this warlord resolves its attack,"
+                                           " move it to your HQ.", "Ethereal. Soldier.", faction,
+                                2, 7, 1, 5, "Bloodied.", 7, 7,
+                                ["4x Ethereal Envoy", "1x Aun'shi's Sanctum",
+                                 "1x Honor Blade", "2x Ethereal Wisdom"]),
+        CardClasses.ArmyCard("Ethereal Envoy", "FORCED REACTION: After this unit resolves its attack, "
+                                               "move it to your HQ.", "Ethereal. Soldier.",
+                             1, faction, "Signature", 1, 3, 1, False),
+        CardClasses.SupportCard("Aun'shi's Sanctum", "Action: Exhaust this support to ready a target unit at a "
+                                                     "planet with 1 or more Ethereal units you control.", "Location.",
+                                2, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Honor Blade", "Attach to an Ethereal unit.Attached unit gains, “Each other Tau "
+                                                  "unit you control at this planet gets +1 ATK.”", "Wargear. Weapon.",
+                                   1, faction, "Signature", 3, False, required_traits="Ethereal"),
+        CardClasses.EventCard("Ethereal Wisdom", "Action: Until the end of the phase, a target Tau unit you control "
+                                                 "gets +1 ATK and gains the Ethereal trait.", "Tactic.",
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tau_cards_array
