@@ -924,6 +924,12 @@ class Game:
         elif self.player_resolving_battle_ability == self.name_1:
             winner = self.p1
         if winner is not None:
+            i = 0
+            while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
+                if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
+                    if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
+                        i = i - 1
+                i = i + 1
             if self.round_number == self.last_planet_checked_for_battle:
                 winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
                 winner.capture_planet(self.last_planet_checked_for_battle,
@@ -1446,7 +1452,7 @@ class Game:
                                     self.p2_triggered_yvarn = False
                                 self.reset_choices_available()
                         elif self.choices_available[int(game_update_string[1])] == "No":
-                            print("Does not want to resolve battle ability")
+                            self.reset_choices_available()
                             await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Gains from Tarrus":
                         if self.choices_available[int(game_update_string[1])] == "Cards":
@@ -4136,6 +4142,7 @@ class Game:
         if p1_has_units and p2_has_units:
             pass
         else:
+
             if p1_has_units:
                 await self.resolve_winning_combat(self.p1, self.p2)
             if p2_has_units:
