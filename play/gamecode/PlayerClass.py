@@ -2081,7 +2081,8 @@ class Player:
                     return True
         return False
 
-    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False):
+    def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
+                             context=""):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -2142,6 +2143,7 @@ class Player:
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
             self.game.damage_can_be_shielded.append(can_shield)
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
+            self.game.card_names_triggering_damage.append(context)
             self.game.amount_that_can_be_removed_by_shield.append(total_damage_that_can_be_blocked)
             return True, len(bodyguard_damage_list)
         return False, len(bodyguard_damage_list)
@@ -2182,7 +2184,7 @@ class Player:
             return True
         return False
 
-    def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True):
+    def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context=""):
         prior_damage = self.headquarters[unit_id].get_damage()
         self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
@@ -2191,12 +2193,13 @@ class Player:
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
         self.game.damage_can_be_shielded.append(can_shield)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
+        self.game.card_names_triggering_damage.append(context)
         self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
-    def suffer_area_effect(self, planet_id, amount):
+    def suffer_area_effect(self, planet_id, amount, faction=""):
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            self.assign_damage_to_pos(planet_id, i, amount)
+            self.assign_damage_to_pos(planet_id, i, amount, context=faction)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):
@@ -2789,7 +2792,7 @@ class Player:
         if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves"):
             mork_count = 0
         for i in range(mork_count):
-            self.assign_damage_to_pos(-2, last_element_hq, 1)
+            self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest")
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]

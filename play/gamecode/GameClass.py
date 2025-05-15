@@ -97,6 +97,7 @@ class Game:
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
+        self.card_names_triggering_damage = []
         self.damage_can_be_shielded = []
         self.amount_that_can_be_removed_by_shield = []
         self.card_type_of_selected_card_in_hand = ""
@@ -173,6 +174,7 @@ class Game:
         self.damage_taken_was_from_attack = []
         self.positions_of_attacker_of_unit_that_took_damage = []
         self.faction_of_attacker = []
+        self.card_names_that_caused_damage = []
         self.on_kill_effects_of_attacker = []
         self.furiable_unit_position = (-1, -1)
         self.nullified_card_pos = -1
@@ -250,6 +252,8 @@ class Game:
         self.resolving_kugath_nurglings = False
         self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
         self.auto_card_destruction = True
+        self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
+                                             "Ragnar Blackmane", "Morkai Rune Priest"]
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -265,6 +269,7 @@ class Game:
         self.damage_on_units_list_before_new_damage = []
         self.positions_of_units_to_take_damage = []
         self.positions_attackers_of_units_to_take_damage = []
+        self.card_names_triggering_damage = []
         self.amount_that_can_be_removed_by_shield = []
         self.damage_can_be_shielded = []
         self.damage_taken_was_from_attack = []
@@ -578,12 +583,12 @@ class Game:
                                                                       discounts=self.discounts_applied)
                                 self.mode = "Normal"
 
-    async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe):
+    async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction=""):
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             self.damage_on_units_list_before_new_damage.append(secondary_player.
                                                                get_damage_given_pos
                                                                (chosen_planet, i))
-        secondary_player.suffer_area_effect(chosen_planet, amount_aoe)
+        secondary_player.suffer_area_effect(chosen_planet, amount_aoe, faction=faction)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
         if self.number_of_units_left_to_suffer_damage > 0:
@@ -1139,10 +1144,8 @@ class Game:
                 self.name_player_making_choices = valid_players[0]
             else:
                 self.auto_card_destruction = True
-                await self.destroy_check_all_cards()
         else:
             self.auto_card_destruction = True
-            await self.destroy_check_all_cards()
 
     async def resolve_indomitable(self, primary_player, secondary_player):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -2638,6 +2641,7 @@ class Game:
             self.damage_taken_was_from_attack = []
             self.positions_of_attacker_of_unit_that_took_damage = []
             self.faction_of_attacker = []
+            self.card_names_that_caused_damage = []
             self.on_kill_effects_of_attacker = []
             self.furiable_unit_position = (-1, -1)
             self.p1.cards_recently_discarded = []
@@ -2796,6 +2800,7 @@ class Game:
                             self.positions_attackers_of_units_to_take_damage[0])
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
+                        self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append(
                             secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
@@ -2834,6 +2839,7 @@ class Game:
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
                         self.faction_of_attacker.append("")
+                        self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append([])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 3:
@@ -2904,6 +2910,8 @@ class Game:
                                             self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
                                                 att_pla, att_pos
                                             ))
+                                            self.card_names_that_caused_damage.append(
+                                                self.card_names_triggering_damage[0])
                                             self.on_kill_effects_of_attacker.append(
                                                 secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                                             if planet_pos != -2:
@@ -2967,6 +2975,8 @@ class Game:
                                             self.damage_taken_was_from_attack.append(False)
                                             self.positions_of_attacker_of_unit_that_took_damage.append(None)
                                             self.faction_of_attacker.append("")
+                                            self.card_names_that_caused_damage.append(
+                                                self.card_names_triggering_damage[0])
                                             self.on_kill_effects_of_attacker.append([])
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
@@ -3527,6 +3537,7 @@ class Game:
         del self.damage_on_units_list_before_new_damage[0]
         del self.positions_attackers_of_units_to_take_damage[0]
         del self.damage_can_be_shielded[0]
+        del self.card_names_triggering_damage[0]
         self.damage_moved_to_old_one_eye = 0
         if self.positions_of_units_to_take_damage:
             self.advance_damage_aiming_reticle()
@@ -3574,7 +3585,8 @@ class Game:
                             self.furiable_unit_position = (self.recently_damaged_units[0][1],
                                                            self.recently_damaged_units[0][2])
                             valid_players.append(player_with_cato.name_player)
-            if self.faction_of_attacker[i] == "Space Marines":
+            if self.faction_of_attacker[i] == "Space Marines" or \
+                    self.card_names_that_caused_damage[i] in self.valid_crushing_blow_triggers:
                 if self.recently_damaged_units[0][0] == 1:
                     crushing_player = self.p2
                 else:

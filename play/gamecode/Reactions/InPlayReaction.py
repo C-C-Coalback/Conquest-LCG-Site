@@ -159,7 +159,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                     if can_continue:
-                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Veteran Barbrus")
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
                 else:
@@ -316,7 +316,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Ragnar Blackmane")
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Nahumekh":
             if game_update_string[1] == "1":
@@ -558,7 +558,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if int(game_update_string[1]) == int(secondary_player.get_number()):
                 if abs(origin_planet - target_planet) == 1:
                     if secondary_player.cards_in_play[target_planet + 1][
-                        target_pos].get_card_type() == "Army":
+                            target_pos].get_card_type() == "Army":
                         can_continue = True
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
@@ -583,7 +583,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                  int(game_update_string[3]),
                                                                  origin_planet)
                             new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
-                            secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1)
+                            secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1,
+                                                                  context="Sicarius's Chosen")
                             secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos,
                                                                         "red")
                             self.delete_reaction()

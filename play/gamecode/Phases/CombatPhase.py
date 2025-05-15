@@ -71,11 +71,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 secondary_player = self.p1
                             amount_aoe = primary_player.get_area_effect_given_pos(self.attacker_planet,
                                                                                   self.attacker_position)
+                            faction = primary_player.get_faction_given_pos(self.attacker_planet,
+                                                                           self.attacker_position)
                             if amount_aoe > 0:
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
-                                await self.aoe_routine(primary_player, secondary_player, chosen_planet, amount_aoe)
+                                await self.aoe_routine(primary_player, secondary_player, chosen_planet,
+                                                       amount_aoe, faction=faction)
                                 self.reset_combat_positions()
                                 self.number_with_combat_turn = secondary_player.get_number()
                                 self.player_with_combat_turn = secondary_player.get_name_player()
