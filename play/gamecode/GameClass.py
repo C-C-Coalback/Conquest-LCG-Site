@@ -969,6 +969,8 @@ class Game:
                                                                 may_nullify=False)
             elif self.nullify_context == "The Fury of Sicarius":
                 await self.resolve_fury_sicarius(primary_player, secondary_player)
+            elif self.nullify_context == "Crushing Blow":
+                await self.resolve_crushing_blow(primary_player, secondary_player)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
             elif self.nullify_context == "Glorious Intervention":
@@ -1052,7 +1054,25 @@ class Game:
                     primary_player.discard_card_name_from_hand(self.nullified_card_name)
                 primary_player.spend_resources(self.cost_card_nullified)
                 if self.nullify_context == "The Fury of Sicarius":
-                    pass
+                    sources, valid_players = self.extra_damage_possible()
+                    if sources:
+                        sources.append("None")
+                        self.choices_available = sources
+                        self.auto_card_destruction = False
+                        self.choice_context = "Use an extra source of damage?"
+                        self.name_player_making_choices = valid_players[0]
+                    else:
+                        self.auto_card_destruction = True
+                elif self.nullify_context == "Crushing Blow":
+                    sources, valid_players = self.extra_damage_possible()
+                    if sources:
+                        sources.append("None")
+                        self.choices_available = sources
+                        self.auto_card_destruction = False
+                        self.choice_context = "Use an extra source of damage?"
+                        self.name_player_making_choices = valid_players[0]
+                    else:
+                        self.auto_card_destruction = True
                 elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
                     self.pos_shield_card = -1
                 primary_player.aiming_reticle_coords_hand = None
@@ -1101,7 +1121,28 @@ class Game:
         primary_player.discard_card_name_from_hand("The Fury of Sicarius")
         planet_pos, unit_pos = self.furiable_unit_position
         secondary_player.set_damage_given_pos(planet_pos, unit_pos, 999)
+        self.auto_card_destruction = True
         await self.destroy_check_all_cards()
+
+    async def resolve_crushing_blow(self, primary_player, secondary_player):
+        primary_player.discard_card_name_from_hand("Crushing Blow")
+        planet_pos, unit_pos = self.furiable_unit_position
+        damage = secondary_player.get_damage_given_pos(planet_pos, unit_pos)
+        secondary_player.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+        if not secondary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+            sources, valid_players = self.extra_damage_possible()
+            if sources:
+                sources.append("None")
+                self.choices_available = sources
+                self.auto_card_destruction = False
+                self.choice_context = "Use an extra source of damage?"
+                self.name_player_making_choices = valid_players[0]
+            else:
+                self.auto_card_destruction = True
+                await self.destroy_check_all_cards()
+        else:
+            self.auto_card_destruction = True
+            await self.destroy_check_all_cards()
 
     async def resolve_indomitable(self, primary_player, secondary_player):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -1915,11 +1956,39 @@ class Game:
                         if self.choices_available[int(game_update_string[1])] == "The Fury of Sicarius":
                             self.choice_context = "Use The Fury of Sicarius?"
                             self.choices_available = ["Yes", "No"]
+                        elif self.choices_available[int(game_update_string[1])] == "Crushing Blow":
+                            self.choice_context = "Use Crushing Blow?"
+                            self.choices_available = ["Yes", "No"]
                         else:
                             self.auto_card_destruction = True
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                    elif self.choice_context == "Use Crushing Blow?":
+                        planet_pos, unit_pos = self.furiable_unit_position
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            if secondary_player.nullify_check():
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play Crushing Blow; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "Crushing Blow"
+                                self.cost_card_nullified = 0
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "Crushing Blow"
+                            else:
+                                await self.resolve_crushing_blow(primary_player, secondary_player)
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.auto_card_destruction = True
                     elif self.choice_context == "Use The Fury of Sicarius?":
                         planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":
@@ -1944,7 +2013,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            await self.destroy_check_all_cards()
+                            self.auto_card_destruction = True
                     elif self.choice_context == "Use alternative shield effect?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -3502,7 +3571,20 @@ class Game:
                     if self.fury_search(player_with_cato, player_without_cato):
                         if "The Fury of Sicarius" not in sources:
                             sources.append("The Fury of Sicarius")
+                            self.furiable_unit_position = (self.recently_damaged_units[0][1],
+                                                           self.recently_damaged_units[0][2])
                             valid_players.append(player_with_cato.name_player)
+            if self.faction_of_attacker[i] == "Space Marines":
+                if self.recently_damaged_units[0][0] == 1:
+                    crushing_player = self.p2
+                else:
+                    crushing_player = self.p1
+                if crushing_player.search_hand_for_card("Crushing Blow"):
+                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
+                                                   self.recently_damaged_units[0][2])
+                    if "Crushing Blow" not in sources:
+                        sources.append("Crushing Blow")
+                        valid_players.append(crushing_player.name_player)
         return sources, valid_players
 
     async def update_reactions(self, name, game_update_string, count=0):
