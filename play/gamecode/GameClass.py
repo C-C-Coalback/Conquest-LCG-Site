@@ -249,6 +249,7 @@ class Game:
         self.just_moved_units = False
         self.resolving_kugath_nurglings = False
         self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
+        self.auto_card_destruction = True
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -273,6 +274,7 @@ class Game:
         if self.stored_mode:
             self.mode = self.stored_mode
         self.furiable_unit_position = (-1, -1)
+        self.auto_card_destruction = True
 
     def reset_effects_data(self):
         self.effects_waiting_on_resolution = []
@@ -1909,6 +1911,15 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
+                    elif self.choice_context == "Use an extra source of damage?":
+                        if self.choices_available[int(game_update_string[1])] == "The Fury of Sicarius":
+                            self.choice_context = "Use The Fury of Sicarius?"
+                            self.choices_available = ["Yes", "No"]
+                        else:
+                            self.auto_card_destruction = True
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
                     elif self.choice_context == "Use The Fury of Sicarius?":
                         planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":
@@ -1927,20 +1938,6 @@ class Game:
                                 self.cost_card_nullified = 2
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "The Fury of Sicarius"
-                                """
-                                elif secondary_player.communications_relay_check(planet_pos, unit_pos) and \
-                                        self.communications_relay_enabled:
-                                    await self.game_sockets[0].receive_game_update(
-                                        "Communications Relay may be used.")
-                                    self.choices_available = ["Yes", "No"]
-                                    self.name_player_making_choices = secondary_player.name_player
-                                    self.choice_context = "Use Communications Relay?"
-                                    self.nullified_card_name = "The Fury of Sicarius"
-                                    self.cost_card_nullified = 0
-                                    self.nullify_string = "/".join(game_update_string)
-                                    self.first_player_nullified = primary_player.name_player
-                                    self.nullify_context = "The Fury of Sicarius"
-                                """
                             else:
                                 await self.resolve_fury_sicarius(primary_player, secondary_player)
                         elif game_update_string[1] == "1":
@@ -3428,9 +3425,11 @@ class Game:
                         self.recently_damaged_units[0][1],
                         self.recently_damaged_units[0][2]) != "Warlord":
                     print("Not warlord")
+                    """
                     self.choice_context = "Use The Fury of Sicarius?"
                     self.choices_available = ["Yes", "No"]
                     self.name_player_making_choices = player_with_cato.name_player
+                    """
                     self.furiable_unit_position = (self.recently_damaged_units[0][1],
                                                    self.recently_damaged_units[0][2])
                     return True
@@ -3465,28 +3464,46 @@ class Game:
         else:
             if self.damage_from_attack:
                 self.clear_attacker_aiming_reticle()
-            fury_of_cato_check = False
-            print("\n---FURY CHECK---\n")
             print(self.recently_damaged_units)
             print(self.damage_taken_was_from_attack)
             print(self.positions_of_attacker_of_unit_that_took_damage)
             print(self.faction_of_attacker)
             print(self.on_kill_effects_of_attacker)
-            for i in range(len(self.recently_damaged_units)):
-                if self.damage_taken_was_from_attack[i]:
-                    print("Damage was from attack")
-                    if self.faction_of_attacker[i] == "Space Marines":
-                        print("Attacker was a space marines unit")
-                        if self.recently_damaged_units[0][0] == 1:
-                            player_with_cato = self.p2
-                            player_without_cato = self.p1
-                        else:
-                            player_with_cato = self.p1
-                            player_without_cato = self.p2
-                        if self.fury_search(player_with_cato, player_without_cato):
-                            fury_of_cato_check = True
-            if not fury_of_cato_check:
+            sources_extra_on_damage, player_names = self.extra_damage_possible()
+            if sources_extra_on_damage:
+                sources_extra_on_damage.append("None")
+                self.choices_available = sources_extra_on_damage
+                self.auto_card_destruction = False
+                self.choice_context = "Use an extra source of damage?"
+                self.name_player_making_choices = player_names[0]
+                """
+                self.choice_context = "Use The Fury of Sicarius?"
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = player_with_cato.name_player
+                """
+            else:
                 await self.destroy_check_all_cards()
+
+    def extra_damage_possible(self):
+        print("\nCALLING EXTRA DAMAGE\n")
+        sources = []
+        valid_players = []
+        for i in range(len(self.recently_damaged_units)):
+            if self.damage_taken_was_from_attack[i]:
+                print("Damage was from attack")
+                if self.faction_of_attacker[i] == "Space Marines":
+                    print("Attacker was a space marines unit")
+                    if self.recently_damaged_units[0][0] == 1:
+                        player_with_cato = self.p2
+                        player_without_cato = self.p1
+                    else:
+                        player_with_cato = self.p1
+                        player_without_cato = self.p2
+                    if self.fury_search(player_with_cato, player_without_cato):
+                        if "The Fury of Sicarius" not in sources:
+                            sources.append("The Fury of Sicarius")
+                            valid_players.append(player_with_cato.name_player)
+        return sources, valid_players
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
@@ -3832,8 +3849,9 @@ class Game:
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         if self.resolve_destruction_checks_after_reactions:
             if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage:
-                self.resolve_destruction_checks_after_reactions = False
-                await self.destroy_check_all_cards()
+                if self.auto_card_destruction:
+                    self.resolve_destruction_checks_after_reactions = False
+                    await self.destroy_check_all_cards()
         if not self.resolve_destruction_checks_after_reactions and not self.positions_of_units_to_take_damage and \
                 not self.reactions_needing_resolving and not self.effects_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
@@ -3847,7 +3865,8 @@ class Game:
                 self.p2.ethereal_movement_resolution()
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
-            await self.destroy_check_all_cards()
+            if self.auto_card_destruction:
+                await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         print("---\nDEBUG INFO\n---")
