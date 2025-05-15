@@ -23,8 +23,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 print("reached new in play unit action")
                 ability = card_chosen.get_ability()
-                if ability == "Haemonculus Tormentor":
-                    if player_owning_card.name_player == name:
+                if player_owning_card.name_player == name:
+                    if ability == "Haemonculus Tormentor":
                         if player_owning_card.spend_resources(1):
                             player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
                                                                               2, expiration="EOP")
@@ -35,8 +35,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.player_with_deploy_turn = secondary_player.name_player
                                 self.number_with_deploy_turn = secondary_player.get_number()
                             await self.send_update_message("Haemonculus buffed")
-                elif ability == "Virulent Spore Sacs":
-                    if player_owning_card.name_player == name:
+                    elif ability == "Virulent Spore Sacs":
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.infested_planets[planet_pos] = True
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
@@ -47,142 +46,148 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.player_with_action = ""
                         self.action_chosen = ""
                         self.mode = "Normal"
-                elif ability == "Captain Markis":
-                    if not card_chosen.get_once_per_phase_used():
-                        card_chosen.set_once_per_phase_used(True)
-                        self.action_chosen = ability
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        self.chosen_second_card = False
-                        self.chosen_first_card = False
-                elif ability == "Air Caste Courier":
-                    if card_chosen.get_ready():
-                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
-                        self.action_chosen = ability
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        self.chosen_second_card = False
-                elif ability == "Wildrider Squadron":
-                    if not card_chosen.get_once_per_phase_used():
-                        if player_owning_card.name_player == name:
+                    elif ability == "Captain Markis":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
-                elif ability == "Vaulting Harlequin":
-                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
-                        self.action_cleanup()
-                elif ability == "Boss Zugnog":
-                    if not card_chosen.get_once_per_phase_used():
-                        if self.planets_in_play_array[self.round_number]:
+                            self.chosen_second_card = False
+                            self.chosen_first_card = False
+                    elif ability == "Air Caste Courier":
+                        if card_chosen.get_ready():
+                            player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.chosen_second_card = False
+                    elif ability == "Wildrider Squadron":
+                        if not card_chosen.get_once_per_phase_used():
+                            if player_owning_card.name_player == name:
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Vaulting Harlequin":
+                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
+                            self.action_cleanup()
+                    elif ability == "Boss Zugnog":
+                        if not card_chosen.get_once_per_phase_used():
+                            if self.planets_in_play_array[self.round_number]:
+                                card_chosen.set_once_per_phase_used(True)
+                                self.action_chosen = ability
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.misc_target_planet = planet_pos
+                                self.misc_counter = 0
+                    elif ability == "Hunter Gargoyles":
+                        if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.misc_target_planet = planet_pos
-                            self.misc_counter = 0
-                elif ability == "Hunter Gargoyles":
-                    if not card_chosen.get_once_per_phase_used():
-                        card_chosen.set_once_per_phase_used(True)
-                        self.action_chosen = ability
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                elif ability == "Canoptek Spyder":
-                    if not card_chosen.once_per_combat_round_used:
-                        if planet_pos == self.last_planet_checked_for_battle:
-                            card_chosen.once_per_combat_round_used = True
+                    elif ability == "Canoptek Spyder":
+                        if not card_chosen.once_per_combat_round_used:
+                            if planet_pos == self.last_planet_checked_for_battle:
+                                card_chosen.once_per_combat_round_used = True
+                                self.action_chosen = ability
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.chosen_first_card = False
+                    elif ability == "Mandragoran Immortals":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    elif ability == "Autarch Celachia":
+                        if not card_chosen.once_per_round_used:
+                            if primary_player.spend_resources(1):
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                if self.phase == "DEPLOY":
+                                    self.player_with_deploy_turn = secondary_player.name_player
+                                    self.number_with_deploy_turn = secondary_player.number
+                                self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
+                                self.choice_context = "Autarch Celachia"
+                                self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Immortal Legion":
+                        if card_chosen.get_ready():
+                            if secondary_player.warlord_faction == primary_player.enslaved_faction:
+                                target_planet = secondary_player.get_planet_of_warlord()
+                                if target_planet != -2 and target_planet != -1:
+                                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                    primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
+                                    self.action_cleanup()
+                    elif ability == "Ravenwing Escort":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.misc_target_planet = planet_pos
+                            self.action_chosen = ability
                             self.chosen_first_card = False
-                elif ability == "Mandragoran Immortals":
-                    if not card_chosen.get_once_per_phase_used():
-                        card_chosen.set_once_per_phase_used(True)
-                        self.action_chosen = ability
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                elif ability == "Autarch Celachia":
-                    if not card_chosen.once_per_round_used:
-                        if primary_player.spend_resources(1):
+                    elif ability == "Dread Monolith":
+                        if not card_chosen.once_per_round_used:
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].set_once_per_round_used(True)
+                            self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
-                            if self.phase == "DEPLOY":
-                                self.player_with_deploy_turn = secondary_player.name_player
-                                self.number_with_deploy_turn = secondary_player.number
-                            self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
-                            self.choice_context = "Autarch Celachia"
-                            self.name_player_making_choices = primary_player.name_player
-                elif ability == "Immortal Legion":
-                    if card_chosen.get_ready():
-                        if secondary_player.warlord_faction == primary_player.enslaved_faction:
-                            target_planet = secondary_player.get_planet_of_warlord()
-                            if target_planet != -2 and target_planet != -1:
-                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                                primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
+                            cards_discard = []
+                            for _ in range(3):
+                                if primary_player.discard_top_card_deck():
+                                    last_element = len(primary_player.discard) - 1
+                                    cards_discard.append(primary_player.discard[last_element])
+                            self.choices_available = []
+                            for i in range(len(cards_discard)):
+                                card = FindCard.find_card(cards_discard[i], self.card_array)
+                                if card.get_is_unit() and card.get_faction() == "Necrons":
+                                    if not card.check_for_a_trait("Vehicle"):
+                                        self.choices_available.append(card.get_name())
+                            if self.choices_available:
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.choice_context = "Target Dread Monolith:"
+                                self.name_player_making_choices = primary_player.name_player
+                            else:
+                                await self.send_update_message(
+                                    "No valid targets for Dread Monolith; better luck next time!"
+                                )
                                 self.action_cleanup()
-                elif ability == "Ravenwing Escort":
-                    if card_chosen.get_ready():
-                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                        self.misc_target_planet = planet_pos
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
-                elif ability == "Dread Monolith":
-                    if not card_chosen.once_per_round_used:
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].set_once_per_round_used(True)
-                        self.action_chosen = ability
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        cards_discard = []
-                        for _ in range(3):
-                            if primary_player.discard_top_card_deck():
-                                last_element = len(primary_player.discard) - 1
-                                cards_discard.append(primary_player.discard[last_element])
-                        self.choices_available = []
-                        for i in range(len(cards_discard)):
-                            card = FindCard.find_card(cards_discard[i], self.card_array)
-                            if card.get_is_unit() and card.get_faction() == "Necrons":
-                                if not card.check_for_a_trait("Vehicle"):
-                                    self.choices_available.append(card.get_name())
-                        if self.choices_available:
-                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.choice_context = "Target Dread Monolith:"
-                            self.name_player_making_choices = primary_player.name_player
-                        else:
-                            await self.send_update_message(
-                                "No valid targets for Dread Monolith; better luck next time!"
-                            )
-                            self.action_cleanup()
-                elif ability == "Pathfinder Shi Or'es":
-                    if not card_chosen.get_once_per_phase_used():
-                        self.action_chosen = ability
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        card_chosen.set_once_per_phase_used(True)
-                elif ability == "Veteran Brother Maxos":
-                    if player_owning_card.name_player == name:
-                        self.action_chosen = ability
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                elif ability == "Zarathur's Flamers":
-                    if player_owning_card.name_player == name:
-                        self.action_chosen = "Zarathur's Flamers"
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                elif ability == "Ravenous Flesh Hounds":
-                    if player_owning_card.name_player == name:
-                        self.action_chosen = "Ravenous Flesh Hounds"
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                elif ability == "Nazdreg's Flash Gitz":
-                    if not card_chosen.get_once_per_phase_used():
+                    elif ability == "Pathfinder Shi Or'es":
+                        if not card_chosen.get_once_per_phase_used():
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            card_chosen.set_once_per_phase_used(True)
+                    elif ability == "Mekaniak Repair Krew":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Veteran Brother Maxos":
                         if player_owning_card.name_player == name:
-                            if not card_chosen.get_ready():
-                                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
-                                player_owning_card.set_aiming_reticle_in_play(planet_pos,
-                                                                              unit_pos, "red")
-                                player_owning_card.ready_given_pos(planet_pos, unit_pos)
-                                card_chosen.set_once_per_phase_used(True)
-                                self.player_with_action = ""
-                                self.action_chosen = ""
-                                self.mode = "Normal"
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Zarathur's Flamers":
+                        if player_owning_card.name_player == name:
+                            self.action_chosen = "Zarathur's Flamers"
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Ravenous Flesh Hounds":
+                        if player_owning_card.name_player == name:
+                            self.action_chosen = "Ravenous Flesh Hounds"
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Nazdreg's Flash Gitz":
+                        if not card_chosen.get_once_per_phase_used():
+                            if player_owning_card.name_player == name:
+                                if not card_chosen.get_ready():
+                                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                    player_owning_card.set_aiming_reticle_in_play(planet_pos,
+                                                                                  unit_pos, "red")
+                                    player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                                    card_chosen.set_once_per_phase_used(True)
+                                    self.player_with_action = ""
+                                    self.action_chosen = ""
+                                    self.mode = "Normal"
     elif self.action_chosen == "Twisted Laboratory":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

@@ -33,6 +33,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Mekaniak Repair Krew":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(-2, uni)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(-2, unit_pos, "blue")
                     elif ability == "Slumbering Tomb":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -492,6 +497,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if not secondary_player.has_passed:
                             self.player_with_deploy_turn = secondary_player.name_player
                             self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Mekaniak Repair Krew":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+                if primary_player.get_faction_given_pos(-2, unit_pos) == "Orks":
+                    primary_player.ready_given_pos(-2, unit_pos)
+                    primary_player.assign_damage_to_pos(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1], 1)
+                    primary_player.set_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1], "red")
+                    self.action_cleanup()
     elif self.action_chosen == "Subdual":
         if game_update_string[1] == "1":
             target_player = self.p1
