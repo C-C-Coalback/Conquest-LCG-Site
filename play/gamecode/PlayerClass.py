@@ -1861,6 +1861,7 @@ class Player:
                 self.headquarters[i].mobile_eop = False
                 self.headquarters[i].flying_eop = False
                 self.headquarters[i].brutal_eop = False
+                self.headquarters[i].extra_traits_eop = ""
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
@@ -1872,6 +1873,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):

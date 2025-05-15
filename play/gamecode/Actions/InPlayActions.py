@@ -854,6 +854,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Ethereal Wisdom":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Tau":
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Ethereal"
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += 1
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.action_cleanup()
     elif self.action_chosen == "Clogged with Corpses":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
