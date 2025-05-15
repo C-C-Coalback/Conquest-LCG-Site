@@ -287,6 +287,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.chosen_first_card = True
                         self.position_of_actioned_card = (-2, unit_pos)
                         primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+    elif self.action_chosen == "To Arms!":
+        if game_update_string[1] == "1":
+            target_player = self.p1
+        else:
+            target_player = self.p2
+        if target_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+            if not target_player.get_ready_given_pos(-2, unit_pos):
+                target_player.ready_given_pos(-2, unit_pos)
+                self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
