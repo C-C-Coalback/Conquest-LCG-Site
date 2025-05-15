@@ -854,6 +854,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Aun'shi's Sanctum":
+        ethereal_present = False
+        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ethereal"):
+                ethereal_present = True
+        if ethereal_present:
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.action_cleanup()
     elif self.action_chosen == "Ethereal Wisdom":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
