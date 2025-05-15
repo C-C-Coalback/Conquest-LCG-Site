@@ -254,6 +254,7 @@ class Game:
         self.auto_card_destruction = True
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
+        self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -616,6 +617,12 @@ class Game:
                         if self.chosen_first_card:
                             await self.send_update_message("Stopping Smash 'n Bash early")
                             self.action_cleanup()
+                    elif self.action_chosen == "Preemptive Barrage":
+                        await self.send_update_message("Stopping Preemptive Barrage early")
+                        self.action_cleanup()
+                    elif self.action_chosen == "Know No Fear":
+                        await self.send_update_message("Stopping Know No Fear early")
+                        self.action_cleanup()
                     else:
                         await self.send_update_message("Too far in; action must be concluded now")
             elif len(game_update_string) == 2:

@@ -52,6 +52,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.muster_the_guard_count += 1
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.action_cleanup()
+                    elif ability == "Know No Fear":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                            self.action_chosen = ability
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.misc_counter = 3
+                            self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
+                            self.chosen_first_card = False
                     elif ability == "Dakka Dakka Dakka!":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):

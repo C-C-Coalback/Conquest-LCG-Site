@@ -279,6 +279,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     damage = primary_player.get_damage_given_pos(-2, unit_pos)
                     primary_player.remove_damage_from_pos(-2, unit_pos, 999)
                     self.action_cleanup()
+    elif self.action_chosen == "Know No Fear":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                    if primary_player.get_faction_given_pos(-2, unit_pos) == "Space Marines":
+                        self.chosen_first_card = True
+                        self.position_of_actioned_card = (-2, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

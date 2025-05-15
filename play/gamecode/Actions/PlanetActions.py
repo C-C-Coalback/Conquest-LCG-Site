@@ -442,6 +442,22 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
             self.action_cleanup()
+    elif self.action_chosen == "Know No Fear":
+        if self.chosen_first_card:
+            if self.planets_free_for_know_no_fear[chosen_planet]:
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                primary_player.move_unit_to_planet(self.position_of_actioned_card[0],
+                                                   self.position_of_actioned_card[1], chosen_planet)
+                self.planets_free_for_know_no_fear[chosen_planet] = False
+                self.misc_counter -= 1
+                if self.misc_counter > 0:
+                    self.chosen_first_card = False
+                    self.position_of_actioned_card = (-1, -1)
+                    await self.send_update_message(str(self.misc_counter) + " uses left of Know No Fear")
+                else:
+                    self.action_cleanup()
+                    self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
     elif self.action_chosen == "Gift of Isha":
         discard = primary_player.get_discard()
         i = len(discard) - 1
