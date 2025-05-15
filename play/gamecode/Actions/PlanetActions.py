@@ -442,6 +442,30 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
             self.action_cleanup()
+    elif self.action_chosen == "Nurgling Bomb":
+        found_nurgling_bomb_target_p1 = False
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            primary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
+            if not primary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Nurgle"):
+                primary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
+                primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                found_nurgling_bomb_target_p1 = True
+        found_nurgling_bomb_target_p2 = False
+        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+            secondary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
+            if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Nurgle"):
+                secondary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
+                secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                found_nurgling_bomb_target_p2 = True
+        if found_nurgling_bomb_target_p1:
+            self.resolving_nurgling_bomb = True
+            self.player_resolving_nurgling_bomb = primary_player.name_player
+        elif found_nurgling_bomb_target_p2:
+            self.resolving_nurgling_bomb = True
+            self.player_resolving_nurgling_bomb = secondary_player.name_player
+        else:
+            self.resolving_nurgling_bomb = False
+        self.action_cleanup()
     elif self.action_chosen == "Know No Fear":
         if self.chosen_first_card:
             if self.planets_free_for_know_no_fear[chosen_planet]:

@@ -240,6 +240,8 @@ class UnitCard(Card):
         self.negative_hp_until_eop = 0
         self.positive_hp_until_eop = 0
         self.positive_hp_until_eob = 0
+        self.choice_nurgling_bomb = ""
+        self.need_to_resolve_nurgling_bomb = False
 
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
