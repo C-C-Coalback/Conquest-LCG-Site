@@ -135,7 +135,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     elif ability == "Immortal Legion":
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
-                        if card_chosen.get_ready():
+                        if card.get_ready():
                             if secondary_player.warlord_faction == primary_player.enslaved_faction:
                                 target_planet = secondary_player.get_planet_of_warlord()
                                 if target_planet != -2 and target_planet != -1:
@@ -143,11 +143,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
                     elif ability == "Pathfinder Shi Or'es":
-                        if not card_chosen.get_once_per_phase_used():
+                        if not card.get_once_per_phase_used():
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             self.position_of_actioned_card = (-2, int(game_update_string[2]))
                             card_chosen.set_once_per_phase_used(True)
+                    elif ability == "Ammo Depot":
+                        if card.get_ready():
+                            if len(primary_player.cards) < 4:
+                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                primary_player.draw_card()
+                                self.action_cleanup()
                     elif ability == "Repair Bay":
                         if card.get_ready():
                             card.exhaust_card()
