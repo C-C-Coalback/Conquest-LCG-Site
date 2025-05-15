@@ -155,6 +155,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             card_chosen.set_once_per_phase_used(True)
+                    elif ability == "Rotten Plaguebearers":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Mekaniak Repair Krew":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -573,13 +579,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -593,17 +593,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 planet, position, attachment_position = self.position_of_selected_attachment
                 if primary_player.move_attachment_card(planet, position, attachment_position, planet_pos, unit_pos):
-                    self.action_chosen = ""
-                    self.mode = "Normal"
-                    self.player_with_action = ""
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.position_of_actioned_card = (-1, -1)
-                    if self.phase == "DEPLOY":
-                        if not secondary_player.has_passed:
-                            self.player_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.get_number()
+                    self.action_cleanup()
     elif self.action_chosen == "Reanimation Protocol":
         if primary_player.get_number() == game_update_string[1]:
             if card_chosen.get_faction() == "Necrons" and card_chosen.get_is_unit():
@@ -658,6 +652,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (-1, -1)
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.action_cleanup()
+    elif self.action_chosen == "Rotten Plaguebearers":
+        if planet_pos == self.position_of_actioned_card[0]:
+            can_continue = True
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy card abilities.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+            if can_continue:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                if self.position_of_actioned_card != (-1, -1):
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
+                self.position_of_actioned_card = (-1, -1)
+                self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -822,15 +842,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
                         self.chosen_second_card = True
-                        self.action_chosen = ""
-                        self.player_with_action = ""
-                        self.mode = "Normal"
                         if self.position_of_actioned_card != (-1, -1):
                             primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
                         self.position_of_actioned_card = (-1, -1)
-                        if self.phase == "DEPLOY":
-                            self.player_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.get_number()
+                        self.action_cleanup()
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
