@@ -47,6 +47,9 @@ def neutral_cards_init():
         CardClasses.EventCard("Calamity", "HEADQUARTERS ACTION: Return each army unit with printed cost 2 or "
                                           "lower to its owner's hand.", "Disaster.",
                               1, "Neutral", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS")
+                              action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS"),
+        CardClasses.ArmyCard("Inquisitor Caius Wroth", "Reaction: After this unit enters play, each player must "
+                                                       "choose and discard down to 4 cards in his hand, if able.",
+                             "Psyker. Inquisitor.", 4, "Neutral", "Common", 3, 5, 1, True)
     ]
     return neutral_card_array

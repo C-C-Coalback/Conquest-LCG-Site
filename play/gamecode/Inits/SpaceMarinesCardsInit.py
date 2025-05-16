@@ -178,6 +178,42 @@ def space_marines_cards_init():
                               1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
         CardClasses.EventCard("Crushing Blow", "Reaction: After a Space Marines unit damages an enemy unit, deal 1 "
                                                "unpreventable damage to that enemy unit.", "Tactic.",
-                              0, faction, "Common", 1, False)
+                              0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Blood Claw Pack", "Reaction: After an enemy warlord commits to this planet, "
+                                                "exhaust this unit to put a Space Wolves unit into play from "
+                                                "your hand at this planet.", "Soldier. Space Wolves.",
+                             3, faction, "Common", 2, 2, 1, False),
+        CardClasses.EventCard("Rally the Charge", "Action: Until the end of the phase, a target Space Marines "
+                                                  "unit you control at a planet with your warlord gets +2 "
+                                                  "ATK for each command icon it has.", "Tactic.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Secluded Apothecarion", "Reaction: After a Space Marines unit you control is "
+                                                         "destroyed, exhaust this support to gain 1 resource.",
+                                "Location.", 1, faction, "Loyal", False),
+        CardClasses.ArmyCard("Firedrake Terminators", "Reaction: After this unit is declared as a defender, "
+                                                      "deal 1 damage to the attacker.", "Soldier. Salamanders. Elite.",
+                             5, faction, "Common", 3, 6, 2, False),
+        CardClasses.ArmyCard("Imperial Fists Siege Force", "Reaction: After you deploy this unit, rout 1 or more target"
+                                                           " Ally units at this planet.", "Soldier. Imperial Fists.",
+                             2, faction, "Common", 2, 2, 1, False),
+        CardClasses.AttachmentCard("Nocturne-Ultima Storm Bolter", "Attach to an army unit.\n"
+                                                                   "After attached unit damages an enemy "
+                                                                   "unit by an attack, deal damage equal "
+                                                                   "to the attached unit's ATK value to "
+                                                                   "another target unit at the same planet.",
+                                   "Wargear. Weapon.", 3, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Space Wolves Predator", "No Wargear Attachments.\n"
+                                                      "Reaction: After you deploy this unit, your opponent cannot "
+                                                      "commit his warlord to this planet this round unless it is "
+                                                      "the only planet in play.", "Vehicle. Space Wolves. Elite.",
+                             7, faction, "Common", 5, 5, 3, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Primal Howl", "Reaction: After your warlord commits to a planet with an "
+                                             "enemy warlord, draw 3 cards. Max 1 per round.",
+                              "Power. Space Wolves.", 0, faction, "Loyal", 2, False),
+        CardClasses.SupportCard("Hallow Librarium", "Action: Exhaust this support to have a target unit at a "
+                                                    "planet without an enemy warlord get -2 ATK until"
+                                                    " the end of the phase.", "Location.",
+                                2, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return space_marines_card_array

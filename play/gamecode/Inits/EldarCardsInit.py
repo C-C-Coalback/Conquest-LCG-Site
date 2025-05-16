@@ -151,6 +151,40 @@ def eldar_cards_init():
                              "Warrior. Iyanden.", 3, faction, "Common", 2, 3, 1, False),
         CardClasses.EventCard("Foretell", "Interrupt: When a Battle ability triggers, exhaust your warlord to cancel "
                                           "its effects. Then, draw 1 card.", "Power. Maneuver.",
-                              0, faction, "Common", 1, False)
+                              0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Vectored Vyper Squad", "No Wargear Attachments.\n"
+                                                     "This unit gains Mobile while it is undamaged.",
+                             "Vehicle. Alaitoc.", 4, faction, "Loyal", 3, 3, 1, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Guardian Mesh Armor", "Attach to an Eldar army unit.\n"
+                                                          "Interrupt: When you use a shield card to prevent damage "
+                                                          "to attached unit, exhaust this attachment to double "
+                                                          "the nunber of shields on that card.",
+                                   "Wargear. Armor.", 1, faction, "Common", 1, False,
+                                   unit_must_match_faction=True, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Mighty Wraithknight", "No Wargear Attachments.\n"
+                                                    "Reaction: After this unit enters play, exhaust each non-Spirit"
+                                                    " unit at this planet.", "Vehicle. Spirit. Elite.",
+                             6, faction, "Common", 5, 5, 2, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Seer's Exodus", "Action: Move 1 or more units you control at a "
+                                               "planet with your warlord to your HQ.", "Power.",
+                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Slumbering Gardens", "Interrupt: When an effect would move a unit you control "
+                                                      "from a planet, exhaust this support to cancel that effect.",
+                                "Location.", 1, faction, "Common", False),
+        CardClasses.WarlordCard("Baharroth", "Mobile.", "Warrior. Phoenix Lord.",
+                                faction, 2, 6, 1, 5, "Bloodied.", 7, 7,
+                                ["4x Baharroth's Hawks", "1x Banner of the Ashen Sky",
+                                 "2x Cry of the Wind", "1x The Shining Blade"], mobile=True),
+        CardClasses.ArmyCard("Baharroth's Hawks", "Mobile.\n"
+                                                  "This unit gets +3 ATK while it is at a planet with your warlord.",
+                             "Warrior.", 3, faction, "Signature", 0, 2, 2, False, mobile=True),
+        CardClasses.SupportCard("Banner of the Ashen Sky", "Reaction: After a unit moves from one planet to another, "
+                                                           "exhaust this support to give that unit "
+                                                           "+2 ATK for its next attack this phase.", "Upgrade.",
+                                1, faction, "Signature", False),
+        CardClasses.EventCard("Cry of the Wind", "Reaction: After a unit moves from one planet to another,"
+                                                 " move that unit to an adjacent planet.",
+                              "Tactic.", 0, faction, "Signature", 1, False)
     ]
     return eldar_cards_array

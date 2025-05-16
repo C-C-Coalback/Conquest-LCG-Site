@@ -159,6 +159,29 @@ def tau_cards_init():
                                    1, faction, "Signature", 3, False, required_traits="Ethereal"),
         CardClasses.EventCard("Ethereal Wisdom", "Action: Until the end of the phase, a target Tau unit you control "
                                                  "gets +1 ATK and gains the Ethereal trait.", "Tactic.",
-                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Sa'cea XV88 Broadside", "This unit gain Area Effect (2) "
+                                                      "while it has 1 or more attachments.",
+                             "Soldier. Pilot. Elite.", 6, faction, "Loyal", 4, 6, 3, False),
+        CardClasses.EventCard("Tense Negotiations", "Action: Exhaust your warlord to trigger the Battle "
+                                                    "ability at the same planet as your warlord.", "Tactic."
+                              , 1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Heavy Marker Drone", "Attach to an enemy army unit.\n"
+                                                         "Double damage dealt to attached unit.", "Drone.",
+                                   1, faction, "Loyal", 2, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_enemy_unit=True),
+        CardClasses.ArmyCard("Fire Warrior Grenadiers", "For each Ethereal unit you control at this planet, "
+                                                        "this unit gets +2 ATK and gains 1 command icon.",
+                             "Soldier. Shas'la.", 3, faction, "Common", 2, 2, 0, False),
+        CardClasses.SupportCard("Ksi'm'yen Orbital City", "Combat Action: Exhaust this support to move an Ethereal"
+                                                          " unit from your HQ to a target planet. "
+                                                          "Then, ready that unit.", "Location.",
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Vior'la Warrior Cadre", "This unit gains Ranged while you control an"
+                                                      " Ethereal unit at this planet.", "Soldier. Shas'la.",
+                             4, faction, "Common", 4, 3, 1, False),
+        CardClasses.EventCard("For the Tau'va", "Action: Exhaust your warlord to ready each unit "
+                                                "you control with 1 or more attachments.", "Tactic. Maneuver.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tau_cards_array

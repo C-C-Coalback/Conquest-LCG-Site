@@ -183,6 +183,54 @@ def astra_militarum_cards_init():
                                                             "While at a planet with an enemy warlord attached unit "
                                                             "gains Armorbane and Ranged.", "Wargear. Award.",
                                    2, faction, "Loyal", 2, False,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Steel Legion Chimera", "No Wargear Attachments.\n"
+                                                     "Reaction: After a non-Vehicle unit you control at this "
+                                                     "planet is assigned damage by an attack, prevent 1 of "
+                                                     "that damage.", "Vehicle. Transport.",
+                             3, faction, "Common", 2, 4, 1, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Tallarn Raiders", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Soldier. Tallarn.", 1, faction, "Common", 0, 2, 1, False),
+        CardClasses.SupportCard("Staging Ground", "Action: Exhaust this support to deploy a unit"
+                                                  " with printed cost 2 or lower at a planet",
+                                "Location.", 1, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.WarlordCard("Torquemada Coteaz", "Combat Action: Sacrifice a unit at this planet to give "
+                                                     "this warlord +3 ATK for its next attack this phase. "
+                                                     "(Limit once per attack).", "Soldier. Inquisitor.",
+                                faction, 0, 8, 1, 6,
+                                "Bloodied.", 8, 8,
+                                ["4x Coteaz's Henchmen", "2x The Emperor Protects",
+                                 "1x Formosan Black Ship", "1x The Glovodan Eagle"],
+                                action_in_play=True, allowed_phases_in_play="COMBAT"
+                                ),
+        CardClasses.ArmyCard("Coteaz's Henchmen", "Interrupt: When this unit leaves play, ready your warlord",
+                             "Soldier.", 2, faction, "Signature", 1, 3, 1, False),
+        CardClasses.SupportCard("Formosan Black Ship", "Interrupt: When you sacrifice a non-token unit, exhaust "
+                                                       "this support to put 2 Guardsman tokens into play at the "
+                                                       "same planet as the sacrificed unit.", "Upgrade.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("The Glovodan Eagle", "Attach to your warlord.\n"
+                                                         "Attached warlord gets +1 ATK.\n"
+                                                         "Combat Action: Detach this card to have it become an army "
+                                                         "unit with 1 ATK and 1 HP and the text: "
+                                                         "“Action: Return this unit to your hand.”", "Familiar.",
+                                   1, faction, "Signature", 3, True, action_in_play=True,
+                                   allowed_phases_in_play="COMBAT", type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True, extra_attack=1),
+        CardClasses.EventCard("The Emperor Protects", "Interrupt: When a unit you control leaves play from a "
+                                                      "planet with your warlord, return that unit to your "
+                                                      "hand instead.", "Tactic.",
+                              0, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Shrieking Basilisk", "No Wargear Attachments.\n"
+                                                   "Ranged.\n"
+                                                   "Reaction: After this unit damages an enemy unit, "
+                                                   "exhaust a target support card.", "Vehicle. Artillery. Elite.",
+                             6, faction, "Common", 3, 5, 3, False, wargear_attachments_permitted=False, ranged=True),
+        CardClasses.EventCard("The Emperor's Warrant", "Combat Action: Exhaust a target enemy unit at a planet "
+                                                       "without an enemy warlord. Then, deal damage equal to "
+                                                       "that unit's ATK value to another target unit at that planet.",
+                              "Tactic.", 2, faction, "Loyal", 2, False, action_in_hand=True,
+                              allowed_phases_in_hand="COMBAT")
     ]
     return astra_militarum_cards_array

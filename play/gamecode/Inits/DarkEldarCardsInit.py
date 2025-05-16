@@ -165,6 +165,57 @@ def dark_eldar_cards_init():
                              1, faction, "Common", 2, 2, 2, False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.EventCard("Despise", "Combat Action: Each player must sacrifice an Ally "
                                          "unit he controls, if able.", "Tactic.",
-                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Bloodied Reavers", "No Wargear AttachmentsThis unit gets +2 ATK while it is"
+                                                 " at a planet with a warlord.", "Vehicle.",
+                             2, faction, "Common", 2, 2, 1, False, wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Crucible of Malediction", "Reaction: After you play a Torture event card, "
+                                                           "exhaust this support to look at the top 3 cards of a deck. "
+                                                           "Discard 1 of those cards, and place the remaining cards on"
+                                                           " top of that deck in any order.", "Upgrade.",
+                                1, faction, "Common", False),
+        CardClasses.EventCard("Searing Brand", "Combat Action: Deal 3 unpreventable damage to a target non-warlord "
+                                               "unit at a planet with your warlord. Your opponent may choose "
+                                               "and discard 2 cards from his hand to cancel this effect.",
+                              "Tactic. Torture.", 3, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Kabalite Halfborn", "Interrupt: When this unit leaves play, draw 1 card.",
+                             "Warrior. Kabalite.", 1, faction, "Common", 1, 1, 0, False),
+        CardClasses.EventCard("Slake the Thirst", "Action: Exhaust your warlord to discard up to 3 cards at random "
+                                                  "from a target player's hand. Then, that player draws cards "
+                                                  "equal to the number of cards discarded.", "Tactic. Maneuver.",
+                              "Tactic. Maneuver.", 0, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Shadow Field", "Attach to a Dark Eldar army unit.\n"
+                                                   "Attached unit cannot be dealt damage by an army unit "
+                                                   "with printed cost 2 or lower.", "Wargear.",
+                                   2, faction, "Loyal", 2, False, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.WarlordCard("Urien Rakarth", "The cost for you to play each Torture event is reduced by 1.\n"
+                                                 "The cost for you to play each non-Torture event is increased by 1.",
+                                "Scholar. Haemonculus.", faction, 2, 6, 1, 6,
+                                "Bloodied.", 8, 7,
+                                ["4x Rakarth's Experimentations", "1x Ichor Gauntlet",
+                                 "2x Twisted Wracks", "1x Urien's Oubliette"]),
+        CardClasses.ArmyCard("Twisted Wracks", "Action: Discard a Torture card from your hand to ready this unit.",
+                             "Creature. Abomination.", 2, faction, "Signature", 3, 3, 0, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Rakarth's Experimentations", "Action: Name a card type "
+                                                            "(unit, support, attachment, event). "
+                                                            "Your opponent must either discard 1 card of "
+                                                            "that type from his hand or deal 1 damage to his warlord.",
+                              "Tactic. Torture.", 1, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Ichor Gauntlet", "Attach to your warlord.\n"
+                                                     "Reaction: After you play a Torture event card,"
+                                                     " exhaust attached warlord to copy its effects. "
+                                                     "You may choose new targets.", "Wargear. Weapon.",
+                                   2, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True),
+        CardClasses.SupportCard("Urien's Oubliette", "Your opponent plays with the top card of his deck revealed.\n"
+                                                     "Action: Exhaust this support to discard the top "
+                                                     "card of each player's deck or have each player draw 1 card.",
+                                "Location.", 1, faction, "Signature", True, action_in_play=True,
+                                allowed_phases_in_play="ALL")
     ]
     return dark_eldar_cards_array

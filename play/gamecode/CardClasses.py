@@ -518,7 +518,7 @@ class UnitCard(Card):
 
 class WarlordCard(UnitCard):
     def __init__(self, name, text, traits, faction, attack, health, bloodied_attack, bloodied_health, bloodied_text,
-                 starting_resources, starting_cards, signature_squad, image_name="", brutal=False, flying=False,
+                 starting_cards, starting_resources, signature_squad, image_name="", brutal=False, flying=False,
                  armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None, ranged=False,

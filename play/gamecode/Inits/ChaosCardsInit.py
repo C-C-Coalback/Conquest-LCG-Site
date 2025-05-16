@@ -171,6 +171,44 @@ def chaos_cards_init():
                                                        "deck. If the printed cost of the discarded card is "
                                                        "3 or higher, put 2 Cultist tokens into play at your HQ.",
                                 "Upgrade. Slaanesh.", 3, faction, "Loyal", False,
-                                action_in_play=True, allowed_phases_in_play="ALL")
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Gleeful Plague Beast", "No Wargear Attachments.\n"
+                                                     "FORCED REACTION: After the combat phase begins, deal 1 damage "
+                                                     "to each unit at this planet.", "Daemon. Nurgle. Elite.",
+                             5, faction, "Loyal", 3, 5, 1, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Doombolt", "Deploy Action: Deal X damage to a target enemy army unit. "
+                                          "X is the amount of damage on that unit.", "Power.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.AttachmentCard("Blight Grenades", "Combat Action: Sacrifice this attachment to give attached "
+                                                      "unit Area Effect (2) until the end of the combat phase.",
+                                   "Wargear. Nurgle.", 1, faction, "Common", 1, False,
+                                   action_in_play=True, allowed_phases_in_play="COMBAT",
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Nurgle"),
+        CardClasses.ArmyCard("Noise Marine Zealots", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Warrior. Slaanesh.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.SupportCard("Turbulent Rift", "Reaction: After you deploy an Elite unit, deal 1 damage to that "
+                                                  "unit to deal 1 damage to each enemy unit at that planet.",
+                                "Location.", 1, faction, "Common", False),
+        CardClasses.EventCard("Cacophonic Choir", "Deploy Action: Exhaust your warlord to have your opponent deal "
+                                                  "X indirect damage among units he controls. "
+                                                  "X is the number of units your opponent controls.",
+                              "Power. Maneuver. Slaanesh.", 2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Ancient Keeper of Secrets", "No Wargear Attachments.\n"
+                                                          "Action: Sacrifice a Cultist unit to ready this unit.",
+                             "Daemon. Slaanesh. Elite.", 7, faction, "Common", 5, 5, 3, False,
+                             wargear_attachments_permitted=False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Slaanesh's Temptation", "Attach to a planet.\n"
+                                                            "Increase the cost of each enemy unit being deployed "
+                                                            "at another planet by 1.\n"
+                                                            "FORCED REACTION: After a battle at attached planet ends, "
+                                                            "sacrifice this attachment.", "Power. Slaanesh.",
+                                   2, faction, "Loyal", 2, True, planet_attachment=True),
+        CardClasses.AttachmentCard("Doom Siren", "Attach to an army unit you control.\n"
+                                                 "Reaction: After attached unit uses its Area Effect ability, "
+                                                 "deal damage equal to its Area Effect value to each enemy unit "
+                                                 "at each adjacent planet. Then, sacrifice the attached unit.",
+                                   "Wargear. Slaanesh.", 2, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
     ]
     return chaos_card_array

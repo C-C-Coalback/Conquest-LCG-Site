@@ -142,6 +142,52 @@ def orks_cards_init():
         CardClasses.SupportCard("Ammo Depot", "Action: Exhaust this support to draw 1 card if you have 3 or "
                                               "fewer cards in your hand.", "Location.",
                                 1, faction, "Common", False,
-                                action_in_play=True, allowed_phases_in_play="ALL")
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.WarlordCard("Old Zogwort",
+                                "Reaction: After this warlord commits to a planet or is declared as an attacker, "
+                                "put a Snotlings token into play at this planet.",
+                                "Psyker. Oddboy.", faction, 1, 7, 1, 6,
+                                "Bloodied.\n"
+                                "FORCED REACTION: After the combat phase ends, destroy each "
+                                "Snotlings token you control.", 7, 7,
+                                ['1x Wyrdboy Stikk', "1x Zogwort's Hovel",
+                                 '2x Launch da Snots', "4x Zogwort's Runtherders"]
+                                ),
+        CardClasses.ArmyCard("Zogwort's Runtherders", "Interrupt: When this unit takes damage, "
+                                                      "put a Snotlings token into play at this planet.", "Oddboy.",
+                             3, faction, "Signature", 1, 3, 1, False),
+        CardClasses.SupportCard("Zogwort's Hovel", "Reaction: After your warlord is declared as a defender, "
+                                                   "put a Snotlings token into play at the "
+                                                   "same planet as your warlord.", "Location.",
+                                2, faction, "Signature", False),
+        CardClasses.AttachmentCard("Wyrdboy Stikk", "Attach to an Oddboy unit.\n"
+                                                    "Reaction: After a Snotlings token is destroyed, exhaust "
+                                                    "this attachment to put a Snotlings token into play at a planet.",
+                                   "Wargear. Weapon.", 0, faction, "Signature", 3, False,
+                                   required_traits="Oddboy"),
+        CardClasses.EventCard("Launch da Snots", "Reaction: After an Orks unit you control is declared as an attacker,"
+                                                 " it gets +X ATK for that attack. X is the number of "
+                                                 "Snotlings tokens at the same planet as the attacking unit.",
+                              "Tactic.", 1, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Snakebite Thug", "FORCED REACTION: After this unit resolves its attack, "
+                                               "deal 1 damage to it.", "Warrior. Boyz.",
+                             2, faction, "Common", 3, 4, 1, False),
+        CardClasses.ArmyCard("Evil Sunz Warbiker", "This unit gets +2 ATK while it is at a planet with a warlord.",
+                             "Warrior. Boyz.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.SupportCard("Mork's Great Heap", "Each non-token Orks unit you control gets +1 HP.",
+                                "Upgrade.", 3, faction, "Loyal", True),
+        CardClasses.ArmyCard("Big Shoota Battlewagon", "No Wargear Attachments.\n"
+                                                       "Interrupt: When this unit is destroyed, put 4"
+                                                       " Snotlings tokens into play at this planet.", "Vehicle. Elite.",
+                             6, faction, "Common", 4, 4, 1, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Made Ta Fight", "Interrupt: When an army unit you control leaves play from a planet"
+                                               " with your warlord, deal damage equal to that army unit's"
+                                               " printed ATK value to a target non-warlord unit at the same planet.",
+                              "Power.", 2, faction, "Common", 1, False),
+        CardClasses.EventCard("Squiggify", "Combat Action: Target a non-Vehicle army unit. "
+                                           "Until the end of the phase, set that unit's ATK value to 1,"
+                                           " its printed text box is treated as blank (except for Traits),"
+                                           " and it gains the Squig trait.", "Power.",
+                              3, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return orks_card_array
