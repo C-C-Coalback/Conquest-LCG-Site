@@ -23,6 +23,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 print("reached new in play unit action")
                 ability = card_chosen.get_ability()
+                if player_owning_card.name_player != name:
+                    if ability == "Sslyth Mercenary":
+                        if primary_player.spend_resources(2):
+                            self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+                            self.action_cleanup()
                 if player_owning_card.name_player == name:
                     if ability == "Haemonculus Tormentor":
                         if player_owning_card.spend_resources(1):
