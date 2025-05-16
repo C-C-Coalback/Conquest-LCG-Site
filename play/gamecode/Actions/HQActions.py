@@ -115,23 +115,29 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     elif ability == "Ork Landa":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
-                            primary_player.discard_top_card_deck()
-                            card = primary_player.get_card_top_discard()
-                            if card.get_faction() == "Orks" and card.get_cost() % 2 == 1:
-                                await self.send_update_message(
-                                    "Ork Landa hit an odd Orks card!"
-                                )
-                                self.location_of_indirect = "ALL"
-                                self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
-                                secondary_player.indirect_damage_applied = 0
-                                secondary_player.total_indirect_damage = card.get_cost()
-                            else:
-                                await self.send_update_message(
-                                    "Ork Landa missed"
-                                )
-                            self.action_chosen = ""
-                            self.player_with_action = ""
-                            self.mode = "Normal"
+                            if primary_player.discard_top_card_deck():
+                                card = primary_player.get_card_top_discard()
+                                if card.get_faction() == "Orks" and card.get_cost() % 2 == 1:
+                                    await self.send_update_message(
+                                        "Ork Landa hit an odd Orks card!"
+                                    )
+                                    self.location_of_indirect = "ALL"
+                                    self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+                                    secondary_player.indirect_damage_applied = 0
+                                    secondary_player.total_indirect_damage = card.get_cost()
+                                else:
+                                    await self.send_update_message(
+                                        "Ork Landa missed"
+                                    )
+                            self.action_cleanup()
+                    elif ability == "Throne of Vainglory":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            if primary_player.discard_top_card_deck():
+                                card = primary_player.get_card_top_discard()
+                                if card.get_cost() > 2:
+                                    primary_player.summon_token_at_hq("Cultist", 2)
+                                self.action_cleanup()
                     elif ability == "Immortal Legion":
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
