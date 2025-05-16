@@ -257,6 +257,7 @@ class Game:
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
+        self.player_using_battle_ability = ""
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -939,6 +940,8 @@ class Game:
         self.number_resolving_battle_ability = -1
 
     async def resolve_battle_conclusion(self, name, game_string):
+        self.p1.foretell_permitted = True
+        self.p2.foretell_permitted = True
         winner = None
         if self.player_resolving_battle_ability == self.name_2:
             winner = self.p2
@@ -981,6 +984,7 @@ class Game:
         # self.reset_choices_available()
 
     async def complete_nullify(self):
+        self.choosing_unit_for_nullify = False
         resolve_nullify_discard = True
         if self.first_player_nullified == self.name_1:
             primary_player = self.p1
@@ -1012,6 +1016,13 @@ class Game:
                 await self.resolve_crushing_blow(primary_player, secondary_player)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
+            elif self.nullify_context == "Foretell":
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Use Foretell?"
+                self.name_player_making_choices = primary_player.name_player
+                self.nullify_enabled = False
+                await self.update_game_event(primary_player.name_player, ["CHOICE", "0"], same_thread=True)
+                self.nullify_enabled = True
             elif self.nullify_context == "Glorious Intervention":
                 primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                 primary_player.aiming_reticle_color = "blue"
@@ -1084,6 +1095,12 @@ class Game:
                                 if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                     self.p2.aiming_reticle_coords_hand -= 1
                             self.nullify_count -= 1
+            elif self.nullify_context == "Foretell":
+                print("\n\n!!CALLING FORETELL SPECIAL!!\n\n")
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Use Foretell?"
+                self.name_player_making_choices = secondary_player.name_player
+                await self.resolve_choice(secondary_player.name_player, ["CHOICE", "1"])
             else:
                 if self.nullified_card_pos != -1:
                     primary_player.discard_card_from_hand(self.nullified_card_pos)
@@ -1145,7 +1162,7 @@ class Game:
                 if self.card_pos_to_deploy != -1 and self.nullify_context == "Bigga Is Betta":
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
         self.nullify_count = 0
-        if self.choice_context != "Use Interrupt?":
+        if self.choice_context != "Use Interrupt?" and self.nullify_context != "Foretell":
             self.nullify_context = ""
             self.nullify_string = ""
             self.nullified_card_pos = -1
@@ -1337,6 +1354,44 @@ class Game:
         self.name_player_making_choices = player.name_player
         self.choice_context = "Choose Enslaved Faction:"
 
+    async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
+        self.reset_choices_available()
+        if self.battle_ability_to_resolve == "Osus IV":
+            if loser.spend_resources(1):
+                winner.add_resources(1)
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Barlus":
+            loser.discard_card_at_random()
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Elouith":
+            if len(winner.deck) > 2:
+                winner.number_cards_to_search = 3
+                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                self.name_player_who_is_searching = winner.name_player
+                self.number_who_is_searching = str(winner.number)
+                self.what_to_do_with_searched_card = "DRAW"
+                self.traits_of_searched_card = None
+                self.card_type_of_searched_card = None
+                self.faction_of_searched_card = None
+                self.max_cost_of_searched_card = None
+                self.no_restrictions_on_chosen_card = True
+            else:
+                await self.send_update_message("Too few cards in deck for search")
+                await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Tarrus":
+            winner_count = winner.count_units_in_play_all()
+            loser_count = loser.count_units_in_play_all()
+            if winner_count < loser_count:
+                self.choices_available = ["Cards", "Resources"]
+                self.choice_context = "Gains from Tarrus"
+            else:
+                await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Y'varn":
+            self.yvarn_active = True
+            self.p1_triggered_yvarn = False
+            self.p2_triggered_yvarn = False
+            self.reset_choices_available()
+
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
             primary_player = self.p1
@@ -1445,6 +1500,32 @@ class Game:
                         self.asking_if_remove_infested_planet = False
                         self.already_asked_remove_infestation = True
                         await self.resolve_winning_combat(primary_player, secondary_player)
+                    elif self.choice_context == "Use Foretell?":
+                        if self.choices_available[int(game_update_string[1])] == "Yes":
+                            primary_player.spend_foretell()
+                            self.reset_choices_available()
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play Foretell; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "Foretell"
+                                self.cost_card_nullified = 0
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "Foretell"
+                            else:
+                                primary_player.draw_card()
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                        else:
+                            primary_player.foretell_permitted = False
+                            self.choice_context = "Resolve Battle Ability?"
+                            self.choices_available = ["Yes", "No"]
+                            self.name_player_making_choices = self.player_using_battle_ability
+                            await self.update_game_event(self.player_using_battle_ability, ["CHOICE", "0"], True)
                     elif self.choice_context == "Resolve Battle Ability?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             print("Wants to resolve battle ability")
@@ -1454,43 +1535,20 @@ class Game:
                             else:
                                 winner = self.p1
                                 loser = self.p2
-                            if self.battle_ability_to_resolve == "Osus IV":
-                                if loser.spend_resources(1):
-                                    winner.add_resources(1)
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                            elif self.battle_ability_to_resolve == "Barlus":
-                                loser.discard_card_at_random()
-                                await self.resolve_battle_conclusion(name, game_update_string)
-                            elif self.battle_ability_to_resolve == "Elouith":
-                                if len(winner.deck) > 2:
-                                    winner.number_cards_to_search = 3
-                                    self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
-                                    self.name_player_who_is_searching = winner.name_player
-                                    self.number_who_is_searching = str(winner.number)
-                                    self.what_to_do_with_searched_card = "DRAW"
-                                    self.traits_of_searched_card = None
-                                    self.card_type_of_searched_card = None
-                                    self.faction_of_searched_card = None
-                                    self.max_cost_of_searched_card = None
-                                    self.no_restrictions_on_chosen_card = True
-                                else:
-                                    await self.send_update_message("Too few cards in deck for search")
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                            elif self.battle_ability_to_resolve == "Tarrus":
-                                winner_count = winner.count_units_in_play_all()
-                                loser_count = loser.count_units_in_play_all()
-                                if winner_count < loser_count:
-                                    self.choices_available = ["Cards", "Resources"]
-                                    self.choice_context = "Gains from Tarrus"
-                                else:
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                            self.player_using_battle_ability = winner.name_player
+                            if winner.foretell_check():
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Use Foretell?"
+                                self.name_player_making_choices = winner.name_player
+                                await self.send_update_message("Foretell window offered")
+                            elif loser.foretell_check():
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Use Foretell?"
+                                self.name_player_making_choices = loser.name_player
+                                await self.send_update_message("Foretell window offered")
                             else:
-                                if self.battle_ability_to_resolve == "Y'varn":
-                                    self.yvarn_active = True
-                                    self.p1_triggered_yvarn = False
-                                    self.p2_triggered_yvarn = False
-                                self.reset_choices_available()
-                        elif self.choices_available[int(game_update_string[1])] == "No":
+                                await self.quick_battle_ability_resolution(name, game_update_string, winner, loser)
+                        else:
                             self.reset_choices_available()
                             await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Gains from Tarrus":
@@ -2255,6 +2313,7 @@ class Game:
                 self.reset_choices_available()
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
         elif name == self.player_resolving_battle_ability:
+            print("Name match")
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
@@ -3994,7 +4053,7 @@ class Game:
             print("String validated as ok")
             if self.choosing_unit_for_nullify:
                 await self.nullification_unit(name, game_update_string)
-            if self.resolving_consumption:
+            elif self.resolving_consumption:
                 await self.consumption_resolution(name, game_update_string)
             elif self.manual_bodyguard_resolution:
                 await self.resolve_manual_bodyguard(name, game_update_string)
@@ -4024,6 +4083,7 @@ class Game:
                 print("Resolve mobile")
                 await self.resolve_mobile(name, game_update_string)
             elif self.battle_ability_to_resolve:
+                print("Resolve battle ability")
                 await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":
                 await DeployPhase.update_game_event_deploy_section(self, name, game_update_string)

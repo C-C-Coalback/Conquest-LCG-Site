@@ -108,6 +108,7 @@ class Player:
         self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits", "White Scars Bikers",
                                         "Eldritch Corsair"]
         self.sacced_card_for_despise = True
+        self.foretell_permitted = True
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1663,6 +1664,19 @@ class Player:
             if self.search_card_in_hq("Communications Relay", ready_relevant=True):
                 return True
         return False
+
+    def foretell_check(self):
+        if self.foretell_permitted:
+            war_plan, war_pos = self.get_location_of_warlord()
+            if self.get_ready_given_pos(war_plan, war_pos):
+                if self.search_hand_for_card("Foretell"):
+                    return True
+        return False
+
+    def spend_foretell(self):
+        war_plan, war_pos = self.get_location_of_warlord()
+        self.exhaust_given_pos(war_plan, war_pos)
+        self.discard_card_name_from_hand("Foretell")
 
     def search_hand_for_card(self, card_name):
         print("Looking for", card_name)
