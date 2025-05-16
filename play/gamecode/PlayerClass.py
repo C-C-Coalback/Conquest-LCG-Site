@@ -594,7 +594,8 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction[i] = (num, pla, pos)
                     elif pos == unit_pos:
                         if i == 0:
-                            self.game.delete_reaction()
+                            pass
+                            # self.game.delete_reaction()
                         else:
                             del self.reactions_needing_resolving[i]
                             del self.player_who_resolves_reaction[i]
@@ -2325,6 +2326,9 @@ class Player:
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Deathmark Assassins":
                 self.game.create_reaction("Deathmark Assassins", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Warlock Destructor":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), -2, i))
             for j in range(len(self.headquarters[i].get_attachments())):
                 if phase == "COMBAT":
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
@@ -2336,6 +2340,9 @@ class Player:
 
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
+                    if phase == "DEPLOY":
+                        self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
@@ -2367,6 +2374,8 @@ class Player:
         return True
 
     def sacrifice_card_in_play(self, planet_num, card_pos):
+        if planet_num == -2:
+            return self.sacrifice_card_in_hq(card_pos)
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             return False
         self.add_card_in_play_to_discard(planet_num, card_pos)
@@ -2578,6 +2587,9 @@ class Player:
         self.adjust_own_reactions(-2, card_pos)
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
+        if planet_num == -2:
+            self.add_card_in_hq_to_discard(card_pos)
+            return None
         card = self.cards_in_play[planet_num + 1][card_pos]
         card_name = card.get_name()
         if card.get_card_type() == "Army":

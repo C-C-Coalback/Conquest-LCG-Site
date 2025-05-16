@@ -2145,10 +2145,18 @@ class Game:
                         elif game_update_string[1] == "1":
                             primary_player.add_resources(1)
                         self.delete_reaction()
+                    elif self.choice_context == "Warlock Destructor: pay fee or discard?":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if game_update_string[1] == "0":
+                            num, planet, unit = self.positions_of_unit_triggering_reaction[0]
+                            primary_player.add_card_in_play_to_discard(planet, unit)
+                        else:
+                            primary_player.spend_resources(1)
+                        self.delete_reaction()
                     elif self.choice_context == "Sautekh Complex: Gain Card or Resource?":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                         if game_update_string[1] == "0":
                             primary_player.draw_card()
                         elif game_update_string[1] == "1":
@@ -3190,7 +3198,8 @@ class Game:
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
-                    self.delete_reaction()
+                    if self.reactions_needing_resolving[0] != "Warlock Destructor":
+                        self.delete_reaction()
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetsReaction.resolve_planet_reaction(self, name, game_update_string,
@@ -3674,6 +3683,8 @@ class Game:
                             self.name_player_making_choices = self.name_1
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
                             self.asking_if_reaction = True
@@ -3687,6 +3698,8 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
                             self.asking_if_reaction = True
@@ -3703,6 +3716,8 @@ class Game:
                             self.name_player_making_choices = self.name_2
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
                             self.asking_if_reaction = True
@@ -3716,6 +3731,8 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
                             self.asking_if_reaction = True
