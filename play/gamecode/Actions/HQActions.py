@@ -289,6 +289,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
                     self.action_cleanup()
+    elif self.action_chosen == "Despise":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Ally"):
+                if primary_player.sacrifice_card_in_hq(unit_pos):
+                    self.player_with_action = secondary_player.name_player
+                    primary_player.sacced_card_for_despise = True
+                    if primary_player.sacced_card_for_despise and secondary_player.sacced_card_for_despise:
+                        self.action_cleanup()
+                        await secondary_player.dark_eldar_event_played()
     elif self.action_chosen == "Fetid Haze":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.headquarters[unit_pos].get_is_unit():

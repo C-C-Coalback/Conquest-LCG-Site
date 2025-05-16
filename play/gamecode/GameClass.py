@@ -625,6 +625,19 @@ class Game:
                         if self.chosen_first_card:
                             await self.send_update_message("Stopping Smash 'n Bash early")
                             self.action_cleanup()
+                    elif self.action_chosen == "Despise":
+                        await self.send_update_message(
+                            self.player_with_action + " does not sacrifice a card for Despise."
+                        )
+                        if self.player_with_action == self.name_1:
+                            self.player_with_action = self.name_2
+                            self.p1.sacced_card_for_despise = True
+                        else:
+                            self.player_with_action = self.name_1
+                            self.p2.sacced_card_for_despise = True
+                        if self.p1.sacced_card_for_despise and self.p2.sacced_card_for_despise:
+                            self.action_cleanup()
+                            await secondary_player.dark_eldar_event_played()
                     elif self.action_chosen == "Preemptive Barrage":
                         await self.send_update_message("Stopping Preemptive Barrage early")
                         self.action_cleanup()

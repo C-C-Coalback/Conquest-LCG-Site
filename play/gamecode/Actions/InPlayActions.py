@@ -1151,6 +1151,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "Despise":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ally"):
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.player_with_action = secondary_player.name_player
+                    primary_player.sacced_card_for_despise = True
+                    if primary_player.sacced_card_for_despise and secondary_player.sacced_card_for_despise:
+                        self.action_cleanup()
+                        await secondary_player.dark_eldar_event_played()
     elif self.action_chosen == "Zarathur's Flamers":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

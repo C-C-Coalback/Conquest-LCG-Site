@@ -107,6 +107,7 @@ class Player:
         self.soul_seizure_value = 0
         self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits", "White Scars Bikers",
                                         "Eldritch Corsair"]
+        self.sacced_card_for_despise = True
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()

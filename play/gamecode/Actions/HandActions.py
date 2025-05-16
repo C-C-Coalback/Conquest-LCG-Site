@@ -67,6 +67,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.misc_counter = 3
                             self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
                             self.chosen_first_card = False
+                    elif ability == "Despise":
+                        self.action_chosen = ability
+                        primary_player.sacced_card_for_despise = False
+                        secondary_player.sacced_card_for_despise = False
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        await self.send_update_message("Both players must sacrifice an Ally unit for Despise.")
                     elif ability == "Dakka Dakka Dakka!":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
