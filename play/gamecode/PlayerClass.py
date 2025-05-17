@@ -106,7 +106,8 @@ class Player:
         self.muster_the_guard_count = 0
         self.soul_seizure_value = 0
         self.plus_two_atk_if_warlord = ["Ymgarl Genestealer", "Bork'an Recruits", "White Scars Bikers",
-                                        "Eldritch Corsair"]
+                                        "Eldritch Corsair", "Tallarn Raiders", "Bloodied Reavers",
+                                        "Evil Sunz Warbiker", "Noise Marine Zealots"]
         self.sacced_card_for_despise = True
         self.foretell_permitted = True
 
@@ -528,6 +529,8 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].set_damage(amount)
 
     def get_ranged_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return False
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Termagant Spikers":
@@ -535,6 +538,10 @@ class Player:
         if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
             if self.check_for_enemy_warlord(planet_id):
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Vior'la Warrior Cadre":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.check_for_trait_given_pos(planet_id, i, "Ethereal"):
+                    return True
         return self.cards_in_play[planet_id + 1][unit_id].get_ranged()
 
     def check_for_trait_given_pos(self, planet_id, unit_id, trait):
@@ -1276,6 +1283,10 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_command()
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Fire Warrior Grenadiers":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
+                    command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
@@ -1972,6 +1983,8 @@ class Player:
                     self.game.create_reaction("Blacksun Filter", self.name_player, (int(self.number), planet_pos, i))
 
     def get_attack_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return -1
         card = self.cards_in_play[planet_id + 1][unit_id]
         attack_value = card.get_attack()
         if card.get_name() == "Termagant":
@@ -2011,6 +2024,13 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.check_for_warlord(planet_id):
                         attack_value += 2
+        if card.get_ability() == "Baharroth's Hawks":
+            if self.check_for_warlord(planet_id):
+                attack_value += 3
+        if card.get_ability() == "Fire Warrior Grenadiers":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
+                    attack_value += 2
         if card.get_brutal():
             attack_value = attack_value + card.get_damage()
         if card.get_ability() == "Virulent Plague Squad":
@@ -2144,6 +2164,8 @@ class Player:
             return False, len(bodyguard_damage_list)
         if zara_check and damage > 0:
             damage += 1
+        if self.search_attachments_at_pos(planet_id, unit_id, "Heavy Marker Drone"):
+            damage = damage * 2
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield, reassign=is_reassign)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -2228,12 +2250,19 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            if self.get_faction_given_pos(-2, unit_id) == "Orks":
+                if self.get_card_type_given_pos(-2, unit_id) != "Token":
+                    if self.search_card_in_hq("Mork's Great Heap"):
+                        health += 1
             if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if card.get_faction() == "Orks" and card.get_card_type() != "Token":
+            if self.search_card_in_hq("Mork's Great Heap"):
+                health += 1
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":

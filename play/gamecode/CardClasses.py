@@ -301,6 +301,9 @@ class UnitCard(Card):
             return True
         if self.mobile_eor:
             return True
+        if self.get_ability() == "Vectored Vyper Squad":
+            if self.damage == 0:
+                return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Mobility":
                 return True
@@ -391,6 +394,9 @@ class UnitCard(Card):
         area_effect += self.area_effect_eor
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Gun Drones":
+                area_effect += 2
+        if self.get_ability() == "Sa'cea XV88 Broadside":
+            if self.attachments:
                 area_effect += 2
         return area_effect
 
