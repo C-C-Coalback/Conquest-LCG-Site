@@ -887,6 +887,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if ethereal_present:
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.action_cleanup()
+    elif self.action_chosen == "Rally the Charge":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                    if primary_player.check_for_warlord(planet_pos):
+                        command = 2 * primary_player.get_command_given_pos(planet_pos, unit_pos)
+                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
+                                                                      command, expiration="EOP")
+                        name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        await self.send_update_message(
+                            name_card + " gained +" + str(command) + " ATK from Rally the Charge!"
+                        )
+                        self.action_cleanup()
     elif self.action_chosen == "Ethereal Wisdom":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
