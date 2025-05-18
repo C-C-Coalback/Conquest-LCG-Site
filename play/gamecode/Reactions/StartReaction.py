@@ -250,6 +250,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
+            primary_player.exhaust_all_cards_of_ability("Wyrdboy Stikk")
         elif self.reactions_needing_resolving[0] == "Zogwort's Runtherders":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Snotlings", planet_pos)

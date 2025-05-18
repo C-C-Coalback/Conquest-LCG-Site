@@ -342,14 +342,19 @@ class Player:
             self.last_discard_string = joined_string
             await self.game.send_update_message(joined_string)
 
-    def search_for_card_everywhere(self, card_name, ability=True):
+    def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False):
         for i in range(len(self.headquarters)):
             if self.get_ability_given_pos(-2, i) == card_name:
+                return True
+            if self.search_attachments_at_pos(-2, i, card_name, ready_relevant=ready_relevant):
                 return True
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.get_ability_given_pos(i, j) == card_name:
                     return True
+                if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant):
+                    return True
+        return False
 
     def exhaust_card_in_hq_given_name(self, card_name):
         for i in range(len(self.headquarters)):
@@ -1707,14 +1712,21 @@ class Player:
                     discounts_available += 2
         return discounts_available
 
-    def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil):
+    def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil, ready_relevant=False):
         if planet_pos == -2:
             for i in range(len(self.headquarters[unit_pos].get_attachments())):
                 if self.headquarters[unit_pos].get_attachments()[i].get_ability() == card_abil:
-                    return True
+                    if not ready_relevant:
+                        return True
+                    if self.headquarters[unit_pos].get_attachments()[i].get_ready():
+                        return True
             return False
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == card_abil:
+                if not ready_relevant:
+                    return True
+                if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ready():
+                    return True
                 return True
         return False
 
@@ -2585,9 +2597,18 @@ class Player:
                                 if self.game.player_who_resolves_reaction[j] == self.name_player:
                                     already_termagant_sentry = True
                         if not already_termagant_sentry:
-                            self.game.reactions_needing_resolving.append("Termagant Sentry")
-                            self.game.player_who_resolves_reaction.append(self.name_player)
-                            self.game.positions_of_unit_triggering_reaction((int(self.number), planet_num, -1))
+                            self.game.create_reaction("Termagant Sentry", self.name_player,
+                                                      (int(self.number), planet_num, -1))
+            if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Snotlings":
+                if self.search_for_card_everywhere("Wyrdboy Stikk", ready_relevant=True):
+                    already_weirdboy_stikk = False
+                    for i in range(len(self.game.reactions_needing_resolving)):
+                        if self.game.reactions_needing_resolving[i] == "Wyrdboy Stikk":
+                            if self.game.player_who_resolves_reaction[i] == self.name_player:
+                                already_weirdboy_stikk = True
+                    if not already_weirdboy_stikk:
+                        self.game.create_reaction("Wyrdboy Stikk", self.name_player,
+                                                  (int(self.number), -1, -1))
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
@@ -2620,6 +2641,21 @@ class Player:
                                           (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
+
+    def exhaust_all_cards_of_ability(self, card_name):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == card_name:
+                self.exhaust_given_pos(-2, i)
+            for k in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[k].get_ability() == card_name:
+                    self.headquarters[i].get_attachments()[k].exhaust_card()
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == card_name:
+                    self.exhaust_given_pos(i, j)
+                for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
+                    if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == card_name:
+                        self.cards_in_play[i + 1][j].get_attachments()[k].exhaust_card()
 
     def destroy_all_cards_at_planet(self, planet_num, ignore_uniques=True, enemy_event=True):
         i = 0

@@ -19,6 +19,9 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.delete_reaction()
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
+    elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
+        primary_player.summon_token_at_planet("Snotlings", chosen_planet)
+        self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Heretek Inventor":
         p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
         if origin_planet != chosen_planet:
