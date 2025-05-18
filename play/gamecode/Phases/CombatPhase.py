@@ -124,7 +124,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if can_continue:
                                 is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
                                 if is_ready:
-                                    if player.cards_in_play[chosen_planet + 1][chosen_unit]\
+                                    if player.cards_in_play[chosen_planet + 1][chosen_unit] \
                                             .get_card_type() == "Warlord":
                                         self.choices_available = ["Yes", "No"]
                                         self.choice_context = "Retreat Warlord?"
@@ -152,7 +152,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     in self.units_move_hq_attack:
                                 self.unit_will_move_after_attack = True
-                                player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     ethereal_movement_active = True
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":
@@ -163,7 +163,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
                                     player.discard_top_card_deck()
-                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position,
+                                                            bloodied_relevant=True) \
                                     == "Ku'gath Plaguefather":
                                 self.create_reaction("Ku'gath Plaguefather", player.name_player,
                                                      (int(player.number), self.attacker_planet,
@@ -181,6 +182,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Spiritseer Erathal":
                                 self.create_reaction("Spiritseer Erathal", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position,
+                                                            bloodied_relevant=True) \
+                                    == "Old Zogwort":
+                                self.create_reaction("Old Zogwort", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
@@ -226,7 +233,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         .get_ability() != "Honored Librarian":
                                     can_continue = False
                         if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
-                                .get_ability() != "Lychguard Sentinel" or\
+                                .get_ability() != "Lychguard Sentinel" or \
                                 not secondary_player.get_ready_given_pos(self.defender_planet, self.defender_position):
                             for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                 if secondary_player.cards_in_play[self.defender_planet + 1][i] \
@@ -256,7 +263,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if not secondary_player.get_ready_given_pos(self.defender_planet,
                                                                             self.defender_position):
                                     attack_value += 2
-                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                            if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                     .get_card_type() != "Warlord":
                                 attack_value += self.banshee_power_sword_extra_attack
                                 self.banshee_power_sword_extra_attack = 0

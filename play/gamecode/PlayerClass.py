@@ -989,8 +989,6 @@ class Player:
                 else:
                     if self.spend_resources(cost):
                         if self.add_card_to_planet(card, position) != -1:
-                            print("Played card to planet", position)
-                            print(card.get_ability())
                             location_of_unit = len(self.cards_in_play[position + 1]) - 1
                             if damage_to_take > 0:
                                 if self.game.bigga_is_betta_active:
@@ -1221,16 +1219,16 @@ class Player:
                     print(headquarters_list[i].get_name())
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
                         self.game.create_reaction("Packmaster Kith", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.create_reaction("Eldorath Starbane", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
-                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
-                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
+                        self.game.create_reaction("Old Zogwort", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
                     for j in range(7):
                         if j != planet_pos - 1:
@@ -1249,25 +1247,24 @@ class Player:
                     if card_type != "Warlord":
                         headquarters_list[i].exhaust_card()
                         if headquarters_list[i].get_ability() == "Experimental Devilfish":
-                            self.game.reactions_needing_resolving.append("Experimental Devilfish")
-                            self.game.positions_of_unit_triggering_reaction.append(
-                                [int(self.number), planet_pos - 1, -1])
+                            self.game.create_reaction("Experimental Devilfish", self.name_player,
+                                                      (int(self.number), planet_pos - 1, -1))
                             self.game.player_who_resolves_reaction.append(self.name_player)
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
+                        self.game.create_reaction("Old Zogwort", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
                         self.game.create_reaction("The Swarmlord", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Packmaster Kith":
                         self.game.create_reaction("Packmaster Kith", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Eldorath Starbane":
                         self.game.create_reaction("Eldorath Starbane", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
-                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
-                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
-                                                  [int(self.number), planet_pos - 1, -1])
+                                                  (int(self.number), planet_pos - 1, -1))
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
                     for j in range(7):
                         if j != planet_pos - 1:
@@ -1427,10 +1424,10 @@ class Player:
             return self.headquarters[unit_id].has_hive_mind
         return self.cards_in_play[planet_id + 1][unit_id].has_hive_mind
 
-    def get_ability_given_pos(self, planet_id, unit_id):
+    def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
         if planet_id == -2:
-            return self.headquarters[unit_id].get_ability()
-        return self.cards_in_play[planet_id + 1][unit_id].get_ability()
+            return self.headquarters[unit_id].get_ability(bloodied_relevant=bloodied_relevant)
+        return self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=bloodied_relevant)
 
     def get_ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
@@ -1981,6 +1978,10 @@ class Player:
             for j in range(len(self.cards_in_play[planet_pos + 1][i].get_attachments())):
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":
                     self.game.create_reaction("Blacksun Filter", self.name_player, (int(self.number), planet_pos, i))
+            if self.cards_in_play[planet_pos + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
+                if self.game.phase == "COMMAND":
+                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                              (int(self.number), planet_pos, i))
 
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
@@ -2357,6 +2358,33 @@ class Player:
         return None
 
     def perform_own_reactions_on_phase_change(self, phase):
+        # Forced reactions first
+        zog_wort = False
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_ability() == "Old Zogwort":
+                if phase == "HEADQUARTERS":
+                    zog_wort = True
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_ability() == "Old Zogwort":
+                    if phase == "HEADQUARTERS":
+                        zog_wort = True
+        if zog_wort:
+            i = 0
+            while i < len(self.headquarters):
+                if self.headquarters[i].get_name() == "Snotlings":
+                    self.destroy_card_in_hq(i)
+                    i = i - 1
+                i = i + 1
+            i = 0
+            while i < 7:
+                j = 0
+                while j < len(self.cards_in_play[i + 1]):
+                    if self.cards_in_play[i + 1][j].get_name() == "Snotlings":
+                        self.destroy_card_in_play(i, j)
+                        j = j - 1
+                    j = j + 1
+                i = i + 1
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":

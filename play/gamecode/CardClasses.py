@@ -100,7 +100,7 @@ class Card:
             return "BLANKED"
         if bloodied_relevant:
             if self.bloodied:
-                return "BLOODIED"
+                return self.ability + " BLOODIED"
         return self.ability
 
     def set_blanked(self, new_val, exp="EOP"):
@@ -574,6 +574,8 @@ class WarlordCard(UnitCard):
         self.attack = self.bloodied_attack
         self.text = self.bloodied_text
         self.bloodied = True
+        if self.name == "Baharroth":
+            self.mobile = False
 
     def print_info(self):
         if self.unique:

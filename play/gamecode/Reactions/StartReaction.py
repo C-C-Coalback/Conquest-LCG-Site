@@ -246,6 +246,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Sautekh Complex: Gain Card or Resource?"
             self.asking_if_reaction = False
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif self.reactions_needing_resolving[0] == "Old Zogwort":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Warlock Destructor":
             self.resolving_search_box = True
             self.choices_available = ["Discard Card", "Lose Resource"]
