@@ -40,6 +40,11 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.send_update_message(ability + " activated")
+                elif ability == "Blight Grenades":
+                    if primary_player.get_name_player() == self.player_with_action:
+                        primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
+                        self.action_cleanup()
                 elif ability == "Hyperphase Sword":
                     if primary_player.get_name_player() == self.player_with_action:
                         self.action_chosen = ability

@@ -707,6 +707,9 @@ class Player:
     def destroy_attachment_from_pos(self, planet, position, attachment_position):
         self.remove_attachment_from_pos(planet, position, attachment_position, discard=True)
 
+    def sacrifice_attachment_from_pos(self, planet, position, attachment_position):
+        self.remove_attachment_from_pos(planet, position, attachment_position, discard=True)
+
     def remove_attachment_from_pos(self, planet, position, attachment_position, discard=False):
         if planet == -2:
             card = self.headquarters[position]

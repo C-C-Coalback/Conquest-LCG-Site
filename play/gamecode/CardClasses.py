@@ -235,6 +235,7 @@ class UnitCard(Card):
         self.mobile_eop = False
         self.flying_eop = False
         self.area_effect_eor = 0
+        self.area_effect_eocr = 0
         self.mobile_eor = False
         self.armorbane_eor = False
         self.negative_hp_until_eop = 0
@@ -392,6 +393,7 @@ class UnitCard(Card):
         area_effect = self.area_effect
         area_effect += self.area_effect_eop
         area_effect += self.area_effect_eor
+        area_effect += self.area_effect_eocr
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Gun Drones":
                 area_effect += 2
@@ -435,6 +437,7 @@ class UnitCard(Card):
 
     def reset_own_eocr_values(self):
         self.brutal_eocr = False
+        self.area_effect_eocr = 0
 
     def get_brutal(self):
         if self.blanked_eop:
