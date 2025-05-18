@@ -162,6 +162,21 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Tense Negotiations":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if warlord_planet != -2:
+                            if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                                primary_player.discard_card_from_hand(int(game_update_string[2]))
+                                primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                                self.action_cleanup()
+                                self.need_to_resolve_battle_ability = True
+                                self.battle_ability_to_resolve = self.planet_array[warlord_planet]
+                                self.player_resolving_battle_ability = primary_player.name_player
+                                self.number_resolving_battle_ability = str(primary_player.number)
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Resolve Battle Ability?"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.tense_negotiations_active = True
                     elif ability == "Clogged with Corpses":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

@@ -262,6 +262,7 @@ class Game:
         self.searing_brand_cancel_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.guardian_mesh_armor_active = False
+        self.tense_negotiations_active = False
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -943,46 +944,47 @@ class Game:
     async def resolve_battle_conclusion(self, name, game_string):
         self.p1.foretell_permitted = True
         self.p2.foretell_permitted = True
-        winner = None
-        if self.player_resolving_battle_ability == self.name_2:
-            winner = self.p2
-        elif self.player_resolving_battle_ability == self.name_1:
-            winner = self.p1
-        if winner is not None:
-            i = 0
-            while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
-                if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
-                    if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
-                        i = i - 1
-                i = i + 1
-            if self.round_number == self.last_planet_checked_for_battle:
-                winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
-                winner.capture_planet(self.last_planet_checked_for_battle,
-                                      self.planet_cards_array)
-                self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                await winner.send_victory_display()
-            self.planet_aiming_reticle_active = False
-        self.planet_aiming_reticle_position = -1
-        self.p1.reset_extra_attack_eob()
-        self.p2.reset_extra_attack_eob()
-        self.p1.reset_extra_health_eob()
-        self.p2.reset_extra_health_eob()
-        self.mode = "Normal"
-        another_battle = self.find_next_planet_for_combat()
-        if another_battle:
-            self.set_battle_initiative()
-            self.p1.has_passed = False
-            self.p2.has_passed = False
-            self.planet_aiming_reticle_active = True
-            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-        else:
-            await self.change_phase("HEADQUARTERS")
-            await self.send_update_message(
-                "Window provided for reactions and actions during HQ phase."
-            )
+        if not self.tense_negotiations_active:
+            winner = None
+            if self.player_resolving_battle_ability == self.name_2:
+                winner = self.p2
+            elif self.player_resolving_battle_ability == self.name_1:
+                winner = self.p1
+            if winner is not None:
+                i = 0
+                while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
+                    if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
+                        if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
+                            i = i - 1
+                    i = i + 1
+                if self.round_number == self.last_planet_checked_for_battle:
+                    winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
+                    winner.capture_planet(self.last_planet_checked_for_battle,
+                                          self.planet_cards_array)
+                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    await winner.send_victory_display()
+                self.planet_aiming_reticle_active = False
+            self.planet_aiming_reticle_position = -1
+            self.p1.reset_extra_attack_eob()
+            self.p2.reset_extra_attack_eob()
+            self.p1.reset_extra_health_eob()
+            self.p2.reset_extra_health_eob()
+            self.mode = "Normal"
+            another_battle = self.find_next_planet_for_combat()
+            if another_battle:
+                self.set_battle_initiative()
+                self.p1.has_passed = False
+                self.p2.has_passed = False
+                self.planet_aiming_reticle_active = True
+                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            else:
+                await self.change_phase("HEADQUARTERS")
+                await self.send_update_message(
+                    "Window provided for reactions and actions during HQ phase."
+                )
+        self.tense_negotiations_active = False
         self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
-        # self.reset_choices_available()
 
     async def complete_nullify(self):
         self.choosing_unit_for_nullify = False
@@ -1398,6 +1400,7 @@ class Game:
             if winner_count < loser_count:
                 self.choices_available = ["Cards", "Resources"]
                 self.choice_context = "Gains from Tarrus"
+                self.name_player_making_choices = winner.name_player
             else:
                 await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Y'varn":
@@ -1607,6 +1610,7 @@ class Game:
                                 self.p1.add_resources(3)
                             elif name == self.name_2:
                                 self.p2.add_resources(3)
+                        self.reset_choices_available()
                         await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Amount to spend for Tzeentch's Firestorm:":
                         print(self.choices_available[int(game_update_string[1])])
