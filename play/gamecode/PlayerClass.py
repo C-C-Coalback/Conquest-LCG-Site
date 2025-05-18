@@ -901,6 +901,10 @@ class Player:
             if self.headquarters[i].get_ability() == "Uber Grotesque":
                 if not self.headquarters[i].once_per_phase_used:
                     self.game.create_reaction("Uber Grotesque", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Crucible of Malediction":
+                if self.headquarters[i].get_ready():
+                    self.game.create_reaction("Crucible of Malediction", self.name_player,
+                                              (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Uber Grotesque":

@@ -258,6 +258,20 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
             else:
                 self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Crucible of Malediction":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.choices_available = ["Own deck", "Enemy deck"]
+            self.name_player_making_choices = primary_player.name_player
+            self.choice_context = "Which deck to use Crucible of Malediction:"
+            self.resolving_search_box = True
+            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Biel-Tan Warp Spiders":
+            self.choices_available = ["Own deck", "Enemy deck"]
+            self.name_player_making_choices = primary_player.name_player
+            self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
+            self.resolving_search_box = True
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Secluded Apothecarion":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_given_pos(planet_pos, unit_pos)

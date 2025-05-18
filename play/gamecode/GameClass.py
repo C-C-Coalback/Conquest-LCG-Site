@@ -2271,10 +2271,30 @@ class Game:
                         self.name_player_making_choices = ""
                         self.effects_waiting_on_resolution.append("Commander Shadowsun")
                         self.player_resolving_effect.append(name)
+                    elif self.choice_context == "Which deck to use Crucible of Malediction:":
+                        self.reset_choices_available()
+                        if game_update_string[1] == "0":
+                            player = primary_player
+                            self.searching_enemy_deck = False
+                        else:
+                            player = secondary_player
+                            self.searching_enemy_deck = True
+                        if len(player.deck) > 2:
+                            player.number_cards_to_search = 3
+                            self.bottom_cards_after_search = False
+                            self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                            self.name_player_who_is_searching = primary_player.name_player
+                            self.number_who_is_searching = str(primary_player.number)
+                            self.what_to_do_with_searched_card = "DISCARD"
+                            self.traits_of_searched_card = None
+                            self.card_type_of_searched_card = None
+                            self.faction_of_searched_card = None
+                            self.max_cost_of_searched_card = None
+                            self.no_restrictions_on_chosen_card = True
+                        else:
+                            await self.send_update_message("Too few cards in deck")
                     elif self.choice_context == "Which deck to use Biel-Tan Warp Spiders:":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         if game_update_string[1] == "0":
                             player = primary_player
                             self.searching_enemy_deck = False
