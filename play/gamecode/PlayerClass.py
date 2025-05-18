@@ -2260,6 +2260,7 @@ class Player:
         afterwards_damage = self.headquarters[unit_id].get_damage()
         total_that_can_be_blocked = afterwards_damage - prior_damage
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
+        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         self.game.damage_can_be_shielded.append(can_shield)
         self.game.damage_is_preventable.append(preventable)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
