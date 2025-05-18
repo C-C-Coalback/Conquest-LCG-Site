@@ -281,6 +281,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             .get_card_type() != "Warlord":
                                         secondary_player.exhaust_given_pos(self.defender_planet,
                                                                            self.defender_position)
+                                if secondary_player.cards_in_play[
+                                    self.defender_planet + 1][self.defender_position] \
+                                        .get_card_type() == "Warlord":
+                                    if secondary_player.search_card_in_hq("Zogwort's Hovel"):
+                                        self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet, -1))
                                 # Flying check
                                 if def_flying and not att_flying and not att_ignores_flying:
                                     attack_value = int(attack_value / 2 + (attack_value % 2))
