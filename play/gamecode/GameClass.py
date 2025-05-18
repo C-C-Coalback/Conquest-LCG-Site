@@ -2930,6 +2930,9 @@ class Game:
                             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                                 self.create_reaction("Solarite Avetys", primary_player.name_player,
                                                      (int(secondary_player.number), planet_pos, unit_pos))
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
+                            self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
+                                                 (int(primary_player.number), planet_pos, unit_pos))
                         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
@@ -3051,6 +3054,12 @@ class Game:
                                                     self.create_reaction("Solarite Avetys", primary_player.name_player,
                                                                          (int(secondary_player.number), planet_pos,
                                                                           unit_pos))
+                                            if primary_player.get_ability_given_pos(
+                                                    planet_pos, unit_pos) == "Zogwort's Runtherders":
+                                                self.create_reaction("Zogwort's Runtherders",
+                                                                     primary_player.name_player,
+                                                                     (int(primary_player.number),
+                                                                      planet_pos, unit_pos))
                                             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Volatile Pyrovore":
