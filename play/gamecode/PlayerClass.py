@@ -1991,8 +1991,12 @@ class Player:
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":
                     self.game.create_reaction("Blacksun Filter", self.name_player, (int(self.number), planet_pos, i))
             if self.cards_in_play[planet_pos + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
-                if self.game.phase == "COMMAND":
-                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                # Need an extra check that the ability has not already fired this phase.
+                self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                          (int(self.number), planet_pos, i))
+            if self.cards_in_play[planet_pos + 1][i].get_ability() == "Blood Claw Pack":
+                if self.get_ready_given_pos(planet_pos, i):
+                    self.game.create_reaction("Blood Claw Pack", self.name_player,
                                               (int(self.number), planet_pos, i))
 
     def get_attack_given_pos(self, planet_id, unit_id):
