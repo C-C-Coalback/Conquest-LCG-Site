@@ -607,8 +607,10 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction[i] = (num, pla, pos)
                     elif pos == unit_pos:
                         if i == 0:
-                            pass
-                            # self.game.delete_reaction()
+                            if not self.game.already_resolving_reaction:
+                                del self.reactions_needing_resolving[i]
+                                del self.player_who_resolves_reaction[i]
+                                del self.positions_of_unit_triggering_reaction[i]
                         else:
                             del self.reactions_needing_resolving[i]
                             del self.player_who_resolves_reaction[i]
@@ -2444,6 +2446,13 @@ class Player:
                         if self.nahumekh_value > 0:
                             self.game.create_reaction("Nahumekh", self.name_player,
                                                       (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Gleeful Plague Beast":
+                    if phase == "COMBAT":
+                        self.suffer_area_effect(i, 1)
+                        if self.name_player == self.game.name_1:
+                            self.game.p2.suffer_area_effect(i, 1)
+                        else:
+                            self.game.p1.suffer_area_effect(i, 1)
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     if phase == "COMBAT":
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
