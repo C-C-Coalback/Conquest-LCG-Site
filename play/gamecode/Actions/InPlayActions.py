@@ -555,6 +555,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False)
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
+                        await primary_player.dark_eldar_event_played()
+                        primary_player.torture_event_played()
                         self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:

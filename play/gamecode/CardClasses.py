@@ -244,6 +244,14 @@ class UnitCard(Card):
         self.choice_nurgling_bomb = ""
         self.need_to_resolve_nurgling_bomb = False
 
+    def exhaust_first_attachment_name(self, card_name):
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == card_name:
+                if self.attachments[i].get_ready():
+                    self.attachments[i].exhaust_card()
+                    return None
+        return None
+
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
 

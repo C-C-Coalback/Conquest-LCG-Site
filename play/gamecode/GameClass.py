@@ -260,6 +260,8 @@ class Game:
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.searing_brand_cancel_enabled = True
+        self.guardian_mesh_armor_enabled = True
+        self.guardian_mesh_armor_active = False
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -1781,6 +1783,23 @@ class Game:
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
+                    elif self.choice_context == "Use Guardian Mesh Armor?":
+                        self.guardian_mesh_armor_enabled = False
+                        num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                        primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Guardian Mesh Armor")
+                        if game_update_string[1] == "0":
+                            self.guardian_mesh_armor_active = True
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
+                        else:
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Target Holy Sepulchre:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
@@ -3058,111 +3077,129 @@ class Game:
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
                             if self.damage_can_be_shielded[0]:
-                                no_mercy_possible = False
-                                if can_no_mercy:
-                                    for i in range(len(secondary_player.cards)):
-                                        if secondary_player.cards[i] == "No Mercy":
-                                            no_mercy_possible = True
-                                if no_mercy_possible:
-                                    no_mercy_possible = secondary_player.search_ready_unique_unit()
-                                if no_mercy_possible:
-                                    self.last_shield_string = game_update_string
-                                    self.choice_context = "Use No Mercy?"
-                                    self.choices_available = ["Yes", "No"]
-                                    self.name_player_making_choices = secondary_player.name_player
-                                else:
-                                    shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
-                                    took_damage = True
-                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
-                                    primary_player.discard_card_from_hand(hand_pos)
-                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                    if took_damage:
-                                        self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
-                                        if self.positions_attackers_of_units_to_take_damage[0] is not None:
-                                            self.damage_taken_was_from_attack.append(True)
-                                            self.positions_of_attacker_of_unit_that_took_damage.append(
-                                                self.positions_attackers_of_units_to_take_damage[0]
-                                            )
-                                            att_num, att_pla, att_pos = self. \
-                                                positions_attackers_of_units_to_take_damage[0]
-                                            self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
-                                                att_pla, att_pos
-                                            ))
-                                            self.card_names_that_caused_damage.append(
-                                                self.card_names_triggering_damage[0])
-                                            self.on_kill_effects_of_attacker.append(
-                                                secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
-                                            if planet_pos != -2:
-                                                if primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].get_ability() == "Reanimating Warriors" \
-                                                        and not primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].once_per_phase_used:
-                                                    self.effects_waiting_on_resolution.append("Reanimating Warriors")
-                                                    self.player_resolving_effect.append(primary_player.name_player)
-                                            if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
-                                                                                        "Repulsor Impact Field"):
-                                                self.create_reaction("Repulsor Impact Field",
-                                                                     primary_player.name_player,
-                                                                     (int(secondary_player.number), att_pla, att_pos))
-                                            if primary_player.get_ability_given_pos(planet_pos,
-                                                                                    unit_pos) == "Solarite Avetys":
-                                                if not secondary_player.get_flying_given_pos(att_pla, att_pos):
-                                                    self.create_reaction("Solarite Avetys", primary_player.name_player,
+                                can_continue = True
+                                if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
+                                                                            "Guardian Mesh Armor",
+                                                                            ready_relevant=True):
+                                    if self.guardian_mesh_armor_enabled:
+                                        self.last_shield_string = game_update_string
+                                        self.choice_context = "Use Guardian Mesh Armor?"
+                                        self.choices_available = ["Yes", "No"]
+                                        self.name_player_making_choices = primary_player.name_player
+                                        can_continue = False
+                                if can_continue:
+                                    no_mercy_possible = False
+                                    if can_no_mercy:
+                                        for i in range(len(secondary_player.cards)):
+                                            if secondary_player.cards[i] == "No Mercy":
+                                                no_mercy_possible = True
+                                    if no_mercy_possible:
+                                        no_mercy_possible = secondary_player.search_ready_unique_unit()
+                                    if no_mercy_possible:
+                                        self.last_shield_string = game_update_string
+                                        self.choice_context = "Use No Mercy?"
+                                        self.choices_available = ["Yes", "No"]
+                                        self.name_player_making_choices = secondary_player.name_player
+                                    else:
+                                        if self.guardian_mesh_armor_active:
+                                            shields = shields * 2
+                                        self.guardian_mesh_armor_enabled = True
+                                        shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
+                                        took_damage = True
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
+                                        primary_player.discard_card_from_hand(hand_pos)
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        if took_damage:
+                                            self.recently_damaged_units.append(
+                                                self.positions_of_units_to_take_damage[0])
+                                            if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                                self.damage_taken_was_from_attack.append(True)
+                                                self.positions_of_attacker_of_unit_that_took_damage.append(
+                                                    self.positions_attackers_of_units_to_take_damage[0]
+                                                )
+                                                att_num, att_pla, att_pos = self. \
+                                                    positions_attackers_of_units_to_take_damage[0]
+                                                self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
+                                                    att_pla, att_pos
+                                                ))
+                                                self.card_names_that_caused_damage.append(
+                                                    self.card_names_triggering_damage[0])
+                                                self.on_kill_effects_of_attacker.append(
+                                                    secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
+                                                if planet_pos != -2:
+                                                    if primary_player.cards_in_play[planet_pos + 1][
+                                                        unit_pos].get_ability() == "Reanimating Warriors" \
+                                                            and not primary_player.cards_in_play[planet_pos + 1][
+                                                            unit_pos].once_per_phase_used:
+                                                        self.effects_waiting_on_resolution.append(
+                                                            "Reanimating Warriors")
+                                                        self.player_resolving_effect.append(primary_player.name_player)
+                                                if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
+                                                                                            "Repulsor Impact Field"):
+                                                    self.create_reaction("Repulsor Impact Field",
+                                                                         primary_player.name_player,
+                                                                         (int(secondary_player.number),
+                                                                          att_pla, att_pos))
+                                                if primary_player.get_ability_given_pos(planet_pos,
+                                                                                        unit_pos) == "Solarite Avetys":
+                                                    if not secondary_player.get_flying_given_pos(att_pla, att_pos):
+                                                        self.create_reaction("Solarite Avetys",
+                                                                             primary_player.name_player,
+                                                                             (int(secondary_player.number), planet_pos,
+                                                                              unit_pos))
+                                                if primary_player.get_ability_given_pos(
+                                                        planet_pos, unit_pos) == "Zogwort's Runtherders":
+                                                    self.create_reaction("Zogwort's Runtherders",
+                                                                         primary_player.name_player,
+                                                                         (int(primary_player.number),
+                                                                          planet_pos, unit_pos))
+                                                if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                    if primary_player.get_ability_given_pos(
+                                                            planet_pos, unit_pos) == "Volatile Pyrovore":
+                                                        self.create_reaction("Volatile Pyrovore",
+                                                                             primary_player.name_player,
+                                                                             (int(secondary_player.number), att_pla,
+                                                                              att_pos))
+                                                    if planet_pos != -2:
+                                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                                == "Treacherous Lhamaean":
+                                                            self.create_reaction("Treacherous Lhamaean",
+                                                                                 primary_player.name_player,
+                                                                                 (int(primary_player.number),
+                                                                                  planet_pos, unit_pos))
+                                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                                == "Swarmling Termagants":
+                                                            self.create_reaction("Swarmling Termagants",
+                                                                                 primary_player.name_player,
+                                                                                 (int(primary_player.number),
+                                                                                  planet_pos, unit_pos))
+                                                if secondary_player.get_ability_given_pos(att_pla, att_pos) \
+                                                        == "Deathskull Lootas":
+                                                    self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                                                          (int(secondary_player.number), planet_pos,
                                                                           unit_pos))
-                                            if primary_player.get_ability_given_pos(
-                                                    planet_pos, unit_pos) == "Zogwort's Runtherders":
-                                                self.create_reaction("Zogwort's Runtherders",
-                                                                     primary_player.name_player,
-                                                                     (int(primary_player.number),
-                                                                      planet_pos, unit_pos))
-                                            if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                if primary_player.get_ability_given_pos(
-                                                        planet_pos, unit_pos) == "Volatile Pyrovore":
-                                                    self.create_reaction("Volatile Pyrovore",
-                                                                         primary_player.name_player,
-                                                                         (int(secondary_player.number), att_pla,
-                                                                          att_pos))
-                                                if planet_pos != -2:
-                                                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                                                            == "Treacherous Lhamaean":
-                                                        self.create_reaction("Treacherous Lhamaean",
-                                                                             primary_player.name_player,
-                                                                             (int(primary_player.number), planet_pos,
-                                                                              unit_pos))
-                                                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                                                            == "Swarmling Termagants":
-                                                        self.create_reaction("Swarmling Termagants",
-                                                                             primary_player.name_player,
-                                                                             (int(primary_player.number), planet_pos,
-                                                                              unit_pos))
-                                            if secondary_player.get_ability_given_pos(att_pla, att_pos) \
-                                                    == "Deathskull Lootas":
-                                                self.create_reaction("Deathskull Lootas", secondary_player.name_player,
-                                                                     (int(secondary_player.number), planet_pos,
-                                                                      unit_pos))
-                                            if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
-                                                        .get_card_type() != "Warlord":
-                                                    if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
-                                                            "Black Heart Ravager":
-                                                        self.create_reaction("Black Heart Ravager",
-                                                                             secondary_player.name_player,
-                                                                             (int(primary_player.number), planet_pos,
-                                                                              unit_pos))
-                                                    if secondary_player.search_attachments_at_pos(att_pla, att_pos,
-                                                                                                  "Pincer Tail"):
-                                                        self.create_reaction("Pincer Tail",
-                                                                             secondary_player.name_player,
-                                                                             pos_holder)
-                                        else:
-                                            self.damage_taken_was_from_attack.append(False)
-                                            self.positions_of_attacker_of_unit_that_took_damage.append(None)
-                                            self.faction_of_attacker.append("")
-                                            self.card_names_that_caused_damage.append(
-                                                self.card_names_triggering_damage[0])
-                                            self.on_kill_effects_of_attacker.append([])
-                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
+                                                            .get_card_type() != "Warlord":
+                                                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
+                                                                "Black Heart Ravager":
+                                                            self.create_reaction("Black Heart Ravager",
+                                                                                 secondary_player.name_player,
+                                                                                 (int(primary_player.number),
+                                                                                  planet_pos, unit_pos))
+                                                        if secondary_player.search_attachments_at_pos(att_pla, att_pos,
+                                                                                                      "Pincer Tail"):
+                                                            self.create_reaction("Pincer Tail",
+                                                                                 secondary_player.name_player,
+                                                                                 pos_holder)
+                                            else:
+                                                self.damage_taken_was_from_attack.append(False)
+                                                self.positions_of_attacker_of_unit_that_took_damage.append(None)
+                                                self.faction_of_attacker.append("")
+                                                self.card_names_that_caused_damage.append(
+                                                    self.card_names_triggering_damage[0])
+                                                self.on_kill_effects_of_attacker.append([])
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
                                 await self.send_update_message("This damage can not be shielded!")
                 elif game_update_string[0] == "HQ":
@@ -3755,6 +3792,8 @@ class Game:
             self.p2.reset_defense_batteries()
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
+        self.guardian_mesh_armor_active = False
+        self.guardian_mesh_armor_enabled = True
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")

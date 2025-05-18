@@ -2253,6 +2253,13 @@ class Player:
             return True
         return False
 
+    def exhaust_attachment_name_pos(self, planet_pos, unit_pos, name):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].exhaust_first_attachment_name(name)
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].exhaust_first_attachment_name(name)
+        return None
+
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context="", preventable=True):
         prior_damage = self.headquarters[unit_id].get_damage()
         self.game.damage_on_units_list_before_new_damage.append(prior_damage)
