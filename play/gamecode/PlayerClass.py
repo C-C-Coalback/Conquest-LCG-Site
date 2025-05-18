@@ -2482,6 +2482,19 @@ class Player:
                 self.game.reactions_needing_resolving.append("Shrouded Harlequin")
                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                 self.game.player_who_resolves_reaction.append(self.name_player)
+            if self.get_faction_given_pos(-2, card_pos) == "Space Marines" \
+                    and self.check_is_unit_at_pos(-2, card_pos):
+                already_apoth = False
+                for i in range(len(self.game.reactions_needing_resolving)):
+                    if self.game.reactions_needing_resolving[i] == "Secluded Apothecarion":
+                        if self.game.player_who_resolves_reaction[i] == self.name_player:
+                            already_apoth = True
+                if not already_apoth:
+                    for i in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, i) == "Secluded Apothecarion":
+                            if self.get_ready_given_pos(-2, i):
+                                self.game.create_reaction("Secluded Apothecarion", self.name_player,
+                                                          (int(self.number), -2, i))
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
 
@@ -2633,16 +2646,26 @@ class Player:
                     self.game.player_who_resolves_reaction.append(self.game.p1.name_player)
                 self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
-                self.game.reactions_needing_resolving.append("Carnivore Pack")
-                self.game.player_who_resolves_reaction.append(self.name_player)
-                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
+                self.game.create_reaction("Carnivore Pack", self.name_player,
+                                          (int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
-                self.game.reactions_needing_resolving.append("Shrouded Harlequin")
-                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-                self.game.player_who_resolves_reaction.append(self.name_player)
+                self.game.create_reaction("Shrouded Harlequin", self.name_player,
+                                          (int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
                 self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
                                           (int(self.number), -1, -1))
+            if self.get_faction_given_pos(planet_num, card_pos) == "Space Marines":
+                already_apoth = False
+                for i in range(len(self.game.reactions_needing_resolving)):
+                    if self.game.reactions_needing_resolving[i] == "Secluded Apothecarion":
+                        if self.game.player_who_resolves_reaction[i] == self.name_player:
+                            already_apoth = True
+                if not already_apoth:
+                    for i in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, i) == "Secluded Apothecarion":
+                            if self.get_ready_given_pos(-2, i):
+                                self.game.create_reaction("Secluded Apothecarion", self.name_player,
+                                                          (int(self.number), -2, i))
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
 
