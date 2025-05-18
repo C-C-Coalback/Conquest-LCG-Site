@@ -511,6 +511,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_card_type() == "Army":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True
+    elif self.action_chosen == "Staging Ground":
+        card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card.get_is_unit():
+            if card.get_cost() < 3:
+                self.chosen_first_card = True
+                self.card_pos_to_deploy = int(game_update_string[2])
+                self.faction_of_card_to_play = card.get_faction()
+                self.name_of_card_to_play = card.get_name()
+                self.traits_of_card_to_play = card.get_traits()
+                primary_player.aiming_reticle_color = "blue"
+                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                self.card_type_of_selected_card_in_hand = "Army"
     elif self.action_chosen == "Slumbering Tomb":
         primary_player.discard_card_from_hand(int(game_update_string[2]))
         self.misc_counter += 1

@@ -226,6 +226,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     primary_player.aiming_reticle_coords_hand = None
     self.planet_aiming_reticle_active = False
     self.planet_aiming_reticle_position = -1
+    if self.phase == "COMBAT":
+        self.planet_aiming_reticle_active = True
+        self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
     self.discounts_applied = 0
     self.available_discounts = 0
     self.faction_of_card_to_play = ""

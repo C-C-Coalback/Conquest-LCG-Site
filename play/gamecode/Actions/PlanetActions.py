@@ -466,6 +466,22 @@ async def update_game_event_action_planet(self, name, game_update_string):
         else:
             self.resolving_nurgling_bomb = False
         self.action_cleanup()
+    elif self.action_chosen == "Staging Ground":
+        if self.chosen_first_card:
+            planet_chosen = int(game_update_string[1])
+            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            self.discounts_applied = 0
+            await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
+            await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+            self.card_to_deploy = card
+            if self.available_discounts > self.discounts_applied:
+                self.stored_mode = self.mode
+                self.mode = "DISCOUNT"
+                self.planet_aiming_reticle_position = int(game_update_string[1])
+                self.planet_aiming_reticle_active = True
+            else:
+                await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
+                                                      discounts=self.discounts_applied)
     elif self.action_chosen == "Know No Fear":
         if self.chosen_first_card:
             if self.planets_free_for_know_no_fear[chosen_planet]:
