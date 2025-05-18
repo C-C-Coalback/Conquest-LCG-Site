@@ -89,6 +89,52 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 if name == self.player_who_is_shielding:
                     if game_update_string[1] == self.number_who_is_shielding:
                         hand_pos = int(game_update_string[2])
+            elif self.mode == "Normal":
+                print("mode ok")
+                if name == self.player_with_combat_turn:
+                    print("name ok")
+                    if game_update_string[1] == self.number_with_combat_turn:
+                        print("target ok")
+                        if self.attacker_position != -1:
+                            print("attacker ok")
+                            hand_pos = int(game_update_string[2])
+                            if self.number_with_combat_turn == "1":
+                                player = self.p1
+                                other_player = self.p2
+                            else:
+                                player = self.p2
+                                other_player = self.p1
+                            if player.cards[hand_pos] == "Launch da Snots":
+                                print("is launch")
+                                if player.get_faction_given_pos(self.attacker_planet, self.attacker_position) == "Orks":
+                                    print("is orks")
+                                    if player.resources > 0:
+                                        if self.nullify_enabled and other_player.nullify_check():
+                                            await self.send_update_message(
+                                                player.name_player + " wants to play " +
+                                                "Launcha da Snots" + "; Nullify window offered.")
+                                            self.choices_available = ["Yes", "No"]
+                                            self.name_player_making_choices = other_player.name_player
+                                            self.choice_context = "Use Nullify?"
+                                            self.nullified_card_pos = int(game_update_string[2])
+                                            self.nullified_card_name = "Launch da Snots"
+                                            self.cost_card_nullified = 1
+                                            self.first_player_nullified = player.name_player
+                                            self.nullify_context = "Launch da Snots"
+                                        else:
+                                            player.spend_resources(1)
+                                            extra_attack = player.count_copies_at_planet(self.attacker_planet,
+                                                                                         "Snotlings")
+                                            player.increase_attack_of_unit_at_pos(self.attacker_planet,
+                                                                                  self.attacker_position,
+                                                                                  extra_attack, expiration="NEXT")
+                                            attack_name = player.get_name_given_pos(self.attacker_planet,
+                                                                                    self.attacker_position)
+                                            await self.send_update_message(
+                                                attack_name + " gained " + str(extra_attack)
+                                                + " ATK from Launch Da Snots!"
+                                            )
+                                            player.discard_card_from_hand(hand_pos)
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             print("Unit clicked on.")

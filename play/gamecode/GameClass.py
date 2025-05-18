@@ -1057,6 +1057,20 @@ class Game:
                                               self.card_array)
                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                         self.choices_available.append(card.get_name())
+            elif self.nullify_context == "Launch da Snots":
+                primary_player.spend_resources(1)
+                extra_attack = primary_player.count_copies_at_planet(self.attacker_planet,
+                                                                     "Snotlings")
+                primary_player.increase_attack_of_unit_at_pos(self.attacker_planet,
+                                                              self.attacker_position,
+                                                              extra_attack, expiration="NEXT")
+                attack_name = primary_player.get_name_given_pos(self.attacker_planet,
+                                                                self.attacker_position)
+                await self.send_update_message(
+                    attack_name + " gained " + str(extra_attack)
+                    + " ATK from Launch Da Snots!"
+                )
+                primary_player.discard_card_name_from_hand("Launch da Snots")
         else:
             if self.nullifying_backlash:
                 primary_player.discard_card_name_from_hand("Backlash")
@@ -2238,7 +2252,7 @@ class Game:
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -2515,7 +2529,7 @@ class Game:
                             if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
                                     .get_card_type() != "Warlord" and \
                                     player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                                    .get_card_type() != "Support":
+                                            .get_card_type() != "Support":
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
@@ -3040,7 +3054,7 @@ class Game:
                                                 if primary_player.cards_in_play[planet_pos + 1][
                                                     unit_pos].get_ability() == "Reanimating Warriors" \
                                                         and not primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].once_per_phase_used:
+                                                    unit_pos].once_per_phase_used:
                                                     self.effects_waiting_on_resolution.append("Reanimating Warriors")
                                                     self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
@@ -3495,7 +3509,7 @@ class Game:
                                     hand_pos = int(game_update_string[2])
                                     card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
                                     if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                         self.location_hand_attachment_shadowsun = hand_pos
                                         primary_player.aiming_reticle_coords_hand = hand_pos
                                         primary_player.aiming_reticle_color = "blue"
@@ -3575,7 +3589,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                .check_for_a_trait("Soldier"):
+                                                        .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
