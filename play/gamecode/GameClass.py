@@ -97,6 +97,7 @@ class Game:
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
+        self.damage_is_preventable = []
         self.card_names_triggering_damage = []
         self.damage_can_be_shielded = []
         self.amount_that_can_be_removed_by_shield = []
@@ -258,6 +259,7 @@ class Game:
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
+        self.searing_brand_cancel_enabled = True
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -276,6 +278,7 @@ class Game:
         self.card_names_triggering_damage = []
         self.amount_that_can_be_removed_by_shield = []
         self.damage_can_be_shielded = []
+        self.damage_is_preventable = []
         self.damage_taken_was_from_attack = []
         self.damage_from_atrox = False
         self.units_damaged_by_attack = []
@@ -594,10 +597,6 @@ class Game:
                                 self.mode = "Normal"
 
     async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction=""):
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            self.damage_on_units_list_before_new_damage.append(secondary_player.
-                                                               get_damage_given_pos
-                                                               (chosen_planet, i))
         secondary_player.suffer_area_effect(chosen_planet, amount_aoe, faction=faction)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
@@ -1197,8 +1196,7 @@ class Game:
     async def resolve_crushing_blow(self, primary_player, secondary_player):
         primary_player.discard_card_name_from_hand("Crushing Blow")
         planet_pos, unit_pos = self.furiable_unit_position
-        damage = secondary_player.get_damage_given_pos(planet_pos, unit_pos)
-        secondary_player.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False)
         if not secondary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
             sources, valid_players = self.extra_damage_possible()
             if sources:
@@ -1282,11 +1280,11 @@ class Game:
             self.choices_available = []
             self.choice_context = ""
             self.name_player_making_choices = ""
-            self.communications_relay_enabled = False
+            self.backlash_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
             await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.communications_relay_enabled = True
+            self.backlash_enabled = True
 
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
@@ -1481,17 +1479,46 @@ class Game:
                             self.name_player_making_choices = ""
                             self.communications_relay_enabled = False
                             self.backlash_enabled = False
+                            self.searing_brand_cancel_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.communications_relay_enabled = True
+                            self.searing_brand_cancel_enabled = True
                             self.backlash_enabled = True
                         elif chosen_choice == "Communications Relay":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Communications Relay?"
+                        elif chosen_choice == "Searing Brand":
+                            self.choice_context = "Discard 2 Cards for Searing Brand?"
+                            self.choices_available = ["Yes", "No"]
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                    elif self.choice_context == "Choose card to discard for Searing Brand":
+                        primary_player.discard_card_from_hand(int(game_update_string[1]))
+                        self.misc_counter += 1
+                        self.choices_available = primary_player.cards
+                        if self.misc_counter > 1:
+                            secondary_player.discard_card_from_hand(secondary_player.aiming_reticle_coords_hand)
+                            secondary_player.aiming_reticle_coords_hand = None
+                            self.action_cleanup()
+                            self.reset_choices_available()
+                    elif self.choice_context == "Searing Brand":
+                        if game_update_string[1] == "0":
+                            self.choices_available = primary_player.cards
+                            self.misc_counter = 0
+                            self.choice_context = "Choose card to discard for Searing Brand"
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.searing_brand_cancel_enabled = False
+                            new_string_list = self.nullify_string.split(sep="/")
+                            print("String used:", new_string_list)
+                            await self.update_game_event(secondary_player.name_player, new_string_list,
+                                                         same_thread=True)
+                            self.searing_brand_cancel_enabled = True
                     elif self.choice_context == "Use Backlash?":
                         await self.resolve_backlash(name, game_update_string, primary_player, secondary_player)
                     elif self.choice_context == "Use Communications Relay?":
@@ -2998,6 +3025,8 @@ class Game:
                         self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append([])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+            elif not self.damage_is_preventable[0]:
+                await self.send_update_message("Damage is not preventable; you must pass")
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
                     if game_update_string[1] == str(self.number_who_is_shielding):
@@ -3740,6 +3769,7 @@ class Game:
         del self.damage_on_units_list_before_new_damage[0]
         del self.positions_attackers_of_units_to_take_damage[0]
         del self.damage_can_be_shielded[0]
+        del self.damage_is_preventable[0]
         del self.card_names_triggering_damage[0]
         self.damage_moved_to_old_one_eye = 0
         if self.positions_of_units_to_take_damage:

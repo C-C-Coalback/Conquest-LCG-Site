@@ -1646,8 +1646,12 @@ class Player:
                         return True
         return False
 
-    def interrupt_cancel_target_check(self, planet_pos, unit_pos):
+    def interrupt_cancel_target_check(self, planet_pos, unit_pos, context=""):
         possible_interrupts = []
+        if context == "Searing Brand":
+            if self.game.searing_brand_cancel_enabled:
+                if len(self.cards) > 1:
+                    possible_interrupts.append("Searing Brand")
         if self.game.communications_relay_enabled:
             if self.communications_relay_check(planet_pos, unit_pos):
                 possible_interrupts.append("Communications Relay")
@@ -2144,7 +2148,7 @@ class Player:
         return False
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
-                             context=""):
+                             context="", preventable=True):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -2204,6 +2208,7 @@ class Player:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
         if damage_on_card_after > damage_on_card_before:
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
+            self.game.damage_is_preventable.append(preventable)
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
             self.game.damage_can_be_shielded.append(can_shield)
             self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
@@ -2248,7 +2253,7 @@ class Player:
             return True
         return False
 
-    def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context=""):
+    def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context="", preventable=True):
         prior_damage = self.headquarters[unit_id].get_damage()
         self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
@@ -2256,6 +2261,7 @@ class Player:
         total_that_can_be_blocked = afterwards_damage - prior_damage
         self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
         self.game.damage_can_be_shielded.append(can_shield)
+        self.game.damage_is_preventable.append(preventable)
         self.game.positions_attackers_of_units_to_take_damage.append(None)
         self.game.card_names_triggering_damage.append(context)
         self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
