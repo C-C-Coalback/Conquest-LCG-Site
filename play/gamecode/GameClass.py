@@ -3025,13 +3025,6 @@ class Game:
                                     shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                     took_damage = True
                                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
-                                    """
-                                    if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                            self.damage_on_units_list_before_new_damage[0]:
-                                        primary_player.set_damage_given_pos(
-                                            planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
-                                        took_damage = False
-                                    """
                                     primary_player.discard_card_from_hand(hand_pos)
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     if took_damage:
@@ -3054,7 +3047,7 @@ class Game:
                                                 if primary_player.cards_in_play[planet_pos + 1][
                                                     unit_pos].get_ability() == "Reanimating Warriors" \
                                                         and not primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].once_per_phase_used:
+                                                        unit_pos].once_per_phase_used:
                                                     self.effects_waiting_on_resolution.append("Reanimating Warriors")
                                                     self.player_resolving_effect.append(primary_player.name_player)
                                             if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
@@ -3132,7 +3125,8 @@ class Game:
                                 print("is ready")
                                 primary_player.exhaust_given_pos(-2, hq_pos)
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                                self.amount_that_can_be_removed_by_shield[0] -= 1
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
                                 if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
                                         self.damage_on_units_list_before_new_damage[0]:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3174,6 +3168,19 @@ class Game:
                                 primary_player.assign_damage_to_pos_hq(hq_pos, damage, can_shield=False)
                                 primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if planet_pos == hurt_planet and hurt_pos == unit_pos:
+                                if primary_player.get_ready_given_pos(hurt_planet, hurt_pos):
+                                    if not primary_player.headquarters[hurt_pos].misc_ability_used:
+                                        primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                        primary_player.headquarters[hurt_pos].misc_ability_used = True
+                                        self.amount_that_can_be_removed_by_shield[0] = \
+                                            self.amount_that_can_be_removed_by_shield[0] - 1
+                                        if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
+                                                self.damage_on_units_list_before_new_damage[0]:
+                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     if game_update_string[1] == str(self.number_who_is_shielding):
@@ -3191,6 +3198,35 @@ class Game:
                                     self.misc_target_planet = hurt_planet
                                     self.misc_target_unit = hurt_pos
                                     self.old_one_eye_pos = (planet_pos, unit_pos)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if planet_pos == hurt_planet and hurt_pos == unit_pos:
+                                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                    if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                        primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                        self.amount_that_can_be_removed_by_shield[0] = \
+                                            self.amount_that_can_be_removed_by_shield[0] - 1
+                                        if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
+                                                self.damage_on_units_list_before_new_damage[0]:
+                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Steel Legion Chimera":
+                            if self.positions_attackers_of_units_to_take_damage[0]:
+                                hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                                if planet_pos == hurt_planet:
+                                    if not primary_player.cards_in_play[hurt_planet + 1][hurt_pos]\
+                                            .check_for_a_trait("Vehicle"):
+                                        if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                            primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                            primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                                misc_ability_used = True
+                                            self.amount_that_can_be_removed_by_shield[0] = \
+                                                self.amount_that_can_be_removed_by_shield[0] - 1
+                                            if primary_player.get_damage_given_pos(hurt_planet, hurt_pos) == \
+                                                    self.damage_on_units_list_before_new_damage[0]:
+                                                primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                                await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                 .get_ability() == "Adamant Hive Guard":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
@@ -3670,6 +3706,10 @@ class Game:
             self.p2.reset_defense_batteries()
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
+        primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
+        primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
+        secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")
+        secondary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
             if player_num == 1:

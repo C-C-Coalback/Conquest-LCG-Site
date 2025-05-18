@@ -499,7 +499,7 @@ class UnitCard(Card):
         return command
 
     def damage_card(self, player, amount, can_shield=True, reassign=False):
-        self.assign_damage(amount, reassign=reassign)
+        self.assign_damage(amount)
         if self.check_health():
             print("Card still standing")
             return 0
@@ -507,12 +507,7 @@ class UnitCard(Card):
             print("Damage exceeds health")
             return 1
 
-    def assign_damage(self, amount, reassign=False):
-        if amount > 0:
-            if self.get_ability() == "Blood Angels Veterans":
-                if not reassign:
-                    if self.get_ready():
-                        amount = amount - 1
+    def assign_damage(self, amount):
         self.damage = self.damage + amount
 
     def check_health(self):
