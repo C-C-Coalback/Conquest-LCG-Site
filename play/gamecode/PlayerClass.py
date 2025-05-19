@@ -1173,6 +1173,16 @@ class Player:
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
+            if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
+                already_banner = False
+                self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
+                for i in range(len(self.game.reactions_needing_resolving)):
+                    if self.game.reactions_needing_resolving[i] == "Banner of the Ashen Sky":
+                        if self.game.player_who_resolves_reaction[i] == self.name_player:
+                            already_banner = True
+                if not already_banner:
+                    self.game.create_reaction("Banner of the Ashen Sky", self.name_player,
+                                              (int(self.number), -1, -1))
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
                 self.game.create_reaction("Piranha Hunter", self.name_player, (int(self.number), destination, new_pos))
         if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":

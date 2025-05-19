@@ -619,6 +619,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
                             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
+            if game_update_string[1] == primary_player.number:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
+                    card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                    await self.send_update_message(card_name + " gained +2 ATK from Banner!")
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]

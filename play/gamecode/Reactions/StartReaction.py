@@ -444,6 +444,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Soul Grinder":
             self.player_who_resolves_reaction[0] = secondary_player.name_player
+        elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
+            primary_player.exhaust_card_in_hq_given_name("Banner of the Ashen Sky")
         elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
