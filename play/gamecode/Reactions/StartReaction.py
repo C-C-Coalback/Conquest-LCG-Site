@@ -442,6 +442,17 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Carnivore Pack":
             primary_player.add_resources(3)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
+                    if primary_player.get_ready_given_pos(planet_pos, i):
+                        primary_player.exhaust_given_pos(planet_pos, i)
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
+                    if secondary_player.get_ready_given_pos(planet_pos, i):
+                        secondary_player.exhaust_given_pos(planet_pos, i)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)

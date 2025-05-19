@@ -846,6 +846,9 @@ class Player:
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
             self.game.create_reaction("Swordwind Farseer", self.name_player,
                                       (int(self.number), position, last_element_index))
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Mighty Wraithknight":
+            self.game.create_reaction("Mighty Wraithknight", self.name_player,
+                                      (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
             self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
                                                                             last_element_index))
