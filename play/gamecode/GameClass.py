@@ -1564,6 +1564,27 @@ class Game:
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                    elif self.choice_context == "Rakarth's Experimentations card type":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        self.choices_available = ["Damage Warlord"]
+                        for i in range(len(secondary_player.cards)):
+                            card = FindCard.find_card(secondary_player.cards[i], self.card_array)
+                            if card.get_card_type() == self.misc_target_choice:
+                                if card.get_name() not in self.choices_available:
+                                    self.choices_available.append(card.get_name())
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Suffer Rakarth's Experimentations":
+                        if game_update_string[1] == "0":
+                            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                            primary_player.assign_damage_to_pos(warlord_planet, warlord_pos, 1)
+                        else:
+                            card_name = self.choices_available[int(game_update_string[1])]
+                            primary_player.discard_card_name_from_hand(card_name)
+                        self.reset_choices_available()
+                        self.action_cleanup()
+                        await primary_player.dark_eldar_event_played()
+                        primary_player.torture_event_played()
                     elif self.choice_context == "Choose card to discard for Searing Brand":
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1
