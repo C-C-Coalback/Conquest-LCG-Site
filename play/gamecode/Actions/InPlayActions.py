@@ -51,6 +51,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.player_with_action = ""
                         self.action_chosen = ""
                         self.mode = "Normal"
+                    elif ability == "The Glovodan Eagle":
+                        primary_player.return_card_to_hand(planet_pos, unit_pos)
+                        self.action_cleanup()
                     elif ability == "Captain Markis":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)

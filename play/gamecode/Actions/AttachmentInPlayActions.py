@@ -1,3 +1,6 @@
+from ..CardClasses import ArmyCard
+
+
 async def update_game_event_action_attachment_in_play(self, name, game_update_string):
     if name == self.name_1:
         primary_player = self.p1
@@ -44,6 +47,14 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                     if primary_player.get_name_player() == self.player_with_action:
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
+                        self.action_cleanup()
+                elif ability == "The Glovodan Eagle":
+                    if primary_player.get_name_player() == self.player_with_action:
+                        primary_player.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        card = ArmyCard("The Glovodan Eagle", "Action: Return this unit to your hand.", "Familiar.",
+                                        1, "Astra Militarum", "Signature", 1, 1, 0, True,
+                                        action_in_play=True, allowed_phases_in_play="ALL")
+                        primary_player.add_card_to_planet(card, planet_pos)
                         self.action_cleanup()
                 elif ability == "Hyperphase Sword":
                     if primary_player.get_name_player() == self.player_with_action:
