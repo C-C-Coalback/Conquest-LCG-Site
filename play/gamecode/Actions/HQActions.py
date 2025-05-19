@@ -251,7 +251,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Ravenous Flesh Hounds":
-                        self.action_chosen = "Ravenous Flesh Hounds"
+                        self.action_chosen = ability
+                        primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                    elif ability == "Ancient Keeper of Secrets":
+                        self.action_chosen = ability
                         primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                     elif card.get_ability() == "Tellyporta Pad":
                         if card.get_ready():
@@ -768,12 +771,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Ravenous Flesh Hounds":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if primary_player.get_number() == game_update_string[1]:
             unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
@@ -782,12 +779,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1], 999)
                 primary_player.sacrifice_card_in_hq(unit_pos)
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
+                self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Ancient Keeper of Secrets":
+        if primary_player.get_number() == game_update_string[1]:
+            unit_pos = int(game_update_string[2])
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                primary_player.ready_given_pos(self.position_of_actioned_card[0],
+                                               self.position_of_actioned_card[1])
+                primary_player.sacrifice_card_in_hq(unit_pos)
+                self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Squadron Redeployment":
         if self.unit_to_move_position == [-1, -1]:
