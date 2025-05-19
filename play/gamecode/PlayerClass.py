@@ -781,6 +781,9 @@ class Player:
             if not target_card.get_wargear_attachments_permitted():
                 print("Unit may not have wargear")
                 return False
+        if card.get_name() == "The Shining Blade":
+            if not target_card.get_mobile():
+                return False
         name_owner = self.name_player
         if not_own_attachment:
             if self.number == "1":

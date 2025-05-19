@@ -142,6 +142,25 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 + " ATK from Launch Da Snots!"
                                             )
                                             player.discard_card_from_hand(hand_pos)
+    elif len(game_update_string) == 6:
+        if game_update_string[0] == "ATTACHMENT" and game_update_string[1] == "IN_PLAY":
+            if game_update_string[2] == self.number_with_combat_turn:
+                if self.number_with_combat_turn == "1":
+                    player = self.p1
+                else:
+                    player = self.p2
+                planet_pos = int(game_update_string[3])
+                unit_pos = int(game_update_string[4])
+                attachment_pos = int(game_update_string[5])
+                if planet_pos == self.attacker_planet and unit_pos == self.attacker_position:
+                    if player.cards_in_play[planet_pos + 1][unit_pos].\
+                            get_attachments()[attachment_pos].get_ability() == "The Shining Blade":
+                        if player.cards_in_play[planet_pos + 1][unit_pos].\
+                                get_attachments()[attachment_pos].get_ready():
+                            player.cards_in_play[planet_pos + 1][unit_pos].\
+                                get_attachments()[attachment_pos].exhaust_card()
+                            self.shining_blade_active = True
+                            await self.send_update_message("The Shining Blade activated!")
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             print("Unit clicked on.")
@@ -268,7 +287,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                 elif self.defender_position == -1:
+                    can_continue = False
                     if int(game_update_string[2]) == self.attacker_planet:
+                        can_continue = True
+                    elif self.shining_blade_active:
+                        if abs(int(game_update_string[2]) - self.attacker_planet) == 1:
+                            can_continue = True
+                    if can_continue:
                         if game_update_string[1] != self.number_with_combat_turn:
                             armorbane_check = False
                             self.defender_planet = int(game_update_string[2])
@@ -438,6 +463,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     primary_player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
                                                                         shadow_field_possible=True)
                                 self.reset_combat_positions()
+                                self.shining_blade_active = False
                                 self.number_with_combat_turn = secondary_player.get_number()
                                 self.player_with_combat_turn = secondary_player.get_name_player()
                                 if self.unit_will_move_after_attack:

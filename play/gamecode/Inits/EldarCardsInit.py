@@ -183,6 +183,11 @@ def eldar_cards_init():
                                                            "exhaust this support to give that unit "
                                                            "+2 ATK for its next attack this phase.", "Upgrade.",
                                 1, faction, "Signature", False),
+        CardClasses.AttachmentCard("The Shining Blade", "Attach to a mobile unit.\n"
+                                                        "Interrupt: When attached unit declares an attack, "
+                                                        "declare that attack against an enemy unit at an "
+                                                        "adjacent planet instead.", "Relic. Wargear.",
+                                   1, faction, "Signature", 3, True),
         CardClasses.EventCard("Cry of the Wind", "Reaction: After a unit moves from one planet to another,"
                                                  " move that unit to an adjacent planet.",
                               "Tactic.", 0, faction, "Signature", 1, False)
