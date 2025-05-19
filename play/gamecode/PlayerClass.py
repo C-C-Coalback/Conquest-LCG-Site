@@ -2913,9 +2913,8 @@ class Player:
         self.discard.append(card_name)
         self.cards_recently_discarded.append(card_name)
         if card.get_card_type() == "Army":
-            if self.search_hand_for_card("The Emperor Protects"):
-                if self.check_for_warlord(planet_num):
-                    self.stored_targets_the_emperor_protects.append(card_name)
+            if self.check_for_warlord(planet_num):
+                self.stored_targets_the_emperor_protects.append(card_name)
         self.discard_attachments_from_card(planet_num, card_pos)
         self.remove_card_from_play(planet_num, card_pos)
 

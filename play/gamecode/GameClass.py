@@ -1099,6 +1099,10 @@ class Game:
                 self.name_player_making_choices = self.first_player_nullified
                 self.choice_context = "Target The Emperor Protects:"
                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+            elif self.nullify_context == "Made Ta Fight":
+                self.name_player_making_choices = self.first_player_nullified
+                self.choice_context = "Target Made Ta Fight:"
+                self.choices_available = primary_player.stored_targets_the_emperor_protects
             elif self.nullify_context == "Launch da Snots":
                 primary_player.spend_resources(1)
                 extra_attack = primary_player.count_copies_at_planet(self.attacker_planet,
@@ -2050,6 +2054,12 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.delete_reaction()
+                    elif self.choice_context == "Target Made Ta Fight:":
+                        target = self.choices_available[int(game_update_string[1])]
+                        card = FindCard.find_card(target, self.card_array)
+                        self.misc_counter = card.attack
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Target The Emperor Protects:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.discard_card_name_from_hand("The Emperor Protects")
@@ -2230,6 +2240,30 @@ class Game:
                         self.player_with_action = ""
                         self.mode = "Normal"
                         self.action_chosen = ""
+                    elif self.choice_context == "Use Made Ta Fight?":
+                        if game_update_string[1] == "0":
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play Made Ta Fight; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "Made Ta Fight"
+                                self.cost_card_nullified = 2
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "Made Ta Fight"
+                            else:
+                                self.choices_available = primary_player.stored_targets_the_emperor_protects
+                                self.choice_context = "Target Made Ta Fight:"
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
+                            self.delete_reaction()
                     elif self.choice_context == "Use The Emperor Protects?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
@@ -2241,7 +2275,7 @@ class Game:
                                 self.choice_context = "Use Nullify?"
                                 self.nullified_card_pos = -1
                                 self.nullified_card_name = "The Emperor Protects"
-                                self.cost_card_nullified = 1
+                                self.cost_card_nullified = 0
                                 self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "The Emperor Protects"
@@ -3001,6 +3035,7 @@ class Game:
                     self.player_who_resolves_reaction.append(self.name_2)
                     self.positions_of_unit_triggering_reaction.append((2, -1, -1))
         self.emp_protecc()
+        self.made_ta_fight()
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
@@ -4404,6 +4439,33 @@ class Game:
                 return True
         return False
 
+    def made_ta_fight(self):
+        warlord_planet, warlord_pos = self.p1.get_location_of_warlord()
+        print("made ta fight")
+        if warlord_planet != -2:
+            print("ok warlord")
+            if self.p1.stored_targets_the_emperor_protects:
+                print("units valid")
+                if self.p1.search_hand_for_card("Made Ta Fight") and self.p1.resources > 1:
+                    already_present = False
+                    for i in range(len(self.reactions_needing_resolving)):
+                        if self.reactions_needing_resolving[i] == "Made Ta Fight":
+                            if self.player_who_resolves_reaction[i] == self.name_1:
+                                already_present = True
+                    if not already_present:
+                        self.create_reaction("Made Ta Fight", self.name_1, (1, -1, -1))
+        warlord_planet, warlord_pos = self.p2.get_location_of_warlord()
+        if warlord_planet != -2:
+            if self.p2.stored_targets_the_emperor_protects:
+                if self.p2.search_hand_for_card("Made Ta Fight") and self.p2.resources > 1:
+                    already_present = False
+                    for i in range(len(self.reactions_needing_resolving)):
+                        if self.reactions_needing_resolving[i] == "Made Ta Fight":
+                            if self.player_who_resolves_reaction[i] == self.name_2:
+                                already_present = True
+                    if not already_present:
+                        self.create_reaction("Made Ta Fight", self.name_2, (2, -1, -1))
+
     def emp_protecc(self):
         if self.p1.stored_targets_the_emperor_protects:
             if self.p1.search_hand_for_card("The Emperor Protects"):
@@ -4414,8 +4476,6 @@ class Game:
                             already_present = True
                 if not already_present:
                     self.create_reaction("The Emperor Protects", self.name_1, (1, -1, -1))
-            else:
-                self.p1.stored_targets_the_emperor_protects = []
         if self.p2.stored_targets_the_emperor_protects:
             if self.p2.search_hand_for_card("The Emperor Protects"):
                 already_present = False
@@ -4425,8 +4485,6 @@ class Game:
                             already_present = True
                 if not already_present:
                     self.create_reaction("The Emperor Protects", self.name_2, (2, -1, -1))
-            else:
-                self.p2.stored_targets_the_emperor_protects = []
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
@@ -4525,10 +4583,12 @@ class Game:
                 if self.auto_card_destruction:
                     self.resolve_destruction_checks_after_reactions = False
                     await self.destroy_check_all_cards()
-        if not self.resolve_destruction_checks_after_reactions and not self.positions_of_units_to_take_damage and \
-                not self.effects_waiting_on_resolution \
+        if not self.positions_of_units_to_take_damage and not self.effects_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal":
+            if not self.reactions_needing_resolving and not self.resolving_search_box:
+                self.p1.stored_targets_the_emperor_protects = []
+                self.p2.stored_targets_the_emperor_protects = []
             if self.need_to_reset_tomb_blade_squadron:
                 self.need_to_reset_tomb_blade_squadron = False
                 self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
