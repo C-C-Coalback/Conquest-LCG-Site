@@ -570,7 +570,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         await primary_player.dark_eldar_event_played()
-                        primary_player.torture_event_played()
+                        primary_player.torture_event_played("Searing Brand")
                         self.action_cleanup()
     elif self.action_chosen == "Torquemada Coteaz":
         if planet_pos == self.position_of_actioned_card[0]:

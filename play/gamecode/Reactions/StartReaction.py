@@ -108,6 +108,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_second_card = False
             self.need_to_reset_tomb_blade_squadron = True
             self.misc_target_unit = (-1, -1)
+        elif self.reactions_needing_resolving[0] == "Ichor Gauntlet":
+            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.exhaust_attachment_name_pos(warlord_planet, warlord_pos, "Ichor Gauntlet")
+            card_target = primary_player.ichor_gauntlet_target
+            card = FindCard.find_card(card_target, self.card_array)
+            primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant))
+            if card_target in primary_player.discard:
+                primary_player.discard.remove(card_target)
+            primary_player.cards.append(card_target)
+            last_element = len(primary_player.cards) - 1
+            self.player_with_action = primary_player.name_player
+            if self.phase == "DEPLOY":
+                self.player_with_deploy_turn = primary_player.name_player
+                self.number_with_deploy_turn = primary_player.number
+            self.mode = "ACTION"
+            string_to_use = ["HAND", primary_player.number, str(last_element)]
+            self.delete_reaction()
+            await self.update_game_event_action(name, string_to_use)
         elif self.reactions_needing_resolving[0] == "Deathmark Assassins":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.discard_top_card_deck():

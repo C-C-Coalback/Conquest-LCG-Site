@@ -113,6 +113,7 @@ class Player:
         self.foretell_permitted = True
         self.last_planet_sacrifice = -1
         self.urien_relevant = False
+        self.ichor_gauntlet_target = ""
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -918,7 +919,11 @@ class Player:
         string_sent = self.name_player + " reveals their hand: " + string_sent
         await self.game.send_update_message(string_sent)
 
-    def torture_event_played(self):
+    def torture_event_played(self, name=""):
+        warlord_planet, warlord_pos = self.get_location_of_warlord()
+        if self.search_attachments_at_pos(warlord_planet, warlord_pos, "Ichor Gauntlet", ready_relevant=True):
+            self.game.create_reaction("Ichor Gauntlet", self.name_player, (int(self.number), -1, -1))
+            self.ichor_gauntlet_target = name
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Uber Grotesque":
                 if not self.headquarters[i].once_per_phase_used:
@@ -1805,7 +1810,6 @@ class Player:
                     return True
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ready():
                     return True
-                return True
         return False
 
     def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None):

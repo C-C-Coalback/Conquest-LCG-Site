@@ -1584,7 +1584,7 @@ class Game:
                         self.reset_choices_available()
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
-                        primary_player.torture_event_played()
+                        secondary_player.torture_event_played("Rakarth's Experimentations")
                     elif self.choice_context == "Choose card to discard for Searing Brand":
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1
@@ -1868,7 +1868,7 @@ class Game:
                         self.name_player_making_choices = ""
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
-                        primary_player.torture_event_played()
+                        primary_player.torture_event_played("Visions of Agony")
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
