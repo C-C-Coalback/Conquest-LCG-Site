@@ -203,6 +203,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             primary_player.headquarters[int(game_update_string[2])].flying_eop = True
                             self.action_cleanup()
+                    elif ability == "Ksi'm'yen Orbital City":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.chosen_first_card = False
+                            self.misc_target_unit = (-1, -1)
+                            self.action_chosen = ability
                     elif ability == "Inquisitorial Fortress":
                         if card.get_ready():
                             if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
@@ -607,6 +613,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Ksi'm'yen Orbital City":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.headquarters[unit_pos].get_is_unit():
+                    if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal"):
+                        self.misc_target_unit = (-2, unit_pos)
+                        self.chosen_first_card = True
+                        primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
     elif self.action_chosen == "Clogged with Corpses":
         planet_pos = -2
         unit_pos = int(game_update_string[2])

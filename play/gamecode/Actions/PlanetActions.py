@@ -532,6 +532,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.chosen_first_card = True
             else:
                 await self.send_update_message("An enemy warlord is present.")
+    elif self.action_chosen == "Ksi'm'yen Orbital City":
+        if self.chosen_first_card:
+            origin_planet, origin_pos = self.misc_target_unit
+            primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+            primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+            new_pos = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+            primary_player.ready_given_pos(chosen_planet, new_pos)
+            self.action_cleanup()
     elif self.action_chosen == "Snotling Attack":
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
