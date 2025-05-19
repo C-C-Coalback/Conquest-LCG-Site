@@ -22,7 +22,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 print("reached new in play unit action")
-                ability = card_chosen.get_ability()
+                ability = card_chosen.get_ability(bloodied_relevant=True)
                 if player_owning_card.name_player != name:
                     if ability == "Sslyth Mercenary":
                         if primary_player.spend_resources(2):
@@ -88,6 +88,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Hunter Gargoyles":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    elif ability == "Torquemada Coteaz":
+                        if not card_chosen.misc_ability_used:
+                            card_chosen.misc_ability_used = True
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -558,6 +564,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
                         self.action_cleanup()
+    elif self.action_chosen == "Torquemada Coteaz":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                    primary_player.increase_attack_of_unit_at_pos(warlord_planet, warlord_pos, 3, expiration="NEXT")
+                    primary_player.reset_aiming_reticle_in_play(warlord_planet, warlord_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

@@ -366,12 +366,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                           self.attacker_position)
                                 if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                         == "Burna Boyz":
-                                    self.reactions_needing_resolving.append("Burna Boyz")
-                                    self.positions_of_unit_triggering_reaction.append([int(primary_player.number),
-                                                                                       self.attacker_planet,
-                                                                                       self.attacker_position])
-                                    self.player_who_resolves_reaction.append(primary_player.name_player)
+                                    self.create_reaction("Burna Boyz", primary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
                                     self.last_defender_pos = (self.defender_planet, self.defender_position)
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                        == "Torquemada Coteaz":
+                                    primary_player.reset_card_name_misc_ability("Torquemada Coteaz")
                                 can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
                                                                                         self.attacker_position)
                                 took_damage, bodyguards = secondary_player.assign_damage_to_pos(
