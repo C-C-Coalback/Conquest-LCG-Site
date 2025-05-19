@@ -533,6 +533,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use Fall Back?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "The Emperor Protects":
+            self.resolving_search_box = True
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Use The Emperor Protects?"
+            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Leviathan Hive Ship":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]

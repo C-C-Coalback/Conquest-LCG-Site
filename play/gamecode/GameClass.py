@@ -1060,6 +1060,10 @@ class Game:
                                               self.card_array)
                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                         self.choices_available.append(card.get_name())
+            elif self.nullify_context == "The Emperor Protects":
+                self.name_player_making_choices = self.first_player_nullified
+                self.choice_context = "Target The Emperor Protects:"
+                self.choices_available = primary_player.stored_targets_the_emperor_protects
             elif self.nullify_context == "Launch da Snots":
                 primary_player.spend_resources(1)
                 extra_attack = primary_player.count_copies_at_planet(self.attacker_planet,
@@ -1908,6 +1912,21 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.delete_reaction()
+                    elif self.choice_context == "Target The Emperor Protects:":
+                        target = self.choices_available[int(game_update_string[1])]
+                        primary_player.discard_card_name_from_hand("The Emperor Protects")
+                        primary_player.cards.append(target)
+                        try:
+                            primary_player.stored_targets_the_emperor_protects.remove(target)
+                            primary_player.discard.remove(target)
+                            primary_player.stored_cards_recently_discarded.remove(target)
+                            primary_player.stored_cards_recently_destroyed.remove(target)
+                        except ValueError:
+                            pass
+                        self.choices_available = primary_player.stored_targets_the_emperor_protects
+                        self.emp_protecc()
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
                     elif self.choice_context == "Target Fall Back:":
                         primary_player.spend_resources(1)
                         target = self.choices_available[int(game_update_string[1])]
@@ -1928,9 +1947,8 @@ class Game:
                                 if card.check_for_a_trait("Elite") and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
                         if not self.choices_available:
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
                             self.resolving_search_box = False
+                            self.reset_choices_available()
                     elif self.choice_context == "Target Shrine of Warpflame:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
@@ -2072,6 +2090,30 @@ class Game:
                         self.player_with_action = ""
                         self.mode = "Normal"
                         self.action_chosen = ""
+                    elif self.choice_context == "Use The Emperor Protects?":
+                        if game_update_string[1] == "0":
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play The Emperor Protects; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = -1
+                                self.nullified_card_name = "The Emperor Protects"
+                                self.cost_card_nullified = 1
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "The Emperor Protects"
+                            else:
+                                self.choices_available = primary_player.stored_targets_the_emperor_protects
+                                self.choice_context = "Target The Emperor Protects:"
+                        elif game_update_string[1] == "1":
+                            primary_player.stored_targets_the_emperor_protects = []
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            self.resolving_search_box = False
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
@@ -2760,7 +2802,7 @@ class Game:
             for i in range(len(self.reactions_needing_resolving)):
                 if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
                     if self.player_who_resolves_reaction[i] == self.name_1:
-                        aready_hive_ship = True
+                        already_hive_ship = True
             if not already_hive_ship:
                 self.create_reaction("Leviathan Hive Ship", self.name_1, (1, -1, -1))
         if self.leviathan_hive_ship_check(self.p2):
@@ -2768,7 +2810,7 @@ class Game:
             for i in range(len(self.reactions_needing_resolving)):
                 if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
                     if self.player_who_resolves_reaction[i] == self.name_2:
-                        aready_hive_ship = True
+                        already_hive_ship = True
             if not already_hive_ship:
                 self.create_reaction("Leviathan Hive Ship", self.name_2, (2, -1, -1))
         if self.holy_sepulchre_check(self.p1):
@@ -2813,6 +2855,7 @@ class Game:
                     self.reactions_needing_resolving.append("Shrine of Warpflame")
                     self.player_who_resolves_reaction.append(self.name_2)
                     self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+        self.emp_protecc()
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
@@ -4197,6 +4240,30 @@ class Game:
                 self.player_resolving_nurgling_bomb = sec.name_player
                 return True
         return False
+
+    def emp_protecc(self):
+        if self.p1.stored_targets_the_emperor_protects:
+            if self.p1.search_hand_for_card("The Emperor Protects"):
+                already_present = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "The Emperor Protects":
+                        if self.player_who_resolves_reaction[i] == self.name_1:
+                            already_present = True
+                if not already_present:
+                    self.create_reaction("The Emperor Protects", self.name_1, (1, -1, -1))
+            else:
+                self.p1.stored_targets_the_emperor_protects = []
+        if self.p2.stored_targets_the_emperor_protects:
+            if self.p2.search_hand_for_card("The Emperor Protects"):
+                already_present = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "The Emperor Protects":
+                        if self.player_who_resolves_reaction[i] == self.name_2:
+                            already_present = True
+                if not already_present:
+                    self.create_reaction("The Emperor Protects", self.name_2, (2, -1, -1))
+            else:
+                self.p2.stored_targets_the_emperor_protects = []
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:

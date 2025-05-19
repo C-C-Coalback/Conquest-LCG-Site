@@ -76,6 +76,7 @@ class Player:
         self.total_indirect_damage = 0
         self.cards_recently_discarded = []
         self.stored_cards_recently_discarded = []
+        self.stored_targets_the_emperor_protects = []
         self.cards_recently_destroyed = []
         self.stored_cards_recently_destroyed = []
         self.num_nullify_played = 0
@@ -1706,9 +1707,7 @@ class Player:
         self.discard_card_name_from_hand("Foretell")
 
     def search_hand_for_card(self, card_name):
-        print("Looking for", card_name)
         for i in range(len(self.cards)):
-            print(self.cards[i])
             if self.cards[i] == card_name:
                 return True
         return False
@@ -2824,6 +2823,10 @@ class Player:
             self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
         self.discard.append(card_name)
         self.cards_recently_discarded.append(card_name)
+        if card.get_card_type() == "Army":
+            if self.search_hand_for_card("The Emperor Protects"):
+                if self.check_for_warlord(planet_num):
+                    self.stored_targets_the_emperor_protects.append(card_name)
         self.discard_attachments_from_card(planet_num, card_pos)
         self.remove_card_from_play(planet_num, card_pos)
 
