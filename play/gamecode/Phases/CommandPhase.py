@@ -12,15 +12,49 @@ async def update_game_event_command_section(self, name, game_update_string):
                 print("Save warlord to this planet")
                 if name == self.name_1:
                     if not self.p1.committed_warlord:
-                        self.p1.warlord_commit_location = int(game_update_string[1])
-                        self.p1.committed_warlord = True
-                        await self.send_update_message(self.name_1 + " has chosen a planet to commit "
-                                                                     "their warlord.")
-                        if self.p1.search_synapse_in_hq():
-                            await self.send_update_message(self.name_1 + " has a synapse; please"
-                                                                         " commit this as well")
-                            self.p1.committed_synapse = False
-                            self.p1.synapse_commit_location = -1
+                        if self.p1.permitted_commit_locs_warlord[int(game_update_string[1])]:
+                            self.p1.warlord_commit_location = int(game_update_string[1])
+                            self.p1.committed_warlord = True
+                            await self.send_update_message(self.name_1 + " has chosen a planet to commit "
+                                                                         "their warlord.")
+                            if self.p1.search_synapse_in_hq():
+                                await self.send_update_message(self.name_1 + " has a synapse; please"
+                                                                             " commit this as well")
+                                self.p1.committed_synapse = False
+                                self.p1.synapse_commit_location = -1
+                        else:
+                            await self.send_update_message(
+                                self.name_1 + ", your warlord may not commit there this round!"
+                            )
+                            self.p1.illegal_commits_warlord += 1
+                            if self.p1.illegal_commits_warlord > 4:
+                                await self.send_update_message(
+                                    "Automatically determining \"Most Legal\" warlord commit."
+                                )
+                                last_planet = 0
+                                for i in range(len(self.planets_in_play_array)):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                current_target = last_planet
+                                found_planet = False
+                                while current_target > -1 and not found_planet:
+                                    if not self.planets_in_play_array[current_target]:
+                                        current_target = current_target - 1
+                                    elif not self.p1.permitted_commit_locs_warlord[current_target]:
+                                        current_target = current_target - 1
+                                    else:
+                                        found_planet = True
+                                if not found_planet:
+                                    current_target = last_planet
+                                self.p1.warlord_commit_location = current_target
+                                self.p1.committed_warlord = True
+                                await self.send_update_message(self.name_1 + " has chosen a planet to commit "
+                                                                             "their warlord.")
+                                if self.p1.search_synapse_in_hq():
+                                    await self.send_update_message(self.name_1 + " has a synapse; please"
+                                                                                 " commit this as well")
+                                    self.p1.committed_synapse = False
+                                    self.p1.synapse_commit_location = -1
                     elif not self.p1.committed_synapse:
                         self.p1.synapse_commit_location = int(game_update_string[1])
                         self.p1.committed_synapse = True
@@ -30,21 +64,78 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.p1.committed_synapse = False
                             await self.send_update_message(
                                 "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
+                            self.p1.illegal_commits_synapse += 1
+                            if self.p1.illegal_commits_synapse > 4:
+                                await self.send_update_message(
+                                    "Automatically determining \"Most Legal\" synapse commit."
+                                )
+                                last_planet = 0
+                                for i in range(len(self.planets_in_play_array)):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                current_target = last_planet
+                                found_planet = False
+                                while current_target > -1 and not found_planet:
+                                    if not self.planets_in_play_array[current_target]:
+                                        current_target = current_target - 1
+                                    elif current_target == self.p1.warlord_commit_location:
+                                        current_target = current_target - 1
+                                    else:
+                                        found_planet = True
+                                if not found_planet:
+                                    current_target = last_planet
+                                self.p1.synapse_commit_location = current_target
+                                self.p1.committed_synapse = True
+                                await self.send_update_message(self.name_1 + " has chosen a planet to commit "
+                                                                             "their synapse.")
                         else:
                             await self.send_update_message(
                                 self.name_1 + " has chosen a planet to commit their synapse.")
-
                 else:
                     if not self.p2.committed_warlord:
-                        self.p2.warlord_commit_location = int(game_update_string[1])
-                        self.p2.committed_warlord = True
-                        await self.send_update_message(self.name_2 + " has chosen a planet to commit "
-                                                                     "their warlord.")
-                        if self.p2.search_synapse_in_hq():
-                            await self.send_update_message(self.name_2 + " has a synapse; please"
-                                                                         " commit this as well")
-                            self.p2.committed_synapse = False
-                            self.p2.synapse_commit_location = -1
+                        if self.p2.permitted_commit_locs_warlord[int(game_update_string[1])]:
+                            self.p2.warlord_commit_location = int(game_update_string[1])
+                            self.p2.committed_warlord = True
+                            await self.send_update_message(self.name_2 + " has chosen a planet to commit "
+                                                                         "their warlord.")
+                            if self.p2.search_synapse_in_hq():
+                                await self.send_update_message(self.name_2 + " has a synapse; please"
+                                                                             " commit this as well")
+                                self.p2.committed_synapse = False
+                                self.p2.synapse_commit_location = -1
+                        else:
+                            await self.send_update_message(
+                                self.name_2 + ", your warlord may not commit there this round!"
+                            )
+                            self.p2.illegal_commits_warlord += 1
+                            if self.p2.illegal_commits_warlord > 4:
+                                await self.send_update_message(
+                                    "Automatically determining \"Most Legal\" warlord commit."
+                                )
+                                last_planet = 0
+                                for i in range(len(self.planets_in_play_array)):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                current_target = last_planet
+                                found_planet = False
+                                while current_target > -1 and not found_planet:
+                                    if not self.planets_in_play_array[current_target]:
+                                        current_target = current_target - 1
+                                    elif not self.p2.permitted_commit_locs_warlord[current_target]:
+                                        current_target = current_target - 1
+                                    else:
+                                        found_planet = True
+                                if not found_planet:
+                                    current_target = last_planet
+                                self.p2.warlord_commit_location = current_target
+                                self.p2.committed_warlord = True
+                                await self.send_update_message(self.name_2 + " has chosen a planet to commit "
+                                                                             "their warlord.")
+                                if self.p2.search_synapse_in_hq():
+                                    await self.send_update_message(self.name_2 + " has a synapse; please"
+                                                                                 " commit this as well")
+                                    self.p2.committed_synapse = False
+                                    self.p2.synapse_commit_location = -1
                     elif not self.p2.committed_synapse:
                         self.p2.synapse_commit_location = int(game_update_string[1])
                         self.p2.committed_synapse = True
@@ -54,6 +145,30 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.p2.committed_synapse = False
                             await self.send_update_message(
                                 "Savage Warrior Prime can't go to the same planet as your warlord. Pick again.")
+                            self.p2.illegal_commits_synapse += 1
+                            if self.p2.illegal_commits_synapse > 4:
+                                await self.send_update_message(
+                                    "Automatically determining \"Most Legal\" synapse commit."
+                                )
+                                last_planet = 0
+                                for i in range(len(self.planets_in_play_array)):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                current_target = last_planet
+                                found_planet = False
+                                while current_target > -1 and not found_planet:
+                                    if not self.planets_in_play_array[current_target]:
+                                        current_target = current_target - 1
+                                    elif current_target == self.p2.warlord_commit_location:
+                                        current_target = current_target - 1
+                                    else:
+                                        found_planet = True
+                                if not found_planet:
+                                    current_target = last_planet
+                                self.p2.synapse_commit_location = current_target
+                                self.p2.committed_synapse = True
+                                await self.send_update_message(self.name_2 + " has chosen a planet to commit "
+                                                                             "their synapse.")
                         else:
                             await self.send_update_message(
                                 self.name_2 + " has chosen a planet to commit their synapse.")

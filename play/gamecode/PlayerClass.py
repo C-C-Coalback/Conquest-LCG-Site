@@ -114,6 +114,9 @@ class Player:
         self.last_planet_sacrifice = -1
         self.urien_relevant = False
         self.ichor_gauntlet_target = ""
+        self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
+        self.illegal_commits_warlord = 0
+        self.illegal_commits_synapse = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -154,7 +157,6 @@ class Player:
             self.game.phase = "DEPLOY"
             await self.game.send_update_message(
                 self.game.name_1 + " may mulligan their opening hand.")
-        card = FindCard.find_card("Defense Battery", self.card_array)
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
 
@@ -1059,6 +1061,9 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kith's Khymeramasters":
                                 self.game.create_reaction("Kith's Khymeramasters", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Space Wolves Predator":
+                                self.game.create_reaction("Space Wolves Predator", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
                                 for i in range(7):

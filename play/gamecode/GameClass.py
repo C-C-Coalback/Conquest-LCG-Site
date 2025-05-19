@@ -4737,6 +4737,12 @@ class Game:
     def reset_values_for_new_round(self):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.p1.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
+        self.p2.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
+        self.p1.illegal_commits_warlord = 0
+        self.p1.illegal_commits_synapse = 0
+        self.p2.illegal_commits_warlord = 0
+        self.p2.illegal_commits_synapse = 0
         self.mode = "Normal"
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()

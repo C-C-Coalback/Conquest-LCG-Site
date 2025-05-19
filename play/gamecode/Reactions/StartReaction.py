@@ -103,6 +103,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.discard_top_card_deck()
             primary_player.discard_top_card_deck()
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Space Wolves Predator":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            secondary_player.permitted_commit_locs_warlord[planet_pos] = False
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
             self.chosen_first_card = False
             self.chosen_second_card = False
