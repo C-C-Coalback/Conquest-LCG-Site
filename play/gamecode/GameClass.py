@@ -141,7 +141,7 @@ class Game:
         self.misc_target_unit = (-1, -1)
         self.misc_target_attachment = (-1, -1, -1)
         self.misc_player_storage = ""
-        self.last_defender_position = (-1, -1)
+        self.last_defender_position = (-1, -1, -1)
         self.location_of_indirect = ""
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.faction_of_cards_for_indirect = ""
@@ -3080,6 +3080,11 @@ class Game:
                         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
                             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, unit_pos))
+                        for i in range(len(secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments())):
+                            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability()\
+                                    == "Nocturne-Ultima Storm Bolter":
+                                self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
+                                                     (int(secondary_player.number), att_pla, att_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
@@ -3438,7 +3443,7 @@ class Game:
                         self.alaitoc_shrine_activated = False
                     if self.reactions_needing_resolving[0] == "Fire Warrior Elite":
                         self.may_move_defender = False
-                        current_planet, current_unit = self.last_defender_position
+                        _, current_planet, current_unit = self.last_defender_position
                         last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
                                                    str(current_unit)]
                         await CombatPhase.update_game_event_combat_section(

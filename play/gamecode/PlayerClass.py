@@ -598,6 +598,16 @@ class Player:
                         return True
         return False
 
+    def adjust_last_def_pos(self, planet_pos, unit_pos):
+        num, pla, pos = self.game.last_defender_position
+        if int(num) == int(self.number):
+            if pla == planet_pos:
+                if pos == unit_pos:
+                    self.game.last_defender_position = (num, pla, -1)
+                if pos > unit_pos:
+                    pos -= 1
+                    self.game.last_defender_position = (num, pla, pos)
+
     def adjust_own_reactions(self, planet_pos, unit_pos):
         i = 0
         while i < len(self.game.reactions_needing_resolving):
@@ -2752,10 +2762,12 @@ class Player:
         # self.discard_object(card_object)
         del self.cards_in_play[planet_num + 1][card_pos]
         self.adjust_own_reactions(planet_num, card_pos)
+        self.adjust_last_def_pos(planet_num, card_pos)
 
     def remove_card_from_hq(self, card_pos):
         del self.headquarters[card_pos]
         self.adjust_own_reactions(-2, card_pos)
+        self.adjust_last_def_pos(-2, card_pos)
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
         if planet_num == -2:
