@@ -195,6 +195,8 @@ class Game:
         self.asking_if_reaction = False
         self.already_resolving_reaction = False
         self.last_search_string = ""
+        self.last_deck_string_1 = ""
+        self.last_deck_string_2 = ""
         self.asking_which_reaction = True
         self.stored_reaction_indexes = []
         self.manual_bodyguard_resolution = False
@@ -330,6 +332,7 @@ class Game:
 
     async def joined_requests_graphics(self, name):
         self.condition_main_game.acquire()
+        await self.send_decks(force=True)
         await self.p1.send_hand(force=True)
         await self.p2.send_hand(force=True)
         await self.p1.send_hq(force=True)
@@ -347,6 +350,22 @@ class Game:
         await self.send_planet_array(force=True)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
+
+    async def send_decks(self, force=False):
+        card_one = "Cardback"
+        card_two = "Cardback"
+        if self.p1.deck:
+            if self.p2.search_card_in_hq("Urien's Oubliette"):
+                card_one = self.p1.deck[0]
+        if self.p2.deck:
+            if self.p1.search_card_in_hq("Urien's Oubliette"):
+                card_two = self.p2.deck[0]
+        if force or self.last_deck_string_1 != card_one:
+            self.last_deck_string_1 = card_one
+            await self.send_update_message("GAME_INFO/DECK/1/" + card_one)
+        if force or self.last_deck_string_2 != card_two:
+            self.last_deck_string_2 = card_two
+            await self.send_update_message("GAME_INFO/DECK/2/" + card_two)
 
     async def send_search(self, force=False):
         card_string = ""
@@ -1564,6 +1583,15 @@ class Game:
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                    elif self.choice_context == "Urien's Oubliette":
+                        if game_update_string[1] == "0":
+                            primary_player.discard_top_card_deck()
+                            secondary_player.discard_top_card_deck()
+                        else:
+                            primary_player.draw_card()
+                            secondary_player.draw_card()
+                        self.action_cleanup()
+                        self.reset_choices_available()
                     elif self.choice_context == "Rakarth's Experimentations card type":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = ["Damage Warlord"]
@@ -4494,7 +4522,7 @@ class Game:
                     self.resolve_destruction_checks_after_reactions = False
                     await self.destroy_check_all_cards()
         if not self.resolve_destruction_checks_after_reactions and not self.positions_of_units_to_take_damage and \
-                not self.reactions_needing_resolving and not self.effects_waiting_on_resolution \
+                not self.effects_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal":
             if self.need_to_reset_tomb_blade_squadron:
@@ -4524,6 +4552,7 @@ class Game:
                     self.player_with_deploy_turn = self.name_1
         await self.send_search()
         await self.send_info_box()
+        await self.send_decks()
         await self.p1.send_units_at_all_planets()
         await self.p1.send_hq()
         await self.p1.send_hand()

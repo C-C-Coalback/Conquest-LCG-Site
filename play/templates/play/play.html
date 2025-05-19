@@ -391,6 +391,13 @@
                         var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class=` + display_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                         document.getElementById(target_victory_display_id).innerHTML += full_string;
                     }
+                } else if (split_data[1] === "DECK") {
+                    var target_deck_id = "current-deck-player-" + split_data[2];
+                    var card_name = split_data[3].split(' ').join('_')
+                    document.getElementById(target_deck_id).innerHTML =
+                    `<img src="/static/images/CardImages/` + card_name + `.jpg"
+                    alt="didnt work" id="deck-p1" class="Card">`;
+
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
                     document.getElementById(target_discard_pile_id).innerHTML = ``;
