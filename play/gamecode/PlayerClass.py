@@ -1052,6 +1052,17 @@ class Player:
                                             if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
                                                 self.game.create_reaction("Tomb Blade Squadron", self.name_player,
                                                                           (int(self.number), -1, -1))
+                                for i in range(len(self.headquarters)):
+                                    if self.headquarters[i].get_ability() == "Tomb Blade Squadron":
+                                        if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
+                                            self.game.create_reaction("Tomb Blade Squadron", self.name_player,
+                                                                      (int(self.number), -1, -1))
+                            if card.check_for_a_trait("Elite"):
+                                for i in range(len(self.headquarters)):
+                                    if self.get_ability_given_pos(-2, i) == "Turbulent Rift":
+                                        if self.get_ready_given_pos(-2, i):
+                                            self.game.create_reaction("Turbulent Rift", self.name_player,
+                                                                      (int(self.number), position, location_of_unit))
                             if card.get_faction() != "Necrons":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):
