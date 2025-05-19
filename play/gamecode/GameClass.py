@@ -602,7 +602,8 @@ class Game:
                                                                       discounts=self.discounts_applied)
                                 self.mode = "Normal"
 
-    async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction=""):
+    async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction="",
+                          shadow_field_possible=False):
         secondary_player.suffer_area_effect(chosen_planet, amount_aoe, faction=faction)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
@@ -3788,7 +3789,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                        .check_for_a_trait("Soldier"):
+                                                .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -4178,13 +4179,13 @@ class Game:
                             if self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
                                     self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
                                 self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
-                                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
                     else:
                         if self.p2.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target:
                             if self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
                                     self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
                                 self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
-                                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
 
     def set_targeting_icons_kugath_nurglings(self):
         for i in range(7):

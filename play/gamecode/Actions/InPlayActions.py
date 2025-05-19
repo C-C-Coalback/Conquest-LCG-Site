@@ -47,7 +47,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                             if i == 0:
                                 secondary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
-                            secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+                            secondary_player.assign_damage_to_pos(planet_pos, i, 1, shadow_field_possible=True)
                         self.player_with_action = ""
                         self.action_chosen = ""
                         self.mode = "Normal"
@@ -759,7 +759,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "In Play Action"
             if can_continue:
-                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
                 if self.position_of_actioned_card != (-1, -1):
                     primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
@@ -1295,8 +1295,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         hitting_self = True
                         await self.send_update_messagee("Dont hit yourself")
                 if not hitting_self:
-                    player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2)
-                    player_receiving_damage.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                    player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2, shadow_field_possible=True)
                     primary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
                                                           self.position_of_actioned_card[1])
                     self.position_of_actioned_card = (-1, -1)

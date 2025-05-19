@@ -2169,7 +2169,10 @@ class Player:
         return False
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
-                             context="", preventable=True):
+                             context="", preventable=True, shadow_field_possible=False):
+        if shadow_field_possible:
+            if self.search_attachments_at_pos(planet_id, unit_id, "Shadow Field"):
+                return False, 0
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -2296,9 +2299,10 @@ class Player:
         self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
-    def suffer_area_effect(self, planet_id, amount, faction=""):
+    def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            self.assign_damage_to_pos(planet_id, i, amount, context=faction)
+            self.assign_damage_to_pos(planet_id, i, amount, context=faction,
+                                      shadow_field_possible=shadow_field_possible)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):

@@ -77,8 +77,15 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
+                                shadow_field = False
+                                if primary_player.get_cost_given_pos(
+                                        self.attacker_planet, self.attacker_position) < 3 \
+                                        and primary_player.get_card_type_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Army":
+                                    shadow_field = True
                                 await self.aoe_routine(primary_player, secondary_player, chosen_planet,
-                                                       amount_aoe, faction=faction)
+                                                       amount_aoe, faction=faction,
+                                                       shadow_field_possible=shadow_field)
                                 self.reset_combat_positions()
                                 self.number_with_combat_turn = secondary_player.get_number()
                                 self.player_with_combat_turn = secondary_player.get_name_player()
@@ -382,9 +389,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     primary_player.reset_card_name_misc_ability("Torquemada Coteaz")
                                 can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
                                                                                         self.attacker_position)
+                                shadow_field = False
+                                if primary_player.get_cost_given_pos(
+                                        self.attacker_planet, self.attacker_position) < 3 \
+                                        and primary_player.get_card_type_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Army":
+                                    shadow_field = True
                                 took_damage, bodyguards = secondary_player.assign_damage_to_pos(
                                     self.defender_planet, self.defender_position, damage=attack_value,
-                                    att_pos=self.attacker_location, can_shield=can_shield
+                                    att_pos=self.attacker_location, can_shield=can_shield,
+                                    shadow_field_possible=shadow_field
                                 )
                                 if self.manual_bodyguard_resolution:
                                     await self.send_update_message(
@@ -402,13 +416,17 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         else:
                                             secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                         self.defender_position, "blue")
-                                    self.damage_from_attack = True
+                                        self.damage_from_attack = True
+                                    else:
+                                        primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                                    self.attacker_position)
                             else:
                                 primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                             self.attacker_position)
                             if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Snakebite Thug":
-                                primary_player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1)
+                                primary_player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
+                                                                    shadow_field_possible=True)
                             self.reset_combat_positions()
                             self.number_with_combat_turn = secondary_player.get_number()
                             self.player_with_combat_turn = secondary_player.get_name_player()
