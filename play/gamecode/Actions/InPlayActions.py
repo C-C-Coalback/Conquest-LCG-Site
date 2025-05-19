@@ -1457,20 +1457,62 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card[0],
                     self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
-    elif self.action_chosen == "Catachan Outpost":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
+    elif self.action_chosen == "Hallow Librarium":
+        if game_update_string[1] == "1":
+            player_receiving_buff = self.p1
         else:
-            primary_player = self.p2
-        if int(game_update_string[1] == "1"):
+            player_receiving_buff = self.p2
+        can_continue = True
+        if not secondary_player.check_for_warlord(planet_pos):
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy card abilities.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+            if can_continue:
+                player_receiving_buff.increase_attack_of_unit_at_pos(planet_pos, unit_pos, -2,
+                                                                     expiration="EOP")
+                await self.send_update_message(
+                    "Hallow Librarium used on " + player_receiving_buff.cards_in_play[int(game_update_string[2]) + 1]
+                    [int(game_update_string[3])].get_name() + ", located at planet " + game_update_string[2] +
+                    ", position " + game_update_string[3])
+                self.position_of_actioned_card = (-1, -1)
+                self.action_cleanup()
+    elif self.action_chosen == "Catachan Outpost":
+        if game_update_string[1] == "1":
             player_receiving_buff = self.p1
         else:
             player_receiving_buff = self.p2
         can_continue = True
         if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
+            elif possible_interrupts:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
         if can_continue:
             player_receiving_buff.increase_attack_of_unit_at_pos(int(game_update_string[2]),
                                                                  int(game_update_string[3]), 2,
@@ -1482,9 +1524,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
             self.position_of_actioned_card = (-1, -1)
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
+            self.action_cleanup()
     elif self.action_chosen == "Tellyporta Pad":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
