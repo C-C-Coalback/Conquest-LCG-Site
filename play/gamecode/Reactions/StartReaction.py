@@ -477,6 +477,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                     can_continue = False
             if can_continue:
                 primary_player.discard_card_name_from_hand("Cry of the Wind")
+        elif self.reactions_needing_resolving[0] == "Big Shoota Battlewagon":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            for _ in range(4):
+                primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Primal Howl":
             can_continue = True
             if self.nullify_enabled:
