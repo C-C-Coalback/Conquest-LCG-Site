@@ -980,6 +980,22 @@ class Game:
                 winner = self.p1
             if winner is not None:
                 i = 0
+                j = 0
+                while j < len(self.p1.attachments_at_planet[self.last_planet_checked_for_battle]):
+                    if self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j].\
+                            get_ability() == "Slaanesh's Temptation":
+                        del self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j]
+                        j = j - 1
+                        self.p1.discard.append("Slaanesh's Temptation")
+                    j = j + 1
+                j = 0
+                while j < len(self.p2.attachments_at_planet[self.last_planet_checked_for_battle]):
+                    if self.p2.attachments_at_planet[self.last_planet_checked_for_battle][j]. \
+                            get_ability() == "Slaanesh's Temptation":
+                        del self.p2.attachments_at_planet[self.last_planet_checked_for_battle][j]
+                        j = j - 1
+                        self.p2.discard.append("Slaanesh's Temptation")
+                    j = j + 1
                 while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
                     if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
                         if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
@@ -3167,6 +3183,21 @@ class Game:
             self.discounts_applied += num_termagants
         if card.get_faction() == "Astra Militarum":
             self.discounts_applied += player.muster_the_guard_count
+        slaanesh_temptation = False
+        if player.name_player == self.name_1:
+            for i in range(len(self.p2.attachments_at_planet)):
+                if i != planet_chosen:
+                    for j in range(len(self.p2.attachments_at_planet[i])):
+                        if self.p2.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
+                            slaanesh_temptation = True
+        else:
+            for i in range(len(self.p1.attachments_at_planet)):
+                if i != planet_chosen:
+                    for j in range(len(self.p1.attachments_at_planet[i])):
+                        if self.p1.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
+                            slaanesh_temptation = True
+        if slaanesh_temptation:
+            self.discounts_applied -= 1
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
         self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
@@ -3185,6 +3216,21 @@ class Game:
             self.available_discounts += num_termagants
         if card.get_faction() == "Astra Militarum":
             self.available_discounts += player.muster_the_guard_count
+        slaanesh_temptation = False
+        if player.name_player == self.name_1:
+            for i in range(len(self.p2.attachments_at_planet)):
+                if i != planet_chosen:
+                    for j in range(len(self.p2.attachments_at_planet[i])):
+                        if self.p2.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
+                            slaanesh_temptation = True
+        else:
+            for i in range(len(self.p1.attachments_at_planet)):
+                if i != planet_chosen:
+                    for j in range(len(self.p1.attachments_at_planet[i])):
+                        if self.p1.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
+                            slaanesh_temptation = True
+        if slaanesh_temptation:
+            self.available_discounts -= 1
         self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
         self.available_discounts += temp_av_disc
 

@@ -140,16 +140,21 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                                       discounts=self.discounts_applied)
                     elif card.get_card_type() == "Attachment":
                         if card.planet_attachment:
-                            cost = card.get_cost()
-                            discounts = player.search_hq_for_discounts("", "", is_attachment=True)
-                            cost = cost - discounts
-                            if player.spend_resources(cost):
-                                player.add_attachment_to_planet(planet_chosen, card)
-                                player.remove_card_from_hand(self.card_pos_to_deploy)
-                                self.card_pos_to_deploy = -1
-                                self.planet_pos_to_deploy = -1
-                                player.aiming_reticle_coords_hand = None
-                                self.action_cleanup()
+                            can_continue = True
+                            if card.get_unique():
+                                if player.search_for_unique_card(card.get_name()):
+                                    can_continue = False
+                            if can_continue:
+                                cost = card.get_cost()
+                                discounts = player.search_hq_for_discounts("", "", is_attachment=True)
+                                cost = cost - discounts
+                                if player.spend_resources(cost):
+                                    player.add_attachment_to_planet(planet_chosen, card)
+                                    player.remove_card_from_hand(self.card_pos_to_deploy)
+                                    self.card_pos_to_deploy = -1
+                                    self.planet_pos_to_deploy = -1
+                                    player.aiming_reticle_coords_hand = None
+                                    self.action_cleanup()
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":

@@ -604,6 +604,10 @@ class Player:
                 for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
                     if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name == name:
                         return True
+        for i in range(len(self.attachments_at_planet)):
+            for j in range(len(self.attachments_at_planet[i])):
+                if self.attachments_at_planet[i][j].name == name:
+                    return True
         return False
 
     def adjust_last_def_pos(self, planet_pos, unit_pos):
