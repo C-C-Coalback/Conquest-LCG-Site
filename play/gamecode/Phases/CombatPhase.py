@@ -77,6 +77,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
+                                if primary_player.search_attachments_at_pos(self.attacker_planet,
+                                                                            self.attacker_position,
+                                                                            "Doom Siren"):
+                                    self.create_reaction("Doom Siren", primary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                    self.value_doom_siren = amount_aoe
                                 shadow_field = False
                                 if primary_player.get_cost_given_pos(
                                         self.attacker_planet, self.attacker_position) < 3 \

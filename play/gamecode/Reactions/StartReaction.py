@@ -630,6 +630,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             self.misc_target_planet = warlord_pla
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif self.reactions_needing_resolving[0] == "Doom Siren":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos != 0:
+                if self.planets_in_play_array[planet_pos + 1]:
+                    secondary_player.suffer_area_effect(planet_pos + 1, self.value_doom_siren)
+            if planet_pos != 6:
+                if self.planets_in_play_array[planet_pos - 1]:
+                    secondary_player.suffer_area_effect(planet_pos - 1, self.value_doom_siren)
+            primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Leviathan Hive Ship":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]

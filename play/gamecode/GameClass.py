@@ -270,6 +270,7 @@ class Game:
         self.guardian_mesh_armor_active = False
         self.tense_negotiations_active = False
         self.shining_blade_active = False
+        self.value_doom_siren = 0
 
     async def send_update_message(self, message):
         if self.game_sockets:
