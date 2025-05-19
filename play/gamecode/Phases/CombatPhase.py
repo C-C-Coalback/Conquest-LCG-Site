@@ -336,6 +336,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if secondary_player.search_card_in_hq("Zogwort's Hovel"):
                                         self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet, -1))
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Firedrake Terminators":
+                                    self.create_reaction("Firedrake Terminators", secondary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
                                 # Flying check
                                 if def_flying and not att_flying and not att_ignores_flying:
                                     attack_value = int(attack_value / 2 + (attack_value % 2))
