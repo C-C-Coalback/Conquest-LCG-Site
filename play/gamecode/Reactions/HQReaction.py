@@ -33,6 +33,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                         self.chosen_first_card = True
                         self.misc_target_unit = (-2, unit_pos)
                         primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+        elif self.reactions_needing_resolving[0] == "Shrieking Basilisk":
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+                    primary_player.exhaust_given_pos(-2, unit_pos)
+                    self.delete_reaction()
+            elif game_update_string[1] == secondary_player.number:
+                if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+                    secondary_player.exhaust_given_pos(-2, unit_pos)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Seraphim Superior Allegra":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
