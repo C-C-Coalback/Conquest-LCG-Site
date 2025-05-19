@@ -296,7 +296,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             can_continue = True
             if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                     move_from_planet=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -1175,7 +1176,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         elif unit_count < unit_cost:
             can_continue = False
         elif player_being_routed.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                 move_from_planet=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
@@ -1216,10 +1218,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         planet_pos = int(game_update_string[2])
         unit_pos = int(game_update_string[3])
         can_continue = True
-        if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+        if player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
             can_continue = False
-        elif player_being_routed.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+        elif player_being_routed.name_player == secondary_player.name_player and can_continue:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                 move_from_planet=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")

@@ -187,6 +187,7 @@ class Game:
         self.nullify_enabled = True
         self.nullify_string = ""
         self.communications_relay_enabled = True
+        self.slumbering_gardens_enabled = True
         self.backlash_enabled = True
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
@@ -1301,6 +1302,44 @@ class Game:
             await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             self.backlash_enabled = True
 
+    async def resolve_slumbering_gardens(self, name, game_update_string, primary_player, secondary_player):
+        if game_update_string[1] == "0":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
+            if self.nullify_context == "Event Action":
+                secondary_player.aiming_reticle_coords_hand = None
+                secondary_player.aiming_reticle_coords_hand_2 = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                self.amount_spend_for_tzeentch_firestorm = 0
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "In Play Action":
+                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                self.position_of_actioned_card = (-1, -1)
+            elif self.nullify_context == "Reaction":
+                self.delete_reaction()
+            elif self.nullify_context == "Reaction Event":
+                self.delete_reaction()
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+                await self.resolve_battle_conclusion(secondary_player, game_string="")
+        elif game_update_string[1] == "1":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            self.slumbering_gardens_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.slumbering_gardens_enabled = True
+
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
             self.choices_available = []
@@ -1330,11 +1369,6 @@ class Game:
             elif self.nullify_context == "Reaction Event":
                 self.delete_reaction()
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-                """
-                elif self.nullify_context == "The Fury of Sicarius":
-                    secondary_player.spend_resources(2)
-                    secondary_player.discard_card_name_from_hand("The Fury of Sicarius")
-                """
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
@@ -1496,15 +1530,20 @@ class Game:
                             self.communications_relay_enabled = False
                             self.backlash_enabled = False
                             self.searing_brand_cancel_enabled = False
+                            self.slumbering_gardens_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.communications_relay_enabled = True
                             self.searing_brand_cancel_enabled = True
+                            self.slumbering_gardens_enabled = True
                             self.backlash_enabled = True
                         elif chosen_choice == "Communications Relay":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Communications Relay?"
+                        elif chosen_choice == "Slumbering Gardens":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Slumbering Gardens?"
                         elif chosen_choice == "Searing Brand":
                             self.choice_context = "Discard 2 Cards for Searing Brand?"
                             self.choices_available = ["Yes", "No"]
@@ -1562,6 +1601,9 @@ class Game:
                     elif self.choice_context == "Use Communications Relay?":
                         await self.resolve_communications_relay(name, game_update_string,
                                                                 primary_player, secondary_player)
+                    elif self.choice_context == "Use Slumbering Gardens?":
+                        await self.resolve_slumbering_gardens(name, game_update_string, primary_player,
+                                                              secondary_player)
                     elif self.asking_if_reaction and self.reactions_needing_resolving \
                             and not self.resolving_search_box:
                         print("Asking if reaction")
@@ -2482,7 +2524,8 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if self.player_resolving_battle_ability != self.p1.name_player:
-                                    possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                    possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                                move_from_planet=True)
                                     if possible_interrupts:
                                         can_continue = False
                                         await self.send_update_message(
@@ -2507,7 +2550,8 @@ class Game:
                                 planet_pos = int(game_update_string[2])
                                 unit_pos = int(game_update_string[3])
                                 if self.player_resolving_battle_ability != self.p2.name_player:
-                                    possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
+                                    possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                                move_from_planet=True)
                                     if possible_interrupts:
                                         can_continue = False
                                         await self.send_update_message(

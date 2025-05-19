@@ -1672,12 +1672,16 @@ class Player:
                         return True
         return False
 
-    def interrupt_cancel_target_check(self, planet_pos, unit_pos, context=""):
+    def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False):
         possible_interrupts = []
         if context == "Searing Brand":
             if self.game.searing_brand_cancel_enabled:
                 if len(self.cards) > 1:
                     possible_interrupts.append("Searing Brand")
+        if move_from_planet:
+            if self.game.slumbering_gardens_enabled:
+                if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
+                    possible_interrupts.append("Slumbering Gardens")
         if self.game.communications_relay_enabled:
             if self.communications_relay_check(planet_pos, unit_pos):
                 possible_interrupts.append("Communications Relay")

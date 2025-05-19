@@ -342,10 +342,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
             if can_continue:
-                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    secondary_player.apply_negative_health_eop(planet_pos, unit_pos,
+                if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_being_hit.apply_negative_health_eop(planet_pos, unit_pos,
                                                                primary_player.nahumekh_value)
-                    name = secondary_player.get_name_given_pos(planet_pos, unit_pos)
+                    name = player_being_hit.get_name_given_pos(planet_pos, unit_pos)
                     await self.send_update_message(
                         name + " received -" + str(primary_player.nahumekh_value) + " HP."
                     )
@@ -383,7 +383,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ally"):
                     can_continue = True
                     if player_being_hit.name_player == secondary_player.name_player:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                             move_from_planet=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -628,7 +629,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.cards_in_play[target_planet + 1][
                             target_pos].get_card_type() == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                             move_from_planet=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
                                                                                target_pos):
                             can_continue = False
