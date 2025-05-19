@@ -110,6 +110,7 @@ class Player:
                                         "Evil Sunz Warbiker", "Noise Marine Zealots"]
         self.sacced_card_for_despise = True
         self.foretell_permitted = True
+        self.last_planet_sacrifice = -1
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -2495,6 +2496,13 @@ class Player:
             return self.sacrifice_card_in_hq(card_pos)
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             return False
+        if self.cards_in_play[planet_num + 1][card_pos].get_card_type() != "Token":
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Formosan Black Ship":
+                    if self.headquarters[i].get_ready():
+                        self.game.create_reaction("Formosan Black Ship", self.name_player,
+                                                  (int(self.number), -2, -1))
+                        self.last_planet_sacrifice = planet_num
         self.add_card_in_play_to_discard(planet_num, card_pos)
         return True
 
