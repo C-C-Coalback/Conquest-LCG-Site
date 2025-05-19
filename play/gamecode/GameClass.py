@@ -228,7 +228,9 @@ class Game:
             "Noble Deed", "Smash 'n Bash", "Visions of Agony", "Empower", "Calamity",
             "Awake the Sleepers", "Reanimation Protocol", "Recycle", "Mechanical Enhancement",
             "Drudgery", "Extermination", "Fetid Haze", "Dakka Dakka Dakka!", "Soul Seizure",
-            "Death from Above", "Kauyon Strike"
+            "Death from Above", "Kauyon Strike", "Rally the Charge", "Doombolt", "Searing Brand",
+            "Tense Negotiations", "Cacophonic Choir", "Slake the Thirst", "Rakarth's Experimentations",
+            "Squiggify", "The Emperor's Warrant", "For the Tau'va"
         ]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
@@ -239,7 +241,8 @@ class Game:
         self.card_to_deploy = None
         self.saved_planet_string = ""
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
-                                 "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers"]
+                                 "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
+                                 "Imperial Fists Siege Force"]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""

@@ -1014,11 +1014,11 @@ class Player:
                                 else:
                                     self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             if card.get_ability() == "Murder of Razorwings":
-                                self.game.reactions_needing_resolving.append("Murder of Razorwings")
-                                self.game.positions_of_unit_triggering_reaction.append((int(self.number), position,
-                                                                                        location_of_unit))
-                                self.game.player_who_resolves_reaction.append(self.name_player)
-                                # self.game.discard_card_at_random_from_opponent(self.number)
+                                self.game.create_reaction("Murder of Razorwings", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Imperial Fists Siege Force":
+                                self.game.create_reaction("Imperial Fists Siege Force", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
