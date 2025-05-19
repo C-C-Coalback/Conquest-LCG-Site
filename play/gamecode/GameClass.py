@@ -3913,6 +3913,12 @@ class Game:
             del self.player_who_resolves_reaction[0]
             del self.positions_of_unit_triggering_reaction[0]
         if not self.reactions_needing_resolving:
+            for i in range(7):
+                for j in range(len(self.p1.cards_in_play[i + 1])):
+                    self.p1.cards_in_play[i + 1][j].valid_target_ashen_banner = False
+            for i in range(7):
+                for j in range(len(self.p2.cards_in_play[i + 1])):
+                    self.p2.cards_in_play[i + 1][j].valid_target_ashen_banner = False
             self.p1.reset_defense_batteries()
             self.p2.reset_defense_batteries()
 
