@@ -500,13 +500,44 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     if not secondary_player.has_passed:
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.get_number()
-    elif self.action_chosen == "Calculated Strike":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
+    elif self.action_chosen == "Squiggify":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
         else:
-            primary_player = self.p2
-            secondary_player = self.p1
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        can_continue = True
+        if not player_being_hit.headquarters[unit_pos].check_for_a_trait("Vehicle") and \
+                player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Army":
+            if player_being_hit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy events.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            if can_continue:
+                player_being_hit.headquarters[unit_pos].extra_traits_eop += "Squig"
+                player_being_hit.set_blanked_given_pos(-2, unit_pos)
+                player_being_hit.headquarters[unit_pos].attack_set_eop = 1
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                name_card = player_being_hit.get_name_given_pos(-2, unit_pos)
+                await self.send_update_message(
+                    name_card + " got Squiggified!"
+                )
+                self.action_cleanup()
+    elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -526,7 +557,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.name_player_making_choices = secondary_player.name_player
                 self.choice_context = "Interrupt Effect?"
                 self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 1
+                self.cost_card_nullified = 0
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
@@ -535,13 +566,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.destroy_card_in_hq(unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Master Program":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2

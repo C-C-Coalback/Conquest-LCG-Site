@@ -249,6 +249,7 @@ class UnitCard(Card):
         self.choice_nurgling_bomb = ""
         self.need_to_resolve_nurgling_bomb = False
         self.valid_target_ashen_banner = False
+        self.attack_set_eop = -1
 
     def exhaust_first_attachment_name(self, card_name):
         for i in range(len(self.attachments)):

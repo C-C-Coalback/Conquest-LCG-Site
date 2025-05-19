@@ -1984,6 +1984,7 @@ class Player:
                 self.headquarters[i].ranged_eop = False
                 self.headquarters[i].mobile_eop = False
                 self.headquarters[i].flying_eop = False
+                self.headquarters[i].attack_set_eop = -1
                 self.headquarters[i].brutal_eop = False
                 self.headquarters[i].extra_traits_eop = ""
         for planet_pos in range(7):
@@ -1997,6 +1998,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].attack_set_eop = -1
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
 
     def reset_extra_attack_eop(self):
@@ -2096,6 +2098,8 @@ class Player:
         if planet_id == -2:
             return -1
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if card.attack_set_eop != -1:
+            return card.attack_set_eop
         attack_value = card.get_attack()
         if card.get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):

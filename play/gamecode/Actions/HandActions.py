@@ -303,6 +303,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Squiggify":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Subdual":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
