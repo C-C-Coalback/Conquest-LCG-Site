@@ -640,6 +640,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                     secondary_player.suffer_area_effect(planet_pos - 1, self.value_doom_siren)
             primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
+            primary_player.discard_inquis_caius_wroth = True
+            secondary_player.discard_inquis_caius_wroth = True
         elif self.reactions_needing_resolving[0] == "Leviathan Hive Ship":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]

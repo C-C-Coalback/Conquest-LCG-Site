@@ -24,6 +24,8 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                         more = True
                 if not more:
                     self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
         elif self.reactions_needing_resolving[0] == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card.check_for_a_trait("Space Wolves"):

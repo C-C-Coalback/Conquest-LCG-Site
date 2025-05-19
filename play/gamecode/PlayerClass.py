@@ -118,6 +118,7 @@ class Player:
         self.illegal_commits_warlord = 0
         self.illegal_commits_synapse = 0
         self.primal_howl_used = False
+        self.discard_inquis_caius_wroth = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -657,9 +658,11 @@ class Player:
             self.game.create_reaction("Heretek Inventor", enemy_name,
                                       (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Swordwind Farseer":
-            self.game.reactions_needing_resolving.append("Swordwind Farseer")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.create_reaction("Swordwind Farseer", self.name_player,
+                                      (int(self.number), -2, last_element_index))
+        elif self.headquarters[last_element_index].get_ability() == "Inquisitor Caius Wroth":
+            self.game.create_reaction("Inquisitor Caius Wroth", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
             i = len(self.discard) - 1
             while i > -1:
@@ -878,6 +881,9 @@ class Player:
                                       (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
             self.game.create_reaction("Weirdboy Maniak", self.name_player,
+                                      (int(self.number), position, last_element_index))
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Inquisitor Caius Wroth":
+            self.game.create_reaction("Inquisitor Caius Wroth", self.name_player,
                                       (int(self.number), position, last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
             self.game.create_reaction("Earth Caste Technician", self.name_player,

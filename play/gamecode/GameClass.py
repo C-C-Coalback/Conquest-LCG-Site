@@ -4618,6 +4618,17 @@ class Game:
                     self.reset_all_valid_targets_kugath_nurglings()
             else:
                 self.reset_all_valid_targets_kugath_nurglings()
+        if self.p1.discard_inquis_caius_wroth or self.p2.discard_inquis_caius_wroth:
+            if self.player_who_resolves_reaction[0] == self.name_1:
+                if len(self.p1.cards) < 5:
+                    self.p1.discard_inquis_caius_wroth = False
+                    self.player_who_resolves_reaction[0] = self.name_2
+            else:
+                if len(self.p2.cards) < 5:
+                    self.p2.discard_inquis_caius_wroth = False
+                    self.player_who_resolves_reaction[0] = self.name_1
+            if not self.p1.discard_inquis_caius_wroth and not self.p2.discard_inquis_caius_wroth:
+                self.delete_reaction()
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
