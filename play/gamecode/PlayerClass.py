@@ -2787,6 +2787,9 @@ class Player:
                     if not already_queued_elysian_assault_team:
                         self.game.create_reaction("Elysian Assault Team", self.name_player,
                                                   (int(self.number), planet_num, -1))
+        if self.get_ability_given_pos(planet_num, card_pos) == "Coteaz's Henchmen":
+            self.game.create_reaction("Coteaz's Henchmen", self.name_player,
+                                      (int(self.number), -1, -1))
         if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Murder Cogitator":
@@ -2843,6 +2846,9 @@ class Player:
             self.game.reactions_needing_resolving.append("Enginseer Augur")
             self.game.player_who_resolves_reaction.append(self.name_player)
             self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
+        if self.get_ability_given_pos(-2, card_pos) == "Coteaz's Henchmen":
+            self.game.create_reaction("Coteaz's Henchmen", self.name_player,
+                                      (int(self.number), -1, -1))
         if card.get_ability() == "Interrogator Acolyte":
             self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
         self.discard.append(card_name)

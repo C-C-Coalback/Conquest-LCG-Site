@@ -272,6 +272,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
             self.resolving_search_box = True
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Coteaz's Henchmen":
+            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.ready_given_pos(warlord_planet, warlord_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Secluded Apothecarion":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
