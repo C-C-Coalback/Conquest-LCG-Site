@@ -442,6 +442,8 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Carnivore Pack":
             primary_player.add_resources(3)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Soul Grinder":
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
         elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):

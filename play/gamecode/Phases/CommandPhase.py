@@ -273,7 +273,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.positions_of_unit_triggering_reaction.append(["1", planet_id, i])
                 self.reactions_needing_resolving.append("Soul Grinder")
-                self.player_who_resolves_reaction.append(self.name_2)
+                self.player_who_resolves_reaction.append(self.name_1)
             if self.p1.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
                 self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.create_reaction("Toxic Venomthrope", self.name_1, ("1", planet_id, i))
@@ -307,7 +307,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.positions_of_unit_triggering_reaction.append(["2", planet_id, i])
                 self.reactions_needing_resolving.append("Soul Grinder")
-                self.player_who_resolves_reaction.append(self.name_1)
+                self.player_who_resolves_reaction.append(self.name_2)
             if self.p2.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
                 self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
                 self.create_reaction("Toxic Venomthrope", self.name_2, ("2", planet_id, i))
