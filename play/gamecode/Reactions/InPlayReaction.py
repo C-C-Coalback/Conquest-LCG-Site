@@ -626,6 +626,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                     await self.send_update_message(card_name + " gained +2 ATK from Banner!")
                     self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Cry of the Wind":
+            if not self.chosen_first_card:
+                if game_update_string[1] == primary_player.number:
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.chosen_first_card = True
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]

@@ -1053,6 +1053,9 @@ class Game:
                 await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
                                                                      new_string_list)
                 self.nullify_enabled = True
+            elif self.nullify_context == "Cry of the Wind":
+                primary_player.discard_card_name_from_hand("Cry of the Wind")
+                self.chosen_first_card = False
             elif self.nullify_context == "No Mercy":
                 self.choices_available = []
                 self.choice_context = ""
@@ -1161,6 +1164,12 @@ class Game:
                         self.auto_card_destruction = True
                 elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
                     self.pos_shield_card = -1
+                elif self.nullify_context == "Reaction Event":
+                    if self.nullified_card_name == "Cry of the Wind":
+                        if primary_player.search_hand_for_card("Cry of the Wind"):
+                            self.create_reaction("Cry of the Wind", primary_player.name_player,
+                                                 (int(primary_player.number), -1, -1))
+                    self.delete_reaction()
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
         if resolve_nullify_discard:
