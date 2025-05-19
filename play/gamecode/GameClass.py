@@ -1093,6 +1093,8 @@ class Game:
         else:
             if self.nullifying_backlash:
                 primary_player.discard_card_name_from_hand("Backlash")
+                if primary_player.urien_relevant:
+                    primary_player.spend_resources(1)
                 primary_player.spend_resources(1)
                 self.choices_available = []
                 self.choice_context = ""
@@ -1255,6 +1257,8 @@ class Game:
         self.name_player_making_choices = ""
         primary_player.spend_resources(1)
         primary_player.discard_card_name_from_hand("Backlash")
+        if primary_player.urien_relevant:
+            primary_player.spend_resources(1)
         print(self.nullified_card_name)
         print(self.nullify_context)
         if self.nullify_context == "Event Action":
@@ -2010,6 +2014,8 @@ class Game:
                         self.reset_choices_available()
                     elif self.choice_context == "Target Fall Back:":
                         primary_player.spend_resources(1)
+                        if primary_player.urien_relevant:
+                            primary_player.spend_resources(1)
                         target = self.choices_available[int(game_update_string[1])]
                         card = FindCard.find_card(target, self.card_array)
                         primary_player.add_to_hq(card)
@@ -2843,6 +2849,9 @@ class Game:
     def fall_back_check(self, player):
         if player.search_hand_for_card("Fall Back!"):
             if player.resources > 0:
+                if player.urien_relevant:
+                    if player.resources < 2:
+                        return False
                 for card_name in player.stored_cards_recently_discarded:
                     card = FindCard.find_card(card_name, self.card_array)
                     if card.check_for_a_trait("Elite"):
@@ -3228,6 +3237,9 @@ class Game:
                                         for i in range(len(secondary_player.cards)):
                                             if secondary_player.cards[i] == "No Mercy":
                                                 no_mercy_possible = True
+                                                if secondary_player.urien_relevant:
+                                                    if secondary_player.resources < 1:
+                                                        no_mercy_possible = False
                                     if no_mercy_possible:
                                         no_mercy_possible = secondary_player.search_ready_unique_unit()
                                     if no_mercy_possible:
@@ -4141,6 +4153,8 @@ class Game:
                         if primary_player.valid_nullify_unit(-2, int(game_update_string[2])):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             primary_player.num_nullify_played += 1
+                            if primary_player.urien_relevant:
+                                primary_player.spend_resources(1)
                             self.nullify_count += 1
                             if secondary_player.nullify_check():
                                 self.choices_available = ["Yes", "No"]
@@ -4156,6 +4170,8 @@ class Game:
                         if primary_player.valid_nullify_unit(int(game_update_string[2]), int(game_update_string[3])):
                             primary_player.exhaust_given_pos(int(game_update_string[2]), int(game_update_string[3]))
                             primary_player.num_nullify_played += 1
+                            if primary_player.urien_relevant:
+                                primary_player.spend_resources(1)
                             self.nullify_count += 1
                             if secondary_player.nullify_check():
                                 self.choices_available = ["Yes", "No"]

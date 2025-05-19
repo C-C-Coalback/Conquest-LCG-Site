@@ -153,6 +153,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif primary_player.cards[hand_pos] == "Superiority":
+                        cost = 1
+                        if primary_player.urien_relevant:
+                            cost += 1
                         if secondary_player.nullify_check() and self.nullify_enabled:
                             await self.send_update_message(
                                 primary_player.name_player + " wants to play Superiority; "
@@ -162,11 +165,11 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.choice_context = "Use Nullify?"
                             self.nullified_card_pos = int(game_update_string[2])
                             self.nullified_card_name = "Superiority"
-                            self.cost_card_nullified = 1
+                            self.cost_card_nullified = cost
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Superiority"
-                        elif primary_player.spend_resources(1):
+                        elif primary_player.spend_resources(cost):
                             self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
                                                                                -1, -1])
                             self.reactions_needing_resolving.append("Superiority")

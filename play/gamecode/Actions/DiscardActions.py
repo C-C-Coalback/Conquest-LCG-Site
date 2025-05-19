@@ -133,7 +133,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
             if chosen_discard == int(secondary_player.number):
                 card = FindCard.find_card(secondary_player.discard[pos_discard], self.card_array)
                 if card.get_card_type() == "Army":
-                    if card.get_cost() <= primary_player.soul_seizure_value:
+                    if card.get_cost(primary_player.urien_relevant) <= primary_player.soul_seizure_value:
                         self.chosen_first_card = True
                         secondary_player.aiming_reticle_coords_discard = pos_discard
                         self.anrakyr_unit_position = pos_discard

@@ -155,7 +155,12 @@ class Card:
     def get_image_name(self):
         return self.image_name
 
-    def get_cost(self):
+    def get_cost(self, urien_relevant=False):
+        if urien_relevant:
+            if self.card_type == "Event":
+                if self.check_for_a_trait("Torture"):
+                    return self.cost - 1
+                return self.cost + 1
         return self.cost
 
     def get_faction(self):

@@ -13,6 +13,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         elif self.reactions_needing_resolving[0] == "Nullify":
             if primary_player.valid_nullify_unit(-2, unit_pos):
                 primary_player.exhaust_given_pos(-2, unit_pos)
+                if primary_player.urien_relevant:
+                    primary_player.spend_resources(1)
                 self.nullify_count += 1
                 primary_player.num_nullify_played += 1
                 if secondary_player.nullify_check():

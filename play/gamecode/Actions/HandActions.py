@@ -10,6 +10,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         secondary_player = self.p1
     card = primary_player.get_card_in_hand(int(game_update_string[2]))
     ability = card.get_ability()
+    urien_rel = primary_player.urien_relevant
+    cost = card.get_cost(urien_rel)
     print(card.get_allowed_phases_while_in_hand(), self.phase)
     print(card.get_has_action_while_in_hand())
     if not self.action_chosen:
@@ -23,9 +25,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.card_to_deploy = card
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                     primary_player.aiming_reticle_color = "blue"
-                elif primary_player.spend_resources(card.get_cost()):
+                elif primary_player.spend_resources(cost):
                     if may_nullify and secondary_player.nullify_check():
-                        primary_player.add_resources(card.get_cost())
+                        primary_player.add_resources(cost)
                         await self.send_update_message(primary_player.name_player + " wants to play " +
                                                        ability + "; Nullify window offered.")
                         self.choices_available = ["Yes", "No"]
@@ -33,7 +35,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choice_context = "Use Nullify?"
                         self.nullified_card_pos = int(game_update_string[2])
                         self.nullified_card_name = ability
-                        self.cost_card_nullified = card.get_cost()
+                        self.cost_card_nullified = cost
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Regular Action"
                     elif ability == "Spawn Termagants":
@@ -339,7 +341,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         else:
-                            primary_player.add_resources(card.get_cost())
+                            primary_player.add_resources(cost)
                     elif ability == "Dark Cunning":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -392,7 +394,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.all_conditions_searched_card_required = True
                             self.no_restrictions_on_chosen_card = False
                         else:
-                            primary_player.add_resources(card.get_cost())
+                            primary_player.add_resources(cost)
                             await self.send_update_message("No battle taking place")
                     elif ability == "Squadron Redeployment":
                         self.action_chosen = "Squadron Redeployment"
@@ -532,10 +534,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             self.name_player_making_choices = primary_player.name_player
                         else:
-                            primary_player.add_resources(card.get_cost())
+                            primary_player.add_resources(cost)
                             await self.send_update_message("No cards to look at with Visions of Agony")
                     else:
-                        primary_player.add_resources(card.get_cost())
+                        primary_player.add_resources(cost)
                         await self.send_update_message(card.get_name() + " not "
                                                                          "implemented")
     elif self.action_chosen == "Ambush Platform":

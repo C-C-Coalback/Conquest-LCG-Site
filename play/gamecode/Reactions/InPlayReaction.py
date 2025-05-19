@@ -22,6 +22,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             unit_pos = int(game_update_string[3])
             if primary_player.valid_nullify_unit(planet_pos, unit_pos):
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                if primary_player.urien_relevant:
+                    primary_player.spend_resources(1)
                 primary_player.num_nullify_played += 1
                 self.nullify_count += 1
                 if secondary_player.nullify_check():

@@ -112,12 +112,15 @@ class Player:
         self.sacced_card_for_despise = True
         self.foretell_permitted = True
         self.last_planet_sacrifice = -1
+        self.urien_relevant = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
         self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array)))
         self.warlord_faction = self.headquarters[0].get_faction()
+        if self.headquarters[0].get_name() == "Urien Rakarth":
+            self.urien_relevant = True
         self.deck = deck_list[1:]
         if deck_list[0] in self.tyranid_warlord_list:
             i = 0
@@ -558,6 +561,7 @@ class Player:
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
+        self.urien_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
@@ -1681,6 +1685,9 @@ class Player:
     def nullify_check(self):
         print("---\nNullify Check!\n---")
         num_nullifies = 0
+        if self.urien_relevant:
+            if self.resources < 1:
+                return False
         for i in range(len(self.cards)):
             if self.cards[i] == "Nullify":
                 num_nullifies += 1
@@ -1724,6 +1731,9 @@ class Player:
                 backlash_permitted = True
         if backlash_permitted:
             if self.resources > 0:
+                if self.urien_relevant:
+                    if self.resources < 2:
+                        return False
                 if self.search_hand_for_card("Backlash"):
                     return True
         return False
@@ -1745,6 +1755,9 @@ class Player:
 
     def foretell_check(self):
         if self.foretell_permitted:
+            if self.urien_relevant:
+                if self.resources < 1:
+                    return False
             war_plan, war_pos = self.get_location_of_warlord()
             if self.get_ready_given_pos(war_plan, war_pos):
                 if self.search_hand_for_card("Foretell"):
@@ -1755,6 +1768,8 @@ class Player:
         war_plan, war_pos = self.get_location_of_warlord()
         self.exhaust_given_pos(war_plan, war_pos)
         self.discard_card_name_from_hand("Foretell")
+        if self.urien_relevant:
+            self.spend_resources(1)
 
     def search_hand_for_card(self, card_name):
         for i in range(len(self.cards)):
