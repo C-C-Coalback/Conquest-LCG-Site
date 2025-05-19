@@ -3,9 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-Oops haven't updated the read me in a while.
-Tyranids have been added, most necrons cards
-are implemented. Working on front-end stuff.
+Full Warlord cycle + 2 first deluxe expansions supported.
 
 # What is this?
 
