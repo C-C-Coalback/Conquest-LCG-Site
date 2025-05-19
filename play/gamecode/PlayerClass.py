@@ -2877,12 +2877,11 @@ class Player:
                                 self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                                 self.game.player_who_resolves_reaction.append(self.name_player)
         if card.get_ability() == "Enginseer Augur":
-            self.game.reactions_needing_resolving.append("Enginseer Augur")
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            self.game.positions_of_unit_triggering_reaction.append(int(self.number), -1, -1)
+            self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
+        if card.get_ability() == "Kabalite Halfborn":
+            self.game.create_reaction("Kabalite Halfborn", self.name_player, (int(self.number), -1, -1))
         if self.get_ability_given_pos(-2, card_pos) == "Coteaz's Henchmen":
-            self.game.create_reaction("Coteaz's Henchmen", self.name_player,
-                                      (int(self.number), -1, -1))
+            self.game.create_reaction("Coteaz's Henchmen", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Interrogator Acolyte":
             self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
         self.discard.append(card_name)

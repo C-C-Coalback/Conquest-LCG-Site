@@ -184,7 +184,7 @@ def dark_eldar_cards_init():
         CardClasses.EventCard("Slake the Thirst", "Action: Exhaust your warlord to discard up to 3 cards at random "
                                                   "from a target player's hand. Then, that player draws cards "
                                                   "equal to the number of cards discarded.", "Tactic. Maneuver.",
-                              "Tactic. Maneuver.", 0, faction, "Common", 1, False,
+                              0, faction, "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.AttachmentCard("Shadow Field", "Attach to a Dark Eldar army unit.\n"
                                                    "Attached unit cannot be dealt damage by an army unit "

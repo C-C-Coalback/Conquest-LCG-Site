@@ -1531,6 +1531,28 @@ class Game:
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.searing_brand_cancel_enabled = True
+                    elif self.choice_context == "Which Player? (Slake the Thirst):":
+                        self.misc_target_choice = game_update_string[1]
+                        self.choices_available = []
+                        for i in range(len(self.p1.cards)):
+                            if len(self.choices_available) < 4:
+                                self.choices_available.append(str(i))
+                        self.choice_context = "How Many Cards? (Slake the Thirst):"
+                    elif self.choice_context == "How Many Cards? (Slake the Thirst):":
+                        num_cards = int(game_update_string[1])
+                        if self.misc_target_choice == "0":
+                            for _ in range(num_cards):
+                                primary_player.discard_card_at_random()
+                            for _ in range(num_cards):
+                                primary_player.draw_card()
+                        else:
+                            for _ in range(num_cards):
+                                secondary_player.discard_card_at_random()
+                            for _ in range(num_cards):
+                                secondary_player.draw_card()
+                        await primary_player.dark_eldar_event_played()
+                        self.action_cleanup()
+                        self.reset_choices_available()
                     elif self.choice_context == "Use Backlash?":
                         await self.resolve_backlash(name, game_update_string, primary_player, secondary_player)
                     elif self.choice_context == "Use Communications Relay?":

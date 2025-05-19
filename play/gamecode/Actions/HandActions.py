@@ -172,6 +172,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
                             secondary_player.indirect_damage_applied = 0
                             secondary_player.total_indirect_damage = secondary_player.count_units_in_play_all()
+                    elif ability == "Slake the Thirst":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.choices_available = ["Yourself", "Opponent"]
+                            self.choice_context = "Which Player? (Slake the Thirst):"
+                            self.name_player_making_choices = primary_player.name_player
                     elif ability == "Tense Negotiations":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
