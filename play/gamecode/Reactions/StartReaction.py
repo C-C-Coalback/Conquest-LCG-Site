@@ -477,6 +477,25 @@ async def start_resolving_reaction(self, name, game_update_string):
                     can_continue = False
             if can_continue:
                 primary_player.discard_card_name_from_hand("Cry of the Wind")
+        elif self.reactions_needing_resolving[0] == "Primal Howl":
+            can_continue = True
+            if self.nullify_enabled:
+                if secondary_player.nullify_check():
+                    await self.send_update_message(primary_player.name_player + " wants to play Cry of the Wind" +
+                                                   "; Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Primal Howl"
+                    self.cost_card_nullified = 0
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                    can_continue = False
+            if can_continue:
+                primary_player.discard_card_name_from_hand("Primal Howl")
+                for _ in range(3):
+                    primary_player.draw_card()
         elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):

@@ -117,6 +117,7 @@ class Player:
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
         self.illegal_commits_synapse = 0
+        self.primal_howl_used = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -2073,6 +2074,11 @@ class Player:
         return area_effect
 
     def resolve_enemy_warlord_committed_to_planet(self, planet_pos):
+        if self.check_for_warlord(planet_pos):
+            if self.search_hand_for_card("Primal Howl"):
+                if not self.primal_howl_used:
+                    self.primal_howl_used = True
+                    self.game.create_reaction("Primal Howl", self.name_player, (self.number, -1, -1))
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             for j in range(len(self.cards_in_play[planet_pos + 1][i].get_attachments())):
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":

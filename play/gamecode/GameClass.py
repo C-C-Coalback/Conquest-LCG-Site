@@ -1075,6 +1075,10 @@ class Game:
             elif self.nullify_context == "Cry of the Wind":
                 primary_player.discard_card_name_from_hand("Cry of the Wind")
                 self.chosen_first_card = False
+            elif self.nullify_context == "Primal Howl":
+                primary_player.discard_card_name_from_hand("Primal Howl")
+                for _ in range(3):
+                    primary_player.draw_card()
             elif self.nullify_context == "No Mercy":
                 self.choices_available = []
                 self.choice_context = ""
@@ -4743,6 +4747,8 @@ class Game:
         self.p1.illegal_commits_synapse = 0
         self.p2.illegal_commits_warlord = 0
         self.p2.illegal_commits_synapse = 0
+        self.p1.primal_howl_used = False
+        self.p2.primal_howl_used = False
         self.mode = "Normal"
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()
