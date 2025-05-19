@@ -1399,6 +1399,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message(str(self.misc_counter) + " uses of Smash 'n Bash left")
                     if self.misc_counter < 1:
                         self.action_cleanup()
+    elif self.action_chosen == "Seer's Exodus":
+        if game_update_string[1] == primary_player.get_number():
+            if planet_pos == self.misc_target_planet:
+                primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

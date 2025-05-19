@@ -52,6 +52,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.muster_the_guard_count += 1
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             self.action_cleanup()
+                    elif ability == "Seer's Exodus":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if warlord_planet != -2:
+                            self.misc_target_planet = warlord_planet
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.action_chosen = ability
                     elif ability == "To Arms!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

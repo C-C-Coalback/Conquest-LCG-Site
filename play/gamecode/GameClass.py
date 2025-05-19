@@ -632,6 +632,9 @@ class Game:
                         if self.chosen_first_card:
                             await self.send_update_message("Stopping Smash 'n Bash early")
                             self.action_cleanup()
+                    elif self.action_chosen == "Seer's Exodus":
+                        await self.send_update_message("Stopping Seer's Exodus")
+                        self.action_cleanup()
                     elif self.action_chosen == "Despise":
                         await self.send_update_message(
                             self.player_with_action + " does not sacrifice a card for Despise."
