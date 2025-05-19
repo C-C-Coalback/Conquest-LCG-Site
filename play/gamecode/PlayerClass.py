@@ -1358,7 +1358,7 @@ class Player:
     def count_units_in_play_all(self):
         unit_count = 0
         for i in range(7):
-            unit_count += len(self.cards_in_play[i])
+            unit_count += len(self.cards_in_play[i + 1])
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_card_type() != "Support":
                 unit_count += 1

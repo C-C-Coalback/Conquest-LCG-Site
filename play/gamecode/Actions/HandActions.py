@@ -162,6 +162,16 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Cacophonic Choir":
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.action_cleanup()
+                            self.location_of_indirect = "ALL"
+                            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+                            secondary_player.indirect_damage_applied = 0
+                            secondary_player.total_indirect_damage = secondary_player.count_units_in_play_all()
                     elif ability == "Tense Negotiations":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
