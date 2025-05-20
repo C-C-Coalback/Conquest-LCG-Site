@@ -10,6 +10,10 @@
     height: 70px;
 }
 
+#manual-deck-import {
+    display: none;
+}
+
 .box {
     width: 40vw;
     height: 300px;

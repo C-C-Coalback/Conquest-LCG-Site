@@ -11,7 +11,8 @@
     <h1>to set the deck's ally faction and the name.</h1>
     <h1>Note that card names are case-sensitive.</h1>
 </div>
-
+<input id="toggle-manual" type="button" value="Show/Hide Manual" onclick="showDeckImport();">
+<div id="manual-deck-import">
 <textarea id="chat-log" cols="100" rows="20"></textarea><br>
 <input id="chat-message-input" type="search" list="card_list" size="100"><br>
 <datalist id="card_list">
@@ -439,8 +440,9 @@
     <option value="For the Tau'va"></option>
     <option value="Inquisitor Caius Wroth"></option>
 </datalist>
-<input id="chat-message-submit" type="button" value="Add Card">
 <input id="deck-submit" type="button" value="Send Deck" onclick="sendDeck();">
+<input id="chat-message-submit" type="button" value="Add Card">
+</div>
 <div id="current-warlord">
     <p></p>
 </div>
@@ -808,5 +810,17 @@
             }));
             messageInputDom.value = '';
         };
+
+    function showDeckImport() {
+        var target_id = "manual-deck-import";
+        var x = document.getElementById(target_id);
+        if (x.style.display !== "block") {
+            x.style.display = "block";
+            console.log("Set to block")
+        } else {
+            x.style.display = "none";
+            console.log("Set to none")
+        }
+    }
 </script>
 {% endblock %}

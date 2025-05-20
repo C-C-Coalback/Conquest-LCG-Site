@@ -707,7 +707,7 @@
         var target_discard_display = "expanded/" + discard_id;
         target_discard_display = target_discard_display.split('/').join('-');
         var x = document.getElementById(target_discard_display);
-        if (x.style.display === "none") {
+        if (x.style.display !== "block") {
             x.style.display = "block";
             console.log("Set to block")
         } else {
