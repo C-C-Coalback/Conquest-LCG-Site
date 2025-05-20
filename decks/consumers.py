@@ -241,6 +241,9 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         self.ally_faction = split_message[1]
                         changed_ally = True
                 print(self.main_faction, self.ally_faction)
+                if self.main_faction == "Tyranids" or self.main_faction == "Necrons":
+                    if split_message[1] == "":
+                        changed_ally = True
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "LOAD DECK":
