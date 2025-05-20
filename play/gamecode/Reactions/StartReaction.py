@@ -114,7 +114,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_target_unit = (-1, -1)
         elif self.reactions_needing_resolving[0] == "Ichor Gauntlet":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
-            primary_player.exhaust_attachment_name_pos(warlord_planet, warlord_pos, "Ichor Gauntlet")
+            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
             card_target = primary_player.ichor_gauntlet_target
             card = FindCard.find_card(card_target, self.card_array)
             primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant))
