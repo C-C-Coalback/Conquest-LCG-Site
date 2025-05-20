@@ -287,6 +287,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             del message[0]
             try:
                 if message[0] == "" and len(message) > 1:
+                    if message[1] != "loaddeck":
+                        await self.receive_game_update(
+                            self.name + " is using a command: " + "/".join(message)
+                        )
                     if message[1] == "planets":
                         print("Need to load planets")
                         for i in range(len(active_games)):
@@ -516,10 +520,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             int(unit_position[2]))
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name, {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                                    self.room_group_name,
+                                    {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
                                 )
                 else:
-                    message = self.name + ": " + message[0]
+                    message = self.name + ": " + "/".join(message)
                     print("receive:", message)
                     chat_messages[0].append(self.room_name)
                     chat_messages[1].append(message)
