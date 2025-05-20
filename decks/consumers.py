@@ -22,7 +22,6 @@ def clean_sent_deck(deck_message):
 
 def second_part_deck_validation(deck):
     global cards_array
-    remaining_signature_squad = []
     print("Size should be fine")
     name = deck[0]
     res = name != '' and all(c.isalnum() or c.isspace() for c in name)
@@ -253,18 +252,48 @@ class DecksConsumer(AsyncWebsocketConsumer):
                             deck_content = f.read()
                         deck_list_content = deck_content.split(sep="\n")
                         message = "Load deck/" + deck_content
-                        deck_name = deck_list_content[0]
-                        warlord = deck_list_content[2]
+                        deck_name = "Name/" + deck_list_content[0]
+                        await self.send(text_data=json.dumps({"message": deck_name}))
+                        warlord = "Warlord/" + deck_list_content[2]
+                        await self.send(text_data=json.dumps({"message": warlord}))
                         factions = deck_list_content[3]
                         factions = factions.split(sep=" (")
                         for i in range(len(factions)):
                             factions[i] = factions[i].replace(")", "")
                             if i == 0:
                                 self.main_faction = factions[i]
+                                if len(factions) == 1:
+                                    ally = "SetAlly/"
+                                    await self.send(text_data=json.dumps({"message": ally}))
                             elif i == 1:
                                 self.ally_faction = factions[i]
-                        print("Sending: ", deck_name, warlord, factions, sep="\n")
-                        await self.send(text_data=json.dumps({"message": message}))
+                                ally = "SetAlly/" + factions[i]
+                                await self.send(text_data=json.dumps({"message": ally}))
+                        await self.send(text_data=json.dumps({"message": "Ally"}))
+                        for i in range(4):
+                            del deck_list_content[0]
+                        i = 0
+                        while i < len(deck_list_content):
+                            if deck_list_content[i] in ["-----------------------------------"
+                                                        "-----------------------------------", ""]:
+                                del deck_list_content[i]
+                                i = i - 1
+                            i = i + 1
+                        current_header = "SS"
+                        for i in range(len(deck_list_content)):
+                            if deck_list_content[i] in ["Signature Squad", "Army", "Support",
+                                                        "Synapse", "Attachment", "Event", "Planet"]:
+                                current_header = deck_list_content[i]
+                                if current_header == "Signature Squad":
+                                    current_header = "SS"
+                            else:
+                                number_of_cards = deck_list_content[i][0]
+                                card_name = deck_list_content[i][3:]
+                                for _ in range(int(number_of_cards)):
+                                    item_sent = current_header + "/" + card_name
+                                    await self.send(text_data=json.dumps({"message": item_sent}))
+                        # print("Sending: ", deck_name, warlord, factions, sep="\n")
+                        # await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "SEND DECK":
                 message_to_send = ""
                 split_message[1] = split_message[1].replace("\"", "")
@@ -272,6 +301,10 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 print(deck)
                 deck_name = deck[0]
                 if len(deck) > 5:
+                    if "{AUTOMAIN}" in deck[2]:
+                        warlord = FindCard.find_card(deck[1], cards_array)
+                        deck[2] = deck[2].replace("{AUTOMAIN}", warlord.get_faction())
+                        split_message[1] = split_message[1].replace("{AUTOMAIN}", warlord.get_faction())
                     message_to_send = second_part_deck_validation(deck)
                 if message_to_send == "SUCCESS":
                     print("Need to save deck")

@@ -10,6 +10,74 @@
     height: 70px;
 }
 
+.no-break {
+    display: inline;
+}
+
+.db-image {
+    width: 75px;
+    height: 100px;
+}
+
+.auto-deck-build {
+    background: rgba(47, 40, 153, 0.3);
+    width: 450px;
+    height: 500px;
+    border: 5px solid green;
+    display: grid;
+    grid-template-columns: 75px 75px 50px 100px 150px;
+    grid-template-rows: 100px 200px 200px;
+    grid-template-areas:
+    "warlord-card synapse-card details details details"
+    "signature-squad-cards signature-squad-cards army-cards army-cards army-cards"
+    "event-cards event-cards attachment-cards attachment-cards support-cards";
+}
+
+.auto-deck-build > #details {
+    background: rgba(47, 40, 153, 0.3);
+    border: 1px solid black;
+    text-align: center;
+}
+
+.auto-deck-build > .db-section {
+    background: rgba(47, 40, 153, 0.3);
+    border: 1px solid black;
+    text-align: center;
+    overflow-y:auto;
+}
+
+#warlord-card {
+    grid-area: warlord-card;
+}
+
+#synapse-card {
+    grid-area: synapse-card;
+}
+
+#details {
+    grid-area: details;
+}
+
+#signature-squad-cards {
+    grid-area: signature-squad-cards;
+}
+
+#army-cards {
+    grid-area: army-cards;
+}
+
+#event-cards {
+    grid-area: event-cards;
+}
+
+#support-cards {
+    grid-area: support-cards;
+}
+
+#attachment-cards {
+    grid-area: attachment-cards;
+}
+
 #manual-deck-import {
     display: none;
 }
@@ -36,7 +104,7 @@
 
 #existing-decks {
     position: absolute;
-    right:240px;
+    left:max(600px, calc(100vw - 280px));
     width:260px;
     top:75px;
     overflow-y: scroll;
