@@ -521,8 +521,11 @@
                 }
                 numDecksLoaded = 1;
                 var message = "";
+                var cardName = split_data[2].split(' ').join('_');
+                var route_text = "/static/images/CardImages/" + cardName + ".jpg";
                 message = `<div class=saved-deck-box>`;
-                message += `<p>` + split_data[1] + `: ` + split_data[2] + `</p>`;
+                message += `<img src=` + route_text + ` alt=` + route_text + ` class="Card-saved-box" />`;
+                message += `<p>` + split_data[1] + `</p>`;
                 message += `</div>`;
                 message += `<button id=` + split_data[1].split(' ').join('-') + ` onclick="loadSavedDeck(this.id)">
                 Load Deck
