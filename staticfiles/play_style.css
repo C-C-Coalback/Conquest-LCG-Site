@@ -476,7 +476,7 @@ summary:focus {
     max-width:5vw;
     overflow-x:auto;
     overflow-y:hidden;
-    top:0%;
+    bottom:0%;
     right:0;
 }
 
