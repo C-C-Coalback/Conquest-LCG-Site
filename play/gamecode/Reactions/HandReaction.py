@@ -15,7 +15,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             hand_pos = int(game_update_string[2])
             if primary_player.cards[hand_pos] == "Elysian Assault Team":
                 planet_pos = self.positions_of_unit_triggering_reaction[0][1]
-                card = FindCard.find_card("Elysian Assault Team", self.card_array)
+                card = FindCard.find_card("Elysian Assault Team", self.card_array, self.cards_dict)
                 primary_player.add_card_to_planet(card, planet_pos)
                 del primary_player.cards[hand_pos]
                 more = False

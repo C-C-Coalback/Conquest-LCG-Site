@@ -39,7 +39,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.choices_available = []
                         self.choice_context = "Awake the Sleepers"
                         for i in range(len(primary_player.discard)):
-                            card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                            card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                             if card.get_faction() == "Necrons":
                                 self.choices_available.append(card.get_name())
                         self.resolving_search_box = True
@@ -70,7 +70,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             self.choices_available = []
                             self.choice_context = ability
                             for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.get_is_unit() and card.get_faction() != "Necrons" and card.get_cost() < 4:
                                     self.choices_available.append(card.get_name())
                             self.resolving_search_box = True
@@ -131,7 +131,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
     elif self.action_chosen == "Soul Seizure":
         if not self.chosen_first_card:
             if chosen_discard == int(secondary_player.number):
-                card = FindCard.find_card(secondary_player.discard[pos_discard], self.card_array)
+                card = FindCard.find_card(secondary_player.discard[pos_discard], self.card_array, self.cards_dict)
                 if card.get_card_type() == "Army":
                     if card.get_cost(primary_player.urien_relevant) <= primary_player.soul_seizure_value:
                         self.chosen_first_card = True
@@ -139,7 +139,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.anrakyr_unit_position = pos_discard
     elif self.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
-            card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array)
+            card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array, self.cards_dict)
             if card.get_is_unit():
                 primary_player.shuffle_card_in_discard_into_deck(pos_discard)
                 self.misc_counter += 1

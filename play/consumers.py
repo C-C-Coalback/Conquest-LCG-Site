@@ -10,6 +10,9 @@ import logging
 import datetime
 
 card_array = Initfunctions.init_player_cards()
+cards_dict = {}
+for key in range(len(card_array)):
+    cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 
 active_lobbies = [[], []]
@@ -185,11 +188,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         global active_games
         global card_array
         global planet_array
+        global cards_dict
         for i in range(len(active_games)):
             if active_games[i].game_id == game_id:
                 new_game_id = game_id + random.choice('0123456789ABCDEF')
                 return self.create_game(name_1, name_2, new_game_id)
-        active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array))
+        active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict))
         return game_id
 
 
@@ -357,7 +361,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
                     elif message[1] == "addcard" and len(message) > 3:
                         card_name = message[3]
-                        card = FindCard.find_card(card_name, active_games[self.game_position].card_array)
+                        card = FindCard.find_card(card_name, active_games[self.game_position].card_array,
+                                                  active_games[self.game_position].cards_dict)
                         if card.get_shields() != -1:
                             if message[2] == "1":
                                 active_games[self.game_position].p1.cards.append(card.get_name())

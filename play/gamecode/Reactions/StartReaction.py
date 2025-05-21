@@ -116,7 +116,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
             card_target = primary_player.ichor_gauntlet_target
-            card = FindCard.find_card(card_target, self.card_array)
+            card = FindCard.find_card(card_target, self.card_array, self.cards_dict)
             primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant))
             if card_target in primary_player.discard:
                 primary_player.discard.remove(card_target)
@@ -134,7 +134,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.discard_top_card_deck():
                 last_card_discard = len(primary_player.discard) - 1
-                card = FindCard.find_card(primary_player.discard[last_card_discard], self.card_array)
+                card = FindCard.find_card(primary_player.discard[last_card_discard], self.card_array, self.cards_dict)
                 cost = card.get_cost()
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
             self.delete_reaction()
@@ -172,7 +172,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Resurrection Orb":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.discard:
-                card = FindCard.find_card(primary_player.discard[-1], self.card_array)
+                card = FindCard.find_card(primary_player.discard[-1], self.card_array, self.cards_dict)
                 if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
                         not card.check_for_a_trait("Elite"):
                     primary_player.add_card_to_planet(card, planet_pos)
@@ -366,7 +366,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Doom Scythe Invader":
             self.choices_available = []
             for i in range(len(primary_player.discard)):
-                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                 if card.get_is_unit():
                     if card.check_for_a_trait("Vehicle"):
                         if not card.check_for_a_trait("Elite"):
@@ -535,7 +535,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
             while i > -1:
-                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                 if card.get_card_type() == "Event":
                     primary_player.cards.append(card.get_name())
                     del primary_player.discard[i]
@@ -592,7 +592,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             seen_a_canoptek = False
             allowed_cards = []
             for i in range(len(primary_player.discard)):
-                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                 if card.get_faction() == "Necrons" and card.get_card_type() == "Army":
                     if card.get_name() != "Canoptek Scarab Swarm":
                         allowed_cards.append(card.get_name())

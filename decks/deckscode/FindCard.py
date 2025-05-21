@@ -1,4 +1,8 @@
-def find_card(card_to_find, card_array):
+def find_card(card_to_find, card_array, card_dict=None):
+    if card_dict is not None:
+        if card_to_find in card_dict:
+            return card_dict[card_to_find]
+        return card_array[-1]
     i = 0
     while card_array[i].get_shields() != -1:
         if card_to_find == card_array[i].get_name():

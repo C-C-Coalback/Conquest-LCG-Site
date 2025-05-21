@@ -22,9 +22,10 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array):
+    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict):
         self.game_sockets = []
         self.card_array = card_array
+        self.cards_dict = cards_dict
         self.planet_cards_array = planet_array
         self.game_id = game_id
         self.name_1 = player_one_name
@@ -33,8 +34,8 @@ class Game:
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
-        self.p1 = PlayerClass.Player(player_one_name, 1, card_array, self)
-        self.p2 = PlayerClass.Player(player_two_name, 2, card_array, self)
+        self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, self)
+        self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, self)
         self.phase = "SETUP"
         self.round_number = 0
         self.current_board_state = ""
@@ -890,7 +891,7 @@ class Game:
                         valid_card = True
                         if not self.no_restrictions_on_chosen_card:
                             card_chosen = FindCard.find_card(self.p1.deck[int(game_update_string[1])],
-                                                             self.card_array)
+                                                             self.card_array, self.cards_dict)
                             valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
                         if valid_card:
                             if self.what_to_do_with_searched_card == "DRAW":
@@ -926,7 +927,7 @@ class Game:
                         valid_card = True
                         if not self.no_restrictions_on_chosen_card:
                             card_chosen = FindCard.find_card(self.p2.deck[int(game_update_string[1])],
-                                                             self.card_array)
+                                                             self.card_array, self.cards_dict)
                             valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
                         if valid_card:
                             if self.what_to_do_with_searched_card == "DRAW":
@@ -1109,7 +1110,7 @@ class Game:
                 self.choice_context = "Target Fall Back:"
                 for i in range(len(primary_player.stored_cards_recently_destroyed)):
                     card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                              self.card_array)
+                                              self.card_array, self.cards_dict)
                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                         self.choices_available.append(card.get_name())
             elif self.nullify_context == "The Emperor Protects":
@@ -1621,7 +1622,7 @@ class Game:
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = ["Damage Warlord"]
                         for i in range(len(secondary_player.cards)):
-                            card = FindCard.find_card(secondary_player.cards[i], self.card_array)
+                            card = FindCard.find_card(secondary_player.cards[i], self.card_array, self.cards_dict)
                             if card.get_card_type() == self.misc_target_choice:
                                 if card.get_name() not in self.choices_available:
                                     self.choices_available.append(card.get_name())
@@ -1894,7 +1895,7 @@ class Game:
                         target_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]
                         self.resolving_search_box = False
-                        card = FindCard.find_card(target_choice, self.card_array)
+                        card = FindCard.find_card(target_choice, self.card_array, self.cards_dict)
                         primary_player.add_card_to_planet(card, pla)
                         primary_player.discard.remove(target_choice)
                         self.delete_reaction()
@@ -1905,7 +1906,7 @@ class Game:
                         target_choice = self.choices_available[int(game_update_string[1])]
                         planet, pos = self.position_of_actioned_card
                         primary_player.reset_aiming_reticle_in_play(planet, pos)
-                        card = FindCard.find_card(target_choice, self.card_array)
+                        card = FindCard.find_card(target_choice, self.card_array, self.cards_dict)
                         primary_player.add_card_to_planet(card, planet)
                         primary_player.discard.remove(target_choice)
                         self.choices_available = []
@@ -1977,7 +1978,7 @@ class Game:
                         if self.holy_sepulchre_check(primary_player):
                             for i in range(len(primary_player.stored_cards_recently_discarded)):
                                 card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
-                                                          self.card_array)
+                                                          self.card_array, self.cards_dict)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
                         if not self.choices_available:
@@ -1992,7 +1993,7 @@ class Game:
                             self.anrakyr_deck_choice = primary_player.name_player
                             i = len(primary_player.discard) - 1
                             while i > -1 and not found_card:
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.get_is_unit():
                                     name = card.get_name()
                                     found_card = True
@@ -2008,7 +2009,7 @@ class Game:
                             self.anrakyr_deck_choice = secondary_player.name_player
                             i = len(secondary_player.discard) - 1
                             while i > -1 and not found_card:
-                                card = FindCard.find_card(secondary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(secondary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.get_is_unit():
                                     name = card.get_name()
                                     found_card = True
@@ -2057,7 +2058,7 @@ class Game:
                     elif self.choice_context == "Planet Target Leviathan Hive Ship":
                         chosen_planet = int(game_update_string[1])
                         if self.planets_in_play_array[chosen_planet]:
-                            card = FindCard.find_card(self.misc_target_choice, self.card_array)
+                            card = FindCard.find_card(self.misc_target_choice, self.card_array, self.cards_dict)
                             primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
                             try:
                                 primary_player.discard.remove(self.misc_target_choice)
@@ -2073,7 +2074,7 @@ class Game:
                             self.delete_reaction()
                     elif self.choice_context == "Target Made Ta Fight:":
                         target = self.choices_available[int(game_update_string[1])]
-                        card = FindCard.find_card(target, self.card_array)
+                        card = FindCard.find_card(target, self.card_array, self.cards_dict)
                         self.misc_counter = card.attack
                         self.reset_choices_available()
                         self.resolving_search_box = False
@@ -2097,7 +2098,7 @@ class Game:
                         if primary_player.urien_relevant:
                             primary_player.spend_resources(1)
                         target = self.choices_available[int(game_update_string[1])]
-                        card = FindCard.find_card(target, self.card_array)
+                        card = FindCard.find_card(target, self.card_array, self.cards_dict)
                         primary_player.add_to_hq(card)
                         try:
                             primary_player.discard.remove(target)
@@ -2110,7 +2111,7 @@ class Game:
                         if self.fall_back_check(primary_player):
                             for i in range(len(primary_player.stored_cards_recently_destroyed)):
                                 card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                                          self.card_array)
+                                                          self.card_array, self.cards_dict)
                                 if card.check_for_a_trait("Elite") and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
                         if not self.choices_available:
@@ -2200,7 +2201,7 @@ class Game:
                             await self.send_update_message("Shrine of Warpflame triggered")
                             print(primary_player.discard)
                             for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.check_for_a_trait("Tzeentch"):
                                     self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -2325,7 +2326,7 @@ class Game:
                                 self.choice_context = "Target Fall Back:"
                                 for i in range(len(primary_player.stored_cards_recently_destroyed)):
                                     card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                                              self.card_array)
+                                                              self.card_array, self.cards_dict)
                                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                                         self.choices_available.append(card.get_name())
                         elif game_update_string[1] == "1":
@@ -2339,7 +2340,7 @@ class Game:
                             self.choice_context = "Target Holy Sepulchre:"
                             for i in range(len(primary_player.stored_cards_recently_discarded)):
                                 card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
-                                                          self.card_array)
+                                                          self.card_array, self.cards_dict)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
                         elif game_update_string[1] == "1":
@@ -2353,7 +2354,7 @@ class Game:
                             self.choice_context = "Target Leviathan Hive Ship:"
                             for i in range(len(primary_player.stored_cards_recently_destroyed)):
                                 card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                                          self.card_array)
+                                                          self.card_array, self.cards_dict)
                                 if card.get_is_unit():
                                     if card.has_hive_mind and card.get_cost() < 4:
                                         self.choices_available.append(card.get_name())
@@ -2533,7 +2534,7 @@ class Game:
                             self.choice_context = "Shadowsun attachment from discard:"
                             self.name_player_making_choices = name
                             for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
                                     card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
@@ -2936,7 +2937,7 @@ class Game:
     def holy_sepulchre_check(self, player):
         if player.search_card_in_hq("Holy Sepulchre", ready_relevant=True):
             for card_name in player.stored_cards_recently_discarded:
-                card = FindCard.find_card(card_name, self.card_array)
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                     return True
         return False
@@ -2944,7 +2945,7 @@ class Game:
     def leviathan_hive_ship_check(self, player):
         if player.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
             for card_name in player.stored_cards_recently_destroyed:
-                card = FindCard.find_card(card_name, self.card_array)
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
                 if card.get_is_unit():
                     if card.has_hive_mind and card.get_cost() < 4:
                         return True
@@ -2957,7 +2958,7 @@ class Game:
                     if player.resources < 2:
                         return False
                 for card_name in player.stored_cards_recently_discarded:
-                    card = FindCard.find_card(card_name, self.card_array)
+                    card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
                     if card.check_for_a_trait("Elite"):
                         return True
         return False
@@ -3920,9 +3921,10 @@ class Game:
                             if game_update_string[1] == primary_player.get_number():
                                 if self.location_hand_attachment_shadowsun == -1:
                                     hand_pos = int(game_update_string[2])
-                                    card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array)
+                                    card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
+                                                              self.cards_dict)
                                     if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                         self.location_hand_attachment_shadowsun = hand_pos
                                         primary_player.aiming_reticle_coords_hand = hand_pos
                                         primary_player.aiming_reticle_color = "blue"
@@ -3938,7 +3940,7 @@ class Game:
                                     player_receiving_attachment = secondary_player
                                     own_attachment = False
                                 card = FindCard.find_card(primary_player.cards[self.location_hand_attachment_shadowsun],
-                                                          self.card_array)
+                                                          self.card_array, self.cards_dict)
                                 army_unit_as_attachment = False
                                 if card.get_name() == "Shadowsun's Stealth Cadre":
                                     army_unit_as_attachment = True
@@ -3967,7 +3969,8 @@ class Game:
                                 else:
                                     player_receiving_attachment = secondary_player
                                     own_attachment = False
-                                card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array)
+                                card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array,
+                                                          self.cards_dict)
                                 army_unit_as_attachment = False
                                 if card.get_name() == "Shadowsun's Stealth Cadre":
                                     army_unit_as_attachment = True

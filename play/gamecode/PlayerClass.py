@@ -33,9 +33,10 @@ def clean_received_deck(raw_deck):
 
 
 class Player:
-    def __init__(self, name, number, card_array, game):
+    def __init__(self, name, number, card_array, cards_dict, game):
         self.game = game
         self.card_array = card_array
+        self.cards_dict = cards_dict
         self.number = str(number)
         self.name_player = name
         self.position_activated = []
@@ -123,7 +124,7 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
-        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array)))
+        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array, self.cards_dict)))
         self.warlord_faction = self.headquarters[0].get_faction()
         if self.headquarters[0].get_name() == "Urien Rakarth":
             self.urien_relevant = True
@@ -132,7 +133,8 @@ class Player:
             i = 0
             while i < len(self.deck):
                 if self.deck[i] in self.synapse_list:
-                    self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array)))
+                    self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array,
+                                                                              self.cards_dict)))
                     del self.deck[i]
                 i = i + 1
         self.shuffle_deck()
@@ -436,7 +438,7 @@ class Player:
             print("Deck is empty, you lose!")
             return None
         else:
-            card = FindCard.find_card(self.deck[0], self.card_array)
+            card = FindCard.find_card(self.deck[0], self.card_array, self.cards_dict)
             return card
 
     def draw_card(self):
@@ -524,7 +526,7 @@ class Player:
 
     def get_shields_given_pos(self, pos_in_hand, planet_pos=None):
         shield_card_name = self.cards[pos_in_hand]
-        card_object = FindCard.find_card(shield_card_name, self.card_array)
+        card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict)
         shields = card_object.get_shields()
         if shields > 0:
             if card_object.get_faction() == "Tau":
@@ -666,7 +668,7 @@ class Player:
         elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
             i = len(self.discard) - 1
             while i > -1:
-                card = FindCard.find_card(self.discard[i], self.card_array)
+                card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
                 if card.get_card_type() == "Event":
                     self.cards.append(card.get_name())
                     del self.discard[i]
@@ -688,7 +690,7 @@ class Player:
             if played_card == "SUCCESS":
                 return "SUCCESS/Support"
             return played_card
-        card = FindCard.find_card(self.cards[position_hand], self.card_array)
+        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict)
         if card.card_type == "Support":
             print("Need to play support card")
             played_card = self.play_card(-2, card=card)
@@ -698,11 +700,11 @@ class Player:
         return "SUCCESS/Not Support"
 
     def get_card_in_hand(self, position_hand):
-        card = FindCard.find_card(self.cards[position_hand], self.card_array)
+        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict)
         return card
 
     def get_card_in_discard(self, position_discard):
-        card = FindCard.find_card(self.discard[position_discard], self.card_array)
+        card = FindCard.find_card(self.discard[position_discard], self.card_array, self.cards_dict)
         return card
 
     def get_discard(self):
@@ -955,7 +957,7 @@ class Player:
     def count_tortures_in_discard(self):
         count = 0
         for i in range(len(self.discard)):
-            card = FindCard.find_card(self.discard[i], self.card_array)
+            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
             if card.check_for_a_trait("Torture"):
                 count += 1
         return count
@@ -977,7 +979,7 @@ class Player:
                         self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), i, j))
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
-        card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array))
+        card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array, self.cards_dict))
         if unit_only:
             if card.get_card_type() != "Army":
                 return False
@@ -2219,7 +2221,7 @@ class Player:
     def count_units_in_discard(self):
         count = 0
         for i in range(len(self.discard)):
-            card = FindCard.find_card(self.discard[i], self.card_array)
+            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
             if card.get_card_type() == "Army":
                 count = count + 1
         return count
@@ -2684,7 +2686,7 @@ class Player:
     def get_card_top_discard(self):
         if self.discard:
             card_name = self.discard[-1]
-            card = FindCard.find_card(card_name, self.card_array)
+            card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
             return card
         return None
 
@@ -2839,12 +2841,12 @@ class Player:
                 self.destroy_card_in_play(planet_num, i)
 
     def summon_token_at_planet(self, token_name, planet_num):
-        card = FindCard.find_card(token_name, self.card_array)
+        card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
         if card.get_name() != "FINAL CARD":
             self.add_card_to_planet(card, planet_num)
 
     def summon_token_at_hq(self, token_name, amount=1):
-        card = FindCard.find_card(token_name, self.card_array)
+        card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
         if card.get_name() != "FINAL CARD":
             for _ in range(amount):
                 self.add_to_hq(card)

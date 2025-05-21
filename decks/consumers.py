@@ -5,6 +5,9 @@ import os
 import copy
 
 cards_array = Initfunctions.init_player_cards()
+cards_dict = {}
+for key in range(len(cards_array)):
+    cards_dict[cards_array[key].name] = cards_array[key]
 planet_cards_array = Initfunctions.init_planet_cards()
 
 
@@ -22,6 +25,7 @@ def clean_sent_deck(deck_message):
 
 def second_part_deck_validation(deck):
     global cards_array
+    global cards_dict
     print("Size should be fine")
     name = deck[0]
     res = name != '' and all(c.isalnum() or c.isspace() for c in name)
@@ -29,7 +33,7 @@ def second_part_deck_validation(deck):
         return "Name too long"
     elif not res:
         return "Name contains non-alphanumeric characters"
-    warlord_card = FindCard.find_card(deck[1], cards_array)
+    warlord_card = FindCard.find_card(deck[1], cards_array, cards_dict)
     if warlord_card.get_card_type() != "Warlord":
         print("Card in Warlord position is not a warlord")
         return "Card in Warlord position is not a warlord"
@@ -69,6 +73,7 @@ def second_part_deck_validation(deck):
 
 def deck_validation(deck, remaining_signature_squad, factions):
     global cards_array
+    global cards_dict
     print("Can continue")
     current_index = 4
     while deck[current_index] != "Army":
@@ -103,7 +108,7 @@ def deck_validation(deck, remaining_signature_squad, factions):
                     return "Too many copies: " + current_name
             except ValueError:
                 return "Number missing"
-            card_result = FindCard.find_card(current_name, cards_array)
+            card_result = FindCard.find_card(current_name, cards_array, cards_dict)
             if card_result.get_name() != current_name:
                 print("Card not found in database", current_name)
                 return "Card not found in database: " + current_name
@@ -180,12 +185,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data): # noqa
         global cards_array
+        global cards_dict
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print("receive:", message)
         split_message = message.split(sep="/")
         if len(split_message) == 1:
-            card_object = FindCard.find_card(message, cards_array)
+            card_object = FindCard.find_card(message, cards_array, cards_dict)
             if card_object.get_name() != "FINAL CARD":
                 card_type = card_object.get_card_type()
                 card_loyalty = card_object.get_loyalty()
@@ -305,7 +311,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 deck_name = deck[0]
                 if len(deck) > 5:
                     if "{AUTOMAIN}" in deck[2]:
-                        warlord = FindCard.find_card(deck[1], cards_array)
+                        warlord = FindCard.find_card(deck[1], cards_array, cards_dict)
                         deck[2] = deck[2].replace("{AUTOMAIN}", warlord.get_faction())
                         split_message[1] = split_message[1].replace("{AUTOMAIN}", warlord.get_faction())
                     message_to_send = second_part_deck_validation(deck)

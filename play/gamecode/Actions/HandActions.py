@@ -245,7 +245,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = []
                         self.choice_context = "Awake the Sleepers"
                         for i in range(len(primary_player.discard)):
-                            card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                            card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                             if card.get_faction() == "Necrons":
                                 self.choices_available.append(card.get_name())
                         self.resolving_search_box = True
@@ -274,7 +274,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.choices_available = []
                             self.choice_context = ability
                             for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.get_is_unit() and card.get_faction() != "Necrons" and card.get_cost() < 4:
                                     self.choices_available.append(card.get_name())
                             self.resolving_search_box = True
@@ -345,7 +345,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if any_infested:
                             choices = []
                             for i in range(len(primary_player.discard)):
-                                c = FindCard.find_card(primary_player.discard[i], primary_player.card_array)
+                                c = FindCard.find_card(primary_player.discard[i], primary_player.card_array,
+                                                       self.cards_dict)
                                 if c.get_cost() < 4 and c.get_card_type() == "Army":
                                     choices.append(c.get_name())
                             if choices:
@@ -576,7 +577,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             primary_player = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is None:
-            card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array)
+            card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array,
+                                      self.cards_dict)
             if card.get_card_type() == "Attachment" or card.get_ability() == "Gun Drones" or \
                     card.get_ability() == "Shadowsun's Stealth Cadre":
                 if not card.get_limited() or primary_player.can_play_limited:
@@ -591,7 +593,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True
     elif self.action_chosen == "Twisted Wracks":
-        card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array)
+        card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array, self.cards_dict)
         if card.check_for_a_trait("Torture"):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             planet_pos, unit_pos = self.position_of_actioned_card
@@ -662,7 +664,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             primary_player = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is None:
-            card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array)
+            card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array,
+                                      self.cards_dict)
             if card.get_is_unit():
                 if card.get_faction() == "Chaos":
                     if card.get_cost() <= 3:

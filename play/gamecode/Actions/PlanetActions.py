@@ -49,7 +49,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Decaying Warrior Squad":
         self.planet_pos_to_deploy = int(game_update_string[1])
-        card = FindCard.find_card("Decaying Warrior Squad", self.card_array)
+        card = FindCard.find_card("Decaying Warrior Squad", self.card_array, self.cards_dict)
         self.card_to_deploy = card
         self.traits_of_card_to_play = card.get_traits()
         self.faction_of_card_to_play = card.get_faction()
@@ -138,7 +138,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         else:
             pos_hand = primary_player.aiming_reticle_coords_hand_2
             pos_planet = int(game_update_string[1])
-            card = FindCard.find_card(primary_player.cards[pos_hand], self.card_array)
+            card = FindCard.find_card(primary_player.cards[pos_hand], self.card_array, self.cards_dict)
             unit_pos = primary_player.add_card_to_planet(card, pos_planet)
             if unit_pos != -1:
                 primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
@@ -280,7 +280,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.choice_context = "Archon's Palace"
         self.name_player_making_choices = primary_player.name_player
     elif self.action_chosen == "Drudgery":
-        card = FindCard.find_card(self.misc_target_choice, self.card_array)
+        card = FindCard.find_card(self.misc_target_choice, self.card_array, self.cards_dict)
         primary_player.add_card_to_planet(card, chosen_planet)
         primary_player.discard.remove(self.misc_target_choice)
         if not primary_player.harbinger_of_eternity_active:
@@ -371,9 +371,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_unit_position != -1:
             if self.anrakyr_deck_choice == primary_player.name_player:
-                card = FindCard.find_card(primary_player.discard[self.anrakyr_unit_position], self.card_array)
+                card = FindCard.find_card(primary_player.discard[self.anrakyr_unit_position], self.card_array,
+                                          self.cards_dict)
             else:
-                card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array)
+                card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
+                                          self.cards_dict)
             self.card_to_deploy = card
             await self.calculate_available_discounts_unit(
                 planet_chosen=chosen_planet, card=card, player=primary_player
@@ -412,7 +414,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Spore Burst":
         if self.infested_planets[chosen_planet]:
             primary_player.discard.remove(self.misc_target_choice)
-            card = FindCard.find_card(self.misc_target_choice, self.card_array)
+            card = FindCard.find_card(self.misc_target_choice, self.card_array, self.cards_dict)
             primary_player.add_card_to_planet(card, chosen_planet)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
@@ -436,7 +438,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                                     self.position_of_actioned_card[1])
     elif self.action_chosen == "Soul Seizure":
         if self.chosen_first_card:
-            card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array)
+            card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
+                                      self.cards_dict)
             primary_player.add_card_to_planet(card, chosen_planet)
             del secondary_player.discard[self.anrakyr_unit_position]
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
