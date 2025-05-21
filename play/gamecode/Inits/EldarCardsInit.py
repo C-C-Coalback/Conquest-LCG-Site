@@ -190,6 +190,94 @@ def eldar_cards_init():
                                    1, faction, "Signature", 3, True),
         CardClasses.EventCard("Cry of the Wind", "Reaction: After a unit moves from one planet to another,"
                                                  " move that unit to an adjacent planet.",
-                              "Tactic.", 0, faction, "Signature", 1, False)
+                              "Tactic.", 0, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Prophetic Farseer", "Reaction: After you deploy this unit, "
+                                                  "look at the top 3 cards of your opponent's deck. "
+                                                  "Discard any number of those cards with 1 or more shield icons"
+                                                  " and place the remaining cards on top of his deck in any order.",
+                             "Psyker. Saim-Hann.", 3, faction, "Common", 2, 4, 1, False),
+        CardClasses.ArmyCard("Wraithguard Revenant", "Interrupt: When you win a command struggle at a "
+                                                     "Stronghold planet (green), put this unit into play from your"
+                                                     " discard pile or hand at that planet instead of taking the "
+                                                     "planet's card and resource bonuses.", "Drone. Spirit.",
+                             2, faction, "Common", 3, 2, 0, False),
+        CardClasses.SupportCard("Deathly Web Shrine", "Combat Action: After you move a unit you control from one "
+                                                      "planet to another, exhaust this support to exhaust a non-Elite "
+                                                      "army unit at the same planet as the unit just moved.",
+                                "Location.", 2, faction, "Loyal", True),
+        CardClasses.ArmyCard("Dire Avenger Exarch", "A Warrior unit you control at this planet must be declared "
+                                                    "as a defender, if able.", "Warrior.",
+                             3, faction, "Loyal", 2, 4, 1, False),
+        CardClasses.EventCard("Mind War", "Action: Exhaust a target non-Elite army unit at"
+                                          " a planet with a Psyker army unit you control.", "Power.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Fire Prism", "No Wargear Attachments.\n"
+                                           "Ranged.\n"
+                                           "Reaction: After this unit damages an army unit by an attack, exhaust a "
+                                           "target enemy army unit at this planet.", "Vehicle. Tank. Elite.",
+                             6, faction, "Loyal", 3, 7, 3, False, wargear_attachments_permitted=False, ranged=True),
+        CardClasses.AttachmentCard("Saim-Hann Jetbike", "Attach to an army unit you control.\n"
+                                                        "Limit 1 per unit.\n"
+                                                        "Combat Action: Exhaust this attachment to move attached"
+                                                        " unit to a planet with a type shared with this planet. "
+                                                        "Then, deal 1 damage to an army unit at this planet.",
+                                   "Wargear. Vehicle. Saim-Hann.", 2, faction, "Loyal", 2, False,
+                                   must_be_own_unit=True, type_of_units_allowed_for_attachment="Army",
+                                   limit_one_per_unit=1, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Wildrider Vyper", "No Wargear Attachments.\n"
+                                                "Mobile.\n"
+                                                "Reaction: After another unit moves from this planet to "
+                                                "another planet, move this unit to that planet.",
+                             "Vehicle. Saim-Hann. Elite.", 5, faction, "Common", 5, 4, 2, False, mobile=True),
+        CardClasses.SupportCard("Bonesinger Choir", "Limited.\n"
+                                                    "Interrupt: When you deploy an Vehicle or Drone unit, "
+                                                    "exhaust this support to reduce"
+                                                    " its cost by 2 (to a minimum of 1).", "Upgrade.",
+                                2, faction, "Loyal", False, limited=True),
+        CardClasses.ArmyCard("Saim-Hann Kinsman", "While this unit is at a Stronghold planet (green) "
+                                                  "it gets +1 ATK and +1 HP.", "Scout. Saim-Hann. Ally.",
+                             1, faction, "Common", 1, 1, 1, False),
+        CardClasses.EventCard("Eldritch Storm", "Combat Action: Target up to 1 enemy unit at each Stronghold planet"
+                                                " (green). Deal 2 damage to each targeted unit.", "Power.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.AttachmentCard("Shuriken Catapult", "Ambush.\n"
+                                                        "Attach to a Warrior army unit.\n"
+                                                        "Attached unit gets +3 ATK.", "Wargear. Weapon.",
+                                   2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT",
+                                   ambush=True, extra_attack=3, type_of_units_allowed_for_attachment="Army",
+                                   required_traits="Warrior"),
+        CardClasses.WarlordCard("Talyesin Fharenal", "Each unit you control at this planet with the"
+                                                     " Psyker or Warrior trait gets +1 HP.\n"
+                                                     "While you control a Psyker unit and a Warrior unit at this "
+                                                     "planet, each unit you control at this planet with the"
+                                                     " Psyker or Warrior trait gets +1 ATK.\n", "Autarch. Saim-Hann.",
+                                faction, 2, 6, 2, 5, "Bloodied.", 7, 7,
+                                ["2x Talyesin's Spiders", "2x Talyesin's Warlocks", "1x Wisdom of the Serpent",
+                                 "2x Path of the Leader", "1x Autarch Powersword"]),
+        CardClasses.ArmyCard("Talyesin's Spiders", "Reaction: After a Psyker unit you control is declared as an "
+                                                   "attacker, move this unit to the same planet as that unit.",
+                             "Warrior. Saim-Hann.", 2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.ArmyCard("Talyesin's Warlocks", "Combat Action: Discard a Warrior card from your hand to ready "
+                                                    "this unit. (Limit once per combat round.)", "Psyker. Saim-Hann.",
+                             3, faction, "Signature", 3, 2, 1, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Wisdom of the Serpent", "HEADQUARTERS ACTION: Exhaust this support to choose"
+                                                         " Psyker or Warrior. Then, search the top 3 cards of your "
+                                                         "deck for a unit with the chosen Trait. Reveal it, add it "
+                                                         "to your hand, and place the remaining cards on the bottom"
+                                                         " of your deck in any order.", "Upgrade.",
+                                1, faction, "Signature", False,
+                                action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.EventCard("Path of the Leader", "Action: Either (choose one): gain 1 resource, have a Warrior unit"
+                                                    " you control get +1 ATK until the end of the phase, "
+                                                    "or exhaust a Psyker unit you control to move it "
+                                                    "from one planet to another.", "Tactic.",
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Autarch Powersword", "Attach to a unit you control.\n"
+                                                         "Attached unit gets +1 ATK and +1 HP.\n"
+                                                         "If attached unit is an army unit, "
+                                                         "it gains the Warrior and Psyker traits.", "Wargear. Weapon.",
+                                   1, faction, "Signature", 3, False, extra_attack=1, extra_health=1,
+                                   must_be_own_unit=True)
     ]
     return eldar_cards_array

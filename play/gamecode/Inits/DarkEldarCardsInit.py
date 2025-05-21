@@ -216,6 +216,78 @@ def dark_eldar_cards_init():
                                                      "Action: Exhaust this support to discard the top "
                                                      "card of each player's deck or have each player draw 1 card.",
                                 "Location.", 1, faction, "Signature", True, action_in_play=True,
-                                allowed_phases_in_play="ALL")
+                                allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Stalking Ur-Ghul", "No Attachments.\n"
+                                                 "This unit gets -5 ATK while attacking a warlord "
+                                                 "or undamaged army unit.", "Creature.",
+                             3, faction, "Common", 5, 3, 0, False, no_attachments=True),
+        CardClasses.SupportCard("Holding Cell", "Your opponent cannot deploy copies of the attached card.\n"
+                                                "Reaction: After an enemy army unit is destroyed by an attack,"
+                                                " if no card is attached to this support, "
+                                                "attach that unit to this support.", "Location.",
+                                1, faction, "Loyal", False),
+        CardClasses.WarlordCard("Archon Salaine Morn", "Reaction: After a Kabalite or Raider unit enters play under "
+                                                       "your control at a Material planet (red), "
+                                                       "gain 1 resource. (Limit once per phase.)", "Warrior. Archon.",
+                                faction, 2, 7, 2, 6, "Bloodied", 7, 7,
+                                ["4x Shadowed Thorns Pillagers", "1x The Nexus of Shadows",
+                                 "2x Inevitable Betrayal", "1x Last Breath"]),
+        CardClasses.ArmyCard("Shadowed Thorns Pillagers", "Ambush.", "Warrior. Raider. Kabalite.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("The Nexus of Shadows", "Action: Pay 2 resources to draw 1 card. "
+                                                        "(Limit once per phase.)", "Location.",
+                                1, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Inevitable Betrayal", "Action: Choose any number of undamaged enemy army units at a "
+                                                     "target planet. Until the end of the phase, treat each of "
+                                                     "those units as if its printed text box were blank.", "Tactic.",
+                              2, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Last Breath", "Attach to a unique unit.\n"
+                                                  "Reaction: After attached unit damages an army unit by attack, "
+                                                  "the attacked unit gets -3 ATK until the end of the phase.",
+                                   "Relic. Wargear. Weapon.", 1, faction, "Signature", 3, True,
+                                   unit_must_be_unique=True),
+        CardClasses.ArmyCard("Mandrake Fearmonger", "Reaction: After this unit damages an army unit by an attack, "
+                                                    "discard 1 card at random from your opponent's hand.", "Warrior.",
+                             3, faction, "Loyal", 1, 3, 1, False),
+        CardClasses.AttachmentCard("Shadowed Thorns Bodysuit", "Attach to a Kabalite army unit.\n"
+                                                               "Reaction: After attached unit is declared as a"
+                                                               " defender, exhaust this attachment to cancel the"
+                                                               " remainder of the attack.", "Wargear. Armor.",
+                                   0, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Kabalite"),
+        CardClasses.ArmyCard("Dying Sun Marauder", "Reaction: After you gain 1 or more resources, ready this unit.",
+                             "Warrior. Raider. Kabalite.", 2, faction, "Loyal", 2, 3, 0, False),
+        CardClasses.ArmyCard("Kabalite Harriers", "Reaction: After a Kabalite unit enters play at this planet,"
+                                                  " deal 1 damage to a target undamaged unit at this planet.",
+                             "Warrior. Kabalite.", 2, faction, "Common", 1, 2, 1, False),
+        CardClasses.EventCard("Gut and Pillage", "Reaction: After you win a battle at a Material planet (red), "
+                                                 "gain 3 resources. (Max 1 per round.)", "Tactic.",
+                              0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Shadowed Thorns Venom", "No Wargear Attachments.\n"
+                                                      "Reaction: After you deploy this unit, you may move each "
+                                                      "Kabalite army unit you control to a Material planet (red)."
+                                                      " (Each unit can move to a different planet).",
+                             "Vehicle. Raider. Elite.", 5, faction, "Common", 4, 4, 2, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.EventCard("Rapid Assault", "Combat Action: Target a planet. Put a Kabalite unit with a printed"
+                                               " cost 3 or lower into play from your hand exhausted at the "
+                                               "targeted planet. Then, if the targeted planet is a Material planet"
+                                               " (red), ready up to 2 Kabalite units at that planet.", "Tactic.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Flayed Skull Slaver", "While this unit is at a Material planet (red), it gains: "
+                                                    "+2 resources when command struggle won at this planet.",
+                             "Warrior. Kabalite. Ally.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.SupportCard("Raiding Portal", "Reaction: After you win a command struggle, exhaust this "
+                                                  "support to move a target Kabalite army unit you control at"
+                                                  " that planet to a Material planet (red). That unit gains 1"
+                                                  " command icon until the end of the phase.", "Upgrade.",
+                                1, faction, "Common", False),
+        CardClasses.AttachmentCard("Hallucinogen Grenade", "Attach to a Kabalite army unit you control.\n"
+                                                           "Combat Action: Sacrifice this attachment to exhaust a"
+                                                           " target enemy non-Elite army unit at this planet. Then, "
+                                                           "deal damage to that unit equal to its printed ATK value.",
+                                   "Wargear.", 2, faction, "Loyal", 2, False, must_be_own_unit=True,
+                                   required_traits="Kabalite", type_of_units_allowed_for_attachment="Army",
+                                   action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return dark_eldar_cards_array

@@ -182,6 +182,79 @@ def tau_cards_init():
                              4, faction, "Common", 4, 3, 1, False),
         CardClasses.EventCard("For the Tau'va", "Action: Exhaust your warlord to ready each unit "
                                                 "you control with 1 or more attachments.", "Tactic. Maneuver.",
-                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.WarlordCard("Commander Starblaze", "You may include common Astra Militarum cards in your deck, "
+                                                       "but cannot include other cards from a non-Tau faction.\n"
+                                                       "Reaction: After this warlord commits to a planet, move 1 "
+                                                       "Astra Militarum unit you control from an "
+                                                       "adjacent planet to this planet.", "Shas'o. Soldier.",
+                                faction, 2, 6, 2, 5, "Bloodied.", 7, 7,
+                                ["4x Ardent Auxiliaries", "1x Starblaze's Outpost",
+                                 "2x Bond of Brotherhood", "1x Searing Burst Cannon"]),
+        CardClasses.ArmyCard("Ardent Auxiliaries", "Reaction: After this unit commits to a planet, if you control an "
+                                                   "Astra Militarum unit at this planet, ready this unit.", "Soldier.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("Starblaze's Outpost", "Action: Exhaust this support and return an Astra Militarum "
+                                                       "army unit at a planet to your hand to put a Tau unit "
+                                                       "with equal or lower printed cost into play from your "
+                                                       "hand at the same planet.", "Location.",
+                                2, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Bond of Brotherhood", "Action: Until the end of the phase, each Tau unit you control"
+                                                     " at a target planet gets +2 HP and each Astra Militarum"
+                                                     " unit you control at the targeted planet gets +2 ATK.", "Tactic.",
+                              2, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Searing Burst Cannon", "Attach to a unit.\n"
+                                                           "Interrupt: When attached unit damages an enemy unit by an"
+                                                           " attack, if no shield card was used during this"
+                                                           " attack, double the damage taken.", "Wargear. Weapon.",
+                                   1, faction, "Signature", 3, False),
+        CardClasses.ArmyCard("Prudent Fire Warriors", "Interrupt: When this unit leaves play, attach each attachment "
+                                                      "on it to a target eligible unit at this planet.", "Soldier.",
+                             2, faction, "Common", 2, 3, 0, False),
+        CardClasses.ArmyCard("Exploratory Drone", "Reaction: After a non-Tau unit is deployed at this planet,"
+                                                  " move this unit to an adjacent planet.", "Drone.",
+                             1, faction, "Loyal", 0, 2, 1, False),
+        CardClasses.AttachmentCard("Auxiliary Armor", "Attach to an army unit.\n"
+                                                      "Attached unit gets +2 ATK and +1 HP.\n"
+                                                      "If attached unit is a non-Tau unit, it gains 1 command icon.",
+                                   "Wargear. Armor.", 2, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army", extra_attack=2, extra_health=1),
+        CardClasses.ArmyCard("Prototype Crisis Suit", "Reaction: After you deploy this unit, search the top 9 cards "
+                                                      "of your deck for up to 2 Tau attachments, each with printed "
+                                                      "cost 2 or lower. Put each eligible attachment into play "
+                                                      "attached to this unit. Then, shuffle the remaining cards "
+                                                      "into your deck.", "Pilot. Elite.",
+                             5, faction, "Common", 4, 4, 2, False),
+        CardClasses.EventCard("Mont'ka Strike", "Combat Action: Exhaust each ready Soldier unit you control at a "
+                                                "target planet to deal damage equal to their combined printed"
+                                                " ATK value to an enemy army unit at the targeted planet.", "Tactic.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.SupportCard("Sae'lum Enclave", "Limited.\n"
+                                                   "Interrupt: When you deploy a non-Tau unit, exhaust this support "
+                                                   "to reduce that unit's cost by 2.", "Location.",
+                                1, faction, "Loyal", True, limited=True),
+        CardClasses.ArmyCard("Auxiliary Overseer", "For each non-Tau unit you conrol at this planet,"
+                                                   " this unit gets +1 ATK.", "Soldier.",
+                             2, faction, "Loyal", 1, 3, 1, False),
+        CardClasses.AttachmentCard("Drone Defense System", "Attach to a Pilot or Vehicle unit.\n"
+                                                           "Combat Action: Exhaust attached unit to deal 2 damage to"
+                                                           " each exhausted enemy unit at this planet.", "Hardpoint.",
+                                   1, faction, "Common", 1, False, required_traits="Vehicle",
+                                   type_of_units_allowed_for_attachment="Army", action_in_play=True,
+                                   allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Sae'lum Pioneer", "While this unit is at a Material planet (red), it gains: "
+                                                "+2 resources when command struggle won at this planet.",
+                             "Scout. Ally.", 3, faction, "Common", 2, 2, 1, False),
+        CardClasses.SupportCard("Colony Shield Generator", "Interrupt: When a support card you control would be "
+                                                           "targeted, exhaust this support to have this card "
+                                                           "be targeted instead (ignoring targeting restrictions).",
+                                "Upgrade.", 0, faction, "Common", False),
+        CardClasses.ArmyCard("Kroot Hunter", "Reaction: After you deploy this unit at a "
+                                             "Material planet (red), gain 1 resource.", "Scout. Ally. Kroot.",
+                             1, faction, "Common", 2, 2, 0, False),
+        CardClasses.EventCard("War of Ideas", "Interrupt: When a command struggle resolves at a planet, "
+                                              "exhausted army units you control count their command "
+                                              "icons during that command struggle.", "Tactic.",
+                              0, faction, "Common", 1, False)
     ]
     return tau_cards_array

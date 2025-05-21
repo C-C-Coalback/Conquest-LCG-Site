@@ -214,6 +214,86 @@ def space_marines_cards_init():
         CardClasses.SupportCard("Hallow Librarium", "Action: Exhaust this support to have a target unit at a "
                                                     "planet without an enemy warlord get -2 ATK until"
                                                     " the end of the phase.", "Location.",
-                                2, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL")
+                                2, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Lone Wolf", "Action: Exhaust this unit to move it to a target planet with an enemy "
+                                          "warlord and without any unit you control.", "Soldier. Space Wolves.",
+                             3, faction, "Loyal", 3, 3, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Righteous Initiate", "UNSTOPPABLE - The first time this unit is assigned damage this"
+                                                   " round, prevent 1 of that damage and this unit gets "
+                                                   "+2 ATK until the end of the phase.", "Soldier. Black Templars.",
+                             2, faction, "Common", 1, 2, 1, False, unstoppable=True),
+        CardClasses.EventCard("Accept Any Challenge", "Reaction: After you win a battle at a Tech planet (blue), "
+                                                      "draw 1 card for each Black Templars unit you"
+                                                      " control at that planet. (Max 1 per round.)", "Tactic. Vow.",
+                              1, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Neophyte Apprentice", "FORCED REACTION: After this unit damages an enemy unit by an "
+                                                    "attack, sacrifice it to search the top 6 cards of your"
+                                                    " deck for a Black Templars unit with cost 4 or lower. "
+                                                    "Put that unit into play at this planet, and shuffle the"
+                                                    " remaining cards into your deck.",
+                             "Ally. Black Templars. Soldier.", 1, faction, "Common", 1, 1, 1, False),
+        CardClasses.AttachmentCard("The Black Sword", "Attach to a Black Templars army unit.\n"
+                                                      "Reaction: After attached unit is declared as a defender,"
+                                                      " deal 2 damage to the attacker.", "Relic. Weapon.",
+                                   2, faction, "Loyal", 2, True, required_traits="Black Templars",
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Imperial Fists Devastators", "Reaction: After you deploy this unit to a tech planet "
+                                                           "(blue), destroy a target Location support card.",
+                             "Soldier. Imperial Fists.", 4, faction, "Common", 4, 3, 2, False),
+        CardClasses.SupportCard("Teleportarium", "Action: Exhaust this support to move a Space Marines army unit you "
+                                                 "control with printed cost 3 or lower from a Tech planet "
+                                                 "(blue) to an adjacent planet.", "Location.",
+                                2, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Sword Brethren Dreadnought", "No Wargear Attachments.\n"
+                                                           "UNSTOPPABLE - The first time this unit is assigned damage "
+                                                           "this round, prevent 1 of that damage and you may trigger"
+                                                           " the Battle ability of this planet.",
+                             "Vehicle. Black Templars. Elite.", 7, faction, "Loyal", 5, 6, 3, False,
+                             unstoppable=True, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Declare the Crusade", "Reaction: After you win a battle at a tech planet (blue), "
+                                                     "choose another planet in play and a planet that has been"
+                                                     " removed from the game. Switch the chosen planets.", "Tactic.",
+                              2, faction, "Common", 1, False),
+        CardClasses.AttachmentCard("Cenobyte Servitor", "Attach to a Black Templars unit.\n"
+                                                        "Attached unit gets +1 HP.\n"
+                                                        "Action: Sacrifice this attachment to put a Relic attachment "
+                                                        "into play from your hand attached to an eligible unit.",
+                                   "Drone.", 1, faction, "Common", 1, False,
+                                   extra_health=1, required_traits="Black Templars"),
+        CardClasses.WarlordCard("Chaplain Mavros", "Action: Deal 1 damage to a target Space Marines unit you "
+                                                   "control at a tech planet (blue). The targeted unit gets +1 "
+                                                   "ATK until the end of the phase. (Limit twice per phase.)",
+                                "Soldier. Black Templars.", faction, 2, 7, 1, 6, "Bloodied.", 7, 7,
+                                ["3x Reclusiam Templars", "1x The Emperor's Champion", "1x Faith and Hatred",
+                                 "2x Vow of Honor", "1x Ancient Crozius Arcanum"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Reclusiam Templars", "UNSTOPPABLE - The first time this unit is assigned damage this"
+                                                   " round, prevent 1 of that damage and ready this unit.",
+                             "Soldier. Black Templars.", 3, faction, "Signature", 2, 3, 1, False, unstoppable=True),
+        CardClasses.ArmyCard("The Emperor's Champion", "Combat Action: A target ready enemy army unit at this planet "
+                                                       "must be declared as an attacker and this unit declared as a "
+                                                       "defender during your opponent's next combat turn, if able. "
+                                                       "(Limit once per combat phase.)",
+                             "Soldier. Black Templars. Elite.", 5, faction, "Signature",
+                             3, 6, 2, True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Faith and Hatred", "Reaction: After a unit you control is assigned damage "
+                                                    "by an attack, exhaust this support to prevent 1 of that damage.",
+                                "Creed.", 0, faction, "Signature", False),
+        CardClasses.EventCard("Vow of Honor", "Reaction: After a Space Marines unit you control takes damage, that "
+                                              "unit gets +3 ATK for its next attack this phase.", "Power. Vow.",
+                              1, faction, "Signature", 1, False),
+        CardClasses.AttachmentCard("Ancient Crozius Arcanum", "Attach to a unit you control.\n"
+                                                              "Attached unit gains, “Unstoppable - The first time this"
+                                                              " unit is assigned damage this round, prevent 1 of that"
+                                                              " damage and remove 1 damage from this unit.”",
+                                   "Wargear. Weapon.", 1, faction, "Signature", 3, False, must_be_own_unit=True),
+        CardClasses.ArmyCard("Reliquary Techmarine", "While this unit is at a tech planet (blue), "
+                                                     "it gains: +1 card when command struggle won at this planet.",
+                             "Soldier. Black Templars. Ally.", 3, faction, "Common", 2, 4, 1, False),
+        CardClasses.SupportCard("Crypt of Saint Camila", "Deploy Action: Exhaust this support to put a non-Elite "
+                                                         "Space Marines unit into play from your hand at a "
+                                                         "tech planet (blue). (Limit once per phase.)",
+                                "Location. Ecclesiarchy.", 4, faction, "Loyal", True,
+                                action_in_play=True, allowed_phases_in_play="DEPLOY")
     ]
     return space_marines_card_array

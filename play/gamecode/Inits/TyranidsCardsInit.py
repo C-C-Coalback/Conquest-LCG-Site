@@ -200,6 +200,74 @@ def tyranids_cards_init():
         CardClasses.ArmyCard("Swarmling Termagants", "Interrupt: When this unit is destroyed, put X Termagant tokens "
                                                      "into play at this planet. X is the number of factions among "
                                                      "enemy units at this planet.", "Creature. Leviathan. Termagant.",
-                             2, faction, "Common", 1, 1, 1, False)
+                             2, faction, "Common", 1, 1, 1, False),
+        CardClasses.ArmyCard("Striking Ravener", "Reaction: After this unit destroys an "
+                                                 "army unit by an attack, ready this unit.", "Creature. Kraken. Elite.",
+                             5, faction, "Common", 3, 5, 2, False),
+        CardClasses.AttachmentCard("Acid Maw", "Attach to an army unit you control.\n"
+                                               "Damage dealt by attached unit cannot be prevented.",
+                                   "Wargear. Biomorph.", 2, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Soaring Gargoyles", "Flying. HIVE MIND - Each Termagant token you control at"
+                                                  " this planet gains Flying.", "Creature. Leviathan.",
+                             2, faction, "Common", 2, 3, 0, False, flying=True, hive_mind=True),
+        CardClasses.SupportCard("Sacaellum Infestors", "Reaction: After a planet is infested, exhaust this support to "
+                                                       "take either the card bonus or the resource "
+                                                       "bonus of that planet.", "Upgrade.",
+                                2, faction, "Common", True),
+        CardClasses.ArmyCard("Genestealer Prowler", "", "Creature. Genestealer.",
+                             1, faction, "Common", 2, 2, 0, False),
+        CardClasses.EventCard("Biomass Sacrifice", "Action: Discard 1 or more unit cards from your hand to gain "
+                                                   "resources equal to the number of cards discarded by this effect.",
+                              "Tactic.", 0, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.WarlordCard("Subject: Omega-X62113", "Each Genestealer card in your hand may be deployed to "
+                                                         "infested planets as if it had ambush.",
+                                "Creature. Genestealer.", faction, 2, 6, 2, 5, "Bloodied.", 6, 6,
+                                ["4x Invasive Genestealers", "1x Ruined Passages",
+                                 "2x Gene Implantation", "1x Lethal Toxin Sacs"]),
+        CardClasses.ArmyCard("Invasive Genestealers", "Reaction: After you deploy this unit, target an enemy army "
+                                                      "unit at this planet. Until the end of the phase, the"
+                                                      " targeted unit gets -1 HP and this unit gets +1 HP.",
+                             "Creature. Genestealer.", 3, faction, "Signature", 2, 3, 1, False),
+        CardClasses.SupportCard("Ruined Passages", "Combat Action: Exhaust and sacrifice this support to ready each "
+                                                   "Genestealer unit you control at a target planet.", "Location.",
+                                3, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Gene Implantation", "Reaction: After a Genestealer unit you control destroys an "
+                                                   "enemy unit with printed cost 3 or lower by an attack,"
+                                                   " put that unit into play from your opponent's discard pile "
+                                                   "under your control at the same planet.", "Power.",
+                              1, faction, "Signature", 1, False),
+        CardClasses.AttachmentCard("Lethal Toxin Sacs", "You may deploy this attachment from your discard pile.\n"
+                                                        "Attach to an army unit you control.\n"
+                                                        "Attached unit gets +3 ATK and -1 HP.", "Genestealer. Wargear.",
+                                   2, faction, "Signature", 3, False, extra_attack=3, extra_health=-1,
+                                   must_be_own_unit=True, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Devourer Venomthrope", "Reaction: After you win a command struggle at an "
+                                                     "infested planet, exhaust a target non-Elite army"
+                                                     " unit at this planet.", "Creature. Psyker. Kraken.",
+                             4, faction, "Common", 4, 2, 2, False),
+        CardClasses.ArmyCard("Genestealer Brood", "Reaction: After you deploy this unit, search the top 6 cards of"
+                                                  " your deck for a Genestealer card. Reveal it, add it to your "
+                                                  "hand, and place the remaining cards on the bottom of your deck "
+                                                  "in any order.", "Creature. Genestealer.",
+                             3, faction, "Common", 3, 2, 1, False),
+        CardClasses.EventCard("Sudden Adaptation", "Action: Return a Tyranids army unit at a planet to your hand to "
+                                                   "put a Tyranids army unit with equal or lower printed cost and a "
+                                                   "different name into play from your hand at the same planet.",
+                              "Power.", 2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Genestealer Harvesters", "Reaction: While this unit is at an infested planet, it gains:"
+                                                       " +1 card and +1 resource when command struggle"
+                                                       " won at this planet.", "Creature. Genestealer.",
+                             2, faction, "Common", 2, 2, 1, False),
+        CardClasses.SupportCard("Nesting Chamber", "Action: Exhaust this support to infest a planet with 2 or "
+                                                   "more Genestealer units at it.", "Upgrade.",
+                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Ymgarl Factor", "Attach to an army unit you control.\n"
+                                                    "Action: Pay 1 resource to have attached unit get, until the end "
+                                                    "of the phase, either: +2 ATK or +2 HP.", "Skill. Genestealer.",
+                                   1, faction, "Common", 2, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return tyranids_card_array

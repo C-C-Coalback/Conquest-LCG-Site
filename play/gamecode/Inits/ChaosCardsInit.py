@@ -209,6 +209,76 @@ def chaos_cards_init():
                                                  "deal damage equal to its Area Effect value to each enemy unit "
                                                  "at each adjacent planet. Then, sacrifice the attached unit.",
                                    "Wargear. Slaanesh.", 2, faction, "Loyal", 2, False,
-                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Ravening Psychopath", "Reaction: After this unit resolves an attack, deal 1 damage to "
+                                                    "this unit to deal 1 damage to an enemy army unit at the "
+                                                    "same planet.", "Ally. Cultist. Khorne.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.EventCard("Sowing Chaos", "Deploy Action: Destroy each army unit with printed cost 2"
+                                              " or lower at each tech planet (blue).", "Tactic.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.WarlordCard("Ba'ar Zul the Hate-Bound", "Reaction: After a unit you control at this planet "
+                                                            "takes damage, move all of that damage to this warlord.",
+                                "Khorne. Warrior.", faction, 0, 5, 3, 11, "Bloodied.", 7, 7,
+                                ["4x Ba'ar Zul's Cleavers", "1x Kaerux Erameas",
+                                 "2x Blood For The Blood God!", "1x The Butcher's Nails"]),
+        CardClasses.ArmyCard("Ba'ar Zul's Cleavers", "Action: Deal 2 damage to this unit to have it get +2 "
+                                                     "ATK for its next attack this phase. (Limit once per phase)",
+                             "Warrior. Khorne. World Eaters.", 3, faction, "Signature",
+                             2, 5, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Kaerux Erameas", "Combat Action: Exhaust this support to resolve a battle at a "
+                                                  "non-first planet without a warlord. Use this ability only if no "
+                                                  "battle has been initiated this phase.", "Location. Space Hulk.",
+                                2, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.AttachmentCard("The Butcher's Nails", "Attach to your warlord.\n"
+                                                          "Attached unit gains Brutal while it is hale.\n"
+                                                          "Attached unit gains Armorbane while it is bloodied.",
+                                   "Wargear. World Eaters.", 1, faction, "Signature", 3, False,
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
+        CardClasses.ArmyCard("Prodigal Sons Disciple", "Reaction: After this unit resolves an attack against an "
+                                                       "enemy army unit, deal X unpreventable damage to a target "
+                                                       "enemy unit at this planet. X is the number of command icons"
+                                                       " the targeted unit has.", "Psyker. Tzeentch. Elite.",
+                             5, faction, "Loyal", 3, 6, 3, False),
+        CardClasses.ArmyCard("Seer of Deceit", "While this unit is at a tech planet (blue), it gains: +1 card"
+                                               " when command struggle won at this planet.", "Scholar. Ally.",
+                             3, faction, "Common", 3, 3, 1, False),
+        CardClasses.AttachmentCard("Khornate Chain Axe", "Attach to an army unit.\n"
+                                                         "Attached unit gets +2 ATK.\n"
+                                                         "BLOODTHIRST - During a round in which 1 or more units "
+                                                         "have been destroyed at this planet, attached unit "
+                                                         "gains Brutal.", "Wargear. Weapon. Khorne.",
+                                   1, faction, "Common", 1, False, extra_attack=2,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Master Warpsmith", "Reaction: After you sacrifice a Cultist token, reduce the "
+                                                 "cost of the next Elite unit you deploy this phase by 1.", "Scholar.",
+                             4, faction, "Common", 2, 4, 2, False),
+        CardClasses.SupportCard("Corrupted Teleportarium", "Action: Exhaust this support to move an Elite unit you"
+                                                           " control from a tech planet (blue) to another planet.",
+                                "Location.", 1, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Berzerker Warriors", "Interrupt: When an enemy unit is destroyed, "
+                                                   "deploy this unit from your hand at the same "
+                                                   "planet as the destroyed unit.", "Warrior. Khorne. World Eaters.",
+                             2, faction, "Loyal", 3, 2, 0, False),
+        CardClasses.SupportCard("Killing Field", "Action: Exhaust this support to have each unit at a target planet"
+                                                 " lose Ranged until the end of the phase.", "Location.",
+                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Staff of Change", "Attach to an army unit.\n"
+                                                      "Limit 1 per unit.\n"
+                                                      "Reaction: After you win a command struggle at this planet,"
+                                                      " deal 2 damage to a target unit at this planet.",
+                                   "Wargear. Weapon. Tzeentch.", 1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", limit_one_per_unit=True),
+        CardClasses.ArmyCard("Frenzied Bloodthirster", "No Wargear Attachments.\n"
+                                                       "Immune to Power events.\n"
+                                                       "BLOODTHIRST - During a combat round in which 1 or more units "
+                                                       "have been destroyed at this planet, this unit gains "
+                                                       "Armorbane, Brutal, and Flying.", "Daemon. Khorne. Elite.",
+                             10, faction, "Loyal", 8, 8, 2, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Warp Rift", "HEADQUARTERS ACTION: Switch a target planet with an adjacent planet. "
+                                           "(Units that were at a switched-out planet are now at "
+                                           "the switched-in planet.)", "Power. Tzeentch.", 1, faction, "Loyal",
+                              2, False, action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS")
     ]
     return chaos_card_array

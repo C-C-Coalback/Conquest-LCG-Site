@@ -5,7 +5,7 @@ class Card:
     def __init__(self, name, text, traits, cost, faction, loyalty, shields, card_type, unique, image_name="",
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
-                 limited=False):
+                 limited=False, ambush=False):
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name_owner = ""
@@ -52,6 +52,7 @@ class Card:
         self.valid_kugath_nurgling_target = False
         self.damage_from_kugath_nurgling = 0
         self.extra_traits_eop = ""
+        self.ambush = ambush
 
     def reset_own_eocr_values(self):
         pass
@@ -63,7 +64,7 @@ class Card:
         self.once_per_round_used = new_val
 
     def get_ambush(self):
-        return False
+        return self.ambush
 
     def set_sacrifice_end_of_phase(self, new_val):
         self.sacrifice_end_of_phase = new_val
@@ -198,7 +199,7 @@ class UnitCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
-                 mobile=False, ambush=False, hive_mind=False):
+                 mobile=False, ambush=False, hive_mind=False, unstoppable=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited)
@@ -250,6 +251,7 @@ class UnitCard(Card):
         self.need_to_resolve_nurgling_bomb = False
         self.valid_target_ashen_banner = False
         self.attack_set_eop = -1
+        self.unstoppable = unstoppable
 
     def exhaust_first_attachment_name(self, card_name):
         for i in range(len(self.attachments)):
@@ -261,6 +263,9 @@ class UnitCard(Card):
 
     def get_indirect_and_direct_damage(self):
         return self.damage + self.not_yet_assigned_damage
+
+    def get_unstoppable(self):
+        return self.unstoppable
 
     def get_has_hive_mind(self):
         return self.hive_mind
@@ -618,7 +623,7 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False, hive_mind=False):
+                 ambush=False, hive_mind=False, unstoppable=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -626,7 +631,7 @@ class ArmyCard(UnitCard):
                          wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
-                         ambush=ambush, hive_mind=hive_mind)
+                         ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable)
 
     def print_info(self):
         if self.unique:
@@ -673,12 +678,12 @@ class AttachmentCard(Card):
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
                  extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS",
-                 planet_attachment=False):
+                 planet_attachment=False, ambush=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
                          action_in_play=action_in_play, allowed_phases_in_play=allowed_phases_in_play,
-                         limited=limited)
+                         limited=limited, ambush=ambush)
         self.type_of_units_allowed_for_attachment = type_of_units_allowed_for_attachment
         self.unit_must_be_unique = unit_must_be_unique
         self.unit_must_match_faction = unit_must_match_faction
