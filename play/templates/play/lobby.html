@@ -119,6 +119,12 @@
             }));
         }
 
+        function leaveLobby(clicked_id) {
+            lobbySocket.send(JSON.stringify({
+                'message': "Leave lobby/" + clicked_id
+            }));
+        }
+
         function startGame(clicked_id) {
             const checked = document.getElementById("cb").checked
             lobbySocket.send(JSON.stringify({
@@ -153,6 +159,11 @@
                     </button>`;
         }
 
+        function playSound(url) {
+            const audio = new Audio(url);
+            audio.play();
+        }
+
         function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
             document.getElementById("add_to_me").innerHTML +=
                 `<div class="box">` + nameOfPlayerOne + ` VS `+ nameOfPlayerTwo + `
@@ -161,6 +172,13 @@
                 document.getElementById("add_to_me").innerHTML +=
                     `<button id=` + nameOfPlayerOne + ` onclick="joinLobby(this.id)">
                     Join Lobby
+                    </button>`;
+            } else if (nameOfPlayerTwo !== "" && nameOfPlayerOne === "{{ user.username }}") {
+                // playSound("");
+            } else if (nameOfPlayerTwo === "{{ user.username }}") {
+                document.getElementById("add_to_me").innerHTML +=
+                    `<button id=` + nameOfPlayerOne + ` onclick="leaveLobby(this.id)">
+                    Leave Lobby
                     </button>`;
             }
             if (nameOfPlayerOne === "{{ user.username }}") {
