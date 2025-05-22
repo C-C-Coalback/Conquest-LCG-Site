@@ -588,6 +588,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use Shrine of Warpflame?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Syren Zythlex":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Canoptek Scarab Swarm":
             seen_a_canoptek = False
             allowed_cards = []

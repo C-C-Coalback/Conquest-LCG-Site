@@ -1103,6 +1103,15 @@ class Player:
                                         if self.headquarters[i].get_ability() == "Sautekh Complex":
                                             self.game.create_reaction("Sautekh Complex", self.name_player,
                                                                       (int(self.number), -2, i))
+                            if self.game.request_search_for_enemy_card_at_planet(self.number, position,
+                                                                                 "Syren Zythlex"):
+                                name = self.name_player
+                                if name == self.game.name_1:
+                                    name = self.game.name_2
+                                else:
+                                    name = self.game.name_1
+                                self.game.create_reaction("Syren Zythlex", name,
+                                                          (int(self.number), position, location_of_unit))
                             return "SUCCESS", location_of_unit
                         self.add_resources(cost)
                         return "FAIL/Unique already in play", -1
