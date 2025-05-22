@@ -50,7 +50,7 @@ def second_part_deck_validation(deck):
         return "Warlord does not match main faction"
     if len(factions) == 1 and warlord_matches:
         factions.append("None")
-        return deck_validation(deck, remaining_signature_squad, factions)
+        return deck_validation(deck, remaining_signature_squad, factions, warlord_card.get_name())
     if len(factions) == 2 and warlord_matches:
         if factions[0] == factions[1]:
             print("Main faction and ally faction can not be the same")
@@ -67,11 +67,13 @@ def second_part_deck_validation(deck):
             if factions[1] == alignment_wheel[ally_pos_1] \
                     or factions[1] == alignment_wheel[ally_pos_2]:
                 return deck_validation(deck, remaining_signature_squad, factions)
+            elif factions[1] == "Astra Militarum" and warlord_card.get_name() == "Commander Starblaze":
+                return deck_validation(deck, remaining_signature_squad, factions, "Commander Starblaze")
         return "Issue with faction matching."
     return "Unknown issue"
 
 
-def deck_validation(deck, remaining_signature_squad, factions):
+def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
     global cards_array
     global cards_dict
     print("Can continue")
@@ -137,6 +139,11 @@ def deck_validation(deck, remaining_signature_squad, factions):
                 if factions[0] == "Tyranids" and card_result.get_card_type() == "Army":
                     return "Tyranids may not have Neutral Army Units in their deck"
                 faction_check_passed = True
+            elif warlord == "Gorzod":
+                if card_result.get_faction() == "Astra Militarum" or card_result.get_faction() == "Space Marines":
+                    if card_result.get_card_type() == "Army" and card_result.get_loyalty() == "Common":
+                        if card_result.check_for_a_trait("Vehicle"):
+                            faction_check_passed = True
             if not faction_check_passed:
                 print("Faction check not passed", factions[0], factions[1], card_result.get_faction())
                 return "Faction check not passed (Main, Ally, Card): "\
