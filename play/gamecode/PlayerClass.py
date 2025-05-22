@@ -1169,11 +1169,23 @@ class Player:
 
     def return_card_to_hand(self, planet_pos, unit_pos):
         if planet_pos == -2:
-            self.cards.append(self.headquarters[unit_pos].get_name())
+            if self.headquarters[unit_pos].name_owner == self.name_player:
+                self.cards.append(self.headquarters[unit_pos].get_name())
+            else:
+                ret_player = self.game.p1
+                if self.game.name_1 == self.name_player:
+                    ret_player = self.game.p2
+                ret_player.cards.append(self.headquarters[unit_pos].get_name())
             self.discard_attachments_from_card(planet_pos, unit_pos)
             self.remove_card_from_hq(unit_pos)
             return None
-        self.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
+        if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == self.name_player:
+            self.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
+        else:
+            ret_player = self.game.p1
+            if self.game.name_1 == self.name_player:
+                ret_player = self.game.p2
+            ret_player.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
         self.discard_attachments_from_card(planet_pos, unit_pos)
         self.remove_card_from_play(planet_pos, unit_pos)
         return None
