@@ -272,6 +272,7 @@ class Game:
         self.tense_negotiations_active = False
         self.shining_blade_active = False
         self.value_doom_siren = 0
+        self.before_first_combat = False
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -3798,12 +3799,8 @@ class Game:
                                                                         self.unit_to_move_position[1], "blue")
         if primary_player.mobile_resolved and secondary_player.mobile_resolved:
             await self.send_update_message("mobile complete")
-            self.check_battle(self.round_number)
-            self.last_planet_checked_for_battle = self.round_number
-            self.begin_combat_round()
-            self.set_battle_initiative()
-            self.planet_aiming_reticle_active = True
-            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            await self.send_update_message("Window granted for players to use "
+                                           "reactions/actions before the battle begins.")
             self.p1.has_passed = False
             self.p2.has_passed = False
 
@@ -3831,20 +3828,20 @@ class Game:
                                             self.faction_of_cards_for_indirect or not \
                                             self.faction_of_cards_for_indirect:
                                         player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
-                if (self.location_of_indirect == "PLANET" and self.planet_of_indirect == int(game_update_string[2])) \
-                        or self.location_of_indirect == "ALL":
+                if self.location_of_indirect == "PLANET" or self.location_of_indirect == "ALL":
                     if len(game_update_string) == 4:
-                        if game_update_string[0] == "IN_PLAY":
-                            if game_update_string[1] == player.get_number():
-                                if player.get_card_type_given_pos(
-                                        int(game_update_string[2]), int(game_update_string[3])) \
-                                        in self.valid_targets_for_indirect:
-                                    if player.get_faction_given_pos(
-                                            int(game_update_string[2]), int(game_update_string[3])) == \
-                                            self.faction_of_cards_for_indirect or not \
-                                            self.faction_of_cards_for_indirect:
-                                        player.increase_indirect_damage_at_pos(int(game_update_string[2]),
-                                                                               int(game_update_string[3]), 1)
+                        if self.planet_of_indirect == int(game_update_string[2]):
+                            if game_update_string[0] == "IN_PLAY":
+                                if game_update_string[1] == player.get_number():
+                                    if player.get_card_type_given_pos(
+                                            int(game_update_string[2]), int(game_update_string[3])) \
+                                            in self.valid_targets_for_indirect:
+                                        if player.get_faction_given_pos(
+                                                int(game_update_string[2]), int(game_update_string[3])) == \
+                                                self.faction_of_cards_for_indirect or not \
+                                                self.faction_of_cards_for_indirect:
+                                            player.increase_indirect_damage_at_pos(int(game_update_string[2]),
+                                                                                   int(game_update_string[3]), 1)
         if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
@@ -4195,6 +4192,8 @@ class Game:
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
                             if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                                self.choices_available = ["Yes"]
+                            elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":
                                 self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
@@ -4563,6 +4562,7 @@ class Game:
             elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+                print("indirect code")
                 await self.apply_indirect_damage(name, game_update_string)
             elif self.mode == "DISCOUNT":
                 await self.update_game_event_applying_discounts(name, game_update_string)

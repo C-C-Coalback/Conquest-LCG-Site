@@ -326,6 +326,9 @@ async def update_game_event_command_section(self, name, game_update_string):
             self.before_command_struggle = False
             self.after_command_struggle = False
             await self.change_phase("COMBAT")
+            self.before_first_combat = True
+            self.p1.has_passed = False
+            self.p2.has_passed = False
             self.p1.set_available_mobile_all(True)
             self.p2.set_available_mobile_all(True)
             self.p1.mobile_resolved = False
@@ -335,14 +338,18 @@ async def update_game_event_command_section(self, name, game_update_string):
             if not self.p2.search_cards_for_available_mobile():
                 self.p2.mobile_resolved = True
             if self.p1.mobile_resolved and self.p2.mobile_resolved:
-                self.check_battle(self.round_number)
-                self.begin_battle(self.round_number)
-                self.begin_combat_round()
-                self.set_battle_initiative()
-                self.planet_aiming_reticle_active = True
-                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                self.p1.has_passed = False
-                self.p2.has_passed = False
+                await self.send_update_message("Window granted for players to use "
+                                               "reactions/actions before the battle begins.")
+            """
+            self.check_battle(self.round_number)
+            self.begin_battle(self.round_number)
+            self.begin_combat_round()
+            self.set_battle_initiative()
+            self.planet_aiming_reticle_active = True
+            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            self.p1.has_passed = False
+            self.p2.has_passed = False
+            """
 
 
 def resolve_command_struggle(self):

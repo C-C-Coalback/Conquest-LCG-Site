@@ -1,6 +1,42 @@
 async def update_game_event_combat_section(self, name, game_update_string):
     if self.mode == "ACTION":
         await self.update_game_event_action(name, game_update_string)
+    elif self.before_first_combat:
+        if game_update_string[0] == "action-button":
+            if self.get_actions_allowed():
+                self.stored_mode = self.mode
+                self.mode = "ACTION"
+                self.player_with_action = name
+                await self.send_update_message(name + " wants to take an action.")
+                if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
+                    self.choices_available = ["Dark Possession", "Regular Action"]
+                    self.choice_context = "Use Dark Possession?"
+                    self.name_player_making_choices = self.player_with_action
+                elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
+                    self.choices_available = ["Dark Possession", "Regular Action"]
+                    self.choice_context = "Use Dark Possession?"
+                    self.name_player_making_choices = self.player_with_action
+        elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+            if name == self.name_1:
+                if not self.p1.has_passed:
+                    await self.send_update_message(self.name_1 + " is ready to proceed to the battle "
+                                                                 "for the first planet")
+                self.p1.has_passed = True
+            else:
+                if not self.p2.has_passed:
+                    await self.send_update_message(self.name_2 + " is ready to proceed to the battle "
+                                                                 "for the first planet")
+                self.p2.has_passed = True
+            if self.p1.has_passed and self.p2.has_passed:
+                self.before_first_combat = False
+                self.check_battle(self.round_number)
+                self.begin_battle(self.round_number)
+                self.begin_combat_round()
+                self.set_battle_initiative()
+                self.planet_aiming_reticle_active = True
+                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                self.p1.has_passed = False
+                self.p2.has_passed = False
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":
             if self.get_actions_allowed():

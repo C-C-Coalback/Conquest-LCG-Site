@@ -1640,7 +1640,6 @@ class Player:
     def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True, ready_relevant=False):
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
-            print(current_name, name_of_card)
             if current_name == name_of_card:
                 if not bloodied_relevant:
                     if ready_relevant:
