@@ -651,6 +651,7 @@ class Player:
                 return False
         self.headquarters.append(copy.deepcopy(card_object))
         last_element_index = len(self.headquarters) - 1
+        self.headquarters[last_element_index].name_owner = self.name_player
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
         elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
@@ -807,8 +808,7 @@ class Player:
                 name_owner = self.game.p2.name_player
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
-        card.name_owner = name_owner
-        target_card.add_attachment(card)
+        target_card.add_attachment(card, name_owner=name_owner)
         return True
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
@@ -849,12 +849,24 @@ class Player:
                 self.add_resources(cost)
         return False
 
-    def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False):
+    def get_name_enemy_player(self):
+        name = self.name_player
+        if self.name_player == self.game.name_1:
+            name = self.game.name_2
+        else:
+            name = self.game.name_1
+        return name
+
+    def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
+                           is_owner_of_card=True):
         if card.get_unique():
             if self.search_for_unique_card(card.name):
                 return -1
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
+        self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
+        if not is_owner_of_card:
+            self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
         if sacrifice_end_of_phase:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Heretek Inventor":
@@ -987,7 +999,8 @@ class Player:
         del self.cards[hand_pos]
         return True
 
-    def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0):
+    def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0,
+                  is_owner_of_card=True):
         damage_on_play = damage_to_take
         if position_hand is not None:
             return "ERROR/play_card function called incorrectly", -1
@@ -1027,7 +1040,7 @@ class Player:
                 if card.get_limited():
                     if self.can_play_limited:
                         if self.spend_resources(cost):
-                            if self.add_card_to_planet(card, position) != -1:
+                            if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
                                 self.set_can_play_limited(False)
                                 print("Played card to planet", position)
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
@@ -1045,7 +1058,7 @@ class Player:
                         return "FAIL/Limited already played", -1
                 else:
                     if self.spend_resources(cost):
-                        if self.add_card_to_planet(card, position) != -1:
+                        if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
                             location_of_unit = len(self.cards_in_play[position + 1]) - 1
                             if damage_to_take > 0:
                                 if self.game.bigga_is_betta_active:
@@ -2852,13 +2865,15 @@ class Player:
     def summon_token_at_planet(self, token_name, planet_num):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
         if card.get_name() != "FINAL CARD":
-            self.add_card_to_planet(card, planet_num)
+            if self.count_copies_in_play(card.get_name()) < 10:
+                self.add_card_to_planet(card, planet_num)
 
     def summon_token_at_hq(self, token_name, amount=1):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
         if card.get_name() != "FINAL CARD":
             for _ in range(amount):
-                self.add_to_hq(card)
+                if self.count_copies_in_play(card.get_name()) < 10:
+                    self.add_to_hq(card)
 
     def remove_card_from_play(self, planet_num, card_pos):
         # card_object = self.cards_in_play[planet_num + 1][card_pos]
@@ -2933,11 +2948,16 @@ class Player:
                 self.game.positions_of_unit_triggering_reaction.append([1, -1, -1])
                 self.game.player_who_resolves_reaction.append(self.game.name_1)
         if card.get_ability() == "Enginseer Augur":
-            self.game.reactions_needing_resolving.append("Enginseer Augur")
-            self.game.player_who_resolves_reaction.append(self.name_player)
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-        self.discard.append(card_name)
-        self.cards_recently_discarded.append(card_name)
+            self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
+        if card.get_card_type() != "Token":
+            if card.name_owner == self.name_player:
+                self.discard.append(card_name)
+                self.cards_recently_discarded.append(card_name)
+            else:
+                dis_player = self.game.p1
+                if self.game.name_1 == self.name_player:
+                    dis_player = self.game.p2
+                dis_player.discard.append(card_name)
         if card.get_card_type() == "Army":
             if self.check_for_warlord(planet_num):
                 self.stored_targets_the_emperor_protects.append(card_name)
@@ -2945,7 +2965,6 @@ class Player:
         self.remove_card_from_play(planet_num, card_pos)
 
     def add_card_in_hq_to_discard(self, card_pos):
-        card_name = self.headquarters[card_pos].get_name()
         card = self.headquarters[card_pos]
         card_name = card.get_name()
         for i in range(len(card.get_attachments())):
@@ -2964,9 +2983,8 @@ class Player:
                                 if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
                                     already_using_murder_cogitator = True
                             if not already_using_murder_cogitator:
-                                self.game.reactions_needing_resolving.append("Murder Cogitator")
-                                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-                                self.game.player_who_resolves_reaction.append(self.name_player)
+                                self.game.create_reaction("Murder Cogitator", self.name_player,
+                                                          (int(self.number), -2, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Kabalite Halfborn":
@@ -2975,8 +2993,15 @@ class Player:
             self.game.create_reaction("Coteaz's Henchmen", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Interrogator Acolyte":
             self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
-        self.discard.append(card_name)
-        self.cards_recently_discarded.append(card_name)
+        if card.get_card_type() != "Token":
+            if card.name_owner == self.name_player:
+                self.discard.append(card_name)
+                self.cards_recently_discarded.append(card_name)
+            else:
+                dis_player = self.game.p1
+                if self.game.name_1 == self.name_player:
+                    dis_player = self.game.p2
+                dis_player.discard.append(card_name)
         self.discard_attachments_from_card(-2, card_pos)
         self.remove_card_from_hq(card_pos)
 

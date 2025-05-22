@@ -387,10 +387,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.planet_aiming_reticle_position = int(game_update_string[1])
             if self.discounts_applied >= self.available_discounts:
                 added_card_to_planet = False
-                primary_player.play_card(
-                    chosen_planet, card=self.card_to_deploy
+                own_card = True
+                if self.anrakyr_deck_choice == secondary_player.name_player:
+                    own_card = False
+                added_card_to_planet, _ = primary_player.play_card(
+                    chosen_planet, card=self.card_to_deploy, is_owner_of_card=own_card
                 )
-                if added_card_to_planet:
+                if added_card_to_planet == "SUCCESS":
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.action_cleanup()
@@ -440,7 +443,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.chosen_first_card:
             card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
                                       self.cards_dict)
-            primary_player.add_card_to_planet(card, chosen_planet)
+            primary_player.add_card_to_planet(card, chosen_planet, is_owner_of_card=False)
             del secondary_player.discard[self.anrakyr_unit_position]
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None

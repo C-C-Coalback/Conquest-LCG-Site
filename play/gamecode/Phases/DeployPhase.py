@@ -199,10 +199,15 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     print("position hand of unit: ", self.card_pos_to_deploy)
     print("Damage to take: ", damage_to_take)
     self.bigga_is_betta_active = True
+    own_card = True
+    if self.action_chosen == "Anrakyr the Traveller":
+        if self.anrakyr_deck_choice == secondary_player:
+            own_card = False
     played_card, position_of_unit = primary_player.play_card(int(planet_pos),
                                                              card=self.card_to_deploy,
                                                              discounts=discounts,
-                                                             damage_to_take=damage_to_take)
+                                                             damage_to_take=damage_to_take,
+                                                             is_owner_of_card=own_card)
     if played_card:
         if not self.action_chosen or self.action_chosen == "Ambush":
             primary_player.cards.remove(self.card_to_deploy.get_name())

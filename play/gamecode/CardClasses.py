@@ -349,12 +349,9 @@ class UnitCard(Card):
     def get_attachments(self):
         return self.attachments
 
-    def add_attachment(self, attachment_card):
-        print("Adding attachment to:", self.name)
-        print(attachment_card.name)
+    def add_attachment(self, attachment_card, name_owner=""):
         self.attachments.append(copy.deepcopy(attachment_card))
-        for i in range(len(self.attachments)):
-            print(self.attachments[i].get_name())
+        self.attachments[-1].name_owner = name_owner
 
     def set_ranged(self, new_val):
         self.ranged = new_val
