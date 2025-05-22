@@ -161,6 +161,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
         self.name = self.user.username
         self.main_faction = ""
         self.ally_faction = ""
+        self.warlord = ""
         print("got to decks consumer")
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -199,6 +200,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 if card_type == "Warlord":
                     message = message + "/" + card_object.get_faction()
                     self.main_faction = card_object.get_faction()
+                    self.warlord = card_object.get_name()
                 if card_loyalty != "Signature" or card_type == "Warlord":
                     if self.main_faction == card_object.get_faction():
                         await self.send(text_data=json.dumps({"message": message}))
@@ -212,6 +214,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                             await self.send(text_data=json.dumps({"message": message}))
                         elif card_type != "Army":
                             await self.send(text_data=json.dumps({"message": message}))
+                    elif self.warlord == "Gorzod":
+                        if card_object.get_card_type() == "Army":
+                            if card_object.get_faction() == "Space Marines" \
+                                    or card_object.get_faction() == "Astra Militarum":
+                                if card_object.check_for_a_trait("Vehicle"):
+                                    if card_loyalty == "Common":
+                                        await self.send(text_data=json.dumps({"message": message}))
                 if card_type == "Warlord":
                     sig_squad = card_object.signature_squad
                     for i in range(len(sig_squad)):
@@ -242,7 +251,15 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 if position_main_faction != -1:
                     ally_pos_1 = (position_main_faction + 1) % 7
                     ally_pos_2 = (position_main_faction - 1) % 7
-                    if split_message[1] == alignment_wheel[ally_pos_1] \
+                    if self.warlord == "Commander Starblaze":
+                        if split_message[1] == "Astra Militarum":
+                            self.ally_faction = split_message[1]
+                            changed_ally = True
+                    elif self.warlord == "Gorzod":
+                        if split_message[1] == "":
+                            self.ally_faction = ""
+                            changed_ally = True
+                    elif split_message[1] == alignment_wheel[ally_pos_1] \
                             or split_message[1] == alignment_wheel[ally_pos_2]:
                         self.ally_faction = split_message[1]
                         changed_ally = True
