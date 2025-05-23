@@ -59,19 +59,14 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         if primary_player.get_name_player() == self.player_with_action:
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2)
                             card_chosen.exhaust_card()
-                            if self.phase == "DEPLOY":
-                                self.player_with_deploy_turn = other_player.name_player
-                                self.number_with_deploy_turn = other_player.number
-                            self.action_chosen = ""
-                            self.mode = "Normal"
-                            self.player_with_action = ""
+                            self.action_cleanup()
                 elif ability == "Heavy Venom Cannon":
                     if not card_chosen.get_once_per_phase_used():
-                        if primary_player.get_name_player() == self.player_with_action:
-                            self.choice_context = "Heavy Venom Cannon"
-                            self.choices_available = ["Armorbane", "Area Effect (2)"]
-                            self.name_player_making_choices = primary_player.get_name_player()
-                            self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                        self.choice_context = ability
+                        self.choices_available = ["Armorbane", "Area Effect (2)"]
+                        self.name_player_making_choices = primary_player.get_name_player()
+                        self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                        self.misc_target_player = player_owning_card.name_player
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()

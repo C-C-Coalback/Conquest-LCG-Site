@@ -407,7 +407,8 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 if attachments[j].get_ability() == "Noxious Fleshborer":
                     if not already_noxious and not self.infested_planets[planet_id]:
                         already_noxious = True
-                        self.create_reaction("Noxious Fleshborer", self.name_1, ("1", planet_id, i))
+                        own = attachments[j].name_owner
+                        self.create_reaction("Noxious Fleshborer", own, (1, planet_id, i))
         return ret_val
     elif command_p2 > command_p1:
         print("P2 wins command")
@@ -441,6 +442,7 @@ def resolve_command_struggle_at_planet(self, planet_id):
                 if attachments[j].get_ability() == "Noxious Fleshborer":
                     if not already_noxious and not self.infested_planets[planet_id]:
                         already_noxious = True
-                        self.create_reaction("Noxious Fleshborer", self.name_2, ("2", planet_id, i))
+                        own = attachments[j].name_owner
+                        self.create_reaction("Noxious Fleshborer", own, (2, planet_id, i))
         return ret_val
     return None

@@ -26,52 +26,54 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 ability = card_chosen.get_ability()
                 print("ability:", ability)
-                if ability == "Command-Link Drone":
-                    if primary_player.get_name_player() == self.player_with_action:
+                if card_chosen.name_owner == self.player_with_action:
+                    print("ok owner")
+                    if ability == "Command-Link Drone":
                         if primary_player.spend_resources(1):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                            self.misc_target_player = player_owning_card.name_player
                             await self.send_update_message(ability + " activated")
-                elif ability == "Gauss Flayer":
-                    if primary_player.get_name_player() == self.player_with_action:
-                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                            self.action_chosen = ability
-                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.position_of_actioned_card = (planet_pos, unit_pos)
-                            self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                            await self.send_update_message(ability + " activated")
-                elif ability == "Blight Grenades":
-                    if primary_player.get_name_player() == self.player_with_action:
-                        primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
+                    elif ability == "Gauss Flayer":
+                        if primary_player.get_name_player() == self.player_with_action:
+                            if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                                self.misc_target_player = player_owning_card.name_player
+                                await self.send_update_message(ability + " activated")
+                    elif ability == "Blight Grenades":
+                        player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
                         self.action_cleanup()
-                elif ability == "The Glovodan Eagle":
-                    if primary_player.get_name_player() == self.player_with_action:
-                        primary_player.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                    elif ability == "The Glovodan Eagle":
+                        player_owning_card.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         card = ArmyCard("The Glovodan Eagle", "Action: Return this unit to your hand.", "Familiar.",
                                         1, "Astra Militarum", "Signature", 1, 1, 0, True,
                                         action_in_play=True, allowed_phases_in_play="ALL")
                         primary_player.add_card_to_planet(card, planet_pos)
                         self.action_cleanup()
-                elif ability == "Hyperphase Sword":
-                    if primary_player.get_name_player() == self.player_with_action:
-                        self.action_chosen = ability
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
-                        self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
-                        await self.send_update_message(ability + " activated")
-                        self.chosen_first_card = False
-                        self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
-                elif ability == "Mind Shackle Scarab":
-                    if card_chosen.get_ready():
+                    elif ability == "Hyperphase Sword":
                         if primary_player.get_name_player() == self.player_with_action:
+                            self.action_chosen = ability
+                            self.misc_target_player = player_owning_card.name_player
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                            await self.send_update_message(ability + " activated")
+                            self.chosen_first_card = False
+                            self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                    elif ability == "Mind Shackle Scarab":
+                        if card_chosen.get_ready():
                             if primary_player.get_number() != player_owning_card.get_number():
                                 if secondary_player.get_faction_given_pos(planet_pos, unit_pos) \
                                         == primary_player.enslaved_faction:
                                     card_chosen.exhaust_card()
+                                    "Royal Phylactery"
                                     self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
                                     last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
                                     primary_player.cards_in_play[planet_pos + 1][last_el].mind_shackle_scarab_effect = True
@@ -80,30 +82,24 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                     "Mind Shackle Scarab on own unit not supported"
                                 )
                             self.action_cleanup()
-                elif ability == "The Staff of Command":
-                    if card_chosen.get_ready():
-                        if primary_player.get_name_player() == self.player_with_action:
-                            card_chosen.exhaust_card()
-                            await self.create_necrons_wheel_choice(primary_player)
-                            self.action_cleanup()
-                elif ability == "Regeneration":
-                    if card_chosen.get_ready():
-                        if primary_player.get_name_player() == self.player_with_action:
+                    elif ability == "The Staff of Command":
+                        if card_chosen.get_ready():
+                            if primary_player.get_name_player() == self.player_with_action:
+                                card_chosen.exhaust_card()
+                                await self.create_necrons_wheel_choice(primary_player)
+                                self.action_cleanup()
+                    elif ability == "Regeneration":
+                        if card_chosen.get_ready():
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2)
                             card_chosen.exhaust_card()
-                            if self.phase == "DEPLOY":
-                                self.player_with_deploy_turn = other_player.name_player
-                                self.number_with_deploy_turn = other_player.number
-                            self.action_chosen = ""
-                            self.mode = "Normal"
-                            self.player_with_action = ""
-                elif ability == "Heavy Venom Cannon":
-                    if not card_chosen.get_once_per_phase_used():
-                        if primary_player.get_name_player() == self.player_with_action:
-                            self.choice_context = "Heavy Venom Cannon"
+                            self.action_cleanup()
+                    elif ability == "Heavy Venom Cannon":
+                        if not card_chosen.get_once_per_phase_used():
+                            self.choice_context = ability
                             self.choices_available = ["Armorbane", "Area Effect (2)"]
                             self.name_player_making_choices = primary_player.get_name_player()
                             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                            self.misc_target_player = player_owning_card.name_player
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()

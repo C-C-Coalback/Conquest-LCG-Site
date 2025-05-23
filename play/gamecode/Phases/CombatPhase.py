@@ -115,7 +115,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                           self.attacker_position)
                                 if primary_player.search_attachments_at_pos(self.attacker_planet,
                                                                             self.attacker_position,
-                                                                            "Doom Siren"):
+                                                                            "Doom Siren", must_match_name=True):
                                     self.create_reaction("Doom Siren", primary_player.name_player,
                                                          (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position))
@@ -197,7 +197,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 attachment_pos = int(game_update_string[5])
                 if planet_pos == self.attacker_planet and unit_pos == self.attacker_position:
                     if player.cards_in_play[planet_pos + 1][unit_pos].\
-                            get_attachments()[attachment_pos].get_ability() == "The Shining Blade":
+                            get_attachments()[attachment_pos].get_ability() == "The Shining Blade" \
+                            and player.cards_in_play[planet_pos + 1][unit_pos].\
+                            get_attachments()[attachment_pos].name_owner == player.name_player:
                         if player.cards_in_play[planet_pos + 1][unit_pos].\
                                 get_attachments()[attachment_pos].get_ready():
                             player.cards_in_play[planet_pos + 1][unit_pos].\
@@ -320,12 +322,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
-                                                                "Banshee Power Sword"):
+                                                                "Banshee Power Sword", must_match_name=True):
                                 self.create_reaction("Banshee Power Sword", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
-                                                                "The Plaguefather's Banner"):
+                                                                "The Plaguefather's Banner", must_match_name=True):
                                 self.create_reaction("The Plaguefather's Banner", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))

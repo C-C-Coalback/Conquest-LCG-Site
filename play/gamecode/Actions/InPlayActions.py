@@ -683,17 +683,50 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             primary_player = self.p2
             secondary_player = self.p1
+        planet_pos = int(game_update_string[2])
+        unit_pos = int(game_update_string[3])
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 planet, position, attachment_position = self.position_of_selected_attachment
-                if primary_player.move_attachment_card(planet, position, attachment_position, planet_pos, unit_pos):
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
-                    self.position_of_selected_attachment = (-1, -1, -1)
-                    self.position_of_actioned_card = (-1, -1)
-                    self.action_cleanup()
+                og_player = self.misc_target_player
+                if og_player == primary_player.name_player:
+                    if primary_player.move_attachment_card(planet, position, attachment_position, planet_pos, unit_pos):
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.position_of_selected_attachment = (-1, -1, -1)
+                        self.position_of_actioned_card = (-1, -1)
+                        self.action_cleanup()
+                else:
+                    card = secondary_player.get_attachment_at_pos(planet, position, attachment_position)
+                    if primary_player.attach_card(card, planet_pos, unit_pos):
+                        secondary_player.remove_attachment_from_pos(planet, position, attachment_position)
+                        secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                      self.position_of_actioned_card[1])
+                        self.position_of_selected_attachment = (-1, -1, -1)
+                        self.position_of_actioned_card = (-1, -1)
+                        self.action_cleanup()
+        else:
+            if secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                planet, position, attachment_position = self.position_of_selected_attachment
+                og_player = self.misc_target_player
+                if og_player == secondary_player.name_player:
+                    card = secondary_player.get_attachment_at_pos(planet, position, attachment_position)
+                    if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
+                        secondary_player.remove_attachment_from_pos(planet, position, attachment_position)
+                        secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                      self.position_of_actioned_card[1])
+                        self.position_of_selected_attachment = (-1, -1, -1)
+                        self.position_of_actioned_card = (-1, -1)
+                        self.action_cleanup()
+                else:
+                    card = primary_player.get_attachment_at_pos(planet, position, attachment_position)
+                    if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
+                        primary_player.remove_attachment_from_pos(planet, position, attachment_position)
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.position_of_selected_attachment = (-1, -1, -1)
+                        self.position_of_actioned_card = (-1, -1)
+                        self.action_cleanup()
     elif self.action_chosen == "Reanimation Protocol":
         if primary_player.get_number() == game_update_string[1]:
             if card_chosen.get_faction() == "Necrons" and card_chosen.get_is_unit():

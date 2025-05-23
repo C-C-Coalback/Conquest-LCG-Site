@@ -167,7 +167,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+            if num == 1:
+                self.p1.remove_damage_from_pos(planet_pos, unit_pos, 1)
+            else:
+                self.p2.remove_damage_from_pos(planet_pos, unit_pos, 1)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Resurrection Orb":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -218,7 +221,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Hypex Injector":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.ready_given_pos(planet_pos, unit_pos)
+            if num == 1:
+                self.p1.ready_given_pos(planet_pos, unit_pos)
+            else:
+                self.p2.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
             self.player_who_resolves_reaction[0] = secondary_player.name_player
@@ -264,7 +270,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
-            primary_player.exhaust_all_cards_of_ability("Wyrdboy Stikk")
+            if primary_player.enemy_has_wyrdboy_stikk:
+                secondary_player.exhaust_all_cards_of_ability("Wyrdboy Stikk")
+            else:
+                primary_player.exhaust_all_cards_of_ability("Wyrdboy Stikk")
         elif self.reactions_needing_resolving[0] == "Blood Claw Pack":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.get_ready_given_pos(planet_pos, unit_pos):

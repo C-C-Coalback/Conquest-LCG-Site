@@ -120,6 +120,7 @@ class Player:
         self.illegal_commits_synapse = 0
         self.primal_howl_used = False
         self.discard_inquis_caius_wroth = False
+        self.enemy_has_wyrdboy_stikk = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -354,7 +355,7 @@ class Player:
             self.last_discard_string = joined_string
             await self.game.send_update_message(joined_string)
 
-    def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False):
+    def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False):
         for i in range(len(self.headquarters)):
             if self.get_ability_given_pos(-2, i) == card_name:
                 return True
@@ -364,7 +365,8 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.get_ability_given_pos(i, j) == card_name:
                     return True
-                if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant):
+                if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant,
+                                                  must_match_name=must_own):
                     return True
         return False
 
@@ -752,7 +754,12 @@ class Player:
                 self.discard.append(card.get_name())
             del card.get_attachments()[attachment_position]
 
-    def attach_card(self, card, planet, position, not_own_attachment, army_unit_as_attachment=False):
+    def get_attachment_at_pos(self, planet, position, attachment_position):
+        if planet == -2:
+            return self.headquarters[position].get_attachments()[attachment_position]
+        return self.cards_in_play[planet + 1][position].get_attachments()[attachment_position]
+
+    def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False):
         if planet == -2:
             target_card = self.headquarters[position]
         else:
@@ -980,15 +987,27 @@ class Player:
             if self.headquarters[i].get_ability() == "Beasthunter Wyches":
                 self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), -2, i))
             for attach in self.headquarters[i].get_attachments():
-                if attach.get_ability() == "Hypex Injector":
+                if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
                     self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Beasthunter Wyches":
                     self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), i, j))
                 for attach in self.cards_in_play[i + 1][j].get_attachments():
-                    if attach.get_ability() == "Hypex Injector":
+                    if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
                         self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), i, j))
+        other_player = self.game.p1
+        if other_player.name_player == self.name_player:
+            other_player = self.game.p2
+        for i in range(len(other_player.headquarters)):
+            for attach in other_player.headquarters[i].get_attachments():
+                if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
+                    self.game.create_reaction("Hypex Injector", self.name_player, (int(other_player.number), -2, i))
+        for i in range(7):
+            for j in range(len(other_player.cards_in_play[i + 1])):
+                for attach in other_player.cards_in_play[i + 1][j].get_attachments():
+                    if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
+                        self.game.create_reaction("Hypex Injector", self.name_player, (int(other_player.number), i, j))
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
         card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array, self.cards_dict))
@@ -1847,21 +1866,25 @@ class Player:
                     discounts_available += 2
         return discounts_available
 
-    def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil, ready_relevant=False):
+    def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil, ready_relevant=False, must_match_name=False):
         if planet_pos == -2:
             for i in range(len(self.headquarters[unit_pos].get_attachments())):
                 if self.headquarters[unit_pos].get_attachments()[i].get_ability() == card_abil:
-                    if not ready_relevant:
-                        return True
-                    if self.headquarters[unit_pos].get_attachments()[i].get_ready():
-                        return True
+                    if not must_match_name or \
+                            self.headquarters[unit_pos].get_attachments()[i].name_owner == self.name_player:
+                        if not ready_relevant:
+                            return True
+                        if self.headquarters[unit_pos].get_attachments()[i].get_ready():
+                            return True
             return False
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == card_abil:
-                if not ready_relevant:
-                    return True
-                if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ready():
-                    return True
+                if not must_match_name or self.cards_in_play[planet_pos + 1][unit_pos]\
+                        .get_attachments()[i].name_owner == self.name_player:
+                    if not ready_relevant:
+                        return True
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ready():
+                        return True
         return False
 
     def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None):
@@ -2130,7 +2153,8 @@ class Player:
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             for j in range(len(self.cards_in_play[planet_pos + 1][i].get_attachments())):
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":
-                    self.game.create_reaction("Blacksun Filter", self.name_player, (int(self.number), planet_pos, i))
+                    owner = self.cards_in_play[planet_pos + 1][i].get_attachments()[j].name_owner
+                    self.game.create_reaction("Blacksun Filter", owner, (int(self.number), planet_pos, i))
             if self.cards_in_play[planet_pos + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
                 # Need an extra check that the ability has not already fired this phase.
                 self.game.create_reaction("Ragnar Blackmane", self.name_player,
@@ -2580,7 +2604,8 @@ class Player:
                         self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
                         if self.headquarters[i].get_damage() > 0:
-                            self.game.create_reaction("Royal Phylactery", self.name_player, (int(self.number), -2, i))
+                            owner = self.headquarters[i].get_attachments()[j].name_owner
+                            self.game.create_reaction("Royal Phylactery", owner, (int(self.number), -2, i))
 
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
@@ -2615,8 +2640,8 @@ class Player:
                             self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), i, j))
                     if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Royal Phylactery":
                         if self.cards_in_play[i + 1][j].get_damage() > 0:
-                            self.game.create_reaction("Royal Phylactery", self.name_player,
-                                                      (int(self.number), i, j))
+                            owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
+                            self.game.create_reaction("Royal Phylactery", owner, (int(self.number), i, j))
 
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
@@ -2743,7 +2768,7 @@ class Player:
 
     def resolve_battle_begins(self, planet_num):
         for i in range(len(self.cards_in_play[planet_num + 1])):
-            if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf"):
+            if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf", must_match_name=True):
                 if self.get_ready_given_pos(planet_num, i):
                     self.game.create_reaction("Fenrisian Wolf", self.name_player, (int(self.number), planet_num, i))
 
@@ -2761,8 +2786,8 @@ class Player:
             for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Royal Phylactery":
                     if self.cards_in_play[planet_num + 1][i].get_damage() > 0:
-                        self.game.create_reaction("Royal Phylactery", self.name_player,
-                                                  (int(self.number), planet_num, i))
+                        owner = self.cards_in_play[planet_num + 1][i].get_attachments()[j].name_owner
+                        self.game.create_reaction("Royal Phylactery", owner, (int(self.number), planet_num, i))
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Resurrection Orb":
                     self.game.create_reaction("Resurrection Orb", self.name_player,
                                               (int(self.number), planet_num, i))
@@ -2788,8 +2813,9 @@ class Player:
                             self.game.create_reaction("Termagant Sentry", self.name_player,
                                                       (int(self.number), planet_num, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Snotlings":
+                self.enemy_has_wyrdboy_stikk = False
+                already_weirdboy_stikk = False
                 if self.search_for_card_everywhere("Wyrdboy Stikk", ready_relevant=True):
-                    already_weirdboy_stikk = False
                     for i in range(len(self.game.reactions_needing_resolving)):
                         if self.game.reactions_needing_resolving[i] == "Wyrdboy Stikk":
                             if self.game.player_who_resolves_reaction[i] == self.name_player:
@@ -2797,6 +2823,36 @@ class Player:
                     if not already_weirdboy_stikk:
                         self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                   (int(self.number), -1, -1))
+                else:
+                    found_stikk = False
+                    other_player = self.p1
+                    if other_player.name_player == self.name_player:
+                        other_player = self.p2
+                    for i in range(len(other_player.headquarters)):
+                        if other_player.headquarters[i].get_is_unit():
+                            for j in range(len(other_player.headquarters[i].get_attachments())):
+                                attach = other_player.headquarters[i].get_attachments()[j]
+                                if attach.get_ability() == "Wyrdboy Stikk":
+                                    if attach.get_ready() and attach.name_owner == self.name_player:
+                                        found_stikk = True
+                                        self.enemy_has_wyrdboy_stikk = True
+                    for h in range(7):
+                        for i in range(len(other_player.cards_in_play[h + 1])):
+                            if other_player.cards_in_play[h + 1][i].get_is_unit():
+                                for j in range(len(other_player.cards_in_play[h + 1][i].get_attachments())):
+                                    attach = other_player.cards_in_play[h + 1][i].get_attachments()[j]
+                                    if attach.get_ability() == "Wyrdboy Stikk":
+                                        if attach.get_ready() and attach.name_owner == self.name_player:
+                                            found_stikk = True
+                                            self.enemy_has_wyrdboy_stikk = True
+                    if found_stikk:
+                        for k in range(len(self.game.reactions_needing_resolving)):
+                            if self.game.reactions_needing_resolving[k] == "Wyrdboy Stikk":
+                                if self.game.player_who_resolves_reaction[k] == self.name_player:
+                                    already_weirdboy_stikk = True
+                        if not already_weirdboy_stikk:
+                            self.game.create_reaction("Wyrdboy Stikk", self.name_player,
+                                                      (int(self.number), -1, -1))
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
@@ -2917,13 +2973,16 @@ class Player:
                                                                                             planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                self.game.create_reaction("Straken's Cunning", self.name_player, (int(self.number), -1, -1))
+                owner = card.get_attachments()[i].name_owner
+                self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
-        if self.search_attachments_at_pos(planet_num, card_pos, "Mark of Chaos"):
-            self.game.create_reaction("Mark of Chaos", self.name_player, (int(self.number), planet_num, -1))
+        for i in range(len(card.get_attachments())):
+            if card.get_attachments()[i].get_ability() == "Mark of Chaos":
+                owner = card.get_attachments()[i].name_owner
+                self.game.create_reaction("Mark of Chaos", owner, (int(self.number), planet_num, -1))
         if card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier"):
             for i in range(len(self.cards)):
                 if self.cards[i] == "Elysian Assault Team":
@@ -2996,6 +3055,10 @@ class Player:
                             if not already_using_murder_cogitator:
                                 self.game.create_reaction("Murder Cogitator", self.name_player,
                                                           (int(self.number), -2, -1))
+            for i in range(len(card.get_attachments())):
+                if card.get_attachments()[i].get_ability() == "Straken's Cunning":
+                    owner = card.get_attachments()[i].name_owner
+                    self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Kabalite Halfborn":

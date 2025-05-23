@@ -215,6 +215,7 @@ class Game:
         self.damage_moved_to_old_one_eye = 0
         self.old_one_eye_pos = (-1, -1)
         self.misc_target_choice = -1
+        self.misc_target_player = ""
         self.resolve_destruction_checks_after_reactions = False
         self.ravenous_haruspex_gain = 0
         self.reset_resolving_attack_on_units = False
@@ -1004,7 +1005,7 @@ class Game:
                 i = 0
                 j = 0
                 while j < len(self.p1.attachments_at_planet[self.last_planet_checked_for_battle]):
-                    if self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j].\
+                    if self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j]. \
                             get_ability() == "Slaanesh's Temptation":
                         del self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j]
                         j = j - 1
@@ -2243,41 +2244,42 @@ class Game:
                         self.choice_context = ""
                         self.choices_available = []
                         self.name_player_making_choices = ""
+                        target_player = primary_player
+                        if self.misc_target_player == secondary_player.name_player:
+                            target_player = secondary_player
                         if game_update_string[1] == "0":
                             if planet == -2:
-                                primary_player.headquarters[unit].armorbane_eop = True
-                                primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
-                                name = primary_player.headquarters[unit].get_name()
+                                target_player.headquarters[unit].armorbane_eop = True
+                                target_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
+                                name = target_player.headquarters[unit].get_name()
                                 await self.send_update_message(
                                     name + " gained armorbane from Heavy Venom Cannon!"
                                 )
                             else:
-                                primary_player.cards_in_play[planet + 1][unit].armorbane_eop = True
-                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[
+                                target_player.cards_in_play[planet + 1][unit].armorbane_eop = True
+                                target_player.cards_in_play[planet + 1][unit].get_attachments()[
                                     att].set_once_per_phase_used(True)
-                                name = primary_player.cards_in_play[planet + 1][unit].get_name()
+                                name = target_player.cards_in_play[planet + 1][unit].get_name()
                                 await self.send_update_message(
                                     name + " gained armorbane from Heavy Venom Cannon!"
                                 )
                         elif game_update_string[1] == "1":
                             if planet == -2:
-                                primary_player.headquarters[unit].area_effect_eop += 2
-                                primary_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
-                                name = primary_player.headquarters[unit].get_name()
+                                target_player.headquarters[unit].area_effect_eop += 2
+                                target_player.headquarters[unit].get_attachments()[att].set_once_per_phase_used(True)
+                                name = target_player.headquarters[unit].get_name()
                                 await self.send_update_message(
                                     name + " gained area effect (2) from Heavy Venom Cannon!"
                                 )
                             else:
-                                primary_player.cards_in_play[planet + 1][unit].area_effect_eop += 2
-                                primary_player.cards_in_play[planet + 1][unit].get_attachments()[att]. \
+                                target_player.cards_in_play[planet + 1][unit].area_effect_eop += 2
+                                target_player.cards_in_play[planet + 1][unit].get_attachments()[att]. \
                                     set_once_per_phase_used(True)
-                                name = primary_player.cards_in_play[planet + 1][unit].get_name()
+                                name = target_player.cards_in_play[planet + 1][unit].get_name()
                                 await self.send_update_message(
                                     name + " gained area effect (2) from Heavy Venom Cannon!"
                                 )
-                        self.player_with_action = ""
-                        self.mode = "Normal"
-                        self.action_chosen = ""
+                        self.action_cleanup()
                     elif self.choice_context == "Use Made Ta Fight?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:
@@ -3298,7 +3300,8 @@ class Game:
                         self.on_kill_effects_of_attacker.append(
                             secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
-                        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field"):
+                        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field",
+                                                                    must_match_name=True):
                             self.create_reaction("Repulsor Impact Field", primary_player.name_player,
                                                  (int(secondary_player.number), att_pla, att_pos))
                         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
@@ -3329,8 +3332,10 @@ class Game:
                             self.create_reaction("Shrieking Basilisk", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, unit_pos))
                         for i in range(len(secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments())):
-                            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability()\
-                                    == "Nocturne-Ultima Storm Bolter":
+                            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability() \
+                                    == "Nocturne-Ultima Storm Bolter" and secondary_player.\
+                                    cards_in_play[att_pla + 1][att_pos].get_attachments()[i].name_owner \
+                                    == secondary_player.name_player:
                                 self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
                                                      (int(secondary_player.number), att_pla, att_pos))
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
@@ -3383,7 +3388,8 @@ class Game:
                                 can_continue = True
                                 if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                             "Guardian Mesh Armor",
-                                                                            ready_relevant=True):
+                                                                            ready_relevant=True,
+                                                                            must_match_name=True):
                                     if self.guardian_mesh_armor_enabled:
                                         self.last_shield_string = game_update_string
                                         self.choice_context = "Use Guardian Mesh Armor?"
@@ -3436,7 +3442,7 @@ class Game:
                                                     if primary_player.cards_in_play[planet_pos + 1][
                                                         unit_pos].get_ability() == "Reanimating Warriors" \
                                                             and not primary_player.cards_in_play[planet_pos + 1][
-                                                            unit_pos].once_per_phase_used:
+                                                        unit_pos].once_per_phase_used:
                                                         self.effects_waiting_on_resolution.append(
                                                             "Reanimating Warriors")
                                                         self.player_resolving_effect.append(primary_player.name_player)
@@ -3481,7 +3487,8 @@ class Game:
                                                                                   planet_pos, unit_pos))
                                                 if secondary_player.get_ability_given_pos(att_pla, att_pos) \
                                                         == "Deathskull Lootas":
-                                                    self.create_reaction("Deathskull Lootas", secondary_player.name_player,
+                                                    self.create_reaction("Deathskull Lootas",
+                                                                         secondary_player.name_player,
                                                                          (int(secondary_player.number), planet_pos,
                                                                           unit_pos))
                                                 if secondary_player.get_ability_given_pos(
@@ -3490,6 +3497,18 @@ class Game:
                                                                          secondary_player.name_player,
                                                                          (int(secondary_player.number), planet_pos,
                                                                           unit_pos))
+                                                for i in range(len(secondary_player.cards_in_play[att_pla + 1][
+                                                                       att_pos].get_attachments())):
+                                                    if secondary_player.cards_in_play[att_pla + 1][
+                                                        att_pos].get_attachments()[i].get_ability() \
+                                                            == "Nocturne-Ultima Storm Bolter" and secondary_player. \
+                                                            cards_in_play[att_pla + 1][att_pos].get_attachments()[
+                                                        i].name_owner \
+                                                            == secondary_player.name_player:
+                                                        self.create_reaction("Nocturne-Ultima Storm Bolter",
+                                                                             secondary_player.name_player,
+                                                                             (int(secondary_player.number), att_pla,
+                                                                              att_pos))
                                                 if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                     if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                                             .get_card_type() != "Warlord":
@@ -3499,8 +3518,8 @@ class Game:
                                                                                  secondary_player.name_player,
                                                                                  (int(primary_player.number),
                                                                                   planet_pos, unit_pos))
-                                                        if secondary_player.search_attachments_at_pos(att_pla, att_pos,
-                                                                                                      "Pincer Tail"):
+                                                        if secondary_player.search_attachments_at_pos(
+                                                                att_pla, att_pos, "Pincer Tail", must_match_name=True):
                                                             self.create_reaction("Pincer Tail",
                                                                                  secondary_player.name_player,
                                                                                  pos_holder)
@@ -3613,11 +3632,11 @@ class Game:
                             if self.positions_attackers_of_units_to_take_damage[0]:
                                 hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                                 if planet_pos == hurt_planet:
-                                    if not primary_player.cards_in_play[hurt_planet + 1][hurt_pos]\
+                                    if not primary_player.cards_in_play[hurt_planet + 1][hurt_pos] \
                                             .check_for_a_trait("Vehicle"):
                                         if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                            primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                            primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
                                                 misc_ability_used = True
                                             self.amount_that_can_be_removed_by_shield[0] = \
                                                 self.amount_that_can_be_removed_by_shield[0] - 1
@@ -3644,7 +3663,8 @@ class Game:
                                 if int(game_update_string[3]) == unit_pos:
                                     attachment_pos = int(game_update_string[4])
                                     attachment = primary_player.headquarters[unit_pos].get_attachments()[attachment_pos]
-                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready():
+                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
+                                            attachment.name_owner == primary_player.name_player:
                                         attachment.exhaust_card()
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.pos_shield_card = -1
@@ -3663,7 +3683,8 @@ class Game:
                                     attachment_pos = int(game_update_string[5])
                                     attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                         .get_attachments()[attachment_pos]
-                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready():
+                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
+                                            attachment.name_owner == primary_player.name_player:
                                         attachment.exhaust_card()
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.pos_shield_card = -1
@@ -3940,7 +3961,7 @@ class Game:
                                     card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
                                                               self.cards_dict)
                                     if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                         self.location_hand_attachment_shadowsun = hand_pos
                                         primary_player.aiming_reticle_coords_hand = hand_pos
                                         primary_player.aiming_reticle_color = "blue"
@@ -4021,7 +4042,7 @@ class Game:
                                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                 .check_for_a_trait("Warrior") or \
                                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                .check_for_a_trait("Soldier"):
+                                                        .check_for_a_trait("Soldier"):
                                             primary_player.aiming_reticle_coords_hand = None
                                             primary_player.discard_card_from_hand(self.pos_shield_card)
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
