@@ -112,7 +112,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
     elif self.action_chosen == "Subdual":
-        player_owning_card.deck.insert(0, card_chosen.get_name())
+        if card_chosen.name_owner == self.name_1:
+            self.p1.deck.insert(0, card_chosen.get_name())
+        else:
+            self.p2.deck.insert(0, card_chosen.get_name())
         del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
         self.action_chosen = ""
         self.player_with_action = ""

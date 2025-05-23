@@ -3830,8 +3830,8 @@ class Game:
                                         player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
                 if self.location_of_indirect == "PLANET" or self.location_of_indirect == "ALL":
                     if len(game_update_string) == 4:
-                        if self.planet_of_indirect == int(game_update_string[2]):
-                            if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[0] == "IN_PLAY":
+                            if self.planet_of_indirect == int(game_update_string[2]):
                                 if game_update_string[1] == player.get_number():
                                     if player.get_card_type_given_pos(
                                             int(game_update_string[2]), int(game_update_string[3])) \
