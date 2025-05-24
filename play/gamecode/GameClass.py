@@ -1884,8 +1884,7 @@ class Game:
                             self.asked_if_resolve_effect = True
                             self.misc_target_unit = (-1, -1)
                         if game_update_string[1] == "1":
-                            del self.interrupts_waiting_on_resolution[0]
-                            del self.player_resolving_interrupts[0]
+                            self.delete_interrupt()
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -1997,6 +1996,7 @@ class Game:
                                 self.name_player_making_choices = ""
                                 self.interrupts_waiting_on_resolution.append("No Mercy")
                                 self.player_resolving_interrupts.append(name)
+                                self.already_resolving_interrupt = True
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -2522,6 +2522,7 @@ class Game:
                                     primary_player.aiming_reticle_color = "blue"
                                     self.interrupts_waiting_on_resolution.append("Glorious Intervention")
                                     self.player_resolving_interrupts.append(primary_player.name_player)
+                                    self.already_resolving_interrupt = True
                     elif self.choice_context == "Awake the Sleepers":
                         target_name = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.append(target_name)
@@ -3955,8 +3956,7 @@ class Game:
                             if abs(origin_planet - target_planet) == 1:
                                 primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                                 primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
-                                del self.interrupts_waiting_on_resolution[0]
-                                del self.player_resolving_interrupts[0]
+                                self.delete_interrupt()
                                 self.asked_if_resolve_effect = False
                                 self.chosen_first_card = False
                     elif len(game_update_string) == 4 and not self.chosen_first_card:
@@ -4009,8 +4009,7 @@ class Game:
                                             att_num, att_pla, att_pos = \
                                                 self.positions_attackers_of_units_to_take_damage[0]
                                             secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
-                                            del self.interrupts_waiting_on_resolution[0]
-                                            del self.player_resolving_interrupts[0]
+                                            self.delete_interrupt()
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif self.interrupts_waiting_on_resolution[0] == "No Mercy":
                 if len(game_update_string) == 3:
@@ -4022,8 +4021,7 @@ class Game:
                                     primary_player.headquarters[hq_pos].get_ready():
                                 primary_player.exhaust_given_pos(-2, hq_pos)
                                 primary_player.discard_card_name_from_hand("No Mercy")
-                                del self.interrupts_waiting_on_resolution[0]
-                                del self.player_resolving_interrupts[0]
+                                self.delete_interrupt()
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
                 elif len(game_update_string) == 4:
@@ -4036,8 +4034,7 @@ class Game:
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ready():
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 primary_player.discard_card_name_from_hand("No Mercy")
-                                del self.interrupts_waiting_on_resolution[0]
-                                del self.player_resolving_interrupts[0]
+                                self.delete_interrupt()
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
 
