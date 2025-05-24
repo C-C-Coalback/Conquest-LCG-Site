@@ -676,6 +676,7 @@ class Player:
                                 del self.reactions_needing_resolving[i]
                                 del self.player_who_resolves_reaction[i]
                                 del self.positions_of_unit_triggering_reaction[i]
+                                i = i - 1
                         else:
                             del self.reactions_needing_resolving[i]
                             del self.player_who_resolves_reaction[i]
@@ -3014,7 +3015,9 @@ class Player:
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
-            self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
+            self.game.interrupts_waiting_on_resolution.append("Interrogator Acolyte")
+            self.game.player_resolving_interrupts.append(self.name_player)
+            # self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Mark of Chaos":
                 owner = card.get_attachments()[i].name_owner
