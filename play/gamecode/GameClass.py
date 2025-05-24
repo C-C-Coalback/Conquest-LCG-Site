@@ -1624,15 +1624,6 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
-                    elif self.asking_if_interrupt and self.interrupts_waiting_on_resolution \
-                            and not self.resolving_search_box:
-                        print("Asking if interrupt")
-                        self.asking_if_interrupt = False
-                        if game_update_string[1] == "0":
-                            self.has_chosen_to_resolve = True
-                        elif game_update_string[1] == "1":
-                            self.delete_interrupt()
-                        self.reset_choices_available()
                     elif self.choice_context == "Interrupt Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         print("Choice chosen:", chosen_choice)
@@ -1663,6 +1654,16 @@ class Game:
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                    elif self.asking_if_interrupt and self.interrupts_waiting_on_resolution \
+                            and not self.resolving_search_box:
+                        print("Asking if interrupt")
+                        self.asking_if_interrupt = False
+                        if game_update_string[1] == "0":
+                            self.has_chosen_to_resolve = True
+                            self.already_resolving_interrupt = True
+                        elif game_update_string[1] == "1":
+                            self.delete_interrupt()
+                        self.reset_choices_available()
                     elif self.choice_context == "Urien's Oubliette":
                         if game_update_string[1] == "0":
                             primary_player.discard_top_card_deck()
@@ -2577,9 +2578,8 @@ class Game:
                         self.name_player_making_choices = ""
                         if game_update_string[1] == "0":
                             self.shadowsun_chose_hand = True
+                            self.reactions_needing_resolving[0] = "Commander Shadowsun hand"
                             self.location_hand_attachment_shadowsun = -1
-                            self.interrupts_waiting_on_resolution.append("Commander Shadowsun")
-                            self.player_resolving_interrupts.append(name)
                             await self.send_update_message("Choose card in hand")
                         else:
                             self.shadowsun_chose_hand = False
@@ -2589,7 +2589,7 @@ class Game:
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -2597,6 +2597,7 @@ class Game:
                                 self.name_player_making_choices = ""
                                 await self.send_update_message("No valid cards in discard")
                                 self.resolving_search_box = False
+                                self.delete_reaction()
                             else:
                                 await self.send_update_message("Choose card in discard")
                     elif self.choice_context == "Shadowsun attachment from discard:":
@@ -2606,8 +2607,7 @@ class Game:
                         self.choices_available = []
                         self.choice_context = ""
                         self.name_player_making_choices = ""
-                        self.interrupts_waiting_on_resolution.append("Commander Shadowsun")
-                        self.player_resolving_interrupts.append(name)
+                        self.reactions_needing_resolving[0] = "Commander Shadowsun discard"
                     elif self.choice_context == "Which deck to use Crucible of Malediction:":
                         self.reset_choices_available()
                         if game_update_string[1] == "0":
@@ -3760,6 +3760,10 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     if self.reactions_needing_resolving[0] == "Soul Grinder":
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]
@@ -3973,91 +3977,6 @@ class Game:
                                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
                                         primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-            elif self.interrupts_waiting_on_resolution[0] == "Commander Shadowsun":
-                if self.shadowsun_chose_hand:
-                    if len(game_update_string) == 1:
-                        if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            primary_player.aiming_reticle_coords_hand = None
-                            del self.interrupts_waiting_on_resolution[0]
-                            del self.player_resolving_interrupts[0]
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.resolving_search_box = False
-                    if len(game_update_string) == 3:
-                        if game_update_string[0] == "HAND":
-                            if game_update_string[1] == primary_player.get_number():
-                                if self.location_hand_attachment_shadowsun == -1:
-                                    hand_pos = int(game_update_string[2])
-                                    card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
-                                                              self.cards_dict)
-                                    if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                            card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
-                                        self.location_hand_attachment_shadowsun = hand_pos
-                                        primary_player.aiming_reticle_coords_hand = hand_pos
-                                        primary_player.aiming_reticle_color = "blue"
-                    elif len(game_update_string) == 4:
-                        if game_update_string[0] == "IN_PLAY":
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if planet_pos == primary_player.warlord_commit_location:
-                                if game_update_string[1] == primary_player.number:
-                                    player_receiving_attachment = primary_player
-                                    own_attachment = True
-                                else:
-                                    player_receiving_attachment = secondary_player
-                                    own_attachment = False
-                                card = FindCard.find_card(primary_player.cards[self.location_hand_attachment_shadowsun],
-                                                          self.card_array, self.cards_dict)
-                                army_unit_as_attachment = False
-                                if card.get_name() == "Shadowsun's Stealth Cadre":
-                                    army_unit_as_attachment = True
-                                if player_receiving_attachment.play_attachment_card_to_in_play(
-                                        card, planet_pos, unit_pos, discounts=card.get_cost(),
-                                        not_own_attachment=own_attachment,
-                                        army_unit_as_attachment=army_unit_as_attachment):
-                                    primary_player.remove_card_from_hand(self.location_hand_attachment_shadowsun)
-                                    primary_player.aiming_reticle_coords_hand = None
-                                    self.shadowsun_chose_hand = False
-                                    self.location_hand_attachment_shadowsun = -1
-                                    self.resolving_search_box = False
-                                    del self.interrupts_waiting_on_resolution[0]
-                                    del self.player_resolving_interrupts[0]
-                                else:
-                                    await self.send_update_message("Invalid target")
-                else:
-                    if len(game_update_string) == 4:
-                        if game_update_string[0] == "IN_PLAY":
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if planet_pos == primary_player.warlord_commit_location:
-                                if game_update_string[1] == primary_player.number:
-                                    player_receiving_attachment = primary_player
-                                    own_attachment = True
-                                else:
-                                    player_receiving_attachment = secondary_player
-                                    own_attachment = False
-                                card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array,
-                                                          self.cards_dict)
-                                army_unit_as_attachment = False
-                                if card.get_name() == "Shadowsun's Stealth Cadre":
-                                    army_unit_as_attachment = True
-                                if player_receiving_attachment.play_attachment_card_to_in_play(
-                                        card, planet_pos, unit_pos, discounts=card.get_cost(),
-                                        not_own_attachment=own_attachment,
-                                        army_unit_as_attachment=army_unit_as_attachment):
-                                    i = 0
-                                    removed_card = False
-                                    while i < len(primary_player.discard) and not removed_card:
-                                        if primary_player.discard[i] == self.name_attachment_discard_shadowsun:
-                                            removed_card = True
-                                            del primary_player.discard[i]
-                                    self.name_attachment_discard_shadowsun = ""
-                                    self.resolving_search_box = False
-                                    del self.interrupts_waiting_on_resolution[0]
-                                    del self.player_resolving_interrupts[0]
-                                else:
-                                    await self.send_update_message("Invalid target")
             elif self.interrupts_waiting_on_resolution[0] == "Glorious Intervention":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -4647,7 +4566,7 @@ class Game:
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_interrupt = True
-                            await self.send_update_message("Do interrupt code here")
+                            self.reset_choices_available()
                             await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
                     else:
                         interrupt_pos = self.stored_interrupt_indexes[0]
@@ -4661,7 +4580,7 @@ class Game:
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_interrupt = True
-                            await self.send_update_message("Do interrupt code here")
+                            self.reset_choices_available()
                             await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
                 else:
                     self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_2)
@@ -4678,7 +4597,7 @@ class Game:
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_interrupt = True
-                            await self.send_update_message("Do interrupt code here")
+                            self.reset_choices_available()
                             await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
                     else:
                         interrupt_pos = self.stored_interrupt_indexes[0]
@@ -4692,7 +4611,7 @@ class Game:
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
                             self.already_resolving_interrupt = True
-                            await self.send_update_message("Do interrupt code here")
+                            self.reset_choices_available()
                             await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):

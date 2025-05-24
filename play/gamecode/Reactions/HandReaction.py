@@ -11,6 +11,16 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
             self.banshee_power_sword_extra_attack += 1
+        elif self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
+            if self.location_hand_attachment_shadowsun == -1:
+                hand_pos = int(game_update_string[2])
+                card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
+                                          self.cards_dict)
+                if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
+                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                    self.location_hand_attachment_shadowsun = hand_pos
+                    primary_player.aiming_reticle_coords_hand = hand_pos
+                    primary_player.aiming_reticle_color = "blue"
         elif self.reactions_needing_resolving[0] == "Elysian Assault Team":
             hand_pos = int(game_update_string[2])
             if primary_player.cards[hand_pos] == "Elysian Assault Team":
