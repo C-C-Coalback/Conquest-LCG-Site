@@ -95,10 +95,13 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
         elif game_update_string[0] == "HQ":
             if name == self.player_with_deploy_turn:
-                if game_update_string[1] == self.number_with_deploy_turn:
-                    if self.mode == "Normal":
+                if self.mode == "Normal":
+                    if game_update_string[1] == self.number_with_deploy_turn:
                         await deploy_card_routine_attachment(self, name, game_update_string)
-                    if self.mode == "DISCOUNT":
+                    else:
+                        await deploy_card_routine_attachment(self, name, game_update_string)
+                if self.mode == "DISCOUNT":
+                    if game_update_string[1] == self.number_with_deploy_turn:
                         if self.number_with_deploy_turn == "1":
                             player = self.p1
                         else:

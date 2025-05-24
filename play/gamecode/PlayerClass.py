@@ -580,18 +580,54 @@ class Player:
         print("performing relic search")
         for i in range(len(self.headquarters)):
             if self.headquarters[i].check_for_a_trait("Relic"):
-                return True
+                if self.headquarters[i].name_owner == self.name_player:
+                    return True
             for j in range(len(self.headquarters[i].get_attachments())):
                 if self.headquarters[i].get_attachments()[j].check_for_a_trait("Relic"):
-                    return True
+                    if self.headquarters[i].get_attachments()[j].name_owner == self.name_player:
+                        return True
+        print("not own hq")
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Relic"):
-                    return True
+                    if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == self.name_player:
+                        return True
                 for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
                     if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
                             check_for_a_trait("Relic"):
+                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                                name_owner == self.name_player:
+                            return True
+        print("not own in play")
+        if self.name_player == self.game.name_1:
+            return self.game.p2.search_enemy_relic_in_own_cards()
+        return self.game.p1.search_enemy_relic_in_own_cards()
+
+    def search_enemy_relic_in_own_cards(self):
+        name = self.game.name_1
+        if name == self.name_player:
+            name = self.game.name_2
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].check_for_a_trait("Relic"):
+                if self.headquarters[i].name_owner == name:
+                    return True
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[j].check_for_a_trait("Relic"):
+                    if self.headquarters[i].get_attachments()[j].name_owner == name:
                         return True
+        print("not enemy hq")
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Relic"):
+                    if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == name:
+                        return True
+                for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                            check_for_a_trait("Relic"):
+                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                                name_owner == name:
+                            return True
+        print("not enemy in play")
         return False
 
     def search_for_unique_card(self, name):
