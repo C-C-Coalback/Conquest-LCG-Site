@@ -280,6 +280,18 @@ class Game:
         self.shining_blade_active = False
         self.value_doom_siren = 0
         self.before_first_combat = False
+        self.last_planet_checked_command_struggle = -1
+        self.planet_aiming_reticle_active = True
+        self.during_command_struggle = False
+        self.before_command_at_planet_resolves = False
+        self.during_command_at_planet_resolves = False
+        self.after_command_at_planet_resolves = False
+        self.interrupts_before_cs_allowed = True
+        self.interrupts_during_cs_allowed = True
+        self.reactions_after_cs_allowed = True
+        self.name_winner_cs = ""
+        self.total_gains_command_struggle = [None, None, None, None, None, None, None]
+        self.resolve_remaining_cs_after_reactions = False
 
     async def send_update_message(self, message):
         if self.game_sockets:
@@ -4705,6 +4717,11 @@ class Game:
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
             self.last_player_who_resolved_reaction = ""
+            if self.resolve_remaining_cs_after_reactions and not self.positions_of_units_to_take_damage \
+                    and not self.interrupts_waiting_on_resolution:
+                self.resolve_remaining_cs_after_reactions = False
+                ret_val = CommandPhase.try_entire_command(self, self.last_planet_checked_command_struggle)
+                await CommandPhase.interpret_command_state(self, ret_val)
         if not self.interrupts_waiting_on_resolution:
             self.last_player_who_resolved_interrupt = ""
         if self.positions_of_units_to_take_damage:

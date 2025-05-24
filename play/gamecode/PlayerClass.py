@@ -2078,6 +2078,15 @@ class Player:
                     sacrificed_locations[planet_pos + 1] = True
         return sacrificed_locations
 
+    def clear_effects_end_of_cs(self):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_is_unit():
+                self.headquarters[i].hit_by_superiority = False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.cards_in_play[i + 1][j].get_is_unit():
+                    self.cards_in_play[i + 1][j].hit_by_superiority = False
+
     def reset_extra_abilities_eop(self):
         self.dark_possession_active = False
         for i in range(len(self.headquarters)):

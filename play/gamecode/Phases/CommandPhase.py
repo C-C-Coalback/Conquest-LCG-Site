@@ -197,23 +197,6 @@ async def update_game_event_command_section(self, name, game_update_string):
                 elif name == self.name_2:
                     self.p2.has_passed = True
         elif len(game_update_string) == 3:
-            if game_update_string[0] == "HQ":
-                if name == self.name_1:
-                    primary_player = self.p1
-                    secondary_player = self.p2
-                else:
-                    primary_player = self.p2
-                    secondary_player = self.p1
-                if game_update_string[1] == primary_player.get_number():
-                    unit_pos = int(game_update_string[2])
-                    if primary_player.get_ability_given_pos(-2, unit_pos) == "Archon's Palace":
-                        if primary_player.get_ready_given_pos(-2, unit_pos):
-                            primary_player.exhaust_given_pos(-2, unit_pos)
-                            self.mode = "ACTION"
-                            self.action_chosen = "Archon's Palace"
-                            self.player_with_action = primary_player.name_player
-                            self.position_of_actioned_card = (-2, unit_pos)
-                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
             if game_update_string[0] == "HAND":
                 if name == self.name_1:
                     primary_player = self.p1
@@ -267,30 +250,70 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.player_who_resolves_reaction.append(primary_player.name_player)
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                    elif primary_player.cards[hand_pos] == "Superiority":
-                        cost = 1
-                        if primary_player.urien_relevant:
-                            cost += 1
-                        if secondary_player.nullify_check() and self.nullify_enabled:
-                            await self.send_update_message(
-                                primary_player.name_player + " wants to play Superiority; "
-                                                             "Nullify window offered.")
-                            self.choices_available = ["Yes", "No"]
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Nullify?"
-                            self.nullified_card_pos = int(game_update_string[2])
-                            self.nullified_card_name = "Superiority"
-                            self.cost_card_nullified = cost
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Superiority"
-                        elif primary_player.spend_resources(cost):
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
-                                                                               -1, -1])
-                            self.reactions_needing_resolving.append("Superiority")
-                            self.player_who_resolves_reaction.append(primary_player.name_player)
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+    elif self.during_command_struggle:
+        if len(game_update_string) == 1:
+            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                if name == self.name_1:
+                    self.p1.has_passed = True
+                elif name == self.name_2:
+                    self.p2.has_passed = True
+        elif len(game_update_string) == 3:
+            if game_update_string[0] == "HAND":
+                if self.interrupts_before_cs_allowed:
+                    if name == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    if game_update_string[1] == primary_player.get_number():
+                        hand_pos = int(game_update_string[2])
+                        if primary_player.cards[hand_pos] == "Superiority":
+                            cost = 1
+                            if primary_player.urien_relevant:
+                                cost += 1
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play Superiority; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = int(game_update_string[2])
+                                self.nullified_card_name = "Superiority"
+                                self.cost_card_nullified = cost
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "Superiority"
+                            elif primary_player.spend_resources(cost):
+                                self.positions_of_unit_triggering_reaction.append((int(primary_player.get_number()),
+                                                                                   -1, -1))
+                                self.reactions_needing_resolving.append("Superiority")
+                                self.player_who_resolves_reaction.append(primary_player.name_player)
+                                primary_player.aiming_reticle_color = "blue"
+                                primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+            if game_update_string[0] == "HQ":
+                if not self.interrupts_before_cs_allowed and self.interrupts_during_cs_allowed:
+                    if name == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    if game_update_string[1] == primary_player.get_number():
+                        unit_pos = int(game_update_string[2])
+                        if primary_player.get_ability_given_pos(-2, unit_pos) == "Archon's Palace":
+                            if primary_player.get_ready_given_pos(-2, unit_pos):
+                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                self.mode = "ACTION"
+                                self.action_chosen = "Archon's Palace"
+                                self.player_with_action = primary_player.name_player
+                                self.misc_target_planet = self.last_planet_checked_command_struggle
+                                self.choices_available = ["Cards", "Resources"]
+                                self.choice_context = "Archon's Palace"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.position_of_actioned_card = (-2, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
     elif self.after_command_struggle:
         print("After command struggle")
         if len(game_update_string) == 1:
@@ -316,12 +339,19 @@ async def update_game_event_command_section(self, name, game_update_string):
     if self.p1.has_passed and self.p2.has_passed:
         print("Both passed")
         if self.before_command_struggle:
-            resolve_command_struggle(self)
             self.before_command_struggle = False
-            self.after_command_struggle = True
-            self.p1.has_passed = False
-            self.p2.has_passed = False
-            await self.send_update_message("Window given for actions after command struggle.")
+            self.during_command_struggle = True
+            self.last_planet_checked_command_struggle = self.round_number
+            self.total_gains_command_struggle = [None, None, None, None, None, None, None]
+            ret_val = try_entire_command(self, self.last_planet_checked_command_struggle)
+            await interpret_command_state(self, ret_val)
+        elif self.during_command_struggle:
+            if self.interrupts_before_cs_allowed:
+                self.interrupts_before_cs_allowed = False
+            elif self.interrupts_during_cs_allowed:
+                self.interrupts_during_cs_allowed = False
+            ret_val = try_entire_command(self, self.last_planet_checked_command_struggle)
+            await interpret_command_state(self, ret_val)
         elif self.after_command_struggle:
             self.before_command_struggle = False
             self.after_command_struggle = False
@@ -340,16 +370,93 @@ async def update_game_event_command_section(self, name, game_update_string):
             if self.p1.mobile_resolved and self.p2.mobile_resolved:
                 await self.send_update_message("Window granted for players to use "
                                                "reactions/actions before the battle begins.")
-            """
-            self.check_battle(self.round_number)
-            self.begin_battle(self.round_number)
-            self.begin_combat_round()
-            self.set_battle_initiative()
-            self.planet_aiming_reticle_active = True
-            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-            self.p1.has_passed = False
-            self.p2.has_passed = False
-            """
+
+
+async def interpret_command_state(self, ret_val):
+    if ret_val == "COMPLETE":
+        receive_winnings(self)
+        self.planet_aiming_reticle_position = -1
+        self.after_command_struggle = True
+        self.during_command_struggle = False
+        self.p1.has_passed = False
+        self.p2.has_passed = False
+        self.resolve_remaining_cs_after_reactions = False
+        await self.send_update_message("Window given for actions after command struggle.")
+    elif ret_val == "INTERRUPT PRE STRUGGLE":
+        message = "Window given for effects pre-command struggle at " + \
+                  self.planet_array[self.last_planet_checked_command_struggle] + "."
+        await self.send_update_message(message)
+    elif ret_val == "INTERRUPT DURING STRUGGLE":
+        message = "Window given for effects mid-command struggle at " + \
+                  self.planet_array[self.last_planet_checked_command_struggle] + "."
+        await self.send_update_message(message)
+    elif ret_val == "REACTIONS":
+        message = "Reactions need resolving before command struggles may continue."
+        await self.send_update_message(message)
+
+
+def try_entire_command(self, planet_pos):
+    self.planet_aiming_reticle_position = planet_pos
+    if planet_pos > 6:
+        return "COMPLETE"
+    if not self.planets_in_play_array[planet_pos]:
+        return try_entire_command(self, planet_pos + 1)
+    if self.interrupts_before_cs_allowed:
+        self.p1.has_passed = False
+        self.p2.has_passed = False
+        if self.p1.search_hand_for_card("Superiority") and self.p2.count_command_at_planet(planet_pos) > 0:
+            cost = 1
+            if self.p1.urien_relevant:
+                cost += 1
+            if self.p1.resources >= cost:
+                return "INTERRUPT PRE STRUGGLE"
+        elif self.p2.search_hand_for_card("Superiority") and self.p1.count_command_at_planet(planet_pos) > 0:
+            cost = 1
+            if self.p2.urien_relevant:
+                cost += 1
+            if self.p2.resources >= cost:
+                return "INTERRUPT PRE STRUGGLE"
+    name_winner = determine_winner_command_struggle(self, planet_pos)
+    if self.interrupts_during_cs_allowed:
+        self.interrupts_before_cs_allowed = False
+        self.p1.has_passed = False
+        self.p2.has_passed = False
+        if name_winner == "":
+            pass
+        elif name_winner == self.name_1:
+            if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
+                return "INTERRUPT DURING STRUGGLE"
+        elif name_winner == self.name_2:
+            if self.p1.search_card_in_hq("Archon's Palace", ready_relevant=True):
+                return "INTERRUPT DURING STRUGGLE"
+    winnings = None
+    if name_winner == self.name_1:
+        winnings = resolve_winnings(self, self.p1, self.p2, planet_pos)
+    elif name_winner == self.name_2:
+        winnings = resolve_winnings(self, self.p2, self.p1, planet_pos)
+    self.total_gains_command_struggle[planet_pos] = winnings
+    self.last_planet_checked_command_struggle += 1
+    self.interrupts_during_cs_allowed = True
+    self.interrupts_before_cs_allowed = True
+    self.p1.clear_effects_end_of_cs()
+    self.p2.clear_effects_end_of_cs()
+    if not self.reactions_needing_resolving:
+        return try_entire_command(self, self.last_planet_checked_command_struggle)
+    self.resolve_remaining_cs_after_reactions = True
+    return "REACTIONS"
+
+
+def receive_winnings(self):
+    for i in range(len(self.total_gains_command_struggle)):
+        if self.total_gains_command_struggle[i] is not None:
+            if self.total_gains_command_struggle[i][0] == "1":
+                self.p1.add_resources(self.total_gains_command_struggle[i][1])
+                for _ in range(self.total_gains_command_struggle[i][2]):
+                    self.p1.draw_card()
+            elif self.total_gains_command_struggle[i][0] == "2":
+                self.p2.add_resources(self.total_gains_command_struggle[i][1])
+                for _ in range(self.total_gains_command_struggle[i][2]):
+                    self.p2.draw_card()
 
 
 def resolve_command_struggle(self):
@@ -370,6 +477,52 @@ def resolve_command_struggle(self):
                     self.p2.draw_card()
 
 
+def resolve_winnings(self, winner, loser, planet_id):
+    chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
+    if self.canceled_resource_bonuses[planet_id]:
+        resources_won = 0
+    else:
+        resources_won = chosen_planet.get_resources()
+    if self.canceled_card_bonuses[planet_id]:
+        cards_won = 0
+    else:
+        cards_won = chosen_planet.get_cards()
+    extra_resources, extra_cards = winner.get_bonus_winnings_at_planet(planet_id)
+    resources_won += extra_resources
+    cards_won += extra_cards
+    ret_val = [winner.number, resources_won, cards_won]
+    already_noxious = False
+    if winner.search_card_in_hq("Omega Zero Command"):
+        winner.summon_token_at_planet("Guardsman", planet_id)
+    for i in range(len(self.p1.cards_in_play[planet_id + 1])):
+        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
+            winner.set_aiming_reticle_in_play(planet_id, i, "blue")
+            self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
+        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
+            winner.set_aiming_reticle_in_play(planet_id, i, "blue")
+            self.create_reaction("Toxic Venomthrope", winner.name_player, ("1", planet_id, i))
+        attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
+        for j in range(len(attachments)):
+            if attachments[j].get_ability() == "Noxious Fleshborer":
+                if not already_noxious and not self.infested_planets[planet_id]:
+                    already_noxious = True
+                    own = attachments[j].name_owner
+                    self.create_reaction("Noxious Fleshborer", own, (int(winner.number), planet_id, i))
+    return ret_val
+
+
+def determine_winner_command_struggle(self, planet_id):
+    fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
+    fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
+    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2)
+    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1)
+    if command_p1 > command_p2:
+        return self.name_1
+    elif command_p2 > command_p1:
+        return self.name_2
+    return ""
+
+
 def resolve_command_struggle_at_planet(self, planet_id):
     fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
     fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
@@ -377,72 +530,8 @@ def resolve_command_struggle_at_planet(self, planet_id):
     command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1)
     if command_p1 > command_p2:
         print("P1 wins command")
-        chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-        if self.canceled_resource_bonuses[planet_id]:
-            resources_won = 0
-        else:
-            resources_won = chosen_planet.get_resources()
-        if self.canceled_card_bonuses[planet_id]:
-            cards_won = 0
-        else:
-            cards_won = chosen_planet.get_cards()
-        extra_resources, extra_cards = self.p1.get_bonus_winnings_at_planet(planet_id)
-        resources_won += extra_resources
-        cards_won += extra_cards
-        ret_val = ["1", resources_won, cards_won]
-        already_noxious = False
-        if self.p1.search_card_in_hq("Omega Zero Command"):
-            self.p1.summon_token_at_planet("Guardsman", planet_id)
-        for i in range(len(self.p1.cards_in_play[planet_id + 1])):
-            if self.p1.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
-                self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
-                self.positions_of_unit_triggering_reaction.append(["1", planet_id, i])
-                self.reactions_needing_resolving.append("Soul Grinder")
-                self.player_who_resolves_reaction.append(self.name_1)
-            if self.p1.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
-                self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
-                self.create_reaction("Toxic Venomthrope", self.name_1, ("1", planet_id, i))
-            attachments = self.p1.cards_in_play[planet_id + 1][i].get_attachments()
-            for j in range(len(attachments)):
-                if attachments[j].get_ability() == "Noxious Fleshborer":
-                    if not already_noxious and not self.infested_planets[planet_id]:
-                        already_noxious = True
-                        own = attachments[j].name_owner
-                        self.create_reaction("Noxious Fleshborer", own, (1, planet_id, i))
-        return ret_val
+        return resolve_winnings(self, self.p1, self.p2, planet_id)
     elif command_p2 > command_p1:
         print("P2 wins command")
-        chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
-        if self.canceled_resource_bonuses[planet_id]:
-            resources_won = 0
-        else:
-            resources_won = chosen_planet.get_resources()
-        if self.canceled_card_bonuses[planet_id]:
-            cards_won = 0
-        else:
-            cards_won = chosen_planet.get_cards()
-        extra_resources, extra_cards = self.p2.get_bonus_winnings_at_planet(planet_id)
-        resources_won += extra_resources
-        cards_won += extra_cards
-        ret_val = ["2", resources_won, cards_won]
-        already_noxious = False
-        if self.p2.search_card_in_hq("Omega Zero Command"):
-            self.p2.summon_token_at_planet("Guardsman", planet_id)
-        for i in range(len(self.p2.cards_in_play[planet_id + 1])):
-            if self.p2.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
-                self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
-                self.positions_of_unit_triggering_reaction.append(["2", planet_id, i])
-                self.reactions_needing_resolving.append("Soul Grinder")
-                self.player_who_resolves_reaction.append(self.name_2)
-            if self.p2.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
-                self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
-                self.create_reaction("Toxic Venomthrope", self.name_2, ("2", planet_id, i))
-            attachments = self.p2.cards_in_play[planet_id + 1][i].get_attachments()
-            for j in range(len(attachments)):
-                if attachments[j].get_ability() == "Noxious Fleshborer":
-                    if not already_noxious and not self.infested_planets[planet_id]:
-                        already_noxious = True
-                        own = attachments[j].name_owner
-                        self.create_reaction("Noxious Fleshborer", own, (2, planet_id, i))
-        return ret_val
+        return resolve_winnings(self, self.p2, self.p1, planet_id)
     return None

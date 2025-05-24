@@ -509,7 +509,6 @@ class UnitCard(Card):
     def get_command(self):
         command = self.command
         if self.hit_by_superiority:
-            self.hit_by_superiority = False
             return 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
