@@ -105,7 +105,8 @@ def chaos_cards_init():
                                                     "Forced Interrupt: When attached unit exhaust,"
                                                     " deal it 1 damage.", "Curse. Tzeentch.",
                                    1, "Chaos", "Common", 1, False,
-                                   type_of_units_allowed_for_attachment="Army"),
+                                   type_of_units_allowed_for_attachment="Army", ambush=True,
+                                   action_in_hand=True, allowed_phases_in_hand="COMBAT"),
         CardClasses.SupportCard("Fortress of Madness", "Limited.\nInterrupt: When you deploy"
                                                        " a Chaos unit, exhaust this support to "
                                                        "reduce that unit's cost by 1.",

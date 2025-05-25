@@ -291,7 +291,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                       self.attacker_position))
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \
                                     == "Wailing Wraithfighter":
-                                self.create_reaction("Wailing Wraith Fighter", player.name_player,
+                                self.create_reaction("Wailing Wraithfighter", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.get_ability_given_pos(chosen_planet, self.attacker_position) \

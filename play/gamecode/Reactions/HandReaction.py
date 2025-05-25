@@ -3,6 +3,7 @@ from .. import FindCard
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
     if game_update_string[1] == primary_player.get_number():
+        print("hand reaction num ok")
         if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)

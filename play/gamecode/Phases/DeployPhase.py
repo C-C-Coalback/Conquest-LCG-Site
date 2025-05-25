@@ -247,7 +247,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     print("Finished deploying card")
 
 
-async def deploy_card_routine_attachment(self, name, game_update_string):
+async def deploy_card_routine_attachment(self, name, game_update_string, special_action=False):
     if game_update_string[0] == "HQ":
         game_update_string = ["HQ", game_update_string[1], "-2", game_update_string[2]]
     print("Deploy attachment to: player ", game_update_string[1], "planet ", game_update_string[2],
@@ -259,6 +259,13 @@ async def deploy_card_routine_attachment(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    if special_action:
+        if self.player_with_action == self.name_1:
+            primary_player = self.p1
+            secondary_player = self.p2
+        else:
+            primary_player = self.p2
+            secondary_player = self.p1
     if game_update_string[1] == "1":
         player_gaining_attachment = self.p1
     else:

@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def update_game_event_action_in_play(self, name, game_update_string):
@@ -781,6 +782,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (-1, -1)
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.action_cleanup()
+    elif self.action_chosen == "Ambush":
+        if self.card_type_of_selected_card_in_hand == "Attachment":
+            await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True

@@ -3745,6 +3745,7 @@ class Game:
 
     async def resolve_reaction(self, name, game_update_string):
         if name == self.player_who_resolves_reaction[0]:
+            print("player reacting:", name)
             if name == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -3790,7 +3791,9 @@ class Game:
                     await PlanetsReaction.resolve_planet_reaction(self, name, game_update_string,
                                                                   primary_player, secondary_player)
             elif len(game_update_string) == 3:
+                print("len is 3")
                 if game_update_string[0] == "HAND":
+                    print("hand reaction")
                     await HandReaction.resolve_hand_reaction(self, name, game_update_string,
                                                              primary_player, secondary_player)
                 elif game_update_string[0] == "HQ":
