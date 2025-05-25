@@ -3022,6 +3022,12 @@ class Player:
                     if not already_cadian_mortar_squad:
                         self.game.create_reaction("Cadian Mortar Squad", self.name_player, (int(self.number),
                                                                                             planet_num, -1))
+                for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
+                    if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability()\
+                            == "Commissarial Bolt Pistol":
+                        self.game.create_reaction("Commissarial Bolt Pistol", self.name_player,
+                                                  (int(self.number), planet_num, i))
+                        print("created bolt pistol react")
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                 owner = card.get_attachments()[i].name_owner
