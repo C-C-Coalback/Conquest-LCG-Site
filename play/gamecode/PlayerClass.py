@@ -3168,10 +3168,16 @@ class Player:
         return True
 
     def resolve_combat_round_ends_effects(self, planet_id):
+        can_forward_barracks = False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ability_given_pos(planet_id, i) == "Anxious Infantry Platoon":
                 self.game.create_reaction("Anxious Infantry Platoon", self.name_player,
                                           (int(self.number), planet_id, i))
+            if self.get_faction_given_pos(planet_id, i) == "Astra Militarum":
+                can_forward_barracks = True
+        if can_forward_barracks:
+            if self.search_card_in_hq("Forward Barracks"):
+                self.game.create_reaction("Forward Barracks", self.name_player, (int(self.number), planet_id, -1))
 
     def rout_unit(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
