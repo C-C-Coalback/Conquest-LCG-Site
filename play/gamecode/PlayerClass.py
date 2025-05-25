@@ -3167,6 +3167,12 @@ class Player:
         self.remove_card_from_play(planet_id, unit_id)
         return True
 
+    def resolve_combat_round_ends_effects(self, planet_id):
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if self.get_ability_given_pos(planet_id, i) == "Anxious Infantry Platoon":
+                self.game.create_reaction("Anxious Infantry Platoon", self.name_player,
+                                          (int(self.number), planet_id, i))
+
     def rout_unit(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
@@ -3177,6 +3183,7 @@ class Player:
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
+        self.adjust_own_reactions(planet_id, unit_id)
         last_element_hq = len(self.headquarters) - 1
         self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
@@ -3270,6 +3277,7 @@ class Player:
             self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest")
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)
+        self.adjust_own_reactions(planet_id, unit_id)
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 

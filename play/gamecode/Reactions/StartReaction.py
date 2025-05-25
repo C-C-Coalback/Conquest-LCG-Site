@@ -228,6 +228,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
             self.player_who_resolves_reaction[0] = secondary_player.name_player
+        elif self.reactions_needing_resolving[0] == "Anxious Infantry Platoon":
+            self.choices_available = ["Pay resource", "Retreat unit"]
+            self.choice_context = "Anxious Infantry Platoon Payment"
+            self.name_player_making_choices = self.player_who_resolves_reaction[0]
         elif self.reactions_needing_resolving[0] == "Piranha Hunter":
             primary_player.draw_card()
             self.delete_reaction()

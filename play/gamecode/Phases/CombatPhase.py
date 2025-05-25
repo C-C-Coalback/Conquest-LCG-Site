@@ -80,6 +80,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
                             self.p1.has_passed = False
                             self.p2.has_passed = False
+                            self.p1.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
+                            self.p2.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
                             self.reset_combat_turn()
                             self.mode = "RETREAT"
                             await self.check_combat_end(name)

@@ -243,6 +243,7 @@ class Game:
             "Tense Negotiations", "Cacophonic Choir", "Slake the Thirst", "Rakarth's Experimentations",
             "Squiggify", "The Emperor's Warrant", "For the Tau'va"
         ]
+        self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean"]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
@@ -1717,6 +1718,16 @@ class Game:
                             secondary_player.draw_card()
                         self.action_cleanup()
                         self.reset_choices_available()
+                    elif self.choice_context == "Anxious Infantry Platoon Payment":
+                        if self.choices_available[int(game_update_string[1])] == "Pay resource":
+                            if primary_player.spend_resources(1):
+                                self.delete_reaction()
+                                self.reset_choices_available()
+                        else:
+                            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            primary_player.retreat_unit(planet_pos, unit_pos)
+                            self.reset_choices_available()
+                            self.delete_reaction()
                     elif self.choice_context == "Rakarth's Experimentations card type":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = ["Damage Warlord"]
@@ -4241,9 +4252,7 @@ class Game:
                             self.name_player_making_choices = self.name_1
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
-                                self.choices_available = ["Yes"]
-                            elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":
+                            if self.reactions_needing_resolving[0] in self.forced_reactions:
                                 self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
@@ -4258,7 +4267,7 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                            if self.reactions_needing_resolving[0] in self.forced_reactions:
                                 self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
@@ -4276,7 +4285,7 @@ class Game:
                             self.name_player_making_choices = self.name_2
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                            if self.reactions_needing_resolving[0] in self.forced_reactions:
                                 self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
@@ -4291,7 +4300,7 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] == "Warlock Destructor":
+                            if self.reactions_needing_resolving[0] in self.forced_reactions:
                                 self.choices_available = ["Yes"]
                             self.choice_context = self.reactions_needing_resolving[0]
                             self.name_player_making_choices = self.player_who_resolves_reaction[0]
