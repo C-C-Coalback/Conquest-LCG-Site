@@ -4036,6 +4036,10 @@ class Game:
                                     primary_player.headquarters[hq_pos].get_ready():
                                 primary_player.exhaust_given_pos(-2, hq_pos)
                                 primary_player.discard_card_name_from_hand("No Mercy")
+                                try:
+                                    secondary_player.discard_card_from_hand(self.pos_shield_card)
+                                except:
+                                    pass
                                 self.delete_interrupt()
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
@@ -4049,6 +4053,10 @@ class Game:
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ready():
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 primary_player.discard_card_name_from_hand("No Mercy")
+                                try:
+                                    secondary_player.discard_card_from_hand(self.pos_shield_card)
+                                except:
+                                    pass
                                 self.delete_interrupt()
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
