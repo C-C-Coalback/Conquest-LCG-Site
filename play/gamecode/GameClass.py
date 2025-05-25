@@ -292,6 +292,38 @@ class Game:
         self.name_winner_cs = ""
         self.total_gains_command_struggle = [None, None, None, None, None, None, None]
         self.resolve_remaining_cs_after_reactions = False
+        self.additional_icons_planets_eop = [[], [], [], [], [], [], []]
+        self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
+
+    def get_red_icon(self, planet_pos):
+        planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if planet_card.get_red():
+            return True
+        if "red" in self.additional_icons_planets_eop[planet_pos]:
+            return True
+        if "red" in self.additional_icons_planets_eob[planet_pos]:
+            return True
+        return False
+
+    def get_blue_icon(self, planet_pos):
+        planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if planet_card.get_blue():
+            return True
+        if "blue" in self.additional_icons_planets_eop[planet_pos]:
+            return True
+        if "blue" in self.additional_icons_planets_eob[planet_pos]:
+            return True
+        return False
+
+    def get_green_icon(self, planet_pos):
+        planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if planet_card.get_green():
+            return True
+        if "green" in self.additional_icons_planets_eop[planet_pos]:
+            return True
+        if "green" in self.additional_icons_planets_eob[planet_pos]:
+            return True
+        return False
 
     async def send_update_message(self, message):
         if self.game_sockets:

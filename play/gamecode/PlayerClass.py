@@ -2286,6 +2286,11 @@ class Player:
                     if self.game.p1.check_for_warlord(planet_id):
                         attack_value += 2
         if planet_id != -2:
+            if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
+                if self.get_ability_given_pos(planet_id, unit_id) != "Broderick Worr":
+                    if self.game.get_green_icon(planet_id):
+                        if self.search_for_card_everywhere("Broderick Worr"):
+                            attack_value += 1
             if card.get_faction() == "Tau":
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if i != unit_id:
@@ -3224,6 +3229,17 @@ class Player:
             enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                                    "Umbral Preacher")
             if own_umbral_check or enemy_umbral_check:
+                return False
+            if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
+                every_worr_check = self.search_for_card_everywhere("Broderick Worr")
+                if every_worr_check:
+                    if self.game.get_green_icon(planet_id):
+                        return False
+            own_worr_check = self.search_card_at_planet(planet_id, "Broderick Worr", bloodied_relevant=True)
+            enemy_worr_check = self.game.request_search_for_enemy_card_at_planet(
+                self.number, planet_id, "Broderick Worr", bloodied_relevant=True)
+            if own_worr_check or enemy_worr_check:
+                self.destroy_card_in_play(planet_id, unit_id)
                 return False
         if not self.cards_in_play[planet_id + 1][unit_id].can_retreat:
             return False
