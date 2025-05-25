@@ -3169,6 +3169,11 @@ class Player:
 
     def rout_unit(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
+                every_worr_check = self.search_for_card_everywhere("Broderick Worr")
+                if every_worr_check:
+                    if self.game.get_green_icon(planet_id):
+                        return False
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
