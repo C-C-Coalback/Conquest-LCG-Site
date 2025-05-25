@@ -251,7 +251,7 @@ def astra_militarum_cards_init():
                                                    "Combat Action: Sacrifice a unit at a planet with your warlord "
                                                    "to have that planet gain a Stronghold icon (green) until the "
                                                    "end of the battle. Then, draw 1 card.", "Tactic.",
-                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
         CardClasses.AttachmentCard("Commissarial Bolt Pistol", "Attach to a Commissar unit.\n"
                                                                "Attached unit gets +1 ATK.\n"
                                                                "Reaction: After an army unit you control at this "

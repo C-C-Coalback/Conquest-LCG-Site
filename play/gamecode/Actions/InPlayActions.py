@@ -861,6 +861,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Summary Execution":
+        if primary_player.get_number() == game_update_string[1]:
+            if self.misc_target_planet == planet_pos:
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.additional_icons_planets_eob[planet_pos].append("green")
+                    primary_player.draw_card()
+                    self.action_cleanup()
     elif self.action_chosen == "Master Program":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:

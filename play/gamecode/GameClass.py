@@ -359,8 +359,6 @@ class Game:
         self.player_resolving_interrupts = []
         self.active_effects = []
 
-
-
     def reset_reactions_data(self):
         self.reactions_needing_resolving = []
         self.player_who_resolves_reaction = []
@@ -1090,6 +1088,7 @@ class Game:
             self.p2.reset_extra_attack_eob()
             self.p1.reset_extra_health_eob()
             self.p2.reset_extra_health_eob()
+            self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
             self.mode = "Normal"
             another_battle = self.find_next_planet_for_combat()
             if another_battle:
@@ -5003,7 +5002,6 @@ class Game:
         if p1_has_units and p2_has_units:
             pass
         else:
-
             if p1_has_units:
                 await self.resolve_winning_combat(self.p1, self.p2)
             if p2_has_units:
