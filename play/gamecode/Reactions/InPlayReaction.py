@@ -6,6 +6,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
     unit_pos = int(game_update_string[3])
     print("Check what player")
     print(self.player_who_resolves_reaction)
+    current_reaction = self.reactions_needing_resolving[0]
     if name == self.player_who_resolves_reaction[0]:
         if self.reactions_needing_resolving[0] == "Power from Pain":
             if int(primary_player.get_number()) == int(
@@ -186,6 +187,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.spend_resources(1)
                         primary_player.discard_card_name_from_hand("Vengeance!")
                         primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Commander Starblaze":
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                    war_num, war_pla, war_pos = self.positions_of_unit_triggering_reaction[0]
+                    if abs(war_pla - planet_pos) == 1:
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, war_pla)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

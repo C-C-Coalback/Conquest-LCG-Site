@@ -127,12 +127,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.number_with_deploy_turn = secondary_player.number
             self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Infernal Gateway":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is None:
             await self.send_update_message("Choose a valid unit first")
         else:
@@ -152,12 +146,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.action_chosen = ""
                 self.player_with_action = ""
     elif self.action_chosen == "Khymera Den":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p2
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
         for i in range(len(self.khymera_to_move_positions)):
@@ -175,12 +163,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                             self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
         self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p2
         if self.chosen_first_card:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = -1
@@ -208,6 +190,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_action = ""
             self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Bond of Brotherhood":
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            if primary_player.get_faction_given_pos(chosen_planet, i) == "Tau":
+                primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
+            if primary_player.get_faction_given_pos(chosen_planet, i) == "Astra Militarum":
+                primary_player.cards_in_play[chosen_planet + 1][i].extra_attack_until_end_of_phase += 2
+        self.action_cleanup()
     elif self.action_chosen == "Mechanical Enhancement":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":

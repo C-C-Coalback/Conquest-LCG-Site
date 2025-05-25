@@ -79,6 +79,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Nurgling Bomb":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Bond of Brotherhood":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
                     elif ability == "Know No Fear":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
@@ -593,6 +596,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_color = "blue"
         else:
             await self.send_update_message("already chosen a valid attachment for ambush platform")
+    elif self.action_chosen == "Starblaze's Outpost":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_card_type() == "Army":
+                if card.get_faction() == "Tau":
+                    if card.get_cost() <= self.misc_counter:
+                        primary_player.add_card_to_planet(card, self.misc_target_planet)
+                        primary_player.remove_card_from_hand(int(game_update_string[2]))
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.action_cleanup()
     elif self.action_chosen == "Canoptek Spyder":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))

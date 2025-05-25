@@ -1430,8 +1430,14 @@ class Player:
                             self.game.create_reaction("Experimental Devilfish", self.name_player,
                                                       (int(self.number), planet_pos - 1, -1))
                             self.game.player_who_resolves_reaction.append(self.name_player)
+                        if headquarters_list[i].get_ability() == "Ardent Auxiliaries":
+                            self.game.create_reaction("Ardent Auxiliaries", self.name_player,
+                                                      (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
                         self.game.create_reaction("Old Zogwort", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Starblaze":
+                        self.game.create_reaction("Commander Starblaze", self.name_player,
                                                   (int(self.number), planet_pos - 1, i))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
                         self.game.create_reaction("The Swarmlord", self.name_player,

@@ -3414,6 +3414,9 @@ class Game:
                         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
                             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, unit_pos))
+                        if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Searing Burst Cannon"):
+                            damage = self.amount_that_can_be_removed_by_shield[0]
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].damage += damage
                         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Shrieking Basilisk":
                             self.create_reaction("Shrieking Basilisk", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, unit_pos))

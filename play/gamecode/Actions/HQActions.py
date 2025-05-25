@@ -190,7 +190,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.choices_available = []
                             self.choice_context = "Repair Bay"
                             self.name_player_making_choices = primary_player.name_player
-                            self.action_chosen = ""
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if card.check_for_a_trait("Drone") or card.check_for_a_trait("Pilot"):
@@ -202,10 +201,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 )
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
-                            self.player_with_action = ""
-                            self.mode = "Normal"
-                            self.name_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.number
+                            self.action_cleanup()
+                    elif ability == "Starblaze's Outpost":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.misc_target_planet = -1
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            self.misc_counter = -1
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
                     elif ability == "Kraktoof Hall":
                         if card.get_ready():
                             self.action_chosen = ability

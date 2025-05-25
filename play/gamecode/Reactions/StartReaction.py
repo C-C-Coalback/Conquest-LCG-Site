@@ -8,6 +8,7 @@ async def start_resolving_reaction(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    current_reaction = self.reactions_needing_resolving[0]
     if not self.resolving_search_box:
         if self.reactions_needing_resolving[0] == "Enginseer Augur":
             self.resolving_search_box = True
@@ -62,6 +63,15 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Experimental Devilfish":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
+            self.delete_reaction()
+        elif current_reaction == "Ardent Auxiliaries":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            am_present = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_faction_given_pos(planet_pos, i) == "Astra Militarum":
+                    am_present = True
+            if am_present:
+                primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
