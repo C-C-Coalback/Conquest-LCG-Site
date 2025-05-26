@@ -1701,11 +1701,9 @@ class Player:
         return False
 
     def get_immune_to_enemy_events(self, planet_pos, unit_pos):
-        if planet_pos == -2:
-            if self.headquarters[unit_pos].get_ability() == "Stalwart Ogryn":
-                return True
-            return False
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Stalwart Ogryn":
+        if self.search_attachments_at_pos(planet_pos, unit_pos, "Lucky Warpaint"):
+            return True
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Stalwart Ogryn":
             return True
         return False
 

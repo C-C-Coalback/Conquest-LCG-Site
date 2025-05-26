@@ -53,6 +53,7 @@ class Card:
         self.damage_from_kugath_nurgling = 0
         self.extra_traits_eop = ""
         self.ambush = ambush
+        self.attachments = []
 
     def reset_own_eocr_values(self):
         pass
@@ -151,7 +152,11 @@ class Card:
         return self.traits
 
     def check_for_a_trait(self, trait_to_find):
-        return trait_to_find in (self.traits + self.extra_traits_eop)
+        extra_traits = ""
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Lucky Warpaint":
+                extra_traits += "Blue."
+        return trait_to_find in (self.traits + self.extra_traits_eop + extra_traits)
 
     def get_image_name(self):
         return self.image_name
