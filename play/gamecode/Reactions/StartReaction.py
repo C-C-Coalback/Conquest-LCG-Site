@@ -569,22 +569,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 i = i - 1
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weirdboy Maniak":
-            no_units_damaged = True
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if unit_pos != i:
-                    if no_units_damaged:
-                        primary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
-                        no_units_damaged = False
-                    else:
-                        primary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                     primary_player.assign_damage_to_pos(planet_pos, i, 1)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                if no_units_damaged:
-                    secondary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
-                    no_units_damaged = False
-                else:
-                    secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Earth Caste Technician":

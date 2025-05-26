@@ -2414,6 +2414,13 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield, reassign=is_reassign)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
+        if total_damage_that_can_be_blocked > 0:
+            if self.cards_in_play[planet_id + 1][unit_id].unstoppable:
+                if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
+                    self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True
+                    self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
+                    total_damage_that_can_be_blocked = total_damage_that_can_be_blocked - 1
+                    damage_on_card_after = damage_on_card_after - 1
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
             if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
@@ -2476,17 +2483,24 @@ class Player:
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context="", preventable=True):
         prior_damage = self.headquarters[unit_id].get_damage()
-        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         afterwards_damage = self.headquarters[unit_id].get_damage()
         total_that_can_be_blocked = afterwards_damage - prior_damage
-        self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
-        self.game.damage_on_units_list_before_new_damage.append(prior_damage)
-        self.game.damage_can_be_shielded.append(can_shield)
-        self.game.damage_is_preventable.append(preventable)
-        self.game.positions_attackers_of_units_to_take_damage.append(None)
-        self.game.card_names_triggering_damage.append(context)
-        self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
+        if total_that_can_be_blocked > 0:
+            if self.headquarters[unit_id].unstoppable:
+                if not self.headquarters[unit_id].once_per_round_used:
+                    self.headquarters[unit_id].once_per_round_used = True
+                    self.headquarters[unit_id].set_damage(afterwards_damage - 1)
+                    total_that_can_be_blocked = total_that_can_be_blocked - 1
+                    afterwards_damage = afterwards_damage - 1
+        if total_that_can_be_blocked > 0:
+            self.game.damage_on_units_list_before_new_damage.append(prior_damage)
+            self.game.damage_is_preventable.append(preventable)
+            self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
+            self.game.damage_can_be_shielded.append(can_shield)
+            self.game.positions_attackers_of_units_to_take_damage.append(None)
+            self.game.card_names_triggering_damage.append(context)
+            self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
     def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False):
