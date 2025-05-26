@@ -3025,6 +3025,11 @@ class Game:
                         self.create_reaction("Patrolling Wraith", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))
                         self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
+                    if self.on_kill_effects_of_attacker[i][j] == "Holding Cell":
+                        self.create_reaction("Holding Cell", secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
+                        self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
+
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
                 if primary_player.search_hand_for_card("Vengeance!"):
                     self.create_reaction("Vengeance!", primary_player.name_player,
@@ -3390,7 +3395,7 @@ class Game:
                         self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
                         self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append(
-                            secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
+                            secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos, planet_pos, unit_pos))
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
                         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field",
                                                                     must_match_name=True):
@@ -3532,7 +3537,8 @@ class Game:
                                                 self.card_names_that_caused_damage.append(
                                                     self.card_names_triggering_damage[0])
                                                 self.on_kill_effects_of_attacker.append(
-                                                    secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos))
+                                                    secondary_player.get_on_kill_effects_of_attacker(
+                                                        att_pla, att_pos, planet_pos, unit_pos))
                                                 if planet_pos != -2:
                                                     if primary_player.cards_in_play[planet_pos + 1][
                                                         unit_pos].get_ability() == "Reanimating Warriors" \
@@ -4811,6 +4817,10 @@ class Game:
                 if self.auto_card_destruction:
                     self.resolve_destruction_checks_after_reactions = False
                     await self.destroy_check_all_cards()
+        elif not self.positions_of_units_to_take_damage:
+            if self.auto_card_destruction and not self.positions_of_units_to_take_damage:
+                self.resolve_destruction_checks_after_reactions = False
+                await self.destroy_check_all_cards()
         if not self.positions_of_units_to_take_damage and not self.interrupts_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal":

@@ -579,6 +579,28 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Ravening Psychopath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
+        elif current_reaction == "Holding Cell":
+            found = False
+            name_card = self.name_of_attacked_unit
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.headquarters[i].get_ability() == "Holding Cell":
+                    if not primary_player.headquarters[i].get_attachments() and not found:
+                        found = True
+                        card = FindCard.find_card(name_card, self.card_array, self.cards_dict)
+                        primary_player.headquarters[i].add_attachment(card, name_owner=secondary_player.name_player)
+            if found:
+                last_index = len(secondary_player.discard) - 1
+                found = False
+                while last_index > -1 and not found:
+                    if secondary_player.discard[last_index] == name_card:
+                        del secondary_player.discard[last_index]
+                        if name_card in secondary_player.cards_recently_discarded:
+                            secondary_player.cards_recently_discarded.remove(name_card)
+                        if name_card in secondary_player.cards_recently_destroyed:
+                            secondary_player.cards_recently_destroyed.remove(name_card)
+                        found = True
+                    last_index -= 1
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
             if primary_player.spend_resources(1):
                 primary_player.discard_card_name_from_hand("Accept Any Challenge")

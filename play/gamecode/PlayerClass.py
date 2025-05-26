@@ -350,7 +350,7 @@ class Player:
             await self.game.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_player + "; sufficient icons on captured planets."
-                "----GAME END----"
+                                                    "----GAME END----"
             )
 
     async def send_discard(self, force=False):
@@ -603,9 +603,9 @@ class Player:
                     if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == self.name_player:
                         return True
                 for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
-                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                             check_for_a_trait("Relic"):
-                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                                 name_owner == self.name_player:
                             return True
         print("not own in play")
@@ -632,9 +632,9 @@ class Player:
                     if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == name:
                         return True
                 for attachment_pos in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
-                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                             check_for_a_trait("Relic"):
-                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].\
+                        if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                                 name_owner == name:
                             return True
         print("not enemy in play")
@@ -765,7 +765,7 @@ class Player:
         if origin_planet == -2:
             target_attachment = self.headquarters[origin_position].get_attachments()[origin_attachment_position]
         else:
-            target_attachment = self.cards_in_play[origin_planet + 1][origin_position].\
+            target_attachment = self.cards_in_play[origin_planet + 1][origin_position]. \
                 get_attachments()[origin_attachment_position]
         if destination_planet == -2:
             target_card = self.headquarters[destination_position]
@@ -864,6 +864,18 @@ class Player:
                 name_owner = self.game.p1.name_player
         target_card.add_attachment(card, name_owner=name_owner)
         return True
+
+    def enemy_holding_cell_check(self, card_name):
+        if self.name_player == self.game.name_1:
+            other_player = self.game.p2
+        else:
+            other_player = self.game.p1
+        for i in range(len(other_player.headquarters)):
+            if other_player.headquarters[i].get_ability() == "Holding Cell":
+                for j in range(len(other_player.headquarters[i].get_attachments())):
+                    if other_player.headquarters[i].get_attachments()[j].get_name() == card_name:
+                        return True
+        return False
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
                                         army_unit_as_attachment=False):
@@ -979,7 +991,7 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].resolving_attack = False
 
-    def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos):
+    def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos, def_pla, def_pos):
         print("\nGetting on kill effects\n")
         on_kill_effects = []
         if planet_pos == -2:
@@ -993,6 +1005,13 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
                 print("\nBone Sabres detected\n")
+        if self.search_card_in_hq("Holding Cell"):
+            if self.name_player == self.game.name_1:
+                other_player = self.game.p2
+            else:
+                other_player = self.game.p1
+            if other_player.get_card_type_given_pos(def_pla, def_pla) == "Army":
+                on_kill_effects.append("Holding Cell")
         return on_kill_effects
 
     async def reveal_hand(self):
@@ -1104,7 +1123,7 @@ class Player:
             else:
                 cost = card.get_cost() - discounts
                 if card.get_limited():
-                    if self.can_play_limited:
+                    if self.can_play_limited and not self.enemy_holding_cell_check(card.get_name()):
                         if self.spend_resources(cost):
                             if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
                                 self.set_can_play_limited(False)
@@ -1122,7 +1141,7 @@ class Player:
                             return "FAIL/Unique already in play", -1
                     else:
                         return "FAIL/Limited already played", -1
-                else:
+                elif not self.enemy_holding_cell_check(card.get_name()):
                     if self.spend_resources(cost):
                         if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
                             location_of_unit = len(self.cards_in_play[position + 1]) - 1
@@ -1865,7 +1884,6 @@ class Player:
                     return True
         return False
 
-
     def communications_relay_check(self, planet_pos, unit_pos):
         print("---\nCommunications Relay Check!\n---")
         communications_permitted = False
@@ -1930,7 +1948,7 @@ class Player:
             return False
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == card_abil:
-                if not must_match_name or self.cards_in_play[planet_pos + 1][unit_pos]\
+                if not must_match_name or self.cards_in_play[planet_pos + 1][unit_pos] \
                         .get_attachments()[i].name_owner == self.name_player:
                     if not ready_relevant:
                         return True
@@ -2357,7 +2375,7 @@ class Player:
 
     def search_ready_unique_unit(self):
         for i in range(len(self.headquarters)):
-            if self.headquarters[i].get_is_unit() and self.headquarters[i].get_ready() and\
+            if self.headquarters[i].get_is_unit() and self.headquarters[i].get_ready() and \
                     self.headquarters[i].get_unique():
                 return True
         for j in range(7):
@@ -2469,9 +2487,11 @@ class Player:
             return None
         while self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].name_owner == self.game.name_1:
-                self.game.p1.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+                self.game.p1.discard.append(
+                    self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
             else:
-                self.game.p2.discard.append(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
+                self.game.p2.discard.append(
+                    self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
             del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0]
         return None
 
@@ -3066,7 +3086,7 @@ class Player:
                         self.game.create_reaction("Cadian Mortar Squad", self.name_player, (int(self.number),
                                                                                             planet_num, -1))
                 for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
-                    if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability()\
+                    if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() \
                             == "Commissarial Bolt Pistol":
                         self.game.create_reaction("Commissarial Bolt Pistol", self.name_player,
                                                   (int(self.number), planet_num, i))

@@ -20,12 +20,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_allowed_phases_while_in_hand() == self.phase or \
                     card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.get_ambush_of_card(card):
-                    self.card_pos_to_deploy = int(game_update_string[2])
-                    self.action_chosen = "Ambush"
-                    self.card_to_deploy = card
-                    self.card_type_of_selected_card_in_hand = card.get_card_type()
-                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                    primary_player.aiming_reticle_color = "blue"
+                    if not primary_player.enemy_holding_cell_check(card.get_name()):
+                        self.card_pos_to_deploy = int(game_update_string[2])
+                        self.action_chosen = "Ambush"
+                        self.card_to_deploy = card
+                        self.card_type_of_selected_card_in_hand = card.get_card_type()
+                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(cost):
                     if may_nullify and secondary_player.nullify_check():
                         primary_player.add_resources(cost)

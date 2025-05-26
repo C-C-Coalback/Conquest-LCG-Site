@@ -55,6 +55,13 @@ class Card:
         self.ambush = ambush
         self.attachments = []
 
+    def get_attachments(self):
+        return self.attachments
+
+    def add_attachment(self, attachment_card, name_owner=""):
+        self.attachments.append(copy.deepcopy(attachment_card))
+        self.attachments[-1].name_owner = name_owner
+
     def reset_own_eocr_values(self):
         pass
 
@@ -731,9 +738,6 @@ class SupportCard(Card):
                          0, "Support", unique, image_name, applies_discounts, action_in_hand
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
                          is_faction_limited_unique_discounter, limited)
-
-    def get_attachments(self):
-        return []
 
     def print_info(self):
         if self.unique:
