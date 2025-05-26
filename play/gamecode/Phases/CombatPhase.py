@@ -126,7 +126,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if primary_player.get_cost_given_pos(
                                         self.attacker_planet, self.attacker_position) < 3 \
                                         and primary_player.get_card_type_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Army":
+                                    self.attacker_planet, self.attacker_position) == "Army":
                                     shadow_field = True
                                 await self.aoe_routine(primary_player, secondary_player, chosen_planet,
                                                        amount_aoe, faction=faction,
@@ -198,13 +198,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 unit_pos = int(game_update_string[4])
                 attachment_pos = int(game_update_string[5])
                 if planet_pos == self.attacker_planet and unit_pos == self.attacker_position:
-                    if player.cards_in_play[planet_pos + 1][unit_pos].\
+                    if player.cards_in_play[planet_pos + 1][unit_pos]. \
                             get_attachments()[attachment_pos].get_ability() == "The Shining Blade" \
-                            and player.cards_in_play[planet_pos + 1][unit_pos].\
+                            and player.cards_in_play[planet_pos + 1][unit_pos]. \
                             get_attachments()[attachment_pos].name_owner == player.name_player:
-                        if player.cards_in_play[planet_pos + 1][unit_pos].\
+                        if player.cards_in_play[planet_pos + 1][unit_pos]. \
                                 get_attachments()[attachment_pos].get_ready():
-                            player.cards_in_play[planet_pos + 1][unit_pos].\
+                            player.cards_in_play[planet_pos + 1][unit_pos]. \
                                 get_attachments()[attachment_pos].exhaust_card()
                             self.shining_blade_active = True
                             await self.send_update_message("The Shining Blade activated!")
@@ -450,6 +450,19 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             attack_value = attack_value * 2
                                     if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                             self.attacker_position) \
+                                            == "Stalking Ur-Ghul":
+                                        if secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                    self.defender_position) \
+                                                == "Warlord":
+                                            attack_value = attack_value - 5
+                                        elif secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                      self.defender_position) \
+                                                == "Army":
+                                            if secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                                     self.defender_position) == 0:
+                                                attack_value = attack_value - 5
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
                                             == "Roghrax Bloodhand":
                                         if self.bloodthirst_active[self.attacker_planet]:
                                             attack_value = attack_value * 2
@@ -473,7 +486,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if primary_player.get_cost_given_pos(
                                             self.attacker_planet, self.attacker_position) < 3 \
                                             and primary_player.get_card_type_given_pos(
-                                            self.attacker_planet, self.attacker_position) == "Army":
+                                        self.attacker_planet, self.attacker_position) == "Army":
                                         shadow_field = True
                                     took_damage, bodyguards = secondary_player.assign_damage_to_pos(
                                         self.defender_planet, self.defender_position, damage=attack_value,
