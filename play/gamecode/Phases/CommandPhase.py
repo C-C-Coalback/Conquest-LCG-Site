@@ -259,13 +259,13 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.has_passed = True
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
+                if name == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
                 if self.interrupts_before_cs_allowed:
-                    if name == self.name_1:
-                        primary_player = self.p1
-                        secondary_player = self.p2
-                    else:
-                        primary_player = self.p2
-                        secondary_player = self.p1
                     if game_update_string[1] == primary_player.get_number():
                         hand_pos = int(game_update_string[2])
                         if primary_player.cards[hand_pos] == "Superiority":
@@ -292,14 +292,28 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.player_who_resolves_reaction.append(primary_player.name_player)
                                 primary_player.aiming_reticle_color = "blue"
                                 primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                elif self.interrupts_during_cs_allowed:
+                    if game_update_string[1] == primary_player.get_number():
+                        hand_pos = int(game_update_string[2])
+                        if primary_player.cards[hand_pos] == "Wraithguard Revenant":
+                            if self.get_green_icon(self.last_planet_checked_command_struggle):
+                                card = primary_player.get_card_in_hand(hand_pos)
+                                primary_player.add_card_to_planet(card, self.last_planet_checked_command_struggle)
+                                del primary_player.cards[hand_pos]
+                                self.p1.has_passed = True
+                                self.p2.has_passed = True
+                                self.canceled_resource_bonuses[self.last_planet_checked_command_struggle] = True
+                                self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
             if game_update_string[0] == "HQ":
-                if not self.interrupts_before_cs_allowed and self.interrupts_during_cs_allowed:
-                    if name == self.name_1:
-                        primary_player = self.p1
-                        secondary_player = self.p2
-                    else:
-                        primary_player = self.p2
-                        secondary_player = self.p1
+                if name == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+                if self.interrupts_before_cs_allowed:
+                    pass
+                if self.interrupts_during_cs_allowed:
                     if game_update_string[1] == primary_player.get_number():
                         unit_pos = int(game_update_string[2])
                         if primary_player.get_ability_given_pos(-2, unit_pos) == "Archon's Palace":
@@ -424,9 +438,15 @@ def try_entire_command(self, planet_pos):
         if name_winner == "":
             pass
         elif name_winner == self.name_1:
+            if self.get_green_icon(planet_pos):
+                if self.p1.search_hand_for_card("Wraithguard Revenant"):
+                    return "INTERRUPT DURING STRUGGLE"
             if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
         elif name_winner == self.name_2:
+            if self.get_green_icon(planet_pos):
+                if self.p2.search_hand_for_card("Wraithguard Revenant"):
+                    return "INTERRUPT DURING STRUGGLE"
             if self.p1.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
     winnings = None
