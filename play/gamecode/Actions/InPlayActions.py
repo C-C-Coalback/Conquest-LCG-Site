@@ -133,6 +133,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                    elif ability == "Lone Wolf":
+                        if card_chosen.get_ready():
+                            target_planet = secondary_player.get_planet_of_warlord()
+                            if target_planet != -2 and target_planet != -1:
+                                if not primary_player.cards_in_play[target_planet + 1]:
+                                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                    primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
+                                    self.action_cleanup()
                     elif ability == "Ravenwing Escort":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)

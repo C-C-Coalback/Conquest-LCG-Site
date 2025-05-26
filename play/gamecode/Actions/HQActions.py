@@ -139,12 +139,22 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     primary_player.summon_token_at_hq("Cultist", 2)
                                 self.action_cleanup()
                     elif ability == "Immortal Legion":
-                        planet_pos = int(game_update_string[2])
-                        unit_pos = int(game_update_string[3])
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
                         if card.get_ready():
                             if secondary_player.warlord_faction == primary_player.enslaved_faction:
                                 target_planet = secondary_player.get_planet_of_warlord()
                                 if target_planet != -2 and target_planet != -1:
+                                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                    primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
+                                    self.action_cleanup()
+                    elif ability == "Lone Wolf":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if card.get_ready():
+                            target_planet = secondary_player.get_planet_of_warlord()
+                            if target_planet != -2 and target_planet != -1:
+                                if not primary_player.cards_in_play[target_planet + 1]:
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
