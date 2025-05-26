@@ -1177,6 +1177,9 @@ class Player:
                             if card.get_ability() == "Space Wolves Predator":
                                 self.game.create_reaction("Space Wolves Predator", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Prophetic Farseer":
+                                self.game.create_reaction("Prophetic Farseer", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):

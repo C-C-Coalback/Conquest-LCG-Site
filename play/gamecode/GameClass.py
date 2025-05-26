@@ -1627,6 +1627,12 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.shuffle_deck()
                         self.action_cleanup()
+                    elif self.choice_context == "Prophetic Farseer Discard":
+                        self.choice_context = "Prophetic Farseer Rearrange"
+                    elif self.choice_context == "Prophetic Farseer Rearrange":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
                     if self.choice_context == "Choose Which Interrupt":
@@ -1945,6 +1951,19 @@ class Game:
                             self.misc_target_unit = (-1, -1)
                         if game_update_string[1] == "1":
                             self.delete_interrupt()
+                    elif self.choice_context == "Prophetic Farseer Discard":
+                        card_name = secondary_player.deck[int(game_update_string[1])]
+                        card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                        if card.get_shields() > 0:
+                            secondary_player.discard.append(card_name)
+                            del secondary_player.deck[int(game_update_string[1])]
+                            del self.choices_available[int(game_update_string[1])]
+                        if not self.choices_available:
+                            self.reset_choices_available()
+                            self.delete_reaction()
+                    elif self.choice_context == "Prophetic Farseer Rearrange":
+                        secondary_player.deck.insert(0, secondary_player.deck.pop(int(game_update_string[1])))
+                        self.choices_available.insert(0, self.choices_available.pop(int(game_update_string[1])))
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":
                             self.choices_available = []

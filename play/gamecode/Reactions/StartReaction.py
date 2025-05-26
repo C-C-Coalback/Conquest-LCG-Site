@@ -601,6 +601,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                         found = True
                     last_index -= 1
             self.delete_reaction()
+        elif current_reaction == "Prophetic Farseer":
+            if len(secondary_player.deck) > 2:
+                self.choices_available = secondary_player.deck[:3]
+                self.name_player_making_choices = primary_player.name_player
+                self.choice_context = "Prophetic Farseer Discard"
+                self.resolving_search_box = True
+            else:
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
             if primary_player.spend_resources(1):
                 primary_player.discard_card_name_from_hand("Accept Any Challenge")
