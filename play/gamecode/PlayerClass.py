@@ -2919,9 +2919,9 @@ class Player:
                                                   (int(self.number), -1, -1))
                 else:
                     found_stikk = False
-                    other_player = self.p1
+                    other_player = self.game.p1
                     if other_player.name_player == self.name_player:
-                        other_player = self.p2
+                        other_player = self.game.p2
                     for i in range(len(other_player.headquarters)):
                         if other_player.headquarters[i].get_is_unit():
                             for j in range(len(other_player.headquarters[i].get_attachments())):

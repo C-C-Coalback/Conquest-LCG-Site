@@ -576,6 +576,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "Ravening Psychopath":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
         elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
             if primary_player.spend_resources(1):
                 primary_player.discard_card_name_from_hand("Accept Any Challenge")

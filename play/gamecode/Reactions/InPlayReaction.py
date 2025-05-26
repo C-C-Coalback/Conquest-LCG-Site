@@ -197,6 +197,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if abs(war_pla - planet_pos) == 1:
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, war_pla)
                         self.delete_reaction()
+        elif current_reaction == "Ravening Psychopath":
+            if game_update_string[1] == secondary_player.number:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
+                                                              rickety_warbuggy=True)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":

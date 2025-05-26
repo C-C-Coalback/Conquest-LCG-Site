@@ -505,10 +505,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 else:
                                     primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
                                                                                 self.attacker_position)
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                                        == "Snakebite Thug":
-                                    primary_player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
-                                                                        shadow_field_possible=True)
                                 self.reset_combat_positions()
                                 self.shining_blade_active = False
                                 self.number_with_combat_turn = secondary_player.get_number()
