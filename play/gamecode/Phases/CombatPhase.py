@@ -486,12 +486,17 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if primary_player.get_cost_given_pos(
                                             self.attacker_planet, self.attacker_position) < 3 \
                                             and primary_player.get_card_type_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Army":
+                                            self.attacker_planet, self.attacker_position) == "Army":
                                         shadow_field = True
+                                    preventable = True
+                                    if primary_player.search_attachments_at_pos(
+                                            self.attacker_planet, self.attacker_position, "Acid Maw"):
+                                        preventable = False
                                     took_damage, bodyguards = secondary_player.assign_damage_to_pos(
                                         self.defender_planet, self.defender_position, damage=attack_value,
                                         att_pos=self.attacker_location, can_shield=can_shield,
-                                        shadow_field_possible=shadow_field, rickety_warbuggy=True
+                                        shadow_field_possible=shadow_field, rickety_warbuggy=True,
+                                        preventable=preventable
                                     )
                                     if self.manual_bodyguard_resolution:
                                         await self.send_update_message(
