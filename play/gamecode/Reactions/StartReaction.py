@@ -576,6 +576,17 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Accept Any Challenge")
+                planet_pos = self.last_planet_checked_for_battle
+                count = 0
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.check_for_trait_given_pos(planet_pos, i, "Black Templars"):
+                        count += 1
+                for i in range(count):
+                    primary_player.draw_card()
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Earth Caste Technician":
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6

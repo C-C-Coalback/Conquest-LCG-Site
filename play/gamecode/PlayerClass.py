@@ -121,6 +121,7 @@ class Player:
         self.primal_howl_used = False
         self.discard_inquis_caius_wroth = False
         self.enemy_has_wyrdboy_stikk = False
+        self.accept_any_challenge_used = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -2421,6 +2422,8 @@ class Player:
                     self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
                     total_damage_that_can_be_blocked = total_damage_that_can_be_blocked - 1
                     damage_on_card_after = damage_on_card_after - 1
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Righteous Initiate":
+                        self.cards_in_play[planet_id + 1][unit_id].extra_attack_until_end_of_phase += 2
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
             if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
@@ -2493,6 +2496,8 @@ class Player:
                     self.headquarters[unit_id].set_damage(afterwards_damage - 1)
                     total_that_can_be_blocked = total_that_can_be_blocked - 1
                     afterwards_damage = afterwards_damage - 1
+                    if self.get_ability_given_pos(-2, unit_id) == "Righteous Initiate":
+                        self.headquarters[unit_id].extra_attack_until_end_of_phase += 2
         if total_that_can_be_blocked > 0:
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)

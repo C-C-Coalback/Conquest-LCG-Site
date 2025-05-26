@@ -295,6 +295,9 @@ class Game:
         self.resolve_remaining_cs_after_reactions = False
         self.additional_icons_planets_eop = [[], [], [], [], [], [], []]
         self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
+        self.reactions_on_winning_combat_being_executed = False
+        self.reactions_on_winning_combat_permitted = True
+        self.name_player_who_won_combat = ""
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -4770,6 +4773,14 @@ class Game:
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
+            if self.reactions_on_winning_combat_being_executed:
+                if self.name_player_who_won_combat == self.name_1:
+                    winner = self.p1
+                    loser = self.p2
+                else:
+                    winner = self.p2
+                    loser = self.p1
+                await self.resolve_winning_combat(winner, loser)
             self.last_player_who_resolved_reaction = ""
             if self.resolve_remaining_cs_after_reactions and not self.positions_of_units_to_take_damage \
                     and not self.interrupts_waiting_on_resolution:
@@ -4967,8 +4978,20 @@ class Game:
             print("Discard p1")
             self.p1.discard_card_at_random()
 
+    def check_reactions_from_winning_combat(self, winner, planet_id):
+        reactions = []
+        if self.reactions_on_winning_combat_permitted:
+            if self.get_blue_icon(planet_id):
+                if winner.resources > 0:
+                    if not winner.accept_any_challenge_used:
+                        if winner.search_hand_for_card("Accept Any Challenge"):
+                            reactions.append("Accept Any Challenge")
+        return reactions
+
     async def resolve_winning_combat(self, winner, loser):
+        self.name_player_who_won_combat = winner.name_player
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
+        reactions_win = self.check_reactions_from_winning_combat(winner, self.last_planet_checked_for_battle)
         if self.infested_planets[self.last_planet_checked_for_battle] and \
                 self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation \
                 and winner.warlord_faction != "Tyranids":
@@ -4978,6 +5001,12 @@ class Game:
             self.name_player_making_choices = winner.name_player
             await self.send_update_message(
                 winner.name_player + " has the right to clear infestation from " + planet_name)
+        elif reactions_win:
+            await self.send_update_message("Reactions on winning combat detected.")
+            self.reactions_on_winning_combat_being_executed = True
+            self.reactions_on_winning_combat_permitted = False
+            for i in range(len(reactions_win)):
+                self.create_reaction(reactions_win[i], winner.name_player, (int(winner.number), -1, -1))
         else:
             self.already_asked_remove_infestation = False
             print("Resolve battle ability of:", planet_name)
