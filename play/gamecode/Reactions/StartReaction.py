@@ -601,6 +601,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                         found = True
                     last_index -= 1
             self.delete_reaction()
+        elif current_reaction == "Striking Ravener":
+            planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
+                    primary_player.ready_given_pos(planet_pos, i)
+            self.delete_reaction()
         elif current_reaction == "Deathly Web Shrine":
             if not primary_player.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
                 self.delete_reaction()

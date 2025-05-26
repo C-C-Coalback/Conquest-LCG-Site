@@ -3039,7 +3039,9 @@ class Game:
                     if self.on_kill_effects_of_attacker[i][j] == "Ravenous Haruspex":
                         self.create_reaction("Ravenous Haruspex", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))
-                        self.ravenous_haruspex_gain = primary_player.get_cost_given_pos(planet, pos)
+                    if self.on_kill_effects_of_attacker[i][j] == "Striking Ravener":
+                        self.create_reaction("Striking Ravener", secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
                     if self.on_kill_effects_of_attacker[i][j] == "Patrolling Wraith":
                         self.create_reaction("Patrolling Wraith", secondary_player.name_player,
                                              (int(secondary_player.number), planet, pos))

@@ -993,25 +993,28 @@ class Player:
 
     def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos, def_pla, def_pos):
         print("\nGetting on kill effects\n")
+        if self.name_player == self.game.name_1:
+            other_player = self.game.p2
+        else:
+            other_player = self.game.p1
         on_kill_effects = []
         if planet_pos == -2:
             return on_kill_effects
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
-            if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
-                on_kill_effects.append("Ravenous Haruspex")
         if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Patrolling Wraith":
             on_kill_effects.append("Patrolling Wraith")
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
                 print("\nBone Sabres detected\n")
-        if self.search_card_in_hq("Holding Cell"):
-            if self.name_player == self.game.name_1:
-                other_player = self.game.p2
-            else:
-                other_player = self.game.p1
-            if other_player.get_card_type_given_pos(def_pla, def_pla) == "Army":
+        if other_player.get_card_type_given_pos(def_pla, def_pla) == "Army":
+            if self.search_card_in_hq("Holding Cell"):
                 on_kill_effects.append("Holding Cell")
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
+                if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
+                    on_kill_effects.append("Ravenous Haruspex")
+                    self.game.ravenous_haruspex_gain = other_player.get_cost_given_pos(def_pla, def_pos)
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Striking Ravener":
+                on_kill_effects.append("Striking Ravener")
         return on_kill_effects
 
     async def reveal_hand(self):
