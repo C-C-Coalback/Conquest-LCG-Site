@@ -35,6 +35,7 @@ class Game:
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
+        self.attack_being_resolved = False
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, self)
         self.phase = "SETUP"
@@ -4820,13 +4821,32 @@ class Game:
                 self.need_to_reset_tomb_blade_squadron = False
                 self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
                 self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
-            if self.need_to_move_to_hq:
+            if self.attack_being_resolved:
+                self.attack_being_resolved = False
+                planet = self.last_planet_checked_for_battle
+                if planet > -1:
+                    for i in range(len(self.p1.cards_in_play[planet + 1])):
+                        if self.p1.cards_in_play[planet + 1][i].resolving_attack:
+                            if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
+                                self.p1.cards_in_play[planet + 1][i].resolving_attack = False
+                                self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                            if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
+                                self.p1.cards_in_play[planet + 1][i].resolving_attack = False
+                                self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
+                    for i in range(len(self.p2.cards_in_play[planet + 1])):
+                        if self.p2.cards_in_play[planet + 1][i].resolving_attack:
+                            if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
+                                self.p2.cards_in_play[planet + 1][i].resolving_attack = False
+                                self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                            if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
+                                self.p2.cards_in_play[planet + 1][i].resolving_attack = False
+                                self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
                 self.p1.ethereal_movement_resolution()
                 self.p2.ethereal_movement_resolution()
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
-            if self.auto_card_destruction:
-                await self.destroy_check_all_cards()
+                if self.auto_card_destruction:
+                    await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         print("---\nDEBUG INFO\n---")

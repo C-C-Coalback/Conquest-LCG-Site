@@ -511,6 +511,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.player_with_combat_turn = secondary_player.get_name_player()
                                 if self.unit_will_move_after_attack:
                                     self.need_to_move_to_hq = True
+                                self.attack_being_resolved = True
                             else:
                                 self.defender_planet = -1
                                 self.defender_position = -1

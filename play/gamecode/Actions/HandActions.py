@@ -328,6 +328,26 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.chosen_first_card = False
                         self.misc_target_planet = -1
                         self.misc_counter = -1
+                    elif ability == "Sowing Chaos":
+                        for i in range(7):
+                            if self.get_blue_icon(i):
+                                j = 0
+                                while j < len(primary_player.cards_in_play[i + 1]):
+                                    if primary_player.get_card_type_given_pos(i, j) == "Army":
+                                        if primary_player.get_cost_given_pos(i, j) < 3:
+                                            primary_player.destroy_card_in_play(i, j)
+                                            j = j - 1
+                                    j = j + 1
+                                j = 0
+                                while j < len(secondary_player.cards_in_play[i + 1]):
+                                    if secondary_player.get_card_type_given_pos(i, j) == "Army":
+                                        if secondary_player.get_cost_given_pos(i, j) < 3:
+                                            if not secondary_player.get_immune_to_enemy_events(i, j):
+                                                secondary_player.destroy_card_in_play(i, j)
+                                                j = j - 1
+                                    j = j + 1
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_cleanup()
                     elif ability == "For the Tau'va":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
