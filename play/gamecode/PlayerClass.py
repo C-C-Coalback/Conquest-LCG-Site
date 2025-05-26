@@ -173,6 +173,15 @@ class Player:
                 return True
         return False
 
+    def get_enemy_has_init_for_cards(self, planet_pos, unit_pos):
+        if self.name_player == self.game.name_1:
+            enemy_player = self.game.p2
+        else:
+            enemy_player = self.game.p1
+        if enemy_player.has_initiative:
+            return True
+        return False
+
     def add_attachment_to_planet(self, planet_pos, card):
         self.attachments_at_planet[planet_pos].append(copy.deepcopy(card))
 
@@ -2360,12 +2369,22 @@ class Player:
         return False
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
-                             context="", preventable=True, shadow_field_possible=False):
+                             context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False):
         if shadow_field_possible:
             if self.search_attachments_at_pos(planet_id, unit_id, "Shadow Field"):
                 return False, 0
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
+        if rickety_warbuggy:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Rickety Warbuggy":
+                if self.get_enemy_has_init_for_cards(planet_id, unit_id):
+                    any_non_warbuggies = False
+                    for i in range(len(self.cards_in_play[planet_id + 1])):
+                        if self.get_card_type_given_pos(planet_id, i) == "Army":
+                            if self.get_name_given_pos(planet_id, i) != "Rickety Warbuggy":
+                                any_non_warbuggies = True
+                    if any_non_warbuggies:
+                        return False, 0
         prior_damage = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         zara_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                        "Zarathur, High Sorcerer",
@@ -2508,10 +2527,11 @@ class Player:
             self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
-    def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False):
+    def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False, rickety_warbuggy=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
             self.assign_damage_to_pos(planet_id, i, amount, context=faction,
-                                      shadow_field_possible=shadow_field_possible)
+                                      shadow_field_possible=shadow_field_possible,
+                                      rickety_warbuggy=rickety_warbuggy)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):
@@ -2706,9 +2726,9 @@ class Player:
                     if phase == "COMBAT":
                         self.suffer_area_effect(i, 1)
                         if self.name_player == self.game.name_1:
-                            self.game.p2.suffer_area_effect(i, 1)
+                            self.game.p2.suffer_area_effect(i, 1, rickety_warbuggy=True)
                         else:
-                            self.game.p1.suffer_area_effect(i, 1)
+                            self.game.p1.suffer_area_effect(i, 1, rickety_warbuggy=True)
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     if phase == "COMBAT":
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
@@ -3311,7 +3331,7 @@ class Player:
         if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves"):
             mork_count = 0
         for i in range(mork_count):
-            self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest")
+            self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest", rickety_warbuggy=True)
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)
         self.adjust_own_reactions(planet_id, unit_id)

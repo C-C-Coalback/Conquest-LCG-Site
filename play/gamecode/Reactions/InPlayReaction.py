@@ -96,12 +96,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
                         primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
                                                               self.positions_of_unit_triggering_reaction[0][2], 1)
-                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True,
+                                                            rickety_warbuggy=True)
                         self.delete_reaction()
                 else:
                     primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
                                                           self.positions_of_unit_triggering_reaction[0][2], 1)
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True,
+                                                          rickety_warbuggy=True)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "The Plaguefather's Banner":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -223,7 +225,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                     if can_continue:
-                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Veteran Barbrus")
+                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Veteran Barbrus",
+                                                              rickety_warbuggy=True)
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
                 else:
@@ -255,9 +258,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_context = "Reaction"
                         if can_continue:
                             if self.infested_planets[planet_pos]:
-                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             else:
-                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
@@ -410,7 +413,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Ragnar Blackmane")
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Ragnar Blackmane",
+                                                              rickety_warbuggy=True)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Nahumekh":
             if game_update_string[1] == "1":
@@ -694,7 +698,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
-                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1)
+                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1,
+                                                                  rickety_warbuggy=True)
                             secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
                                                                         "blue")
                             self.delete_reaction()
@@ -725,7 +730,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_context = "Reaction"
                         if can_continue:
                             damage = secondary_player.get_command_given_pos(origin_planet, target_unit_pos)
-                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, damage)
+                            secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, damage,
+                                                                  rickety_warbuggy=True)
                             secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":
@@ -791,7 +797,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                  origin_planet)
                             new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
                             secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1,
-                                                                  context="Sicarius's Chosen")
-                            secondary_player.set_aiming_reticle_in_play(origin_planet, new_unit_pos,
-                                                                        "red")
+                                                                  context="Sicarius's Chosen",
+                                                                  rickety_warbuggy=True)
                             self.delete_reaction()

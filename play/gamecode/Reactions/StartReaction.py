@@ -85,19 +85,19 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.reactions_needing_resolving[0] == "Solarite Avetys":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
-                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                 self.advance_damage_aiming_reticle()
             elif num == 2:
-                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                 self.advance_damage_aiming_reticle()
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Volatile Pyrovore":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
-                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                 self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             elif num == 2:
-                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                 self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
@@ -541,7 +541,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kabalite Halfborn":
             primary_player.draw_card()
@@ -572,9 +572,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if unit_pos != i:
-                    primary_player.assign_damage_to_pos(planet_pos, i, 1)
+                    primary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+                secondary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
             if primary_player.spend_resources(1):
