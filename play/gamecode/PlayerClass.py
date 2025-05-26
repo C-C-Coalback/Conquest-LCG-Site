@@ -1335,6 +1335,10 @@ class Player:
                             already_cry = True
                 if not already_cry:
                     self.game.create_reaction("Cry of the Wind", self.name_player, (int(self.number), -1, -1))
+            if self.game.phase == "COMBAT":
+                if self.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
+                    self.game.create_reaction("Deathly Web Shrine", self.name_player,
+                                              (int(self.number), destination, -1))
             if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
                 already_banner = False
                 self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True

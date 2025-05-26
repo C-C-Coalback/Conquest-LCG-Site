@@ -601,6 +601,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                         found = True
                     last_index -= 1
             self.delete_reaction()
+        elif current_reaction == "Deathly Web Shrine":
+            if not primary_player.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
+                self.delete_reaction()
+            else:
+                primary_player.exhaust_card_in_hq_given_name("Deathly Web Shrine")
         elif current_reaction == "Prophetic Farseer":
             if len(secondary_player.deck) > 2:
                 self.choices_available = secondary_player.deck[:3]
