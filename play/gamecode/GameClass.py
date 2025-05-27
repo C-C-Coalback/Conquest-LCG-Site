@@ -228,6 +228,7 @@ class Game:
         self.reset_resolving_attack_on_units = False
         self.resolving_consumption = False
         self.stored_area_effect_value = 0
+        self.kaerux_erameas_active = False
         self.valid_targets_for_dark_possession = [
             "Drop Pod Assault", "Exterminatus", "Preemptive Barrage", "Suppressive Fire",
             "Battle Cry", "Snotling Attack", "Squig Bombin'", "Infernal Gateway",
@@ -3297,6 +3298,7 @@ class Game:
     async def change_phase(self, new_val, refresh_abilities=True):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.last_planet_checked_for_battle = -1
         self.p1.muster_the_guard_count = 0
         self.p2.muster_the_guard_count = 0
         last_phase = self.phase

@@ -190,6 +190,20 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_action = ""
             self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Kaerux Erameas":
+        if chosen_planet != self.round_number:
+            if primary_player.check_for_warlord(chosen_planet) == 0 and \
+                    secondary_player.check_for_warlord(chosen_planet) == 0:
+                self.kaerux_erameas_active = True
+                self.before_first_combat = False
+                self.begin_battle(chosen_planet)
+                self.begin_combat_round()
+                self.set_battle_initiative()
+                self.planet_aiming_reticle_active = True
+                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                self.p1.has_passed = False
+                self.p2.has_passed = False
+                self.action_cleanup()
     elif self.action_chosen == "Bond of Brotherhood":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Tau":

@@ -1006,7 +1006,7 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
                 print("\nBone Sabres detected\n")
-        if other_player.get_card_type_given_pos(def_pla, def_pla) == "Army":
+        if other_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
             if self.search_card_in_hq("Holding Cell"):
                 on_kill_effects.append("Holding Cell")
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":

@@ -144,6 +144,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 2, "NEXT")
                             primary_player.assign_damage_to_pos(-2, unit_pos, 2)
                             self.action_cleanup()
+                    elif ability == "Kaerux Erameas":
+                        if card.get_ready():
+                            if self.last_planet_checked_for_battle == -1:
+                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                self.action_chosen = "Kaerux Erameas"
                     elif ability == "Immortal Legion":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])
