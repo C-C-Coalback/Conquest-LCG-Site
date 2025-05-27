@@ -3471,7 +3471,7 @@ class Game:
                                 if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
                                     self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                                          (int(primary_player.number), planet_pos, unit_pos))
-                                    self.damage_amounts_baarzul.append()
+                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                     else:
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
@@ -3651,6 +3651,16 @@ class Game:
                                                             self.create_reaction("Pincer Tail",
                                                                                  secondary_player.name_player,
                                                                                  pos_holder)
+                                                        if primary_player.get_ability_given_pos(
+                                                                planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                                                            if primary_player.search_card_at_planet(
+                                                                    planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                                                self.create_reaction("Ba'ar Zul the Hate-Bound",
+                                                                                     primary_player.name_player,
+                                                                                     (int(primary_player.number),
+                                                                                      planet_pos, unit_pos))
+                                                                self.damage_amounts_baarzul.append(
+                                                                    self.amount_that_can_be_removed_by_shield[0])
                                             else:
                                                 self.damage_taken_was_from_attack.append(False)
                                                 self.positions_of_attacker_of_unit_that_took_damage.append(None)
@@ -4166,6 +4176,9 @@ class Game:
 
     def delete_reaction(self):
         if self.reactions_needing_resolving:
+            if self.reactions_needing_resolving[0] == "Ba'ar Zul the Hate-Bound":
+                if self.damage_amounts_baarzul:
+                    del self.damage_amounts_baarzul[0]
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
             self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]

@@ -601,6 +601,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                         found = True
                     last_index -= 1
             self.delete_reaction()
+        elif current_reaction == "Ba'ar Zul the Hate-Bound":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.damage_amounts_baarzul[0])
+            current_damage = primary_player.get_damage_given_pos(warlord_planet, warlord_pos)
+            primary_player.set_damage_given_pos(warlord_planet, warlord_pos,
+                                                current_damage + self.damage_amounts_baarzul[0])
+            self.delete_reaction()
         elif current_reaction == "Striking Ravener":
             planet_pos = self.positions_of_unit_triggering_reaction[0][1]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
