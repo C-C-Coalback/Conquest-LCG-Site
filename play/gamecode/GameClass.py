@@ -3481,6 +3481,12 @@ class Game:
                                                          (int(primary_player.number), planet_pos, unit_pos))
                                     self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                     else:
+                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
+                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
                         self.faction_of_attacker.append("")
@@ -3670,6 +3676,18 @@ class Game:
                                                                 self.damage_amounts_baarzul.append(
                                                                     self.amount_that_can_be_removed_by_shield[0])
                                             else:
+                                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                    if primary_player.get_ability_given_pos(
+                                                            planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                                                        if primary_player.search_card_at_planet(
+                                                                planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                                            self.create_reaction("Ba'ar Zul the Hate-Bound",
+                                                                                 primary_player.name_player,
+                                                                                 (
+                                                                                 int(primary_player.number), planet_pos,
+                                                                                 unit_pos))
+                                                            self.damage_amounts_baarzul.append(
+                                                                self.amount_that_can_be_removed_by_shield[0])
                                                 self.damage_taken_was_from_attack.append(False)
                                                 self.positions_of_attacker_of_unit_that_took_damage.append(None)
                                                 self.faction_of_attacker.append("")

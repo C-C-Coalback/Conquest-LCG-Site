@@ -142,6 +142,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                    elif ability == "Ba'ar Zul's Cleavers":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, "NEXT")
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                            self.action_cleanup()
                     elif ability == "Ravenwing Escort":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)

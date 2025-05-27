@@ -138,6 +138,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 if card.get_cost() > 2:
                                     primary_player.summon_token_at_hq("Cultist", 2)
                                 self.action_cleanup()
+                    elif ability == "Ba'ar Zul's Cleavers":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 2, "NEXT")
+                            primary_player.assign_damage_to_pos(-2, unit_pos, 2)
+                            self.action_cleanup()
                     elif ability == "Immortal Legion":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])
