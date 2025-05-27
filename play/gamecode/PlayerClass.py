@@ -2315,6 +2315,9 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
                     attack_value += 2
+        if card.get_ability() == "Sacaellum Shrine Guard":
+            if self.game.get_green_icon(planet_id):
+                attack_value += 1
         if card.get_brutal():
             attack_value = attack_value + card.get_damage()
         if card.get_ability() == "Virulent Plague Squad":
@@ -2596,6 +2599,9 @@ class Player:
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
+                health += 1
+        if card.get_ability() == "Sacaellum Shrine Guard":
+            if self.game.get_green_icon(planet_id):
                 health += 1
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
