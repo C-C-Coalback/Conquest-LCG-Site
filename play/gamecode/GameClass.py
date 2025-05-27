@@ -7,7 +7,7 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction
-from .Interrupts import StartInterrupt
+from .Interrupts import StartInterrupt, InPlayInterrupts
 
 
 def create_planets(planet_array_objects):
@@ -167,6 +167,7 @@ class Game:
         self.shadowsun_chose_hand = True
         self.interrupts_waiting_on_resolution = []
         self.player_resolving_interrupts = []
+        self.positions_of_units_interrupting = []
         self.location_hand_attachment_shadowsun = -1
         self.name_attachment_discard_shadowsun = ""
         self.units_damaged_by_attack = []
@@ -363,6 +364,7 @@ class Game:
         self.already_resolving_interrupt = False
         self.interrupts_waiting_on_resolution = []
         self.player_resolving_interrupts = []
+        self.positions_of_units_interrupting = []
         self.active_effects = []
 
     def reset_reactions_data(self):
@@ -1167,8 +1169,8 @@ class Game:
             elif self.nullify_context == "Glorious Intervention":
                 primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                 primary_player.aiming_reticle_color = "blue"
-                self.interrupts_waiting_on_resolution.append("Glorious Intervention")
-                self.player_resolving_interrupts.append(primary_player.name_player)
+                self.create_interrupt("Glorious Intervention", primary_player.name_player,
+                                      (int(primary_player.number), -1, -1))
             elif self.nullify_context == "Bigga Is Betta":
                 self.nullify_enabled = False
                 new_string_list = self.nullify_string.split(sep="/")
@@ -1194,8 +1196,8 @@ class Game:
                 self.choice_context = ""
                 self.name_player_making_choices = ""
                 await self.send_update_message("No Mercy window offered")
-                self.interrupts_waiting_on_resolution.append("No Mercy")
-                self.player_resolving_interrupts.append(self.first_player_nullified)
+                self.create_interrupt("No Mercy", self.first_player_nullified,
+                                      (-1, -1, -1))
             elif self.nullify_context == "Fall Back":
                 self.choices_available = []
                 self.name_player_making_choices = self.first_player_nullified
@@ -1552,6 +1554,9 @@ class Game:
         )
         self.player_resolving_interrupts.insert(
             0, self.player_resolving_interrupts.pop(interrupt_pos)
+        )
+        self.positions_of_units_interrupting.insert(
+            0, self.positions_of_units_interrupting.pop(interrupt_pos)
         )
         self.asking_if_interrupt = True
 
@@ -2107,8 +2112,7 @@ class Game:
                                 self.choices_available = []
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
-                                self.interrupts_waiting_on_resolution.append("No Mercy")
-                                self.player_resolving_interrupts.append(name)
+                                self.create_interrupt("No Mercy", name, (-1, -1, -1))
                                 self.already_resolving_interrupt = True
                         elif game_update_string[1] == "1":
                             self.choices_available = []
@@ -2633,8 +2637,8 @@ class Game:
                                 elif primary_player.spend_resources(1):
                                     primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                                     primary_player.aiming_reticle_color = "blue"
-                                    self.interrupts_waiting_on_resolution.append("Glorious Intervention")
-                                    self.player_resolving_interrupts.append(primary_player.name_player)
+                                    self.create_interrupt("Glorious Intervention", primary_player.name_player,
+                                                          (-1, -1, -1))
                                     self.already_resolving_interrupt = True
                     elif self.choice_context == "Awake the Sleepers":
                         target_name = self.choices_available[int(game_update_string[1])]
@@ -3446,16 +3450,6 @@ class Game:
             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
                                      (int(secondary_player.number), att_pla, att_pos))
-            if planet_pos != -2:
-                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
-                    self.create_reaction("Treacherous Lhamaean", primary_player.name_player,
-                                         (int(primary_player.number), planet_pos, unit_pos))
-                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                        == "Swarmling Termagants":
-                    self.create_reaction("Swarmling Termagants",
-                                         primary_player.name_player,
-                                         (int(primary_player.number), planet_pos,
-                                          unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                  (int(secondary_player.number), planet_pos, unit_pos))
@@ -3493,6 +3487,11 @@ class Game:
                         (int(primary_player.number), planet_pos, unit_pos)
                     )
 
+    def create_interrupt(self, name_interrupt, name_player, pos_interrupter):
+        self.interrupts_waiting_on_resolution.append(name_interrupt)
+        self.player_resolving_interrupts.append(name_player)
+        self.positions_of_units_interrupting.append(pos_interrupter)
+
     async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
         if name == self.player_who_is_shielding:
             pos_holder = self.positions_of_units_to_take_damage[0]
@@ -3508,10 +3507,22 @@ class Game:
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                     if planet_pos != -2:
-                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
-                                and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
-                            self.interrupts_waiting_on_resolution.append("Reanimating Warriors")
-                            self.player_resolving_interrupts.append(primary_player.name_player)
+                        if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
+                                    and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
+                                self.create_interrupt("Reanimating Warriors", primary_player.name_player,
+                                                      (int(primary_player.number), planet_pos, unit_pos))
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
+                                self.create_reaction("Treacherous Lhamaean", primary_player.name_player,
+                                                     (int(primary_player.number), planet_pos, unit_pos))
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                    == "Swarmling Termagants":
+                                self.create_reaction("Swarmling Termagants", primary_player.name_player,
+                                                     (int(primary_player.number), planet_pos, unit_pos))
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                    == "Prudent Fire Warriors":
+                                self.create_interrupt("Prudent Fire Warriors", primary_player.name_player,
+                                                      (int(primary_player.number), planet_pos, unit_pos))
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.damage_taken_was_from_attack.append(True)
@@ -3608,6 +3619,33 @@ class Game:
                                         if took_damage:
                                             self.recently_damaged_units.append(
                                                 self.positions_of_units_to_take_damage[0])
+                                            if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                if primary_player.get_ability_given_pos(
+                                                        planet_pos, unit_pos) == "Reanimating Warriors" \
+                                                        and not primary_player.cards_in_play[planet_pos + 1][
+                                                        unit_pos].once_per_phase_used:
+                                                    self.create_interrupt("Reanimating Warriors",
+                                                                          primary_player.name_player,
+                                                                          (int(primary_player.number), planet_pos,
+                                                                           unit_pos))
+                                                if primary_player.get_ability_given_pos(
+                                                        planet_pos, unit_pos) == "Treacherous Lhamaean":
+                                                    self.create_reaction(
+                                                        "Treacherous Lhamaean", primary_player.name_player,
+                                                        (int(primary_player.number), planet_pos, unit_pos)
+                                                    )
+                                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                        == "Swarmling Termagants":
+                                                    self.create_reaction("Swarmling Termagants",
+                                                                         primary_player.name_player,
+                                                                         (int(primary_player.number), planet_pos,
+                                                                          unit_pos))
+                                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                        == "Prudent Fire Warriors":
+                                                    self.create_interrupt("Prudent Fire Warriors",
+                                                                          primary_player.name_player,
+                                                                          (int(primary_player.number), planet_pos,
+                                                                           unit_pos))
                                             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                                 att_num, att_pla, att_pos = \
                                                     self.positions_attackers_of_units_to_take_damage[0]
@@ -4025,79 +4063,30 @@ class Game:
         print("Resolving effect")
         if name == self.player_resolving_interrupts[0]:
             print("name check ok")
-            if self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
-                print("reanimating warriors")
-                if not self.asked_if_resolve_effect:
-                    self.choices_available = ["Yes", "No"]
-                    self.choice_context = "Use Reanimating Warriors?"
-                    self.name_player_making_choices = name
-                else:
-                    if len(game_update_string) == 2 and self.chosen_first_card:
-                        print("planets")
-                        if game_update_string[0] == "PLANETS":
-                            print("planets 2")
-                            origin_planet, origin_pos = self.misc_target_unit
-                            target_planet = int(game_update_string[1])
-                            if abs(origin_planet - target_planet) == 1:
-                                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-                                primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
-                                self.delete_interrupt()
-                                self.asked_if_resolve_effect = False
-                                self.chosen_first_card = False
-                    elif len(game_update_string) == 4 and not self.chosen_first_card:
-                        print("in play")
-                        if game_update_string[0] == "IN_PLAY":
-                            print("in play 2")
-                            if game_update_string[1] == primary_player.number:
-                                print("in play 3")
-                                planet_pos = int(game_update_string[2])
-                                unit_pos = int(game_update_string[3])
-                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
-                                        "Reanimating Warriors" \
-                                        and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
-                                        .once_per_phase_used:
-                                    if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
-                                        self.chosen_first_card = True
-                                        self.misc_target_unit = (planet_pos, unit_pos)
-                                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                                        primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-            elif self.interrupts_waiting_on_resolution[0] == "Glorious Intervention":
-                if len(game_update_string) == 4:
-                    if game_update_string[0] == "IN_PLAY":
-                        if game_update_string[1] == primary_player.get_number():
-                            pos_holder = self.positions_of_units_to_take_damage[0]
-                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
-                            sac_planet_pos = int(game_update_string[2])
-                            sac_unit_pos = int(game_update_string[3])
-                            if sac_planet_pos == planet_pos:
-                                if sac_unit_pos != unit_pos:
-                                    if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
-                                            get_card_type() != "Warlord":
-                                        if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                                .check_for_a_trait("Warrior") or \
-                                                primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                                        .check_for_a_trait("Soldier"):
-                                            primary_player.aiming_reticle_coords_hand = None
-                                            primary_player.discard_card_from_hand(self.pos_shield_card)
-                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                            self.pos_shield_card = -1
-                                            printed_atk = primary_player.cards_in_play[
-                                                sac_planet_pos + 1][sac_unit_pos].attack
-                                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                                    self.damage_on_units_list_before_new_damage[0]:
-                                                primary_player.set_damage_given_pos(
-                                                    planet_pos, unit_pos,
-                                                    self.damage_on_units_list_before_new_damage[0])
-                                            primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
-                                            att_num, att_pla, att_pos = \
-                                                self.positions_attackers_of_units_to_take_damage[0]
-                                            secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
-                                            self.delete_interrupt()
-                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-            elif self.interrupts_waiting_on_resolution[0] == "No Mercy":
-                if len(game_update_string) == 3:
+            if len(game_update_string) == 2:
+                if self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
+                    print("reanimating warriors")
+                    if not self.asked_if_resolve_effect:
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "Use Reanimating Warriors?"
+                        self.name_player_making_choices = name
+                    else:
+                        if self.chosen_first_card:
+                            if game_update_string[0] == "PLANETS":
+                                origin_planet, origin_pos = self.misc_target_unit
+                                target_planet = int(game_update_string[1])
+                                if abs(origin_planet - target_planet) == 1:
+                                    primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                                    primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
+                                    self.delete_interrupt()
+                                    self.asked_if_resolve_effect = False
+                                    self.chosen_first_card = False
+            if len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    await InPlayInterrupts.resolve_in_play_interrupt(self, name, game_update_string,
+                                                                     primary_player, secondary_player)
+            if len(game_update_string) == 3:
+                if self.interrupts_waiting_on_resolution[0] == "No Mercy":
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == primary_player.number:
                             hq_pos = int(game_update_string[2])
@@ -4105,23 +4094,6 @@ class Game:
                                     primary_player.headquarters[hq_pos].get_unique() and \
                                     primary_player.headquarters[hq_pos].get_ready():
                                 primary_player.exhaust_given_pos(-2, hq_pos)
-                                primary_player.discard_card_name_from_hand("No Mercy")
-                                try:
-                                    secondary_player.discard_card_from_hand(self.pos_shield_card)
-                                except:
-                                    pass
-                                self.delete_interrupt()
-                                await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
-                                                                         alt_shields=False, can_no_mercy=False)
-                elif len(game_update_string) == 4:
-                    if game_update_string[0] == "IN_PLAY":
-                        if game_update_string[1] == primary_player.number:
-                            planet_pos = int(game_update_string[2])
-                            unit_pos = int(game_update_string[3])
-                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit() and \
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_unique() and \
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ready():
-                                primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 primary_player.discard_card_name_from_hand("No Mercy")
                                 try:
                                     secondary_player.discard_card_from_hand(self.pos_shield_card)
@@ -4177,6 +4149,7 @@ class Game:
             self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
             del self.interrupts_waiting_on_resolution[0]
             del self.player_resolving_interrupts[0]
+            del self.positions_of_units_interrupting[0]
         self.already_resolving_interrupt = False
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):

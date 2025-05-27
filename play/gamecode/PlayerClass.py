@@ -829,7 +829,13 @@ class Player:
             if target_card.check_for_a_trait("Vehicle"):
                 print("Vehicles may not have army units as attachments")
                 return False
-            target_card.add_attachment(card)
+            name_owner = self.name_player
+            if not_own_attachment:
+                if self.number == "1":
+                    name_owner = self.game.p2.name_player
+                elif self.number == "2":
+                    name_owner = self.game.p1.name_player
+            target_card.add_attachment(card, name_owner=name_owner)
             return True
         allowed_types = card.type_of_units_allowed_for_attachment
         if type_of_card not in allowed_types:
@@ -3156,9 +3162,7 @@ class Player:
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
-            self.game.interrupts_waiting_on_resolution.append("Interrogator Acolyte")
-            self.game.player_resolving_interrupts.append(self.name_player)
-            # self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
+            self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Mark of Chaos":
                 owner = card.get_attachments()[i].name_owner
