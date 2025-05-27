@@ -532,6 +532,9 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 command += self.attachments[i].get_extra_command()
+            if self.attachments[i].get_ability() == "Auxiliary Armor":
+                if self.get_faction() != "Tau":
+                    command += 1
         if self.get_ability() == "Bad Dok" and self.damage > 0:
             command = command + 3
         return command
