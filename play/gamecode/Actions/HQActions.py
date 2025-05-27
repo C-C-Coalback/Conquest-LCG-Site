@@ -149,6 +149,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             if self.last_planet_checked_for_battle == -1:
                                 primary_player.exhaust_given_pos(-2, unit_pos)
                                 self.action_chosen = "Kaerux Erameas"
+                    elif ability == "Troop Transport":
+                        self.action_chosen = ability
+                        primary_player.sacrifice_card_in_hq(unit_pos)
                     elif ability == "The Nexus of Shadows":
                         if not card.get_once_per_phase_used():
                             if primary_player.spend_resources(2):

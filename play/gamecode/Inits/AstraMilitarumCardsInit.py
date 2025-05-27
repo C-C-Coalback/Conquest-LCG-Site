@@ -265,7 +265,8 @@ def astra_militarum_cards_init():
                                                    "Action: Sacrifice this support to either put a Guardsman "
                                                    "token into play at a planet, or put 2 Guardsman tokens into "
                                                    "play at a Stronghold planet (green).", "Upgrade.",
-                                0, faction, "Loyal", False, limited=True),
+                                0, faction, "Loyal", False, limited=True, action_in_play=True,
+                                allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Death Korps Engineers", "Action: Sacrifice this unit to destroy a "
                                                       "target exhausted support card.", "Soldier. Krieg.",
                              2, faction, "Common", 2, 3, 0, False, action_in_play=True, allowed_phases_in_play="ALL"),
