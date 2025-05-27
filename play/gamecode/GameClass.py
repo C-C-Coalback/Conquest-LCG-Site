@@ -4841,25 +4841,31 @@ class Game:
                     for i in range(len(self.p1.cards_in_play[planet + 1])):
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
-                                self.p1.cards_in_play[planet + 1][i].resolving_attack = False
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
-                                self.p1.cards_in_play[planet + 1][i].resolving_attack = False
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
+                            for rok in self.p1.rok_bombardment_active:
+                                if rok == "Own":
+                                    self.p1.assign_damage_to_pos(planet, i, 1)
+                                elif not self.p1.get_immune_to_enemy_events(planet, i):
+                                    self.p1.assign_damage_to_pos(planet, i, 1)
                     for i in range(len(self.p2.cards_in_play[planet + 1])):
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
-                                self.p2.cards_in_play[planet + 1][i].resolving_attack = False
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
-                                self.p2.cards_in_play[planet + 1][i].resolving_attack = False
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
+                            for rok in self.p2.rok_bombardment_active:
+                                if rok == "Own":
+                                    self.p2.assign_damage_to_pos(planet, i, 1)
+                                elif not self.p2.get_immune_to_enemy_events(planet, i):
+                                    self.p2.assign_damage_to_pos(planet, i, 1)
                 self.p1.ethereal_movement_resolution()
                 self.p2.ethereal_movement_resolution()
+                self.p1.reset_resolving_attacks_everywhere()
+                self.p2.reset_resolving_attacks_everywhere()
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
-                if self.auto_card_destruction:
-                    await self.destroy_check_all_cards()
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         print("---\nDEBUG INFO\n---")
@@ -5110,6 +5116,10 @@ class Game:
         self.p2.illegal_commits_synapse = 0
         self.p1.primal_howl_used = False
         self.p2.primal_howl_used = False
+        self.p1.used_reanimation_protocol = False
+        self.p2.used_reanimation_protocol = False
+        self.p1.accept_any_challenge_used = False
+        self.p2.accept_any_challenge_used = False
         self.mode = "Normal"
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()

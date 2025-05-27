@@ -87,6 +87,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
                         self.misc_target_planet = -1
+                    elif ability == "Rok Bombardment":
+                        if self.last_planet_checked_for_battle != -1:
+                            secondary_player.rok_bombardment_active.append("Enemy")
+                            if not self.get_red_icon(self.last_planet_checked_for_battle):
+                                primary_player.rok_bombardment_active.append("Own")
+                        else:
+                            primary_player.add_resources(cost)
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_cleanup()
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

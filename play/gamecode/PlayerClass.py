@@ -122,6 +122,7 @@ class Player:
         self.discard_inquis_caius_wroth = False
         self.enemy_has_wyrdboy_stikk = False
         self.accept_any_challenge_used = False
+        self.rok_bombardment_active = []  # (own: bool)
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1246,6 +1247,17 @@ class Player:
                         self.cards_in_play[planet + 1][i].get_is_unit():
                     count += 1
         return count
+
+    def reset_resolving_attacks_everywhere(self):
+        i = 0
+        while i < len(self.headquarters):
+            self.headquarters[i].resolving_attack = False
+            i += 1
+        for i in range(7):
+            j = 0
+            while j < len(self.cards_in_play[i + 1]):
+                self.cards_in_play[i + 1][j].resolving_attack = False
+                j = j + 1
 
     def ethereal_movement_resolution(self):
         i = 0
