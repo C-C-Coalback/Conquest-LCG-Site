@@ -569,6 +569,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "The Black Sword":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kabalite Halfborn":
             primary_player.draw_card()
             self.delete_reaction()

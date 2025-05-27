@@ -426,6 +426,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.create_reaction("Firedrake Terminators", secondary_player.name_player,
                                                              (int(primary_player.number), self.attacker_planet,
                                                               self.attacker_position))
+                                    if secondary_player.search_attachments_at_pos(
+                                        self.defender_planet, self.defender_position, "The Black Sword"
+                                    ):
+                                        self.create_reaction("The Black Sword", secondary_player.name_player,
+                                                             (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position))
                                     # Flying check
                                     if def_flying and not att_flying and not att_ignores_flying:
                                         attack_value = int(attack_value / 2 + (attack_value % 2))

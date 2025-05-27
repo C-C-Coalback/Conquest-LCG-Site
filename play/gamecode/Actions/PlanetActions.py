@@ -245,11 +245,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Blood For The Blood God!":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_damage_given_pos(chosen_planet, i) == 0:
-                primary_player.assign_damage_to_pos(chosen_planet, i, 1, rickety_warbuggy=True)
+                primary_player.assign_damage_to_pos(chosen_planet, i, 1)
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                 if secondary_player.get_damage_given_pos(chosen_planet, i) == 0:
-                    secondary_player.assign_damage_to_pos(chosen_planet, i, 1, rickety_warbuggy=True)
+                    secondary_player.assign_damage_to_pos(chosen_planet, i, 1)
         self.action_cleanup()
     elif self.action_chosen == "Vile Laboratory":
         if not self.chosen_first_card:
