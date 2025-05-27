@@ -3492,6 +3492,14 @@ class Game:
                                     self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                                          (int(primary_player.number), planet_pos, unit_pos))
                                     self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                            if primary_player.get_card_type_given_pos(
+                                    planet_pos, unit_pos) == "Army":
+                                if secondary_player.search_attachments_at_pos(
+                                        att_pla, att_pos, "Last Breath"):
+                                    self.create_reaction(
+                                        "Last Breath", secondary_player.name_player,
+                                        (int(primary_player.number), planet_pos, unit_pos)
+                                    )
                     else:
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
@@ -3596,10 +3604,11 @@ class Game:
                                                     if primary_player.cards_in_play[planet_pos + 1][
                                                         unit_pos].get_ability() == "Reanimating Warriors" \
                                                             and not primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].once_per_phase_used:
+                                                            unit_pos].once_per_phase_used:
                                                         self.interrupts_waiting_on_resolution.append(
                                                             "Reanimating Warriors")
-                                                        self.player_resolving_interrupts.append(primary_player.name_player)
+                                                        self.player_resolving_interrupts.append(
+                                                            primary_player.name_player)
                                                 if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                             "Repulsor Impact Field"):
                                                     self.create_reaction("Repulsor Impact Field",
@@ -3687,6 +3696,14 @@ class Game:
                                                                                       planet_pos, unit_pos))
                                                                 self.damage_amounts_baarzul.append(
                                                                     self.amount_that_can_be_removed_by_shield[0])
+                                                        if primary_player.get_card_type_given_pos(
+                                                                planet_pos, unit_pos) == "Army":
+                                                            if secondary_player.search_attachments_at_pos(
+                                                                    att_pla, att_pos, "Last Breath"):
+                                                                self.create_reaction(
+                                                                    "Last Breath", secondary_player.name_player,
+                                                                    (int(primary_player.number), planet_pos, unit_pos)
+                                                                )
                                             else:
                                                 if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                     if primary_player.get_ability_given_pos(

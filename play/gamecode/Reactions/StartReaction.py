@@ -615,6 +615,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.set_once_per_phase_used_given_pos(warlord_planet, warlord_pos, True)
                 primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Last Breath":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos != -2:
+                if num == 1:
+                    self.p1.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += -3
+                else:
+                    self.p2.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += -3
+            self.delete_reaction()
         elif current_reaction == "Striking Ravener":
             planet_pos = self.positions_of_unit_triggering_reaction[0][1]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
