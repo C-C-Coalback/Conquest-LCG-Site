@@ -1098,18 +1098,22 @@ class Game:
             self.p2.reset_extra_health_eob()
             self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
             self.mode = "Normal"
-            another_battle = self.find_next_planet_for_combat()
-            if another_battle:
-                self.set_battle_initiative()
-                self.p1.has_passed = False
-                self.p2.has_passed = False
-                self.planet_aiming_reticle_active = True
-                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            if self.kaerux_erameas_active:
+                self.before_first_combat = True
+                self.last_planet_checked_for_battle = -1
             else:
-                await self.change_phase("HEADQUARTERS")
-                await self.send_update_message(
-                    "Window provided for reactions and actions during HQ phase."
-                )
+                another_battle = self.find_next_planet_for_combat()
+                if another_battle:
+                    self.set_battle_initiative()
+                    self.p1.has_passed = False
+                    self.p2.has_passed = False
+                    self.planet_aiming_reticle_active = True
+                    self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                else:
+                    await self.change_phase("HEADQUARTERS")
+                    await self.send_update_message(
+                        "Window provided for reactions and actions during HQ phase."
+                    )
         self.tense_negotiations_active = False
         self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
