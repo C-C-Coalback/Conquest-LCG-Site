@@ -2603,6 +2603,9 @@ class Player:
         if card.get_ability() == "Sacaellum Shrine Guard":
             if self.game.get_green_icon(planet_id):
                 health += 1
+        if card.get_ability() == "Ramshackle Trukk":
+            if self.get_enemy_has_init_for_cards(planet_id, unit_id):
+                health += 4
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
