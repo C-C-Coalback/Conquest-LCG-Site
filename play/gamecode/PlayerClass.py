@@ -1220,6 +1220,18 @@ class Player:
                                         if self.headquarters[i].get_ability() == "Sautekh Complex":
                                             self.game.create_reaction("Sautekh Complex", self.name_player,
                                                                       (int(self.number), -2, i))
+                            if card.get_faction() != "Tau":
+                                for i in range(len(self.cards_in_play[position + 1])):
+                                    if self.get_ability_given_pos(position, i) == "Exploratory Drone":
+                                        self.game.create_reaction("Exploratory Drone", self.name_player,
+                                                                  (int(self.number), position, i))
+                                other_player = self.game.p1
+                                if other_player.name_player == self.name_player:
+                                    other_player = self.game.p2
+                                for i in range(len(other_player.cards_in_play[position + 1])):
+                                    if other_player.get_ability_given_pos(position, i) == "Exploratory Drone":
+                                        self.game.create_reaction("Exploratory Drone", other_player.name_player,
+                                                                  (int(other_player.number), position, i))
                             if self.game.request_search_for_enemy_card_at_planet(self.number, position,
                                                                                  "Syren Zythlex"):
                                 name = self.name_player

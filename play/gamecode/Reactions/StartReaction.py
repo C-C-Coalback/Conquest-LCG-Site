@@ -576,6 +576,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Kabalite Halfborn":
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Exploratory Drone":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif self.reactions_needing_resolving[0] == "Turbulent Rift":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_card_in_hq_given_name("Turbulent Rift")
