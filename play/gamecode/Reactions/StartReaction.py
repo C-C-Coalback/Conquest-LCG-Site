@@ -234,7 +234,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Noxious Fleshborer":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.infested_planets[planet_pos] = True
+            self.infest_planet(planet_pos)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Straken's Command Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -398,7 +398,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if not self.infested_planets[planet_pos]:
-                self.infested_planets[planet_pos] = True
+                self.infest_planet(planet_pos)
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.delete_reaction()
             else:
@@ -452,8 +452,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Scything Hormagaunts":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.infested_planets[planet_pos] = True
+            self.infest_planet(planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Sacaellum Infestors":
+            primary_player.exhaust_card_in_hq_given_name("Sacaellum Infestors")
+            self.resolving_search_box = True
+            self.choice_context = "Choice Sacaellum Infestors"
+            self.name_player_making_choices = primary_player.name_player
+            self.choices_available = ["Cards", "Resources"]
         elif self.reactions_needing_resolving[0] == "Defense Battery":
             self.chosen_first_card = False
         elif self.reactions_needing_resolving[0] == "Ragnar Blackmane":

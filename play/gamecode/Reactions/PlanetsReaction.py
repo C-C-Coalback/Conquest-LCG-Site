@@ -59,5 +59,5 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.positions_of_unit_triggering_reaction[0] = (int(primary_player.number),
                                                                  chosen_planet, new_pos)
     elif self.reactions_needing_resolving[0] == "Spore Chimney":
-        self.infested_planets[int(game_update_string[1])] = True
+        self.infest_planet(int(game_update_string[1]))
         self.delete_reaction()

@@ -1700,6 +1700,20 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "Choice Sacaellum Infestors":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+                        planet_name = self.planet_array[planet_pos]
+                        if chosen_choice == "Cards":
+                            planet_card = FindCard.find_planet_card(planet_name, self.planet_cards_array)
+                            for _ in range(planet_card.get_cards()):
+                                primary_player.draw_card()
+                        elif chosen_choice == "Resources":
+                            planet_card = FindCard.find_planet_card(planet_name, self.planet_cards_array)
+                            primary_player.add_resources(planet_card.get_resources())
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        self.delete_reaction()
                     elif self.choice_context == "Interrupt Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         print("Choice chosen:", chosen_choice)
@@ -5030,6 +5044,14 @@ class Game:
                         if winner.search_hand_for_card("Accept Any Challenge"):
                             reactions.append("Accept Any Challenge")
         return reactions
+
+    def infest_planet(self, planet):
+        if not self.infested_planets[planet]:
+            self.infested_planets[planet] = True
+            if self.p1.search_card_in_hq("Sacaellum Infestors", ready_relevant=True):
+                self.create_reaction("Sacaellum Infestors", self.name_1, (1, planet, -1))
+            if self.p2.search_card_in_hq("Sacaellum Infestors", ready_relevant=True):
+                self.create_reaction("Sacaellum Infestors", self.name_2, (2, planet, -1))
 
     async def resolve_winning_combat(self, winner, loser):
         self.name_player_who_won_combat = winner.name_player

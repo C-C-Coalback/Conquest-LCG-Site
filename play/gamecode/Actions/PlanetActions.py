@@ -107,7 +107,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if self.infested_planets[adj_2]:
                 adj_2_infested = True
         if adj_1_infested or adj_2_infested:
-            self.infested_planets[chosen_planet] = True
+            self.infest_planet(chosen_planet)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             self.mode = "Normal"
             self.action_chosen = ""

@@ -43,7 +43,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await self.send_update_message("Haemonculus buffed")
                     elif ability == "Virulent Spore Sacs":
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
-                        self.infested_planets[planet_pos] = True
+                        self.infest_planet(planet_pos)
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                             secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                             if i == 0:

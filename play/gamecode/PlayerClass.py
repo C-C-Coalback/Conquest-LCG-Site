@@ -1626,6 +1626,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Air Caste Courier":
             if self.warlord_faction != "Tau":
                 return True
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
+            if self.search_card_at_planet(planet_id, "Soaring Gargoyles"):
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
     def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
