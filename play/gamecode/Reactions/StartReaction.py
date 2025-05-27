@@ -36,6 +36,32 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.delete_reaction()
+        elif current_reaction == "Neophyte Apprentice":
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "PLAY TO BATTLE"
+            self.traits_of_searched_card = "Black Templars"
+            self.card_type_of_searched_card = "Army"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 4
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            if self.player_who_resolves_reaction[0] == self.name_1:
+                self.p1.number_cards_to_search = 6
+                if len(self.p1.deck) > 5:
+                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                else:
+                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                self.name_player_who_is_searching = self.p1.name_player
+                self.number_who_is_searching = str(self.p1.number)
+            else:
+                self.p2.number_cards_to_search = 6
+                if len(self.p2.deck) > 5:
+                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                else:
+                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                self.name_player_who_is_searching = self.p2.name_player
+                self.number_who_is_searching = str(self.p2.number)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Swordwind Farseer":
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6

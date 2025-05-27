@@ -3410,6 +3410,75 @@ class Game:
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
 
+    def checks_on_damage_from_attack(self, primary_player, secondary_player, planet_pos, unit_pos):
+        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Neophyte Apprentice":
+            secondary_player.sacrifice_card_in_play(att_pla, att_pos)
+            self.create_reaction("Neophyte Apprentice", secondary_player.name_player,
+                                 (int(secondary_player.number), -1, -1))
+            return None
+        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field",
+                                                    must_match_name=True):
+            self.create_reaction("Repulsor Impact Field", primary_player.name_player,
+                                 (int(secondary_player.number), att_pla, att_pos))
+        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
+            if not secondary_player.get_flying_given_pos(att_pla, att_pos):
+                self.create_reaction("Solarite Avetys", primary_player.name_player,
+                                     (int(secondary_player.number), planet_pos, unit_pos))
+        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
+            self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
+                                 (int(primary_player.number), planet_pos, unit_pos))
+        if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
+                self.create_reaction("Volatile Pyrovore", primary_player.name_player,
+                                     (int(secondary_player.number), att_pla, att_pos))
+            if planet_pos != -2:
+                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
+                    self.create_reaction("Treacherous Lhamaean", primary_player.name_player,
+                                         (int(primary_player.number), planet_pos, unit_pos))
+                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                        == "Swarmling Termagants":
+                    self.create_reaction("Swarmling Termagants",
+                                         primary_player.name_player,
+                                         (int(primary_player.number), planet_pos,
+                                          unit_pos))
+        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
+            self.create_reaction("Deathskull Lootas", secondary_player.name_player,
+                                 (int(secondary_player.number), planet_pos, unit_pos))
+        if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Searing Burst Cannon"):
+            damage = self.amount_that_can_be_removed_by_shield[0]
+            primary_player.cards_in_play[planet_pos + 1][unit_pos].damage += damage
+        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Shrieking Basilisk":
+            self.create_reaction("Shrieking Basilisk", secondary_player.name_player,
+                                 (int(secondary_player.number), planet_pos, unit_pos))
+        for i in range(len(secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments())):
+            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability() \
+                    == "Nocturne-Ultima Storm Bolter" and secondary_player. \
+                    cards_in_play[att_pla + 1][att_pos].get_attachments()[i].name_owner \
+                    == secondary_player.name_player:
+                self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
+                                     (int(secondary_player.number), att_pla, att_pos))
+        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
+                    self.create_reaction("Black Heart Ravager", secondary_player.name_player,
+                                         (int(primary_player.number), planet_pos, unit_pos))
+                if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
+                    self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
+            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
+                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                         (int(primary_player.number), planet_pos, unit_pos))
+                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+            if primary_player.get_card_type_given_pos(
+                    planet_pos, unit_pos) == "Army":
+                if secondary_player.search_attachments_at_pos(
+                        att_pla, att_pos, "Last Breath"):
+                    self.create_reaction(
+                        "Last Breath", secondary_player.name_player,
+                        (int(primary_player.number), planet_pos, unit_pos)
+                    )
+
     async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
         if name == self.player_who_is_shielding:
             pos_holder = self.positions_of_units_to_take_damage[0]
@@ -3430,76 +3499,16 @@ class Game:
                             self.interrupts_waiting_on_resolution.append("Reanimating Warriors")
                             self.player_resolving_interrupts.append(primary_player.name_player)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.damage_taken_was_from_attack.append(True)
                         self.positions_of_attacker_of_unit_that_took_damage.append(
                             self.positions_attackers_of_units_to_take_damage[0])
-                        att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.faction_of_attacker.append(secondary_player.get_faction_given_pos(att_pla, att_pos))
                         self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append(
                             secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos, planet_pos, unit_pos))
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
-                        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field",
-                                                                    must_match_name=True):
-                            self.create_reaction("Repulsor Impact Field", primary_player.name_player,
-                                                 (int(secondary_player.number), att_pla, att_pos))
-                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
-                            if not secondary_player.get_flying_given_pos(att_pla, att_pos):
-                                self.create_reaction("Solarite Avetys", primary_player.name_player,
-                                                     (int(secondary_player.number), planet_pos, unit_pos))
-                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
-                            self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
-                                                 (int(primary_player.number), planet_pos, unit_pos))
-                        if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
-                                self.create_reaction("Volatile Pyrovore", primary_player.name_player,
-                                                     (int(secondary_player.number), att_pla, att_pos))
-                            if planet_pos != -2:
-                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
-                                    self.create_reaction("Treacherous Lhamaean", primary_player.name_player,
-                                                         (int(primary_player.number), planet_pos, unit_pos))
-                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                                        == "Swarmling Termagants":
-                                    self.create_reaction("Swarmling Termagants",
-                                                         primary_player.name_player,
-                                                         (int(primary_player.number), planet_pos,
-                                                          unit_pos))
-                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
-                            self.create_reaction("Deathskull Lootas", secondary_player.name_player,
-                                                 (int(secondary_player.number), planet_pos, unit_pos))
-                        if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Searing Burst Cannon"):
-                            damage = self.amount_that_can_be_removed_by_shield[0]
-                            primary_player.cards_in_play[planet_pos + 1][unit_pos].damage += damage
-                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Shrieking Basilisk":
-                            self.create_reaction("Shrieking Basilisk", secondary_player.name_player,
-                                                 (int(secondary_player.number), planet_pos, unit_pos))
-                        for i in range(len(secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments())):
-                            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability() \
-                                    == "Nocturne-Ultima Storm Bolter" and secondary_player.\
-                                    cards_in_play[att_pla + 1][att_pos].get_attachments()[i].name_owner \
-                                    == secondary_player.name_player:
-                                self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
-                                                     (int(secondary_player.number), att_pla, att_pos))
-                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                                if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
-                                    self.create_reaction("Black Heart Ravager", secondary_player.name_player,
-                                                         (int(primary_player.number), planet_pos, unit_pos))
-                                if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
-                                    self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
-                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
-                                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                         (int(primary_player.number), planet_pos, unit_pos))
-                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
-                            if primary_player.get_card_type_given_pos(
-                                    planet_pos, unit_pos) == "Army":
-                                if secondary_player.search_attachments_at_pos(
-                                        att_pla, att_pos, "Last Breath"):
-                                    self.create_reaction(
-                                        "Last Breath", secondary_player.name_player,
-                                        (int(primary_player.number), planet_pos, unit_pos)
-                                    )
+                        self.checks_on_damage_from_attack(primary_player, secondary_player, planet_pos, unit_pos)
                     else:
                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
@@ -3586,124 +3595,22 @@ class Game:
                                             self.recently_damaged_units.append(
                                                 self.positions_of_units_to_take_damage[0])
                                             if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                                att_num, att_pla, att_pos = \
+                                                    self.positions_attackers_of_units_to_take_damage[0]
                                                 self.damage_taken_was_from_attack.append(True)
                                                 self.positions_of_attacker_of_unit_that_took_damage.append(
-                                                    self.positions_attackers_of_units_to_take_damage[0]
-                                                )
-                                                att_num, att_pla, att_pos = self. \
-                                                    positions_attackers_of_units_to_take_damage[0]
-                                                self.faction_of_attacker.append(secondary_player.get_faction_given_pos(
-                                                    att_pla, att_pos
-                                                ))
+                                                    self.positions_attackers_of_units_to_take_damage[0])
+                                                self.faction_of_attacker.append(
+                                                    secondary_player.get_faction_given_pos(att_pla, att_pos))
                                                 self.card_names_that_caused_damage.append(
                                                     self.card_names_triggering_damage[0])
                                                 self.on_kill_effects_of_attacker.append(
-                                                    secondary_player.get_on_kill_effects_of_attacker(
-                                                        att_pla, att_pos, planet_pos, unit_pos))
-                                                if planet_pos != -2:
-                                                    if primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].get_ability() == "Reanimating Warriors" \
-                                                            and not primary_player.cards_in_play[planet_pos + 1][
-                                                            unit_pos].once_per_phase_used:
-                                                        self.interrupts_waiting_on_resolution.append(
-                                                            "Reanimating Warriors")
-                                                        self.player_resolving_interrupts.append(
-                                                            primary_player.name_player)
-                                                if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
-                                                                                            "Repulsor Impact Field"):
-                                                    self.create_reaction("Repulsor Impact Field",
-                                                                         primary_player.name_player,
-                                                                         (int(secondary_player.number),
-                                                                          att_pla, att_pos))
-                                                if primary_player.get_ability_given_pos(planet_pos,
-                                                                                        unit_pos) == "Solarite Avetys":
-                                                    if not secondary_player.get_flying_given_pos(att_pla, att_pos):
-                                                        self.create_reaction("Solarite Avetys",
-                                                                             primary_player.name_player,
-                                                                             (int(secondary_player.number), planet_pos,
-                                                                              unit_pos))
-                                                if primary_player.get_ability_given_pos(
-                                                        planet_pos, unit_pos) == "Zogwort's Runtherders":
-                                                    self.create_reaction("Zogwort's Runtherders",
-                                                                         primary_player.name_player,
-                                                                         (int(primary_player.number),
-                                                                          planet_pos, unit_pos))
-                                                if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                    if primary_player.get_ability_given_pos(
-                                                            planet_pos, unit_pos) == "Volatile Pyrovore":
-                                                        self.create_reaction("Volatile Pyrovore",
-                                                                             primary_player.name_player,
-                                                                             (int(secondary_player.number), att_pla,
-                                                                              att_pos))
-                                                    if planet_pos != -2:
-                                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                                                                == "Treacherous Lhamaean":
-                                                            self.create_reaction("Treacherous Lhamaean",
-                                                                                 primary_player.name_player,
-                                                                                 (int(primary_player.number),
-                                                                                  planet_pos, unit_pos))
-                                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
-                                                                == "Swarmling Termagants":
-                                                            self.create_reaction("Swarmling Termagants",
-                                                                                 primary_player.name_player,
-                                                                                 (int(primary_player.number),
-                                                                                  planet_pos, unit_pos))
-                                                if secondary_player.get_ability_given_pos(att_pla, att_pos) \
-                                                        == "Deathskull Lootas":
-                                                    self.create_reaction("Deathskull Lootas",
-                                                                         secondary_player.name_player,
-                                                                         (int(secondary_player.number), planet_pos,
-                                                                          unit_pos))
-                                                if secondary_player.get_ability_given_pos(
-                                                        att_pla, att_pos) == "Shrieking Basilisk":
-                                                    self.create_reaction("Shrieking Basilisk",
-                                                                         secondary_player.name_player,
-                                                                         (int(secondary_player.number), planet_pos,
-                                                                          unit_pos))
-                                                for i in range(len(secondary_player.cards_in_play[att_pla + 1][
-                                                                       att_pos].get_attachments())):
-                                                    if secondary_player.cards_in_play[att_pla + 1][
-                                                        att_pos].get_attachments()[i].get_ability() \
-                                                            == "Nocturne-Ultima Storm Bolter" and secondary_player. \
-                                                            cards_in_play[att_pla + 1][att_pos].get_attachments()[
-                                                        i].name_owner \
-                                                            == secondary_player.name_player:
-                                                        self.create_reaction("Nocturne-Ultima Storm Bolter",
-                                                                             secondary_player.name_player,
-                                                                             (int(secondary_player.number), att_pla,
-                                                                              att_pos))
-                                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                    if primary_player.cards_in_play[planet_pos + 1][unit_pos] \
-                                                            .get_card_type() != "Warlord":
-                                                        if secondary_player.get_ability_given_pos(att_pla, att_pos) == \
-                                                                "Black Heart Ravager":
-                                                            self.create_reaction("Black Heart Ravager",
-                                                                                 secondary_player.name_player,
-                                                                                 (int(primary_player.number),
-                                                                                  planet_pos, unit_pos))
-                                                        if secondary_player.search_attachments_at_pos(
-                                                                att_pla, att_pos, "Pincer Tail", must_match_name=True):
-                                                            self.create_reaction("Pincer Tail",
-                                                                                 secondary_player.name_player,
-                                                                                 pos_holder)
-                                                        if primary_player.get_ability_given_pos(
-                                                                planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                                                            if primary_player.search_card_at_planet(
-                                                                    planet_pos, "Ba'ar Zul the Hate-Bound"):
-                                                                self.create_reaction("Ba'ar Zul the Hate-Bound",
-                                                                                     primary_player.name_player,
-                                                                                     (int(primary_player.number),
-                                                                                      planet_pos, unit_pos))
-                                                                self.damage_amounts_baarzul.append(
-                                                                    self.amount_that_can_be_removed_by_shield[0])
-                                                        if primary_player.get_card_type_given_pos(
-                                                                planet_pos, unit_pos) == "Army":
-                                                            if secondary_player.search_attachments_at_pos(
-                                                                    att_pla, att_pos, "Last Breath"):
-                                                                self.create_reaction(
-                                                                    "Last Breath", secondary_player.name_player,
-                                                                    (int(primary_player.number), planet_pos, unit_pos)
-                                                                )
+                                                    secondary_player.get_on_kill_effects_of_attacker(att_pla, att_pos,
+                                                                                                     planet_pos,
+                                                                                                     unit_pos))
+                                                print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
+                                                self.checks_on_damage_from_attack(primary_player, secondary_player,
+                                                                                  planet_pos, unit_pos)
                                             else:
                                                 if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                     if primary_player.get_ability_given_pos(
