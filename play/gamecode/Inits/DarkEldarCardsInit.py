@@ -233,7 +233,8 @@ def dark_eldar_cards_init():
                                 ["4x Shadowed Thorns Pillagers", "1x The Nexus of Shadows",
                                  "2x Inevitable Betrayal", "1x Last Breath"]),
         CardClasses.ArmyCard("Shadowed Thorns Pillagers", "Ambush.", "Warrior. Raider. Kabalite.",
-                             2, faction, "Signature", 2, 2, 1, False),
+                             2, faction, "Signature", 2, 2, 1, False, ambush=True,
+                             action_in_hand=True, allowed_phases_in_hand="COMBAT"),
         CardClasses.SupportCard("The Nexus of Shadows", "Action: Pay 2 resources to draw 1 card. "
                                                         "(Limit once per phase.)", "Location.",
                                 1, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="ALL"),

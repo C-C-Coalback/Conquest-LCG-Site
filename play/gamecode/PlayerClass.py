@@ -365,16 +365,19 @@ class Player:
             self.last_discard_string = joined_string
             await self.game.send_update_message(joined_string)
 
-    def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False):
+    def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False,
+                                   limit_phase_rel=False):
         for i in range(len(self.headquarters)):
             if self.get_ability_given_pos(-2, i) == card_name:
-                return True
+                if not limit_phase_rel or not self.headquarters[i].once_per_phase_used:
+                    return True
             if self.search_attachments_at_pos(-2, i, card_name, ready_relevant=ready_relevant):
                 return True
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.get_ability_given_pos(i, j) == card_name:
-                    return True
+                    if not limit_phase_rel or not self.cards_in_play[i + 1][j].once_per_phase_used:
+                        return True
                 if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant,
                                                   must_match_name=must_own):
                     return True
@@ -968,9 +971,18 @@ class Player:
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
             self.game.create_reaction("Earth Caste Technician", self.name_player,
                                       (int(self.number), position, last_element_index))
+        if card.check_for_a_trait("Kabalite") or card.check_for_a_trait("Raider"):
+            if self.game.get_red_icon(position):
+                if self.search_for_card_everywhere("Archon Salaine Morn", limit_phase_rel=True):
+                    self.game.create_reaction("Archon Salaine Morn", self.name_player, (int(self.number), -1, -1))
         if already_exhausted:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
+
+    def get_once_per_phase_used_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_once_per_phase_used()
+        return self.cards_in_play[planet_id + 1][unit_id].get_once_per_phase_used()
 
     def set_once_per_phase_used_given_pos(self, planet_id, unit_id, new_val):
         if planet_id == -2:

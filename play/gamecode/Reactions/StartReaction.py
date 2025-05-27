@@ -609,6 +609,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.set_damage_given_pos(warlord_planet, warlord_pos,
                                                 current_damage + self.damage_amounts_baarzul[0])
             self.delete_reaction()
+        elif current_reaction == "Archon Salaine Morn":
+            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+            if not primary_player.get_once_per_phase_used_given_pos(warlord_planet, warlord_pos):
+                primary_player.set_once_per_phase_used_given_pos(warlord_planet, warlord_pos, True)
+                primary_player.add_resources(1)
+            self.delete_reaction()
         elif current_reaction == "Striking Ravener":
             planet_pos = self.positions_of_unit_triggering_reaction[0][1]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
