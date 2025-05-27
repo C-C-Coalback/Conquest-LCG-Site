@@ -411,6 +411,9 @@ class UnitCard(Card):
                 return True
             if self.attachments[i].get_ability() == "Goff Big Choppa":
                 return True
+            if self.attachments[i].get_ability() == "The Butcher's Nails":
+                if self.bloodied:
+                    return True
         return self.armorbane
 
     def get_by_base_area_effect(self):
@@ -475,6 +478,9 @@ class UnitCard(Card):
             return True
         if self.brutal_eop:
             return True
+        if self.attachments[i].get_ability() == "The Butcher's Nails":
+            if not self.bloodied:
+                return True
         return self.brutal
 
     def set_brutal(self, new_val):
