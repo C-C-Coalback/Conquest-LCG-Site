@@ -299,6 +299,7 @@ class Game:
         self.reactions_on_winning_combat_being_executed = False
         self.reactions_on_winning_combat_permitted = True
         self.name_player_who_won_combat = ""
+        self.damage_amounts_baarzul = []
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -3466,6 +3467,11 @@ class Game:
                                                          (int(primary_player.number), planet_pos, unit_pos))
                                 if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
                                     self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
+                                    self.damage_amounts_baarzul.append()
                     else:
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
@@ -4197,12 +4203,13 @@ class Game:
                 self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             elif player_num == 2:
                 self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-        del self.positions_of_units_to_take_damage[0]
         del self.damage_on_units_list_before_new_damage[0]
-        del self.positions_attackers_of_units_to_take_damage[0]
-        del self.damage_can_be_shielded[0]
         del self.damage_is_preventable[0]
+        del self.positions_of_units_to_take_damage[0]
+        del self.damage_can_be_shielded[0]
+        del self.positions_attackers_of_units_to_take_damage[0]
         del self.card_names_triggering_damage[0]
+        del self.amount_that_can_be_removed_by_shield[0]
         self.damage_moved_to_old_one_eye = 0
         if self.positions_of_units_to_take_damage:
             self.advance_damage_aiming_reticle()
