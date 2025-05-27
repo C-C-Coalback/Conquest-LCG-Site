@@ -231,6 +231,9 @@ def chaos_cards_init():
                                                   "non-first planet without a warlord. Use this ability only if no "
                                                   "battle has been initiated this phase.", "Location. Space Hulk.",
                                 2, faction, "Signature", True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Blood For The Blood God!", "Combat Action: Deal 1 damage to each undamaged unit "
+                                                          "at a target planet.", "Tactic. Khorne.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
         CardClasses.AttachmentCard("The Butcher's Nails", "Attach to your warlord.\n"
                                                           "Attached unit gains Brutal while it is hale.\n"
                                                           "Attached unit gains Armorbane while it is bloodied.",
