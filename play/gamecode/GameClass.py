@@ -1545,6 +1545,13 @@ class Game:
         self.asking_if_interrupt = True
 
     def move_reaction_to_front(self, reaction_pos):
+        if self.reactions_needing_resolving[reaction_pos] == "Ba'ar Zul the Hate-Bound":
+            count_baar = 0
+            i = 0
+            while i < reaction_pos:
+                if self.reactions_needing_resolving[i] == "Ba'ar Zul the Hate-Bound":
+                    count_baar += 1
+            self.damage_amounts_baarzul.insert(0, self.damage_amounts_baarzul.pop(count_baar))
         self.reactions_needing_resolving.insert(
             0, self.reactions_needing_resolving.pop(reaction_pos)
         )
@@ -1554,6 +1561,7 @@ class Game:
         self.positions_of_unit_triggering_reaction.insert(
             0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
         )
+
         print(self.reactions_needing_resolving)
         self.asking_if_reaction = True
 
