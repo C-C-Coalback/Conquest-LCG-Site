@@ -96,6 +96,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.add_resources(cost)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Mind War":
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.aiming_reticle_color = "blue"
+                        self.action_chosen = ability
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
