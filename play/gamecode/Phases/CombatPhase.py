@@ -355,6 +355,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
                             can_continue = True
+                            exa = secondary_player.search_card_at_planet(self.defender_planet, "Dire Avenger Exarch")
                             if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                     .get_ability() == "Honored Librarian":
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
@@ -366,13 +367,17 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     not secondary_player.get_ready_given_pos(
                                         self.defender_planet, self.defender_position)) and \
                                     secondary_player.get_ability_given_pos(
-                                    self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz":
+                                    self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz" and \
+                                    (exa and not secondary_player.check_for_trait_given_pos(
+                                        self.defender_planet, self.defender_position, "Warrior")):
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if (secondary_player.get_ability_given_pos(
                                         self.defender_planet, i) == "Lychguard Sentinel" and
                                             secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
                                             secondary_player.get_ability_given_pos(
-                                            self.defender_planet, i) == "Front Line 'Ard Boyz":
+                                            self.defender_planet, i) == "Front Line 'Ard Boyz" or \
+                                            (exa and secondary_player.check_for_trait_given_pos(
+                                            self.defender_planet, i, "Warrior")):
                                         can_continue = False
                             if self.may_move_defender:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
