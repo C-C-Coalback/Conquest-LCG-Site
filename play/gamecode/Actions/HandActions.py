@@ -83,6 +83,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Blood For The Blood God!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Inevitable Betrayal":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.misc_target_planet = -1
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

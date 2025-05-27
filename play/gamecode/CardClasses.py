@@ -478,9 +478,10 @@ class UnitCard(Card):
             return True
         if self.brutal_eop:
             return True
-        if self.attachments[i].get_ability() == "The Butcher's Nails":
-            if not self.bloodied:
-                return True
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "The Butcher's Nails":
+                if not self.bloodied:
+                    return True
         return self.brutal
 
     def set_brutal(self, new_val):

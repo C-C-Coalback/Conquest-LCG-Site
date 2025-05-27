@@ -1437,13 +1437,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.mode = "Normal"
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Inevitable Betrayal":
+        if secondary_player.number == game_update_string[1]:
+            if self.misc_target_planet == -1 or self.misc_target_planet == planet_pos:
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if secondary_player.get_damage_given_pos(planet_pos, unit_pos) == 0:
+                        secondary_player.set_blanked_given_pos(planet_pos, unit_pos)
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                        self.misc_target_planet = planet_pos
     elif self.action_chosen == "Deception":
-        if self.number_with_deploy_turn == "1":
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_returning = self.p1
         else:

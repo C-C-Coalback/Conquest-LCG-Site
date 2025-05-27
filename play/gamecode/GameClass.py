@@ -736,6 +736,11 @@ class Game:
                     elif self.action_chosen == "Preemptive Barrage":
                         await self.send_update_message("Stopping Preemptive Barrage early")
                         self.action_cleanup()
+                    elif self.action_chosen == "Inevitable Betrayal":
+                        await self.send_update_message("Finished resolving Inevitable Betrayal")
+                        self.p1.reset_all_aiming_reticles_play_hq()
+                        self.p2.reset_all_aiming_reticles_play_hq()
+                        self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
                         self.action_cleanup()
@@ -1099,6 +1104,7 @@ class Game:
             self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
             self.mode = "Normal"
             if self.kaerux_erameas_active:
+                self.kaerux_erameas_active = False
                 self.before_first_combat = True
                 self.last_planet_checked_for_battle = -1
             else:
