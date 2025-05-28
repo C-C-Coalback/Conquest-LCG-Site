@@ -152,7 +152,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 game_id = self.create_game(first_name, second_name, game_id)
                 if message[2] == "false":
                     current_time = datetime.datetime.now()
-                    time_change = datetime.timedelta(minutes=60)
+                    time_change = datetime.timedelta(minutes=1440)
                     end_time = current_time + time_change
                     spectator_games.append((first_name, second_name, game_id, end_time))
                     print("End game time:")
