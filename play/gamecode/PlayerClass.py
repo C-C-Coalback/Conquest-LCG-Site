@@ -691,14 +691,33 @@ class Player:
                     elif pos == unit_pos:
                         if i == 0:
                             if not self.game.already_resolving_reaction:
-                                del self.reactions_needing_resolving[i]
-                                del self.player_who_resolves_reaction[i]
-                                del self.positions_of_unit_triggering_reaction[i]
+                                del self.game.reactions_needing_resolving[i]
+                                del self.game.player_who_resolves_reaction[i]
+                                del self.game.positions_of_unit_triggering_reaction[i]
                                 i = i - 1
                         else:
-                            del self.reactions_needing_resolving[i]
-                            del self.player_who_resolves_reaction[i]
-                            del self.positions_of_unit_triggering_reaction[i]
+                            del self.game.reactions_needing_resolving[i]
+                            del self.game.player_who_resolves_reaction[i]
+                            del self.game.positions_of_unit_triggering_reaction[i]
+                            i = i - 1
+            i += 1
+
+    def adjust_own_interrupts(self, planet_pos, unit_pos):
+        i = 0
+        while i < len(self.game.interrupts_waiting_on_resolution):
+            num, pla, pos = self.game.positions_of_units_interrupting[i]
+            if num == int(self.number):
+                if pla == planet_pos:
+                    if pos > unit_pos:
+                        pos -= 1
+                        self.game.positions_of_units_interrupting[i] = (num, pla, pos)
+                    elif pos == unit_pos:
+                        if i == 0:
+                            pass
+                        else:
+                            del self.game.interrupts_waiting_on_resolution[i]
+                            del self.game.positions_of_units_interrupting[i]
+                            del self.game.player_resolving_interrupts[i]
                             i = i - 1
             i += 1
 
@@ -3183,11 +3202,13 @@ class Player:
         # self.discard_object(card_object)
         del self.cards_in_play[planet_num + 1][card_pos]
         self.adjust_own_reactions(planet_num, card_pos)
+        self.adjust_own_interrupts(planet_num, card_pos)
         self.adjust_last_def_pos(planet_num, card_pos)
 
     def remove_card_from_hq(self, card_pos):
         del self.headquarters[card_pos]
         self.adjust_own_reactions(-2, card_pos)
+        self.adjust_own_interrupts(-2, card_pos)
         self.adjust_last_def_pos(-2, card_pos)
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
@@ -3379,6 +3400,7 @@ class Player:
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.adjust_own_reactions(planet_id, unit_id)
+        self.adjust_own_interrupts(planet_id, unit_id)
         last_element_hq = len(self.headquarters) - 1
         self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
@@ -3473,6 +3495,7 @@ class Player:
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)
         self.adjust_own_reactions(planet_id, unit_id)
+        self.adjust_own_interrupts(planet_id, unit_id)
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 
