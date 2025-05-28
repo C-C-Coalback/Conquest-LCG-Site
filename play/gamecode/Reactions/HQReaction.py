@@ -79,6 +79,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     secondary_player.destroy_card_in_hq(unit_pos)
                     self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Imperial Fists Devastators":
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            if player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Support":
+                if player_being_hit.check_for_trait_given_pos(-2, unit_pos, "Location"):
+                    player_being_hit.destroy_card_in_hq(unit_pos)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
             if not self.chosen_first_card and not self.chosen_second_card:
                 if game_update_string[1] == primary_player.get_number():
