@@ -454,6 +454,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infest_planet(planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Hostile Acquisition":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Hostile Acquisition")
+                self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "Sacaellum Infestors":
             primary_player.exhaust_card_in_hq_given_name("Sacaellum Infestors")
             self.resolving_search_box = True

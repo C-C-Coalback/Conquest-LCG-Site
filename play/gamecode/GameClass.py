@@ -3473,6 +3473,13 @@ class Game:
                 self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
                                      (int(secondary_player.number), att_pla, att_pos))
         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle"):
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if secondary_player.get_card_type_given_pos(att_pla, att_pos) == "Warlord":
+                        if secondary_player.resources > 0:
+                            if secondary_player.search_hand_for_card("Hostile Acquisition"):
+                                self.create_reaction("Hostile Acquisition", secondary_player.name_player,
+                                                     (int(primary_player.number), planet_pos, unit_pos))
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
                     self.create_reaction("Black Heart Ravager", secondary_player.name_player,
