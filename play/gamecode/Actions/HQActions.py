@@ -273,6 +273,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.chosen_first_card = False
                             self.misc_target_planet = -1
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Death Korps Engineers":
+                        self.action_chosen = ability
+                        player_owning_card.sacrifice_card_in_play(-2, unit_pos)
                     elif ability == "Teleportarium":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -780,6 +783,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Death Korps Engineers":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        if player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Support":
+            if not player_being_hit.get_ready_given_pos(-2, unit_pos):
+                player_being_hit.destroy_card_in_hq(unit_pos)
+                self.action_cleanup()
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2

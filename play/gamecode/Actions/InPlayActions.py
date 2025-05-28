@@ -206,9 +206,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Death Korps Engineers":
+                        self.action_chosen = ability
+                        player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
                     elif ability == "Zarathur's Flamers":
                         if player_owning_card.name_player == name:
-                            self.action_chosen = "Zarathur's Flamers"
+                            self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Ravenous Flesh Hounds":
