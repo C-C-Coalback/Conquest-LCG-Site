@@ -290,8 +290,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_update_message(
                         "Forbidden faction for Veteran Barbrus.")
         elif self.reactions_needing_resolving[0] == "Blazing Zoanthrope":
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -319,6 +317,31 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             else:
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Fire Prism":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if secondary_player.get_number() == game_update_string[1]:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message(
+                                "Immune to enemy card abilities.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                        if can_continue:
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
             if game_update_string[1] == primary_player.number:

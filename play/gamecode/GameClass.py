@@ -3081,22 +3081,9 @@ class Game:
         if primary_player.check_if_card_is_destroyed(planet, pos):
             if self.on_kill_effects_of_attacker[i]:
                 for j in range(len(self.on_kill_effects_of_attacker[i])):
-                    if self.on_kill_effects_of_attacker[i][j] == "Bone Sabres":
-                        self.create_reaction("Bone Sabres", secondary_player.name_player,
-                                             (int(secondary_player.number), planet, pos))
-                    if self.on_kill_effects_of_attacker[i][j] == "Ravenous Haruspex":
-                        self.create_reaction("Ravenous Haruspex", secondary_player.name_player,
-                                             (int(secondary_player.number), planet, pos))
-                    if self.on_kill_effects_of_attacker[i][j] == "Striking Ravener":
-                        self.create_reaction("Striking Ravener", secondary_player.name_player,
-                                             (int(secondary_player.number), planet, pos))
-                    if self.on_kill_effects_of_attacker[i][j] == "Patrolling Wraith":
-                        self.create_reaction("Patrolling Wraith", secondary_player.name_player,
-                                             (int(secondary_player.number), planet, pos))
-                        self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
+                    self.create_reaction(self.on_kill_effects_of_attacker[i][j], secondary_player.name_player,
+                                         (int(secondary_player.number), planet, pos))
                     if self.on_kill_effects_of_attacker[i][j] == "Holding Cell":
-                        self.create_reaction("Holding Cell", secondary_player.name_player,
-                                             (int(secondary_player.number), planet, pos))
                         self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
 
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:

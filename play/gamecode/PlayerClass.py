@@ -1057,6 +1057,8 @@ class Player:
                     self.game.ravenous_haruspex_gain = other_player.get_cost_given_pos(def_pla, def_pos)
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Striking Ravener":
                 on_kill_effects.append("Striking Ravener")
+            if self.get_ability_given_pos(planet_pos, unit_pos) == "Fire Prism":
+                on_kill_effects.append("Fire Prism")
         return on_kill_effects
 
     async def reveal_hand(self):
