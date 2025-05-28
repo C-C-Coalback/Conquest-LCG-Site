@@ -3392,6 +3392,12 @@ class Game:
             )
         temp_av_disc, _ = player. \
             search_same_planet_for_discounts(self.faction_of_card_to_play, planet_pos=planet_chosen)
+        if player.gorzod_relevant:
+            if card.get_faction() == "Astra Militarum" or card.get_faction() == "Space Marines":
+                if card.get_cost() > 1:
+                    warlord_planet, warlord_pos = player.get_location_of_warlord()
+                    player.set_aiming_reticle_in_play(warlord_planet, warlord_pos, "green")
+                    self.available_discounts += 1
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
             self.available_discounts += num_termagants

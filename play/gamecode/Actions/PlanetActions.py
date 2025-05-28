@@ -27,6 +27,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
             same_planet_dis, same_planet_auto_dis = \
                 primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
             num_termagants = 0
+            if primary_player.gorzod_relevant:
+                if card.get_faction() == "Astra Militarum" or card.get_faction() == "Space Marines":
+                    if card.get_cost() > 1:
+                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                        primary_player.set_aiming_reticle_in_play(warlord_planet, warlord_pos, "green")
+                        self.available_discounts += 1
             if card.get_name() == "Burrowing Trygon":
                 num_termagants = primary_player.get_most_termagants_at_single_planet()
                 self.discounts_applied += num_termagants

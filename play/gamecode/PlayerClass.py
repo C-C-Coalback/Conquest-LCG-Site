@@ -114,6 +114,7 @@ class Player:
         self.foretell_permitted = True
         self.last_planet_sacrifice = -1
         self.urien_relevant = False
+        self.gorzod_relevant = False
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -131,6 +132,8 @@ class Player:
         self.warlord_faction = self.headquarters[0].get_faction()
         if self.headquarters[0].get_name() == "Urien Rakarth":
             self.urien_relevant = True
+        if self.headquarters[0].get_name() == "Gorzod":
+            self.gorzod_relevant = True
         self.deck = deck_list[1:]
         if deck_list[0] in self.tyranid_warlord_list:
             i = 0
@@ -585,6 +588,7 @@ class Player:
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.urien_relevant = False
+        self.gorzod_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
@@ -2025,6 +2029,10 @@ class Player:
                         if self.game.infested_planets[target_planet]:
                             discount += 2
                             self.exhaust_given_pos(-2, pos)
+        if self.headquarters[pos].get_ability() == "Gorzod":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                discount += 1
+                self.reset_aiming_reticle_in_play(-2, pos)
         if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
                 if self.headquarters[pos].get_ready():
@@ -2233,6 +2241,10 @@ class Player:
     def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits):
         discount = 0
         if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Crushface":
+            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+                self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                discount += 1
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Gorzod":
             if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 discount += 1
