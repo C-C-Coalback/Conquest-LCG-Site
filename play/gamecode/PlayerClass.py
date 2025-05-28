@@ -3242,6 +3242,8 @@ class Player:
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
+            self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), planet_num, -1))
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Mark of Chaos":
                 owner = card.get_attachments()[i].name_owner
@@ -3300,12 +3302,6 @@ class Player:
     def add_card_in_hq_to_discard(self, card_pos):
         card = self.headquarters[card_pos]
         card_name = card.get_name()
-        for i in range(len(card.get_attachments())):
-            if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                self.draw_card()
-                self.draw_card()
-                self.draw_card()
-                self.game.cards_need_sending_outside_normal_sends = True
         if card.get_is_unit():
             if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
                 for i in range(len(self.headquarters)):
@@ -3329,7 +3325,9 @@ class Player:
         if self.get_ability_given_pos(-2, card_pos) == "Coteaz's Henchmen":
             self.game.create_reaction("Coteaz's Henchmen", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Interrogator Acolyte":
-            self.game.create_reaction("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
+            self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
+        if card.get_ability() == "Vanguard Soldiers":
+            self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), -2, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.discard.append(card_name)

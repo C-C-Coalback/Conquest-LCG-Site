@@ -34,6 +34,10 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if attached_all:
                     primary_player.cards_in_play[og_pla + 1][og_pos].attachments = []
                 self.delete_interrupt()
+    elif current_interrupt == "Vanguard Soldiers":
+        if game_update_string[1] == primary_player.number:
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.delete_interrupt()
     elif current_interrupt == "Reanimating Warriors":
         print("reanimating warriors")
         if not self.asked_if_resolve_effect:
@@ -42,8 +46,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             self.name_player_making_choices = name
         elif not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
                         "Reanimating Warriors" \
                         and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
