@@ -53,6 +53,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.mode = "Normal"
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
+    elif self.action_chosen == "Saim-Hann Jetbike":
+        if not self.chosen_first_card:
+            og_pla, og_pos = self.position_of_actioned_card
+            if og_pla != chosen_planet:
+                if (self.get_green_icon(og_pla) and self.get_green_icon(chosen_planet)) or\
+                    (self.get_red_icon(og_pla) and self.get_red_icon(chosen_planet)) or\
+                        (self.get_blue_icon(og_pla) and self.get_blue_icon(chosen_planet)):
+                    self.chosen_first_card = True
+                    primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                    primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                    self.misc_target_planet = chosen_planet
     elif self.action_chosen == "Teleportarium":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit
