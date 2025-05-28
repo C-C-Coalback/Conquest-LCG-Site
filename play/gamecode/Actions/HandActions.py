@@ -104,6 +104,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
                         self.action_chosen = ability
+                    elif ability == "Biomass Sacrifice":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
@@ -696,6 +699,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_chosen == "Biomass Sacrifice":
+        if card.get_is_unit():
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
+            primary_player.add_resources(1)
     elif self.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):
