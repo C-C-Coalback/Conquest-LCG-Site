@@ -160,8 +160,14 @@
         }
 
         function playSound(url) {
-            const audio = new Audio(url);
-            audio.play();
+            var ourAudio = document.createElement('audio'); // Create a audio element using the DOM
+            ourAudio.style.display = "none"; // Hide the audio element
+            ourAudio.src = url; // Set resource to our URL
+            ourAudio.autoplay = true; // Automatically play sound
+            ourAudio.onended = function() {
+                this.remove(); // Remove when played.
+            };
+            document.body.appendChild(ourAudio);
         }
 
         function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
@@ -174,7 +180,7 @@
                     Join Lobby
                     </button>`;
             } else if (nameOfPlayerTwo !== "" && nameOfPlayerOne === "{{ user.username }}") {
-                // playSound("");
+                // playSound("/static/warning.wav");
             } else if (nameOfPlayerTwo === "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
                     `<button id=` + nameOfPlayerOne + ` onclick="leaveLobby(this.id)">
