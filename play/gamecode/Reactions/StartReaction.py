@@ -462,6 +462,15 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Prototype Crisis Suit":
+            if len(primary_player.deck) > 8:
+                self.choices_available = primary_player.deck[:9]
+                self.choice_context = "Prototype Crisis Suit choices"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+                self.misc_counter = 0
+            else:
+                self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Bodysuit":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Shadowed Thorns Bodysuit")

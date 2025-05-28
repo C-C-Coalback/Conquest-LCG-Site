@@ -1654,6 +1654,11 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.shuffle_deck()
                         self.action_cleanup()
+                    elif self.choice_context == "Prototype Crisis Suit choices":
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        primary_player.shuffle_deck()
                     elif self.choice_context == "Prophetic Farseer Discard":
                         self.choice_context = "Prophetic Farseer Rearrange"
                     elif self.choice_context == "Prophetic Farseer Rearrange":
@@ -2050,6 +2055,22 @@ class Game:
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+                    elif self.choice_context == "Prototype Crisis Suit choices":
+                        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                        card_name = primary_player.deck[int(game_update_string[1])]
+                        card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                        if card.get_card_type() == "Attachment" and card.get_faction() == "Tau":
+                            if card.get_cost() < 3:
+                                if primary_player.attach_card(card, planet_pos, unit_pos):
+                                    del primary_player.deck[int(game_update_string[1])]
+                                    self.misc_counter += 1
+                                    if self.misc_counter == 1:
+                                        self.choices_available = primary_player.deck[:8]
+                                    else:
+                                        self.delete_reaction()
+                                        self.reset_choices_available()
+                                        self.resolving_search_box = False
+                                        primary_player.shuffle_deck()
                     elif self.choice_context == "Use Dark Possession?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
