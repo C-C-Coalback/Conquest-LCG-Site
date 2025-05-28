@@ -1385,6 +1385,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "Teleportarium":
+        if primary_player.get_number() == game_update_string[1]:
+            if not self.chosen_first_card:
+                if self.get_blue_icon(planet_pos):
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 4:
+                            if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                                self.chosen_first_card = True
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Despise":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ally"):

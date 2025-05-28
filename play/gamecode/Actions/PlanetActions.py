@@ -53,6 +53,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.mode = "Normal"
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
+    elif self.action_chosen == "Teleportarium":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.misc_target_unit
+            if abs(chosen_planet - og_pla) == 1:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Decaying Warrior Squad":
         self.planet_pos_to_deploy = int(game_update_string[1])
         card = FindCard.find_card("Decaying Warrior Squad", self.card_array, self.cards_dict)
