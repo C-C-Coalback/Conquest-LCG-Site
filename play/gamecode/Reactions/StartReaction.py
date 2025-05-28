@@ -454,6 +454,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infest_planet(planet_pos)
             self.delete_reaction()
+        elif current_reaction == "The Bloodrunna":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            self.delete_reaction()
         elif current_reaction == "Hostile Acquisition":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.spend_resources(1):

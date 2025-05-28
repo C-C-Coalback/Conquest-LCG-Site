@@ -2312,6 +2312,13 @@ class Player:
                     self.game.create_reaction("Blood Claw Pack", self.name_player,
                                               (int(self.number), planet_pos, i))
 
+    def does_own_reaction_exist(self, reaction_name):
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    return True
+        return False
+
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return -1
@@ -3057,6 +3064,27 @@ class Player:
                         if not already_weirdboy_stikk:
                             self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                       (int(self.number), -1, -1))
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
+                if not self.does_own_reaction_exist("The Bloodrunna"):
+                    for i in range(len(self.cards_in_play[planet_num + 1])):
+                        if i != card_pos:
+                            for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
+                                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability():
+                                    if not self.cards_in_play[planet_num + 1][i].\
+                                            get_attachments()[j].once_per_phase_used:
+                                        self.game.create_reaction("The Bloodrunna", self.name_player,
+                                                                  (int(self.number), planet_num, i))
+                other_player = self.game.p1
+                if other_player.name_player == self.name_player:
+                    other_player = self.game.p2
+                if not other_player.does_own_reaction_exist("The Bloodrunna"):
+                    for i in range(len(other_player.cards_in_play[planet_num + 1])):
+                        for j in range(len(other_player.cards_in_play[planet_num + 1][i].get_attachments())):
+                            if other_player.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability():
+                                if not other_player.cards_in_play[planet_num + 1][i].\
+                                        get_attachments()[j].once_per_phase_used:
+                                    self.game.create_reaction("The Bloodrunna", other_player.name_player,
+                                                              (int(other_player.number), planet_num, i))
             cato_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
