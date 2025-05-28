@@ -1684,6 +1684,9 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ignores_flying()
 
     def get_faction_given_pos(self, planet_id, unit_id):
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+            if self.search_card_in_hq("Kustomisation Station"):
+                return "Orks"
         if planet_id == -2:
             return self.headquarters[unit_id].get_faction()
         return self.cards_in_play[planet_id + 1][unit_id].get_faction()
@@ -2356,6 +2359,10 @@ class Player:
         if card.get_ability() == "Baharroth's Hawks":
             if self.check_for_warlord(planet_id):
                 attack_value += 3
+        if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
+                self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+            if self.search_card_in_hq("Kustomisation Station"):
+                attack_value += 1
         if card.get_ability() == "Gorzod's Wagons":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 attack_value += 2
@@ -2645,6 +2652,10 @@ class Player:
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
+                self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+            if self.search_card_in_hq("Kustomisation Station"):
+                health += 1
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
                 health += 1
