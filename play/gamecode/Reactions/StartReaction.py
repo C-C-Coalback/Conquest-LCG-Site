@@ -462,6 +462,18 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Shadowed Thorns Bodysuit":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Shadowed Thorns Bodysuit")
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_combat_positions()
+            self.shining_blade_active = False
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
             if primary_player.spend_resources(1):
                 self.chosen_first_card = False

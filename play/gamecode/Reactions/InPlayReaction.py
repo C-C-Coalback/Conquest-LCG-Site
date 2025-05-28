@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import CombatPhase
 
 
 async def resolve_in_play_reaction(self, name, game_update_string, primary_player, secondary_player):

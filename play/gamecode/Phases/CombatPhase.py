@@ -259,6 +259,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.attacker_planet = chosen_planet
                             self.attacker_position = chosen_unit
                             self.may_move_defender = True
+                            self.shadow_thorns_body_allowed = True
                             print("Attacker:", self.attacker_planet, self.attacker_position)
                             if self.number_with_combat_turn == "1":
                                 player = self.p1
@@ -399,6 +400,25 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                             self.defender_position,
                                                                                             "red")
+                            if can_continue and self.shadow_thorns_body_allowed:
+                                if secondary_player.search_attachments_at_pos(
+                                    self.defender_planet, self.defender_position,
+                                    "Shadowed Thorns Bodysuit", ready_relevant=True, must_match_name=True
+                                ):
+                                    can_continue = False
+                                    await self.send_update_message(
+                                        "Shadowed Thorns Bodysuit can be used to cancel the attack"
+                                    )
+                                    secondary_player.set_aiming_reticle_in_play(
+                                        self.defender_planet, self.defender_position, "blue"
+                                    )
+                                    self.create_reaction(
+                                        "Shadowed Thorns Bodysuit", secondary_player.name_player,
+                                        (int(secondary_player.number), self.defender_planet, self.defender_position)
+                                    )
+                                    self.last_defender_position = (secondary_player.number,
+                                                                   self.defender_planet,
+                                                                   self.defender_position)
                             if can_continue:
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                         self.attacker_position) == "Starbane's Council":

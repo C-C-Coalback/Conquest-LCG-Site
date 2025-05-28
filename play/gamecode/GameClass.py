@@ -303,6 +303,7 @@ class Game:
         self.reactions_on_winning_combat_permitted = True
         self.name_player_who_won_combat = ""
         self.damage_amounts_baarzul = []
+        self.shadow_thorns_body_allowed = True
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -1861,6 +1862,14 @@ class Game:
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
                         elif game_update_string[1] == "1":
+                            if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit":
+                                self.shadow_thorns_body_allowed = False
+                                _, current_planet, current_unit = self.last_defender_position
+                                await self.send_update_message("Trying to stop bodysuit")
+                                last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                                           str(current_unit)]
+                                await CombatPhase.update_game_event_combat_section(
+                                    self, secondary_player.name_player, last_game_update_string)
                             self.delete_reaction()
                         self.reset_choices_available()
                     elif self.asking_if_remove_infested_planet:
