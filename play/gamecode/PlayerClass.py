@@ -1870,6 +1870,11 @@ class Player:
                 elif self.headquarters[i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
                     self.set_aiming_reticle_in_play(-2, i, "green")
+            if faction_of_card != "Tau":
+                if self.headquarters[i].get_ability() == "Sae'lum Enclave":
+                    if self.get_ready_given_pos(-2, i):
+                        discounts_available += 2
+                        self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
     def search_planet_for_discounts(self, planet_pos, traits):
@@ -2066,6 +2071,11 @@ class Player:
         if self.headquarters[pos].get_ability() == "Gorzod":
             if self.headquarters[pos].aiming_reticle_color == "green":
                 discount += 1
+                self.reset_aiming_reticle_in_play(-2, pos)
+        if self.headquarters[pos].get_ability() == "Sae'lum Enclave":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.exhaust_given_pos(-2, pos)
+                discount += 2
                 self.reset_aiming_reticle_in_play(-2, pos)
         if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
