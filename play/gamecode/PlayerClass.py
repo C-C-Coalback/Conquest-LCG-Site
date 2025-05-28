@@ -1627,6 +1627,9 @@ class Player:
         for i in range(len(self.cards_in_play[planet_id + 1])):
             extra_resources += self.cards_in_play[planet_id + 1][i].get_additional_resources_command_struggle()
             extra_cards += self.cards_in_play[planet_id + 1][i].get_additional_cards_command_struggle()
+            if self.game.get_blue_icon(planet_id):
+                if self.get_ability_given_pos(planet_id, i) == "Seer of Deceit":
+                    extra_cards += 1
         return extra_resources, extra_cards
 
     def find_warlord_planet(self):
