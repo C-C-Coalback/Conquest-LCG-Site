@@ -2345,6 +2345,21 @@ class Player:
                     return True
         return False
 
+    def get_brutal_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return False
+        card = self.cards_in_play[planet_id + 1][unit_id]
+        if card.get_blanked():
+            return False
+        if card.get_ability() != "Nazdreg":
+            nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
+            if nazdreg_check:
+                return True
+        if self.search_attachments_at_pos(planet_id, unit_id, "Khornate Chain Axe"):
+            if self.game.bloodthirst_active[planet_id]:
+                return True
+        return card.get_brutal()
+
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return -1
@@ -2360,10 +2375,6 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
                     attack_value += 1
-        if card.get_ability() != "Nazdreg":
-            nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
-            if nazdreg_check:
-                card.set_brutal(True)
         if card.get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 attack_value += 2
@@ -2406,8 +2417,6 @@ class Player:
         if card.get_ability() == "Sacaellum Shrine Guard":
             if self.game.get_green_icon(planet_id):
                 attack_value += 1
-        if card.get_brutal():
-            attack_value = attack_value + card.get_damage()
         if card.get_ability() == "Virulent Plague Squad":
             attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
         if card.get_ability() == "Infantry Conscripts":
@@ -2441,7 +2450,8 @@ class Player:
                     if i != unit_id:
                         if self.search_attachments_at_pos(planet_id, i, "Honor Blade"):
                             attack_value += 1
-        card.reset_brutal()
+        if self.get_brutal_given_pos(planet_id, unit_id):
+            attack_value = attack_value + card.get_damage()
         return attack_value
 
     def get_most_termagants_at_single_planet(self):
