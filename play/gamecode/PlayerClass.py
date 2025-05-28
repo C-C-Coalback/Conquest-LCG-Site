@@ -2356,6 +2356,9 @@ class Player:
         if card.get_ability() == "Baharroth's Hawks":
             if self.check_for_warlord(planet_id):
                 attack_value += 3
+        if card.get_ability() == "Gorzod's Wagons":
+            if self.get_enemy_has_init_for_cards(planet_id, unit_id):
+                attack_value += 2
         if card.get_ability() == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
