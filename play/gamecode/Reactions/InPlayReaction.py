@@ -118,6 +118,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           self.positions_of_unit_triggering_reaction[0][2], 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
                     self.delete_reaction()
+        elif current_reaction == "Inspirational Fervor":
+            if game_update_string[1] == primary_player.number:
+                if self.misc_target_planet == planet_pos:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                        self.chosen_first_card = True
+                        if self.misc_target_unit == (-1, -1):
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        elif self.misc_target_unit_2 == (-1, -1):
+                            self.misc_target_unit_2 = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif self.reactions_needing_resolving[0] == "Klaivex Warleader":
             att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
             if att_pla == planet_pos:
@@ -148,6 +159,34 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.nullify_context = "Reaction"
                         if can_continue:
                             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
+                            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Prodigal Sons Disciple":
+            if game_update_string[1] == secondary_player.number:
+                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                if att_pla == planet_pos:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message(
+                                "Immune to enemy card abilities.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                        if can_continue:
+                            command = secondary_player.get_command_given_pos(planet_pos, unit_pos)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, command, preventable=False,
+                                                                  rickety_warbuggy=True)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Fenrisian Wolf":
             att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]

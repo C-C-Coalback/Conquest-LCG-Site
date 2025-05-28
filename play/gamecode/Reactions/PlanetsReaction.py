@@ -58,6 +58,18 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.misc_target_unit = (chosen_planet, new_pos)
                 self.positions_of_unit_triggering_reaction[0] = (int(primary_player.number),
                                                                  chosen_planet, new_pos)
+    elif current_reaction == "Inspirational Fervor":
+        if self.chosen_first_card:
+            if chosen_planet != self.misc_target_planet:
+                i = 0
+                og_planet = self.misc_target_planet
+                while i < len(primary_player.cards_in_play[og_planet + 1]):
+                    if primary_player.cards_in_play[og_planet + 1][i].aiming_reticle_color == "blue":
+                        primary_player.reset_aiming_reticle_in_play(og_planet, i)
+                        primary_player.move_unit_to_planet(og_planet, i, chosen_planet)
+                        i = i - 1
+                    i = i + 1
+                self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Spore Chimney":
         self.infest_planet(int(game_update_string[1]))
         self.delete_reaction()

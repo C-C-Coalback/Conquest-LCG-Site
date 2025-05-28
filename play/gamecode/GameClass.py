@@ -142,6 +142,7 @@ class Game:
         self.chosen_second_card = False
         self.misc_target_planet = -1
         self.misc_target_unit = (-1, -1)
+        self.misc_target_unit_2 = (-1, -1)
         self.misc_target_attachment = (-1, -1, -1)
         self.misc_player_storage = ""
         self.last_defender_position = (-1, -1, -1)
@@ -4844,6 +4845,8 @@ class Game:
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
+                                self.create_reaction("Prodigal Sons Disciple", self.name_1, (1, planet, i))
                             for rok in self.p1.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p1.assign_damage_to_pos(planet, i, 1)
@@ -4855,6 +4858,8 @@ class Game:
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
+                                self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
                             for rok in self.p2.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p2.assign_damage_to_pos(planet, i, 1)
@@ -5029,6 +5034,10 @@ class Game:
                     if not winner.accept_any_challenge_used:
                         if winner.search_hand_for_card("Accept Any Challenge"):
                             reactions.append("Accept Any Challenge")
+            if self.get_green_icon(planet_id):
+                if winner.resources > 0:
+                    if winner.search_hand_for_card("Inspirational Fervor"):
+                        reactions.append("Inspirational Fervor")
         return reactions
 
     def infest_planet(self, planet):

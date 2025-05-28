@@ -459,6 +459,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.ready_given_pos(planet_pos, unit_pos)
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             self.delete_reaction()
+        elif current_reaction == "Inspirational Fervor":
+            if primary_player.spend_resources(1):
+                self.chosen_first_card = False
+                self.misc_target_planet = self.last_planet_checked_for_battle
+                self.misc_target_unit = (-1, -1)
+                self.misc_target_unit_2 = (-1, -1)
+                primary_player.discard_card_name_from_hand("Inspirational Fervor")
+            else:
+                self.delete_reaction()
         elif current_reaction == "Hostile Acquisition":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.spend_resources(1):
