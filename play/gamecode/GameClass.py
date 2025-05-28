@@ -3446,6 +3446,9 @@ class Game:
                                                     must_match_name=True):
             self.create_reaction("Repulsor Impact Field", primary_player.name_player,
                                  (int(secondary_player.number), att_pla, att_pos))
+        if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Mandrake Fearmonger":
+            self.create_reaction("Mandrake Fearmonger", secondary_player.name_player,
+                                 (int(secondary_player.number), -1, -1))
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                 self.create_reaction("Solarite Avetys", primary_player.name_player,
