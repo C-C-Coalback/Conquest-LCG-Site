@@ -279,6 +279,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.misc_target_planet = -1
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Killing Field":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
                     elif ability == "Cathedral of Saint Camila":
                         if card.get_ready():
                             if not card.get_once_per_phase_used():

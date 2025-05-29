@@ -373,6 +373,8 @@ class UnitCard(Card):
     def get_ranged(self):
         if self.blanked_eop:
             return False
+        if self.lost_ranged_eop:
+            return False
         if self.ranged_eop:
             return True
         for i in range(len(self.attachments)):

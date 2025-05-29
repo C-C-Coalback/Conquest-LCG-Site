@@ -262,6 +262,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
                 self.misc_target_unit = (-1, -1)
                 self.action_cleanup()
+    elif self.action_chosen == "Killing Field":
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            primary_player.cards_in_play[chosen_planet + 1][i].lost_ranged_eop = True
+        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+            secondary_player.cards_in_play[chosen_planet + 1][i].lost_ranged_eop = True
+        self.action_cleanup()
     elif self.action_chosen == "Extermination":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) != "Necrons" and \

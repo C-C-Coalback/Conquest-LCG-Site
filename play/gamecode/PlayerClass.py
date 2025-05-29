@@ -2338,6 +2338,7 @@ class Player:
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].area_effect_eop = 0
                 self.headquarters[i].armorbane_eop = False
+                self.headquarters[i].lost_ranged_eop = False
                 self.headquarters[i].ranged_eop = False
                 self.headquarters[i].mobile_eop = False
                 self.headquarters[i].flying_eop = False
@@ -2352,6 +2353,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].lost_ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
