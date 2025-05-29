@@ -1928,6 +1928,11 @@ class Player:
                         if "Elite" in traits:
                             discounts_available += 2
                             self.set_aiming_reticle_in_play(-2, i, "green")
+                elif self.headquarters[i].get_ability() == "Bonesinger Choir":
+                    if faction_of_card == "Eldar":
+                        if "Vehicle" in traits or "Drone" in traits:
+                            discounts_available += 2
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
@@ -2151,6 +2156,11 @@ class Player:
                 if self.headquarters[pos].get_ready():
                     self.exhaust_given_pos(-2, pos)
                     discount += 2
+        if self.headquarters[pos].get_ability() == "Bonesinger Choir":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.exhaust_given_pos(-2, pos)
+                discount += 2
+                self.reset_aiming_reticle_in_play(-2, pos)
         if "Daemon" in traits:
             if self.headquarters[pos].get_ability() == "Cultist":
                 discount += 1

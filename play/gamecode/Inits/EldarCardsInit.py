@@ -233,7 +233,8 @@ def eldar_cards_init():
                                                     "Interrupt: When you deploy an Vehicle or Drone unit, "
                                                     "exhaust this support to reduce"
                                                     " its cost by 2 (to a minimum of 1).", "Upgrade.",
-                                2, faction, "Loyal", False, limited=True),
+                                2, faction, "Loyal", False, limited=True,
+                                applies_discounts=[True, 2, True]),
         CardClasses.ArmyCard("Saim-Hann Kinsman", "While this unit is at a Stronghold planet (green) "
                                                   "it gets +1 ATK and +1 HP.", "Scout. Saim-Hann. Ally.",
                              1, faction, "Common", 1, 1, 1, False),
