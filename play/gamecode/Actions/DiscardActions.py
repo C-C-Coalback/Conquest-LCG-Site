@@ -18,6 +18,11 @@ async def update_game_event_action_discard(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_discard = pos_discard
                     print("found a decaying warrior squad.")
                     self.action_chosen = ability
+            elif ability == "Lethal Toxin Sacs":
+                if self.phase == "DEPLOY":
+                    if primary_player.resources > 1:
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                        self.action_chosen = ability
             elif ability == "Hate":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     await self.send_update_message(

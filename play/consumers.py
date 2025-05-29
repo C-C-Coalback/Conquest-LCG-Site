@@ -325,6 +325,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     elif message[1] == "force-quit-action":
                         await self.receive_game_update("FORCEFULLY QUITTING ACTION")
                         active_games[self.game_position].reset_action_data()
+                        active_games[self.game_position].action_cleanup()
                         await active_games[self.game_position].send_info_box()
                     elif message[1] == "show-discard" and len(message) == 3:
                         if message[2] == "1":

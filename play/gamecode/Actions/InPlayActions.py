@@ -824,8 +824,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.action_cleanup()
     elif self.action_chosen == "Ambush":
-        if self.card_type_of_selected_card_in_hand == "Attachment":
-            await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
+        if not self.omega_ambush_active or self.infested_planets[planet_pos]:
+            if self.card_type_of_selected_card_in_hand == "Attachment":
+                await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True
@@ -1614,6 +1615,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.get_number():
             if planet_pos == self.misc_target_planet:
                 primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+    elif self.action_chosen == "Lethal Toxin Sacs":
+        if game_update_string[1] == primary_player.get_number():
+            card = FindCard.find_card("Lethal Toxin Sacs", self.card_array, self.cards_dict)
+            played_card = primary_player. \
+                play_attachment_card_to_in_play(card, planet_pos, unit_pos, army_unit_as_attachment=False, discounts=0)
+            if played_card:
+                primary_player.discard.remove("Lethal Toxin Sacs")
+                primary_player.aiming_reticle_coords_discard = None
+                self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -1625,8 +1635,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_receiving_attachment = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is not None:
             hand_pos = primary_player.aiming_reticle_coords_hand_2
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict)
             army_unit_as_attachment = False
             discounts = primary_player.search_hq_for_discounts("", "",

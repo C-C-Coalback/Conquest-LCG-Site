@@ -316,7 +316,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                         self.player_with_deploy_turn = secondary_player.get_name_player()
                         self.number_with_deploy_turn = secondary_player.get_number()
                 self.card_pos_to_deploy = -1
-                self.mode = "Normal"
+                self.action_cleanup()
                 self.card_type_of_selected_card_in_hand = ""
                 self.faction_of_card_to_play = ""
                 self.name_of_card_to_play = ""
