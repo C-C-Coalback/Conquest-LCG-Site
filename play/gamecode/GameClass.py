@@ -2140,6 +2140,26 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             primary_player.dark_possession_active = False
+                    elif self.choice_context == "Wisdom of the Serpent trait":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.resolving_search_box = True
+                        self.what_to_do_with_searched_card = "DRAW"
+                        self.traits_of_searched_card = target_choice
+                        self.card_type_of_searched_card = "Army"
+                        self.faction_of_searched_card = None
+                        self.max_cost_of_searched_card = 99
+                        self.all_conditions_searched_card_required = True
+                        self.no_restrictions_on_chosen_card = False
+                        primary_player.number_cards_to_search = 3
+                        if len(primary_player.deck) > 2:
+                            self.cards_in_search_box = \
+                                primary_player.deck[0:primary_player.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                        self.name_player_who_is_searching = primary_player.name_player
+                        self.number_who_is_searching = primary_player.number
+                        self.action_cleanup()
                     elif self.choice_context == "Target Doom Scythe Invader:":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]

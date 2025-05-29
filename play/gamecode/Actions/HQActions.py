@@ -164,6 +164,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 2, "NEXT")
                             primary_player.assign_damage_to_pos(-2, unit_pos, 2)
                             self.action_cleanup()
+                    elif ability == "Wisdom of the Serpent":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.choices_available = ["Warrior", "Psyker"]
+                            self.choice_context = "Wisdom of the Serpent trait"
+                            self.resolving_search_box = True
+                            self.name_player_making_choices = primary_player.name_player
                     elif ability == "Kaerux Erameas":
                         if card.get_ready():
                             if self.last_planet_checked_for_battle == -1:
