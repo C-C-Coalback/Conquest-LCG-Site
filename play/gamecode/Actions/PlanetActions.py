@@ -13,7 +13,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
     if not self.action_chosen:
         pass
     elif self.action_chosen == "Ambush":
-        if self.card_pos_to_deploy != -1 and self.planet_pos_to_deploy == -1:
+        if self.card_pos_to_deploy != -1 and self.planet_pos_to_deploy == -1 and \
+                (not self.omega_ambush_active or self.infested_planets[chosen_planet]):
             self.planet_pos_to_deploy = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
             self.traits_of_card_to_play = card.get_traits()
@@ -48,9 +49,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
+                self.action_cleanup()
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Saim-Hann Jetbike":

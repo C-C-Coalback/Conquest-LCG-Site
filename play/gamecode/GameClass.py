@@ -303,6 +303,7 @@ class Game:
         self.reactions_on_winning_combat_permitted = True
         self.name_player_who_won_combat = ""
         self.damage_amounts_baarzul = []
+        self.omega_ambush_active = False
         self.shadow_thorns_body_allowed = True
 
     def get_red_icon(self, planet_pos):
@@ -1542,6 +1543,7 @@ class Game:
         self.action_chosen = ""
         self.player_with_action = ""
         self.mode = "Normal"
+        self.omega_ambush_active = False
         self.p1.harbinger_of_eternity_active = False
         self.p2.harbinger_of_eternity_active = False
         if self.phase == "DEPLOY":

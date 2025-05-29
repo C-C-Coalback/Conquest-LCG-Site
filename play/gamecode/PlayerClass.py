@@ -115,6 +115,7 @@ class Player:
         self.last_planet_sacrifice = -1
         self.urien_relevant = False
         self.gorzod_relevant = False
+        self.subject_omega_relevant = False
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -134,6 +135,8 @@ class Player:
             self.urien_relevant = True
         if self.headquarters[0].get_name() == "Gorzod":
             self.gorzod_relevant = True
+        if self.headquarters[0].get_name() == "Subject Omega-X62113":
+            self.subject_omega_relevant = True
         self.deck = deck_list[1:]
         if deck_list[0] in self.tyranid_warlord_list:
             i = 0
@@ -589,6 +592,7 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.urien_relevant = False
         self.gorzod_relevant = False
+        self.subject_omega_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
@@ -1745,6 +1749,9 @@ class Player:
     def get_ambush_of_card(self, card):
         if card.get_ability() == "Standard Bearer":
             if self.warlord_faction != "Astra Militarum":
+                return True
+        if card.check_for_a_trait("Genestealer"):
+            if self.subject_omega_relevant:
                 return True
         return card.get_ambush()
 

@@ -221,7 +221,7 @@ def tyranids_cards_init():
                                                    "resources equal to the number of cards discarded by this effect.",
                               "Tactic.", 0, faction, "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
-        CardClasses.WarlordCard("Subject: Omega-X62113", "Each Genestealer card in your hand may be deployed to "
+        CardClasses.WarlordCard("Subject Omega-X62113", "Each Genestealer card in your hand may be deployed to "
                                                          "infested planets as if it had ambush.",
                                 "Creature. Genestealer.", faction, 2, 6, 2, 5, "Bloodied.", 6, 6,
                                 ["4x Invasive Genestealers", "1x Ruined Passages",
