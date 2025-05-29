@@ -58,6 +58,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.misc_target_unit = (chosen_planet, new_pos)
                 self.positions_of_unit_triggering_reaction[0] = (int(primary_player.number),
                                                                  chosen_planet, new_pos)
+    elif current_reaction == "Declare the Crusade":
+        planet_to_add = self.misc_target_choice
+        planet_to_remove = self.planet_array[chosen_planet]
+        self.planets_removed_from_game.remove(planet_to_add)
+        self.planets_removed_from_game.append(planet_to_remove)
+        self.planet_array[chosen_planet] = planet_to_add
+        self.delete_reaction()
     elif current_reaction == "Inspirational Fervor":
         if self.chosen_first_card:
             if chosen_planet != self.misc_target_planet:

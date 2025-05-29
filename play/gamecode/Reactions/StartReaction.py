@@ -462,6 +462,15 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Declare the Crusade":
+            if primary_player.spend_resources(2):
+                primary_player.discard_card_name_from_hand("Declare the Crusade")
+                self.choices_available = self.planets_removed_from_game
+                self.choice_context = "Which planet to add (DtC)"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                self.delete_reaction()
         elif current_reaction == "Sword Brethren Dreadnought":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.delete_reaction()

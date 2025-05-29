@@ -46,6 +46,7 @@ class Game:
         for i in range(10):
             self.planet_array.append(self.planet_cards_array[i].get_name())
         random.shuffle(self.planet_array)
+        self.planets_removed_from_game = copy.deepcopy(self.planet_array[-3:])
         self.planet_array = self.planet_array[:7]
         self.planets_in_play_array = [True, True, True, True, True, False, False]
         self.bloodthirst_active = [False, False, False, False, False, False, False]
@@ -1810,6 +1811,11 @@ class Game:
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         secondary_player.torture_event_played("Rakarth's Experimentations")
+                    elif self.choice_context == "Which planet to add (DtC)":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        self.send_update_message("Choose planet to remove from play")
                     elif self.choice_context == "Choose card to discard for Searing Brand":
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1
@@ -4811,6 +4817,7 @@ class Game:
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         if not self.reactions_needing_resolving:
+            self.last_player_who_resolved_reaction = ""
             if self.reactions_on_winning_combat_being_executed:
                 if self.name_player_who_won_combat == self.name_1:
                     winner = self.p1
@@ -4819,7 +4826,6 @@ class Game:
                     winner = self.p2
                     loser = self.p1
                 await self.resolve_winning_combat(winner, loser)
-            self.last_player_who_resolved_reaction = ""
             if self.resolve_remaining_cs_after_reactions and not self.positions_of_units_to_take_damage \
                     and not self.interrupts_waiting_on_resolution:
                 self.resolve_remaining_cs_after_reactions = False
@@ -5057,6 +5063,9 @@ class Game:
                     if not winner.accept_any_challenge_used:
                         if winner.search_hand_for_card("Accept Any Challenge"):
                             reactions.append("Accept Any Challenge")
+                if winner.resources > 1:
+                    if winner.search_hand_for_card("Declare the Crusade"):
+                        reactions.append("Declare the Crusade")
             if self.get_green_icon(planet_id):
                 if winner.resources > 0:
                     if winner.search_hand_for_card("Inspirational Fervor"):
@@ -5093,7 +5102,9 @@ class Game:
         else:
             self.already_asked_remove_infestation = False
             print("Resolve battle ability of:", planet_name)
+            await self.send_update_message("Trying battle ability")
             self.need_to_resolve_battle_ability = True
+            self.reactions_on_winning_combat_being_executed = False
             self.battle_ability_to_resolve = planet_name
             self.player_resolving_battle_ability = winner.name_player
             self.number_resolving_battle_ability = str(winner.number)
