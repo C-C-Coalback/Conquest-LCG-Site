@@ -538,7 +538,7 @@ class Player:
             return True
         return False
 
-    def set_aiming_reticle_in_play(self, planet_id, unit_id, color):
+    def set_aiming_reticle_in_play(self, planet_id, unit_id, color="blue"):
         if planet_id == -2:
             self.headquarters[unit_id].aiming_reticle_color = color
         else:
@@ -1454,9 +1454,9 @@ class Player:
                 if self.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
                     self.game.create_reaction("Deathly Web Shrine", self.name_player,
                                               (int(self.number), destination, -1))
+            self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
             if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
                 already_banner = False
-                self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
                 for i in range(len(self.game.reactions_needing_resolving)):
                     if self.game.reactions_needing_resolving[i] == "Banner of the Ashen Sky":
                         if self.game.player_who_resolves_reaction[i] == self.name_player:
@@ -1466,6 +1466,17 @@ class Player:
                                               (int(self.number), -1, -1))
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
                 self.game.create_reaction("Piranha Hunter", self.name_player, (int(self.number), destination, new_pos))
+            for i in range(len(self.cards_in_play[origin_planet + 1])):
+                if self.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
+                    self.game.create_reaction("Wildrider Vyper", self.name_player,
+                                              (int(self.number), origin_planet, i))
+            other_player = self.game.p1
+            if other_player.name_player == self.name_player:
+                other_player = self.game.p2
+            for i in range(len(other_player.cards_in_play[origin_planet + 1])):
+                if other_player.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
+                    self.game.create_reaction("Wildrider Vyper", other_player.name_player,
+                                              (int(other_player.number), origin_planet, i))
         if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":
             self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
 

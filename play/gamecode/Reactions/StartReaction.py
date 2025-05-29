@@ -754,6 +754,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
+        elif current_reaction == "Wildrider Vyper":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif current_reaction == "Gut and Pillage":
             cost = 0
             if primary_player.urien_relevant:

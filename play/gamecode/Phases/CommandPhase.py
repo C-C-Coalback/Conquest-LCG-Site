@@ -194,8 +194,10 @@ async def update_game_event_command_section(self, name, game_update_string):
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.name_1:
                     self.p1.has_passed = True
+                    await self.send_update_message(self.name_1 + " is ready to start the command struggle.")
                 elif name == self.name_2:
                     self.p2.has_passed = True
+                    await self.send_update_message(self.name_2 + " is ready to start the command struggle.")
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 if name == self.name_1:
@@ -255,8 +257,10 @@ async def update_game_event_command_section(self, name, game_update_string):
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.name_1:
                     self.p1.has_passed = True
+                    await self.send_update_message(self.name_1 + " does not wish to use an ability.")
                 elif name == self.name_2:
                     self.p2.has_passed = True
+                    await self.send_update_message(self.name_2 + " does not wish to use an ability.")
         elif len(game_update_string) == 3:
             if game_update_string[0] == "HAND":
                 if name == self.name_1:
@@ -334,8 +338,10 @@ async def update_game_event_command_section(self, name, game_update_string):
             if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                 if name == self.name_1:
                     self.p1.has_passed = True
+                    await self.send_update_message(self.name_1 + " is ready to end the command phase.")
                 elif name == self.name_2:
                     self.p2.has_passed = True
+                    await self.send_update_message(self.name_2 + " is ready to end the command phase.")
             if game_update_string[0] == "action-button":
                 if self.get_actions_allowed():
                     self.stored_mode = self.mode

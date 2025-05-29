@@ -254,6 +254,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         player_being_hit.exhaust_given_pos(planet_pos, unit_pos)
                         self.delete_reaction()
+        elif current_reaction == "Wildrider Vyper":
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            if og_pla != planet_pos:
+                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                    primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                    primary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kabalite Harriers":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
