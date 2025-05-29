@@ -138,7 +138,7 @@ class Player:
         if self.headquarters[0].get_name() == "Subject Omega-X62113":
             self.subject_omega_relevant = True
         self.deck = deck_list[1:]
-        if deck_list[0] in self.tyranid_warlord_list:
+        if self.warlord_faction == "Tyranids":
             i = 0
             while i < len(self.deck):
                 if self.deck[i] in self.synapse_list:
@@ -1237,6 +1237,9 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Prototype Crisis Suit":
                                 self.game.create_reaction("Prototype Crisis Suit", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Invasive Genestealers":
+                                self.game.create_reaction("Invasive Genestealers", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
                                 for i in range(7):
