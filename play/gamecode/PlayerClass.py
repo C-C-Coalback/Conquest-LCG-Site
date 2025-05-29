@@ -2194,11 +2194,17 @@ class Player:
     def round_ends_reset_values(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
+                self.headquarters[i].set_once_per_round_used(False)
+                for j in range(len(self.headquarters[i].get_attachments())):
+                    self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
                 self.headquarters[i].area_effect_eor = 0
                 self.headquarters[i].armorbane_eor = False
                 self.headquarters[i].mobile_eor = False
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].set_once_per_round_used(False)
+                for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
+                    self.cards_in_play[i + 1][j].get_attachments()[k].set_once_per_round_used(False)
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
                 self.cards_in_play[i + 1][j].armorbane_eor = False
                 self.cards_in_play[i + 1][j].mobile_eor = False
@@ -2691,6 +2697,19 @@ class Player:
                                                   (int(self.number), planet_id, unit_id))
                     if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
                         self.ready_given_pos(planet_id, unit_id)
+            for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
+                if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].\
+                        get_ability() == "Ancient Crozius Arcanum":
+                    if not self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].once_per_round_used:
+                        self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].once_per_round_used = True
+                        if damage_on_card_before > 0:
+                            self.remove_damage_from_pos(planet_id, unit_id, 1)
+                            damage_on_card_before = damage_on_card_before - 1
+                            damage_on_card_after = damage_on_card_after - 1
+                        if total_damage_that_can_be_blocked > 0:
+                            self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
+                            total_damage_that_can_be_blocked = total_damage_that_can_be_blocked - 1
+                            damage_on_card_after = damage_on_card_after - 1
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
             if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
