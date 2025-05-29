@@ -62,6 +62,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Smasha Gun Battery":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.action_cleanup()
+                            self.location_of_indirect = "ALL"
+                            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+                            secondary_player.indirect_damage_applied = 0
+                            secondary_player.total_indirect_damage = len(secondary_player.cards)
+                            primary_player.indirect_damage_applied = 0
+                            primary_player.total_indirect_damage = len(primary_player.cards)
                     elif ability == "Ambush Platform":
                         if card.get_ready():
                             self.action_chosen = "Ambush Platform"
