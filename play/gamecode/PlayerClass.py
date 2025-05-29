@@ -2525,6 +2525,14 @@ class Player:
             if straken_check:
                 if card.check_for_a_trait("Soldier") or card.check_for_a_trait("Warrior"):
                     attack_value += 1
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+                if self.check_if_trait_at_planet(planet_id, "Psyker"):
+                    attack_value += 1
+        elif self.check_for_trait_given_pos(planet_id, unit_id, "Psyker"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+                if self.check_if_trait_at_planet(planet_id, "Warrior"):
+                    attack_value += 1
         if card.get_ability() == "Auxiliary Overseer":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_faction_given_pos(planet_id, i) != "Tau":
@@ -2851,6 +2859,14 @@ class Player:
     def get_number_of_units_at_planet(self, planet_id):
         return len(self.cards_in_play[planet_id + 1])
 
+    def check_if_trait_at_planet(self, planet_id, trait):
+        if planet_id == -2:
+            return False
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if self.check_for_trait_given_pos(planet_id, i, trait):
+                return True
+        return False
+
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
@@ -2873,6 +2889,12 @@ class Player:
                 health += 1
         if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
+                health += 1
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+                health += 1
+        elif self.check_for_trait_given_pos(planet_id, unit_id, "Psyker"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
                 health += 1
         if card.get_ability() == "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
