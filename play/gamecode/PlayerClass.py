@@ -568,6 +568,10 @@ class Player:
     def remove_card_from_hand(self, card_pos):
         del self.cards[card_pos]
 
+    def remove_card_name_from_hand(self, name):
+        if name in self.cards:
+            self.cards.remove(name)
+
     def get_shields_given_pos(self, pos_in_hand, planet_pos=None):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict)

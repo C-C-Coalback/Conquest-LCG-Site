@@ -762,6 +762,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Vow of Honor")
             else:
                 self.delete_reaction()
+        elif current_reaction == "Sacaellum's Finest":
+            if not primary_player.search_hand_for_card("Sacaellum's Finest"):
+                self.delete_reaction()
         elif current_reaction == "Gut and Pillage":
             cost = 0
             if primary_player.urien_relevant:

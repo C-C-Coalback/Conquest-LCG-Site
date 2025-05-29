@@ -58,6 +58,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.misc_target_unit = (chosen_planet, new_pos)
                 self.positions_of_unit_triggering_reaction[0] = (int(primary_player.number),
                                                                  chosen_planet, new_pos)
+    elif current_reaction == "Sacaellum's Finest":
+        if self.get_green_icon(chosen_planet):
+            primary_player.remove_card_name_from_hand("Sacaellum's Finest")
+            card = FindCard.find_card("Sacaellum's Finest", self.card_array, self.cards_dict)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            self.sacaellums_finest_active = True
+            self.delete_reaction()
     elif current_reaction == "Declare the Crusade":
         planet_to_add = self.misc_target_choice
         planet_to_remove = self.planet_array[chosen_planet]

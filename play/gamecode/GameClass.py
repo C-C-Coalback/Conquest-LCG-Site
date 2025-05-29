@@ -306,6 +306,7 @@ class Game:
         self.damage_amounts_baarzul = []
         self.omega_ambush_active = False
         self.shadow_thorns_body_allowed = True
+        self.sacaellums_finest_active = False
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -5129,6 +5130,9 @@ class Game:
                 if winner.resources > 0:
                     if winner.search_hand_for_card("Inspirational Fervor"):
                         reactions.append("Inspirational Fervor")
+                if planet_id != self.round_number and not self.sacaellums_finest_active:
+                    if winner.search_hand_for_card("Sacaellum's Finest"):
+                        reactions.append("Sacaellum's Finest")
             if self.get_red_icon(planet_id):
                 cost = 0
                 if winner.urien_relevant:
@@ -5176,6 +5180,9 @@ class Game:
             self.player_resolving_battle_ability = winner.name_player
             self.number_resolving_battle_ability = str(winner.number)
             self.choices_available = ["Yes", "No"]
+            if self.sacaellums_finest_active:
+                self.choices_available = ["No", "No"]
+                self.sacaellums_finest_active = False
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = winner.name_player
             await self.send_update_message(winner.name_player + " has the right to use"
