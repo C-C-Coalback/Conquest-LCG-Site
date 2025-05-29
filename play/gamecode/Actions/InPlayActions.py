@@ -1694,6 +1694,31 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard.remove("Lethal Toxin Sacs")
                 primary_player.aiming_reticle_coords_discard = None
                 self.action_cleanup()
+    elif self.action_chosen == "Cathedral of Saint Camila":
+        if secondary_player.get_number() == game_update_string[1]:
+            if self.misc_counter[planet_pos]:
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos):
+                    if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        can_continue = True
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "In Play Action"
+                        if can_continue:
+                            self.misc_counter[planet_pos] = False
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
     elif self.action_chosen == "Ambush Platform":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

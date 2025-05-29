@@ -748,6 +748,9 @@ class Game:
                         self.p1.reset_all_aiming_reticles_play_hq()
                         self.p2.reset_all_aiming_reticles_play_hq()
                         self.action_cleanup()
+                    elif self.action_chosen == "Cathedral of Saint Camila":
+                        self.misc_counter = 0
+                        self.action_cleanup()
                     elif self.action_chosen == "Biomass Sacrifice":
                         self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
