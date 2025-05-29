@@ -1899,6 +1899,8 @@ class Player:
         return False
 
     def get_immune_to_enemy_events(self, planet_pos, unit_pos):
+        if not self.check_is_unit_at_pos(planet_pos, unit_pos):
+            return False
         if self.search_attachments_at_pos(planet_pos, unit_pos, "Lucky Warpaint"):
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Stalwart Ogryn":
@@ -2040,22 +2042,29 @@ class Player:
                         return True
         return False
 
-    def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False):
+    def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False,
+                                      targeting_support=False):
         possible_interrupts = []
-        if context == "Searing Brand":
-            if self.game.searing_brand_cancel_enabled:
-                if len(self.cards) > 1:
-                    possible_interrupts.append("Searing Brand")
-        if move_from_planet:
-            if self.game.slumbering_gardens_enabled:
-                if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
-                    possible_interrupts.append("Slumbering Gardens")
-        if self.game.communications_relay_enabled:
-            if self.communications_relay_check(planet_pos, unit_pos):
-                possible_interrupts.append("Communications Relay")
-        if self.game.backlash_enabled:
-            if self.backlash_check(planet_pos, unit_pos):
-                possible_interrupts.append("Backlash")
+        if targeting_support:
+            if self.game.colony_shield_generator_enabled:
+                if self.get_ability_given_pos(planet_pos, unit_pos) != "Colony Shield Generator":
+                    if self.search_card_in_hq("Colony Shield Generator", ready_relevant=True):
+                        possible_interrupts.append("Colony Shield Generator")
+        else:
+            if context == "Searing Brand":
+                if self.game.searing_brand_cancel_enabled:
+                    if len(self.cards) > 1:
+                        possible_interrupts.append("Searing Brand")
+            if move_from_planet:
+                if self.game.slumbering_gardens_enabled:
+                    if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
+                        possible_interrupts.append("Slumbering Gardens")
+            if self.game.communications_relay_enabled:
+                if self.communications_relay_check(planet_pos, unit_pos):
+                    possible_interrupts.append("Communications Relay")
+            if self.game.backlash_enabled:
+                if self.backlash_check(planet_pos, unit_pos):
+                    possible_interrupts.append("Backlash")
         return possible_interrupts
 
     def backlash_check(self, planet_pos, unit_pos):

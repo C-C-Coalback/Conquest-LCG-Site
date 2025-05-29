@@ -194,6 +194,7 @@ class Game:
         self.nullify_string = ""
         self.communications_relay_enabled = True
         self.slumbering_gardens_enabled = True
+        self.colony_shield_generator_enabled = True
         self.backlash_enabled = True
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
@@ -1468,11 +1469,34 @@ class Game:
             await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             self.backlash_enabled = True
 
+    async def resolve_colony_shield_generator(self, name, game_update_string, primary_player, secondary_player):
+        if game_update_string[1] == "0":
+            self.reset_choices_available()
+            new_pos = -1
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_ability_given_pos(-2, i) == "Colony Shield Generator":
+                    if primary_player.get_ready_given_pos(-2, i):
+                        primary_player.exhaust_given_pos(-2, i)
+                        new_pos = i
+            self.colony_shield_generator_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            if len(new_string_list) == 3:
+                if new_pos != -1:
+                    new_string_list[2] = str(new_pos)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.colony_shield_generator_enabled = True
+        elif game_update_string[1] == "1":
+            self.reset_choices_available()
+            self.colony_shield_generator_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.colony_shield_generator_enabled = True
+
     async def resolve_slumbering_gardens(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
@@ -1497,9 +1521,7 @@ class Game:
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             self.slumbering_gardens_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
@@ -1749,16 +1771,21 @@ class Game:
                             self.backlash_enabled = False
                             self.searing_brand_cancel_enabled = False
                             self.slumbering_gardens_enabled = False
+                            self.colony_shield_generator_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.communications_relay_enabled = True
                             self.searing_brand_cancel_enabled = True
                             self.slumbering_gardens_enabled = True
+                            self.colony_shield_generator_enabled = True
                             self.backlash_enabled = True
                         elif chosen_choice == "Communications Relay":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Communications Relay?"
+                        elif chosen_choice == "Colony Shield Generator":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Colony Shield Generator?"
                         elif chosen_choice == "Slumbering Gardens":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Slumbering Gardens?"
@@ -1777,6 +1804,9 @@ class Game:
                         elif game_update_string[1] == "1":
                             self.delete_interrupt()
                         self.reset_choices_available()
+                    elif self.choice_context == "Use Colony Shield Generator?":
+                        await self.resolve_colony_shield_generator(name, game_update_string, primary_player,
+                                                                   secondary_player)
                     elif self.choice_context == "Urien's Oubliette":
                         if game_update_string[1] == "0":
                             primary_player.discard_top_card_deck()
