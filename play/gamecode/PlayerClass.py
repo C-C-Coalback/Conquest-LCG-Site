@@ -3431,6 +3431,13 @@ class Player:
         if can_forward_barracks:
             if self.search_card_in_hq("Forward Barracks"):
                 self.game.create_reaction("Forward Barracks", self.name_player, (int(self.number), planet_id, -1))
+        if self.game.get_green_icon(planet_id):
+            for i in range(7):
+                if i != planet_id:
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.cards_in_play[i + 1][j].get_ability() == "Taurox APC":
+                            self.game.create_reaction("Taurox APC", self.name_player,
+                                                      (int(self.number), i, j))
 
     def rout_unit(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
