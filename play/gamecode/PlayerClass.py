@@ -126,6 +126,7 @@ class Player:
         self.accept_any_challenge_used = False
         self.rok_bombardment_active = []
         self.master_warpsmith_count = 0
+        self.gut_and_pillage_used = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()

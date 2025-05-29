@@ -5087,6 +5087,14 @@ class Game:
                 if winner.resources > 0:
                     if winner.search_hand_for_card("Inspirational Fervor"):
                         reactions.append("Inspirational Fervor")
+            if self.get_red_icon(planet_id):
+                cost = 0
+                if winner.urien_relevant:
+                    cost += 1
+                if winner.resources >= cost:
+                    if not winner.gut_and_pillage_used:
+                        if winner.search_hand_for_card("Gut and Pillage"):
+                            reactions.append("Gut and Pillage")
         return reactions
 
     def infest_planet(self, planet):
@@ -5184,6 +5192,8 @@ class Game:
         self.p2.illegal_commits_synapse = 0
         self.p1.primal_howl_used = False
         self.p2.primal_howl_used = False
+        self.p1.gut_and_pillage_used = False
+        self.p2.gut_and_pillage_used = False
         self.p1.used_reanimation_protocol = False
         self.p2.used_reanimation_protocol = False
         self.p1.accept_any_challenge_used = False

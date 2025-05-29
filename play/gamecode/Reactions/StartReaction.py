@@ -754,6 +754,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
+        elif current_reaction == "Gut and Pillage":
+            cost = 0
+            if primary_player.urien_relevant:
+                cost += 1
+            if primary_player.spend_resources(cost):
+                primary_player.discard_card_name_from_hand("Gut and Pillage")
+                primary_player.add_resources(3)
+                primary_player.gut_and_pillage_used = True
+            self.delete_reaction()
         elif current_reaction == "Last Breath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos != -2:
