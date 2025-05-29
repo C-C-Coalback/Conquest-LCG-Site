@@ -2160,6 +2160,16 @@ class Game:
                         self.name_player_who_is_searching = primary_player.name_player
                         self.number_who_is_searching = primary_player.number
                         self.action_cleanup()
+                    elif self.choice_context == "Path of the Leader choice":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        if target_choice == "Gain 1 Resource":
+                            primary_player.add_resources(1)
+                            self.action_cleanup()
+                        else:
+                            self.chosen_first_card = False
+                            self.action_chosen = target_choice
                     elif self.choice_context == "Target Doom Scythe Invader:":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]

@@ -1317,6 +1317,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_cleanup()
                         else:
                             await self.send_update_message(str(self.misc_counter) + " uses left of Rapid Assault")
+    elif self.action_chosen == "Move Psyker":
+        if not self.chosen_first_card:
+            if primary_player.number == game_update_string[1]:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Psyker"):
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.chosen_first_card = True
+    elif self.action_chosen == "+1 ATK Warrior":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
+                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                self.action_cleanup()
     elif self.action_chosen == "Indescribable Horror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

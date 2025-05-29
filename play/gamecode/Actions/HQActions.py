@@ -749,6 +749,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.set_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                               self.position_of_actioned_card[1], "red")
                     self.action_cleanup()
+    elif self.action_chosen == "+1 ATK Warrior":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_for_trait_given_pos(-2, unit_pos, "Warrior"):
+                primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 1, expiration="EOP")
+                self.action_cleanup()
     elif self.action_chosen == "Subdual":
         if game_update_string[1] == "1":
             target_player = self.p1

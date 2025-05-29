@@ -262,6 +262,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
                 self.misc_target_unit = (-1, -1)
                 self.action_cleanup()
+    elif self.action_chosen == "Move Psyker":
+        if self.chosen_first_card:
+            planet_pos, unit_pos = self.misc_target_unit
+            if chosen_planet != planet_pos:
+                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_second_card and self.chosen_first_card:
             self.chosen_second_card = True
