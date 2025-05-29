@@ -2689,6 +2689,8 @@ class Player:
                     if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
                         self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
                                                   (int(self.number), planet_id, unit_id))
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
+                        self.ready_given_pos(planet_id, unit_id)
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
             if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
