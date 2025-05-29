@@ -3391,6 +3391,8 @@ class Game:
         if card.get_faction() == "Astra Militarum":
             self.discounts_applied += player.muster_the_guard_count
         slaanesh_temptation = False
+        if card.check_for_a_trait("Elite"):
+            self.discounts_applied += player.master_warpsmith_count
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
                 if i != planet_chosen:
@@ -3429,6 +3431,8 @@ class Game:
             self.available_discounts += num_termagants
         if card.get_faction() == "Astra Militarum":
             self.available_discounts += player.muster_the_guard_count
+        if card.check_for_a_trait("Elite"):
+            self.available_discounts += player.master_warpsmith_count
         slaanesh_temptation = False
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):

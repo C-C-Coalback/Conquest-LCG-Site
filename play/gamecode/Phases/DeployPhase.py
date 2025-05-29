@@ -133,6 +133,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.discounts_applied = 0
                         await self.calculate_available_discounts_unit(planet_chosen, card, player)
                         await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
+                        if card.check_for_a_trait("Elite"):
+                            player.master_warpsmith_count = 0
                         self.card_to_deploy = card
                         if self.available_discounts > self.discounts_applied:
                             self.stored_mode = self.mode

@@ -428,6 +428,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.calculate_automatic_discounts_unit(
                 planet_chosen=chosen_planet, card=card, player=primary_player
             )
+            if card.check_for_a_trait("Elite"):
+                primary_player.master_warpsmith_count = 0
             self.mode = "DISCOUNT"
             self.planet_aiming_reticle_position = int(game_update_string[1])
             if self.discounts_applied >= self.available_discounts:
@@ -524,6 +526,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.discounts_applied = 0
             await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
             await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+            if card.check_for_a_trait("Elite"):
+                primary_player.master_warpsmith_count = 0
             self.card_to_deploy = card
             if self.available_discounts > self.discounts_applied:
                 self.stored_mode = self.mode

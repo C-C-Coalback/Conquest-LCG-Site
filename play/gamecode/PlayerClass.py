@@ -124,7 +124,8 @@ class Player:
         self.discard_inquis_caius_wroth = False
         self.enemy_has_wyrdboy_stikk = False
         self.accept_any_challenge_used = False
-        self.rok_bombardment_active = []  # (own: bool)
+        self.rok_bombardment_active = []
+        self.master_warpsmith_count = 0
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1894,6 +1895,8 @@ class Player:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
                     self.set_aiming_reticle_in_play(-2, i, "green")
+                    if "Elite" in traits:
+                        discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
                 elif self.headquarters[i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
                     self.set_aiming_reticle_in_play(-2, i, "green")
@@ -1911,6 +1914,8 @@ class Player:
                 if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
                     discounts_available += 1
                     self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if "Elite" in traits:
+                        discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
                 elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
                     self.set_aiming_reticle_in_play(planet_pos, i, "green")
@@ -2505,11 +2510,11 @@ class Player:
                 num_copies = current_num
         return num_copies
 
-    def count_copies_in_play(self, card_name):
+    def count_copies_in_play(self, card_name, ability=False):
         num_copies = 0
         for i in range(7):
-            num_copies += self.count_copies_at_planet(planet_num=i, card_name=card_name)
-        num_copies += self.count_copies_at_hq(card_name)
+            num_copies += self.count_copies_at_planet(planet_num=i, card_name=card_name, ability=ability)
+        num_copies += self.count_copies_at_hq(card_name, ability=ability)
         return num_copies
 
     def count_copies_at_planet(self, planet_num, card_name, ability=False):
@@ -2518,9 +2523,8 @@ class Player:
             if ability:
                 if self.cards_in_play[planet_num + 1][i].get_ability() == card_name:
                     num_copies += 1
-            else:
-                if self.cards_in_play[planet_num + 1][i].get_name() == card_name:
-                    num_copies += 1
+            elif self.cards_in_play[planet_num + 1][i].get_name() == card_name:
+                num_copies += 1
         return num_copies
 
     def count_units_in_discard(self):
@@ -2531,10 +2535,13 @@ class Player:
                 count = count + 1
         return count
 
-    def count_copies_at_hq(self, card_name):
+    def count_copies_at_hq(self, card_name, ability=False):
         num_copies = 0
         for i in range(len(self.headquarters)):
-            if self.headquarters[i].get_name() == card_name:
+            if ability:
+                if self.headquarters[i].get_ability() == card_name:
+                    num_copies += 1
+            elif self.headquarters[i].get_name() == card_name:
                 num_copies += 1
         return num_copies
 
@@ -2938,6 +2945,26 @@ class Player:
     def sacrifice_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
             return False
+        if self.headquarters[card_pos].get_name() == "Cultist":
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Master Warpsmith":
+                    if self.game.card_to_deploy is not None:
+                        if self.game.card_to_deploy.check_for_a_trait("Elite"):
+                            self.game.discounts_applied += 1
+                        else:
+                            self.master_warpsmith_count += 1
+                    else:
+                        self.master_warpsmith_count += 1
+            for i in range(7):
+                for j in range(len(self.cards_in_play[i + 1])):
+                    if self.get_ability_given_pos(i, j) == "Master Warpsmith":
+                        if self.game.card_to_deploy is not None:
+                            if self.game.card_to_deploy.check_for_a_trait("Elite"):
+                                self.game.discounts_applied += 1
+                            else:
+                                self.master_warpsmith_count += 1
+                        else:
+                            self.master_warpsmith_count += 1
         self.add_card_in_hq_to_discard(card_pos)
         return True
 
@@ -2953,6 +2980,26 @@ class Player:
                         self.game.create_reaction("Formosan Black Ship", self.name_player,
                                                   (int(self.number), -2, -1))
                         self.last_planet_sacrifice = planet_num
+        if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Cultist":
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Master Warpsmith":
+                    if self.game.card_to_deploy is not None:
+                        if self.game.card_to_deploy.check_for_a_trait("Elite"):
+                            self.game.discounts_applied += 1
+                        else:
+                            self.master_warpsmith_count += 1
+                    else:
+                        self.master_warpsmith_count += 1
+            for i in range(7):
+                for j in range(len(self.cards_in_play[i + 1])):
+                    if self.get_ability_given_pos(i, j) == "Master Warpsmith":
+                        if self.game.card_to_deploy is not None:
+                            if self.game.card_to_deploy.check_for_a_trait("Elite"):
+                                self.game.discounts_applied += 1
+                            else:
+                                self.master_warpsmith_count += 1
+                        else:
+                            self.master_warpsmith_count += 1
         self.add_card_in_play_to_discard(planet_num, card_pos)
         return True
 
