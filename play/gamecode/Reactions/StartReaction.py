@@ -462,6 +462,12 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Outflank'em":
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Outflank'em")
+                self.player_with_combat_turn = primary_player.name_player
+                self.number_with_combat_turn = primary_player.number
+            self.delete_reaction()
         elif current_reaction == "Taurox APC":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             destination = self.last_planet_checked_for_battle

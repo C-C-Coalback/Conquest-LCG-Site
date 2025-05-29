@@ -1646,6 +1646,19 @@ class Player:
             if self.game.get_blue_icon(planet_id):
                 if self.get_ability_given_pos(planet_id, i) == "Seer of Deceit":
                     extra_cards += 1
+                if self.get_ability_given_pos(planet_id, i) == "Reliquary Techmarine":
+                    extra_cards += 1
+            if self.game.get_red_icon(planet_id):
+                if self.get_ability_given_pos(planet_id, i) == "Skrap Nabba":
+                    extra_resources += 2
+                if self.get_ability_given_pos(planet_id, i) == "Sae'lum Pioneer":
+                    extra_resources += 2
+                if self.get_ability_given_pos(planet_id, i) == "Flayed Skull Slaver":
+                    extra_resources += 2
+            if self.game.infested_planets[planet_id]:
+                if self.get_ability_given_pos(planet_id, i) == "Genestealer Harvesters":
+                    extra_resources += 1
+                    extra_cards += 1
         return extra_resources, extra_cards
 
     def find_warlord_planet(self):

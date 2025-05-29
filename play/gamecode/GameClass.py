@@ -4868,9 +4868,11 @@ class Game:
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
                 planet = self.last_planet_checked_for_battle
+                name_player_who_resolved_attack = ""
                 if planet > -1:
                     for i in range(len(self.p1.cards_in_play[planet + 1])):
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
+                            name_player_who_resolved_attack = self.name_1
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
@@ -4884,6 +4886,7 @@ class Game:
                                     self.p1.assign_damage_to_pos(planet, i, 1)
                     for i in range(len(self.p2.cards_in_play[planet + 1])):
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
+                            name_player_who_resolved_attack = self.name_2
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
@@ -4895,6 +4898,12 @@ class Game:
                                     self.p2.assign_damage_to_pos(planet, i, 1)
                                 elif not self.p2.get_immune_to_enemy_events(planet, i):
                                     self.p2.assign_damage_to_pos(planet, i, 1)
+                if name_player_who_resolved_attack == self.name_1:
+                    if self.p1.resources > 1 and self.p1.search_hand_for_card("Outflank'em"):
+                        self.create_reaction("Outflank'em", self.name_1, (1, -1, -1))
+                if name_player_who_resolved_attack == self.name_2:
+                    if self.p2.resources > 1 and self.p2.search_hand_for_card("Outflank'em"):
+                        self.create_reaction("Outflank'em", self.name_2, (2, -1, -1))
                 self.p1.ethereal_movement_resolution()
                 self.p2.ethereal_movement_resolution()
                 self.p1.reset_resolving_attacks_everywhere()
