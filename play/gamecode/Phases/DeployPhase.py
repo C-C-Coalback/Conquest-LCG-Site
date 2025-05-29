@@ -233,6 +233,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.damage_is_taken_one_at_a_time = True
             primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
     self.action_cleanup()
+    if self.interrupts_waiting_on_resolution:
+        if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+            self.delete_interrupt()
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     self.card_to_deploy = None

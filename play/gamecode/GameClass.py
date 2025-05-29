@@ -7,7 +7,7 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction
-from .Interrupts import StartInterrupt, InPlayInterrupts
+from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts
 
 
 def create_planets(planet_array_objects):
@@ -632,9 +632,6 @@ class Game:
                         print("Play card with not all discounts")
                         await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                               discounts=self.discounts_applied)
-                        self.action_chosen = ""
-                        self.player_with_action = ""
-                        self.mode = "Normal"
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == player.get_number():
@@ -4153,23 +4150,9 @@ class Game:
         if name == self.player_resolving_interrupts[0]:
             print("name check ok")
             if len(game_update_string) == 2:
-                if self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
-                    print("reanimating warriors")
-                    if not self.asked_if_resolve_effect:
-                        self.choices_available = ["Yes", "No"]
-                        self.choice_context = "Use Reanimating Warriors?"
-                        self.name_player_making_choices = name
-                    else:
-                        if self.chosen_first_card:
-                            if game_update_string[0] == "PLANETS":
-                                origin_planet, origin_pos = self.misc_target_unit
-                                target_planet = int(game_update_string[1])
-                                if abs(origin_planet - target_planet) == 1:
-                                    primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-                                    primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
-                                    self.delete_interrupt()
-                                    self.asked_if_resolve_effect = False
-                                    self.chosen_first_card = False
+                if game_update_string[0] == "PLANETS":
+                    await PlanetInterrupts.resolve_planet_interrupt(self, name, game_update_string,
+                                                                    primary_player, secondary_player)
             if len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayInterrupts.resolve_in_play_interrupt(self, name, game_update_string,
@@ -4191,6 +4174,7 @@ class Game:
                                 self.delete_interrupt()
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
+
 
     def fury_search(self, player_with_cato, player_without_cato):
         if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
@@ -4908,6 +4892,8 @@ class Game:
             if not self.reactions_needing_resolving and not self.resolving_search_box:
                 self.p1.stored_targets_the_emperor_protects = []
                 self.p2.stored_targets_the_emperor_protects = []
+                self.p1.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
+                self.p2.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
             if self.need_to_reset_tomb_blade_squadron:
                 self.need_to_reset_tomb_blade_squadron = False
                 self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")

@@ -20,3 +20,9 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if "M35 Galaxy Lasgun" in primary_player.cards_recently_discarded:
                 primary_player.cards_recently_discarded.remove("M35 Galaxy Lasgun")
             self.delete_interrupt()
+        elif self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+            if "Berzerker Warriors" not in primary_player.cards:
+                self.delete_interrupt()
+            else:
+                primary_player.aiming_reticle_coords_hand = primary_player.cards.index("Berzerker Warriors")
+                primary_player.aiming_reticle_color = "blue"

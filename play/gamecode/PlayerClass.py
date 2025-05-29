@@ -127,6 +127,7 @@ class Player:
         self.rok_bombardment_active = []
         self.master_warpsmith_count = 0
         self.gut_and_pillage_used = False
+        self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -514,6 +515,13 @@ class Player:
         for i in range(len(self.game.reactions_needing_resolving)):
             if self.game.reactions_needing_resolving[i] == reaction_name:
                 if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    return True
+        return False
+
+    def check_if_already_have_interrupt(self, interrupt_name):
+        for i in range(len(self.game.interrupts_waiting_on_resolution)):
+            if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
+                if self.game.player_resolving_interrupts[i] == self.name_player:
                     return True
         return False
 
@@ -3221,6 +3229,9 @@ class Player:
                                               (int(self.number), planet_num, i))
 
     def destroy_card_in_play(self, planet_num, card_pos):
+        if planet_num == -2:
+            self.destroy_card_in_hq(card_pos)
+            return None
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
                 self.bloody_warlord_given_pos(planet_num, card_pos)
@@ -3229,6 +3240,14 @@ class Player:
                 self.add_card_in_play_to_discard(planet_num, card_pos)
                 self.warlord_just_got_destroyed = True
         else:
+            other_player = self.game.p1
+            other_player.valid_planets_berzerker_warriors[planet_num] = True
+            if other_player.name_player == self.name_player:
+                other_player = self.game.p2
+            if other_player.search_hand_for_card("Berzerker Warriors"):
+                if not other_player.check_if_already_have_reaction("Berzerker Warriors"):
+                    self.game.create_interrupt("Berzerker Warriors", other_player.name_player,
+                                               (int(other_player.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":
