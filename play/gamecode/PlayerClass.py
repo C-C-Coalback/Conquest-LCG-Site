@@ -774,6 +774,9 @@ class Player:
                 enemy_name = self.game.name_2
             self.game.create_reaction("Heretek Inventor", enemy_name,
                                       (int(self.number), -2, last_element_index))
+        elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
+            self.game.create_reaction("Coliseum Fighters", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Swordwind Farseer":
             self.game.create_reaction("Swordwind Farseer", self.name_player,
                                       (int(self.number), -2, last_element_index))
