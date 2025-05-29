@@ -244,6 +244,7 @@ class UnitCard(Card):
         self.additional_resources_command_struggle = additional_resources_command_struggle
         self.additional_cards_command_struggle = additional_cards_command_struggle
         self.ambush = ambush
+        self.shadowed_thorns_venom_valid = False
         self.reaction_available = True
         self.hit_by_superiority = False
         self.has_hive_mind = hive_mind

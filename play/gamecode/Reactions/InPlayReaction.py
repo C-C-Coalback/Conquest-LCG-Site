@@ -289,6 +289,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
                         self.delete_reaction()
+        elif current_reaction == "Shadowed Thorns Venom":
+            if not self.chosen_first_card:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].shadowed_thorns_venom_valid:
+                        self.chosen_first_card = True
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].shadowed_thorns_venom_valid = False
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.misc_target_unit = (planet_pos, unit_pos)
         elif current_reaction == "Vow of Honor":
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor:
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")

@@ -65,6 +65,15 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.add_card_to_planet(card, chosen_planet)
             self.sacaellums_finest_active = True
             self.delete_reaction()
+    elif current_reaction == "Shadowed Thorns Venom":
+        if self.chosen_first_card:
+            if self.get_red_icon(chosen_planet):
+                og_pla, og_pos = self.misc_target_unit
+                if og_pla != chosen_planet:
+                    primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                    primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                    self.chosen_first_card = False
+                    self.misc_target_unit = (-1, -1)
     elif current_reaction == "Salvaged Battlewagon":
         if self.chosen_first_card:
             if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:

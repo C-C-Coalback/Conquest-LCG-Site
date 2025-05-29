@@ -764,6 +764,17 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
         elif current_reaction == "Salvaged Battlewagon":
             self.chosen_first_card = False
+        elif current_reaction == "Shadowed Thorns Venom":
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_card_type_given_pos(-2, i) == "Army":
+                    if primary_player.check_for_trait_given_pos(-2, i, "Kabalite"):
+                        primary_player.headquarters[i].shadowed_thorns_venom_valid = True
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.get_card_type_given_pos(i, j) == "Army":
+                        if primary_player.check_for_trait_given_pos(i, j, "Kabalite"):
+                            primary_player.cards_in_play[i + 1][j].shadowed_thorns_venom_valid = True
+            self.chosen_first_card = False
         elif current_reaction == "Sacaellum's Finest":
             if not primary_player.search_hand_for_card("Sacaellum's Finest"):
                 self.delete_reaction()
