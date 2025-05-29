@@ -509,7 +509,27 @@ class Player:
             self.resources = self.resources - amount
             return True
 
-    def add_resources(self, amount):
+    def check_if_already_have_reaction(self, reaction_name):
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    return True
+        return False
+
+    def add_resources(self, amount, refund=False):
+        if not refund:
+            if not self.check_if_already_have_reaction("Dying Sun Marauder"):
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Dying Sun Marauder":
+                        if not self.get_ready_given_pos(-2, i):
+                            self.game.create_reaction("Dying Sun Marauder", self.name_player,
+                                                      (int(self.number), -2, i))
+                for i in range(7):
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_ability_given_pos(i, j) == "Dying Sun Marauder":
+                            if not self.get_ready_given_pos(i, j):
+                                self.game.create_reaction("Dying Sun Marauder", self.name_player,
+                                                          (int(self.number), i, j))
         self.resources += amount
 
     def check_if_warlord(self, planet_id, unit_id):
@@ -934,7 +954,7 @@ class Player:
                 if self.attach_card(card, planet, position, not_own_attachment,
                                     army_unit_as_attachment=army_unit_as_attachment):
                     return True
-                self.add_resources(cost)
+                self.add_resources(cost, refund=True)
         else:
             if card.must_be_own_unit and not_own_attachment:
                 print("Must be own unit, but is not")
@@ -950,7 +970,7 @@ class Player:
             if self.spend_resources(cost):
                 if self.attach_card(card, planet, position, not_own_attachment):
                     return True
-                self.add_resources(cost)
+                self.add_resources(cost, refund=True)
         return False
 
     def get_name_enemy_player(self):
@@ -1160,7 +1180,7 @@ class Player:
                                 self.set_can_play_limited(False)
                                 print("Played card to HQ")
                                 return "SUCCESS", -1
-                            self.add_resources(cost)
+                            self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
                         return "FAIL/Limited already played", -1
@@ -1172,7 +1192,7 @@ class Player:
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.discard_card_at_random_from_opponent(self.number)
                             return "SUCCESS", -1
-                        self.add_resources(cost)
+                        self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources", -1
@@ -1193,7 +1213,7 @@ class Player:
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 return "SUCCESS", location_of_unit
-                            self.add_resources(cost)
+                            self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
                         return "FAIL/Limited already played", -1
@@ -1292,7 +1312,7 @@ class Player:
                                 self.game.create_reaction("Syren Zythlex", name,
                                                           (int(self.number), position, location_of_unit))
                             return "SUCCESS", location_of_unit
-                        self.add_resources(cost)
+                        self.add_resources(cost, refund=True)
                         return "FAIL/Unique already in play", -1
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources", -1

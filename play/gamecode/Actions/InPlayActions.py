@@ -1677,7 +1677,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         card, planet_pos, unit_pos, not_own_attachment=True,
                         army_unit_as_attachment=army_unit_as_attachment)
                     if not played_card:
-                        primary_player.add_resources(int(card.get_cost()) - discounts)
+                        primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
                 enemy_card = True
             if played_card:
                 if card.get_limited():

@@ -38,7 +38,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(cost):
                     if may_nullify and secondary_player.nullify_check():
-                        primary_player.add_resources(cost)
+                        primary_player.add_resources(cost, refund=True)
                         await self.send_update_message(primary_player.name_player + " wants to play " +
                                                        ability + "; Nullify window offered.")
                         self.choices_available = ["Yes", "No"]
@@ -102,7 +102,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if not self.get_red_icon(self.last_planet_checked_for_battle):
                                 primary_player.rok_bombardment_active.append("Own")
                         else:
-                            primary_player.add_resources(cost)
+                            primary_player.add_resources(cost, refund=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
                     elif ability == "Mind War":
@@ -424,12 +424,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.choice_context = "Spore Burst"
                                 self.name_player_making_choices = primary_player.name_player
                             else:
-                                primary_player.add_resources(2)
+                                primary_player.add_resources(2, refund=True)
                                 await self.send_update_message(
                                     "No valid targets in discard for spore burst."
                                 )
                         else:
-                            primary_player.add_resources(2)
+                            primary_player.add_resources(2, refund=True)
                             await self.send_update_message(
                                 "No valid planets for spore burst."
                             )
@@ -439,7 +439,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         else:
-                            primary_player.add_resources(cost)
+                            primary_player.add_resources(cost, refund=True)
                     elif ability == "Dark Cunning":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -492,7 +492,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.all_conditions_searched_card_required = True
                             self.no_restrictions_on_chosen_card = False
                         else:
-                            primary_player.add_resources(cost)
+                            primary_player.add_resources(cost, refund=True)
                             await self.send_update_message("No battle taking place")
                     elif ability == "Squadron Redeployment":
                         self.action_chosen = "Squadron Redeployment"
@@ -632,10 +632,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                             self.name_player_making_choices = primary_player.name_player
                         else:
-                            primary_player.add_resources(cost)
+                            primary_player.add_resources(cost, refund=True)
                             await self.send_update_message("No cards to look at with Visions of Agony")
                     else:
-                        primary_player.add_resources(cost)
+                        primary_player.add_resources(cost, refund=True)
                         await self.send_update_message(card.get_name() + " not "
                                                                          "implemented")
     elif self.action_chosen == "Ambush Platform":

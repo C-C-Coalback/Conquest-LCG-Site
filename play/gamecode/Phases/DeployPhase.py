@@ -305,7 +305,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                         card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True,
                         army_unit_as_attachment=army_unit_as_attachment)
                     if not played_card:
-                        primary_player.add_resources(int(card.get_cost()) - discounts)
+                        primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
                 enemy_card = True
             if played_card:
                 if limited:

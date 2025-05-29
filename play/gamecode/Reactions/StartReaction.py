@@ -153,7 +153,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
             card_target = primary_player.ichor_gauntlet_target
             card = FindCard.find_card(card_target, self.card_array, self.cards_dict)
-            primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant))
+            primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant), refund=True)
             if card_target in primary_player.discard:
                 primary_player.discard.remove(card_target)
             primary_player.cards.append(card_target)
@@ -749,6 +749,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             if not primary_player.get_once_per_phase_used_given_pos(warlord_planet, warlord_pos):
                 primary_player.set_once_per_phase_used_given_pos(warlord_planet, warlord_pos, True)
                 primary_player.add_resources(1)
+            self.delete_reaction()
+        elif current_reaction == "Dying Sun Marauder":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
         elif current_reaction == "Last Breath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
