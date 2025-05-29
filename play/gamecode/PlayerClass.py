@@ -2481,6 +2481,10 @@ class Player:
             if straken_check:
                 if card.check_for_a_trait("Soldier") or card.check_for_a_trait("Warrior"):
                     attack_value += 1
+        if card.get_ability() == "Auxiliary Overseer":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.get_faction_given_pos(planet_id, i) != "Tau":
+                    attack_value += 1
         if card.get_ability() == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
