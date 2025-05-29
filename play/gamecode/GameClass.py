@@ -3108,8 +3108,7 @@ class Game:
                 for j in range(len(self.on_kill_effects_of_attacker[i])):
                     self.create_reaction(self.on_kill_effects_of_attacker[i][j], secondary_player.name_player,
                                          (int(secondary_player.number), planet, pos))
-                    if self.on_kill_effects_of_attacker[i][j] == "Holding Cell":
-                        self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
+                    self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
 
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
                 if primary_player.search_hand_for_card("Vengeance!"):

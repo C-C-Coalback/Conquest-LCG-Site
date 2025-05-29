@@ -462,6 +462,26 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Gene Implantation":
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Gene Implantation")
+                name_card = self.name_of_attacked_unit
+                planet = self.last_planet_checked_for_battle
+                if name_card in secondary_player.discard:
+                    card = FindCard.find_card(name_card, self.card_array, self.cards_dict)
+                    primary_player.add_card_to_planet(card, planet, is_owner_of_card=False)
+                    last_index = len(secondary_player.discard) - 1
+                    found = False
+                    while last_index > -1 and not found:
+                        if secondary_player.discard[last_index] == name_card:
+                            del secondary_player.discard[last_index]
+                            if name_card in secondary_player.cards_recently_discarded:
+                                secondary_player.cards_recently_discarded.remove(name_card)
+                            if name_card in secondary_player.cards_recently_destroyed:
+                                secondary_player.cards_recently_destroyed.remove(name_card)
+                            found = True
+                        last_index -= 1
+                self.delete_reaction()
         elif current_reaction == "Prototype Crisis Suit":
             if len(primary_player.deck) > 8:
                 self.choices_available = primary_player.deck[:9]

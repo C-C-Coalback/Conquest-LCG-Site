@@ -1055,6 +1055,10 @@ class Player:
         if other_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
             if self.search_card_in_hq("Holding Cell"):
                 on_kill_effects.append("Holding Cell")
+            if self.check_for_trait_given_pos(planet_pos, unit_pos, "Genestealer"):
+                if other_player.get_cost_given_pos(def_pla, def_pos) < 4:
+                    if self.resources > 1 and self.search_hand_for_card("Gene Implantation"):
+                        on_kill_effects.append("Gene Implantation")
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
                 if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
                     on_kill_effects.append("Ravenous Haruspex")
