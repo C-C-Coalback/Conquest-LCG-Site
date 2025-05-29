@@ -1030,6 +1030,11 @@ class Player:
             if self.game.get_red_icon(position):
                 if self.search_for_card_everywhere("Archon Salaine Morn", limit_phase_rel=True):
                     self.game.create_reaction("Archon Salaine Morn", self.name_player, (int(self.number), -1, -1))
+        if card.check_for_a_trait("Kabalite"):
+            for i in range(len(self.cards_in_play[position + 1])):
+                if self.get_ability_given_pos(position, i) == "Kabalite Harriers":
+                    self.game.create_reaction("Kabalite Harriers", self.name_player,
+                                              (int(self.number), position, i))
         if already_exhausted:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
