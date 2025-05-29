@@ -1815,7 +1815,7 @@ class Game:
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.resolving_search_box = False
                         self.reset_choices_available()
-                        self.send_update_message("Choose planet to remove from play")
+                        await self.send_update_message("Choose planet to remove from play")
                     elif self.choice_context == "Choose card to discard for Searing Brand":
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1
