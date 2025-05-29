@@ -4,14 +4,14 @@
   <li><a href="/chat/">Chat</a></li>
   <li><a href="/play/">Play</a></li>
   {% if user.is_authenticated %}
-  <li><p>Logged in as {{ user.username }}</p></li>
-  <li><form action="{% url 'logout' %}" method="post">
+  <li id="loggedin-name" class="pull-right"><p>Logged in as {{ user.username }}</p></li>
+  <li id="log-out-cont" class="pull-right"><form action="{% url 'logout' %}" method="post">
   {% csrf_token %}
-  <button type="submit">Log Out</button>
+  <button id="log-out-button" type="submit">Log Out</button>
   </form></li>
   {% else %}
-  <li><p>You are not logged in</p></li>
-  <li><a href="{% url 'login' %}">Log In</a></li>
-  <li><a href="{% url 'signup' %}">Sign Up</a></li>
+  <li id="sign-up-button" class="pull-right"><a href="{% url 'signup' %}">Sign Up</a></li>
+  <li id="log-in-button" class="pull-right"><a href="{% url 'login' %}">Log In</a></li>
+  <li id="log-out-message" class="pull-right"><p>You are not logged in</p></li>
   {% endif %}
 </ul>

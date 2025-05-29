@@ -11,6 +11,22 @@ ul {
   background-color: #333;
 }
 
+.pull-right {
+    float: right
+}
+
+#loggedin-name {
+    position:absolute;
+    top: 6px;
+    right: 90px;
+}
+
+#log-out-button {
+    position:absolute;
+    top: 20px;
+    right: 20px;
+}
+
 li a {
   display: block;
   color: white;
