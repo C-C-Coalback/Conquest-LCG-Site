@@ -2711,6 +2711,7 @@ class Game:
                         self.choices_available = []
                         self.choice_context = ""
                         self.name_player_making_choices = ""
+                        self.resolving_search_box = False
                         if game_update_string[1] == "0":
                             primary_player.draw_card()
                         elif game_update_string[1] == "1":
