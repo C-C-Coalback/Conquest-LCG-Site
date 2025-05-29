@@ -1705,6 +1705,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard.remove("Lethal Toxin Sacs")
                 primary_player.aiming_reticle_coords_discard = None
                 self.action_cleanup()
+    elif self.action_chosen == "Sudden Adaptation":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Tyranids":
+                        self.misc_counter = primary_player.get_cost_given_pos(planet_pos, unit_pos)
+                        self.misc_target_planet = planet_pos
+                        self.misc_target_choice = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                        primary_player.return_card_to_hand(planet_pos, unit_pos)
+                        self.chosen_first_card = True
     elif self.action_chosen == "Cathedral of Saint Camila":
         if secondary_player.get_number() == game_update_string[1]:
             if self.misc_counter[planet_pos]:

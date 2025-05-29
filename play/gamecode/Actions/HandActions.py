@@ -79,11 +79,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Eldritch Storm":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = "Eldritch Storm"
+                        self.action_chosen = ability
                         self.misc_counter = [False, False, False, False, False, False, False]
                         for i in range(7):
                             if self.get_green_icon(i):
                                 self.misc_counter[i] = True
+                    elif ability == "Sudden Adaptation":
+                        self.chosen_first_card = False
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.misc_counter = 0
+                        self.misc_target_planet = -1
                     elif ability == "Seer's Exodus":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
@@ -705,6 +711,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.chosen_first_card = True
                 primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                 primary_player.aiming_reticle_color = "blue"
+    elif self.action_chosen == "Sudden Adaptation":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_cost() <= self.misc_counter and card.get_card_type() == "Army":
+                if card.get_faction() == "Tyranids" and self.misc_target_choice != card.get_name():
+                    primary_player.add_card_to_planet(card, self.misc_target_planet)
+                    primary_player.remove_card_from_hand(int(game_update_string[2]))
+                    self.action_cleanup()
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card.get_is_unit():
