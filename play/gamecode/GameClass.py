@@ -1928,6 +1928,7 @@ class Game:
                             else:
                                 winner = self.p1
                                 loser = self.p2
+                            self.unit_to_move_position = (-1, -1)
                             self.player_using_battle_ability = winner.name_player
                             if winner.foretell_check():
                                 self.choices_available = ["Yes", "No"]
