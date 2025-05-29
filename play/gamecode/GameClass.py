@@ -740,6 +740,10 @@ class Game:
                     elif self.action_chosen == "Preemptive Barrage":
                         await self.send_update_message("Stopping Preemptive Barrage early")
                         self.action_cleanup()
+                    elif self.action_chosen == "Rapid Assault":
+                        if self.chosen_second_card:
+                            await self.send_update_message("Rapid Assault ended early")
+                            self.action_cleanup()
                     elif self.action_chosen == "Inevitable Betrayal":
                         await self.send_update_message("Finished resolving Inevitable Betrayal")
                         self.p1.reset_all_aiming_reticles_play_hq()

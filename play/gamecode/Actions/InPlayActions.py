@@ -1301,6 +1301,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].has_hive_mind:
                     self.unit_to_move_position = [planet_pos, unit_pos]
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+    elif self.action_chosen == "Rapid Assault":
+        if self.chosen_second_card:
+            if self.misc_target_planet == planet_pos:
+                if game_update_string[1] == primary_player.number:
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kabalite"):
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.misc_counter += 1
+                        if self.misc_counter > 1:
+                            self.action_cleanup()
+                        else:
+                            await self.send_update_message(str(self.misc_counter) + " uses left of Rapid Assault")
     elif self.action_chosen == "Indescribable Horror":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

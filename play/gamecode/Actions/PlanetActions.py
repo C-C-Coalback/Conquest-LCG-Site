@@ -262,6 +262,19 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
                 self.misc_target_unit = (-1, -1)
                 self.action_cleanup()
+    elif self.action_chosen == "Rapid Assault":
+        if not self.chosen_second_card and self.chosen_first_card:
+            self.chosen_second_card = True
+            card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
+            primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
+            if self.get_red_icon(chosen_planet):
+                self.misc_counter = 0
+                self.misc_target_planet = chosen_planet
+                await self.send_update_message("Rapid Assault can ready units at the planet")
+            else:
+                self.action_cleanup()
     elif self.action_chosen == "Killing Field":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             primary_player.cards_in_play[chosen_planet + 1][i].lost_ranged_eop = True

@@ -128,6 +128,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.misc_counter = 3
                             self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
                             self.chosen_first_card = False
+                    elif ability == "Rapid Assault":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        self.chosen_second_card = False
+                        self.misc_counter = 0
                     elif ability == "Despise":
                         self.action_chosen = ability
                         primary_player.sacced_card_for_despise = False
@@ -664,6 +670,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+    elif self.action_chosen == "Rapid Assault":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_card_type() == "Army" and card.check_for_a_trait("Kabalite"):
+                if card.get_cost() < 4:
+                    self.chosen_first_card = True
+                    primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
     elif self.action_chosen == "Canoptek Spyder":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
