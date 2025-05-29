@@ -2,6 +2,7 @@ from .. import FindCard
 
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
+    current_reaction = self.reactions_needing_resolving[0]
     if game_update_string[1] == primary_player.get_number():
         print("hand reaction num ok")
         if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
@@ -37,6 +38,13 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
+        elif current_reaction == "Salvaged Battlewagon":
+            if not self.chosen_first_card:
+                card = primary_player.get_card_in_hand(int(game_update_string[2]))
+                if card.get_faction() == "Orks" and card.get_cost() < 4 and card.get_card_type() == "Army":
+                    primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    primary_player.aiming_reticle_color = "blue"
+                    self.chosen_first_card = True
         elif self.reactions_needing_resolving[0] == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card.check_for_a_trait("Space Wolves"):

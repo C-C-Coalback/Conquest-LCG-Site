@@ -1083,6 +1083,8 @@ class Player:
             return on_kill_effects
         if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Patrolling Wraith":
             on_kill_effects.append("Patrolling Wraith")
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Salvaged Battlewagon":
+            on_kill_effects.append("Salvaged Battlewagon")
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")

@@ -65,6 +65,15 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.add_card_to_planet(card, chosen_planet)
             self.sacaellums_finest_active = True
             self.delete_reaction()
+    elif current_reaction == "Salvaged Battlewagon":
+        if self.chosen_first_card:
+            if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+                card_name = primary_player.cards[primary_player.aiming_reticle_coords_hand]
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                primary_player.add_card_to_planet(card, chosen_planet)
+                primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.delete_reaction()
     elif current_reaction == "Declare the Crusade":
         planet_to_add = self.misc_target_choice
         planet_to_remove = self.planet_array[chosen_planet]
