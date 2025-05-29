@@ -3355,6 +3355,8 @@ class Game:
         self.last_planet_checked_for_battle = -1
         self.p1.muster_the_guard_count = 0
         self.p2.muster_the_guard_count = 0
+        self.p1.master_warpsmith_count = 0
+        self.p2.master_warpsmith_count = 0
         last_phase = self.phase
         self.phase = new_val
         if self.phase == "COMMAND":
