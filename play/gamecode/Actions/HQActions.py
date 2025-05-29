@@ -169,6 +169,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             if self.last_planet_checked_for_battle == -1:
                                 primary_player.exhaust_given_pos(-2, unit_pos)
                                 self.action_chosen = "Kaerux Erameas"
+                    elif ability == "Chaplain Mavros":
+                        if primary_player.headquarters[unit_pos].once_per_phase_used is False:
+                            primary_player.headquarters[unit_pos].once_per_phase_used = 1
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                            self.position_of_actioned_card = (-2, unit_pos)
+                        elif primary_player.headquarters[unit_pos].once_per_phase_used < 2:
+                            primary_player.headquarters[unit_pos].once_per_phase_used += 1
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                            self.position_of_actioned_card = (-2, unit_pos)
                     elif ability == "Troop Transport":
                         self.action_chosen = ability
                         primary_player.sacrifice_card_in_hq(unit_pos)

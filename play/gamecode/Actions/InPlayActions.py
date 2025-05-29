@@ -209,6 +209,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Death Korps Engineers":
                         self.action_chosen = ability
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
+                    elif ability == "Chaplain Mavros":
+                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used is False:
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used = 1
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used < 2:
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used += 1
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Zarathur's Flamers":
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
@@ -1177,10 +1188,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
 
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Chaplain Mavros":
+        if primary_player.get_number() == game_update_string[1]:
+            if self.get_blue_icon(planet_pos):
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+                    self.action_cleanup()
     elif self.action_chosen == "Ancient Keeper of Secrets":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
