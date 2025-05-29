@@ -525,6 +525,10 @@ def resolve_winnings(self, winner, loser, planet_id):
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
             self.create_reaction("Toxic Venomthrope", winner.name_player, (int(winner.get_number()), planet_id, i))
+        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Devourer Venomthrope":
+            if self.infested_planets[planet_id]:
+                self.create_reaction("Devourer Venomthrope", winner.name_player,
+                                     (int(winner.get_number()), planet_id, i))
         attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
         for j in range(len(attachments)):
             if attachments[j].get_ability() == "Noxious Fleshborer":
