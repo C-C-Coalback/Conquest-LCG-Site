@@ -1278,6 +1278,9 @@ class Player:
                             if card.get_ability() == "Doom Scythe Invader":
                                 self.game.create_reaction("Doom Scythe Invader", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Genestealer Brood":
+                                self.game.create_reaction("Genestealer Brood", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kith's Khymeramasters":
                                 self.game.create_reaction("Kith's Khymeramasters", self.name_player,
                                                           (int(self.number), position, location_of_unit))
