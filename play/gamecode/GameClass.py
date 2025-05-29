@@ -1767,7 +1767,6 @@ class Game:
                         self.asking_if_interrupt = False
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
-                            self.already_resolving_interrupt = True
                         elif game_update_string[1] == "1":
                             self.delete_interrupt()
                         self.reset_choices_available()
@@ -4653,8 +4652,10 @@ class Game:
                     self.create_reaction("The Emperor Protects", self.name_2, (2, -1, -1))
 
     async def update_interrupts(self, name, game_update_string, count=0):
+        print("updating")
         if self.interrupts_waiting_on_resolution and not self.already_resolving_interrupt \
                 and not self.already_resolving_reaction:
+            print("not already resolving")
             if count < 10:
                 p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)

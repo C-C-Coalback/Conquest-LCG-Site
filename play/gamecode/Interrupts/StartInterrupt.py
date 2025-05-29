@@ -13,3 +13,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_interrupt()
+        elif self.interrupts_waiting_on_resolution[0] == "M35 Galaxy Lasgun":
+            if "M35 Galaxy Lasgun" in primary_player.discard:
+                primary_player.discard.remove("M35 Galaxy Lasgun")
+                primary_player.cards.append("M35 Galaxy Lasgun")
+            if "M35 Galaxy Lasgun" in primary_player.cards_recently_discarded:
+                primary_player.cards_recently_discarded.remove("M35 Galaxy Lasgun")
+            self.delete_interrupt()
