@@ -719,6 +719,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.add_card_to_planet(card, self.misc_target_planet)
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
                     self.action_cleanup()
+    elif self.action_chosen == "Talyesin's Warlocks":
+        card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card.check_for_a_trait("Warrior"):
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
+            planet_pos, unit_pos = self.position_of_actioned_card
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            self.action_cleanup()
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card.get_is_unit():

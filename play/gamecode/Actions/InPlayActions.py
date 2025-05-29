@@ -236,6 +236,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Talyesin's Warlocks":
+                        if not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_combat_round_used:
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_combat_round_used = True
                     elif ability == "Ancient Keeper of Secrets":
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
