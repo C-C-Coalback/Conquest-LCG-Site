@@ -462,6 +462,18 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.delete_reaction()
+        elif current_reaction == "Sword Brethren Dreadnought":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            self.delete_reaction()
+            self.need_to_resolve_battle_ability = True
+            self.resolving_search_box = True
+            self.battle_ability_to_resolve = self.planet_array[planet_pos]
+            self.player_resolving_battle_ability = primary_player.name_player
+            self.number_resolving_battle_ability = primary_player.number
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Resolve Battle Ability?"
+            self.name_player_making_choices = primary_player.name_player
+            self.tense_negotiations_active = True
         elif current_reaction == "Gene Implantation":
             if primary_player.spend_resources(1):
                 primary_player.discard_card_name_from_hand("Gene Implantation")
