@@ -3715,7 +3715,10 @@ class Player:
 
     def ready_all_at_planet(self, planet_id):
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            self.ready_given_pos(planet_id, i)
+            if self.game.phase != "COMBAT":
+                self.ready_given_pos(planet_id, i)
+            elif not self.search_attachments_at_pos(planet_id, i, "Huge Chain-Choppa"):
+                self.ready_given_pos(planet_id, i)
             if self.game.phase == "HEADQUARTERS":
                 for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
                     self.cards_in_play[planet_id + 1][i].get_attachments()[j].ready_card()
