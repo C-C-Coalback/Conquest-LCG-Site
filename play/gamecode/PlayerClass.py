@@ -824,12 +824,12 @@ class Player:
         if planet == -2:
             card = self.headquarters[position]
             if discard:
-                self.discard.append(card.get_name())
+                self.discard.append(card.get_attachments()[attachment_position].get_name())
             del card.get_attachments()[attachment_position]
         else:
             card = self.cards_in_play[planet + 1][position]
             if discard:
-                self.discard.append(card.get_name())
+                self.discard.append(card.get_attachments()[attachment_position].get_name())
             del card.get_attachments()[attachment_position]
 
     def get_attachment_at_pos(self, planet, position, attachment_position):

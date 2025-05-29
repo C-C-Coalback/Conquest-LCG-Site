@@ -311,10 +311,6 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 primary_player.remove_card_from_hand(self.card_pos_to_deploy)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1
-                if not secondary_player.has_passed:
-                    if self.phase == "DEPLOY":
-                        self.player_with_deploy_turn = secondary_player.get_name_player()
-                        self.number_with_deploy_turn = secondary_player.get_number()
                 self.card_pos_to_deploy = -1
                 self.action_cleanup()
                 self.card_type_of_selected_card_in_hand = ""

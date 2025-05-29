@@ -827,6 +827,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if not self.omega_ambush_active or self.infested_planets[planet_pos]:
             if self.card_type_of_selected_card_in_hand == "Attachment":
                 await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
+    elif self.action_chosen == "Cenobyte Servitor":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            player_getting_attachment = self.p1
+            if game_update_string[1] == "2":
+                player_getting_attachment = self.p2
+            not_own_attachment = False
+            if player_getting_attachment.number != primary_player.number:
+                not_own_attachment = True
+            if player_getting_attachment.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True

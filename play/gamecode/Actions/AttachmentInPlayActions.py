@@ -57,6 +57,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                         action_in_play=True, allowed_phases_in_play="ALL")
                         primary_player.add_card_to_planet(card, planet_pos)
                         self.action_cleanup()
+                    elif ability == "Cenobyte Servitor":
+                        primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        self.chosen_first_card = False
+                        self.action_chosen = ability
                     elif ability == "Saim-Hann Jetbike":
                         self.misc_target_player = player_owning_card.name_player
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

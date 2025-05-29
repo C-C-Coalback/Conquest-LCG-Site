@@ -678,6 +678,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             primary_player.ready_given_pos(planet_pos, unit_pos)
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             self.action_cleanup()
+    elif self.action_chosen == "Cenobyte Servitor":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_card_type() == "Attachment" and card.check_for_a_trait("Relic"):
+                self.chosen_first_card = True
+                primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                primary_player.aiming_reticle_color = "blue"
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card.get_is_unit():

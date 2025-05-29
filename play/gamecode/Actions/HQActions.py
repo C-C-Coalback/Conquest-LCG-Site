@@ -588,6 +588,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     name_card + " got Squiggified!"
                 )
                 self.action_cleanup()
+    elif self.action_chosen == "Cenobyte Servitor":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            player_getting_attachment = self.p1
+            if game_update_string[1] == "2":
+                player_getting_attachment = self.p2
+            not_own_attachment = False
+            if player_getting_attachment.number != primary_player.number:
+                not_own_attachment = True
+            if player_getting_attachment.attach_card(card, -2, unit_pos, not_own_attachment=not_own_attachment):
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

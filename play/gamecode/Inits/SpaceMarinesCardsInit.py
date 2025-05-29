@@ -259,7 +259,8 @@ def space_marines_cards_init():
                                                         "Action: Sacrifice this attachment to put a Relic attachment "
                                                         "into play from your hand attached to an eligible unit.",
                                    "Drone.", 1, faction, "Common", 1, False,
-                                   extra_health=1, required_traits="Black Templars"),
+                                   extra_health=1, required_traits="Black Templars",
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.WarlordCard("Chaplain Mavros", "Action: Deal 1 damage to a target Space Marines unit you "
                                                    "control at a tech planet (blue). The targeted unit gets +1 "
                                                    "ATK until the end of the phase. (Limit twice per phase.)",

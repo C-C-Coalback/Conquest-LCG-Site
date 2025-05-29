@@ -39,6 +39,10 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         primary_player.headquarters[unit_pos].area_effect_eocr += 2
                         self.action_cleanup()
+                elif ability == "Cenobyte Servitor":
+                    primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                    self.chosen_first_card = False
+                    self.action_chosen = ability
                 elif ability == "Mind Shackle Scarab":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
