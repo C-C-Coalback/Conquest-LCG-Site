@@ -3484,9 +3484,6 @@ class Game:
             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                 self.create_reaction("Solarite Avetys", primary_player.name_player,
                                      (int(secondary_player.number), planet_pos, unit_pos))
-        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
-            self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
-                                 (int(primary_player.number), planet_pos, unit_pos))
         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
@@ -3583,17 +3580,27 @@ class Game:
                         print("\n\nSAVED ON KILL EFFECTS\n\n", self.on_kill_effects_of_attacker)
                         self.checks_on_damage_from_attack(primary_player, secondary_player, planet_pos, unit_pos)
                     else:
-                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
-                                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                         (int(primary_player.number), planet_pos, unit_pos))
-                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                         self.damage_taken_was_from_attack.append(False)
                         self.positions_of_attacker_of_unit_that_took_damage.append(None)
                         self.faction_of_attacker.append("")
                         self.card_names_that_caused_damage.append(self.card_names_triggering_damage[0])
                         self.on_kill_effects_of_attacker.append([])
+                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
+                        self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
+                                             (int(primary_player.number), planet_pos, unit_pos))
+                    if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                        if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                            primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
+                            if primary_player.resources > 0:
+                                if primary_player.search_hand_for_card("Vow of Honor"):
+                                    if not primary_player.check_if_already_have_reaction("Vow of Honor"):
+                                        self.create_reaction("Vow of Honor", primary_player.name_player,
+                                                             (int(primary_player.number), -1, -1))
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                            if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                     (int(primary_player.number), planet_pos, unit_pos))
+                                self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif not self.damage_is_preventable[0]:
                 await self.send_update_message("Damage is not preventable; you must pass")
@@ -3712,24 +3719,41 @@ class Game:
                                                 self.checks_on_damage_from_attack(primary_player, secondary_player,
                                                                                   planet_pos, unit_pos)
                                             else:
-                                                if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                    if primary_player.get_ability_given_pos(
-                                                            planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                                                        if primary_player.search_card_at_planet(
-                                                                planet_pos, "Ba'ar Zul the Hate-Bound"):
-                                                            self.create_reaction("Ba'ar Zul the Hate-Bound",
-                                                                                 primary_player.name_player,
-                                                                                 (
-                                                                                 int(primary_player.number), planet_pos,
-                                                                                 unit_pos))
-                                                            self.damage_amounts_baarzul.append(
-                                                                self.amount_that_can_be_removed_by_shield[0])
+
                                                 self.damage_taken_was_from_attack.append(False)
                                                 self.positions_of_attacker_of_unit_that_took_damage.append(None)
                                                 self.faction_of_attacker.append("")
                                                 self.card_names_that_caused_damage.append(
                                                     self.card_names_triggering_damage[0])
                                                 self.on_kill_effects_of_attacker.append([])
+                                            if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                                if primary_player.get_faction_given_pos(planet_pos,
+                                                                                        unit_pos) == "Space Marines":
+                                                    primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
+                                                    if primary_player.resources > 0:
+                                                        if primary_player.search_hand_for_card("Vow of Honor"):
+                                                            if not primary_player.check_if_already_have_reaction(
+                                                                    "Vow of Honor"):
+                                                                self.create_reaction("Vow of Honor",
+                                                                                     primary_player.name_player,
+                                                                                     (int(primary_player.number),
+                                                                                      -1, -1))
+                                                if primary_player.get_ability_given_pos(
+                                                        planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
+                                                    if primary_player.search_card_at_planet(
+                                                            planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                                        self.create_reaction("Ba'ar Zul the Hate-Bound",
+                                                                             primary_player.name_player,
+                                                                             (
+                                                                                 int(primary_player.number), planet_pos,
+                                                                                 unit_pos))
+                                                        self.damage_amounts_baarzul.append(
+                                                            self.amount_that_can_be_removed_by_shield[0])
+                                            if primary_player.get_ability_given_pos(
+                                                    planet_pos, unit_pos) == "Zogwort's Runtherders":
+                                                self.create_reaction("Zogwort's Runtherders",
+                                                                     primary_player.name_player,
+                                                                     (int(primary_player.number), planet_pos, unit_pos))
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
                                 await self.send_update_message("This damage can not be shielded!")
@@ -4889,7 +4913,12 @@ class Game:
                 planet = self.last_planet_checked_for_battle
                 name_player_who_resolved_attack = ""
                 if planet > -1:
+                    for i in range(len(self.p1.headquarters)):
+                        self.p1.headquarters[i].valid_target_vow_of_honor = False
+                    for i in range(len(self.p2.headquarters)):
+                        self.p2.headquarters[i].valid_target_vow_of_honor = False
                     for i in range(len(self.p1.cards_in_play[planet + 1])):
+                        self.p1.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_1
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
@@ -4904,6 +4933,7 @@ class Game:
                                 elif not self.p1.get_immune_to_enemy_events(planet, i):
                                     self.p1.assign_damage_to_pos(planet, i, 1)
                     for i in range(len(self.p2.cards_in_play[planet + 1])):
+                        self.p2.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_2
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":

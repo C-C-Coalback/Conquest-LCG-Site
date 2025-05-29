@@ -265,6 +265,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
                     self.delete_reaction()
+        elif current_reaction == "Vow of Honor":
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor:
+                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
+                self.delete_reaction()
+                target_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                await self.send_update_message(target_name + " got +3 ATK from Vow of Honor")
+                if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):
+                    self.create_reaction("Vow of Honor", primary_player.name_player,
+                                         (int(primary_player.number), -1, -1))
         elif self.reactions_needing_resolving[0] == "Kabalite Harriers":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":

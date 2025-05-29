@@ -2617,6 +2617,13 @@ class Player:
                     return True
         return False
 
+    def set_vow_of_honor(self, planet_pos, unit_pos, value):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].valid_target_vow_of_honor = value
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor = value
+        return None
+
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
                              context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False):
         if shadow_field_possible:
