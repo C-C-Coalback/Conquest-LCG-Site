@@ -21,8 +21,10 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             if name == self.name_1:
                 self.p1.has_passed = True
+                await self.send_update_message(self.name_1 + " is ready to move on to the next round.")
             elif name == self.name_2:
                 self.p2.has_passed = True
+                await self.send_update_message(self.name_2 + " is ready to move on to the next round.")
             if self.p1.has_passed and self.p2.has_passed:
                 self.automated_headquarters_phase()
                 await self.change_phase("DEPLOY")
@@ -31,8 +33,6 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
 
 def headquarters_phase(p_one, p_two, round_number):
     print("hq:", round_number)
-    p_one.set_phase("Headquarters")
-    p_two.set_phase("Headquarters")
     p_one.ready_all_in_play()
     p_two.ready_all_in_play()
     p_one.add_resources(4)
