@@ -343,6 +343,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("The Plaguefather's Banner", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
+                            if player.check_for_trait_given_pos(self.attacker_planet, self.attacker_position, "Psyker"):
+                                for i in range(7):
+                                    if i != self.attacker_planet:
+                                        for j in range(len(player.cards_in_play[i + 1])):
+                                            if player.get_ability_given_pos(i, j) == "Talyesin's Spiders":
+                                                self.create_reaction("Talyesin's Spiders", player.name_player,
+                                                                     (int(player.number), i, j))
                 elif self.defender_position == -1:
                     can_continue = False
                     if int(game_update_string[2]) == self.attacker_planet:

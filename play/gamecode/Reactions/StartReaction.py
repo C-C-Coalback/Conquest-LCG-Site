@@ -570,6 +570,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Inspirational Fervor")
             else:
                 self.delete_reaction()
+        elif current_reaction == "Talyesin's Spiders":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.attacker_planet)
+            self.delete_reaction()
         elif current_reaction == "Hostile Acquisition":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.spend_resources(1):
@@ -593,9 +597,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             planet_1 = planet_pos - 1
             planet_2 = planet_pos + 1
             if 7 > planet_1 > -1:
-                primary_player.summon_token_at_planet("Termagant", planet_1)
+                if self.planets_in_play_array[planet_1]:
+                    primary_player.summon_token_at_planet("Termagant", planet_1)
             if 7 > planet_2 > -1:
-                primary_player.summon_token_at_planet("Termagant", planet_2)
+                if self.planets_in_play_array[planet_2]:
+                    primary_player.summon_token_at_planet("Termagant", planet_2)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Packmaster Kith":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
