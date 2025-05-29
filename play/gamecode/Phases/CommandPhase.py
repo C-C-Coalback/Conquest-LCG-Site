@@ -522,11 +522,9 @@ def resolve_winnings(self, winner, loser, planet_id):
         winner.summon_token_at_planet("Guardsman", planet_id)
     for i in range(len(winner.cards_in_play[planet_id + 1])):
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
-            winner.set_aiming_reticle_in_play(planet_id, i, "blue")
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
-            winner.set_aiming_reticle_in_play(planet_id, i, "blue")
-            self.create_reaction("Toxic Venomthrope", winner.name_player, ("1", planet_id, i))
+            self.create_reaction("Toxic Venomthrope", winner.name_player, (int(winner.get_number()), planet_id, i))
         attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
         for j in range(len(attachments)):
             if attachments[j].get_ability() == "Noxious Fleshborer":
@@ -534,6 +532,10 @@ def resolve_winnings(self, winner, loser, planet_id):
                     already_noxious = True
                     own = attachments[j].name_owner
                     self.create_reaction("Noxious Fleshborer", own, (int(winner.number), planet_id, i))
+            if attachments[j].get_ability() == "Staff of Change":
+                own = attachments[j].name_owner
+                if own == winner.name_player:
+                    self.create_reaction("Staff of Change", own, (int(winner.get_number()), planet_id, i))
     return ret_val
 
 
