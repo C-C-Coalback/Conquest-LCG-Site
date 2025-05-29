@@ -228,17 +228,26 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         chosen_planet = int(game_update_string[2])
                         chosen_unit = int(game_update_string[3])
                         valid_unit = False
+                        if self.number_with_combat_turn == "1":
+                            player = self.p1
+                        else:
+                            player = self.p2
                         if chosen_planet == self.last_planet_checked_for_battle:
-                            if self.number_with_combat_turn == "1":
-                                player = self.p1
-                            else:
-                                player = self.p2
                             can_continue = False
                             if self.ranged_skirmish_active:
+                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
+                                    if player.cards_in_play[chosen_planet + 1][i].emperor_champion_active:
+                                        if player.get_ready_given_pos(chosen_planet, i):
+                                            if player.get_ranged_given_pos(chosen_planet, i):
+                                                chosen_unit = i
                                 is_ranged = player.get_ranged_given_pos(chosen_planet, chosen_unit)
                                 if is_ranged:
                                     can_continue = True
                             else:
+                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
+                                    if player.cards_in_play[chosen_planet + 1][i].emperor_champion_active:
+                                        if player.get_ready_given_pos(chosen_planet, i):
+                                            chosen_unit = i
                                 can_continue = True
                             if can_continue:
                                 is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
@@ -251,11 +260,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.resolving_search_box = True
                                     print("Unit ready, can be used")
                                     valid_unit = True
-                                    player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
-                                    player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
                                 else:
                                     print("Unit not ready")
                         if valid_unit:
+                            player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
+                            player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
                             self.attacker_planet = chosen_planet
                             self.attacker_position = chosen_unit
                             self.may_move_defender = True
@@ -344,15 +353,24 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     if can_continue:
                         if game_update_string[1] != self.number_with_combat_turn:
                             armorbane_check = False
-                            self.defender_planet = int(game_update_string[2])
-                            self.defender_position = int(game_update_string[3])
-                            print("Defender:", self.defender_planet, self.defender_position)
                             if self.number_with_combat_turn == "1":
                                 primary_player = self.p1
                                 secondary_player = self.p2
                             else:
                                 primary_player = self.p2
                                 secondary_player = self.p1
+                            u_pos = int(game_update_string[3])
+                            if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                    emperor_champion_active:
+                                for i in range(len(secondary_player.cards_in_play[self.attacker_planet + 1])):
+                                    if secondary_player.get_name_given_pos(self.attacker_planet, i) == \
+                                            "The Emperor's Champion":
+                                        u_pos = i
+                            primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                                emperor_champion_active = False
+                            self.defender_planet = int(game_update_string[2])
+                            self.defender_position = u_pos
+                            print("Defender:", self.defender_planet, self.defender_position)
                             attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
                             can_continue = True

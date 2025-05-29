@@ -24,6 +24,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 print("reached new in play unit action")
                 ability = card_chosen.get_ability(bloodied_relevant=True)
+                self.position_of_actioned_card = (planet_pos, unit_pos)
                 if player_owning_card.name_player != name:
                     if ability == "Sslyth Mercenary":
                         if primary_player.spend_resources(2):
@@ -142,6 +143,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                    elif ability == "The Emperor's Champion":
+                        if not card_chosen.once_per_combat_round_used:
+                            card_chosen.once_per_combat_round_used = True
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif ability == "Ba'ar Zul's Cleavers":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -1442,6 +1448,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "The Emperor's Champion":
+        if game_update_string[1] == secondary_player.get_number() and planet_pos == self.position_of_actioned_card[0]:
+            can_continue = True
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "In Play Action"
+                    if can_continue:
+                        secondary_player.cards_in_play[planet_pos + 1][unit_pos].emperor_champion_active = True
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
+                        self.position_of_actioned_card = (-1, -1)
+                        self.action_cleanup()
     elif self.action_chosen == "Teleportarium":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:

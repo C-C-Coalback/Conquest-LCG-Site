@@ -42,6 +42,7 @@ class Card:
         self.is_faction_limited_unique_discounter = is_faction_limited_unique_discounter
         self.limited = limited
         self.counter = 0
+        self.emperor_champion_active = False
         self.sacrifice_end_of_phase = False
         self.has_hive_mind = False
         self.resolving_attack = False
