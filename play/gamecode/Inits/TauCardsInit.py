@@ -239,7 +239,7 @@ def tau_cards_init():
         CardClasses.AttachmentCard("Drone Defense System", "Attach to a Pilot or Vehicle unit.\n"
                                                            "Combat Action: Exhaust attached unit to deal 2 damage to"
                                                            " each exhausted enemy unit at this planet.", "Hardpoint.",
-                                   1, faction, "Common", 1, False, required_traits="Vehicle",
+                                   1, faction, "Common", 1, False, required_traits="Vehicle/Pilot",
                                    type_of_units_allowed_for_attachment="Army", action_in_play=True,
                                    allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Sae'lum Pioneer", "While this unit is at a Material planet (red), it gains: "

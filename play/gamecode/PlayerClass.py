@@ -891,8 +891,12 @@ class Player:
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
         if card.required_traits not in target_card.get_traits():
-            print("Wrong traits.")
-            return False
+            if card.get_name() == "Drone Defense System":
+                if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+                    return False
+            else:
+                print("Wrong traits.")
+                return False
         if card.forbidden_traits in target_card.get_traits():
             return False
         if card.unit_must_be_unique:
