@@ -77,6 +77,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.action_chosen = ability
                             self.misc_target_planet = warlord_planet
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
+                    elif ability == "Eldritch Storm":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = "Eldritch Storm"
+                        self.misc_counter = [False, False, False, False, False, False, False]
+                        for i in range(7):
+                            if self.get_green_icon(i):
+                                self.misc_counter[i] = True
                     elif ability == "Seer's Exodus":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:

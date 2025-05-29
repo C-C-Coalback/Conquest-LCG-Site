@@ -749,10 +749,12 @@ class Game:
                         self.p1.reset_all_aiming_reticles_play_hq()
                         self.p2.reset_all_aiming_reticles_play_hq()
                         self.action_cleanup()
-                    elif self.action_chosen == "Cathedral of Saint Camila":
+                    elif self.action_chosen == "Cathedral of Saint Camila" or self.action_chosen == "Eldritch Storm":
+                        await self.send_update_message("Finished " + self.action_chosen)
                         self.misc_counter = 0
                         self.action_cleanup()
                     elif self.action_chosen == "Biomass Sacrifice":
+                        await self.send_update_message("Finished " + self.action_chosen)
                         self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
