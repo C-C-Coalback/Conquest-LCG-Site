@@ -28,7 +28,8 @@ def neutral_cards_init():
         CardClasses.AttachmentCard("Promotion", "Limited.\nAttach to an army unit.\n"
                                                 "Attached unit gains 2 command icons.", "Skill.",
                                    0, "Neutral", "Common", 1, False, limited=True,
-                                   type_of_units_allowed_for_attachment="Army"),
+                                   type_of_units_allowed_for_attachment="Army",
+                                   extra_command=2),
         CardClasses.ArmyCard("Freebooter Kaptain", "Army units with printed cost 2 or lower do not count their command "
                                                    "icons during command struggles at this planet.", "Ally.",
                              3, "Neutral", "Common", 3, 3, 1, False),

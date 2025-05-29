@@ -1928,6 +1928,7 @@ class Game:
                             else:
                                 winner = self.p1
                                 loser = self.p2
+                                "No Mercy"
                             self.unit_to_move_position = (-1, -1)
                             self.player_using_battle_ability = winner.name_player
                             if winner.foretell_check():
@@ -3612,6 +3613,7 @@ class Game:
                         hand_pos = int(game_update_string[2])
                         shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos)
                         alt_shield_check = False
+                        self.pos_shield_card = hand_pos
                         if alt_shields:
                             if primary_player.cards[hand_pos] in self.alternative_shields:
                                 if primary_player.cards[hand_pos] == "Indomitable":
@@ -3620,7 +3622,6 @@ class Game:
                                             if primary_player.get_faction_given_pos(
                                                     planet_pos, unit_pos) == "Space Marines":
                                                 alt_shield_check = True
-                                                self.pos_shield_card = hand_pos
                                                 self.choices_available = ["Shield", "Effect"]
                                                 self.name_player_making_choices = name
                                                 self.choice_context = "Use alternative shield effect?"
@@ -3629,7 +3630,6 @@ class Game:
                                     if primary_player.resources > 0:
                                         if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                             alt_shield_check = True
-                                            self.pos_shield_card = hand_pos
                                             self.choices_available = ["Shield", "Effect"]
                                             self.name_player_making_choices = name
                                             self.choice_context = "Use alternative shield effect?"
