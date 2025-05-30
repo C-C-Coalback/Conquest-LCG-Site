@@ -493,10 +493,27 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.discard_card_at_random()
             self.delete_reaction()
         elif current_reaction == "Outflank'em":
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Outflank'em")
-                self.player_with_combat_turn = primary_player.name_player
-                self.number_with_combat_turn = primary_player.number
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       current_reaction + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Outflank'em")
+                        self.player_with_combat_turn = primary_player.name_player
+                        self.number_with_combat_turn = primary_player.number
+                    self.delete_reaction()
             self.delete_reaction()
         elif current_reaction == "Taurox APC":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -544,24 +561,42 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = primary_player.name_player
             self.tense_negotiations_active = True
         elif current_reaction == "Gene Implantation":
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Gene Implantation")
-                name_card = self.name_of_attacked_unit
-                planet = self.last_planet_checked_for_battle
-                if name_card in secondary_player.discard:
-                    card = FindCard.find_card(name_card, self.card_array, self.cards_dict)
-                    primary_player.add_card_to_planet(card, planet, is_owner_of_card=False)
-                    last_index = len(secondary_player.discard) - 1
-                    found = False
-                    while last_index > -1 and not found:
-                        if secondary_player.discard[last_index] == name_card:
-                            del secondary_player.discard[last_index]
-                            if name_card in secondary_player.cards_recently_discarded:
-                                secondary_player.cards_recently_discarded.remove(name_card)
-                            if name_card in secondary_player.cards_recently_destroyed:
-                                secondary_player.cards_recently_destroyed.remove(name_card)
-                            found = True
-                        last_index -= 1
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       current_reaction + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Gene Implantation")
+                        name_card = self.name_of_attacked_unit
+                        planet = self.last_planet_checked_for_battle
+                        if name_card in secondary_player.discard:
+                            card = FindCard.find_card(name_card, self.card_array, self.cards_dict)
+                            primary_player.add_card_to_planet(card, planet, is_owner_of_card=False)
+                            last_index = len(secondary_player.discard) - 1
+                            found = False
+                            while last_index > -1 and not found:
+                                if secondary_player.discard[last_index] == name_card:
+                                    del secondary_player.discard[last_index]
+                                    if name_card in secondary_player.cards_recently_discarded:
+                                        secondary_player.cards_recently_discarded.remove(name_card)
+                                    if name_card in secondary_player.cards_recently_destroyed:
+                                        secondary_player.cards_recently_destroyed.remove(name_card)
+                                    found = True
+                                last_index -= 1
+                        self.delete_reaction()
+            else:
                 self.delete_reaction()
         elif current_reaction == "Prototype Crisis Suit":
             if len(primary_player.deck) > 8:
@@ -617,11 +652,29 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.attacker_planet)
             self.delete_reaction()
         elif current_reaction == "Hostile Acquisition":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Hostile Acquisition")
-                self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
-            self.delete_reaction()
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       current_reaction + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Hostile Acquisition")
+                        self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+                    self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Sacaellum Infestors":
             primary_player.exhaust_card_in_hq_given_name("Sacaellum Infestors")
             self.resolving_search_box = True
@@ -832,8 +885,26 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif current_reaction == "Vow of Honor":
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Vow of Honor")
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play Vow of Honor" +
+                                                       "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = "Vow of Honor"
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Vow of Honor")
+                    else:
+                        self.delete_reaction()
             else:
                 self.delete_reaction()
         elif current_reaction == "Salvaged Battlewagon":

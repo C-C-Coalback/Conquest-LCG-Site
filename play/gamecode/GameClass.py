@@ -1210,9 +1210,10 @@ class Game:
                 await CommandPhase.update_game_event_command_section(self, self.first_player_nullified,
                                                                      new_string_list)
                 self.nullify_enabled = True
-            elif self.nullify_context == "Cry of the Wind":
-                primary_player.discard_card_name_from_hand("Cry of the Wind")
-                self.chosen_first_card = False
+            elif self.nullify_context == "Reaction Event":
+                self.nullify_enabled = False
+                await StartReaction.start_resolving_reaction(self, "", [])
+                self.nullify_enabled = True
             elif self.nullify_context == "Win Battle Reaction Event":
                 self.nullify_enabled = False
                 await StartReaction.start_resolving_reaction(self, "", [])
