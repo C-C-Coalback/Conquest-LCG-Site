@@ -132,6 +132,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.misc_counter = 0
+                    elif ability == "Nesting Chamber":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
                     elif ability == "Ork Landa":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))

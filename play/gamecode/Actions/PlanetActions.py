@@ -360,6 +360,15 @@ async def update_game_event_action_planet(self, name, game_update_string):
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
+    elif self.action_chosen == "Nesting Chamber":
+        if not self.infested_planets[chosen_planet]:
+            num_genestealers = 0
+            for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                if primary_player.check_for_trait_given_pos(chosen_planet, i, "Genestealer"):
+                    num_genestealers += 1
+            if num_genestealers > 1:
+                self.infest_planet(chosen_planet)
+        self.action_cleanup()
     elif self.action_chosen == "Archon's Palace":
         self.misc_target_planet = chosen_planet
         self.choices_available = ["Cards", "Resources"]
