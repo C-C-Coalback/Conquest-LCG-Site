@@ -11,6 +11,13 @@ ul {
   background-color: #333;
 }
 
+.avatar {
+    position:absolute;
+    width: 40px;
+    height: 40px;
+    right: 90px;
+}
+
 .pull-right {
     float: right
 }
@@ -18,7 +25,7 @@ ul {
 #loggedin-name {
     position:absolute;
     top: 6px;
-    right: 90px;
+    right: 140px;
 }
 
 #log-out-button {

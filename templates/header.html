@@ -3,7 +3,9 @@
   <li><a href="/decks/">Decks</a></li>
   <li><a href="/chat/">Chat</a></li>
   <li><a href="/play/">Play</a></li>
+  <!-- "/static/images/ProfilePictures/{{ user.username }}" -->
   {% if user.is_authenticated %}
+  <li id="avatar" class="pull-right"><img class="avatar" src="static/images/defaultprofile.jpg" alt="Not Found"></li>
   <li id="loggedin-name" class="pull-right"><p>Logged in as {{ user.username }}</p></li>
   <li id="log-out-cont" class="pull-right"><form action="{% url 'logout' %}" method="post">
   {% csrf_token %}
