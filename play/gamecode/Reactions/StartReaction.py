@@ -504,12 +504,31 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.move_unit_to_planet(planet_pos, unit_pos, destination)
             self.delete_reaction()
         elif current_reaction == "Declare the Crusade":
-            if primary_player.spend_resources(2):
-                primary_player.discard_card_name_from_hand("Declare the Crusade")
-                self.choices_available = self.planets_removed_from_game
-                self.choice_context = "Which planet to add (DtC)"
-                self.name_player_making_choices = primary_player.name_player
-                self.resolving_search_box = True
+            if primary_player.resources > 1:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Declare the Crusade; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Declare the Crusade"
+                    self.cost_card_nullified = 2
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Win Battle Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(2):
+                        primary_player.discard_card_name_from_hand("Declare the Crusade")
+                        self.choices_available = self.planets_removed_from_game
+                        self.choice_context = "Which planet to add (DtC)"
+                        self.name_player_making_choices = primary_player.name_player
+                        self.resolving_search_box = True
+                    else:
+                        self.delete_reaction()
             else:
                 self.delete_reaction()
         elif current_reaction == "Sword Brethren Dreadnought":
@@ -566,12 +585,31 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.attack_being_resolved = False
             self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
-            if primary_player.spend_resources(1):
-                self.chosen_first_card = False
-                self.misc_target_planet = self.last_planet_checked_for_battle
-                self.misc_target_unit = (-1, -1)
-                self.misc_target_unit_2 = (-1, -1)
-                primary_player.discard_card_name_from_hand("Inspirational Fervor")
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Inspirational Fervor; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Inspirational Fervor"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Win Battle Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        self.chosen_first_card = False
+                        self.misc_target_planet = self.last_planet_checked_for_battle
+                        self.misc_target_unit = (-1, -1)
+                        self.misc_target_unit_2 = (-1, -1)
+                        primary_player.discard_card_name_from_hand("Inspirational Fervor")
+                    else:
+                        self.delete_reaction()
             else:
                 self.delete_reaction()
         elif current_reaction == "Talyesin's Spiders":
@@ -818,12 +856,31 @@ async def start_resolving_reaction(self, name, game_update_string):
             cost = 0
             if primary_player.urien_relevant:
                 cost += 1
-            if primary_player.spend_resources(cost):
-                primary_player.discard_card_name_from_hand("Gut and Pillage")
-                primary_player.add_resources(3)
-                primary_player.gut_and_pillage_used = True
-                await primary_player.dark_eldar_event_played()
-            self.delete_reaction()
+            if primary_player.resources >= cost:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Gut and Pillage; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Gut and Pillage"
+                    self.cost_card_nullified = cost
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Win Battle Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(cost):
+                        primary_player.discard_card_name_from_hand("Gut and Pillage")
+                        primary_player.add_resources(3)
+                        primary_player.gut_and_pillage_used = True
+                        await primary_player.dark_eldar_event_played()
+                    self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Last Breath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos != -2:
@@ -852,16 +909,35 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Accept Any Challenge":
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Accept Any Challenge")
-                planet_pos = self.last_planet_checked_for_battle
-                count = 0
-                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                    if primary_player.check_for_trait_given_pos(planet_pos, i, "Black Templars"):
-                        count += 1
-                for i in range(count):
-                    primary_player.draw_card()
-            self.delete_reaction()
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Accept Any Challenge; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Accept Any Challenge"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Win Battle Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Accept Any Challenge")
+                        planet_pos = self.last_planet_checked_for_battle
+                        count = 0
+                        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                            if primary_player.check_for_trait_given_pos(planet_pos, i, "Black Templars"):
+                                count += 1
+                        for i in range(count):
+                            primary_player.draw_card()
+                    self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Earth Caste Technician":
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6

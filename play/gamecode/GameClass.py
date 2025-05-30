@@ -312,6 +312,8 @@ class Game:
         self.omega_ambush_active = False
         self.shadow_thorns_body_allowed = True
         self.sacaellums_finest_active = False
+        self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
+                                                 "Declare the Crusade", "Gut and Pillage"]
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -1211,6 +1213,10 @@ class Game:
             elif self.nullify_context == "Cry of the Wind":
                 primary_player.discard_card_name_from_hand("Cry of the Wind")
                 self.chosen_first_card = False
+            elif self.nullify_context == "Win Battle Reaction Event":
+                self.nullify_enabled = False
+                await StartReaction.start_resolving_reaction(self, "", [])
+                self.nullify_enabled = True
             elif self.nullify_context == "Primal Howl":
                 primary_player.discard_card_name_from_hand("Primal Howl")
                 for _ in range(3):
@@ -1333,6 +1339,12 @@ class Game:
                     if self.nullified_card_name == "Cry of the Wind":
                         if primary_player.search_hand_for_card("Cry of the Wind"):
                             self.create_reaction("Cry of the Wind", primary_player.name_player,
+                                                 (int(primary_player.number), -1, -1))
+                    self.delete_reaction()
+                elif self.nullify_context == "Win Battle Reaction Event":
+                    if self.nullified_card_name in self.list_reactions_on_winning_combat:
+                        if primary_player.search_hand_for_card(self.nullified_card_name):
+                            self.create_reaction(self.nullified_card_name, primary_player.name_player,
                                                  (int(primary_player.number), -1, -1))
                     self.delete_reaction()
                 primary_player.aiming_reticle_coords_hand = None
