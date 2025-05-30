@@ -9,18 +9,23 @@ import os
 
 
 def simple_upload(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.FILES.get('file'):
         if request.user.is_authenticated:
             username = request.user.username
             files = request.FILES['file']
             print('got here')
             cwd = os.getcwd()
-            destination = cwd + "/staticfiles/images/ProfilePictures/"
+            destination = cwd + "/media/"
             destination = destination + username + ".jpg"
+            if os.path.exists(destination):
+                os.remove(destination)
+            destination = username + ".jpg"
             print(destination)
             file_data = files.read()
             print(len(file_data))
-            img = Image.open(files)
-            img.save(destination)
-        return redirect("/")
+            fs = FileSystemStorage()
+            file_name = fs.save(destination, files)
+            # img = Image.open(files)
+            # img.save(destination)
+    return redirect("/")
 

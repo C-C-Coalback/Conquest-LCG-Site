@@ -6,7 +6,7 @@
   <!-- "/static/images/ProfilePictures/{{ user.username }}" -->
   {% if user.is_authenticated %}
   <li id="avatar" class="pull-right">
-    <img id="temp" class="avatar" src="/static/images/ProfilePictures/{{ user.username }}.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
+    <img id="temp" class="avatar" src="/media/{{ user.username }}.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
   </li>
   <li id="loggedin-name" class="pull-right"><p>Logged in as {{ user.username }}</p></li>
   <li id="log-out-cont" class="pull-right"><form action="{% url 'logout' %}" method="post">
