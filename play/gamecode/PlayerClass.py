@@ -1675,6 +1675,10 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Warriors of Gidrim":
             if self.count_non_necron_factions() > 1:
                 command += 1
+        if self.get_faction_given_pos(planet_id, unit_id) == "Orks":
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+                if self.search_card_in_hq("Painboy Tent"):
+                    command += 1
         return command
 
     def count_command_at_planet(self, planet_id, fbk=False):
