@@ -3457,6 +3457,11 @@ class Game:
         self.create_reactions_phase_begins()
 
     async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
+        if card.get_faction() == "Astra Militarum":
+            for i in range(len(player.attachments_at_planet[planet_chosen])):
+                if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
+                    if card.get_cost() - self.discounts_applied > 1:
+                        self.discounts_applied += 1
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
             self.discounts_applied += num_termagants
@@ -3481,6 +3486,11 @@ class Game:
             self.discounts_applied -= 1
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
+        if card.get_faction() == "Astra Militarum":
+            for i in range(len(player.attachments_at_planet[planet_chosen])):
+                if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
+                    if card.get_cost() - self.available_discounts > 1:
+                        self.available_discounts += 1
         self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
                                                                   card.get_traits(),
                                                                   planet_chosen=planet_chosen)

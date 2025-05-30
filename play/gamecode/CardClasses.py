@@ -704,7 +704,7 @@ class AttachmentCard(Card):
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
                  extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS",
-                 planet_attachment=False, ambush=False):
+                 planet_attachment=False, ambush=False, blue_required=False, green_required=False, red_required=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
@@ -722,6 +722,9 @@ class AttachmentCard(Card):
         self.required_traits = required_traits
         self.forbidden_traits = forbidden_traits
         self.planet_attachment = planet_attachment
+        self.blue_required = blue_required
+        self.red_required = red_required
+        self.green_required = green_required
         self.defense_battery_activated = False
 
     def get_extra_command(self):

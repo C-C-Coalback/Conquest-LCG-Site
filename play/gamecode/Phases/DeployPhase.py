@@ -150,6 +150,15 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             if card.get_unique():
                                 if player.search_for_unique_card(card.get_name()):
                                     can_continue = False
+                            if card.red_required:
+                                if not self.get_red_icon(planet_chosen):
+                                    can_continue = False
+                            if card.blue_required:
+                                if not self.get_blue_icon(planet_chosen):
+                                    can_continue = False
+                            if card.green_required:
+                                if not self.get_green_icon(planet_chosen):
+                                    can_continue = False
                             if can_continue:
                                 cost = card.get_cost()
                                 discounts = player.search_hq_for_discounts("", "", is_attachment=True)

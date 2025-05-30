@@ -308,6 +308,6 @@ def astra_militarum_cards_init():
         CardClasses.AttachmentCard("Imperial Rally Point", "Attach to a Stronghold planet (green).\n"
                                                            "Reduce the cost of each Astra Militarum unit you deploy "
                                                            "at this planet by 1 (to a minimum of 1).", "Location.",
-                                   1, faction, "Common", 1, False, planet_attachment=True)
+                                   1, faction, "Common", 1, False, planet_attachment=True, green_required=True)
     ]
     return astra_militarum_cards_array
