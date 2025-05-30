@@ -1836,6 +1836,28 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Ymgarl Factor gains:":
+                        planet_pos, unit_pos = self.misc_target_unit
+                        if self.choices_available[int(game_update_string[1])] == "+2 ATK":
+                            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
+                            if planet_pos == -2:
+                                current_attack = primary_player.headquarters[unit_pos].extra_attack_until_end_of_phase
+                            else:
+                                current_attack = primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                    .extra_attack_until_end_of_phase
+                            await self.send_update_message("Gained +2 ATK! Now has +" + str(current_attack) + " ATK.")
+                        elif self.choices_available[int(game_update_string[1])] == "+2 HP":
+                            if planet_pos == -2:
+                                primary_player.headquarters[unit_pos].positive_hp_until_eop += 2
+                                current_health = primary_player.headquarters[unit_pos].positive_hp_until_eop
+                            else:
+                                primary_player.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop += 2
+                                current_health = primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                    positive_hp_until_eop
+                            await self.send_update_message("Gained +2 HP! Now has +" + str(current_health) + " HP.")
+                        self.action_cleanup()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Suffer Rakarth's Experimentations":
                         if game_update_string[1] == "0":
                             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()

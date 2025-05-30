@@ -39,6 +39,14 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         primary_player.headquarters[unit_pos].area_effect_eocr += 2
                         self.action_cleanup()
+                elif ability == "Ymgarl Factor":
+                    if primary_player.spend_resources(1):
+                        self.action_chosen = ability
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.choices_available = ["+2 ATK", "+2 HP"]
+                        self.choice_context = "Ymgarl Factor gains:"
+                        self.name_player_making_choices = primary_player.get_name_player()
+                        self.resolving_search_box = True
                 elif ability == "Cenobyte Servitor":
                     primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                     self.chosen_first_card = False
