@@ -462,7 +462,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                 can_continue = True
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
-                if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
                 elif possible_interrupts:
@@ -484,12 +484,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -498,7 +492,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         can_continue = True
         if player_being_hit.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
-            if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+            if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
@@ -522,12 +516,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.amount_spend_for_tzeentch_firestorm = -1
                 self.action_cleanup()
     elif self.action_chosen == "Hate":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -563,12 +551,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.get_number()
     elif self.action_chosen == "Twisted Laboratory":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -598,13 +580,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     "Twisted Laboratory used on " + player_being_hit.headquarters[unit_pos].get_name()
                     + ", located at HQ, position " + str(unit_pos))
                 self.position_of_actioned_card = (-1, -1)
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Squiggify":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -616,7 +592,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Army":
             if player_being_hit.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
-                if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
                 elif possible_interrupts:
@@ -840,13 +816,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             elif primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
                 if primary_player.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
                     primary_player.destroy_card_in_hq(unit_pos)
-                    self.action_chosen = ""
-                    self.mode = "Normal"
-                    self.player_with_action = ""
-                    if self.phase == "DEPLOY":
-                        if not secondary_player.has_passed:
-                            self.player_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.number
+                    self.action_cleanup()
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.misc_counter = 0
@@ -1124,10 +1094,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if game_update_string[1] == "1":
             player_receiving_attachment = self.p1
         else:

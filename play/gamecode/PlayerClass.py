@@ -1767,6 +1767,9 @@ class Player:
         if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
             if self.search_card_at_planet(planet_id, "Soaring Gargoyles"):
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+            if self.game.bloodthirst_active[planet_id]:
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
     def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
@@ -1798,6 +1801,9 @@ class Player:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Treacherous Lhamaean":
             if self.warlord_faction != "Dark Eldar":
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+            if self.game.bloodthirst_active[planet_id]:
                 return True
         if planet_id != -2:
             if self.get_faction_given_pos(planet_id, unit_id) == "Tau":
@@ -1912,12 +1918,14 @@ class Player:
                     return True
         return False
 
-    def get_immune_to_enemy_events(self, planet_pos, unit_pos):
+    def get_immune_to_enemy_events(self, planet_pos, unit_pos, power=False):
         if not self.check_is_unit_at_pos(planet_pos, unit_pos):
             return False
         if self.search_attachments_at_pos(planet_pos, unit_pos, "Lucky Warpaint"):
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Stalwart Ogryn":
+            return True
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster":
             return True
         return False
 
@@ -2500,6 +2508,9 @@ class Player:
         if card.get_ability() != "Nazdreg":
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+            if self.game.bloodthirst_active[planet_id]:
                 return True
         if self.search_attachments_at_pos(planet_id, unit_id, "Khornate Chain Axe"):
             if self.game.bloodthirst_active[planet_id]:
@@ -3189,7 +3200,7 @@ class Player:
                     if not enemy_event:
                         self.destroy_card_in_hq(i)
                         i = i - 1
-                    elif not self.get_immune_to_enemy_events(-2, i):
+                    elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -3198,7 +3209,7 @@ class Player:
                     if not enemy_event:
                         self.destroy_card_in_hq(i)
                         i = i - 1
-                    elif not self.get_immune_to_enemy_events(-2, i):
+                    elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -3207,7 +3218,7 @@ class Player:
                     if not enemy_event:
                         self.destroy_card_in_hq(i)
                         i = i - 1
-                    elif not self.get_immune_to_enemy_events(-2, i):
+                    elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -3215,7 +3226,7 @@ class Player:
                 if not enemy_event:
                     self.destroy_card_in_hq(i)
                     i = i - 1
-                elif not self.get_immune_to_enemy_events(-2, i):
+                elif not self.get_immune_to_enemy_events(-2, i, power=True):
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 i = i + 1

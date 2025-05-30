@@ -650,12 +650,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(warlord_planet, warlord_pos)
                     self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -666,7 +660,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
-            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
@@ -1143,23 +1137,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Craftworld Gate":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 primary_player.return_card_to_hand(planet_pos, unit_pos)
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.number
+                self.action_cleanup()
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
@@ -1456,7 +1439,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
-            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
             elif possible_interrupts:
@@ -1769,6 +1752,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
                         elif possible_interrupts:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")

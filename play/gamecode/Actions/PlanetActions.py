@@ -374,16 +374,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
     elif self.action_chosen == "Warpstorm":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p2
         first_unit_damaged = True
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
+                if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments() and \
+                        primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
                     primary_player.assign_damage_to_pos(chosen_planet, i, 2)
                     primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                     if first_unit_damaged:
@@ -392,7 +387,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
                 if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
-                    if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
+                    if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                         secondary_player.assign_damage_to_pos(chosen_planet, i, 2)
                         secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                         if first_unit_damaged:
@@ -491,9 +486,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         del secondary_player.discard[self.anrakyr_unit_position]
     elif self.action_chosen == "Ecstatic Seizures":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            primary_player.discard_attachments_from_card(chosen_planet, i)
+            if primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
+                primary_player.discard_attachments_from_card(chosen_planet, i)
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            secondary_player.discard_attachments_from_card(chosen_planet, i)
+            if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
+                secondary_player.discard_attachments_from_card(chosen_planet, i)
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         if self.phase == "DEPLOY":

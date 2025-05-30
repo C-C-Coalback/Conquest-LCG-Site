@@ -552,6 +552,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
                         elif possible_interrupts:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
