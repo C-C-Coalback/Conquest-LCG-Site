@@ -411,6 +411,7 @@ h4 {
     border-width: 6px;
     border-style: double;
     border-color: lightblue;
+    overflow-y:auto;
     background: rgba(47, 40, 153, 0.3);
     bottom:30px;
     right:0;

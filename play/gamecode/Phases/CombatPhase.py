@@ -230,11 +230,19 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         valid_unit = False
                         if self.number_with_combat_turn == "1":
                             player = self.p1
+                            secondary_player = self.p2
                         else:
                             player = self.p2
+                            secondary_player = self.p2
                         if chosen_planet == self.last_planet_checked_for_battle:
                             can_continue = False
-                            if self.ranged_skirmish_active:
+                            print("check enemy cards")
+                            print(len(secondary_player.cards_in_play[chosen_planet + 1]))
+                            if not secondary_player.cards_in_play[chosen_planet + 1]:
+                                valid_unit = False
+                                can_continue = False
+                                await self.send_update_message("No valid units to attack")
+                            elif self.ranged_skirmish_active:
                                 for i in range(len(player.cards_in_play[chosen_planet + 1])):
                                     if player.cards_in_play[chosen_planet + 1][i].emperor_champion_active:
                                         if player.get_ready_given_pos(chosen_planet, i):
