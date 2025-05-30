@@ -69,6 +69,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         self.chosen_first_card = False
                         self.action_chosen = ability
+                    elif ability == "Hallucinogen Grenade":
+                        primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        self.action_chosen = ability
+                        self.misc_target_planet = planet_pos
                     elif ability == "Saim-Hann Jetbike":
                         self.misc_target_player = player_owning_card.name_player
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
