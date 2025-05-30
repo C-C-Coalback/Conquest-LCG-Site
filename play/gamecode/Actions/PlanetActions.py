@@ -269,6 +269,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                 self.action_cleanup()
+    elif self.action_chosen == "Crypt of Saint Camila":
+        if self.chosen_first_card:
+            if self.get_blue_icon(chosen_planet):
+                card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.add_card_to_planet(card, chosen_planet)
+                primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_second_card and self.chosen_first_card:
             self.chosen_second_card = True

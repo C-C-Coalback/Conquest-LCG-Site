@@ -196,6 +196,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 card.set_once_per_phase_used(True)
                                 primary_player.draw_card()
                                 self.action_cleanup()
+                    elif ability == "Crypt of Saint Camila":
+                        if not card.get_once_per_phase_used():
+                            if card.get_ready():
+                                card.exhaust_card()
+                                card.set_once_per_phase_used(True)
+                                self.action_chosen = ability
+                                self.chosen_first_card = False
                     elif ability == "Immortal Legion":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])

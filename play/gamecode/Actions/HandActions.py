@@ -745,6 +745,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 self.card_type_of_selected_card_in_hand = "Army"
+    elif self.action_chosen == "Crypt of Saint Camila":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if not card.check_for_a_trait("Elite") and card.get_faction() == "Space Marines":
+                if card.get_card_type() == "Army":
+                    self.chosen_first_card = True
+                    primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    primary_player.aiming_reticle_color = "blue"
     elif self.action_chosen == "Slumbering Tomb":
         primary_player.discard_card_from_hand(int(game_update_string[2]))
         self.misc_counter += 1
