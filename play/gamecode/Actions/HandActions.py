@@ -601,10 +601,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
                         secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.mode = self.stored_mode
-                        self.player_with_action = ""
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.number
+                        self.action_cleanup()
+                    elif ability == "Warp Rift":
+                        self.action_chosen = ability
+                        primary_player.aiming_reticle_color = "blue"
+                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        self.chosen_first_card = False
+                        self.misc_target_planet = -1
                     elif ability == "Pact of the Haemonculi":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

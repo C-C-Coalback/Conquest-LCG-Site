@@ -484,6 +484,20 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         del primary_player.discard[self.anrakyr_unit_position]
                     else:
                         del secondary_player.discard[self.anrakyr_unit_position]
+    elif self.action_chosen == "Warp Rift":
+        if not self.chosen_first_card:
+            self.chosen_first_card = True
+            self.misc_target_planet = chosen_planet
+            await self.send_update_message("Chose " + self.planet_array[chosen_planet] +
+                                           " as first target for Warp Rift")
+        else:
+            if abs(self.misc_target_planet - chosen_planet) == 1:
+                temp = self.planet_array[chosen_planet]
+                self.planet_array[chosen_planet] = self.planet_array[self.misc_target_planet]
+                self.planet_array[self.misc_target_planet] = temp
+                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
     elif self.action_chosen == "Ecstatic Seizures":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
