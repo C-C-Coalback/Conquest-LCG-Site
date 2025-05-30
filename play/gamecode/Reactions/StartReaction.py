@@ -822,6 +822,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Gut and Pillage")
                 primary_player.add_resources(3)
                 primary_player.gut_and_pillage_used = True
+                await primary_player.dark_eldar_event_played()
             self.delete_reaction()
         elif current_reaction == "Last Breath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

@@ -709,9 +709,13 @@ class Game:
     async def update_game_event_action(self, name, game_update_string):
         if name == self.player_with_action:
             if name == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
                 if self.p1.force_due_to_dark_possession:
                     game_update_string = ["HAND", "1", str(self.p1.pos_card_dark_possession)]
-            elif name == self.name_2:
+            else:
+                primary_player = self.p1
+                secondary_player = self.p2
                 if self.p2.force_due_to_dark_possession:
                     game_update_string = ["HAND", "2", str(self.p2.pos_card_dark_possession)]
             if len(game_update_string) == 1:
@@ -748,12 +752,14 @@ class Game:
                     elif self.action_chosen == "Rapid Assault":
                         if self.chosen_second_card:
                             await self.send_update_message("Rapid Assault ended early")
+                            await primary_player.dark_eldar_event_played()
                             self.action_cleanup()
                     elif self.action_chosen == "Inevitable Betrayal":
                         await self.send_update_message("Finished resolving Inevitable Betrayal")
                         self.p1.reset_all_aiming_reticles_play_hq()
                         self.p2.reset_all_aiming_reticles_play_hq()
                         self.action_cleanup()
+                        await primary_player.dark_eldar_event_played()
                     elif self.action_chosen == "Cathedral of Saint Camila" or self.action_chosen == "Eldritch Storm":
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.misc_counter = 0

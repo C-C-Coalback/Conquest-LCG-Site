@@ -1297,6 +1297,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.misc_counter += 1
                         if self.misc_counter > 1:
+                            await primary_player.dark_eldar_event_played()
                             self.action_cleanup()
                         else:
                             await self.send_update_message(str(self.misc_counter) + " uses left of Rapid Assault")
