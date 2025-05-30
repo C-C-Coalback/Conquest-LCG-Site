@@ -62,6 +62,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.delete_reaction()
+        elif current_reaction == "Leman Russ Conqueror":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")
+            self.delete_reaction()
         elif current_reaction == "Neophyte Apprentice":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "PLAY TO BATTLE"

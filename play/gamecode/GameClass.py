@@ -4243,7 +4243,6 @@ class Game:
                                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                                          alt_shields=False, can_no_mercy=False)
 
-
     def fury_search(self, player_with_cato, player_without_cato):
         if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
             print("Has fury")
@@ -4985,6 +4984,8 @@ class Game:
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":
+                                self.create_reaction("Leman Russ Conqueror", self.name_1, (1, planet, i))
                             for rok in self.p1.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p1.assign_damage_to_pos(planet, i, 1)
@@ -5000,6 +5001,8 @@ class Game:
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":
+                                self.create_reaction("Leman Russ Conqueror", self.name_2, (2, planet, i))
                             for rok in self.p2.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p2.assign_damage_to_pos(planet, i, 1)
