@@ -296,6 +296,24 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.player_who_resolves_reaction.append(primary_player.name_player)
                                 primary_player.aiming_reticle_color = "blue"
                                 primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        elif primary_player.cards[hand_pos] == "War of Ideas":
+                            if secondary_player.nullify_check() and self.nullify_enabled:
+                                await self.send_update_message(
+                                    primary_player.name_player + " wants to play Superiority; "
+                                                                 "Nullify window offered.")
+                                self.choices_available = ["Yes", "No"]
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Use Nullify?"
+                                self.nullified_card_pos = int(game_update_string[2])
+                                self.nullified_card_name = "War of Ideas"
+                                self.cost_card_nullified = 0
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "War of Ideas"
+                            else:
+                                primary_player.discard_card_from_hand(hand_pos)
+                                await self.send_update_message(primary_player.name_player + " activated War of Ideas!")
+                                primary_player.war_of_ideas_active = True
                 elif self.interrupts_during_cs_allowed:
                     if game_update_string[1] == primary_player.get_number():
                         hand_pos = int(game_update_string[2])
@@ -430,12 +448,20 @@ def try_entire_command(self, planet_pos):
                 cost += 1
             if self.p1.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
+        elif self.p1.search_hand_for_card("War of Ideas"):
+            for i in range(len(self.p1.cards_in_play[planet_pos])):
+                if not self.p1.get_ready_given_pos(planet_pos, i):
+                    return "INTERRUPT PRE STRUGGLE"
         elif self.p2.search_hand_for_card("Superiority") and self.p1.count_command_at_planet(planet_pos) > 0:
             cost = 1
             if self.p2.urien_relevant:
                 cost += 1
             if self.p2.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
+        elif self.p2.search_hand_for_card("War of Ideas"):
+            for i in range(len(self.p2.cards_in_play[planet_pos])):
+                if not self.p2.get_ready_given_pos(planet_pos, i):
+                    return "INTERRUPT PRE STRUGGLE"
     name_winner = determine_winner_command_struggle(self, planet_pos)
     if self.interrupts_during_cs_allowed:
         self.interrupts_before_cs_allowed = False
@@ -483,25 +509,6 @@ def receive_winnings(self):
                 self.p2.add_resources(self.total_gains_command_struggle[i][1])
                 for _ in range(self.total_gains_command_struggle[i][2]):
                     self.p2.draw_card()
-
-
-def resolve_command_struggle(self):
-    storage_command_struggle = [None, None, None, None, None, None, None]
-    for i in range(len(self.planet_array)):
-        if self.planets_in_play_array[i]:
-            print("Resolve command struggle at:", self.planet_array[i])
-            storage_command_struggle[i] = resolve_command_struggle_at_planet(self, i)
-    for i in range(len(storage_command_struggle)):
-        if storage_command_struggle[i] is not None:
-            if storage_command_struggle[i][0] == "1":
-                self.p1.add_resources(storage_command_struggle[i][1])
-                for _ in range(storage_command_struggle[i][2]):
-                    self.p1.draw_card()
-            else:
-                self.p2.add_resources(storage_command_struggle[i][1])
-                for _ in range(storage_command_struggle[i][2]):
-                    self.p2.draw_card()
-
 
 def resolve_winnings(self, winner, loser, planet_id):
     chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
@@ -551,24 +558,10 @@ def resolve_winnings(self, winner, loser, planet_id):
 def determine_winner_command_struggle(self, planet_id):
     fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
     fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
-    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2)
-    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1)
+    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2, actual_cs=True)
+    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1, actual_cs=True)
     if command_p1 > command_p2:
         return self.name_1
     elif command_p2 > command_p1:
         return self.name_2
     return ""
-
-
-def resolve_command_struggle_at_planet(self, planet_id):
-    fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
-    fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
-    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2)
-    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1)
-    if command_p1 > command_p2:
-        print("P1 wins command")
-        return resolve_winnings(self, self.p1, self.p2, planet_id)
-    elif command_p2 > command_p1:
-        print("P2 wins command")
-        return resolve_winnings(self, self.p2, self.p1, planet_id)
-    return None

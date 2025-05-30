@@ -128,6 +128,7 @@ class Player:
         self.master_warpsmith_count = 0
         self.gut_and_pillage_used = False
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
+        self.war_of_ideas_active = False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -1685,10 +1686,10 @@ class Player:
                     command += 1
         return command
 
-    def count_command_at_planet(self, planet_id, fbk=False):
+    def count_command_at_planet(self, planet_id, fbk=False, actual_cs=False):
         counted_command = 0
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            if self.get_ready_given_pos(planet_id, i):
+            if self.get_ready_given_pos(planet_id, i) or self.war_of_ideas_active:
                 count_unit_command = True
                 if fbk:
                     if self.get_card_type_given_pos(planet_id, i) == "Army":
@@ -1696,6 +1697,8 @@ class Player:
                             count_unit_command = False
                 if count_unit_command:
                     counted_command += self.get_command_given_pos(planet_id, i)
+        if actual_cs:
+            self.war_of_ideas_active = False
         return counted_command
 
     def count_tyranid_units_at_planet(self, planet_id):
