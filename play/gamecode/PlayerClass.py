@@ -190,6 +190,10 @@ class Player:
             enemy_player = self.game.p1
         if enemy_player.has_initiative:
             return True
+        if planet_pos == self.game.last_planet_checked_for_battle:
+            if self.search_card_at_planet(planet_pos, "Corpulent Ork"):
+                if not enemy_player.search_card_at_planet(planet_pos, "Corpulent Ork", ability_checking=False):
+                    return True
         return False
 
     def add_attachment_to_planet(self, planet_pos, card):
