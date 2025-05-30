@@ -247,7 +247,10 @@ class Game:
             "Drudgery", "Extermination", "Fetid Haze", "Dakka Dakka Dakka!", "Soul Seizure",
             "Death from Above", "Kauyon Strike", "Rally the Charge", "Doombolt", "Searing Brand",
             "Tense Negotiations", "Cacophonic Choir", "Slake the Thirst", "Rakarth's Experimentations",
-            "Squiggify", "The Emperor's Warrant", "For the Tau'va"
+            "Squiggify", "The Emperor's Warrant", "For the Tau'va", "Summary Execution", "Bond of Brotherhood",
+            "Sowing Chaos", "Blood For The Blood God!", "Inevitable Betrayal", "Rok Bombardment", "Mind War",
+            "Mont'ka Strike", "Biomass Sacrifice", "Rapid Assault", "Eldritch Storm", "Sudden Adaptation",
+            "Path of the Leader", "Bolster the Defense", "Warp Rift"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean"]
         self.anrakyr_unit_position = -1
@@ -260,7 +263,8 @@ class Game:
         self.saved_planet_string = ""
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
                                  "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
-                                 "Imperial Fists Siege Force"]
+                                 "Imperial Fists Siege Force", "Prodigal Sons Disciple", "Fire Prism",
+                                 "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion"]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
