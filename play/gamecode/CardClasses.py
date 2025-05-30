@@ -265,6 +265,7 @@ class UnitCard(Card):
         self.negative_hp_until_eop = 0
         self.positive_hp_until_eop = 0
         self.positive_hp_until_eob = 0
+        self.extra_command_eop = 0
         self.choice_nurgling_bomb = ""
         self.need_to_resolve_nurgling_bomb = False
         self.valid_target_ashen_banner = False
@@ -535,6 +536,7 @@ class UnitCard(Card):
 
     def get_command(self):
         command = self.command
+        command += self.extra_command_eop
         if self.hit_by_superiority:
             return 0
         for i in range(len(self.attachments)):

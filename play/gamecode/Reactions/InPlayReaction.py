@@ -539,6 +539,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.chosen_first_card = False
                             self.chosen_second_card = False
                             self.delete_reaction()
+        elif current_reaction == "Raiding Portal":
+            if not self.chosen_first_card:
+                if planet_pos == self.misc_target_planet:
+                    if game_update_string[1] == primary_player.get_number():
+                        if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kabalite"):
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.chosen_first_card = True
         elif self.reactions_needing_resolving[0] == "Made Ta Fight":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1

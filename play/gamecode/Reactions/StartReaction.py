@@ -928,6 +928,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use The Emperor Protects?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif current_reaction == "Raiding Portal":
+            if not primary_player.exhaust_card_in_hq_given_name("Raiding Portal"):
+                self.delete_reaction()
+            else:
+                self.chosen_first_card = False
+                self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
         elif self.reactions_needing_resolving[0] == "Made Ta Fight":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]

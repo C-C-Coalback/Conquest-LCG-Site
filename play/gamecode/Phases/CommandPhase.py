@@ -529,6 +529,11 @@ def resolve_winnings(self, winner, loser, planet_id):
             if self.infested_planets[planet_id]:
                 self.create_reaction("Devourer Venomthrope", winner.name_player,
                                      (int(winner.get_number()), planet_id, i))
+        if winner.check_for_trait_given_pos(planet_id, i, "Kabalite"):
+            if winner.get_card_type_given_pos(planet_id, i) == "Army":
+                if winner.search_card_in_hq("Raiding Portal", ready_relevant=True):
+                    self.create_reaction("Raiding Portal", winner.name_player,
+                                         (int(winner.get_number()), planet_id, -1))
         attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
         for j in range(len(attachments)):
             if attachments[j].get_ability() == "Noxious Fleshborer":
