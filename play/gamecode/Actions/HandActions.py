@@ -260,6 +260,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.choices_available = ["Yourself", "Opponent"]
                             self.choice_context = "Which Player? (Slake the Thirst):"
                             self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Bolster the Defense":
+                        highest_num = 0
+                        for i in range(7):
+                            current_count = 0
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                if primary_player.get_card_type_given_pos(i, j) == "Army":
+                                    current_count += 1
+                            if highest_num < current_count:
+                                highest_num = current_count
+                        self.misc_counter = highest_num
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
                     elif ability == "Tense Negotiations":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
@@ -790,6 +802,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if not self.chosen_first_card:
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             self.chosen_first_card = True
+    elif self.action_chosen == "Bolster the Defense":
+        card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card.get_card_type() == "Support" and card.get_cost() <= self.misc_counter:
+            primary_player.add_to_hq(card)
+            primary_player.remove_card_from_hand(int(game_update_string[2]))
+            self.action_cleanup()
     elif self.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
