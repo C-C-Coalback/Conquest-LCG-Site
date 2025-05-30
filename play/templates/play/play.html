@@ -6,7 +6,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
 <div class="box">
-    <div id="chat-log"></div><br>
+    <div id="chat-log">Use "/loaddeck/{deck_name}" to load a deck<br></div><br>
     <input id="chat-message-input" type="text"><br>
     <input id="chat-message-submit" type="button" value="Send">
     <div id="info-box">
@@ -642,7 +642,13 @@
                     }
                 }
             } else {
-            document.querySelector('#chat-log').innerHTML += (data.message + '<br>');
+                var text = data.message;
+                var split_text = data.message.split(":");
+                var new_img = `
+                <img class="avatar-chat" src="/media/` + split_text[0] + `.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
+                `;
+                console.log(new_img)
+                document.querySelector('#chat-log').innerHTML += (new_img + data.message + '<br>');
             }
             var textarea = document.getElementById('chat-log');
             textarea.scrollTop = textarea.scrollHeight;
