@@ -1303,6 +1303,10 @@ class Player:
                             if card.get_ability() == "Shadowed Thorns Venom":
                                 self.game.create_reaction("Shadowed Thorns Venom", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Kroot Hunter":
+                                if self.game.get_red_icon(position):
+                                    self.game.create_reaction("Kroot Hunter", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):

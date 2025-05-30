@@ -928,6 +928,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use The Emperor Protects?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif current_reaction == "Kroot Hunter":
+            primary_player.add_resources(1)
+            self.delete_reaction()
         elif current_reaction == "Raiding Portal":
             if not primary_player.exhaust_card_in_hq_given_name("Raiding Portal"):
                 self.delete_reaction()
