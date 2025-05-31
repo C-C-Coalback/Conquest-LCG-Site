@@ -32,6 +32,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 self.check_battle(self.round_number)
                 self.begin_battle(self.round_number)
                 self.begin_combat_round()
+                await self.send_update_message("Battle begins at the first planet. Players take combat turns. "
+                                               "Press the action button between turns to take an action.")
                 self.set_battle_initiative()
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
@@ -61,21 +63,23 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.player_with_combat_turn = self.name_2
                     self.p1.has_passed = True
                     self.reset_combat_positions()
+                    await self.send_update_message(self.name_1 + " passes their combat/retreat turn.")
                 else:
                     self.number_with_combat_turn = "1"
                     self.player_with_combat_turn = self.name_1
                     self.p2.has_passed = True
                     self.reset_combat_positions()
+                    await self.send_update_message(self.name_2 + " passes their combat/retreat turn.")
                 if self.p1.has_passed and self.p2.has_passed:
                     if self.mode == "Normal":
                         if self.ranged_skirmish_active:
-                            print("Both players passed, end ranged skirmish")
+                            await self.send_update_message("Both players passed, ranged skirmish ends.")
                             self.p1.has_passed = False
                             self.p2.has_passed = False
                             self.reset_combat_turn()
                             self.ranged_skirmish_active = False
                         else:
-                            print("Both players passed, need to run combat round end.")
+                            await self.send_update_message("Both players passed, combat round ends.")
                             self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)
                             self.p2.ready_all_at_planet(self.last_planet_checked_for_battle)
                             self.p1.has_passed = False
@@ -142,13 +146,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     if game_update_string[1] == self.number_who_is_shielding:
                         hand_pos = int(game_update_string[2])
             elif self.mode == "Normal":
-                print("mode ok")
                 if name == self.player_with_combat_turn:
-                    print("name ok")
                     if game_update_string[1] == self.number_with_combat_turn:
-                        print("target ok")
                         if self.attacker_position != -1:
-                            print("attacker ok")
                             hand_pos = int(game_update_string[2])
                             if self.number_with_combat_turn == "1":
                                 player = self.p1

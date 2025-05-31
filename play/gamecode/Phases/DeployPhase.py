@@ -36,12 +36,14 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p1.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        await self.send_update_message(self.name_1 + " passes their deploy turn.")
                     else:
                         self.number_with_deploy_turn = "1"
                         self.player_with_deploy_turn = self.name_1
                         self.p2.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        await self.send_update_message(self.name_2 + " passes their deploy turn.")
                 elif self.mode == "DISCOUNT":
                     print("Play card with not all discounts")
                     await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
