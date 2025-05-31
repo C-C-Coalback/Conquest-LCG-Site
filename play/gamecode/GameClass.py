@@ -5288,7 +5288,6 @@ class Game:
         else:
             self.already_asked_remove_infestation = False
             print("Resolve battle ability of:", planet_name)
-            await self.send_update_message("Trying battle ability")
             self.need_to_resolve_battle_ability = True
             self.reactions_on_winning_combat_being_executed = False
             self.battle_ability_to_resolve = planet_name

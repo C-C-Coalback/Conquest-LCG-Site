@@ -49,7 +49,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                               discounts=self.discounts_applied)
             if self.p1.has_passed and self.p2.has_passed:
-                print("Both passed, move to warlord movement.")
+                await self.send_update_message("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
