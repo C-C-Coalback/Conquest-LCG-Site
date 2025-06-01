@@ -2761,7 +2761,7 @@ class Player:
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         if total_damage_that_can_be_blocked > 0:
-            if self.cards_in_play[planet_id + 1][unit_id].unstoppable:
+            if self.cards_in_play[planet_id + 1][unit_id].get_unstoppable():
                 if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
                     self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True
                     self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
@@ -2855,7 +2855,7 @@ class Player:
         afterwards_damage = self.headquarters[unit_id].get_damage()
         total_that_can_be_blocked = afterwards_damage - prior_damage
         if total_that_can_be_blocked > 0:
-            if self.headquarters[unit_id].unstoppable:
+            if self.headquarters[unit_id].get_unstoppable():
                 if not self.headquarters[unit_id].once_per_round_used:
                     self.headquarters[unit_id].once_per_round_used = True
                     self.headquarters[unit_id].set_damage(afterwards_damage - 1)

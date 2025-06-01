@@ -284,9 +284,13 @@ class UnitCard(Card):
         return self.damage + self.not_yet_assigned_damage
 
     def get_unstoppable(self):
+        if self.blanked_eop:
+            return False
         return self.unstoppable
 
     def get_has_hive_mind(self):
+        if self.blanked_eop:
+            return False
         return self.hive_mind
 
     def get_reaction_available(self):
