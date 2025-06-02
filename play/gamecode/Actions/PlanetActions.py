@@ -486,6 +486,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     chosen_planet, card=self.card_to_deploy, is_owner_of_card=own_card
                 )
                 if added_card_to_planet == "SUCCESS":
+                    self.queued_sound = "onplay"
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.action_cleanup()

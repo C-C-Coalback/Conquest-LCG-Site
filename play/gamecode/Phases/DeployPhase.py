@@ -77,6 +77,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = -1
                             print(played_support)
                             if played_support == "SUCCESS":
+                                self.queued_sound = "onplay"
                                 if not secondary_player.has_passed:
                                     self.player_with_deploy_turn = secondary_player.get_name_player()
                                     self.number_with_deploy_turn = secondary_player.get_number()
@@ -226,6 +227,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              damage_to_take=damage_to_take,
                                                              is_owner_of_card=own_card)
     if played_card:
+        self.queued_sound = "onplay"
         if not self.action_chosen or self.action_chosen == "Ambush":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
