@@ -184,12 +184,15 @@ class DecksConsumer(AsyncWebsocketConsumer):
             print("Not logged in")
         else:
             for filename in os.listdir("decks/DeckStorage/" + self.name):
-                with open("decks/DeckStorage/" + self.name + "/" + filename, "r") as file:
-                    content = file.readlines()
-                print("Name:", content[0].replace('\n', ''))
-                print("Warlord:", content[2].replace('\n', ''))
-                message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
-                await self.send(text_data=json.dumps({"message": message}))
+                await self.send_deck(filename)
+
+    async def send_deck(self, filename):
+        with open("decks/DeckStorage/" + self.name + "/" + filename, "r") as file:
+            content = file.readlines()
+        print("Name:", content[0].replace('\n', ''))
+        print("Warlord:", content[2].replace('\n', ''))
+        message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
+        await self.send(text_data=json.dumps({"message": message}))
 
     async def receive(self, text_data): # noqa
         global cards_array
@@ -347,8 +350,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     if not os.path.isdir("decks/DeckStorage/" + self.name):
                         print("Path does not exist")
                         os.mkdir("decks/DeckStorage/" + self.name)
+                    will_send = False
+                    if not os.path.exists("decks/DeckStorage/" + self.name + "/" + deck_name):
+                        will_send = True
                     with open("decks/DeckStorage/" + self.name + "/" + deck_name, "w") as file:
                         file.write(split_message[1])
+                    if will_send:
+                        await self.send_deck(deck_name)
                 message_to_send = "Feedback/" + message_to_send
                 message = message_to_send
                 await self.send(text_data=json.dumps({"message": message}))
