@@ -180,7 +180,7 @@
                     Join Lobby
                     </button>`;
             } else if (nameOfPlayerTwo !== "" && nameOfPlayerOne === "{{ user.username }}") {
-                // playSound("/static/warning.wav");
+                playSound("/static/joinsound.wav");
             } else if (nameOfPlayerTwo === "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
                     `<button id=` + nameOfPlayerOne + ` onclick="leaveLobby(this.id)">
