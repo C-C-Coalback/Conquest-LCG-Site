@@ -316,7 +316,7 @@ class Game:
                                                  "Declare the Crusade", "Gut and Pillage"]
         self.queued_sound = ""
         self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
-        self.gunfire_weapon_sounds = ["Astra Militarum", "Chaos", "Dark Eldar", "Tyranids"]
+        self.gunfire_weapon_sounds = ["Astra Militarum", "Chaos", "Dark Eldar", "Tyranids", "Neutral"]
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -3804,6 +3804,7 @@ class Game:
                                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                                         primary_player.discard_card_from_hand(hand_pos)
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        self.queued_sound = "shield"
                                         if took_damage:
                                             self.recently_damaged_units.append(
                                                 self.positions_of_units_to_take_damage[0])

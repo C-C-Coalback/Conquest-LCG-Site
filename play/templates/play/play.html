@@ -574,7 +574,7 @@
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "SOUND") {
                     console.log("trying to play sound")
-                    var soundUrl = "/static/" + split_data[2] + ".wav";
+                    var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
                     playSound(soundUrl);
                 } else if (split_data[1] === "SEARCH") {
                     var full_string = `<details><summary>` + split_data[3] + `</summary>`;
