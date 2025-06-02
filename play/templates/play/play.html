@@ -159,6 +159,18 @@
         cardWidth = 63;
         var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
 
+        function playSound(url) {
+            console.log(url);
+            var ourAudio = document.createElement('audio'); // Create a audio element using the DOM
+            ourAudio.style.display = "none"; // Hide the audio element
+            ourAudio.src = url; // Set resource to our URL
+            ourAudio.autoplay = true; // Automatically play sound
+            ourAudio.onended = function() {
+                this.remove(); // Remove when played.
+            };
+            document.body.appendChild(ourAudio);
+        }
+
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
@@ -560,6 +572,10 @@
                     }
                     full_string += `</details>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
+                } else if (split_data[1] === "SOUND") {
+                    console.log("trying to play sound")
+                    var soundUrl = "/static/" + split_data[2] + ".wav";
+                    playSound(soundUrl);
                 } else if (split_data[1] === "SEARCH") {
                     var full_string = `<details><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
@@ -647,7 +663,6 @@
                 var new_img = `
                 <img class="avatar-chat" src="/media/` + split_text[0] + `.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
                 `;
-                console.log(new_img)
                 document.querySelector('#chat-log').innerHTML += (new_img + data.message + '<br>');
             }
             var textarea = document.getElementById('chat-log');
@@ -701,12 +716,11 @@
         });
 
         function changeDef(image_src) {
-            console.log(image_src);
             document.getElementById("LargeHelperCard").src=image_src;
         }
 
         function changeDefOut() {
-            console.log("mouse left");
+
         }
 
         function showDiscard(discard_id) {
@@ -715,10 +729,8 @@
         var x = document.getElementById(target_discard_display);
         if (x.style.display !== "block") {
             x.style.display = "block";
-            console.log("Set to block")
         } else {
             x.style.display = "none";
-            console.log("Set to none")
         }
         }
     </script>

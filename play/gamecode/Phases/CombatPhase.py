@@ -292,6 +292,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.unit_will_move_after_attack = True
                                 player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     ethereal_movement_active = True
+                            faction = player.get_faction_given_pos(self.attacker_planet, self.attacker_position)
+                            print("atk faction:", faction)
+                            if faction in self.energy_weapon_sounds:
+                                self.queued_sound = "necrons_attack"
+                            if faction in self.gunfire_weapon_sounds:
+                                self.queued_sound = "gunfire_attack"
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,

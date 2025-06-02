@@ -314,6 +314,15 @@ class Game:
         self.sacaellums_finest_active = False
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
                                                  "Declare the Crusade", "Gut and Pillage"]
+        self.queued_sound = ""
+        self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
+        self.gunfire_weapon_sounds = ["Astra Militarum", "Chaos", "Dark Eldar", "Tyranids"]
+
+    async def send_queued_sound(self):
+        if self.queued_sound:
+            print("sending sound")
+            await self.send_update_message("GAME_INFO/SOUND/" + self.queued_sound)
+            self.queued_sound = ""
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
@@ -5103,6 +5112,7 @@ class Game:
         await self.p2.send_discard()
         await self.p2.send_resources()
         await self.send_planet_array()
+        await self.send_queued_sound()
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
