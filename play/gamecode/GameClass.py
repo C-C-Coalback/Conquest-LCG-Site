@@ -1635,6 +1635,7 @@ class Game:
             while i < reaction_pos:
                 if self.reactions_needing_resolving[i] == "Ba'ar Zul the Hate-Bound":
                     count_baar += 1
+                i = i + 1
             self.damage_amounts_baarzul.insert(0, self.damage_amounts_baarzul.pop(count_baar))
         self.reactions_needing_resolving.insert(
             0, self.reactions_needing_resolving.pop(reaction_pos)
