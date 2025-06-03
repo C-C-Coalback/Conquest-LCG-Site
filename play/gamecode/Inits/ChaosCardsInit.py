@@ -46,8 +46,7 @@ def chaos_cards_init():
                              1, "Chaos", "Common", 1, 1, 1,
                              False, ""),
         CardClasses.ArmyCard("Khorne Berzerker", "Brutal.", "Khorne. Warrior. World Eaters.",
-                             3, "Chaos", "Common", 2, 4, 1, False, ""
-                             , brutal=True),
+                             3, "Chaos", "Common", 2, 4, 1, False, "", brutal=True),
         CardClasses.ArmyCard("Vicious Bloodletter", "Area Effect (3), No Wargear Attachments",
                              "Daemon. Elite. Khorne.", 5, "Chaos", "Loyal",
                              4, 4, 0, False, area_effect=3,
@@ -283,6 +282,74 @@ def chaos_cards_init():
         CardClasses.EventCard("Warp Rift", "HEADQUARTERS ACTION: Switch a target planet with an adjacent planet. "
                                            "(Units that were at a switched-out planet are now at "
                                            "the switched-in planet.)", "Power. Tzeentch.", 1, faction, "Loyal",
-                              2, False, action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS")
+                              2, False, action_in_hand=True, allowed_phases_in_hand="HEADQUARTERS"),
+        CardClasses.ArmyCard("Sathariel the Invokator", "Deep Strike (3).\n"
+                                                        "Reaction: After a combat round at this planet begins, "
+                                                        "return a Chaos Power event from your discard pile to"
+                                                        " your hand.", "Psyker. Fallen. Elite.",
+                             5, faction, "Common", 4, 4, 1, True, deepstrike=3),
+        CardClasses.EventCard("The Prince's Might", "Deep Strike (1).\n"
+                                                    "Reaction: After you Deep Strike this event, Daemon units at "
+                                                    "this planet cannot be damaged by units with printed cost 2 "
+                                                    "or lower until the end of the phase.", "Tactic.",
+                              0, faction, "Loyal", 2, False, deepstrike=1),
+        CardClasses.ArmyCard("Infectious Nurgling", "Armorbane.", "Daemon. Nurgle.",
+                             1, faction, "Common", 2, 1, 0, False, armorbane=True),
+        CardClasses.ArmyCard("Seekers of Slaanesh", "No Wargear Attachments.\n"
+                                                    "Action: Sacrifice a Cultist unit at this planet to draw 1 card.",
+                             "Daemon. Slaanesh. Elite.", 5, faction, "Common", 4, 5, 2, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Mark of Slaanesh", "Attach to an army unit you control.\n"
+                                                       "Interrupt: When attached unit leaves play, "
+                                                       "move an army unit you control to this planet.",
+                                   "Curse. Slaanesh.", 0, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Disciple of Excess", "Each Elite unit you control at this planet gains "
+                                                   "“Cannot be routed or exhausted by card effects.”",
+                             "Cultist. Slaanesh.", 2, faction, "Common", 1, 3, 1, False),
+        CardClasses.SupportCard("Blood Rain Tempest", "Reaction: After the combat phase begins, sacrifice this support"
+                                                      " to reverse the order in which planets are checked for battles."
+                                                      " (Start with the last planet and finish with the first planet.)",
+                                "Upgrade.", 1, faction, "Common", False),
+        CardClasses.ArmyCard("Noise Marines Warband", "Area Effect (1), Deep Strike (2)", "Soldier. Slaanesh.",
+                             4, faction, "Loyal", 2, 3, 1, False, area_effect=2, deepstrike=2),
+        CardClasses.EventCard("Ominous Wind", "Action: Draw X cards. X is the highest printed cost among units "
+                                              "you control. Then, discard 4 cards from your hand.", "Power. Nurgle.",
+                              2, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Sickening Helbrute", "Brutal.\n"
+                                                   "FORCED REACTION: After a unit at this planet is declared as a "
+                                                   "defender, deal 1 damage to it.", "Vehicle. Nurgle. Elite.",
+                             7, faction, "Common", 2, 9, 2, False, brutal=True),
+        CardClasses.ArmyCard("Purveyor of Hubris", "Interrupt: When your opponent deploys a non-Elite unit at this "
+                                                   "planet, increase its cost by 2.", "Soldier. Slaanesh.",
+                             4, faction, "Chaos", 3, 4, 2, False),
+        CardClasses.AttachmentCard("Cloud of Flies", "Attach to a Nurgle army unit you control.\n"
+                                                     "Reaction: After a combat round begins at this planet, "
+                                                     "each player deals 2 indirect damage among non-Nurgle units "
+                                                     "he controls at this planet, if able.", "Blessing.",
+                                   1, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True, required_traits="Nurgle"),
+        CardClasses.WarlordCard("Vha'shaelhur", "Area Effect (1).\n"
+                                                "Reaction: After an enemy army unit is destroyed while this "
+                                                "unit is attacking, put a Cultist token into play at your HQ. "
+                                                "(Limit once per attack.)", "Daemon. Slaanesh.",
+                                faction, 1, 8, 1, 6, "Bloodied.", 7, 7,
+                                ["4x Alluring Daemonette", "1x Tower of Worship",
+                                 "2x Daemonic Incursion", "1x Predatory Instinct"], area_effect=1),
+        CardClasses.ArmyCard("Alluring Daemonette", "Combat Action: Sacrifice a Cultist unit you control to move an \n"
+                                                    "enemy army unit at an adjacent planet to this planet. "
+                                                    "(Limit once per phase.)", "Daemon. Slaanesh.", 3, faction,
+                             "Signature", 3, 2, 1, False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Tower of Worship", "Reaction: After you deploy a Daemon unit, put a "
+                                                    "Cultist token into play at your HQ.", "Location. Slaanesh.",
+                                1, faction, "Signature", True),
+        CardClasses.EventCard("Daemonic Incursion", "Action: Search the top 6 cards of your deck for a Daemon unit. "
+                                                    "Reveal it, add it to your hand, and put the remaining cards on"
+                                                    " the bottom of your deck in any order.", "Power.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Predatory Instinct", "Attach to a Chaos unit you control."
+                                                         "Attached unit gains Area Effect (1).", "Skill.",
+                                   2, faction, "Signature", 3, False,
+                                   unit_must_match_faction=True, must_be_own_unit=True)
     ]
     return chaos_card_array

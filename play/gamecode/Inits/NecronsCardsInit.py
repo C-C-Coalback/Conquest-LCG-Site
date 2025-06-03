@@ -195,7 +195,63 @@ def necrons_cards_init():
                                                  "of unit cards from your discard pile into your deck to deal X "
                                                  "damage to a target non-Elite army unit. X is the number of "
                                                  "cards shuffled into your deck.", "Artillery. Upgrade.",
-                                3, faction, "Common", False, action_in_play="TRUE",
+                                3, faction, "Common", False, action_in_play=True,
                                 allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.ArmyCard("Immortal Loyalist", "Each Elite unit you control at this planet gains, "
+                                                  "“Interrupt: When this unit is targeted by a triggered effect "
+                                                  "for the first time this round, cancel that effect.”", "Soldier.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.SupportCard("Shroud Cruiser", "Action: Exhaust this support to move an Elite "
+                                                  "unit you control to an adjacent planet.", "Upgrade.",
+                                2, faction, "Common", False),
+        CardClasses.ArmyCard("Hunting Acanthrites", "Each unit with printed cost 2 or lower at this planet gets -1 HP",
+                             "Drone.", 3, faction, "Common", 1, 3, 0, False),
+        CardClasses.EventCard("Defensive Protocols", "Deep Strike (2).\n"
+                                                     "Reaction: After you Deep Strike this event, until the end of "
+                                                     "this battle's first combat round, reduce all damage taken "
+                                                     "by Necrons units you control to 1.", "Tactic.",
+                              0, faction, "Common", 1, False, deepstrike=2),
+        CardClasses.ArmyCard("Rumbling Tomb Stalker", "Reaction: After this unit assigns damage by an attack, "
+                                                      "remove 1 damage from it.", "Drone. Elite.",
+                             5, faction, "Common", 2, 7, 1, False),
+        CardClasses.WarlordCard("Illuminor Szeras", "Reaction: After you remove any amount of damage from a"
+                                                    " Necrons army unit, gain 1 resource.", "Scholar.",
+                                faction, 1, 8, 1, 5, "Bloodied.", 7, 6,
+                                ["4x Augmented Warriors", "1x Dissection Chamber",
+                                 "2x Vivisection", "1x Eldritch Lance"]),
+        CardClasses.ArmyCard("Augmented Warriors", "FORCED REACTION: After this unit enters play, deal "
+                                                   "it 2 unpreventable damage.", "Soldier.",
+                             2, faction, "Signature", 2, 4, 1, False),
+        CardClasses.SupportCard("Dissection Chamber", "FORCED REACTION: After an army unit enters play,"
+                                                      " deal it 1 damage.", "Location.",
+                                2, faction, "Signature", False),
+        CardClasses.EventCard("Vivisection", "Action: Target a planet. Remove 1 damage from each Necrons unit you "
+                                             "control at the targeted planet and deal 1 damage to each non-Necrons"
+                                             " unit at the targeted planet.", "Tactic.",
+                              3, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Eldritch Lance", "Attach to your warlord.\n"
+                                                     "Attached unit gets +1 ATK.\n"
+                                                     "Combat Action: Exhaust this attachment to remove 1 damage "
+                                                     "from a unit at this planet.", "Wargear. Weapon.",
+                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="WARLORD",
+                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Risen Warriors", "Deep Strike (0)", "Soldier.",
+                             3, faction, "Common", 2, 2, 0, False, deepstrike=0),
+        CardClasses.AttachmentCard("Quantum Shielding", "Attach to a Necrons Vehicle unit you control.\n"
+                                                        "Attached unit gets +2 HP.\n"
+                                                        "Interrupt: When this card is discarded as a shield card, "
+                                                        "attach it to the shielded unit instead of discarding it,"
+                                                        " if eligible.", "Hardpoint.",
+                                   2, faction, "Common", 1, False, extra_health=2, required_traits="Vehicle",
+                                   unit_must_match_faction=True, must_be_own_unit=True),
+        CardClasses.ArmyCard("Dread Command Barge", "No Wargear Attachments.\n"
+                                                    "COMMAND ACTION: Discard a non-Necrons card from your hand "
+                                                    "to move this unit to an adjacent planet.", "Vehicle.",
+                             4, faction, "Common", 3, 3, 3, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Shard of the Deceiver", "X is equal to the number of cards in your discard pile.\n"
+                                                      "FORCED REACTION: After a phase or combat round at this planet "
+                                                      "begins, discard a card. If you have no cards in your hand, "
+                                                      "discard this unit.", "C'tan. Elite.",
+                             7, faction, "Common", 0, 0, 2, False)
     ]
     return necrons_card_array

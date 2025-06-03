@@ -255,6 +255,55 @@ def tau_cards_init():
         CardClasses.EventCard("War of Ideas", "Interrupt: When a command struggle resolves at a planet, "
                                               "exhausted army units you control count their command "
                                               "icons during that command struggle.", "Tactic.",
-                              0, faction, "Common", 1, False)
+                              0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Kroot Guerrilla", "Reaction: After a battle a this planet begins, gain 1 resource.",
+                             "Warrior. Kroot.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.ArmyCard("XV8-05 Enforcer", "Reaction: After damage from an attack by this unit has been assigned,"
+                                                " reassign any amount of that damage to another enemy "
+                                                "unit at this planet. (Limit once per attack.)", "Soldier. Pilot.",
+                             4, faction, "Common", 4, 4, 1, False),
+        CardClasses.ArmyCard("Grav Inhibitor Drone", "Each unit with printed cost 2 or lower at this planet cannot "
+                                                     "attack while a unit with printed cost 3 or higher at"
+                                                     " this planet is ready.", "Drone.",
+                             1, faction, "Common", 0, 4, 0, False),
+        CardClasses.AttachmentCard("Missile Pod", "Attach to a Pilot or Vehicle unit you control."
+                                                  "Deploy Action: Sacrifice this attachment to deal 3 damage to a "
+                                                  "target enemy army unit in your opponent's HQ or destroy a target "
+                                                  "support card.", "Hardpoint.",2, faction, "Common", 1, False,
+                                   must_be_own_unit=True, required_traits="Pilot/Vehicle", action_in_play=True,
+                                   allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("Sniper Drone Team", "Ranged.\n"
+                                                  "Reaction: After the ranged skirmish at this planet ends, "
+                                                  "ready this unit.", "Soldier. Drone.",
+                             4, faction, "Loyal", 2, 5, 2, False),
+        CardClasses.EventCard("Tactical Withdrawal", "Deep Strike (0).\n"
+                                                     "Reaction: After you Deep Strike this event, move any number"
+                                                     " of units you control at this planet to an adjacent planet.",
+                              "Tactic.", 0, faction, "Loyal", 2, False, deepstrike=0),
+        CardClasses.ArmyCard("Herald of the Tau'va", "Each Elite unit you control at this planet gains Mobile.\n"
+                                                     "FORCED REACTION: After this unit resolves its attack,"
+                                                     " move it to your HQ.", "Soldier. Ethereal.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.SupportCard("Beleaguered Garrison", "Each card you control in reserve is counted as a command "
+                                                        "icon at its planet when resolving command struggles.",
+                                "Location.", 1, faction, "Common", True),
+        CardClasses.ArmyCard("XV25 Stealth Squad", "Deep Strike (3).\n"
+                                                   "You may Deep Strike this card as an Action "
+                                                   "during the combat phase.", "Soldier. Pilot. Elite.",
+                             5, faction, "Common", 5, 3, 0, False, deepstrike=3),
+        CardClasses.AttachmentCard("Kroot Hunting Rifle", "Deep Strike (0).\n"
+                                                          "Attach to an army unit you control.\n"
+                                                          "Reaction: After attached unit destroys an enemy unit "
+                                                          "by an attack, gain 1 resource.", "Wargear. Kroot.",
+                                   2, faction, "Common", 1, False, deepstrike=0,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Raging Krootox", "No Attachments.\n"
+                                               "Combat Action: This unit gets +X ATK until the end of ths phase."
+                                               " X is the number of in your resource pool. (Limit once per phase.)",
+                             "Creature. Kroot. Elite.", 5, faction, "Loyal", 2, 6, 0, False,
+                             no_attachments=True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Hunter's Ploy", "Reaction: After the headquarters phase begins, each player gains "
+                                               "resources equal to the highest printed cost among units he controls.",
+                              "Tactic.", 0, faction, "Common", 1, False)
     ]
     return tau_cards_array

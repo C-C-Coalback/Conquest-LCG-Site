@@ -308,6 +308,73 @@ def astra_militarum_cards_init():
         CardClasses.AttachmentCard("Imperial Rally Point", "Attach to a Stronghold planet (green).\n"
                                                            "Reduce the cost of each Astra Militarum unit you deploy "
                                                            "at this planet by 1 (to a minimum of 1).", "Location.",
-                                   1, faction, "Common", 1, False, planet_attachment=True, green_required=True)
+                                   1, faction, "Common", 1, False, planet_attachment=True, green_required=True),
+        CardClasses.ArmyCard("Vostroyan Officer", "Each Elite unit you control at this planet gains "
+                                                  "Immune to enemy events.", "Soldier. Vostroya.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.ArmyCard("Scion Strike Force", "Deep Strike (3), Ranged", "Soldier. Elite.",
+                             5, faction, "Common", 3, 4, 2, False, deepstrike=3, ranged=True),
+        CardClasses.EventCard("No Surprises", "Deploy Action: Destroy a target card in reserve.", "Tactic.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Firstborn Battalion", "While you control 3 or more support cards this "
+                                                    "unit gains Mobile and Ranged.", "Soldier. Vostroya.",
+                             4, faction, "Loyal", 3, 4, 2, False),
+        CardClasses.SupportCard("Clearcut Refuge", "Action: Exhaust this support to give a target unit +X HP until"
+                                                   " the end of the phase. X is the highest printed cost among units"
+                                                   " you control.", "Location", 1, faction, "Common", True,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.WarlordCard("Grigory Maksim", "While a unit you control is being dealth damage, support cards "
+                                                  "may be used as shield cards with 1 shield icon. If the shielded "
+                                                  "card is a Tank, that support card has 2 shield icons instead.",
+                                "Soldier. Vostroya.",
+                                faction, 1, 7, 1, 6, "Bloodied.", 7, 7,
+                                ["4x Maksim's Squadron", "1x Clearing the Path",
+                                 "2x Keep Firing!", "1x Searchlight"]),
+        CardClasses.ArmyCard("Maksim's Squadron", "No Wargear Attachments.\n"
+                                                  "Interrupt: When you use a shield card to "
+                                                  "prevent this unit from taking "
+                                                  "damage, that card gains 1 shield icon.", "Vehicle. Tank. Vostroya.",
+                             3, faction, "Signature", 2, 3, 1, False, wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Clearing the Path", "Reaction: After you win a battle at a planet with your warlord, "
+                                                     "put an Astra Militarum support card from your discard pile"
+                                                     " into play at your HQ.", "Stratagem.",
+                                2, faction, "Signature", False),
+        CardClasses.EventCard("Keep Firing!", "Combat Action: Ready a target Tank unit you control.", "Tactic.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Searchlight", "Attached unit gains 1 command icon.\n"
+                                                  "Exhaust your warlord to move attached unit to another planet.\n"
+                                                  "Action: Exhaust your warlord to move attached "
+                                                  "unit to another planet.", "Hardpoint.",
+                                   1, faction, "Signature", 3, False, extra_command=1, required_traits="Vehicle",
+                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Enginseer Mechanic", "Reaction: After a Vehicle unit you control at this planet is "
+                                                   "assigned damage, exhaust this unit to prevent up to"
+                                                   " 2 of that damage.", "Scholar.",
+                             3, faction, "Common", 1, 6, 1, False),
+        CardClasses.ArmyCard("Griffon Escort", "No Wargear Attachments.\n"
+                                               "Reaction: After this unit enters play, put 2 Guardsman tokens into "
+                                               "play at this planet.", "Vehicle. Tank.",
+                             4, faction, "Loyal", 2, 4, 1, False, wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Hot-Shot Laspistol", "Attach to an army unit you control.\n"
+                                                         "Attached unit gets +2 ATK.\n"
+                                                         "Damage cannot be removed from units at the same planet"
+                                                         " as attached unit.", "Weapon. Wargear.",
+                                   1, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True, extra_attack=2),
+        CardClasses.ArmyCard("Catachan Tracker", "Increase the Deep Strike value of each card you opponent"
+                                                 " controls at this planet by 2.", "Soldier. Catachan.",
+                             3, faction, "Common", 2, 3, 1, False),
+        CardClasses.EventCard("Death Serves the Emperor", "Interrupt: When a Vehicle unit you control is destroyed, "
+                                                          "gain resources equal to its printed cost. Max 1 per round.",
+                              "Tactic.", 0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Mars Alpha Exterminator", "No Wargear Attachments.\n"
+                                                        "Reaction: After this unit is declared as an attacker, "
+                                                        "destroy either a target army unit with printed cost 2 or "
+                                                        "lower at this planet or a target token unit at this planet.",
+                             "Vehicle. Tank. Elite.", 6, faction, "Loyal", 4, 6, 2, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Jungle Trench", "Combat Action: Exhaust this support to prevent 1 damage from each "
+                                                 "attack made by a non-warlord unit this combat round.", "Location.",
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return astra_militarum_cards_array

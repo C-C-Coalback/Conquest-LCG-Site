@@ -28,8 +28,8 @@ def eldar_cards_init():
         CardClasses.ArmyCard("Altansar Rangers", "Ranged.", "Scout. Altansar.", 3, faction,
                              "Common", 2, 2, 2, False, ranged=True),
         CardClasses.ArmyCard("Eldar Survivalist", "+1 resource and +1 card when command struggle"
-                                                  "is won at this planet."
-                             , "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False,
+                                                  "is won at this planet.",
+                             "Scout. Ally.", 2, faction, "Common", 0, 2, 1, False,
                              additional_resources_command_struggle=1,
                              additional_cards_command_struggle=1),
         CardClasses.ArmyCard("Wildrider Squadron", "No Wargear Attachments.\n"
@@ -279,6 +279,74 @@ def eldar_cards_init():
                                                          "If attached unit is an army unit, "
                                                          "it gains the Warrior and Psyker traits.", "Wargear. Weapon.",
                                    1, faction, "Signature", 3, False, extra_attack=1, extra_health=1,
-                                   must_be_own_unit=True)
+                                   must_be_own_unit=True),
+        CardClasses.ArmyCard("Seer Adept", "Reaction: After the command phase begins, "
+                                           "look at a target card your opponent controls in reserve.", "Psyker.",
+                             3, faction, "Common", 2, 4, 1, False),
+        CardClasses.ArmyCard("Furious Wraithblade", "Reaction: After this unit resolves an attack, ready it. "
+                                                    "(Limit once per phase.)", "Drone. Spirit.",
+                             3, faction, "Common", 3, 3, 0, False),
+        CardClasses.AttachmentCard("Hidden Strike Chainsword", "Deep Strike (0).\n"
+                                                               "Attach to an army unit you control.\n"
+                                                               "While attacking a non-Warlord unit, "
+                                                               "attached unit gets +2 ATK.", "Wargear. Weapon.",
+                                   1, faction, "Common", 1, False, deepstrike=0, extra_attack=2,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Adherent Outcast", "Each Elite unit you control at this planet gains Flying.",
+                             "Scout.", 2, faction, "Common", 1, 3, 0, False),
+        CardClasses.EventCard("Concealing Darkness", "Deep Strike (1).\n"
+                                                     "Reaction: After you Deep Strike this event, you may deploy "
+                                                     "each unit in your hand at this planet as though it had "
+                                                     "Ambush until the end of the phase.", "Power.",
+                              0, faction, "Common", 1, False, deepstrike=1),
+        CardClasses.ArmyCard("War Walker Squadron", "No Wargear Attachments.\n"
+                                                    "Reaction: After this unit is chosen as a defender, "
+                                                    "exhaust a Hardpoint attachment on it to cancel that attack.",
+                             "Vehicle. Elite.", 5, faction, "Common", 4, 3, 1, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Phoenix Attack Fighter", "Flying. No Wargear Attachments.\n"
+                                                       "Reaction: After units are committed to this planet, deal 3 "
+                                                       "damage to an exhausted enemy unit at this planet.",
+                             "Vehicle. Elite.", 6, faction, "Loyal", 2, 6, 1, False,
+                             wargear_attachments_permitted=False, flying=True),
+        CardClasses.SupportCard("Webway Passage", "Deploy Action: Exhaust this support to switch the locations of "
+                                                  "two target army units you control.", "Upgrade.",
+                                1, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("Shrieking Exarch", "Reaction: After an army unit is destroyed at this planet, "
+                                                 "draw 1 card and deal 1 damage to a target enemy unit.",
+                             "Warrior. Elite.", 5, faction, "Common", 4, 6, 2, False),
+        CardClasses.AttachmentCard("Ulthwe Spirit Stone", "Attach to an army unit you control\n"
+                                                          ".Interrupt: When attached unit would be destroyed, "
+                                                          "return it to your hand instead.", "Wargear. Ulthwe.",
+                                   0, faction, "Common", 1, False, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.WarlordCard("Jain Zar", "Interrupt: When your opponent targets a unit you control at this planet "
+                                            "with a triggered effect, cancel that effect. (Limit once per round.)",
+                                "Phoenix Lord. Warrior.", faction, 2, 6, 1, 6, "Bloodied.", 7, 7,
+                                ["4x Banshee Assault Squad", "1x Intercept",
+                                 "2x Storm of Silence", "1x The Mask of Jain Zar"]),
+        CardClasses.ArmyCard("Banshee Assault Squad", "Reaction: After you cancel a card effect, put this unit into "
+                                                      "play from you hand at a planet.", "Warrior.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("Intercept", "Reaction: After your opponent targets a single unit with a card effect, "
+                                             "exhaust this support to change the target of that effect to "
+                                             "a target unit you control (ignoring targeting restrictions).",
+                                "Upgrade.", 2, faction, "Signature", False),
+        CardClasses.EventCard("Storm of Silence", "Interrupt: When a card effect targets a unit, cancel that effect. "
+                                                  "If the targeted unit was a unit you control, ready your warlord.",
+                              "Power.", 2, faction, "Signature", 1, False),
+        CardClasses.AttachmentCard("The Mask of Jain Zar", "Attach to your warlord.\n"
+                                                           "After an enemy unit at this planet triggers an ability, "
+                                                           "deal 1 damage to that unit.", "Wargear. Relic.",
+                                   1, faction, "Signature", 3, True, must_be_own_unit=True,
+                                   type_of_units_allowed_for_attachment="Warlord"),
+        CardClasses.ArmyCard("Scorpion Striker", "Deep Strike (2).\n"
+                                                 "Reaction: After you Deep Strike this unit, exhaust a target "
+                                                 "non-Elite army unit at this planet.", "Warrior.",
+                             4, faction, "Common", 3, 3, 1, False, deepstrike=1),
+        CardClasses.EventCard("Piercing Wail", "Deploy Action: Exhaust up to 2 units each with printed cost X or lower."
+                                               " X is equal to the highest printed cost among units you control.",
+                              "Power.", 4, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY")
     ]
     return eldar_cards_array

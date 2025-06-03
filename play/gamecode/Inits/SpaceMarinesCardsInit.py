@@ -295,6 +295,75 @@ def space_marines_cards_init():
                                                          "Space Marines unit into play from your hand at a "
                                                          "tech planet (blue). (Limit once per phase.)",
                                 "Location. Ecclesiarchy.", 4, faction, "Loyal", True,
-                                action_in_play=True, allowed_phases_in_play="DEPLOY")
+                                action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("8th Company Assault Squad", "Deep Strike (2).\n"
+                                                          "Reaction: After you Deep Strike this unit, ready a target "
+                                                          "Space Marines unit at this planet.", "Soldier. Dark Angels.",
+                             3, faction, "Common", 3, 3, 1, False, deepstrike=2),
+        CardClasses.AttachmentCard("Valkyris Pattern Jump Pack", "Deep Strike (0).\n"
+                                                                 "Attach to an army unit you control.\n"
+                                                                 "Attached unit gains Flying.", "Wargear.",
+                                   2, faction, "Loyal", 2, False, must_be_own_unit=True,
+                                   type_of_units_allowed_for_attachment="Army", deepstrike=0),
+        CardClasses.WarlordCard("Epistolary Vezuel", "Reaction: After you Deep Strike a card, draw 1 card.",
+                                "Dark Angels. Psyker.", faction, 2, 6, 2, 6, "Bloodied.", 7, 7,
+                                ["4x Vezuel's Hunters", "1x Dark Angels Cruiser",
+                                 "2x Unseen Strike", "1x Fulgaris"]),
+        CardClasses.ArmyCard("Vezuel's Hunters", "Deep Strike (1).\n"
+                                                 "Reaction: After you Deep Strike this unit, deal 2 damage to a "
+                                                 "target enemy army unit at this planet.", "Soldier. Dark Angels.",
+                             3, faction, "Signature", 2, 2, 1, False, deepstrike=1),
+        CardClasses.SupportCard("Dark Angels Cruiser", "Deploy Action: Exhaust this support to put a target unit"
+                                                       " you control at a planet in reserve.", "Dark Angels. Upgrade.",
+                                0, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.EventCard("Unseen Strike", "Deep Strike (1).\n"
+                                               "Reaction: After you Deep Strike this event, you gain the "
+                                               "initiative in this battle.", "Tactic.",
+                              0, faction, "Signature", 1, False, deepstrike=1),
+        CardClasses.AttachmentCard("Fulgaris", "Attach to your warlord.\n"
+                                               "Reaction: After you Deep Strike a card, attached unit gets "
+                                               "+1 ATK and +1 HP until the end of the phase.", "Wargear. Weapon.",
+                                   1, faction, "Signature", 3, True, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True),
+        CardClasses.ArmyCard("Salamander Flamer Squad", "Area Effect (1).\n"
+                                                        "Reaction: After this unit readies, deal 1 damage to each "
+                                                        "enemy unit damaged by this unit this phase.",
+                             "Soldier. Salamanders.", 4, faction, "Common", 2, 5, 2, False, area_effect=1),
+        CardClasses.ArmyCard("Techmarine Aspirant", "Each Elite unit you control at this planet gains, “Action: Pay "
+                                                    "1 resource to ready this unit. (Limit once per round.)”",
+                             "Soldier. Dark Angels.", 2, faction, "Common", 1, 3, 1, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Deathstorm Drop Pod", "Reaction: After you Deep Strike a card, deal 1 damage to an"
+                                                       " enemy army unit at the same planet as that card.",
+                                "Upgrade. Artillery.", 1, faction, "Common", False),
+        CardClasses.ArmyCard("Deathwing Terminators", "Deep Strike (3).\n"
+                                                      "Reaction: After you Deep Strike this unit, "
+                                                      "it cannot be targeted by enemy card effects until the "
+                                                      "end of the first combat round.", "Soldier. Dark Angels. Elite.",
+                             5, faction, "Common", 4, 5, 2, False, deepstrike=3),
+        CardClasses.EventCard("Repent!", "Action: Each player exhausts a unit he controls with the highest printed "
+                                         "cost among units he controls. Then, each unit exhausted by this effect deals"
+                                         " X damage, where X is its ATK value, to the other player's unit exhausted by"
+                                         " this effect.", "Tactic.", 2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Dark Angels Vindicator", "No Wargear Attachments.\n"
+                                                       "While this unit is attacking it gets +2 ATK for each command "
+                                                       "icon the defender has.", "Vehicle. Tank. Dark Angels.",
+                             4, faction, "Common", 1, 5, 2, False, wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Imperial Power Fist", "Attach to an army unit you control.\n"
+                                                          "While each other unit you control at this planet is "
+                                                          "exhausted, attached unit gets +5 ATK.", "Wargear. Weapon.",
+                                   2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True),
+        CardClasses.ArmyCard("Iron Hands Centurion", "While this unit is ready, each unit with printed cost 2 or lower"
+                                                     " at this planet cannot be declared as an attacker.",
+                             "Soldier. Iron Hands. Elite.", 5, faction, "Common", 3, 7, 3, False),
+        CardClasses.ArmyCard("Land Speeder Vengeance", "Area Effect (3).\n Flying.\n No Wargear Attachments.",
+                             "Vehicle. Dark Angels. Elite.", 6, faction, "Loyal", 4, 3, 1, False,
+                             area_effect=3, flying=False, wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Standard of Devastation", "Reaction: After a Dark Angels unit you control is "
+                                                           "destroyed, each other Space Marines army unit "
+                                                           "you control gets +1 ATK until the end of the phase.",
+                                "Relic. Upgrade.", 3, faction, "Common", True)
     ]
     return space_marines_card_array

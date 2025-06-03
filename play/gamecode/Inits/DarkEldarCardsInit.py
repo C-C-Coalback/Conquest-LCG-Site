@@ -289,6 +289,50 @@ def dark_eldar_cards_init():
                                                            "deal damage to that unit equal to its printed ATK value.",
                                    "Wargear.", 2, faction, "Loyal", 2, False, must_be_own_unit=True,
                                    required_traits="Kabalite", type_of_units_allowed_for_attachment="Army",
-                                   action_in_play=True, allowed_phases_in_play="COMBAT")
+                                   action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Supplicant of Pain", "Each Elite army unit you control at this planet gains Armorbane"
+                                                   " while attacking a damaged enemy unit.", "Creature. Abomination.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.SupportCard("Hunting Grounds", "Action: Exhaust this support and sacrifice a Khymera token to "
+                                                   "ready a Creature army unit you control.", "Location.",
+                                1, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Mandrake Cutthroat", "Deep Strike (1).\n"
+                                                   "Reaction: After you Deep Strike this unit, destroy a "
+                                                   "target Ally unit at this planet.", "Warrior.",
+                             3, faction, "Common", 2, 2, 1, False, deepstrike=1),
+        CardClasses.EventCard("A Thousand Cuts", "Combat Action: Deal 1 damage to a target non-Elite army unit. "
+                                                 "Then, shuffle this card back into your deck.", "Tactic. Torture.",
+                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Corrupted Clawed Fiend", "No Attachments.\n"
+                                                       "Reaction: After a unit with printed cost 2 or lower "
+                                                       "deals damage to this unit by an attack, rout that unit.",
+                             "Creature. Elite.", 7, faction, "Common", 6, 7, 3, False, no_attachments=True),
+        CardClasses.AttachmentCard("Electrocorrosive Whip", "Attach to an army unit you control.\n"
+                                                            "Each non-Elite army unit dealt damage by attached "
+                                                            "unit's attack cannot ready this phase.",
+                                   "Wargear. Weapon.", 1, faction, "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Masked Hunter", "Reaction: After you declare this unit as an attacker, "
+                                              "move a Khymera token from an adjacent planet to this planet.",
+                             "Warrior. Beastmaster.", 3, faction, "Common", 2, 3, 1, False),
+        CardClasses.EventCard("Run Down", "Deep Strike (0).\n"
+                                          "Reaction: After you Deep Strike this event, target a non-Elite army unit "
+                                          "in your opponent's HQ. Move the targeted unit to this planet.", "Tactic.",
+                              0, faction, "Common", 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Kabalite Blackguard", "Reaction: After you win a battle at this planet, "
+                                                    "take up to 2 resources from your opponent.", "Warrior. Kabalite.",
+                             2, faction, "Loyal", 2, 3, 0, False),
+        CardClasses.SupportCard("Abomination Workshop", "HEADQUARTERS ACTION: Sacrifice this support to have each "
+                                                        "player discard cards from his hand until he has cards "
+                                                        "equal to or less than the highest printed cost among "
+                                                        "units he controls.", "Location.", 1, faction, "Common",
+                                False, action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.ArmyCard("Beastmaster Harvester", "Deep Strike (4).\n"
+                                                      "Reaction: After you Deep Strike this unit, put 2 Khymera "
+                                                      "tokens into play at this planet.",
+                             "Warrior. Beastmaster. Elite.", 5, faction, "Common", 2, 5, 2, False, deepstrike=4),
+        CardClasses.ArmyCard("Hydrae Stalker", "Reaction: After you deploy this unit, deal 2 damage to a target unit "
+                                               "with printed cost 2 or lower.", "Warrior. Wych. Raider.",
+                             3, faction, "Common", 2, 3, 0, False)
     ]
     return dark_eldar_cards_array

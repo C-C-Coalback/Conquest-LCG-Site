@@ -222,7 +222,7 @@ def tyranids_cards_init():
                               "Tactic.", 0, faction, "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.WarlordCard("Subject Omega-X62113", "Each Genestealer card in your hand may be deployed to "
-                                                         "infested planets as if it had ambush.",
+                                                        "infested planets as if it had ambush.",
                                 "Creature. Genestealer.", faction, 2, 6, 2, 5, "Bloodied.", 6, 6,
                                 ["4x Invasive Genestealers", "1x Ruined Passages",
                                  "2x Gene Implantation", "1x Lethal Toxin Sacs"]),
@@ -268,6 +268,54 @@ def tyranids_cards_init():
                                                     "Action: Pay 1 resource to have attached unit get, until the end "
                                                     "of the phase, either: +2 ATK or +2 HP.", "Skill. Genestealer.",
                                    1, faction, "Common", 2, False, type_of_units_allowed_for_attachment="Army",
-                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="ALL")
+                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SynapseCard("Keening Maleceptor", "Combat Action: Remove an infestation token from this "
+                                                      "planet to trigger its Battle ability. (Limit once per phase.)",
+                                "Creature. Leviathan. Elite.", 1, 5, 1, True,
+                                action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Crush of Sky-Slashers", "Flying.\n"
+                                                      "Reaction: After a combat round begins at this planet, "
+                                                      "deal 1 damage to a target enemy unit at this planet with "
+                                                      "printed cost 2 or lower.", "Creature.",
+                             1, faction, "Common", 1, 2, 0, False, flying=True),
+        CardClasses.ArmyCard("Caustic Tyrannofex", "Reaction: After you win a command struggle at this planet, until"
+                                                   " the end of the round, this unit gains “Hive Mind -"
+                                                   " Each Termagant token you control at "
+                                                   "this planet gains Armorbane.”", "Creature. Leviathan. Elite.",
+                             5, faction, "Common", 4, 4, 3, False, hive_mind=True),
+        CardClasses.SupportCard("Loamy Broodhive", "Reaction: After you deploy an Elite unit, exhaust this support to "
+                                                   "put 2 Termagant tokens into play at the same planet as that unit.",
+                                "Location.", 1, faction, "Common", False),
+        CardClasses.ArmyCard("Focal Warrior", "Each Elite unit you control at this planet gains Brutal.",
+                             "Creature. Kraken.", 2, faction, "Common", 1, 3, 1, False),
+        CardClasses.AttachmentCard("Flesh Hooks", "Deep Strike (1).\n"
+                                                  "Attach to an enemy army unit with printed cost 2 or lower.\n"
+                                                  "Attached unit cannot be readied.", "Wargear. Biomorph.",
+                                   1, faction, "Common", 1, False, must_be_enemy_unit=True,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Mucolid Spores", "Flying. Mobile.", "Interrupt: When this unit is destroyed, destroy "
+                                                                  "up to 2 target enemy support cards.", "Creature.",
+                             3, faction, "Common", 0, 2, 1, False, flying=True, mobile=True),
+        CardClasses.EventCard("Burst Forth", "Deep Strike (0).\n"
+                                             "Reaction: After you Deep Strike this event, commit either your "
+                                             "warlord or a synapse unit you control to this planet.", "Tactic.",
+                              0, faction, "Common", 1, False, deepstrike=0),
+        CardClasses.ArmyCard("Lictor Vine Lurker", "Deep Strike (2).\n"
+                                                   "Reaction: After you Deep Strike this unit, discard 1 "
+                                                   "card at random from your opponent's hand.", "Creature. Leviathan.",
+                             4, faction, "Common", 3, 3, 1, False, deepstrike=2),
+        CardClasses.SupportCard("Invasion Site", "Reaction: After an Elite unit you control is destroyed, "
+                                                 "sacrifice this support to gain X resources. "
+                                                 "X is equal to that unit's printed cost.", "Location.",
+                                0, faction, "Common", True),
+        CardClasses.ArmyCard("Slavering Mawloc", "Deep Strike (3).\n"
+                                                 "Reaction: After you Deep Strike this unit, it gains Armorbane "
+                                                 "until the end of the phase.", "Creature. Leviathan. Elite.",
+                             6, faction, "Common", 3, 6, 0, False, deepstrike=3),
+        CardClasses.AttachmentCard("Armored Shell", "Attach to an army unit you control.\n"
+                                                    "Reaction: After attached unit is assigned damage by an attack, "
+                                                    "prevent all but 2 of that damage.", "Wargear. Biomorph.",
+                                   2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   must_be_own_unit=True)
     ]
     return tyranids_card_array

@@ -261,6 +261,58 @@ def orks_cards_init():
                                               "combat turn order does not change.)", "Warrior.",
                              3, faction, "Common", 1, 5, 2, False),
         CardClasses.SupportCard("Painboy Tent", "Each damaged Orks army unit you control gains 1 command icon.",
-                                "Location.", 2, faction, "Loyal", True)
+                                "Location.", 2, faction, "Loyal", True),
+        CardClasses.ArmyCard("Blitza-Bommer", "No Wargear Attachments.\n"
+                                              "While this unit is ready it gains Flying.\n"
+                                              "Reaction: After this units readies, have your opponent deal 3 "
+                                              "indirect damage among units they control at this planet.",
+                             "Vehicle. Elite.", 5, faction, "Loyal", 3, 5, 2, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Kommando Sneakaz", "Ambush.\n"
+                                                 "Reaction: After you deploy this unit, ready a target Orks unit"
+                                                 " you control at this planet and deal it 1 damage.", "Soldier.",
+                             3, faction, "Common", 2, 3, 0, False,
+                             action_in_hand=True, allowed_phases_in_hand="COMBAT", ambush=True),
+        CardClasses.ArmyCard("Gorgul Da Slaya", "Interrupt: When a unit you control at this planet is declared as an "
+                                                "attacker, your opponent cannot trigger effects until after "
+                                                "that attack resolves.", "Soldier. Nob.",
+                             4, faction, "Loyal", 4, 5, 0, True),
+        CardClasses.AttachmentCard("Great Iron Gob", "Attach to an Orks army unit you control.\n"
+                                                     "Attached unit gains the Nob trait.\n"
+                                                     "Each army unit you control at this planet gains a command icon.",
+                                   "Wargear.", 2, faction, "Loyal", 2, False, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Squiggoth Brute", "Brutal, No Attachments.\n"
+                                                "Reaction: After the combat phase begins, each enemy army unit "
+                                                "at this planet loses all keywords until the end of the phase.",
+                             "Creature. Elite.", 6, faction, "Common", 5, 9, 0, False,
+                             no_attachments=True, brutal=True),
+        CardClasses.EventCard("Brutal Cunning", "Combat Action: Move up to 2 damage from a target Orks unit you"
+                                                " control to a target non-Elite army unit at the same planet",
+                              "Tactic.", 2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Blood Axe Strategist", "Reaction: After an Orks unit you control at this planet resolves "
+                                                     "an attack, move it to an adjacent planet or your HQ.", "Soldier.",
+                             3, faction, "Common", 2, 4, 2, False),
+        CardClasses.SupportCard("'idden Base", "Each card you control in reserve is treated as a 2 ATK, 2 HP Orks"
+                                               " army unit during the combat phase.", "Location.",
+                                1, faction, "Common", False),
+        CardClasses.ArmyCard("Sootblade Assashun", "Deep Strike (2).\n"
+                                                   "After you Deep Strike this unit, have your opponent deal 2 "
+                                                   "indirect damage among exhausted units he controls at this planet.",
+                             "Soldier.", 4, faction, "Common", 3, 3, 1, False, deepstrike=1),
+        CardClasses.AttachmentCard("Repulsor Minefield", "Deep Strike (1).\n"
+                                                         "Attach to a planet.\n"
+                                                         "FORCED REACTION: After an enemy army unit is declared as "
+                                                         "an attacker at this planet, deal it 1 damage.", "Upgrade.",
+                                   2, faction, "Common", 1, False, deepstrike=1, planet_attachment=True),
+        CardClasses.ArmyCard("Follower of Gork", "Each Elite unit you control at this planet gains, "
+                                                 "“Interrupt: When this unit is assigned damage, "
+                                                 "reduce that damage by 2.”", "Warrior.",
+                             2, faction, "Common", 1, 3, 1, False),
+        CardClasses.SupportCard("Fungal Turf", "HEADQUARTERS ACTION: Sacrifice this support to put X Snotling tokens "
+                                               "into play divided among any number of planets. "
+                                               "X is the highest printed cost among units you control.", "Location.",
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
     ]
     return orks_card_array

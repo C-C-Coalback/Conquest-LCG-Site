@@ -5,7 +5,7 @@ class Card:
     def __init__(self, name, text, traits, cost, faction, loyalty, shields, card_type, unique, image_name="",
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None, is_faction_limited_unique_discounter=False,
-                 limited=False, ambush=False):
+                 limited=False, ambush=False, deepstrike=-1):
         if applies_discounts is None:
             applies_discounts = [False, 0, False]
         self.name_owner = ""
@@ -56,6 +56,15 @@ class Card:
         self.extra_traits_eop = ""
         self.ambush = ambush
         self.attachments = []
+        self.deepstrike = deepstrike
+
+    def get_has_deepstrike(self):
+        if self.deepstrike == -1:
+            return False
+        return True
+
+    def get_deepstrike_value(self):
+        return self.deepstrike
 
     def get_attachments(self):
         return self.attachments
@@ -216,10 +225,10 @@ class UnitCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
-                 mobile=False, ambush=False, hive_mind=False, unstoppable=False):
+                 mobile=False, ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play, limited)
+                         action_in_play, allowed_phases_in_play, limited, deepstrike=deepstrike)
         self.attack = attack
         self.health = health
         self.damage = 0
@@ -620,6 +629,7 @@ class WarlordCard(UnitCard):
 
     def bloody_warlord(self):
         self.damage = 0
+        self.area_effect = 0
         self.health = self.bloodied_health
         self.attack = self.bloodied_attack
         self.text = self.bloodied_text
@@ -644,8 +654,10 @@ class WarlordCard(UnitCard):
 
 
 class SynapseCard(UnitCard):
-    def __init__(self, name, text, traits, attack, health, command, unique):
-        super().__init__(name, text, traits, -1, "Tyranids", "Loyal", "Synapse", attack, health, command, unique)
+    def __init__(self, name, text, traits, attack, health, command, unique,
+                 action_in_play=False, allowed_phases_in_play=""):
+        super().__init__(name, text, traits, -1, "Tyranids", "Loyal", "Synapse", attack, health, command, unique,
+                         action_in_play=action_in_play, allowed_phases_in_play=allowed_phases_in_play)
 
 
 class ArmyCard(UnitCard):
@@ -655,7 +667,7 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False, hive_mind=False, unstoppable=False):
+                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -663,7 +675,7 @@ class ArmyCard(UnitCard):
                          wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
-                         ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable)
+                         ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable, deepstrike=deepstrike)
 
     def print_info(self):
         if self.unique:
@@ -682,11 +694,11 @@ class EventCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False):
+                 limited=False, deepstrike=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Event", unique, image_name, applies_discounts, action_in_hand
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
-                         limited=limited)
+                         limited=limited, deepstrike=deepstrike)
 
     def print_info(self):
         if self.unique:
@@ -710,12 +722,13 @@ class AttachmentCard(Card):
                  unit_must_be_unique=False, unit_must_match_faction=False, must_be_own_unit=False,
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
                  extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS",
-                 planet_attachment=False, ambush=False, blue_required=False, green_required=False, red_required=False):
+                 planet_attachment=False, ambush=False, blue_required=False, green_required=False, red_required=False,
+                 deepstrike=False):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,
                          action_in_play=action_in_play, allowed_phases_in_play=allowed_phases_in_play,
-                         limited=limited, ambush=ambush)
+                         limited=limited, ambush=ambush, deepstrike=deepstrike)
         self.type_of_units_allowed_for_attachment = type_of_units_allowed_for_attachment
         self.unit_must_be_unique = unit_must_be_unique
         self.unit_must_match_faction = unit_must_match_faction
