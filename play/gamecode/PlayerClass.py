@@ -3199,6 +3199,7 @@ class Player:
                                                           (int(self.number), -2, i))
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
+            self.game.queued_sound = "destroy"
 
     def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True, enemy_event=False):
         i = 0
@@ -3436,6 +3437,7 @@ class Player:
                                                           (int(self.number), -2, i))
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
+            self.game.queued_sound = "destroy"
 
     def exhaust_all_cards_of_ability(self, card_name):
         for i in range(len(self.headquarters)):

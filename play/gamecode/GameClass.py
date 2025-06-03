@@ -316,7 +316,7 @@ class Game:
                                                  "Declare the Crusade", "Gut and Pillage"]
         self.queued_sound = ""
         self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
-        self.gunfire_weapon_sounds = ["Astra Militarum", "Chaos", "Dark Eldar", "Tyranids", "Neutral"]
+        self.gunfire_weapon_sounds = ["Astra Militarum", "Orks", "Dark Eldar", "Tyranids", "Neutral"]
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -3685,6 +3685,7 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
+                    self.queued_sound = "damage"
                     if planet_pos != -2:
                         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
@@ -3806,6 +3807,7 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"
                                         if took_damage:
+                                            self.queued_sound = "damage"
                                             self.recently_damaged_units.append(
                                                 self.positions_of_units_to_take_damage[0])
                                             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
