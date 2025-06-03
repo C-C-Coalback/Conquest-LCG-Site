@@ -1875,7 +1875,7 @@ class Game:
                             if planet_pos == -2:
                                 current_attack = primary_player.headquarters[unit_pos].extra_attack_until_end_of_phase
                             else:
-                                current_attack = primary_player.cards_in_play[planet_pos + 1][unit_pos]\
+                                current_attack = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                     .extra_attack_until_end_of_phase
                             await self.send_update_message("Gained +2 ATK! Now has +" + str(current_attack) + " ATK.")
                         elif self.choices_available[int(game_update_string[1])] == "+2 HP":
@@ -1884,7 +1884,7 @@ class Game:
                                 current_health = primary_player.headquarters[unit_pos].positive_hp_until_eop
                             else:
                                 primary_player.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop += 2
-                                current_health = primary_player.cards_in_play[planet_pos + 1][unit_pos].\
+                                current_health = primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
                                     positive_hp_until_eop
                             await self.send_update_message("Gained +2 HP! Now has +" + str(current_health) + " HP.")
                         self.action_cleanup()
@@ -2871,7 +2871,7 @@ class Game:
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -3732,7 +3732,8 @@ class Game:
                                         self.create_reaction("Vow of Honor", primary_player.name_player,
                                                              (int(primary_player.number), -1, -1))
                         if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                            if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
+                            if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound",
+                                                                    bloodied_relevant=True):
                                 self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                                      (int(primary_player.number), planet_pos, unit_pos))
                                 self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
@@ -3814,7 +3815,7 @@ class Game:
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Reanimating Warriors" \
                                                         and not primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].once_per_phase_used:
+                                                    unit_pos].once_per_phase_used:
                                                     self.create_interrupt("Reanimating Warriors",
                                                                           primary_player.name_player,
                                                                           (int(primary_player.number), planet_pos,
@@ -3877,7 +3878,8 @@ class Game:
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
                                                     if primary_player.search_card_at_planet(
-                                                            planet_pos, "Ba'ar Zul the Hate-Bound"):
+                                                            planet_pos, "Ba'ar Zul the Hate-Bound",
+                                                            bloodied_relevant=True):
                                                         self.create_reaction("Ba'ar Zul the Hate-Bound",
                                                                              primary_player.name_player,
                                                                              (
