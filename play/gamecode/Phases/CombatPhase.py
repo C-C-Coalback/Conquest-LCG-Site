@@ -233,7 +233,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             secondary_player = self.p2
                         else:
                             player = self.p2
-                            secondary_player = self.p2
+                            secondary_player = self.p1
                         if chosen_planet == self.last_planet_checked_for_battle:
                             can_continue = False
                             print("check enemy cards")
