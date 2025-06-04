@@ -318,6 +318,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 await self.send_update_message("Deepstrike is complete")
                                     else:
                                         self.choosing_target_for_deepstruck_attachment = True
+                                        player.cards_in_reserve[chosen_planet][chosen_unit].\
+                                            aiming_reticle_color = "blue"
                                         self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
                                         await self.send_update_message("deepstriking attachment")
 
