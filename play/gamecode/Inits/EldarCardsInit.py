@@ -290,7 +290,7 @@ def eldar_cards_init():
                                                                "Attach to an army unit you control.\n"
                                                                "While attacking a non-Warlord unit, "
                                                                "attached unit gets +2 ATK.", "Wargear. Weapon.",
-                                   1, faction, "Common", 1, False, deepstrike=0, extra_attack=2,
+                                   1, faction, "Common", 1, False, deepstrike=0,
                                    type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
         CardClasses.ArmyCard("Adherent Outcast", "Each Elite unit you control at this planet gains Flying.",
                              "Scout.", 2, faction, "Common", 1, 3, 0, False),

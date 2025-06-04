@@ -318,7 +318,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 await self.send_update_message("Deepstrike is complete")
                                     else:
                                         self.choosing_target_for_deepstruck_attachment = True
-                                        player.cards_in_reserve[chosen_planet][chosen_unit].\
+                                        player.cards_in_reserve[chosen_planet][chosen_unit]. \
                                             aiming_reticle_color = "blue"
                                         self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
                                         await self.send_update_message("deepstriking attachment")
@@ -528,7 +528,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 primary_player = self.p2
                                 secondary_player = self.p1
                             u_pos = int(game_update_string[3])
-                            if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                            if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     emperor_champion_active:
                                 for i in range(len(secondary_player.cards_in_play[self.attacker_planet + 1])):
                                     if secondary_player.get_name_given_pos(self.attacker_planet, i) == \
@@ -551,20 +551,20 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         can_continue = False
                             if (secondary_player.get_ability_given_pos(
                                     self.defender_planet, self.defender_position) != "Lychguard Sentinel" or
-                                    not secondary_player.get_ready_given_pos(
-                                        self.defender_planet, self.defender_position)) and \
+                                not secondary_player.get_ready_given_pos(
+                                    self.defender_planet, self.defender_position)) and \
                                     secondary_player.get_ability_given_pos(
-                                    self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz" and \
+                                        self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz" and \
                                     (exa and not secondary_player.check_for_trait_given_pos(
                                         self.defender_planet, self.defender_position, "Warrior")):
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if (secondary_player.get_ability_given_pos(
-                                        self.defender_planet, i) == "Lychguard Sentinel" and
-                                            secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
+                                            self.defender_planet, i) == "Lychguard Sentinel" and
+                                        secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
                                             secondary_player.get_ability_given_pos(
-                                            self.defender_planet, i) == "Front Line 'Ard Boyz" or \
+                                                self.defender_planet, i) == "Front Line 'Ard Boyz" or \
                                             (exa and secondary_player.check_for_trait_given_pos(
-                                            self.defender_planet, i, "Warrior")):
+                                                self.defender_planet, i, "Warrior")):
                                         can_continue = False
                             if self.may_move_defender:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
@@ -588,8 +588,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                             "red")
                             if can_continue and self.shadow_thorns_body_allowed:
                                 if secondary_player.search_attachments_at_pos(
-                                    self.defender_planet, self.defender_position,
-                                    "Shadowed Thorns Bodysuit", ready_relevant=True, must_match_name=True
+                                        self.defender_planet, self.defender_position,
+                                        "Shadowed Thorns Bodysuit", ready_relevant=True, must_match_name=True
                                 ):
                                     can_continue = False
                                     await self.send_update_message(
@@ -618,6 +618,15 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if not secondary_player.get_ready_given_pos(self.defender_planet,
                                                                                 self.defender_position):
                                         attack_value += 2
+                                for i in range(
+                                        len(primary_player.
+                                            cards_in_play[self.attacker_planet + 1][self.attacker_position]
+                                            .get_attachments())):
+                                    if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position] \
+                                            .get_attachments()[i].get_ability() == "Hidden Strike Chainsword":
+                                        if secondary_player.get_card_type_given_pos(
+                                                self.defender_planet, self.defender_position) != "Warlord":
+                                            attack_value += 2
                                 if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                         .get_card_type() != "Warlord":
                                     attack_value += self.banshee_power_sword_extra_attack
@@ -649,7 +658,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                              (int(primary_player.number), self.attacker_planet,
                                                               self.attacker_position))
                                     if secondary_player.search_attachments_at_pos(
-                                        self.defender_planet, self.defender_position, "The Black Sword"
+                                            self.defender_planet, self.defender_position, "The Black Sword"
                                     ):
                                         self.create_reaction("The Black Sword", secondary_player.name_player,
                                                              (int(primary_player.number), self.attacker_planet,
@@ -714,7 +723,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if primary_player.get_cost_given_pos(
                                             self.attacker_planet, self.attacker_position) < 3 \
                                             and primary_player.get_card_type_given_pos(
-                                            self.attacker_planet, self.attacker_position) == "Army":
+                                        self.attacker_planet, self.attacker_position) == "Army":
                                         shadow_field = True
                                     preventable = True
                                     if primary_player.search_attachments_at_pos(
