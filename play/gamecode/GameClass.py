@@ -515,7 +515,10 @@ class Game:
         elif self.phase == "DEPLOY":
             info_string += self.player_with_deploy_turn + "/"
         elif self.phase == "COMBAT":
-            info_string += self.player_with_combat_turn + "/"
+            if self.start_battle_deepstrike:
+                info_string += self.name_player_deepstriking + "/"
+            else:
+                info_string += self.player_with_combat_turn + "/"
         else:
             info_string += "Unspecified/"
         info_string += "Phase: " + self.phase + "/"
@@ -580,10 +583,14 @@ class Game:
                 info_string += "Before command struggle/"
             elif self.after_command_struggle:
                 info_string += "After command struggle/"
+            elif self.during_command_struggle:
+                info_string += "During command struggle/"
             else:
                 info_string += "??????/"
         elif self.phase == "COMBAT":
-            if self.ranged_skirmish_active:
+            if self.start_battle_deepstrike:
+                info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
+            elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
                 info_string += "Active: " + self.player_with_combat_turn + "/"
