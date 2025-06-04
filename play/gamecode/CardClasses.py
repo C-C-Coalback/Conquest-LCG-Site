@@ -286,6 +286,7 @@ class UnitCard(Card):
         self.valid_target_ashen_banner = False
         self.attack_set_eop = -1
         self.unstoppable = unstoppable
+        self.lost_ranged_eop = False
 
     def exhaust_first_attachment_name(self, card_name):
         for i in range(len(self.attachments)):

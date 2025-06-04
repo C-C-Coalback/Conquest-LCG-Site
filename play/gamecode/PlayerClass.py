@@ -281,6 +281,17 @@ class Player:
             self.discard.append(self.cards_in_reserve[planet_id][0].get_name())
             del self.cards_in_reserve[planet_id][0]
 
+    def get_card_type_in_reserve(self, planet_id, unit_id):
+        return self.cards_in_reserve[planet_id][unit_id].get_card_type()
+
+    def get_deepstrike_value_given_pos(self, planet_id, unit_id):
+        return self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
+
+    def deepstrike_unit(self, planet_id, unit_id):
+        card = self.cards_in_reserve[planet_id][unit_id]
+        self.add_card_to_planet(card, planet_id)
+        del self.cards_in_reserve[planet_id][unit_id]
+
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
             if planet_id == -2:

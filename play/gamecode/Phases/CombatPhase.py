@@ -29,6 +29,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 self.p2.has_passed = True
             if self.p1.has_passed and self.p2.has_passed:
                 self.before_first_combat = False
+                self.p1.has_passed = False
+                self.p2.has_passed = False
                 self.check_battle(self.round_number)
                 self.begin_battle(self.round_number)
                 self.begin_combat_round()
@@ -37,8 +39,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 self.set_battle_initiative()
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                self.p1.has_passed = False
-                self.p2.has_passed = False
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":
             if self.get_actions_allowed():
@@ -57,7 +57,29 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.choice_context = "Use Dark Possession?"
                     self.name_player_making_choices = self.player_with_action
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-            if name == self.player_with_combat_turn:
+            if self.start_battle_deepstrike:
+                if name == self.name_player_deepstriking:
+                    if self.num_player_deepstriking == "1":
+                        player = self.p1
+                        other_player = self.p2
+                    else:
+                        player = self.p2
+                        other_player = self.p1
+                    player.has_passed = True
+                    if not other_player.has_passed:
+                        self.name_player_making_choices = other_player.name_player
+                        self.choice_context = "Deepstrike cards?"
+                        self.choices_available = ["Yes", "No"]
+                        self.resolving_search_box = True
+                        await self.send_update_message(other_player.name_player + " can deepstrike")
+                    if player.has_passed and other_player.has_passed:
+                        self.start_battle_deepstrike = False
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        player.has_passed = False
+                        other_player.has_passed = False
+                        await self.send_update_message("Deepstrike is complete")
+            elif name == self.player_with_combat_turn:
                 if self.number_with_combat_turn == "1":
                     self.number_with_combat_turn = "2"
                     self.player_with_combat_turn = self.name_2
@@ -209,7 +231,43 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.shining_blade_active = True
                             await self.send_update_message("The Shining Blade activated!")
     elif len(game_update_string) == 4:
-        if game_update_string[0] == "IN_PLAY":
+        if game_update_string[0] == "RESERVE":
+            if self.start_battle_deepstrike:
+                if name == self.name_player_deepstriking:
+                    if game_update_string[1] == self.num_player_deepstriking:
+                        chosen_planet = int(game_update_string[2])
+                        chosen_unit = int(game_update_string[3])
+                        if chosen_planet == self.last_planet_checked_for_battle:
+                            if self.num_player_deepstriking == "1":
+                                player = self.p1
+                                other_player = self.p2
+                            else:
+                                player = self.p2
+                                other_player = self.p1
+                            cost = player.get_deepstrike_value_given_pos(chosen_planet, chosen_unit)
+                            if player.spend_resources(cost):
+                                if player.get_card_type_in_reserve(chosen_planet, chosen_unit) != "Attachment":
+                                    player.deepstrike_unit(chosen_planet, chosen_unit)
+                                    if not player.cards_in_reserve[chosen_planet]:
+                                        player.has_passed = True
+                                        if not other_player.has_passed:
+                                            self.name_player_making_choices = other_player.name_player
+                                            self.choice_context = "Deepstrike cards?"
+                                            self.choices_available = ["Yes", "No"]
+                                            self.resolving_search_box = True
+                                            await self.send_update_message(
+                                                other_player.name_player + " can deepstrike")
+                                        if player.has_passed and other_player.has_passed:
+                                            self.start_battle_deepstrike = False
+                                            self.resolving_search_box = False
+                                            self.reset_choices_available()
+                                            player.has_passed = False
+                                            other_player.has_passed = False
+                                            await self.send_update_message("Deepstrike is complete")
+                                else:
+                                    await self.send_update_message("deepstriking attachment")
+
+        elif game_update_string[0] == "IN_PLAY":
             print("Unit clicked on.")
             if name == self.player_with_combat_turn:
                 if self.mode == "RETREAT":
@@ -223,6 +281,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             else:
                                 player = self.p2
                             player.retreat_unit(chosen_planet, chosen_unit, exhaust=True)
+
                 elif self.attacker_position == -1:
                     if game_update_string[1] == self.number_with_combat_turn:
                         chosen_planet = int(game_update_string[2])

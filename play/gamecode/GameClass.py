@@ -321,6 +321,8 @@ class Game:
         self.stored_deploy_string = []
         self.deepstrike_deployment_active = False
         self.start_battle_deepstrike = False
+        self.num_player_deepstriking = "1"
+        self.name_player_deepstriking = self.name_1
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -1882,6 +1884,25 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Deepstrike cards?":
+                        if self.choices_available[int(game_update_string[1])] == "Yes":
+                            await self.send_update_message("Please choose cards to deepstrike")
+                            self.resolving_search_box = False
+                            self.num_player_deepstriking = primary_player.number
+                            self.name_player_deepstriking = primary_player.name_player
+                            self.reset_choices_available()
+                        else:
+                            primary_player.has_passed = True
+                            if not secondary_player.has_passed:
+                                self.name_player_making_choices = secondary_player.name_player
+                                await self.send_update_message(secondary_player.name_player + " can deepstrike")
+                            if primary_player.has_passed and secondary_player.has_passed:
+                                self.start_battle_deepstrike = False
+                                self.resolving_search_box = False
+                                self.reset_choices_available()
+                                primary_player.has_passed = False
+                                secondary_player.has_passed = False
+                                await self.send_update_message("Deepstrike is complete")
                     elif self.choice_context == "Ymgarl Factor gains:":
                         planet_pos, unit_pos = self.misc_target_unit
                         if self.choices_available[int(game_update_string[1])] == "+2 ATK":
