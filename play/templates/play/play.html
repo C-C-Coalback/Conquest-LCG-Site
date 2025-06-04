@@ -469,7 +469,7 @@
                                 card_name = "Cardback";
                                 deepstrike = "True";
                             }
-                            var string_id = (i-4).toString();
+                            var string_id = (i-5).toString();
                             var card_class = "Card";
                             string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
                             if (hale === "B") {
@@ -488,7 +488,7 @@
                                 var attachment_name = attachment_data_split[0];
                                 var attachment_ready = attachment_data_split[1];
                                 var attachment_class = "Attachment-Card";
-                                attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-4).toString() + "/" + attachment_string_id;
+                                attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-5).toString() + "/" + attachment_string_id;
                                 var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
                                 var attachment_rotation = "";
                                 if (attachment_ready === "E") {

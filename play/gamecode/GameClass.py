@@ -320,6 +320,7 @@ class Game:
         self.deepstrike_allowed = True
         self.stored_deploy_string = []
         self.deepstrike_deployment_active = False
+        self.start_battle_deepstrike = False
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -891,6 +892,13 @@ class Game:
                         return True
                 elif game_update_string[1] == "2":
                     if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
+                        return True
+            elif game_update_string[0] == "RESERVE":
+                if game_update_string[1] == "1":
+                    if len(self.p1.cards_in_reserve[int(game_update_string[2])]) > int(game_update_string[3]):
+                        return True
+                elif game_update_string[1] == "2":
+                    if len(self.p2.cards_in_reserve[int(game_update_string[2])]) > int(game_update_string[3]):
                         return True
         if len(game_update_string) == 5:
             if game_update_string[0] == "ATTACHMENT":
@@ -4907,10 +4915,31 @@ class Game:
                             self.reset_choices_available()
                             await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
 
+    def change_to_reserve(self, game_update_string):
+        if len(game_update_string) == 4:
+            if game_update_string[0] == "IN_PLAY":
+                if game_update_string[1] == "1":
+                    if len(self.p1.cards_in_play[int(game_update_string[2]) + 1]) <= int(game_update_string[3]):
+                        if self.p1.cards_in_reserve[int(game_update_string[2])]:
+                            game_update_string[0] = "RESERVE"
+                            print(game_update_string[3], len(self.p1.cards_in_play[int(game_update_string[2]) + 1]))
+                            game_update_string[3] = str(int(game_update_string[3]) -
+                                                        len(self.p1.cards_in_play[int(game_update_string[2]) + 1]))
+                            return game_update_string
+                elif game_update_string[1] == "2":
+                    if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) <= int(game_update_string[3]):
+                        if self.p2.cards_in_reserve[int(game_update_string[2])]:
+                            game_update_string[0] = "RESERVE"
+                            game_update_string[3] = str(int(game_update_string[3]) -
+                                                        len(self.p2.cards_in_play[int(game_update_string[2]) + 1]))
+                            return game_update_string
+        return game_update_string
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
         resolved_subroutine = False
+        game_update_string = self.change_to_reserve(game_update_string)
         print(game_update_string)
         if self.phase == "SETUP":
             await self.send_update_message("Buttons can't be pressed in setup")
@@ -5470,6 +5499,28 @@ class Game:
         self.last_planet_checked_for_battle = planet_pos
         self.p1.resolve_battle_begins(planet_pos)
         self.p2.resolve_battle_begins(planet_pos)
+        if self.p1.cards_in_reserve[planet_pos] or self.p2.cards_in_reserve[planet_pos]:
+            self.start_battle_deepstrike = True
+            if self.p1.cards_in_reserve[planet_pos]:
+                self.p1.has_passed = False
+            else:
+                self.p1.has_passed = True
+            if self.p2.cards_in_reserve[planet_pos]:
+                self.p2.has_passed = False
+            else:
+                self.p2.has_passed = True
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Deepstrike cards?"
+            self.resolving_search_box = True
+            if self.p1.cards_in_reserve[planet_pos] and self.p2.cards_in_reserve[planet_pos]:
+                if self.p1.has_initiative:
+                    self.name_player_making_choices = self.name_1
+                else:
+                    self.name_player_making_choices = self.name_2
+            elif self.p1.cards_in_reserve[planet_pos]:
+                self.name_player_making_choices = self.name_1
+            else:
+                self.name_player_making_choices = self.name_2
 
     def find_next_planet_for_combat(self):
         i = self.last_planet_checked_for_battle + 1
