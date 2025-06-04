@@ -667,7 +667,7 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=False):
+                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -694,7 +694,7 @@ class EventCard(Card):
     def __init__(self, name, text, traits, cost, faction, loyalty,
                  shields, unique, image_name="", applies_discounts=None, action_in_hand=False
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
-                 limited=False, deepstrike=False):
+                 limited=False, deepstrike=-1):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Event", unique, image_name, applies_discounts, action_in_hand
                          , allowed_phases_in_hand, action_in_play, allowed_phases_in_play,
@@ -723,7 +723,7 @@ class AttachmentCard(Card):
                  must_be_enemy_unit=False, limit_one_per_unit=False, extra_attack=0, extra_health=0,
                  extra_command=0, required_traits="", forbidden_traits="NO FORBIDDEN TRAITS",
                  planet_attachment=False, ambush=False, blue_required=False, green_required=False, red_required=False,
-                 deepstrike=False):
+                 deepstrike=-1):
         super().__init__(name, text, traits, cost, faction, loyalty,
                          shields, "Attachment", unique, applies_discounts=applies_discounts,
                          action_in_hand=action_in_hand, allowed_phases_in_hand=allowed_phases_in_hand,

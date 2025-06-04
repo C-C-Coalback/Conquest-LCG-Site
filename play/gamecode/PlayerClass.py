@@ -129,6 +129,13 @@ class Player:
         self.gut_and_pillage_used = False
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
         self.war_of_ideas_active = False
+        self.cards_in_reserve = [[], [], [], [], [], [], []]
+
+    def put_card_into_reserve(self, card, planet_pos):
+        if self.spend_resources(1):
+            self.cards_in_reserve[planet_pos].append(copy.deepcopy(card))
+            return True
+        return False
 
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
@@ -274,8 +281,7 @@ class Player:
             if planet_id == -2:
                 await self.send_hq()
             else:
-                joined_string = ""
-                if self.cards_in_play[planet_id + 1]:
+                if self.cards_in_play[planet_id + 1] or self.cards_in_reserve[planet_id]:
                     card_strings = []
                     for i in range(len(self.cards_in_play[planet_id + 1])):
                         current_card = self.cards_in_play[planet_id + 1][i]
@@ -307,10 +313,36 @@ class Player:
                             else:
                                 single_card_string += "E"
                         card_strings.append(single_card_string)
+                    for i in range(len(self.cards_in_reserve[planet_id])):
+                        current_card = self.cards_in_reserve[planet_id][i]
+                        single_card_string = current_card.get_name()
+                        single_card_string = single_card_string + "|"
+                        if current_card.ready:
+                            single_card_string += "R|"
+                        else:
+                            single_card_string += "E|"
+                        single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                        single_card_string += "|"
+                        single_card_string += "D"
+                        single_card_string += "|"
+                        if current_card.aiming_reticle_color is not None:
+                            single_card_string += current_card.aiming_reticle_color
+                        attachments_list = current_card.get_attachments()
+                        for a in range(len(attachments_list)):
+                            single_card_string += "|"
+                            single_card_string += attachments_list[a].get_name()
+                            single_card_string += "+"
+                            if attachments_list[a].get_ready():
+                                single_card_string += "R"
+                            else:
+                                single_card_string += "E"
+                        card_strings.append(single_card_string)
                     joined_string = "/".join(card_strings)
-                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + joined_string
+                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/"\
+                                    + self.name_player + "/" + joined_string
                 else:
-                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id)
+                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) +\
+                                    "/" + str(planet_id) + "/" + self.name_player
                 if self.last_planet_strings[planet_id] != joined_string or force:
                     self.last_planet_strings[planet_id] = joined_string
                     await self.game.send_update_message(joined_string)

@@ -317,6 +317,9 @@ class Game:
         self.queued_sound = ""
         self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
         self.gunfire_weapon_sounds = ["Astra Militarum", "Orks", "Dark Eldar", "Tyranids", "Neutral"]
+        self.deepstrike_allowed = True
+        self.stored_deploy_string = []
+        self.deepstrike_deployment_active = False
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -2147,6 +2150,15 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         await self.update_game_event_action(name, game_update_string)
+                    elif self.choice_context == "Deploy into reserve?":
+                        if self.choices_available[int(game_update_string[1])] == "Normal Deploy":
+                            self.deepstrike_allowed = False
+                            await DeployPhase.update_game_event_deploy_section(self, name, self.stored_deploy_string)
+                            self.deepstrike_allowed = True
+                            self.stored_deploy_string = []
+                        else:
+                            self.deepstrike_deployment_active = True
+                        self.reset_choices_available()
                     elif self.choice_context == "Archon's Palace":
                         if game_update_string[1] == "0":
                             self.canceled_card_bonuses[self.misc_target_planet] = True

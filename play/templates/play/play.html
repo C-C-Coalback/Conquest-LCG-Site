@@ -449,17 +449,29 @@
                     var element =  document.getElementById(target_planet_id);
                     if (typeof(element) != 'undefined' && element != null)
                     {
+                        target_user = split_data[4];
                         document.getElementById(target_planet_id).innerHTML = ``;
-                        for (var i = 4; i < split_data.length; i++) {
+                        for (var i = 5; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
+                            card_name = card_name.split(' ').join('_');
                             var is_ready = card_data_split[1];
                             var damage = card_data_split[2];
                             var hale = card_data_split[3];
+                            var deepstrike = "False";
+                            var original_text = "";
+                            var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                            if (hale === "D") {
+                                if (target_user === "{{ user.username }}") {
+                                    original_text = "/static/images/CardImages/" + card_name + ".jpg";
+                                    enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
+                                }
+                                card_name = "Cardback";
+                                deepstrike = "True";
+                            }
                             var string_id = (i-4).toString();
                             var card_class = "Card";
                             string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
-                            card_name = card_name.split(' ').join('_');
                             if (hale === "B") {
                                 card_name += "_bloodied";
                             }
@@ -493,7 +505,7 @@
                                     style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
                                 }
                             }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             if (card_data_split[4] !== "") {
                                 full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[4] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                             }
@@ -714,6 +726,10 @@
                 }, { once: true });
             });
         });
+
+        function changeDefDeepstrike(image_src) {
+            document.getElementById("LargeHelperCard").src=image_src;
+        }
 
         function changeDef(image_src) {
             document.getElementById("LargeHelperCard").src=image_src;

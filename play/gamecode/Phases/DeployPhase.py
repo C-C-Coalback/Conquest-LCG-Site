@@ -58,6 +58,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     print(game_update_string[1] == self.number_with_deploy_turn)
                     if game_update_string[1] == self.number_with_deploy_turn:
                         print("Deploy card in hand at pos", game_update_string[2])
+                        self.deepstrike_deployment_active = False
                         previous_card_pos_to_deploy = self.card_pos_to_deploy
                         self.card_pos_to_deploy = int(game_update_string[2])
                         if self.number_with_deploy_turn == "1":
@@ -82,6 +83,15 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.player_with_deploy_turn = secondary_player.get_name_player()
                                     self.number_with_deploy_turn = secondary_player.get_number()
                             self.card_pos_to_deploy = -1
+                        elif card.get_has_deepstrike() and primary_player.resources > 0 and self.deepstrike_allowed:
+                            print("deepstrike", card.get_deepstrike_value())
+                            self.stored_deploy_string = game_update_string
+                            self.choices_available = ["Normal Deploy", "Deploy into Reserve"]
+                            self.choice_context = "Deploy into reserve?"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         elif card.get_card_type() == "Army":
                             if (primary_player.warlord_faction == "Necrons" and (
                                     card.get_faction() == primary_player.enslaved_faction or
@@ -132,7 +142,14 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p2
                     planet_chosen = int(game_update_string[1])
                     card = player.get_card_in_hand(self.card_pos_to_deploy)
-                    if card.get_card_type() == "Army":
+                    if self.deepstrike_deployment_active:
+                        if player.put_card_into_reserve(card, planet_chosen):
+                            player.remove_card_from_hand(self.card_pos_to_deploy)
+                            player.aiming_reticle_coords_hand = None
+                            self.card_pos_to_deploy = -1
+                            self.deepstrike_deployment_active = False
+                            self.action_cleanup()
+                    elif card.get_card_type() == "Army":
                         self.discounts_applied = 0
                         await self.calculate_available_discounts_unit(planet_chosen, card, player)
                         await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
