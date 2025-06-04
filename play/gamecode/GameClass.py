@@ -323,6 +323,8 @@ class Game:
         self.start_battle_deepstrike = False
         self.num_player_deepstriking = "1"
         self.name_player_deepstriking = self.name_1
+        self.choosing_target_for_deepstruck_attachment = False
+        self.deepstruck_attachment_pos = (-1, -1)
 
     async def send_queued_sound(self):
         if self.queued_sound:

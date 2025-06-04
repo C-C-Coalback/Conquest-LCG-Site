@@ -287,6 +287,10 @@ class Player:
     def get_deepstrike_value_given_pos(self, planet_id, unit_id):
         return self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
 
+    def deepstrike_event(self, planet_id, unit_id):
+        self.discard.append(self.cards_in_reserve[planet_id][unit_id].get_name())
+        del self.cards_in_reserve[planet_id][unit_id]
+
     def deepstrike_unit(self, planet_id, unit_id):
         card = self.cards_in_reserve[planet_id][unit_id]
         self.add_card_to_planet(card, planet_id)
