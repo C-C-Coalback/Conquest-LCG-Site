@@ -73,6 +73,12 @@ class Card:
         self.attachments.append(copy.deepcopy(attachment_card))
         self.attachments[-1].name_owner = name_owner
 
+    def get_damage(self):
+        return 0
+
+    def get_indirect_damage(self):
+        return 0
+
     def reset_own_eocr_values(self):
         pass
 

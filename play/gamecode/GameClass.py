@@ -1134,6 +1134,8 @@ class Game:
                     winner.capture_planet(self.last_planet_checked_for_battle,
                                           self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     await winner.send_victory_display()
                 self.planet_aiming_reticle_active = False
             self.planet_aiming_reticle_position = -1
@@ -5335,6 +5337,8 @@ class Game:
                     winner.capture_planet(self.last_planet_checked_for_battle,
                                           self.planet_cards_array)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     await winner.send_victory_display()
 
     async def check_combat_end(self, name):
@@ -5351,6 +5355,8 @@ class Game:
             if not p1_has_units and not p2_has_units:
                 if self.round_number == self.last_planet_checked_for_battle:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                 await self.resolve_battle_conclusion(name, ["", ""])
 
     def create_reaction(self, reaction_name, player_name, unit_tuple):

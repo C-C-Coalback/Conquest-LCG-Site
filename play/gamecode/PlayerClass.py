@@ -276,6 +276,11 @@ class Player:
             self.last_hq_string = joined_string
             await self.game.send_update_message(joined_string)
 
+    def discard_all_cards_in_reserve(self, planet_id):
+        while self.cards_in_reserve[planet_id]:
+            self.discard.append(self.cards_in_reserve[planet_id][0].get_name())
+            del self.cards_in_reserve[planet_id][0]
+
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
             if planet_id == -2:
