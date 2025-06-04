@@ -471,6 +471,9 @@ class UnitCard(Card):
             return False
         if self.flying_eop:
             return True
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Valkyris Pattern Jump Pack":
+                return True
         return self.flying
 
     def set_flying(self, new_val):
