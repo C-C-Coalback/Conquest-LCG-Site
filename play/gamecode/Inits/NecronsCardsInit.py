@@ -203,7 +203,7 @@ def necrons_cards_init():
                              2, faction, "Common", 1, 3, 1, False),
         CardClasses.SupportCard("Shroud Cruiser", "Action: Exhaust this support to move an Elite "
                                                   "unit you control to an adjacent planet.", "Upgrade.",
-                                2, faction, "Common", False),
+                                2, faction, "Common", False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Hunting Acanthrites", "Each unit with printed cost 2 or lower at this planet gets -1 HP",
                              "Drone.", 3, faction, "Common", 1, 3, 0, False),
         CardClasses.EventCard("Defensive Protocols", "Deep Strike (2).\n"

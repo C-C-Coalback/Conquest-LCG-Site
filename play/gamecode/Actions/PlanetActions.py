@@ -225,6 +225,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_action = ""
             self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Shroud Cruiser":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.misc_target_unit
+            if abs(chosen_planet - og_pla) == 1:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \

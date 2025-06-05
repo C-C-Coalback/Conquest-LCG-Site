@@ -1153,21 +1153,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Khymera Den":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Khymera":
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+    elif self.action_chosen == "Shroud Cruiser":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.chosen_first_card = True
+                    self.misc_target_unit = (planet_pos, unit_pos)
     elif self.action_chosen == "Kauyon Strike":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
