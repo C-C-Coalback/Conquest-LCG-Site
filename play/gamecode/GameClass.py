@@ -5006,8 +5006,15 @@ class Game:
                         self.asking_amount_xv805_enforcer = True
                         self.asking_if_use_xv805_enforcer = False
                     else:
-                        self.asking_if_use_xv805_enforcer = False
                         self.xv805_enforcer_active = False
+                        self.asking_if_use_xv805_enforcer = False
+                        self.asking_amount_xv805_enforcer = False
+                        self.amount_xv805_enforcer = 0
+                        self.damage_index_xv805 = -1
+                        self.player_using_xv805 = ""
+                        self.og_pos_xv805_target = (-1, -1)
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
             elif self.asking_amount_xv805_enforcer:
                 if game_update_string[0] == "CHOICE":
                     self.amount_xv805_enforcer = int(self.choices_available[int(game_update_string[1])])
