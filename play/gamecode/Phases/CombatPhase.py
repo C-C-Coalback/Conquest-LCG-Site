@@ -717,8 +717,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                             self.attacker_position) \
                                             == "Torquemada Coteaz":
                                         primary_player.reset_card_name_misc_ability("Torquemada Coteaz")
+                                    enemy_unit_damage = secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                                              self.defender_position)
                                     can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                            self.attacker_position)
+                                                                                            self.attacker_position,
+                                                                                            enemy_unit_damage)
                                     shadow_field = False
                                     if primary_player.get_cost_given_pos(
                                             self.attacker_planet, self.attacker_position) < 3 \

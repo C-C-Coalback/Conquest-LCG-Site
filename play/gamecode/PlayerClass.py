@@ -1869,7 +1869,7 @@ class Player:
             return True
         return False
 
-    def get_armorbane_given_pos(self, planet_id, unit_id):
+    def get_armorbane_given_pos(self, planet_id, unit_id, enemy_unit_damage=0):
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 return True
@@ -1885,6 +1885,11 @@ class Player:
                     return True
             if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
                 if self.check_for_enemy_warlord(planet_id):
+                    return True
+        if enemy_unit_damage > 0:
+            if self.check_for_trait_given_pos(planet_id, unit_id, "Elite") and\
+                    self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+                if self.search_card_at_planet(planet_id, "Supplicant of Pain"):
                     return True
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
 
