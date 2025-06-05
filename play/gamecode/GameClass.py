@@ -3249,8 +3249,7 @@ class Game:
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
-                                self.unit_to_move_position[0] = int(game_update_string[2])
-                                self.unit_to_move_position[1] = int(game_update_string[3])
+                                self.unit_to_move_position = (int(game_update_string[2]), int(game_update_string[3]))
                                 player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                   self.unit_to_move_position[1], "blue")
             elif self.battle_ability_to_resolve == "Atrox Prime":

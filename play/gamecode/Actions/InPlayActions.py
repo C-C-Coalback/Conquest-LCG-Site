@@ -236,6 +236,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Keening Maleceptor":
+                        if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                            if self.infested_planets[planet_pos]:
+                                self.infested_planets[planet_pos] = False
+                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos , True)
+                                self.action_cleanup()
+                                self.need_to_resolve_battle_ability = True
+                                self.battle_ability_to_resolve = self.planet_array[planet_pos]
+                                self.player_resolving_battle_ability = primary_player.name_player
+                                self.number_resolving_battle_ability = str(primary_player.number)
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Resolve Battle Ability?"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.tense_negotiations_active = True
                     elif ability == "Talyesin's Warlocks":
                         if not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_combat_round_used:
                             self.action_chosen = ability

@@ -84,7 +84,7 @@ class Player:
         self.warlord_just_got_destroyed = False
         self.mulligan_done = False
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
-                             "Stalking Lictor", "Venomthrope Polluter"]
+                             "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord"]
         self.synapse_name = ""
         self.warlord_faction = ""
