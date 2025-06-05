@@ -136,6 +136,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if card.get_ready():
                             card.exhaust_card()
                             self.action_chosen = ability
+                    elif ability == "Hunting Grounds":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                     elif ability == "Ork Landa":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
@@ -790,6 +795,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Hunting Grounds":
+        if game_update_string[1] == primary_player.number:
+            if not self.chosen_first_card:
+                if primary_player.get_name_given_pos(-2, unit_pos) == "Khymera":
+                    if primary_player.sacrifice_card_in_hq(unit_pos):
+                        self.chosen_first_card = True
+            else:
+                if primary_player.check_for_trait_given_pos(-2, unit_pos, "Creature"):
+                    if primary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                        if not primary_player.get_ready_given_pos(-2, unit_pos):
+                            primary_player.ready_given_pos(-2, unit_pos)
+                            self.action_cleanup()
     elif self.action_chosen == "Dark Cunning":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2

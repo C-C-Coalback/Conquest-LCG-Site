@@ -1564,6 +1564,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         secondary_player.set_blanked_given_pos(planet_pos, unit_pos)
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                         self.misc_target_planet = planet_pos
+    elif self.action_chosen == "Hunting Grounds":
+        if game_update_string[1] == primary_player.number:
+            if not self.chosen_first_card:
+                if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Khymera":
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        self.chosen_first_card = True
+            else:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Creature"):
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.action_cleanup()
     elif self.action_chosen == "Mind War":
         psyker_present = False
         for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
