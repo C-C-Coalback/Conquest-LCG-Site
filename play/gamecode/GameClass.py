@@ -3245,7 +3245,7 @@ class Game:
                             if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
                                     .get_card_type() != "Warlord" and \
                                     player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                                            .get_card_type() != "Support":
+                                    .get_card_type() != "Support":
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])

@@ -3378,6 +3378,8 @@ class Player:
             self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, i))
+            if self.cards_in_play[planet_num + 1][i].get_ability() == "Crush of Sky-Slashers":
+                self.game.create_reaction("Crush of Sky-Slashers", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Sathariel the Invokator":
                 self.game.create_reaction("Sathariel the Invokator", self.name_player,
                                           (int(self.number), planet_num, i))
