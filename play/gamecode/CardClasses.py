@@ -57,6 +57,7 @@ class Card:
         self.ambush = ambush
         self.attachments = []
         self.deepstrike = deepstrike
+        self.immortal_loyalist_ok = True
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

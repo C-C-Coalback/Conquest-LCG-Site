@@ -2169,6 +2169,12 @@ class Player:
             if self.game.backlash_enabled:
                 if self.backlash_check(planet_pos, unit_pos):
                     possible_interrupts.append("Backlash")
+            if planet_pos != -2:
+                if self.cards_in_play[planet_pos + 1][unit_pos].immortal_loyalist_ok:
+                    self.cards_in_play[planet_pos + 1][unit_pos].immortal_loyalist_ok = False
+                    if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        if self.search_card_at_planet(planet_pos, "Immortal Loyalist"):
+                            possible_interrupts.append("Immortal Loyalist")
         return possible_interrupts
 
     def backlash_check(self, planet_pos, unit_pos):

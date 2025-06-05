@@ -1605,6 +1605,46 @@ class Game:
             await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
             self.slumbering_gardens_enabled = True
 
+    async def resolve_immortal_loyalist(self, name, game_update_string, primary_player, secondary_player):
+        if game_update_string[1] == "0":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            if self.nullify_context == "Event Action":
+                secondary_player.aiming_reticle_coords_hand = None
+                secondary_player.aiming_reticle_coords_hand_2 = None
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                self.amount_spend_for_tzeentch_firestorm = 0
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "In Play Action":
+                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                              self.position_of_actioned_card[1])
+                self.action_chosen = ""
+                self.player_with_action = ""
+                self.mode = "Normal"
+                if self.nullified_card_name == "Zarathur's Flamers":
+                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                self.position_of_actioned_card = (-1, -1)
+            elif self.nullify_context == "Reaction":
+                self.delete_reaction()
+            elif self.nullify_context == "Reaction Event":
+                self.delete_reaction()
+                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+                await self.resolve_battle_conclusion(secondary_player, game_string="")
+        elif game_update_string[1] == "1":
+            self.choices_available = []
+            self.choice_context = ""
+            self.name_player_making_choices = ""
+            self.communications_relay_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.communications_relay_enabled = True
+
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
             self.choices_available = []
@@ -1873,6 +1913,9 @@ class Game:
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                        elif chosen_choice == "Immortal Loyalist":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Immortal Loyalist?"
                     elif self.asking_if_interrupt and self.interrupts_waiting_on_resolution \
                             and not self.resolving_search_box:
                         print("Asking if interrupt")
@@ -1885,6 +1928,8 @@ class Game:
                     elif self.choice_context == "Use Colony Shield Generator?":
                         await self.resolve_colony_shield_generator(name, game_update_string, primary_player,
                                                                    secondary_player)
+                    elif self.choice_context == "Use Immortal Loyalist?":
+                        await self.resolve_immortal_loyalist(name, game_update_string, primary_player, secondary_player)
                     elif self.choice_context == "Urien's Oubliette":
                         if game_update_string[1] == "0":
                             primary_player.discard_top_card_deck()
