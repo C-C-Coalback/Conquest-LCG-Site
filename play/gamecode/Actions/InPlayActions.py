@@ -883,14 +883,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.position_of_actioned_card = (-1, -1)
                 self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         if not self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:
                 if primary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:

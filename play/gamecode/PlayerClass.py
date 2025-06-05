@@ -2797,7 +2797,7 @@ class Player:
         bodyguard_damage_list = []
         og_damage = damage
         too_many_bodyguards = False
-        if att_pos is not None and not is_reassign:
+        if att_pos is not None:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if i != unit_id:
                     print("Get attachments")
@@ -2836,7 +2836,7 @@ class Player:
         if self.search_attachments_at_pos(planet_id, unit_id, "Heavy Marker Drone"):
             damage = damage * 2
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
-        self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield, reassign=is_reassign)
+        self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         if total_damage_that_can_be_blocked > 0:

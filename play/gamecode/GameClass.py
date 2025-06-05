@@ -325,6 +325,13 @@ class Game:
         self.name_player_deepstriking = self.name_1
         self.choosing_target_for_deepstruck_attachment = False
         self.deepstruck_attachment_pos = (-1, -1)
+        self.xv805_enforcer_active = False
+        self.asking_if_use_xv805_enforcer = False
+        self.asking_amount_xv805_enforcer = False
+        self.amount_xv805_enforcer = 0
+        self.damage_index_xv805 = -1
+        self.player_using_xv805 = ""
+        self.og_pos_xv805_target = (-1, -1)
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -4991,6 +4998,49 @@ class Game:
                             return game_update_string
         return game_update_string
 
+    async def resolve_xv805_enforcer(self, name, game_update_string):
+        if name == self.player_using_xv805:
+            if self.asking_if_use_xv805_enforcer:
+                if game_update_string[0] == "CHOICE":
+                    if game_update_string[1] == "0":
+                        self.asking_amount_xv805_enforcer = True
+                        self.asking_if_use_xv805_enforcer = False
+                    else:
+                        self.asking_if_use_xv805_enforcer = False
+                        self.xv805_enforcer_active = False
+            elif self.asking_amount_xv805_enforcer:
+                if game_update_string[0] == "CHOICE":
+                    self.amount_xv805_enforcer = int(self.choices_available[int(game_update_string[1])])
+                    self.asking_amount_xv805_enforcer = False
+            else:
+                if game_update_string[0] == "IN_PLAY":
+                    new_pla = int(game_update_string[2])
+                    new_pos = int(game_update_string[3])
+                    if new_pla == self.last_planet_checked_for_battle:
+                        primary_player = self.p1
+                        enemy_player = self.p2
+                        if primary_player.name_player != name:
+                            primary_player = self.p2
+                            enemy_player = self.p1
+                        if game_update_string[1] == enemy_player.get_number():
+                            og_pla, og_pos = self.og_pos_xv805_target
+                            if og_pla != new_pla or og_pos != new_pos:
+                                enemy_player.assign_damage_to_pos(new_pla, new_pos, self.amount_xv805_enforcer,
+                                                                  rickety_warbuggy=True, is_reassign=True)
+                                enemy_player.remove_damage_from_pos(og_pla, og_pos, self.amount_xv805_enforcer)
+                                self.amount_that_can_be_removed_by_shield[self.damage_index_xv805] = \
+                                    self.amount_that_can_be_removed_by_shield[self.damage_index_xv805] - \
+                                    self.amount_xv805_enforcer
+                                self.xv805_enforcer_active = False
+                                self.asking_if_use_xv805_enforcer = False
+                                self.asking_amount_xv805_enforcer = False
+                                self.amount_xv805_enforcer = 0
+                                self.damage_index_xv805 = -1
+                                self.player_using_xv805 = ""
+                                self.og_pos_xv805_target = (-1, -1)
+                                self.resolving_search_box = False
+                                self.reset_choices_available()
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -5003,6 +5053,8 @@ class Game:
             print("String validated as ok")
             if self.choosing_unit_for_nullify:
                 await self.nullification_unit(name, game_update_string)
+            elif self.xv805_enforcer_active:
+                await self.resolve_xv805_enforcer(name, game_update_string)
             elif self.resolving_consumption:
                 await self.consumption_resolution(name, game_update_string)
             elif self.manual_bodyguard_resolution:
@@ -5052,6 +5104,22 @@ class Game:
         if self.resolving_kugath_nurglings:
             if self.check_end_kugath_nurglings():
                 await self.send_update_message("Leaving Ku'gath Nurglings")
+        if self.xv805_enforcer_active:
+            if self.asking_if_use_xv805_enforcer:
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Use XV8-05 Enforcer to reassign?"
+                self.name_player_making_choices = self.player_using_xv805
+                self.resolving_search_box = True
+            elif self.asking_amount_xv805_enforcer:
+                self.choices_available = []
+                for i in range(self.amount_xv805_enforcer):
+                    self.choices_available.append(str(i + 1))
+                self.choice_context = "Use XV8-05 Enforcer to reassign?"
+                self.name_player_making_choices = self.player_using_xv805
+                self.resolving_search_box = True
+            else:
+                self.reset_choices_available()
+                self.resolving_search_box = False
         if self.just_moved_units:
             self.just_moved_units = False
             if self.p1.search_for_card_everywhere("Ku'gath's Nurglings") or \
@@ -5114,17 +5182,18 @@ class Game:
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
         if self.resolve_destruction_checks_after_reactions:
-            if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage:
+            if not self.reactions_needing_resolving and not self.positions_of_units_to_take_damage \
+                    and not self.xv805_enforcer_active:
                 if self.auto_card_destruction:
                     self.resolve_destruction_checks_after_reactions = False
                     await self.destroy_check_all_cards()
         elif not self.positions_of_units_to_take_damage:
-            if self.auto_card_destruction and not self.positions_of_units_to_take_damage:
+            if self.auto_card_destruction:
                 self.resolve_destruction_checks_after_reactions = False
                 await self.destroy_check_all_cards()
         if not self.positions_of_units_to_take_damage and not self.interrupts_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
-                self.mode == "Normal":
+                self.mode == "Normal" and not self.xv805_enforcer_active:
             if not self.reactions_needing_resolving and not self.resolving_search_box:
                 self.p1.stored_targets_the_emperor_protects = []
                 self.p2.stored_targets_the_emperor_protects = []
