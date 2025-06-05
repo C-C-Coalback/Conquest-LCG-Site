@@ -397,6 +397,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Warlock Destructor: pay fee or discard?"
             self.asking_if_reaction = False
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif current_reaction == "Kroot Guerrilla":
+            primary_player.add_resources(1)
+            self.delete_reaction()
         elif current_reaction == "Blitza-Bommer":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.total_indirect_damage += 3

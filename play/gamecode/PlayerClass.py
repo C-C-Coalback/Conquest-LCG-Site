@@ -3364,6 +3364,8 @@ class Player:
             if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf", must_match_name=True):
                 if self.get_ready_given_pos(planet_num, i):
                     self.game.create_reaction("Fenrisian Wolf", self.name_player, (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Kroot Guerrilla":
+                self.game.create_reaction("Kroot Guerrilla", self.name_player, (int(self.number), planet_num, i))
 
     def resolve_combat_round_begins(self, planet_num):
         for i in range(len(self.headquarters)):
