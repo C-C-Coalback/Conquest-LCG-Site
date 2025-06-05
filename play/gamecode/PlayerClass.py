@@ -1989,8 +1989,11 @@ class Player:
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Stalwart Ogryn":
             return True
-        if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster":
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster" and power:
             return True
+        if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+            if self.search_card_at_planet(planet_pos, "Vostroyan Officer"):
+                return True
         return False
 
     def search_card_in_hq(self, name_of_card, bloodied_relevant=False, ability_checking=True, ready_relevant=False):
