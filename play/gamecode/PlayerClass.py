@@ -1834,6 +1834,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
             if self.game.bloodthirst_active[planet_id]:
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Blitza-Bommer":
+            if self.get_ready_given_pos(planet_id, unit_id):
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
     def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
@@ -3911,9 +3914,11 @@ class Player:
             if self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=True) == "Old One Eye":
                 if not self.cards_in_play[planet_id + 1][unit_id].get_once_per_round_used():
                     if self.cards_in_play[planet_id + 1][unit_id].get_damage() > 0:
-                        self.game.reactions_needing_resolving.append("Old One Eye")
-                        self.game.player_who_resolves_reaction.append(self.name_player)
-                        self.game.positions_of_unit_triggering_reaction.append((int(self.number), planet_id, unit_id))
+                        self.game.create_reaction("Old One Eye", self.name_player,
+                                                  (int(self.number), planet_id, unit_id))
+            if self.get_ability_given_pos(planet_id, unit_id) == "Blitza-Bommer":
+                self.game.create_reaction("Blitza-Bommer", self.name_player,
+                                          (int(self.number), planet_id, unit_id))
             if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
                 self.game.create_reaction("Goff Brawlers", self.name_player, (int(self.number), planet_id, unit_id))
         return None
