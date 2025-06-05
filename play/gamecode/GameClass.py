@@ -4204,6 +4204,14 @@ class Game:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,
                                                                   primary_player, secondary_player)
+                elif game_update_string[0] == "RESERVE":
+                    if self.reactions_needing_resolving[0] == "Seer Adept":
+                        if game_update_string[1] == secondary_player.number:
+                            name_card = secondary_player.cards_in_reserve[
+                                int(game_update_string[2])][int(game_update_string[3])].get_name()
+                            await self.send_update_message(secondary_player.name_player + " has a " + name_card +
+                                                           " at that position")
+                            self.delete_reaction()
             elif len(game_update_string) == 5:
                 if game_update_string[0] == "ATTACHMENT":
                     if game_update_string[1] == "PLANETS":

@@ -3157,6 +3157,13 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":
                         self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Seer Adept":
+                    if phase == "COMMAND":
+                        enemy_player = self.game.p1
+                        if enemy_player.name_player == self.name_player:
+                            enemy_player = self.game.p2
+                        if enemy_player.cards_in_reserve[i]:
+                            self.game.create_reaction("Seer Adept", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Blazing Zoanthrope":
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
