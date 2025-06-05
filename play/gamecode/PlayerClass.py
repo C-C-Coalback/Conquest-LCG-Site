@@ -130,6 +130,7 @@ class Player:
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
         self.war_of_ideas_active = False
         self.cards_in_reserve = [[], [], [], [], [], [], []]
+        self.the_princes_might_active = [False, False, False, False, False, False, False]
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -288,7 +289,10 @@ class Player:
         return self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
 
     def deepstrike_event(self, planet_id, unit_id):
-        self.discard.append(self.cards_in_reserve[planet_id][unit_id].get_name())
+        ability = self.cards_in_reserve[planet_id][unit_id].get_name()
+        if ability == "The Prince's Might":
+            self.the_princes_might_active[planet_id] = True
+        self.discard.append(ability)
         del self.cards_in_reserve[planet_id][unit_id]
 
     def deepstrike_unit(self, planet_id, unit_id):
@@ -2438,6 +2442,7 @@ class Player:
 
     def reset_extra_abilities_eop(self):
         self.dark_possession_active = False
+        self.the_princes_might_active = [False, False, False, False, False, False, False]
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].negative_hp_until_eop = 0
@@ -2765,6 +2770,9 @@ class Player:
         if shadow_field_possible:
             if self.search_attachments_at_pos(planet_id, unit_id, "Shadow Field"):
                 return False, 0
+            if self.check_for_trait_given_pos(planet_id, unit_id, "Daemon"):
+                if self.the_princes_might_active[planet_id]:
+                    return False, 0
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         if rickety_warbuggy:
