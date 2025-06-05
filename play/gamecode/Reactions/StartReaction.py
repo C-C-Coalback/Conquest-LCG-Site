@@ -404,6 +404,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
             self.planet_of_indirect = planet_pos
             self.delete_reaction()
+        elif current_reaction == "Furious Wraithblade":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "Goff Brawlers":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.p1.total_indirect_damage += 1

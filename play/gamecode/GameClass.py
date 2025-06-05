@@ -5149,6 +5149,9 @@ class Game:
                             name_player_who_resolved_attack = self.name_1
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                            if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
+                                if not self.p1.get_once_per_phase_used_given_pos(planet, i):
+                                    self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
@@ -5166,6 +5169,9 @@ class Game:
                             name_player_who_resolved_attack = self.name_2
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                            if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
+                                if not self.p2.get_once_per_phase_used_given_pos(planet, i):
+                                    self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
