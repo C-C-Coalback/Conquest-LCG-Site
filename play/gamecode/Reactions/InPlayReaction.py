@@ -488,6 +488,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         target_player.ready_given_pos(planet_pos, unit_pos)
                         self.delete_reaction()
+        elif current_reaction == "Kommando Sneakaz":
+            if game_update_string[1] == primary_player.get_number():
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Invasive Genestealers":
             if game_update_string[1] == secondary_player.get_number():
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

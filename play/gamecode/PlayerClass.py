@@ -1349,6 +1349,9 @@ class Player:
                             if card.get_ability() == "Space Wolves Predator":
                                 self.game.create_reaction("Space Wolves Predator", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Kommando Sneakaz":
+                                self.game.create_reaction("Kommando Sneakaz", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Prophetic Farseer":
                                 self.game.create_reaction("Prophetic Farseer", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -3352,7 +3355,10 @@ class Player:
         for i in range(len(self.cards_in_play[planet_num + 1])):
             self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
-                self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, -1))
+                self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Sathariel the Invokator":
+                self.game.create_reaction("Sathariel the Invokator", self.name_player,
+                                          (int(self.number), planet_num, i))
             for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Royal Phylactery":
                     if self.cards_in_play[planet_num + 1][i].get_damage() > 0:

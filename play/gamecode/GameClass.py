@@ -6,7 +6,7 @@ from . import FindCard
 import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
-from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction
+from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts
 
 
@@ -2211,6 +2211,7 @@ class Game:
                         else:
                             self.deepstrike_deployment_active = True
                         self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Archon's Palace":
                         if game_update_string[1] == "0":
                             self.canceled_card_bonuses[self.misc_target_planet] = True
@@ -4194,6 +4195,9 @@ class Game:
                 elif game_update_string[0] == "HQ":
                     await HQReaction.resolve_hq_reaction(self, name, game_update_string,
                                                          primary_player, secondary_player)
+                elif game_update_string[0] == "IN_DISCARD":
+                    await DiscardReaction.resolve_discard_reaction(self, name, game_update_string,
+                                                                   primary_player, secondary_player)
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,
