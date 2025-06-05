@@ -295,6 +295,11 @@ class Player:
         card = self.cards_in_reserve[planet_id][unit_id]
         self.add_card_to_planet(card, planet_id)
         del self.cards_in_reserve[planet_id][unit_id]
+        last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
+        ability = self.get_ability_given_pos(planet_id, last_element_index)
+        if ability == "8th Company Assault Squad":
+            self.game.create_reaction("8th Company Assault Squad", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
 
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
