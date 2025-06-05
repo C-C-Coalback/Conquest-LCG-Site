@@ -740,8 +740,8 @@ class Game:
                 if self.p1.force_due_to_dark_possession:
                     game_update_string = ["HAND", "1", str(self.p1.pos_card_dark_possession)]
             else:
-                primary_player = self.p1
-                secondary_player = self.p2
+                primary_player = self.p2
+                secondary_player = self.p1
                 if self.p2.force_due_to_dark_possession:
                     game_update_string = ["HAND", "2", str(self.p2.pos_card_dark_possession)]
             if len(game_update_string) == 1:
@@ -814,6 +814,18 @@ class Game:
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayActions.update_game_event_action_in_play(self, name, game_update_string)
+                elif game_update_string[0] == "RESERVE":
+                    if self.action_chosen == "No Surprises":
+                        if game_update_string[1] == "1":
+                            target = self.p1
+                        else:
+                            target = self.p2
+                        target.discard.append(
+                            target.cards_in_reserve[int(game_update_string[2])][int(game_update_string[3])].get_name())
+                        del target.cards_in_reserve[int(game_update_string[2])][int(game_update_string[3])]
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.action_cleanup()
             elif len(game_update_string) == 5:
                 if game_update_string[0] == "ATTACHMENT" and game_update_string[1] == "HQ":
                     await AttachmentHQActions.update_game_event_action_attachment_hq(self, name, game_update_string)
