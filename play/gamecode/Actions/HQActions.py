@@ -273,6 +273,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                    elif ability == "Dark Angels Cruiser":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Repair Bay":
                         if card.get_ready():
                             card.exhaust_card()

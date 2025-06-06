@@ -1166,6 +1166,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.chosen_first_card = True
                     self.misc_target_unit = (planet_pos, unit_pos)
+    elif self.action_chosen == "Dark Angels Cruiser":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].deepstrike != -1:
+                    primary_player.set_damage_given_pos(planet_pos, unit_pos, 0)
+                    primary_player.discard_attachments_from_card(planet_pos, unit_pos)
+                    card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                    primary_player.cards_in_reserve[planet_pos].append(card)
+                    primary_player.remove_card_from_play(planet_pos, unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
