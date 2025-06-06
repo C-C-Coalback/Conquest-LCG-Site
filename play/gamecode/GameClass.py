@@ -3277,8 +3277,7 @@ class Game:
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
-                                self.unit_to_move_position[0] = -2
-                                self.unit_to_move_position[1] = int(game_update_string[2])
+                                self.unit_to_move_position = (-2, int(game_update_string[2]))
                                 player.set_aiming_reticle_in_play(-2, self.unit_to_move_position[1], "blue")
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
