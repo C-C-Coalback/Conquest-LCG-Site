@@ -315,6 +315,9 @@ class Player:
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Vezuel's Hunters":
+            self.game.create_reaction("Vezuel's Hunters", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
 
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
