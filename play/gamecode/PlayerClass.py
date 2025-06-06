@@ -292,6 +292,8 @@ class Player:
         ability = self.cards_in_reserve[planet_id][unit_id].get_name()
         if ability == "The Prince's Might":
             self.the_princes_might_active[planet_id] = True
+        if ability == "Unseen Strike":
+            self.game.force_set_battle_initiative(self.name_player, self.number)
         self.discard.append(ability)
         self.after_any_deepstrike()
         del self.cards_in_reserve[planet_id][unit_id]

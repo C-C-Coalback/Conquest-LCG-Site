@@ -5726,6 +5726,12 @@ class Game:
         self.player_with_combat_turn = self.player_reset_combat_turn
         self.number_with_combat_turn = self.number_reset_combat_turn
 
+    def force_set_battle_initiative(self, name, number):
+        self.player_with_combat_turn = name
+        self.player_reset_combat_turn = name
+        self.number_with_combat_turn = number
+        self.number_reset_combat_turn = number
+
     def set_battle_initiative(self):
         self.p1_has_warlord = self.p1.check_for_warlord(self.last_planet_checked_for_battle)
         self.p2_has_warlord = self.p2.check_for_warlord(self.last_planet_checked_for_battle)
