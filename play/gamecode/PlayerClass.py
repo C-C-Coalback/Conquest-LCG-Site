@@ -293,11 +293,22 @@ class Player:
         if ability == "The Prince's Might":
             self.the_princes_might_active[planet_id] = True
         self.discard.append(ability)
+        self.after_any_deepstrike()
         del self.cards_in_reserve[planet_id][unit_id]
+
+    def after_any_deepstrike(self):
+        warlord_pla, warlord_pos = self.get_location_of_warlord()
+        if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Epistolary Vezuel":
+            self.game.create_reaction("Epistolary Vezuel", self.name_player,
+                                      (int(self.number), warlord_pla, warlord_pos))
+
+    def deepstrike_attachment_extras(self):
+        self.after_any_deepstrike()
 
     def deepstrike_unit(self, planet_id, unit_id):
         card = self.cards_in_reserve[planet_id][unit_id]
         self.add_card_to_planet(card, planet_id)
+        self.after_any_deepstrike()
         del self.cards_in_reserve[planet_id][unit_id]
         last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
         ability = self.get_ability_given_pos(planet_id, last_element_index)
