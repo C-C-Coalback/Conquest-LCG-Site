@@ -3921,6 +3921,8 @@ class Game:
                                             shields = shields * 2
                                         self.guardian_mesh_armor_enabled = True
                                         shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
+                                        self.amount_that_can_be_removed_by_shield[0] = \
+                                            self.amount_that_can_be_removed_by_shield[0] - shields
                                         took_damage = True
                                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                                         primary_player.discard_card_from_hand(hand_pos)
