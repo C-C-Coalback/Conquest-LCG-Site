@@ -303,6 +303,9 @@ class Player:
         if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Epistolary Vezuel":
             self.game.create_reaction("Epistolary Vezuel", self.name_player,
                                       (int(self.number), warlord_pla, warlord_pos))
+        if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Fulgaris"):
+            self.game.create_reaction("Fulgaris", self.name_player,
+                                      (int(self.number), warlord_pla, warlord_pos))
 
     def deepstrike_attachment_extras(self):
         self.after_any_deepstrike()
@@ -2369,6 +2372,14 @@ class Player:
         if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
             return True
         return False
+
+    def increase_health_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
+        if planet_pos == -2:
+            if expiration == "EOP":
+                self.headquarters[unit_pos].increase_extra_health_until_end_of_phase(amount)
+            return None
+        if expiration == "EOP":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_phase(amount)
 
     def increase_attack_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
         if planet_pos == -2:

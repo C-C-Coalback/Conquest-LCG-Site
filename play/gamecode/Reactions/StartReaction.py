@@ -410,6 +410,12 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Epistolary Vezuel":
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Fulgaris":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            await self.send_update_message("Epistolary Vezuel receives +1/+1 from Fulgaris!")
+            primary_player.increase_attack_of_unit_at_pos(warlord_pla, warlord_pos, 1, expiration="EOP")
+            primary_player.increase_health_of_unit_at_pos(warlord_pla, warlord_pos, 1, expiration="EOP")
+            self.delete_reaction()
         elif current_reaction == "Furious Wraithblade":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

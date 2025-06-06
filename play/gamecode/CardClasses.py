@@ -343,6 +343,9 @@ class UnitCard(Card):
     def increase_extra_attack_until_next_attack(self, amount):
         self.extra_attack_until_next_attack += amount
 
+    def increase_extra_health_until_end_of_phase(self, amount):
+        self.positive_hp_until_eop += amount
+
     def reset_extra_attack_until_next_attack(self):
         self.extra_attack_until_next_attack = 0
 
