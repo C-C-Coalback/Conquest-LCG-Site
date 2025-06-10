@@ -287,6 +287,8 @@ class Game:
         self.searing_brand_cancel_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.guardian_mesh_armor_active = False
+        self.maksim_squadron_enabled = True
+        self.maksim_squadron_active = False
         self.tense_negotiations_active = False
         self.shining_blade_active = False
         self.value_doom_siren = 0
@@ -2405,21 +2407,28 @@ class Game:
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
+                    elif self.choice_context == "Use Maksim's Squadron?":
+                        self.maksim_squadron_enabled = False
+                        if game_update_string[1] == "0":
+                            self.maksim_squadron_active = True
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
+                        else:
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Use Guardian Mesh Armor?":
                         self.guardian_mesh_armor_enabled = False
                         num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
                         primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Guardian Mesh Armor")
                         if game_update_string[1] == "0":
                             self.guardian_mesh_armor_active = True
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.better_shield_card_resolution(
                                 primary_player.name_player, self.last_shield_string, alt_shields=False)
                         else:
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.better_shield_card_resolution(
                                 primary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Target Holy Sepulchre:":
@@ -3903,6 +3912,15 @@ class Game:
                                         self.choices_available = ["Yes", "No"]
                                         self.name_player_making_choices = primary_player.name_player
                                         can_continue = False
+                                if not self.choices_available:
+                                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                            == "Maksim's Squadron":
+                                        if self.maksim_squadron_enabled and not primary_player.hit_by_gorgul:
+                                            self.last_shield_string = game_update_string
+                                            self.choice_context = "Use Maksim's Squadron?"
+                                            self.choices_available = ["Yes", "No"]
+                                            self.name_player_making_choices = primary_player.name_player
+                                            can_continue = False
                                 if can_continue:
                                     no_mercy_possible = False
                                     if can_no_mercy:
@@ -3922,6 +3940,9 @@ class Game:
                                     else:
                                         if self.guardian_mesh_armor_active:
                                             shields = shields * 2
+                                        if self.maksim_squadron_active:
+                                            shields += 1
+                                        self.maksim_squadron_enabled = True
                                         self.guardian_mesh_armor_enabled = True
                                         shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                         self.amount_that_can_be_removed_by_shield[0] = \
@@ -4515,6 +4536,8 @@ class Game:
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         self.guardian_mesh_armor_active = False
+        self.maksim_squadron_active = False
+        self.maksim_squadron_enabled = True
         self.guardian_mesh_armor_enabled = True
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
