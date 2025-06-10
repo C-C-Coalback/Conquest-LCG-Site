@@ -36,7 +36,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Mekaniak Repair Krew":
                         if card_chosen.get_ready():
-                            primary_player.exhaust_given_pos(-2, uni)
+                            primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(-2, unit_pos, "blue")
                     elif ability == "Slumbering Tomb":

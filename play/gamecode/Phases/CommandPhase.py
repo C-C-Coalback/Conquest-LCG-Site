@@ -340,7 +340,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                         unit_pos = int(game_update_string[2])
                         if primary_player.get_ability_given_pos(-2, unit_pos) == "Archon's Palace":
                             if primary_player.get_ready_given_pos(-2, unit_pos):
-                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                primary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
                                 self.mode = "ACTION"
                                 self.action_chosen = "Archon's Palace"
                                 self.player_with_action = primary_player.name_player

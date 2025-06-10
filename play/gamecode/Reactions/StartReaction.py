@@ -339,7 +339,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if (secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and not
                         secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
                         secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
-                    secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sautekh Complex":
             self.resolving_search_box = True
@@ -820,11 +820,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
                     if primary_player.get_ready_given_pos(planet_pos, i):
-                        primary_player.exhaust_given_pos(planet_pos, i)
+                        primary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
                     if secondary_player.get_ready_given_pos(planet_pos, i):
-                        secondary_player.exhaust_given_pos(planet_pos, i)
+                        secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -1099,7 +1099,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Syren Zythlex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+            secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Canoptek Scarab Swarm":
             seen_a_canoptek = False

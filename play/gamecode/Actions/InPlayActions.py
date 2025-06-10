@@ -1058,7 +1058,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.chosen_second_card = True
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
@@ -1108,7 +1108,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "In Play Action"
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.chosen_second_card = True
                         if self.position_of_actioned_card != (-1, -1):
                             primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
@@ -1529,7 +1529,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Event Action"
                         if can_continue:
-                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.misc_counter = secondary_player.get_attack_given_pos(planet_pos, unit_pos)
                             self.misc_target_planet = planet_pos
                             self.misc_target_unit = (planet_pos, unit_pos)
@@ -1755,7 +1755,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
                 if card.get_card_type() == "Army":
                     if not card.check_for_a_trait("Elite"):
-                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                        player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         self.action_cleanup()
@@ -1895,7 +1895,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.nullify_context = "In Play Action"
                         if can_continue:
                             self.misc_counter[planet_pos] = False
-                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
     elif self.action_chosen == "Hallucinogen Grenade":
         if secondary_player.get_number() == game_update_string[1]:
             if planet_pos == self.misc_target_planet:
@@ -1919,7 +1919,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "In Play Action"
                         if can_continue:
-                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             atk = secondary_player.cards_in_play[planet_pos + 1][unit_pos].attack
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, atk)
                             self.action_cleanup()

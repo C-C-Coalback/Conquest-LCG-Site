@@ -344,7 +344,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if not player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                     if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        player_being_hit.exhaust_given_pos(planet_pos, unit_pos)
+                        player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.delete_reaction()
         elif current_reaction == "Wildrider Vyper":
             if game_update_string[1] == "1":
@@ -515,7 +515,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
-                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.delete_reaction()
         elif current_reaction == "Devourer Venomthrope":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -541,7 +541,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "Reaction"
                             if can_continue:
-                                secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                                 self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
             if game_update_string[1] == primary_player.number:
@@ -738,7 +738,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
                         if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
                                 get_card_type() != "Warlord":
-                            player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos)
+                            player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Blackmane Sentinel":
             if game_update_string[1] == primary_player.get_number():
@@ -825,7 +825,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
                 if can_continue:
-                    secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Imperial Fists Siege Force":
             if game_update_string[1] == "1":

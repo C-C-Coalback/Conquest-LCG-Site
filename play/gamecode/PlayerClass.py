@@ -2658,7 +2658,7 @@ class Player:
                 self.sacrifice_card_in_play(planet_pos, unit_pos)
         return discount
 
-    def exhaust_given_pos(self, planet_id, unit_id):
+    def exhaust_given_pos(self, planet_id, unit_id, card_effect=False):
         if planet_id == -2:
             previous_state = self.headquarters[unit_id].get_ready()
             self.headquarters[unit_id].exhaust_card()
@@ -2668,6 +2668,9 @@ class Player:
                     if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
                         self.assign_damage_to_pos(-2, unit_id, 1)
             return None
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
+            if self.search_card_at_planet(planet_id, "Disciple of Excess"):
+                return None
         previous_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
         new_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
@@ -3926,6 +3929,9 @@ class Player:
                                                       (int(self.number), i, j))
 
     def rout_unit(self, planet_id, unit_id):
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
+            if self.search_card_at_planet(planet_id, "Disciple of Excess"):
+                return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
                 every_worr_check = self.search_for_card_everywhere("Broderick Worr")
