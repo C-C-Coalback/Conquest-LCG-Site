@@ -273,6 +273,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                    elif ability == "Clearcut Refuge":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Dark Angels Cruiser":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, unit_pos)
@@ -406,13 +410,35 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.number_with_deploy_turn = secondary_player.number
                 self.mode = self.stored_mode
                 await primary_player.dark_eldar_event_played()
-    elif self.action_chosen == "Particle Whip":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
+    elif self.action_chosen == "Clearcut Refuge":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
         else:
-            primary_player = self.p2
-            secondary_player = self.p1
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        if player_being_hit.headquarters[unit_pos].get_is_unit():
+            can_continue = True
+            if player_being_hit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                if possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = self.amount_spend_for_tzeentch_firestorm
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+            if can_continue:
+                highest_cost = player_being_hit.get_highest_cost_units()
+                player_being_hit.increase_health_of_unit_at_pos(-2, unit_pos, highest_cost, expiration="EOP")
+                name_unit = player_being_hit.get_name_given_pos(-2, unit_pos)
+                await self.send_update_message(name_unit + " gained +" + str(highest_cost) + " HP.")
+                self.action_cleanup()
+    elif self.action_chosen == "Particle Whip":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:

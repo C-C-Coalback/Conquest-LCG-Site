@@ -686,6 +686,21 @@ class Player:
             return self.headquarters[unit_id].set_damage(amount)
         return self.cards_in_play[planet_id + 1][unit_id].set_damage(amount)
 
+    def get_highest_cost_units(self):
+        highest_cost = 0
+        for i in range(len(self.headquarters)):
+            if self.get_card_type_given_pos(-2, i) == "Army":
+                cost = self.get_cost_given_pos(-2, i)
+                if cost > highest_cost:
+                    highest_cost = cost
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_card_type_given_pos(i, j) == "Army":
+                    cost = self.get_cost_given_pos(i, j)
+                    if cost > highest_cost:
+                        highest_cost = cost
+        return highest_cost
+
     def get_ranged_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_ranged()
