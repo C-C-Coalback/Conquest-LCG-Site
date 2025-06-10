@@ -243,7 +243,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              discounts=discounts,
                                                              damage_to_take=damage_to_take,
                                                              is_owner_of_card=own_card)
-    if played_card:
+    if played_card == "SUCCESS":
         self.queued_sound = "onplay"
         if not self.action_chosen or self.action_chosen == "Ambush":
             primary_player.cards.remove(self.card_to_deploy.get_name())
