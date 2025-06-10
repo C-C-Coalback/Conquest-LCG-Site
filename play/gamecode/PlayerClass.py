@@ -1019,6 +1019,9 @@ class Player:
             if card.get_name() == "Drone Defense System":
                 if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
                     return False
+            elif card.get_name() == "Missile Pod":
+                if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+                    return False
             else:
                 print("Wrong traits.")
                 return False

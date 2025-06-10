@@ -562,6 +562,55 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played()
                     self.action_cleanup()
+    elif self.action_chosen == "Missile Pod":
+        resolved_something = False
+        print('missile pod')
+        can_continue = True
+        if game_update_string[1] == secondary_player.number:
+            if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                resolved_something = True
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                if possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+                if can_continue:
+                    secondary_player.assign_damage_to_pos(-2, unit_pos, 3)
+                    self.action_cleanup()
+        if not resolved_something:
+            print("support check")
+            if game_update_string[1] == "1":
+                player_being_hit = self.p1
+            else:
+                player_being_hit = self.p2
+            if player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Support":
+                print('interrupt check')
+                if player_being_hit.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        -2, unit_pos, targeting_support=True)
+                    if possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "In Play Action"
+                if can_continue:
+                    player_being_hit.destroy_card_in_hq(unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

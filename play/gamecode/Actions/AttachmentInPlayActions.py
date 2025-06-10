@@ -36,6 +36,12 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             self.misc_target_player = player_owning_card.name_player
                             await self.send_update_message(ability + " activated")
+                    elif ability == "Missile Pod":
+                        player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
+                        self.action_chosen = ability
+                        await self.send_update_message(ability + " activated")
                     elif ability == "Gauss Flayer":
                         if primary_player.get_name_player() == self.player_with_action:
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
