@@ -510,6 +510,7 @@ def receive_winnings(self):
                 for _ in range(self.total_gains_command_struggle[i][2]):
                     self.p2.draw_card()
 
+
 def resolve_winnings(self, winner, loser, planet_id):
     chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
     if self.canceled_resource_bonuses[planet_id]:
@@ -526,7 +527,7 @@ def resolve_winnings(self, winner, loser, planet_id):
     ret_val = [winner.number, resources_won, cards_won]
     already_noxious = False
     if winner.search_card_in_hq("Omega Zero Command"):
-        winner.summon_token_at_planet("Guardsman", planet_id)
+        self.create_reaction("Omega Zero Command", winner.name_player, (int(winner.get_number()), planet_id, -1))
     for i in range(len(winner.cards_in_play[planet_id + 1])):
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
@@ -536,6 +537,8 @@ def resolve_winnings(self, winner, loser, planet_id):
             if self.infested_planets[planet_id]:
                 self.create_reaction("Devourer Venomthrope", winner.name_player,
                                      (int(winner.get_number()), planet_id, i))
+        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Caustic Tyrannofex":
+            self.create_reaction("Caustic Tyrannofex", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.check_for_trait_given_pos(planet_id, i, "Kabalite"):
             if winner.get_card_type_given_pos(planet_id, i) == "Army":
                 if winner.search_card_in_hq("Raiding Portal", ready_relevant=True):

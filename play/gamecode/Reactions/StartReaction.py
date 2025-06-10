@@ -178,6 +178,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_second_card = False
             self.need_to_reset_tomb_blade_squadron = True
             self.misc_target_unit = (-1, -1)
+        elif current_reaction == "Omega Zero Command":
+            primary_player.summon_token_at_planet("Guardsman", planet_id)
+            self.delete_reaction()
+        elif current_reaction == "Caustic Tyrannofex":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos != -2:
+                primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Ichor Gauntlet":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)

@@ -1940,6 +1940,11 @@ class Player:
             if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
                 if self.check_for_enemy_warlord(planet_id):
                     return True
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.get_ability_given_pos(planet_id, i) == "Caustic Tyrannofex":
+                    if self.cards_in_play[planet_id + 1][i].misc_ability_used:
+                        return True
         if enemy_unit_damage > 0:
             if self.check_for_trait_given_pos(planet_id, unit_id, "Elite") and \
                     self.check_is_unit_at_pos(planet_id, unit_id):
@@ -2412,6 +2417,8 @@ class Player:
                 self.headquarters[i].area_effect_eor = 0
                 self.headquarters[i].armorbane_eor = False
                 self.headquarters[i].mobile_eor = False
+                if self.get_name_given_pos(-2, i) == "Caustic Tyrannofex":
+                    self.headquarters[i].misc_ability_used = False
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].set_once_per_round_used(False)
@@ -2420,6 +2427,8 @@ class Player:
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
                 self.cards_in_play[i + 1][j].armorbane_eor = False
                 self.cards_in_play[i + 1][j].mobile_eor = False
+                if self.get_name_given_pos(i, j) == "Caustic Tyrannofex":
+                    self.cards_in_play[i + 1][j].misc_ability_used = False
 
     def check_is_unit_at_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
