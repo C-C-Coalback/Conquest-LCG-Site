@@ -131,6 +131,7 @@ class Player:
         self.war_of_ideas_active = False
         self.cards_in_reserve = [[], [], [], [], [], [], []]
         self.the_princes_might_active = [False, False, False, False, False, False, False]
+        self.hit_by_gorgul = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -2178,6 +2179,8 @@ class Player:
 
     def nullify_check(self):
         print("---\nNullify Check!\n---")
+        if self.hit_by_gorgul:
+            return False
         num_nullifies = 0
         if self.urien_relevant:
             if self.resources < 1:
@@ -2895,7 +2898,11 @@ class Player:
             self.game.damage_bodyguard = og_damage
             return False, len(bodyguard_damage_list)
         if zara_check and damage > 0:
-            damage += 1
+            other_player = self.game.p1
+            if other_player.name_player == self.name_player:
+                other_player = self.game.p2
+            if not other_player.hit_by_gorgul:
+                damage += 1
         if self.search_attachments_at_pos(planet_id, unit_id, "Heavy Marker Drone"):
             damage = damage * 2
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()

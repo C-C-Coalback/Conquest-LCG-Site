@@ -506,6 +506,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("The Plaguefather's Banner", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
+                            if player.search_card_at_planet(self.attacker_planet, "Gorgul Da Slaya"):
+                                self.create_interrupt("Gorgul Da Slaya", player.name_player,
+                                                      (int(player.number), self.attacker_planet, -1))
                             if player.check_for_trait_given_pos(self.attacker_planet, self.attacker_position, "Psyker"):
                                 for i in range(7):
                                     if i != self.attacker_planet:
@@ -522,7 +525,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             can_continue = True
                     if can_continue:
                         if game_update_string[1] != self.number_with_combat_turn:
-                            armorbane_check = False
                             if self.number_with_combat_turn == "1":
                                 primary_player = self.p1
                                 secondary_player = self.p2
@@ -573,7 +575,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if i != self.defender_position:
                                         if secondary_player.get_ability_given_pos(self.defender_planet,
                                                                                   i) == "Fire Warrior Elite":
-                                            if not self.fire_warrior_elite_active:
+                                            if not self.fire_warrior_elite_active \
+                                                    and not secondary_player.hit_by_gorgul:
                                                 self.fire_warrior_elite_active = True
                                                 can_continue = False
                                                 self.reactions_needing_resolving.append("Fire Warrior Elite")

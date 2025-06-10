@@ -3428,9 +3428,7 @@ class Game:
                     if self.player_who_resolves_reaction[i] == self.name_1:
                         already_fall_back = True
             if not already_fall_back:
-                self.reactions_needing_resolving.append("Fall Back!")
-                self.player_who_resolves_reaction.append(self.name_1)
-                self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+                self.create_reaction("Fall Back!", self.name_1, (1, -1, -1))
         if self.fall_back_check(self.p2):
             already_fall_back = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -3438,9 +3436,7 @@ class Game:
                     if self.player_who_resolves_reaction[i] == self.name_2:
                         already_fall_back = True
             if not already_fall_back:
-                self.reactions_needing_resolving.append("Fall Back!")
-                self.player_who_resolves_reaction.append(self.name_2)
-                self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+                self.create_reaction("Fall Back!", self.name_2, (2, -1, -1))
         if self.leviathan_hive_ship_check(self.p1):
             already_hive_ship = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -3464,9 +3460,7 @@ class Game:
                     if self.player_who_resolves_reaction[i] == self.name_1:
                         already_sepulchre = True
             if not already_sepulchre:
-                self.reactions_needing_resolving.append("Holy Sepulchre")
-                self.player_who_resolves_reaction.append(self.name_1)
-                self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+                self.create_reaction("Holy Sepulchre", self.name_1, (1, -1, -1))
         if self.holy_sepulchre_check(self.p2):
             already_sepulchre = False
             for i in range(len(self.reactions_needing_resolving)):
@@ -3474,9 +3468,7 @@ class Game:
                     if self.player_who_resolves_reaction[i] == self.name_2:
                         already_sepulchre = True
             if not already_sepulchre:
-                self.reactions_needing_resolving.append("Holy Sepulchre")
-                self.player_who_resolves_reaction.append(self.name_2)
-                self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+                self.create_reaction("Holy Sepulchre", self.name_2, (2, -1, -1))
         if self.p2.stored_cards_recently_destroyed:
             if self.p1.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
                 already_warp_flame = False
@@ -3485,9 +3477,7 @@ class Game:
                         if self.player_who_resolves_reaction[i] == self.name_1:
                             already_warp_flame = True
                 if not already_warp_flame:
-                    self.reactions_needing_resolving.append("Shrine of Warpflame")
-                    self.player_who_resolves_reaction.append(self.name_1)
-                    self.positions_of_unit_triggering_reaction.append((1, -1, -1))
+                    self.create_reaction("Shrine of Warpflame", self.name_1, (1, -1, -1))
         if self.p1.stored_cards_recently_destroyed:
             if self.p2.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
                 already_warp_flame = False
@@ -3496,9 +3486,7 @@ class Game:
                         if self.player_who_resolves_reaction[i] == self.name_2:
                             already_warp_flame = True
                 if not already_warp_flame:
-                    self.reactions_needing_resolving.append("Shrine of Warpflame")
-                    self.player_who_resolves_reaction.append(self.name_2)
-                    self.positions_of_unit_triggering_reaction.append((2, -1, -1))
+                    self.create_reaction("Shrine of Warpflame", self.name_2, (2, -1, -1))
         self.emp_protecc()
         self.made_ta_fight()
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
@@ -3775,7 +3763,8 @@ class Game:
                 if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
                     self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                          (int(primary_player.number), planet_pos, unit_pos))
-                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                    if not primary_player.hit_by_gorgul:
+                        self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
             if primary_player.get_card_type_given_pos(
                     planet_pos, unit_pos) == "Army":
                 if secondary_player.search_attachments_at_pos(
@@ -3786,9 +3775,14 @@ class Game:
                     )
 
     def create_interrupt(self, name_interrupt, name_player, pos_interrupter):
-        self.interrupts_waiting_on_resolution.append(name_interrupt)
-        self.player_resolving_interrupts.append(name_player)
-        self.positions_of_units_interrupting.append(pos_interrupter)
+        if name_player == self.name_1:
+            player = self.p1
+        else:
+            player = self.p2
+        if not player.hit_by_gorgul:
+            self.interrupts_waiting_on_resolution.append(name_interrupt)
+            self.player_resolving_interrupts.append(name_player)
+            self.positions_of_units_interrupting.append(pos_interrupter)
 
     async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
         if name == self.player_who_is_shielding:
@@ -3855,7 +3849,8 @@ class Game:
                                                                     bloodied_relevant=True):
                                 self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                                      (int(primary_player.number), planet_pos, unit_pos))
-                                self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                                if not primary_player.hit_by_gorgul:
+                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif not self.damage_is_preventable[0]:
                 await self.send_update_message("Damage is not preventable; you must pass")
@@ -3866,7 +3861,7 @@ class Game:
                         shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos)
                         alt_shield_check = False
                         self.pos_shield_card = hand_pos
-                        if alt_shields:
+                        if alt_shields and not primary_player.hit_by_gorgul:
                             if primary_player.cards[hand_pos] in self.alternative_shields:
                                 if primary_player.cards[hand_pos] == "Indomitable":
                                     if primary_player.resources > 0:
@@ -3894,7 +3889,7 @@ class Game:
                                                                             "Guardian Mesh Armor",
                                                                             ready_relevant=True,
                                                                             must_match_name=True):
-                                    if self.guardian_mesh_armor_enabled:
+                                    if self.guardian_mesh_armor_enabled and not primary_player.hit_by_gorgul:
                                         self.last_shield_string = game_update_string
                                         self.choice_context = "Use Guardian Mesh Armor?"
                                         self.choices_available = ["Yes", "No"]
@@ -3924,6 +3919,8 @@ class Game:
                                         self.amount_that_can_be_removed_by_shield[0] = \
                                             self.amount_that_can_be_removed_by_shield[0] - shields
                                         took_damage = True
+                                        if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                            took_damage = False
                                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                                         primary_player.discard_card_from_hand(hand_pos)
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -3936,7 +3933,7 @@ class Game:
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Reanimating Warriors" \
                                                         and not primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].once_per_phase_used:
+                                                        unit_pos].once_per_phase_used:
                                                     self.create_interrupt("Reanimating Warriors",
                                                                           primary_player.name_player,
                                                                           (int(primary_player.number), planet_pos,
@@ -4006,8 +4003,9 @@ class Game:
                                                                              (
                                                                                  int(primary_player.number), planet_pos,
                                                                                  unit_pos))
-                                                        self.damage_amounts_baarzul.append(
-                                                            self.amount_that_can_be_removed_by_shield[0])
+                                                        if not primary_player.hit_by_gorgul:
+                                                            self.damage_amounts_baarzul.append(
+                                                                self.amount_that_can_be_removed_by_shield[0])
                                             if primary_player.get_ability_given_pos(
                                                     planet_pos, unit_pos) == "Zogwort's Runtherders":
                                                 self.create_reaction("Zogwort's Runtherders",
@@ -4016,6 +4014,9 @@ class Game:
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
                                 await self.send_update_message("This damage can not be shielded!")
+                elif primary_player.hit_by_gorgul:
+                    await self.send_update_message("Gorgul da Slaya is in effect; "
+                                                   "your only choices are shield or pass.")
                 elif game_update_string[0] == "HQ":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
@@ -4093,6 +4094,9 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0]:
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+            elif primary_player.hit_by_gorgul:
+                await self.send_update_message("Gorgul da Slaya is in effect; "
+                                               "your only choices are shield or pass.")
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     if game_update_string[1] == str(self.number_who_is_shielding):
@@ -5313,6 +5317,8 @@ class Game:
                         self.create_reaction("Outflank'em", self.name_2, (2, -1, -1))
                 self.p1.ethereal_movement_resolution()
                 self.p2.ethereal_movement_resolution()
+                self.p1.hit_by_gorgul = False
+                self.p2.hit_by_gorgul = False
                 self.p1.reset_resolving_attacks_everywhere()
                 self.p2.reset_resolving_attacks_everywhere()
                 self.need_to_move_to_hq = False
@@ -5573,9 +5579,14 @@ class Game:
                 await self.resolve_battle_conclusion(name, ["", ""])
 
     def create_reaction(self, reaction_name, player_name, unit_tuple):
-        self.reactions_needing_resolving.append(reaction_name)
-        self.player_who_resolves_reaction.append(player_name)
-        self.positions_of_unit_triggering_reaction.append(unit_tuple)
+        if player_name == self.name_1:
+            player = self.p1
+        else:
+            player = self.p2
+        if not player.hit_by_gorgul:
+            self.reactions_needing_resolving.append(reaction_name)
+            self.player_who_resolves_reaction.append(player_name)
+            self.positions_of_unit_triggering_reaction.append(unit_tuple)
 
     def begin_combat_round(self):
         self.bloodthirst_active = [False, False, False, False, False, False, False]

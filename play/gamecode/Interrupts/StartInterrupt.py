@@ -8,6 +8,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    current_interrupt = self.interrupts_waiting_on_resolution[0]
     if not self.resolving_search_box:
         if self.interrupts_waiting_on_resolution[0] == "Interrogator Acolyte":
             primary_player.draw_card()
@@ -26,3 +27,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 primary_player.aiming_reticle_coords_hand = primary_player.cards.index("Berzerker Warriors")
                 primary_player.aiming_reticle_color = "blue"
+        elif current_interrupt == "Gorgul Da Slaya":
+            secondary_player.hit_by_gorgul = True
+            self.delete_interrupt()
