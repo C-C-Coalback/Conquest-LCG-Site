@@ -3137,6 +3137,14 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.search_synapse_at_planet(planet_id):
                         health += 2
+        if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+            if self.get_cost_given_pos(planet_id, unit_id) < 3:
+                hunt_count = self.count_copies_at_planet(planet_id, "Hunting Acanthrites", ability=True)
+                other_player = self.game.p1
+                if other_player.name_player == self.name_player:
+                    other_player = self.game.p2
+                hunt_count += other_player.count_copies_at_planet(planet_id, "Hunting Acanthrites", ability=True)
+                health = health - hunt_count
         attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
         for i in range(len(attachments)):
             if attachments[i].get_ability() == "Noxious Fleshborer":
