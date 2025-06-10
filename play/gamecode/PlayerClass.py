@@ -132,6 +132,7 @@ class Player:
         self.cards_in_reserve = [[], [], [], [], [], [], []]
         self.the_princes_might_active = [False, False, False, False, False, False, False]
         self.hit_by_gorgul = False
+        self.concealing_darkness_active = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -295,6 +296,8 @@ class Player:
             self.the_princes_might_active[planet_id] = True
         if ability == "Unseen Strike":
             self.game.force_set_battle_initiative(self.name_player, self.number)
+        if ability == "Concealing Darkness":
+            self.concealing_darkness_active = True
         self.discard.append(ability)
         self.after_any_deepstrike()
         del self.cards_in_reserve[planet_id][unit_id]
@@ -1979,6 +1982,10 @@ class Player:
         if card.check_for_a_trait("Genestealer"):
             if self.subject_omega_relevant:
                 return True
+        if card.get_faction() == "Eldar":
+            if card.get_is_unit():
+                if self.concealing_darkness_active:
+                    return True
         return card.get_ambush()
 
     def count_supports(self):
@@ -2528,6 +2535,7 @@ class Player:
     def reset_extra_abilities_eop(self):
         self.dark_possession_active = False
         self.the_princes_might_active = [False, False, False, False, False, False, False]
+        self.concealing_darkness_active = False
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].negative_hp_until_eop = 0
