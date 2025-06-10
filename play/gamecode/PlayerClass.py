@@ -305,10 +305,10 @@ class Player:
         if ability == "Defensive Protocols":
             self.defensive_protocols_active = True
         self.discard.append(ability)
-        self.after_any_deepstrike()
+        self.after_any_deepstrike(planet_id)
         del self.cards_in_reserve[planet_id][unit_id]
 
-    def after_any_deepstrike(self):
+    def after_any_deepstrike(self, planet_id):
         warlord_pla, warlord_pos = self.get_location_of_warlord()
         if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Epistolary Vezuel":
             self.game.create_reaction("Epistolary Vezuel", self.name_player,
@@ -316,14 +316,18 @@ class Player:
         if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Fulgaris"):
             self.game.create_reaction("Fulgaris", self.name_player,
                                       (int(self.number), warlord_pla, warlord_pos))
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == "Deathstorm Drop Pod":
+                self.game.create_reaction("Deathstorm Drop Pod", self.name_player,
+                                          (int(self.number), planet_id, -1))
 
-    def deepstrike_attachment_extras(self):
-        self.after_any_deepstrike()
+    def deepstrike_attachment_extras(self, planet_id):
+        self.after_any_deepstrike(planet_id)
 
     def deepstrike_unit(self, planet_id, unit_id):
         card = self.cards_in_reserve[planet_id][unit_id]
         self.add_card_to_planet(card, planet_id)
-        self.after_any_deepstrike()
+        self.after_any_deepstrike(planet_id)
         del self.cards_in_reserve[planet_id][unit_id]
         last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
         ability = self.get_ability_given_pos(planet_id, last_element_index)

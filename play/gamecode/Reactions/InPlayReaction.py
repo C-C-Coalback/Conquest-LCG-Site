@@ -246,6 +246,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
+        elif current_reaction == "Deathstorm Drop Pod":
+            if game_update_string[1] == secondary_player.number:
+                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                if att_pla == planet_pos:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        self.delete_reaction()
         elif current_reaction == "Crush of Sky-Slashers":
             if game_update_string[1] == secondary_player.number:
                 att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]

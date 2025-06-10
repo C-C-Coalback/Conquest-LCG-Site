@@ -69,7 +69,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         og_pla, og_pos = self.deepstruck_attachment_pos
                         player.discard.append(player.cards_in_reserve[og_pla][og_pos].get_name())
                         del player.cards_in_reserve[og_pla][og_pos]
-                        player.after_any_deepstrike()
+                        player.deepstrike_attachment_extras(og_pla)
                         self.choosing_target_for_deepstruck_attachment = False
                         self.deepstruck_attachment_pos = (-1, -1)
                         player.has_passed = True
@@ -301,6 +301,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         player.add_attachment_to_planet(
                                             chosen_planet, player.cards_in_reserve[chosen_planet][chosen_unit])
                                         del player.cards_in_reserve[chosen_planet][chosen_unit]
+                                        self.deepstrike_attachment_extras(chosen_planet)
                                         if not player.cards_in_reserve[chosen_planet]:
                                             player.has_passed = True
                                             if not other_player.has_passed:
@@ -348,7 +349,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
                                                                    not_own_attachment=not_own_att):
                             del player.cards_in_reserve[og_pla][og_pos]
-                            player.after_any_deepstrike()
+                            player.deepstrike_attachment_extras(chosen_planet)
                             self.choosing_target_for_deepstruck_attachment = False
                             self.deepstruck_attachment_pos = (-1, -1)
                             player.has_passed = True
