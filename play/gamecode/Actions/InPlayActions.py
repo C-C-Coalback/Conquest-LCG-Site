@@ -667,34 +667,71 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.increase_attack_of_unit_at_pos(warlord_planet, warlord_pos, 3, expiration="NEXT")
                     primary_player.reset_aiming_reticle_in_play(warlord_planet, warlord_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "A Thousand Cuts":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        can_continue = True
+        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+            if not player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                if player_being_hit.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                if can_continue:
+                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
+                    primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.shuffle_deck()
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.dark_eldar_event_played()
+                    primary_player.torture_event_played()
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                can_continue = False
-                await self.send_update_message("Immune to enemy card abilities.")
-            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
-                can_continue = False
-                await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
-        if can_continue:
-            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+            if player_being_hit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy card abilities.")
+                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy events.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            if can_continue:
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
                 player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)

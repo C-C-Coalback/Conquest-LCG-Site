@@ -184,7 +184,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             card_target = primary_player.ichor_gauntlet_target
             card = FindCard.find_card(card_target, self.card_array, self.cards_dict)
             primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant), refund=True)
-            if card_target in primary_player.discard:
+            if card_target in primary_player.discard and card_target != "A Thousand Cuts":
                 primary_player.discard.remove(card_target)
             primary_player.cards.append(card_target)
             last_element = len(primary_player.cards) - 1

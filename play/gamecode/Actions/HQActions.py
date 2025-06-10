@@ -527,6 +527,41 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
+    elif self.action_chosen == "A Thousand Cuts":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        unit_pos = int(game_update_string[2])
+        can_continue = True
+        if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
+            if not player_being_hit.check_for_trait_given_pos(-2, unit_pos, "Elite"):
+                if player_being_hit.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                    if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                if can_continue:
+                    player_being_hit.assign_damage_to_pos(-2, unit_pos, 1)
+                    primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
+                    primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.shuffle_deck()
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.dark_eldar_event_played()
+                    primary_player.torture_event_played()
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -534,25 +569,25 @@ async def update_game_event_action_hq(self, name, game_update_string):
             player_being_hit = self.p2
         unit_pos = int(game_update_string[2])
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
-            if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
-                can_continue = False
-                await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = self.amount_spend_for_tzeentch_firestorm
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
-        if can_continue:
-            if player_being_hit.headquarters[unit_pos].get_card_type() != "Warlord":
+        if player_being_hit.headquarters[unit_pos].get_card_type() != "Warlord":
+            if player_being_hit.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy events.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            if can_continue:
                 player_being_hit.assign_damage_to_pos(-2, unit_pos, self.amount_spend_for_tzeentch_firestorm)
                 player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
