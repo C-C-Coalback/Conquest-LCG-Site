@@ -1437,6 +1437,10 @@ class Player:
                                         if self.get_ready_given_pos(-2, i):
                                             self.game.create_reaction("Turbulent Rift", self.name_player,
                                                                       (int(self.number), position, location_of_unit))
+                                    if self.get_ability_given_pos(-2, i) == "Loamy Broodhive":
+                                        if self.get_ready_given_pos(-2, i):
+                                            self.game.create_reaction("Loamy Broodhive", self.name_player,
+                                                                      (int(self.number), position, location_of_unit))
                             if card.get_faction() != "Necrons":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):

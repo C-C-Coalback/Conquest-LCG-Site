@@ -840,6 +840,12 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Exploratory Drone":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif self.reactions_needing_resolving[0] == "Loamy Broodhive":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.exhaust_card_in_hq_given_name("Loamy Broodhive")
+            primary_player.summon_token_at_planet("Termagant", planet_pos)
+            primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Turbulent Rift":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_card_in_hq_given_name("Turbulent Rift")
