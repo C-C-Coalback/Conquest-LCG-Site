@@ -2867,6 +2867,12 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.auto_card_destruction = True
+                    elif self.choice_context == "Brutal Cunning: amount of damage":
+                        if game_update_string[1] == "0":
+                            self.misc_counter = 1
+                        elif game_update_string[1] == "1":
+                            self.misc_counter = 2
+                        self.reset_choices_available()
                     elif self.choice_context == "Use The Fury of Sicarius?":
                         planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":

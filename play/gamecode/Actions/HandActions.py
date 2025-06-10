@@ -82,6 +82,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Keep Firing!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Brutal Cunning":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.misc_counter = 0
+                        self.misc_target_planet = -1
+                        self.chosen_first_card = False
+                        self.choices_available = ["1", "2"]
+                        self.choice_context = "Brutal Cunning: amount of damage"
+                        self.name_player_making_choices = primary_player.name_player
                     elif ability == "Summary Execution":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
