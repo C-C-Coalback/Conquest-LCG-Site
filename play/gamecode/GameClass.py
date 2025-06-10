@@ -3865,7 +3865,8 @@ class Game:
                 if game_update_string[0] == "HAND":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hand_pos = int(game_update_string[2])
-                        shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos)
+                        tank = primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank")
+                        shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos, tank=tank)
                         alt_shield_check = False
                         self.pos_shield_card = hand_pos
                         if alt_shields and not primary_player.hit_by_gorgul:

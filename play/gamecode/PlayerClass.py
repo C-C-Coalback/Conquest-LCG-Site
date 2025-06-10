@@ -116,6 +116,7 @@ class Player:
         self.urien_relevant = False
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
+        self.grigory_maksim_relevant = False
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -152,6 +153,8 @@ class Player:
             self.gorzod_relevant = True
         if self.headquarters[0].get_name() == "Subject Omega-X62113":
             self.subject_omega_relevant = True
+        if self.headquarters[0].get_name() == "Grigory Maksim":
+            self.grigory_maksim_relevant = True
         self.deck = deck_list[1:]
         if self.warlord_faction == "Tyranids":
             i = 0
@@ -675,10 +678,15 @@ class Player:
         if name in self.cards:
             self.cards.remove(name)
 
-    def get_shields_given_pos(self, pos_in_hand, planet_pos=None):
+    def get_shields_given_pos(self, pos_in_hand, planet_pos=None, tank=False):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict)
         shields = card_object.get_shields()
+        if card_object.get_card_type() == "Support":
+            if self.grigory_maksim_relevant:
+                shields = 1
+                if tank:
+                    shields = 2
         if shields > 0:
             if card_object.get_faction() == "Tau":
                 if planet_pos is not None:
@@ -740,6 +748,7 @@ class Player:
         self.urien_relevant = False
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
+        self.grigory_maksim_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
