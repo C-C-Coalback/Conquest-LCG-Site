@@ -133,7 +133,7 @@ def chaos_cards_init():
                              3, "Chaos", "Common", 2, 4, 1, False),
         CardClasses.ArmyCard("Heretek Inventor", "FORCED REACTION: After this unit enters play, your opponent may "
                                                  "move it to a planet of his choice.", "Scholar.",
-                             1, "Chaos", "Common", 3, 3, 1, False),
+                             1, "Chaos", "Loyal", 3, 3, 1, False),
         CardClasses.WarlordCard("Ku'gath Plaguefather", "Reaction: After this warlord is declared as an attacker, "
                                                         "move 1 damage from this warlord to another unit "
                                                         "at this planet.", "Deamon. Nurgle.", "Chaos",

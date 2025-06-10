@@ -242,7 +242,7 @@ def orks_cards_init():
         CardClasses.SupportCard("Smasha Gun Battery", "Deploy Action: Exhaust this support to have each player deal an "
                                                       "amount of damage equal to the number of cards in his hand"
                                                       " among units he controls.", "Weapon. Artillery.", 3, faction,
-                                "Loyal", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+                                "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
         CardClasses.ArmyCard("Salvaged Battlewagon", "No Wargear Attachments.\n"
                                                      "Reaction: After this unit destroys an enemy unit by an attack, "
                                                      "put an Orks unit with printed cost 3 or lower into play from "

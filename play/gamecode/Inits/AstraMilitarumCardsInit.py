@@ -134,7 +134,7 @@ def astra_militarum_cards_init():
                                                     "a unit you control, exhaust this "
                                                     "support to reassign 1 of that damage "
                                                     "to this support.", "Upgrade.", 1,
-                                faction, "Common", False),
+                                faction, "Loyal", False),
         CardClasses.SupportCard("Catachan Outpost", "Combat Action: Exhaust this support to "
                                                     "give a target unit +2 ATK for its "
                                                     "next attack this phase.", "Location.",
