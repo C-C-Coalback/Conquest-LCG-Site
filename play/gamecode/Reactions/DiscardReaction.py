@@ -16,3 +16,10 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         primary_player.cards.append(card.get_name())
                         del primary_player.discard[pos_discard]
                         self.delete_reaction()
+        elif current_reaction == "Clearing the Path":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_faction() == "Astra Militarum" and card.get_card_type() == "Support":
+                    primary_player.add_to_hq(card)
+                    del primary_player.discard[pos_discard]
+                    self.delete_reaction()

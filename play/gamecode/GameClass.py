@@ -5521,6 +5521,9 @@ class Game:
     def check_reactions_from_winning_combat(self, winner, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
+            if winner.search_card_in_hq("Clearing the Path"):
+                if winner.check_for_warlord(planet_id):
+                    reactions.append("Clearing the Path")
             if self.get_blue_icon(planet_id):
                 if winner.resources > 0:
                     if not winner.accept_any_challenge_used:
