@@ -889,7 +889,8 @@ class Game:
                 if len(self.cards_in_search_box) > int(game_update_string[1]):
                     return True
             if game_update_string[0] == "PLANETS":
-                return True
+                if self.planets_in_play_array[int(game_update_string[1])]:
+                    return True
             if game_update_string[0] == "CHOICE":
                 if len(self.choices_available) > int(game_update_string[1]):
                     return True
