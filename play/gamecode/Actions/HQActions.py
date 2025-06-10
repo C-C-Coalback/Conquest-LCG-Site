@@ -8,6 +8,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    planet_pos = -2
     unit_pos = int(game_update_string[2])
     if not self.action_chosen:
         self.position_of_actioned_card = (-2, int(game_update_string[2]))
@@ -561,6 +562,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played()
+                    self.action_cleanup()
+    elif self.action_chosen == "Keep Firing!":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank"):
+                if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
                     self.action_cleanup()
     elif self.action_chosen == "Missile Pod":
         resolved_something = False

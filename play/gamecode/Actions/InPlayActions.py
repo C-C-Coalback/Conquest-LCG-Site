@@ -704,6 +704,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played()
                     self.action_cleanup()
+    elif self.action_chosen == "Keep Firing!":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank"):
+                if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
