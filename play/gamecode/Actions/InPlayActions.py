@@ -201,6 +201,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Seekers of Slaanesh":
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.misc_target_planet = planet_pos
                     elif ability == "Mekaniak Repair Krew":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -208,10 +213,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Veteran Brother Maxos":
-                        if player_owning_card.name_player == name:
-                            self.action_chosen = ability
-                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Death Korps Engineers":
                         self.action_chosen = ability
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -1845,11 +1849,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             self.misc_counter[planet_pos] = False
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+    elif self.action_chosen == "Seekers of Slaanesh":
+        if self.misc_target_planet == planet_pos:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        pla, pos = self.position_of_actioned_card
+                        if pos > unit_pos:
+                            pos = pos - 1
+                        primary_player.reset_aiming_reticle_in_play(pla, pos)
+                        primary_player.draw_card()
+                        self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if game_update_string[1] == "1":
             player_receiving_attachment = self.p1
         else:
