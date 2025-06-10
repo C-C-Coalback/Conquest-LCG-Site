@@ -688,13 +688,16 @@ class Player:
 
     def get_ranged_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
-            return False
+            return self.headquarters[unit_id].get_ranged()
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Termagant Spikers":
                     return True
         if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
             if self.check_for_enemy_warlord(planet_id):
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
+            if self.count_supports() > 2:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Vior'la Warrior Cadre":
             for i in range(len(self.cards_in_play[planet_id + 1])):
@@ -1952,6 +1955,13 @@ class Player:
                 return True
         return card.get_ambush()
 
+    def count_supports(self):
+        count = 0
+        for i in range(len(self.headquarters)):
+            if self.get_card_type_given_pos(-2, i) == "Support":
+                count += 1
+        return count
+
     def get_mobile_given_pos(self, planet_id, unit_id):
         if self.get_ability_given_pos(planet_id, unit_id) == "Ravenwing Escort":
             if self.warlord_faction != "Space Marines":
@@ -1959,6 +1969,11 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Venomous Fiend":
             if self.warlord_faction != "Chaos":
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
+            if self.count_supports() > 2:
+                return True
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_mobile()
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()
 
     def get_available_mobile_given_pos(self, planet_id, unit_id):
