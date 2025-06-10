@@ -890,6 +890,9 @@ class Player:
         self.headquarters[last_element_index].name_owner = self.name_player
         if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
+        elif self.headquarters[last_element_index].get_ability() == "Salamander Flamer Squad":
+            self.headquarters[last_element_index].salamanders_flamers_id_number = self.game.current_flamers_id
+            self.game.current_flamers_id += 1
         elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
             enemy_name = self.game.name_1
             if self.name_player == self.game.name_1:
@@ -907,17 +910,17 @@ class Player:
                                       (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
             i = len(self.discard) - 1
-            while i > -1:
+            found = False
+            while i > -1 and not found:
                 card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
                 if card.get_card_type() == "Event":
                     self.cards.append(card.get_name())
                     del self.discard[i]
-                    return None
+                    found = True
                 i = i - 1
         elif self.headquarters[last_element_index].get_ability() == "Earth Caste Technician":
-            self.game.reactions_needing_resolving.append("Earth Caste Technician")
-            self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-            self.game.player_who_resolves_reaction.append(self.name_player)
+            self.game.create_reaction("Earth Caste Technician", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         return True
 
     def print_headquarters(self):
@@ -1136,6 +1139,10 @@ class Player:
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
+        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
+            self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
+                self.game.current_flamers_id
+            self.game.current_flamers_id += 1
         if sacrifice_end_of_phase:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Heretek Inventor":
@@ -2567,6 +2574,7 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].negative_hp_until_eop = 0
+                self.headquarters[i].hit_by_which_salamanders = []
                 self.headquarters[i].extra_command_eop = 0
                 self.headquarters[i].positive_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
@@ -2589,6 +2597,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].lost_ranged_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders = []
                 self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
@@ -4063,9 +4072,11 @@ class Player:
                     print("is old one")
                     if not self.headquarters[unit_id].get_once_per_round_used():
                         if self.headquarters[unit_id].get_damage() > 0:
-                            self.game.reactions_needing_resolving.append("Old One Eye")
-                            self.game.player_who_resolves_reaction.append(self.name_player)
-                            self.game.positions_of_unit_triggering_reaction((int(self.number), planet_id, unit_id))
+                            self.game.create_reaction("Old One Eye", self.name_player,
+                                                      (int(self.number), planet_id, unit_id))
+                if self.get_ability_given_pos(planet_id, unit_id) == "Salamander Flamer Squad":
+                    self.game.create_reaction("Salamander Flamer Squad", self.name_player,
+                                              (int(self.number), planet_id, unit_id))
             return None
         was_ready = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].ready_card()
@@ -4078,6 +4089,9 @@ class Player:
                                                   (int(self.number), planet_id, unit_id))
             if self.get_ability_given_pos(planet_id, unit_id) == "Blitza-Bommer":
                 self.game.create_reaction("Blitza-Bommer", self.name_player,
+                                          (int(self.number), planet_id, unit_id))
+            if self.get_ability_given_pos(planet_id, unit_id) == "Salamander Flamer Squad":
+                self.game.create_reaction("Salamander Flamer Squad", self.name_player,
                                           (int(self.number), planet_id, unit_id))
             if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
                 self.game.create_reaction("Goff Brawlers", self.name_player, (int(self.number), planet_id, unit_id))

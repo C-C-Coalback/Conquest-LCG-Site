@@ -481,6 +481,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.name_player_making_choices = player.name_player
                                 self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Salamander Flamer Squad":
+                                self.flamers_damage_active = True
+                                self.id_of_the_active_flamer = \
+                                    player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                    salamanders_flamers_id_number
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
                                     player.discard_top_card_deck()

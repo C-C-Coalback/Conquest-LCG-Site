@@ -852,6 +852,22 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
             secondary_player.suffer_area_effect(planet_pos, 1)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Salamander Flamer Squad":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            salamander_id = -1
+            if planet_pos == -2:
+                salamander_id = primary_player.headquarters[unit_pos].salamanders_flamers_id_number
+            else:
+                salamander_id = primary_player.cards_in_play[planet_pos + 1][unit_pos].salamanders_flamers_id_number
+            for i in range(len(secondary_player.headquarters)):
+                if salamander_id in secondary_player.headquarters[i].hit_by_which_salamanders:
+                    secondary_player.assign_damage_to_pos(-2, i, 1, context="Salamander Flamer Squad")
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if salamander_id in secondary_player.cards_in_play[i + 1][j].hit_by_which_salamanders:
+                        secondary_player.assign_damage_to_pos(
+                            i, j, 1, context="Salamander Flamer Squad", rickety_warbuggy=True)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kith's Khymeramasters":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Khymera", planet_pos)

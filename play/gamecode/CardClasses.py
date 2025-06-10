@@ -58,6 +58,8 @@ class Card:
         self.attachments = []
         self.deepstrike = deepstrike
         self.immortal_loyalist_ok = True
+        self.salamanders_flamers_id_number = 0
+        self.hit_by_which_salamanders = []
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

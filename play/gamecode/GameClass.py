@@ -334,6 +334,9 @@ class Game:
         self.damage_index_xv805 = -1
         self.player_using_xv805 = ""
         self.og_pos_xv805_target = (-1, -1)
+        self.current_flamers_id = 0
+        self.flamers_damage_active = False
+        self.id_of_the_active_flamer = -1
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -3832,6 +3835,9 @@ class Game:
                                     == "Prudent Fire Warriors":
                                 self.create_interrupt("Prudent Fire Warriors", primary_player.name_player,
                                                       (int(primary_player.number), planet_pos, unit_pos))
+                    if self.flamers_damage_active:
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders.append(
+                            self.id_of_the_active_flamer)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.damage_taken_was_from_attack.append(True)
@@ -3963,6 +3969,10 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"
                                         if took_damage:
+                                            if self.flamers_damage_active:
+                                                primary_player.cards_in_play[planet_pos + 1][
+                                                    unit_pos].hit_by_which_salamanders.append(
+                                                    self.id_of_the_active_flamer)
                                             self.queued_sound = "damage"
                                             self.recently_damaged_units.append(
                                                 self.positions_of_units_to_take_damage[0])
@@ -5301,6 +5311,8 @@ class Game:
                 self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
+                self.flamers_damage_active = False
+                self.id_of_the_active_flamer = -1
                 planet = self.last_planet_checked_for_battle
                 name_player_who_resolved_attack = ""
                 if planet > -1:
