@@ -1786,6 +1786,9 @@ class Player:
             if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
                 if self.search_card_in_hq("Painboy Tent"):
                     command += 1
+        if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+            if self.search_card_at_planet(planet_id, "Great Iron Gob"):
+                command += 1
         return command
 
     def count_command_at_planet(self, planet_id, fbk=False, actual_cs=False):
@@ -2028,6 +2031,8 @@ class Player:
                     if self.cards_in_play[planet_id + 1][i].get_bloodied():
                         return False
                     return True
+                if self.search_attachments_at_pos(planet_id, i, name_of_card):
+                    return True
             return False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             current_name = self.cards_in_play[planet_id + 1][i].get_ability()
@@ -2037,6 +2042,8 @@ class Player:
                     return True
                 if self.cards_in_play[planet_id + 1][i].get_bloodied():
                     return False
+                return True
+            if self.search_attachments_at_pos(planet_id, i, name_of_card):
                 return True
         return False
 

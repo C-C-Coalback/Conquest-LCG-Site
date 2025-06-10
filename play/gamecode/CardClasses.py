@@ -184,6 +184,8 @@ class Card:
             if self.attachments[i].get_ability() == "Autarch Powersword":
                 if self.get_card_type() == "Army":
                     extra_traits += "Warrior. Psyker."
+            if self.attachments[i].get_ability() == "Great Iron Gob":
+                extra_traits += "Nob."
         return trait_to_find in (self.traits + self.extra_traits_eop + extra_traits)
 
     def get_image_name(self):
