@@ -34,6 +34,13 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if attached_all:
                     primary_player.cards_in_play[og_pla + 1][og_pos].attachments = []
                 self.delete_interrupt()
+    elif current_interrupt == "Mark of Slaanesh":
+        if game_update_string[1] == primary_player.number:
+            dest_planet = self.positions_of_units_interrupting[0][1]
+            if dest_planet != planet_pos:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
+                    self.delete_interrupt()
     elif current_interrupt == "Vanguard Soldiers":
         if game_update_string[1] == primary_player.number:
             primary_player.ready_given_pos(planet_pos, unit_pos)

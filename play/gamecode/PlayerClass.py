@@ -3690,12 +3690,13 @@ class Player:
                                                   (int(self.number), planet_num, i))
                         print("created bolt pistol react")
         for i in range(len(card.get_attachments())):
+            owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                owner = card.get_attachments()[i].name_owner
                 self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":
-                owner = card.get_attachments()[i].name_owner
                 self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
+            if card.get_attachments()[i].get_ability() == "Mark of Slaanesh":
+                self.game.create_interrupt("Mark of Slaanesh", owner, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
