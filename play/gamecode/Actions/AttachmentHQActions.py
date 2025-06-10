@@ -28,6 +28,15 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.send_update_message(ability + " activated")
+                elif ability == "Searchlight":
+                    if primary_player.get_name_player() == player_owning_card.name_player:
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_pla, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            await self.send_update_message(ability + " activated")
                 elif ability == "Missile Pod":
                     if primary_player.get_name_player() == self.player_with_action:
                         player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
