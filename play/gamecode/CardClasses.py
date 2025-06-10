@@ -60,6 +60,7 @@ class Card:
         self.immortal_loyalist_ok = True
         self.salamanders_flamers_id_number = 0
         self.hit_by_which_salamanders = []
+        self.techmarine_aspirant_available = True
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

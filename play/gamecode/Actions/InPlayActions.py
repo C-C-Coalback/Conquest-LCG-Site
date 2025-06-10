@@ -231,15 +231,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Zarathur's Flamers":
-                        if player_owning_card.name_player == name:
-                            self.action_chosen = ability
-                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Ravenous Flesh Hounds":
-                        if player_owning_card.name_player == name:
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Techmarine Aspirant":
+                        if primary_player.resources > 0:
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.misc_target_planet = planet_pos
                     elif ability == "Keening Maleceptor":
                         if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                             if self.infested_planets[planet_pos]:
@@ -1213,6 +1217,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.chosen_first_card = True
                     self.misc_target_unit = (planet_pos, unit_pos)
+    elif self.action_chosen == "Techmarine Aspirant":
+        if game_update_string[1] == primary_player.number:
+            if planet_pos == self.misc_target_planet and not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].techmarine_aspirant_available:
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].techmarine_aspirant_available = False
+                        primary_player.spend_resources(1)
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        og_pla, og_pos = self.position_of_actioned_card
+                        primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        self.action_cleanup()
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
