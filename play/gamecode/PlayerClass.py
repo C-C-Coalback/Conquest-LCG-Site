@@ -1888,6 +1888,10 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Blitza-Bommer":
             if self.get_ready_given_pos(planet_id, unit_id):
                 return True
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
+            if self.search_card_at_planet(planet_id, "Adherent Outcast") and \
+                    self.check_is_unit_at_pos(planet_id, unit_id):
+                return True
         return self.cards_in_play[planet_id + 1][unit_id].get_flying()
 
     def set_blanked_given_pos(self, planet_id, unit_id, exp="EOP"):
@@ -1931,8 +1935,8 @@ class Player:
                 if self.check_for_enemy_warlord(planet_id):
                     return True
         if enemy_unit_damage > 0:
-            if self.check_for_trait_given_pos(planet_id, unit_id, "Elite") and\
-                    self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+            if self.check_for_trait_given_pos(planet_id, unit_id, "Elite") and \
+                    self.check_is_unit_at_pos(planet_id, unit_id):
                 if self.search_card_at_planet(planet_id, "Supplicant of Pain"):
                     return True
         return self.cards_in_play[planet_id + 1][unit_id].get_armorbane()
