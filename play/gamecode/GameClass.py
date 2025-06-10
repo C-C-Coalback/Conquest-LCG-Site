@@ -3797,6 +3797,13 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                        if primary_player.defensive_protocols_active:
+                            amount_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+                            if amount_to_remove > 0:
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - amount_to_remove
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, amount_to_remove)
                     self.recently_damaged_units.append(self.positions_of_units_to_take_damage[0])
                     self.queued_sound = "damage"
                     if planet_pos != -2:
@@ -3918,10 +3925,18 @@ class Game:
                                         shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                         self.amount_that_can_be_removed_by_shield[0] = \
                                             self.amount_that_can_be_removed_by_shield[0] - shields
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
                                         took_damage = True
                                         if self.amount_that_can_be_removed_by_shield[0] == 0:
                                             took_damage = False
-                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, shields)
+                                        if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                                            if primary_player.defensive_protocols_active:
+                                                amount_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+                                                if amount_to_remove > 0:
+                                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                                        self.amount_that_can_be_removed_by_shield[0] - amount_to_remove
+                                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos,
+                                                                                          amount_to_remove)
                                         primary_player.discard_card_from_hand(hand_pos)
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"

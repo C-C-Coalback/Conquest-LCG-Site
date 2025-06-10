@@ -133,6 +133,7 @@ class Player:
         self.the_princes_might_active = [False, False, False, False, False, False, False]
         self.hit_by_gorgul = False
         self.concealing_darkness_active = False
+        self.defensive_protocols_active = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -298,6 +299,8 @@ class Player:
             self.game.force_set_battle_initiative(self.name_player, self.number)
         if ability == "Concealing Darkness":
             self.concealing_darkness_active = True
+        if ability == "Defensive Protocols":
+            self.defensive_protocols_active = True
         self.discard.append(ability)
         self.after_any_deepstrike()
         del self.cards_in_reserve[planet_id][unit_id]
@@ -3875,6 +3878,7 @@ class Player:
 
     def resolve_combat_round_ends_effects(self, planet_id):
         can_forward_barracks = False
+        self.defensive_protocols_active = False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ability_given_pos(planet_id, i) == "Anxious Infantry Platoon":
                 self.game.create_reaction("Anxious Infantry Platoon", self.name_player,
