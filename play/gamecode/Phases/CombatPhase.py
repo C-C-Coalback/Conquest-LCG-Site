@@ -389,10 +389,36 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player = self.p2
                             secondary_player = self.p1
                         if chosen_planet == self.last_planet_checked_for_battle:
+                            grav_inhib_rel = player.search_card_at_planet(chosen_planet, "Grav Inhibitor Drone")
+                            if not grav_inhib_rel:
+                                grav_inhib_rel = secondary_player.search_card_at_planet(chosen_planet,
+                                                                                        "Grav Inhibitor Drone")
+                            if grav_inhib_rel:
+                                grav_inhib_rel = False
+                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
+                                    if player.get_card_type_given_pos(chosen_planet, i) == "Army":
+                                        if player.get_cost_given_pos(chosen_planet, i) > 2:
+                                            if player.get_ready_given_pos(chosen_planet, i):
+                                                grav_inhib_rel = True
+                                for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                                    if secondary_player.get_card_type_given_pos(chosen_planet, i) == "Army":
+                                        if secondary_player.get_cost_given_pos(chosen_planet, i) > 2:
+                                            if secondary_player.get_ready_given_pos(chosen_planet, i):
+                                                grav_inhib_rel = True
+                            if grav_inhib_rel:
+                                grav_inhib_rel = False
+                                if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Army":
+                                    if player.get_cost_given_pos(chosen_planet, chosen_unit) < 3:
+                                        grav_inhib_rel = True
                             can_continue = False
                             print("check enemy cards")
                             print(len(secondary_player.cards_in_play[chosen_planet + 1]))
-                            if not secondary_player.cards_in_play[chosen_planet + 1]:
+                            if grav_inhib_rel:
+                                can_continue = False
+                                valid_unit = False
+                                await self.send_update_message("Grav Inhibitor Drone is preventing "
+                                                               "this unit from attacking")
+                            elif not secondary_player.cards_in_play[chosen_planet + 1]:
                                 valid_unit = False
                                 can_continue = False
                                 await self.send_update_message("No enemy units to declare as defender. Combat ends.")
