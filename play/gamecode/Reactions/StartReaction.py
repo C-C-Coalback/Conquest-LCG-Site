@@ -852,6 +852,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
             secondary_player.suffer_area_effect(planet_pos, 1)
             self.delete_reaction()
+        elif current_reaction == "Squiggoth Brute":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                    secondary_player.cards_in_play[planet_pos + 1][i].lost_keywords_eop = True
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Salamander Flamer Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             salamander_id = -1

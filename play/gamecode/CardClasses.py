@@ -61,6 +61,7 @@ class Card:
         self.salamanders_flamers_id_number = 0
         self.hit_by_which_salamanders = []
         self.techmarine_aspirant_available = True
+        self.lost_keywords_eop = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
@@ -308,10 +309,14 @@ class UnitCard(Card):
     def get_unstoppable(self):
         if self.blanked_eop:
             return False
+        if self.lost_keywords_eop:
+            return False
         return self.unstoppable
 
     def get_has_hive_mind(self):
         if self.blanked_eop:
+            return False
+        if self.lost_keywords_eop:
             return False
         return self.hive_mind
 
@@ -331,6 +336,8 @@ class UnitCard(Card):
         self.not_yet_assigned_damage = 0
 
     def get_ambush(self):
+        if self.lost_keywords_eop:
+            return False
         return self.ambush
 
     def get_extra_attack_until_end_of_phase(self):
@@ -365,6 +372,8 @@ class UnitCard(Card):
 
     def get_mobile(self):
         if self.blanked_eop:
+            return False
+        if self.lost_keywords_eop:
             return False
         if self.mobile_eop:
             return True
@@ -407,6 +416,8 @@ class UnitCard(Card):
     def get_ranged(self):
         if self.blanked_eop:
             return False
+        if self.lost_keywords_eop:
+            return False
         if self.lost_ranged_eop:
             return False
         if self.ranged_eop:
@@ -436,6 +447,8 @@ class UnitCard(Card):
     def get_armorbane(self):
         if self.blanked_eop:
             return False
+        if self.lost_keywords_eop:
+            return False
         if self.armorbane_eop:
             return True
         if self.armorbane_eor:
@@ -460,6 +473,8 @@ class UnitCard(Card):
     def get_area_effect(self):
         if self.blanked_eop:
             return 0
+        if self.lost_keywords_eop:
+            return 0
         area_effect = self.area_effect
         area_effect += self.area_effect_eop
         area_effect += self.area_effect_eor
@@ -477,6 +492,8 @@ class UnitCard(Card):
 
     def get_flying(self):
         if self.blanked_eop:
+            return False
+        if self.lost_keywords_eop:
             return False
         if self.flying_eop:
             return True
@@ -514,6 +531,8 @@ class UnitCard(Card):
 
     def get_brutal(self):
         if self.blanked_eop:
+            return False
+        if self.lost_keywords_eop:
             return False
         if self.brutal_eocr:
             return True

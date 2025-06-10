@@ -2439,6 +2439,7 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].set_once_per_round_used(False)
+                self.headquarters[i].techmarine_aspirant_available = True
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
                 self.headquarters[i].area_effect_eor = 0
@@ -2449,6 +2450,7 @@ class Player:
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].set_once_per_round_used(False)
+                self.cards_in_play[i + 1][j].techmarine_aspirant_available = True
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     self.cards_in_play[i + 1][j].get_attachments()[k].set_once_per_round_used(False)
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
@@ -2591,8 +2593,10 @@ class Player:
                 self.headquarters[i].attack_set_eop = -1
                 self.headquarters[i].brutal_eop = False
                 self.headquarters[i].extra_traits_eop = ""
+                self.headquarters[i].lost_keywords_eop = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].lost_keywords_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
@@ -3309,6 +3313,9 @@ class Player:
                     if phase == "COMBAT":
                         self.game.create_reaction("Blazing Zoanthrope", self.name_player,
                                                   (int(self.number), i, j))
+                if self.get_ability_given_pos(i, j) == "Squiggoth Brute":
+                    if phase == "COMBAT":
+                        self.game.create_reaction("Squiggoth Brute", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Deathmark Assassins":
                     if phase == "COMBAT":
                         self.game.create_reaction("Deathmark Assassins", self.name_player,
