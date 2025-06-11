@@ -2214,6 +2214,13 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                    elif self.choice_context == "Blood Axe Strategist Destination":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if game_update_string[1] == "0":
+                            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+                            self.delete_reaction()
                     elif self.choice_context == "Use Reanimating Warriors?":
                         self.choices_available = []
                         self.choice_context = ""
@@ -5375,6 +5382,9 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
+                            if self.p1.get_faction_given_pos(planet, i) == "Orks":
+                                if self.p1.search_card_at_planet(planet, "Blood Axe Strategist"):
+                                    self.create_reaction("Blood Axe Strategist", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
@@ -5395,6 +5405,9 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p2.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
+                            if self.p2.get_faction_given_pos(planet, i) == "Orks":
+                                if self.p2.search_card_at_planet(planet, "Blood Axe Strategist"):
+                                    self.create_reaction("Blood Axe Strategist", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":

@@ -987,6 +987,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.set_damage_given_pos(warlord_planet, warlord_pos,
                                                 current_damage + self.damage_amounts_baarzul[0])
             self.delete_reaction()
+        elif current_reaction == "Blood Axe Strategist":
+            self.choices_available = ["HQ", "Adjacent Planet"]
+            self.choice_context = "Blood Axe Strategist Destination"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Griffon Escort":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Guardsman", planet_pos)

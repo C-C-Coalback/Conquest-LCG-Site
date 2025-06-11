@@ -29,6 +29,11 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
         primary_player.summon_token_at_planet("Snotlings", chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "Blood Axe Strategist":
+        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        if abs(planet_pos - chosen_planet) == 1:
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+            self.delete_reaction()
     elif current_reaction == "Tactical Withdrawal":
         if not self.chosen_first_card:
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
