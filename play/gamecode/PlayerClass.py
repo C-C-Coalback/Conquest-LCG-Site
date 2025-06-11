@@ -905,6 +905,14 @@ class Player:
         self.headquarters.append(copy.deepcopy(card_object))
         last_element_index = len(self.headquarters) - 1
         self.headquarters[last_element_index].name_owner = self.name_player
+        if self.get_card_type_given_pos(-2, last_element_index) == "Army":
+            if self.search_card_in_hq("Dissection Chamber"):
+                self.assign_damage_to_pos(-2, last_element_index, 1)
+            enemy_player = self.game.p1
+            if enemy_player.name_player == self.name_player:
+                enemy_player = self.game.p2
+            if enemy_player.search_card_in_hq("Dissection Chamber"):
+                self.assign_damage_to_pos(-2, last_element_index, 1)
         if self.get_ability_given_pos(-2, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
@@ -1166,6 +1174,14 @@ class Player:
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
+        if self.get_card_type_given_pos(position, last_element_index) == "Army":
+            if self.search_card_in_hq("Dissection Chamber"):
+                self.assign_damage_to_pos(position, last_element_index, 1)
+            enemy_player = self.game.p1
+            if enemy_player.name_player == self.name_player:
+                enemy_player = self.game.p2
+            if enemy_player.search_card_in_hq("Dissection Chamber"):
+                self.assign_damage_to_pos(position, last_element_index, 1)
         if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(position, last_element_index, 2, preventable=False)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
