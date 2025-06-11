@@ -3662,7 +3662,6 @@ class Player:
                 self.warlord_just_got_destroyed = True
         else:
             other_player = self.game.p1
-            other_player.valid_planets_berzerker_warriors[planet_num] = True
             if other_player.name_player == self.name_player:
                 other_player = self.game.p2
             if other_player.search_hand_for_card("Berzerker Warriors"):
@@ -3693,9 +3692,6 @@ class Player:
                                                   (int(self.number), -1, -1))
                 else:
                     found_stikk = False
-                    other_player = self.game.p1
-                    if other_player.name_player == self.name_player:
-                        other_player = self.game.p2
                     for i in range(len(other_player.headquarters)):
                         if other_player.headquarters[i].get_is_unit():
                             for j in range(len(other_player.headquarters[i].get_attachments())):
@@ -3731,9 +3727,6 @@ class Player:
                                             get_attachments()[j].once_per_phase_used:
                                         self.game.create_reaction("The Bloodrunna", self.name_player,
                                                                   (int(self.number), planet_num, i))
-                other_player = self.game.p1
-                if other_player.name_player == self.name_player:
-                    other_player = self.game.p2
                 if not other_player.does_own_reaction_exist("The Bloodrunna"):
                     for i in range(len(other_player.cards_in_play[planet_num + 1])):
                         for j in range(len(other_player.cards_in_play[planet_num + 1][i].get_attachments())):
@@ -3746,21 +3739,22 @@ class Player:
                                                                            "Captain Cato Sicarius",
                                                                            bloodied_relevant=True)
             if cato_check:
-                self.game.reactions_needing_resolving.append("Captain Cato Sicarius")
-                if self.number == "1":
-                    self.game.player_who_resolves_reaction.append(self.game.p2.name_player)
-                else:
-                    self.game.player_who_resolves_reaction.append(self.game.p1.name_player)
-                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
+                self.game.create_reaction("Captain Cato Sicarius", other_player.name_player,
+                                          (int(other_player.number), -1, -1))
             xavaes_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_num,
                                                                              "Xavaes Split-Tongue")
             if xavaes_check:
-                self.game.reactions_needing_resolving.append("Xavaes Split-Tongue")
-                if self.number == "1":
-                    self.game.player_who_resolves_reaction.append(self.game.p2.name_player)
-                else:
-                    self.game.player_who_resolves_reaction.append(self.game.p1.name_player)
-                self.game.positions_of_unit_triggering_reaction.append((int(self.number), -1, -1))
+                self.game.create_reaction("Xavaes Split-Tongue", other_player.name_player,
+                                          (int(other_player.number), -1, -1))
+            if self.get_card_type_given_pos(planet_num, card_pos) == "Army":
+                for i in range(len(self.cards_in_play[planet_num + 1])):
+                    if self.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
+                        self.game.create_reaction("Shrieking Exarch", self.name_player,
+                                                  (int(self.number), planet_num, i))
+                for i in range(len(other_player.cards_in_play[planet_num + 1])):
+                    if other_player.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
+                        self.game.create_reaction("Shrieking Exarch", other_player.name_player,
+                                                  (int(other_player.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
                 self.game.create_reaction("Carnivore Pack", self.name_player,
                                           (int(self.number), -1, -1))
