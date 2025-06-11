@@ -2764,6 +2764,9 @@ class Player:
         if self.search_attachments_at_pos(planet_id, unit_id, "Khornate Chain Axe"):
             if self.game.bloodthirst_active[planet_id]:
                 return True
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
+            if self.search_card_at_planet(planet_id, "Focal Warrior"):
+                return True
         return card.get_brutal()
 
     def get_attack_given_pos(self, planet_id, unit_id):
