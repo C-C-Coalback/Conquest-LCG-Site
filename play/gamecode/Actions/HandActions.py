@@ -450,6 +450,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     j = j + 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Ominous Wind":
+                        self.misc_counter = primary_player.get_highest_cost_units()
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        for _ in range(self.misc_counter):
+                            primary_player.draw_card()
+                        self.misc_counter = 4
+                        self.action_chosen = ability
+                        await self.send_update_message("4 cards left to discard")
                     elif ability == "Repent!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.misc_counter = primary_player.get_highest_cost_units()
@@ -847,6 +855,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if card.get_card_type() == "Support" and card.get_cost() <= self.misc_counter:
             primary_player.add_to_hq(card)
             primary_player.remove_card_from_hand(int(game_update_string[2]))
+            self.action_cleanup()
+    elif self.action_chosen == "Ominous Wind":
+        primary_player.discard_card_from_hand(int(game_update_string[2]))
+        self.misc_counter = self.misc_counter - 1
+        if self.misc_counter > 0:
+            await self.send_update_message(str(self.misc_counter) + " cards left to discard")
+        else:
             self.action_cleanup()
     elif self.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
