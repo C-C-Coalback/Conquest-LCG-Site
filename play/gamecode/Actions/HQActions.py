@@ -1204,17 +1204,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.unit_to_move_position = [planet_pos, unit_pos]
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Deception":
-        if self.number_with_deploy_turn == "1":
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_returning = self.p1
         else:
             player_returning = self.p2
-        unit_pos = int(game_update_string[2])
         can_continue = True
         if player_returning.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)

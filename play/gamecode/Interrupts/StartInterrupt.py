@@ -27,6 +27,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 primary_player.aiming_reticle_coords_hand = primary_player.cards.index("Berzerker Warriors")
                 primary_player.aiming_reticle_color = "blue"
+        elif current_interrupt == "Mucolid Spores":
+            self.misc_counter = 0
         elif current_interrupt == "Ulthwe Spirit Stone":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             primary_player.return_card_to_hand(planet_pos, unit_pos)

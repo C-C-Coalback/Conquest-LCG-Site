@@ -3557,9 +3557,10 @@ class Player:
             if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
             if self.headquarters[card_pos].get_ability() == "Shrouded Harlequin":
-                self.game.reactions_needing_resolving.append("Shrouded Harlequin")
-                self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-                self.game.player_who_resolves_reaction.append(self.name_player)
+                self.game.create_reaction("Shrouded Harlequin", self.name_player,
+                                          (int(self.number), -1, -1))
+            if self.get_ability_given_pos(-2, card_pos) == "Mucolid Spores":
+                self.game.create_interrupt("Mucolid Spores", self.name_player, (int(self.number), -1, -1))
             if self.get_faction_given_pos(-2, card_pos) == "Space Marines" \
                     and self.check_is_unit_at_pos(-2, card_pos):
                 already_apoth = False
@@ -3802,6 +3803,8 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
                 self.game.create_reaction("Carnivore Pack", self.name_player,
                                           (int(self.number), -1, -1))
+            if self.get_ability_given_pos(planet_num, card_pos) == "Mucolid Spores":
+                self.game.create_interrupt("Mucolid Spores", self.name_player, (int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Big Shoota Battlewagon":
                 self.game.create_reaction("Big Shoota Battlewagon", self.name_player,
                                           (int(self.number), planet_num, -1))

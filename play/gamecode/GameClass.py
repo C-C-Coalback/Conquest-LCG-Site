@@ -7,7 +7,7 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
-from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts
+from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts
 
 
 def create_planets(planet_array_objects):
@@ -4541,22 +4541,9 @@ class Game:
                     await InPlayInterrupts.resolve_in_play_interrupt(self, name, game_update_string,
                                                                      primary_player, secondary_player)
             if len(game_update_string) == 3:
-                if self.interrupts_waiting_on_resolution[0] == "No Mercy":
-                    if game_update_string[0] == "HQ":
-                        if game_update_string[1] == primary_player.number:
-                            hq_pos = int(game_update_string[2])
-                            if primary_player.headquarters[hq_pos].get_is_unit() and \
-                                    primary_player.headquarters[hq_pos].get_unique() and \
-                                    primary_player.headquarters[hq_pos].get_ready():
-                                primary_player.exhaust_given_pos(-2, hq_pos)
-                                primary_player.discard_card_name_from_hand("No Mercy")
-                                try:
-                                    secondary_player.discard_card_from_hand(self.pos_shield_card)
-                                except:
-                                    pass
-                                self.delete_interrupt()
-                                await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
-                                                                         alt_shields=False, can_no_mercy=False)
+                if game_update_string[0] == "HQ":
+                    await HQInterrupts.resolve_hq_interrupt(self, name, game_update_string,
+                                                            primary_player, secondary_player)
 
     def fury_search(self, player_with_cato, player_without_cato):
         if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
