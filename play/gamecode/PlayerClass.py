@@ -346,6 +346,9 @@ class Player:
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Deathwing Terminators":
+            self.game.create_reaction("Deathwing Terminators", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Mandrake Cutthroat":
             self.game.create_reaction("Mandrake Cutthroat", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
@@ -2149,7 +2152,15 @@ class Player:
                 return True
         return False
 
+    def get_dw_term_active(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].misc_ability_used
+        return self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used
+
     def get_immune_to_enemy_card_abilities(self, planet_pos, unit_pos):
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Deathwing Terminators":
+            if self.get_dw_term_active(planet_pos, unit_pos):
+                return True
         if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
             for i in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
@@ -3286,9 +3297,13 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].reset_own_eocr_values()
+                if self.get_ability_given_pos(-2, i) == "Deathwing Terminators":
+                    self.headquarters[i].misc_ability_used = False
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].reset_own_eocr_values()
+                if self.get_ability_given_pos(i, j) == "Deathwing Terminators":
+                    self.cards_in_play[i + 1][j].misc_ability_used = False
 
     def count_non_necron_factions(self):
         faction_list = []
