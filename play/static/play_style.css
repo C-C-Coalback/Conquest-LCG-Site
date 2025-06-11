@@ -122,7 +122,7 @@ h4 {
 
 .Card-div {
     position: relative;
-    height:6vh;
+    height:9vh;
     width:auto;
 }
 
@@ -132,15 +132,15 @@ h4 {
 
 .Card {
     position: relative;
-    height:6vh;
-    width:5vw;
+    height:9vh;
+    width:6.63vh;
 }
 
 .Exhausted-Card {
     position: relative;
     top:-1vh;
-    width:6vh;
-    height:4.3vw;
+    width:9vh;
+    height:6.63vh;
 }
 
 .Damage {
@@ -154,16 +154,16 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 6vh;
-    width: 4.3vw;
+    height: 9vh;
+    width:6.63vh;
 }
 
 .Exhausted-Attachment-Card {
     position: absolute;
     top: 0;
     left: 0;
-    width: 6vh;
-    height: 4.3vw;
+    width: 9vh;
+    height: 6.63vh;
 }
 
 .Planet-Attachment-Card {
@@ -216,8 +216,8 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    height: 6vh;
-    width: 4.3vw;
+    height: 9vh;
+    width: 6.63vh;
     pointer-events: none;
 }
 
@@ -318,7 +318,7 @@ h4 {
     height:14vh;
     max-height: 14vh;
     overflow-x:auto;
-    overflow-y:hidden;
+    overflow-y:auto;
     white-space:nowrap;
     display:grid;
     grid-template-rows: auto auto;
@@ -339,7 +339,7 @@ h4 {
     height:14vh;
     max-height: 14vh;
     overflow-x:auto;
-    overflow-y:hidden;
+    overflow-y:auto;
     white-space:nowrap;
     display:grid;
     grid-template-rows: auto auto;
