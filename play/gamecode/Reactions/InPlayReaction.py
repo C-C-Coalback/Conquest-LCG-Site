@@ -986,11 +986,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if self.attacker_planet == int(game_update_string[2]):
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.delete_reaction()
+        elif current_reaction == "Masked Hunter":
+            if primary_player.get_number() == game_update_string[1]:
+                dest = self.positions_of_unit_triggering_reaction[0][1]
+                if abs(dest - planet_pos) == 1:
+                    if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Khymera":
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

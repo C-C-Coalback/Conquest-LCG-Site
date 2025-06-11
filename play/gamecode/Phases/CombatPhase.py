@@ -481,9 +481,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
-                                self.choices_available = ["Own deck", "Enemy deck"]
-                                self.name_player_making_choices = player.name_player
-                                self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Masked Hunter":
+                                self.create_reaction("Masked Hunter", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Salamander Flamer Squad":
                                 self.flamers_damage_active = True
