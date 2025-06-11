@@ -803,9 +803,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         name + " received -" + str(primary_player.nahumekh_value) + " HP."
                     )
                     self.delete_reaction()
+        elif current_reaction == "Phoenix Attack Fighter":
+            if game_update_string[1] == secondary_player.number:
+                if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                    if not secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if game_update_string[1] != primary_player.get_number():
                 can_continue = True
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)

@@ -1706,15 +1706,20 @@ class Player:
                 return True
         return False
 
+    def phoenix_attack_fighter_triggers(self, planets_list):
+        for planet_pos in planets_list:
+            for i in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.get_ability_given_pos(planet_pos, i) == "Phoenix Attack Fighter":
+                    self.game.create_reaction("Phoenix Attack Fighter", self.name_player,
+                                              (int(self.number), planet_pos, i))
+
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_card_type() == "Synapse":
                     if self.headquarters[i].get_ability() == "Gravid Tervigon":
-                        self.game.reactions_needing_resolving.append("Gravid Tervigon")
-                        self.game.positions_of_unit_triggering_reaction.append(
-                            [int(self.number), self.synapse_commit_location, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Gravid Tervigon", self.name_player,
+                                                  (int(self.number), self.synapse_commit_location, -1))
                     if self.headquarters[i].get_ability() == "Venomthrope Polluter":
                         self.game.create_reaction("Venomthrope Polluter", self.name_player,
                                                   (int(self.number), self.synapse_commit_location, -1))
