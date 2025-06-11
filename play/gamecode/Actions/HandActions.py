@@ -450,6 +450,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     j = j + 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Vivisection":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
                     elif ability == "For the Tau'va":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):

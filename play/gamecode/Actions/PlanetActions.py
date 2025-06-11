@@ -238,6 +238,18 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
             primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
             self.action_cleanup()
+    elif self.action_chosen == "Vivisection":
+        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
+                if primary_player.get_damage_given_pos(chosen_planet, i) > 0:
+                    primary_player.remove_damage_from_pos(chosen_planet, i, 1, healing=True)
+            else:
+                primary_player.assign_damage_to_pos(chosen_planet, i, 1)
+        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+            if secondary_player.get_faction_given_pos(chosen_planet, i) != "Necrons":
+                if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
+                    secondary_player.assign_damage_to_pos(chosen_planet, i, 1)
+        self.action_cleanup()
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \
