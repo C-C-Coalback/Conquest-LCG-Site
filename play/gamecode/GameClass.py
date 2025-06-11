@@ -337,6 +337,7 @@ class Game:
         self.current_flamers_id = 0
         self.flamers_damage_active = False
         self.id_of_the_active_flamer = -1
+        self.bloodrain_tempest_active = False
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -3606,6 +3607,7 @@ class Game:
         self.p2.muster_the_guard_count = 0
         self.p1.master_warpsmith_count = 0
         self.p2.master_warpsmith_count = 0
+        self.bloodrain_tempest_active = False
         last_phase = self.phase
         self.phase = new_val
         if self.phase == "COMMAND":
@@ -5778,20 +5780,36 @@ class Game:
                 self.name_player_making_choices = self.name_2
 
     def find_next_planet_for_combat(self):
-        i = self.last_planet_checked_for_battle + 1
-        while i < len(self.planet_array):
-            if self.planets_in_play_array[i]:
-                p1_has_warlord = self.p1.check_for_warlord(i)
-                p2_has_warlord = self.p2.check_for_warlord(i)
-                if not p1_has_warlord and not p2_has_warlord:
-                    p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
-                    p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
-                if p1_has_warlord or p2_has_warlord:
-                    self.begin_battle(i)
-                    self.begin_combat_round()
-                    self.ranged_skirmish_active = True
-                    return True
-            i = i + 1
+        if not self.bloodrain_tempest_active:
+            i = self.last_planet_checked_for_battle + 1
+            while i < len(self.planet_array):
+                if self.planets_in_play_array[i]:
+                    p1_has_warlord = self.p1.check_for_warlord(i)
+                    p2_has_warlord = self.p2.check_for_warlord(i)
+                    if not p1_has_warlord and not p2_has_warlord:
+                        p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
+                        p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
+                    if p1_has_warlord or p2_has_warlord or i == self.round_number:
+                        self.begin_battle(i)
+                        self.begin_combat_round()
+                        self.ranged_skirmish_active = True
+                        return True
+                i = i + 1
+        else:
+            i = self.last_planet_checked_for_battle - 1
+            while i > -1:
+                if self.planets_in_play_array[i]:
+                    p1_has_warlord = self.p1.check_for_warlord(i)
+                    p2_has_warlord = self.p2.check_for_warlord(i)
+                    if not p1_has_warlord and not p2_has_warlord:
+                        p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
+                        p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
+                    if p1_has_warlord or p2_has_warlord or i == self.round_number:
+                        self.begin_battle(i)
+                        self.begin_combat_round()
+                        self.ranged_skirmish_active = True
+                        return True
+                i = i - 1
         return False
 
     def reset_combat_turn(self):

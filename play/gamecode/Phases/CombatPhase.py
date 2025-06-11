@@ -31,9 +31,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 self.before_first_combat = False
                 self.p1.has_passed = False
                 self.p2.has_passed = False
-                self.check_battle(self.round_number)
-                self.begin_battle(self.round_number)
-                self.begin_combat_round()
+                self.last_planet_checked_for_battle = -1
+                if self.bloodrain_tempest_active:
+                    self.last_planet_checked_for_battle = 7
+                self.find_next_planet_for_combat()
                 await self.send_update_message("Battle begins at the first planet. Players take combat turns. "
                                                "Press the action button between turns to take an action.")
                 self.set_battle_initiative()
