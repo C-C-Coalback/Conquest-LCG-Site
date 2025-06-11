@@ -264,14 +264,14 @@ class Game:
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
                                  "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
                                  "Imperial Fists Siege Force", "Prodigal Sons Disciple", "Fire Prism",
-                                 "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion"]
+                                 "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion", ]
         self.nullifying_backlash = ""
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
         self.name_player_using_backlash = ""
         self.canceled_card_bonuses = [False, False, False, False, False, False, False]
         self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
-        self.units_move_hq_attack = ["Aun'ui Prelate", "Aun'shi", "Ethereal Envoy"]
+        self.units_move_hq_attack = ["Aun'ui Prelate", "Aun'shi", "Ethereal Envoy", "Herald of the Tau'va"]
         self.unit_will_move_after_attack = False
         self.need_to_move_to_hq = False
         self.just_moved_units = False
