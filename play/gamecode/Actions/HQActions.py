@@ -1,4 +1,5 @@
 from .. import FindCard
+import copy
 
 
 async def update_game_event_action_hq(self, name, game_update_string):
@@ -213,6 +214,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 card.set_once_per_phase_used(True)
                                 self.action_chosen = ability
                                 self.chosen_first_card = False
+                    elif ability == "Webway Passage":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            self.misc_target_unit = (-1, -1)
                     elif ability == "Immortal Legion":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])
@@ -411,6 +418,36 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.number_with_deploy_turn = secondary_player.number
                 self.mode = self.stored_mode
                 await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "Webway Passage":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not self.chosen_first_card:
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.chosen_first_card = True
+                else:
+                    other_pla, other_pos = self.misc_target_unit
+                    primary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
+                    if other_pla != planet_pos:
+                        card1 = primary_player.get_card_given_pos(planet_pos, unit_pos)
+                        card2 = primary_player.get_card_given_pos(other_pla, other_pos)
+                        if other_pla == -2:
+                            primary_player.headquarters.append(copy.deepcopy(card1))
+                        else:
+                            primary_player.cards_in_play[other_pla + 1].append(copy.deepcopy(card1))
+                        if planet_pos == -2:
+                            primary_player.headquarters.append(copy.deepcopy(card2))
+                        else:
+                            primary_player.cards_in_play[planet_pos + 1].append(copy.deepcopy(card2))
+                        if planet_pos == -2:
+                            del primary_player.headquarters[unit_pos]
+                        else:
+                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                        if other_pla == -2:
+                            del primary_player.headquarters[other_pos]
+                        else:
+                            del primary_player.cards_in_play[other_pla + 1][other_pos]
+                    self.action_cleanup()
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

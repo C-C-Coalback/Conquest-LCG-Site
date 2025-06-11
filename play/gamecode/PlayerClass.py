@@ -1140,6 +1140,11 @@ class Player:
             name = self.game.name_1
         return name
 
+    def get_card_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos]
+        return self.cards_in_play[planet_pos + 1][unit_pos]
+
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True):
         if card.get_unique():

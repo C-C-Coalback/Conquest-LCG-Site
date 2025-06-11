@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import DeployPhase
+import copy
 
 
 async def update_game_event_action_in_play(self, name, game_update_string):
@@ -1896,6 +1897,36 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             self.misc_counter[planet_pos] = False
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+    elif self.action_chosen == "Webway Passage":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not self.chosen_first_card:
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.chosen_first_card = True
+                else:
+                    other_pla, other_pos = self.misc_target_unit
+                    primary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
+                    if other_pla != planet_pos:
+                        card1 = primary_player.get_card_given_pos(planet_pos, unit_pos)
+                        card2 = primary_player.get_card_given_pos(other_pla, other_pos)
+                        if other_pla == -2:
+                            primary_player.headquarters.append(copy.deepcopy(card1))
+                        else:
+                            primary_player.cards_in_play[other_pla + 1].append(copy.deepcopy(card1))
+                        if planet_pos == -2:
+                            primary_player.headquarters.append(copy.deepcopy(card2))
+                        else:
+                            primary_player.cards_in_play[planet_pos + 1].append(copy.deepcopy(card2))
+                        if planet_pos == -2:
+                            del primary_player.headquarters[unit_pos]
+                        else:
+                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                        if other_pla == -2:
+                            del primary_player.headquarters[other_pos]
+                        else:
+                            del primary_player.cards_in_play[other_pla + 1][other_pos]
+                    self.action_cleanup()
     elif self.action_chosen == "Hallucinogen Grenade":
         if secondary_player.get_number() == game_update_string[1]:
             if planet_pos == self.misc_target_planet:
