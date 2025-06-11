@@ -292,7 +292,7 @@ def tyranids_cards_init():
                                                   "Attach to an enemy army unit with printed cost 2 or lower.\n"
                                                   "Attached unit cannot be readied.", "Wargear. Biomorph.",
                                    1, faction, "Common", 1, False, must_be_enemy_unit=True,
-                                   type_of_units_allowed_for_attachment="Army"),
+                                   type_of_units_allowed_for_attachment="Army", deepstrike=1),
         CardClasses.ArmyCard("Mucolid Spores", "Flying. Mobile.", "Interrupt: When this unit is destroyed, destroy "
                                                                   "up to 2 target enemy support cards.", "Creature.",
                              3, faction, "Common", 0, 2, 1, False, flying=True, mobile=True),

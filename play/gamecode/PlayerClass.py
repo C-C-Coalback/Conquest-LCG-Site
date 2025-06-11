@@ -1075,6 +1075,9 @@ class Player:
         if card.get_name() == "The Shining Blade":
             if not target_card.get_mobile():
                 return False
+        if card.get_name() == "Flesh Hooks":
+            if target_card.get_cost() > 2:
+                return False
         name_owner = self.name_player
         if not_own_attachment:
             if self.number == "1":

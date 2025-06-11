@@ -223,6 +223,9 @@ class Card:
         return self.ready
 
     def ready_card(self):
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Flesh Hooks":
+                return None
         self.ready = True
 
     def exhaust_card(self):
