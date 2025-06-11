@@ -3294,6 +3294,13 @@ class Player:
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount, healing=False):
         if healing:
+            if self.search_card_at_planet(planet_id, "Hot-Shot Laspistol"):
+                return None
+            enemy_player = self.game.p1
+            if enemy_player.name_player == self.name_player:
+                enemy_player = self.game.p2
+            if enemy_player.search_card_at_planet(planet_id, "Hot-Shot Laspistol"):
+                return None
             if self.search_attachments_at_pos(planet_id, unit_id, "Great Scything Talons"):
                 self.game.create_reaction("Great Scything Talons", self.name_player,
                                           (int(self.number), planet_id, unit_id))
