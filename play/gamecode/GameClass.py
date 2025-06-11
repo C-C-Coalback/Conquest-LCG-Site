@@ -2084,10 +2084,10 @@ class Game:
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
                         elif game_update_string[1] == "1":
-                            if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit":
+                            if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit" or \
+                                    self.reactions_needing_resolving[0] == "War Walker Squadron":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
-                                await self.send_update_message("Trying to stop bodysuit")
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
@@ -2383,6 +2383,21 @@ class Game:
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played("Visions of Agony")
+                    elif self.choice_context == "War Walker Attach Exhaust":
+                        target_attachment_name = self.choices_available[int(game_update_string[1])]
+                        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                        primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, target_attachment_name)
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                        self.reset_combat_positions()
+                        self.shining_blade_active = False
+                        self.number_with_combat_turn = primary_player.get_number()
+                        self.player_with_combat_turn = primary_player.get_name_player()
+                        self.need_to_move_to_hq = True
+                        self.attack_being_resolved = False
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Use No Mercy?":
                         if game_update_string[1] == "0":
                             if secondary_player.nullify_check() and self.nullify_enabled:

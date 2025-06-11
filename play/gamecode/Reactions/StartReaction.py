@@ -660,6 +660,38 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "War Walker Squadron":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            attachments = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()
+            name_targets = []
+            for i in range(len(attachments)):
+                if attachments[i].get_ready() and attachments[i].check_for_a_trait("Hardpoint"):
+                    name_targets.append(attachments[i].get_name())
+            cancel_attack = False
+            if len(name_targets) == 0:
+                await self.send_update_message("Somehow did not detect an exhaustible hardpoint. "
+                                               "Proceeding as though one did exist.")
+                cancel_attack = True
+            elif len(name_targets) == 1:
+                await self.send_update_message("Only one hardpoint; automatically selecting it.")
+                primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, name_targets[0])
+                cancel_attack = True
+            else:
+                await self.send_update_message("Multiple possible hardpoints; please indicate which.")
+                self.choices_available = name_targets
+                self.choice_context = "War Walker Attach Exhaust"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            if cancel_attack:
+                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                self.reset_combat_positions()
+                self.shining_blade_active = False
+                self.number_with_combat_turn = primary_player.get_number()
+                self.player_with_combat_turn = primary_player.get_name_player()
+                self.need_to_move_to_hq = True
+                self.attack_being_resolved = False
+                self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
             if primary_player.resources > 0:
                 can_continue = True

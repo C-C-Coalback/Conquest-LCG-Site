@@ -644,6 +644,30 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.last_defender_position = (secondary_player.number,
                                                                    self.defender_planet,
                                                                    self.defender_position)
+                                elif secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "War Walker Squadron":
+                                    attachments = secondary_player.cards_in_play[
+                                        self.defender_planet + 1][self.defender_position].get_attachments()
+                                    found_hardpoint = False
+                                    for i in range(len(attachments)):
+                                        if attachments[i].check_for_a_trait("Hardpoint") and attachments[i].get_ready():
+                                            found_hardpoint = True
+                                    if found_hardpoint:
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "War Walker Squadron can be used to cancel the attack"
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_reaction(
+                                            "War Walker Squadron", secondary_player.name_player,
+                                            (int(secondary_player.number), self.defender_planet,
+                                             self.defender_position)
+                                        )
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
                             if can_continue:
                                 faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
