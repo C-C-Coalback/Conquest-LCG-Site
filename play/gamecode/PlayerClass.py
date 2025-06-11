@@ -905,7 +905,9 @@ class Player:
         self.headquarters.append(copy.deepcopy(card_object))
         last_element_index = len(self.headquarters) - 1
         self.headquarters[last_element_index].name_owner = self.name_player
-        if self.headquarters[last_element_index].get_ability() == "Promethium Mine":
+        if self.get_ability_given_pos(-2, last_element_index) == "Augmented Warriors":
+            self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
+        elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
         elif self.headquarters[last_element_index].get_ability() == "Salamander Flamer Squad":
             self.headquarters[last_element_index].salamanders_flamers_id_number = self.game.current_flamers_id
@@ -2948,14 +2950,14 @@ class Player:
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
                              context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False):
+        if planet_id == -2:
+            return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         if shadow_field_possible:
             if self.search_attachments_at_pos(planet_id, unit_id, "Shadow Field"):
                 return False, 0
             if self.check_for_trait_given_pos(planet_id, unit_id, "Daemon"):
                 if self.the_princes_might_active[planet_id]:
                     return False, 0
-        if planet_id == -2:
-            return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         if rickety_warbuggy:
             if self.get_ability_given_pos(planet_id, unit_id) == "Rickety Warbuggy":
                 if self.get_enemy_has_init_for_cards(planet_id, unit_id):
