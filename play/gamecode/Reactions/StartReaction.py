@@ -987,6 +987,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.set_damage_given_pos(warlord_planet, warlord_pos,
                                                 current_damage + self.damage_amounts_baarzul[0])
             self.delete_reaction()
+        elif current_reaction == "Griffon Escort":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            self.delete_reaction()
         elif current_reaction == "Deathwing Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
