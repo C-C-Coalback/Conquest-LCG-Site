@@ -191,6 +191,13 @@ class Player:
         self.condition_player_main.notify_all()
         self.condition_player_main.release()
 
+    def resolve_electro_whip(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].cannot_ready_phase = True
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = True
+        return None
+
     def search_synapse_in_hq(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_card_type() == "Synapse":
@@ -2594,6 +2601,7 @@ class Player:
                 self.headquarters[i].brutal_eop = False
                 self.headquarters[i].extra_traits_eop = ""
                 self.headquarters[i].lost_keywords_eop = False
+                self.headquarters[i].cannot_ready_phase = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].lost_keywords_eop = False
@@ -2611,6 +2619,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].attack_set_eop = -1
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
+                self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = False
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):
@@ -4083,6 +4092,8 @@ class Player:
 
     def ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
+            if self.headquarters[unit_id].cannot_ready_phase:
+                return None
             was_ready = self.headquarters[unit_id].get_ready()
             self.headquarters[unit_id].ready_card()
             is_ready = self.headquarters[unit_id].get_ready()
@@ -4098,6 +4109,8 @@ class Player:
                 if self.get_ability_given_pos(planet_id, unit_id) == "Salamander Flamer Squad":
                     self.game.create_reaction("Salamander Flamer Squad", self.name_player,
                                               (int(self.number), planet_id, unit_id))
+            return None
+        if self.cards_in_play[planet_id + 1][unit_id].cannot_ready_phase:
             return None
         was_ready = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].ready_card()

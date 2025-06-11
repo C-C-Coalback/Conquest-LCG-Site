@@ -62,6 +62,7 @@ class Card:
         self.hit_by_which_salamanders = []
         self.techmarine_aspirant_available = True
         self.lost_keywords_eop = False
+        self.cannot_ready_phase = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
