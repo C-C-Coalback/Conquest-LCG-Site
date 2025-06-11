@@ -692,6 +692,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.need_to_move_to_hq = True
                 self.attack_being_resolved = False
                 self.delete_reaction()
+        elif current_reaction == "Sniper Drone Team":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
             if primary_player.resources > 0:
                 can_continue = True

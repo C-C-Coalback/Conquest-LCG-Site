@@ -130,6 +130,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p2.has_passed = False
                             self.reset_combat_turn()
                             self.ranged_skirmish_active = False
+                            self.p1.ranged_skirmish_ends_triggers(self.last_planet_checked_for_battle)
+                            self.p2.ranged_skirmish_ends_triggers(self.last_planet_checked_for_battle)
                         else:
                             await self.send_update_message("Both players passed, combat round ends.")
                             self.p1.ready_all_at_planet(self.last_planet_checked_for_battle)

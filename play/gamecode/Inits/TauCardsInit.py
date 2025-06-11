@@ -275,7 +275,7 @@ def tau_cards_init():
         CardClasses.ArmyCard("Sniper Drone Team", "Ranged.\n"
                                                   "Reaction: After the ranged skirmish at this planet ends, "
                                                   "ready this unit.", "Soldier. Drone.",
-                             4, faction, "Loyal", 2, 5, 2, False),
+                             4, faction, "Loyal", 2, 5, 2, False, ranged=True),
         CardClasses.EventCard("Tactical Withdrawal", "Deep Strike (0).\n"
                                                      "Reaction: After you Deep Strike this event, move any number"
                                                      " of units you control at this planet to an adjacent planet.",
