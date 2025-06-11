@@ -62,6 +62,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.delete_reaction()
+        elif current_reaction == "Rumbling Tomb Stalker":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
         elif current_reaction == "Blood Rain Tempest":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
