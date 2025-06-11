@@ -117,6 +117,7 @@ class Player:
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
+        self.illuminor_szeras_relevant = False
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -155,6 +156,8 @@ class Player:
             self.subject_omega_relevant = True
         if self.headquarters[0].get_name() == "Grigory Maksim":
             self.grigory_maksim_relevant = True
+        if self.headquarters[0].get_name() == "Illuminor Szeras":
+            self.illuminor_szeras_relevant = True
         self.deck = deck_list[1:]
         if self.warlord_faction == "Tyranids":
             i = 0
@@ -762,6 +765,7 @@ class Player:
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
+        self.illuminor_szeras_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
@@ -3033,7 +3037,7 @@ class Player:
                     if not self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].once_per_round_used:
                         self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].once_per_round_used = True
                         if damage_on_card_before > 0:
-                            self.remove_damage_from_pos(planet_id, unit_id, 1)
+                            self.remove_damage_from_pos(planet_id, unit_id, 1, healing=True)
                             damage_on_card_before = damage_on_card_before - 1
                             damage_on_card_after = damage_on_card_after - 1
                         if total_damage_that_can_be_blocked > 0:
@@ -3243,10 +3247,16 @@ class Player:
             return not self.check_damage_too_great_given_pos(planet_id, unit_id)
         return not self.check_damage_too_great_given_pos(planet_id, unit_id)
 
-    def remove_damage_from_pos(self, planet_id, unit_id, amount):
-        if self.search_attachments_at_pos(planet_id, unit_id, "Great Scything Talons"):
-            self.game.create_reaction("Great Scything Talons", self.name_player, (int(self.number), planet_id, unit_id))
-            self.game.great_scything_talons_value = amount
+    def remove_damage_from_pos(self, planet_id, unit_id, amount, healing=False):
+        if healing:
+            if self.search_attachments_at_pos(planet_id, unit_id, "Great Scything Talons"):
+                self.game.create_reaction("Great Scything Talons", self.name_player,
+                                          (int(self.number), planet_id, unit_id))
+                self.game.great_scything_talons_value = amount
+            if self.illuminor_szeras_relevant:
+                if self.get_faction_given_pos(planet_id, unit_id) == "Necrons":
+                    if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+                        self.game.create_reaction("Illuminor Szeras", self.name_player, (int(self.number), -1, -1))
         if planet_id == -2:
             self.headquarters[unit_id].remove_damage(amount)
         else:

@@ -989,7 +989,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 planet_pos = int(game_update_string[2])
                 unit_pos = int(game_update_string[3])
                 if self.attacker_planet == int(game_update_string[2]):
-                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:

@@ -3211,7 +3211,7 @@ class Game:
                                     self.nullify_context = "Iridial"
                             if can_continue:
                                 self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
-                                                               99)
+                                                               99, healing=True)
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
                         elif game_update_string[1] == "2":
@@ -3235,7 +3235,7 @@ class Game:
                                     self.nullify_context = "Iridial"
                             if can_continue:
                                 self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
-                                                               99)
+                                                               99, healing=True)
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
                 elif len(game_update_string) == 3:
@@ -3260,7 +3260,7 @@ class Game:
                                     self.first_player_nullified = self.p2.name_player
                                     self.nullify_context = "Iridial"
                             if can_continue:
-                                self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                                self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99, healing=True)
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
                         elif game_update_string[1] == "2":
@@ -3283,7 +3283,7 @@ class Game:
                                     self.first_player_nullified = self.p1.name_player
                                     self.nullify_context = "Iridial"
                             if can_continue:
-                                self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99)
+                                self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99, healing=True)
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
             elif self.battle_ability_to_resolve == "Plannum":

@@ -85,7 +85,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                 elif ability == "Regeneration":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
-                            player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                            player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                             card_chosen.exhaust_card()
                             self.action_cleanup()
                 elif ability == "Heavy Venom Cannon":

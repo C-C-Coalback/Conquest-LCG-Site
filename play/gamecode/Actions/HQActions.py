@@ -520,7 +520,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if primary_player.headquarters[unit_pos].get_is_unit():
                 if primary_player.headquarters[unit_pos].check_for_a_trait("Nurgle"):
                     damage = primary_player.get_damage_given_pos(-2, unit_pos)
-                    primary_player.remove_damage_from_pos(-2, unit_pos, 999)
+                    primary_player.remove_damage_from_pos(-2, unit_pos, 999, healing=True)
                     self.action_cleanup()
     elif self.action_chosen == "Know No Fear":
         if not self.chosen_first_card:
@@ -847,7 +847,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                         self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
         planet_pos = -2
@@ -1095,7 +1095,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             unit_pos = int(game_update_string[2])
             if primary_player.get_faction_given_pos(-2, unit_pos) == "Necrons" and \
                     primary_player.headquarters[unit_pos].get_is_unit():
-                primary_player.remove_damage_from_pos(-2, unit_pos, 2)
+                primary_player.remove_damage_from_pos(-2, unit_pos, 2, healing=True)
                 if not primary_player.harbinger_of_eternity_active:
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
@@ -1139,7 +1139,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
-                                                      self.position_of_actioned_card[1], 999)
+                                                      self.position_of_actioned_card[1], 999, healing=True)
                 primary_player.sacrifice_card_in_hq(unit_pos)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)

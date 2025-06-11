@@ -364,7 +364,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Nurgle"):
                     damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
-                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                     self.location_of_indirect = "PLANET"
                     self.planet_of_indirect = planet_pos
                     self.valid_targets_for_indirect = ["Army"]
@@ -464,7 +464,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if self.position_of_actioned_card[0] == planet_pos:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and \
                             primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
@@ -854,7 +854,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Reanimation Protocol":
         if primary_player.get_number() == game_update_string[1]:
             if card_chosen.get_faction() == "Necrons" and card_chosen.get_is_unit():
-                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2)
+                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                 if not primary_player.harbinger_of_eternity_active:
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
@@ -1007,7 +1007,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                         self.action_cleanup()
     elif self.action_chosen == "Hyperphase Sword":
         print("cool sword")
@@ -1329,7 +1329,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
-                                                      self.position_of_actioned_card[1], 999)
+                                                      self.position_of_actioned_card[1], 999, healing=True)
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
 
                 self.action_cleanup()

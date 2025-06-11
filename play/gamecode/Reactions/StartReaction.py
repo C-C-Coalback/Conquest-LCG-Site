@@ -64,7 +64,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Rumbling Tomb Stalker":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            self.delete_reaction()
+        elif current_reaction == "Illuminor Szeras":
+            primary_player.add_resources(1)
             self.delete_reaction()
         elif current_reaction == "Blood Rain Tempest":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -255,9 +258,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
-                self.p1.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                self.p1.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             else:
-                self.p2.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                self.p2.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Resurrection Orb":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -522,7 +525,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             if damage % 2 == 1:
                 damage += 1
             damage = int(damage / 2)
-            primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage)
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage, healing=True)
             primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Scything Hormagaunts":
