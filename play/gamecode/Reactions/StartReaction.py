@@ -65,7 +65,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Blood Rain Tempest":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-            self.bloodrain_tempest_active = True
+            self.bloodrain_tempest_active = not self.bloodrain_tempest_active
             self.delete_reaction()
         elif current_reaction == "Corrupted Clawed Fiend":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
