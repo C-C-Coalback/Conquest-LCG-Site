@@ -1321,10 +1321,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.chosen_first_card = True
+    elif self.action_chosen == "Eldritch Lance":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        if planet_pos == self.misc_target_planet:
+            if player_being_hit.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                player_being_hit.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                self.action_cleanup()
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Cultist"):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])

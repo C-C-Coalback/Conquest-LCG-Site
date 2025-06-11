@@ -141,6 +141,11 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                             card_chosen.exhaust_card()
                             self.action_cleanup()
+                    elif ability == "Eldritch Lance":
+                        if card_chosen.get_ready():
+                            card_chosen.exhaust_card()
+                            self.action_chosen = ability
+                            self.misc_target_planet = planet_pos
                     elif ability == "Heavy Venom Cannon":
                         if not card_chosen.get_once_per_phase_used():
                             self.choice_context = ability

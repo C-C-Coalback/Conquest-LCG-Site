@@ -233,8 +233,9 @@ def necrons_cards_init():
                                                      "Attached unit gets +1 ATK.\n"
                                                      "Combat Action: Exhaust this attachment to remove 1 damage "
                                                      "from a unit at this planet.", "Wargear. Weapon.",
-                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="WARLORD",
-                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True, action_in_play=True, allowed_phases_in_play="COMBAT",
+                                   extra_attack=1),
         CardClasses.ArmyCard("Risen Warriors", "Deep Strike (0)", "Soldier.",
                              3, faction, "Common", 2, 2, 0, False, deepstrike=0),
         CardClasses.AttachmentCard("Quantum Shielding", "Attach to a Necrons Vehicle unit you control.\n"
