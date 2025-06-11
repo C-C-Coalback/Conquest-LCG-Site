@@ -1933,6 +1933,10 @@ class Game:
                         if game_update_string[1] == "0":
                             self.has_chosen_to_resolve = True
                         elif game_update_string[1] == "1":
+                            if self.interrupts_waiting_on_resolution[0] == "Ulthwe Spirit Stone":
+                                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                                primary_player.discard_attachment_name_from_card(planet_pos, unit_pos,
+                                                                                 "Ulthwe Spirit Stone")
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Colony Shield Generator?":
@@ -3556,6 +3560,9 @@ class Game:
             self.set_targeting_icons_kugath_nurglings()
 
     async def destroy_check_all_cards(self):
+        if not self.interrupts_waiting_on_resolution:
+            self.p1.search_for_preemptive_destroy_interrupts()
+            self.p2.search_for_preemptive_destroy_interrupts()
         if not self.reactions_needing_resolving and not self.interrupts_waiting_on_resolution:
             print("\n\nABOUT TO EXECUTE:", self.on_kill_effects_of_attacker)
             for i in range(len(self.recently_damaged_units)):

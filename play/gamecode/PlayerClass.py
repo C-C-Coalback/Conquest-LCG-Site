@@ -3108,6 +3108,33 @@ class Player:
             return True, len(bodyguard_damage_list)
         return False, len(bodyguard_damage_list)
 
+    def discard_attachment_name_from_card(self, planet_pos, unit_pos, name):
+        i = 0
+        if planet_pos == -2:
+            while i < len(self.headquarters[unit_pos].get_attachments()):
+                if self.headquarters[unit_pos].get_attachments()[i].get_name() == name:
+                    if self.headquarters[unit_pos].get_attachments()[i].name_owner == self.game.name_1:
+                        self.game.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                    else:
+                        self.game.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                    del self.headquarters[unit_pos].get_attachments()[i]
+                    i = i - 1
+                i = i + 1
+            return None
+        while i < len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()):
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name() == name:
+                if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].name_owner ==\
+                        self.game.name_1:
+                    self.game.p1.discard.append(
+                        self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name())
+                else:
+                    self.game.p2.discard.append(
+                        self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name())
+                del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i]
+                i = i - 1
+            i = i + 1
+        return None
+
     def discard_attachments_from_card(self, planet_pos, unit_pos):
         if planet_pos == -2:
             while self.headquarters[unit_pos].get_attachments():
@@ -3648,6 +3675,17 @@ class Player:
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Resurrection Orb":
                     self.game.create_reaction("Resurrection Orb", self.name_player,
                                               (int(self.number), planet_num, i))
+
+    def search_for_preemptive_destroy_interrupts(self):
+        for i in range(len(self.headquarters)):
+            if self.check_if_card_is_destroyed(-2, i):
+                if self.search_attachments_at_pos(-2, i, "Ulthwe Spirit Stone"):
+                    self.game.create_interrupt("Ulthwe Spirit Stone", self.name_player, (int(self.number), -2, i))
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.check_if_card_is_destroyed(i, j):
+                    if self.search_attachments_at_pos(i, j, "Ulthwe Spirit Stone"):
+                        self.game.create_interrupt("Ulthwe Spirit Stone", self.name_player, (int(self.number), i, j))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if planet_num == -2:
