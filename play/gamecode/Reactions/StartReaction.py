@@ -67,6 +67,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
             self.bloodrain_tempest_active = True
             self.delete_reaction()
+        elif current_reaction == "Corrupted Clawed Fiend":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            secondary_player.rout_unit(planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "Leman Russ Conqueror":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")

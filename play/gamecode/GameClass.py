@@ -3734,6 +3734,11 @@ class Game:
             self.create_reaction("Neophyte Apprentice", secondary_player.name_player,
                                  (int(secondary_player.number), -1, -1))
             return None
+        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Corrupted Clawed Fiend":
+            if secondary_player.get_card_type_given_pos(att_pla, att_pos) == "Army":
+                if secondary_player.get_cost_given_pos(att_pla, att_pos) < 3:
+                    self.create_reaction("Corrupted Clawed Fiend", primary_player.name_player,
+                                         (int(secondary_player.number), att_pla, att_pos))
         if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Repulsor Impact Field",
                                                     must_match_name=True):
             self.create_reaction("Repulsor Impact Field", primary_player.name_player,
