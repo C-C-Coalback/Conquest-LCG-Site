@@ -1164,6 +1164,8 @@ class Player:
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
+        if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
+            self.assign_damage_to_pos(position, last_element_index, 2, preventable=False)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id
