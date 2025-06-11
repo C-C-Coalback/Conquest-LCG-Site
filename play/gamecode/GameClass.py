@@ -338,6 +338,8 @@ class Game:
         self.flamers_damage_active = False
         self.id_of_the_active_flamer = -1
         self.bloodrain_tempest_active = False
+        self.shrieking_exarch_cost_payed = False
+        self.paying_shrieking_exarch_cost = False
 
     async def send_queued_sound(self):
         if self.queued_sound:

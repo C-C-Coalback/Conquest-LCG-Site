@@ -6,7 +6,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
         await self.update_game_event_action(name, game_update_string)
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":
-            if self.get_actions_allowed():
+            if self.get_actions_allowed() and not self.paying_shrieking_exarch_cost:
                 print("Need to run action code")
                 if self.player_with_deploy_turn == name:
                     self.stored_mode = self.mode
@@ -30,7 +30,13 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     self.stored_mode = ""
                     await self.send_update_message(name + " cancelled their action request.")
                 elif self.mode == "Normal":
-                    if self.number_with_deploy_turn == "1":
+                    if self.paying_shrieking_exarch_cost:
+                        await self.send_update_message("Cancelling cards payment for Shrieking Exarch")
+                        self.paying_shrieking_exarch_cost = False
+                        self.card_pos_to_deploy = -1
+                        self.p1.aiming_reticle_coords_hand = None
+                        self.p2.aiming_reticle_coords_hand = None
+                    elif self.number_with_deploy_turn == "1":
                         self.number_with_deploy_turn = "2"
                         self.player_with_deploy_turn = self.name_2
                         self.p1.has_passed = True
@@ -71,7 +77,19 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.faction_of_card_to_play = card.get_faction()
                         self.name_of_card_to_play = card.get_name()
                         self.traits_of_card_to_play = card.get_traits()
-                        if card.get_card_type() == "Support":
+                        if self.paying_shrieking_exarch_cost:
+                            if self.card_pos_to_deploy != previous_card_pos_to_deploy:
+                                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+                                if self.card_pos_to_deploy < previous_card_pos_to_deploy:
+                                    previous_card_pos_to_deploy = previous_card_pos_to_deploy - 1
+                            self.card_pos_to_deploy = previous_card_pos_to_deploy
+                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                            self.misc_counter += 1
+                            if self.misc_counter > 1:
+                                await self.send_update_message("Additional cost for Shrieking Exarch paid."
+                                                               "You may continue deployment.")
+                                self.paying_shrieking_exarch_cost = False
+                        elif card.get_card_type() == "Support":
                             played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
                                                                                  already_checked=True, card=card)[0]
                             primary_player.aiming_reticle_color = ""
@@ -98,9 +116,19 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     card.get_faction() == "Necrons" or
                                     card.get_faction() == "Neutral")) or primary_player.warlord_faction != "Necrons":
                                 if not primary_player.enemy_holding_cell_check(card.get_name()):
-                                    primary_player.aiming_reticle_color = "blue"
-                                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                                    self.card_type_of_selected_card_in_hand = "Army"
+                                    if card.get_name() == "Shrieking Exarch" and not self.shrieking_exarch_cost_payed:
+                                        if len(primary_player.cards) > 2:
+                                            await self.send_update_message("You must discard 2 cards to play "
+                                                                           "Shrieking Exarch")
+                                            self.paying_shrieking_exarch_cost = True
+                                            primary_player.aiming_reticle_color = "blue"
+                                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                            self.card_type_of_selected_card_in_hand = "Army"
+                                            self.misc_counter = 0
+                                    else:
+                                        primary_player.aiming_reticle_color = "blue"
+                                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                                        self.card_type_of_selected_card_in_hand = "Army"
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
@@ -135,7 +163,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
     elif len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if name == self.player_with_deploy_turn:
-                if self.card_pos_to_deploy != -1:
+                if self.card_pos_to_deploy != -1 and not self.paying_shrieking_exarch_cost:
                     if self.number_with_deploy_turn == "1":
                         player = self.p1
                     else:
