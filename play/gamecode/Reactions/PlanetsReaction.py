@@ -34,6 +34,14 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if abs(planet_pos - chosen_planet) == 1:
             primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
             self.delete_reaction()
+    elif current_reaction == "Banshee Assault Squad":
+        primary_player.remove_card_name_from_hand("Banshee Assault Squad")
+        card = FindCard.find_card("Banshee Assault Squad", self.card_array, self.cards_dict)
+        primary_player.add_card_to_planet(card, chosen_planet)
+        self.delete_reaction()
+        if primary_player.search_hand_for_card("Banshee Assault Squad"):
+            self.create_reaction("Banshee Assault Squad", primary_player.name_player,
+                                 (int(primary_player.number), -1, -1))
     elif current_reaction == "Tactical Withdrawal":
         if not self.chosen_first_card:
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

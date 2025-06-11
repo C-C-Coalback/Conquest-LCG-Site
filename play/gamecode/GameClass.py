@@ -1233,6 +1233,10 @@ class Game:
                 primary_player = self.p2
                 secondary_player = self.p1
         if self.nullify_count % 2 == 0:
+            if self.nullify_count > 0:
+                if primary_player.search_hand_for_card("Banshee Assault Squad"):
+                    self.create_reaction("Banshee Assault Squad", primary_player.name_player,
+                                         (int(primary_player.number), -1, -1))
             if self.nullifying_backlash:
                 self.nullifying_backlash = False
                 await self.complete_backlash(primary_player, secondary_player)
@@ -1325,14 +1329,15 @@ class Game:
                 )
                 primary_player.discard_card_name_from_hand("Launch da Snots")
         else:
+            if secondary_player.search_hand_for_card("Banshee Assault Squad"):
+                self.create_reaction("Banshee Assault Squad", secondary_player.name_player,
+                                     (int(secondary_player.number), -1, -1))
             if self.nullifying_backlash:
                 primary_player.discard_card_name_from_hand("Backlash")
                 if primary_player.urien_relevant:
                     primary_player.spend_resources(1)
                 primary_player.spend_resources(1)
-                self.choices_available = []
-                self.choice_context = ""
-                self.name_player_making_choices = ""
+                self.reset_choices_available()
                 self.nullifying_backlash = False
                 new_string_list = self.nullify_string.split(sep="/")
                 print("String used:", new_string_list)
@@ -1657,6 +1662,9 @@ class Game:
         if game_update_string[1] == "0":
             self.reset_choices_available()
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            if primary_player.search_hand_for_card("Banshee Assault Squad"):
+                self.create_reaction("Banshee Assault Squad", primary_player.name_player,
+                                     (int(primary_player.number), -1, -1))
             if warlord_pla != -2:
                 primary_player.cards_in_play[warlord_pla + 1][warlord_pos].once_per_round_used = True
             if self.nullify_context == "Event Action":
