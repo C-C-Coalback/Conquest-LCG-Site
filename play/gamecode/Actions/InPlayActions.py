@@ -1313,10 +1313,29 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.cards_in_reserve[planet_pos].append(card)
                     primary_player.remove_card_from_play(planet_pos, unit_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Repent!":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.get_cost_given_pos(planet_pos, unit_pos) >= self.misc_counter:
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    if not self.chosen_first_card:
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.chosen_first_card = True
+                        self.player_with_action = secondary_player.name_player
+                        self.misc_counter = secondary_player.get_highest_cost_units()
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    else:
+                        self.player_with_action = secondary_player.name_player
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        atk1 = primary_player.get_attack_given_pos(planet_pos, unit_pos)
+                        other_pla, other_pos = self.misc_target_unit
+                        atk2 = secondary_player.get_attack_given_pos(other_pla, other_pos)
+                        secondary_player.exhaust_given_pos(other_pla, other_pos)
+                        secondary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk2)
+                        secondary_player.assign_damage_to_pos(other_pla, other_pos, atk1)
+                        self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ethereal"):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

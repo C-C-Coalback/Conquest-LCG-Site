@@ -450,6 +450,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     j = j + 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Repent!":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.misc_counter = primary_player.get_highest_cost_units()
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        self.misc_target_unit = (-1, -1)
                     elif ability == "Vivisection":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

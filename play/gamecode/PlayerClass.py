@@ -2809,7 +2809,18 @@ class Player:
 
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
-            return -1
+            card = self.headquarters[unit_id]
+            attack_value = card.get_attack()
+            if card.get_ability() == "Praetorian Ancient":
+                if self.count_units_in_discard() > 5:
+                    attack_value += 2
+            if card.get_ability() == "Pyrrhian Eternals":
+                attack_value += self.discard.count("Pyrrhian Eternals")
+            if card.get_ability() == "Destroyer Cultist":
+                attack_value += self.count_non_necron_factions()
+            if card.get_ability() == "Virulent Plague Squad":
+                attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
+            return attack_value
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.attack_set_eop != -1:
             return card.attack_set_eop
