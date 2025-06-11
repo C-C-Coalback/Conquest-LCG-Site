@@ -1901,6 +1901,9 @@ class Player:
                     counted_command += self.get_command_given_pos(planet_id, i)
         if actual_cs:
             self.war_of_ideas_active = False
+            if self.cards_in_reserve[planet_id]:
+                if self.search_card_in_hq("Beleaguered Garrison"):
+                    counted_command += len(self.cards_in_reserve[planet_id])
         return counted_command
 
     def count_tyranid_units_at_planet(self, planet_id):
