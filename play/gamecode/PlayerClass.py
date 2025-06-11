@@ -311,6 +311,8 @@ class Player:
             self.concealing_darkness_active = True
         if ability == "Defensive Protocols":
             self.defensive_protocols_active = True
+        if ability == "Tactical Withdrawal":
+            self.game.create_reaction("Tactical Withdrawal", self.name_player, (int(self.number), planet_id, -1))
         self.discard.append(ability)
         self.after_any_deepstrike(planet_id)
         del self.cards_in_reserve[planet_id][unit_id]

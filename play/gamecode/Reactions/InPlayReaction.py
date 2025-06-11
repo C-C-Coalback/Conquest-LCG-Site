@@ -803,6 +803,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         name + " received -" + str(primary_player.nahumekh_value) + " HP."
                     )
                     self.delete_reaction()
+        elif current_reaction == "Tactical Withdrawal":
+            if self.chosen_first_card:
+                if game_update_string[1] == primary_player.get_number():
+                    _, og_pla, _ = self.positions_of_unit_triggering_reaction[0]
+                    dest = self.misc_target_planet
+                    if planet_pos == og_pla:
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
         elif current_reaction == "Phoenix Attack Fighter":
             if game_update_string[1] == secondary_player.number:
                 if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:

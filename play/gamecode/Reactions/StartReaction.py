@@ -696,6 +696,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
+        elif current_reaction == "Tactical Withdrawal":
+            self.misc_target_planet = -1
+            self.chosen_first_card = False
+            await self.send_update_message("Please choose the planet to move to first.")
         elif current_reaction == "Inspirational Fervor":
             if primary_player.resources > 0:
                 can_continue = True
