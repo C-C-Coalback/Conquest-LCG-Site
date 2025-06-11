@@ -4,7 +4,7 @@ from .. import FindCard
 async def resolve_hq_reaction(self, name, game_update_string, primary_player, secondary_player):
     unit_pos = int(game_update_string[2])
     current_reaction = self.reactions_needing_resolving[0]
-    if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
+    if primary_player.get_number() == game_update_string[1]:
         if self.reactions_needing_resolving[0] == "Power from Pain":
             if primary_player.headquarters[unit_pos].get_card_type() == "Army":
                 primary_player.sacrifice_card_in_hq(unit_pos)
@@ -120,4 +120,16 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     if primary_player.spend_resources(1):
                         primary_player.headquarters[unit_pos].set_reaction_available(False)
                         primary_player.summon_token_at_hq("Khymera", 1)
+                        self.delete_reaction()
+    else:
+        print('enemy hq')
+        if current_reaction == "Run Down":
+            print('run down')
+            if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                print('army')
+                if not secondary_player.check_for_trait_given_pos(-2, unit_pos, "Elite"):
+                    print('not elite')
+                    if not secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                        dest = self.positions_of_unit_triggering_reaction[0][1]
+                        secondary_player.move_unit_to_planet(-2, unit_pos, dest)
                         self.delete_reaction()

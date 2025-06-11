@@ -1200,8 +1200,9 @@ class Game:
                 another_battle = self.find_next_planet_for_combat()
                 if another_battle:
                     self.set_battle_initiative()
-                    self.p1.has_passed = False
-                    self.p2.has_passed = False
+                    if not self.start_battle_deepstrike:
+                        self.p1.has_passed = False
+                        self.p2.has_passed = False
                     self.planet_aiming_reticle_active = True
                     self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
                 else:
