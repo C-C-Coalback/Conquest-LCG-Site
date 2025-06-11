@@ -1021,6 +1021,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                         primary_player.draw_card()
                         self.delete_reaction()
+        elif current_reaction == "Burst Forth":
+            if primary_player.get_number() == game_update_string[1] and self.misc_target_planet != planet_pos:
+                card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
+                if card_type == "Warlord" or card_type == "Synapse":
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

@@ -2,6 +2,7 @@ from .. import FindCard
 
 
 async def resolve_hq_reaction(self, name, game_update_string, primary_player, secondary_player):
+    planet_pos = -2
     unit_pos = int(game_update_string[2])
     current_reaction = self.reactions_needing_resolving[0]
     if primary_player.get_number() == game_update_string[1]:
@@ -60,6 +61,11 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     if primary_player.get_ready_given_pos(-2, unit_pos):
                         primary_player.exhaust_given_pos(-2, unit_pos)
                         self.cato_stronghold_activated = True
+        elif current_reaction == "Burst Forth":
+            card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
+            if card_type == "Warlord" or card_type == "Synapse":
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Murder Cogitator":
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
                 if primary_player.headquarters[unit_pos].get_ready():
