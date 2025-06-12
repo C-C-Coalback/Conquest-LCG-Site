@@ -2944,17 +2944,25 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.check_for_warlord(planet_id):
                         attack_value += 2
-        if planet_id != -2:
-            if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
-                if self.get_ability_given_pos(planet_id, unit_id) != "Broderick Worr":
-                    if self.game.get_green_icon(planet_id):
-                        if self.search_for_card_everywhere("Broderick Worr"):
-                            attack_value += 1
-            if card.get_faction() == "Tau":
-                for i in range(len(self.cards_in_play[planet_id + 1])):
-                    if i != unit_id:
-                        if self.search_attachments_at_pos(planet_id, i, "Honor Blade"):
-                            attack_value += 1
+            if attachments[i].get_ability() == "Imperial Power Fist":
+                if len(self.cards_in_play[planet_id + 1]) > 1:
+                    other_ready_unit_present = False
+                    for j in range(len(self.cards_in_play[planet_id + 1])):
+                        if j != unit_id:
+                            if self.get_ready_given_pos(planet_id, j):
+                                other_ready_unit_present = True
+                    if not other_ready_unit_present:
+                        attack_value += 5
+        if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
+            if self.get_ability_given_pos(planet_id, unit_id) != "Broderick Worr":
+                if self.game.get_green_icon(planet_id):
+                    if self.search_for_card_everywhere("Broderick Worr"):
+                        attack_value += 1
+        if card.get_faction() == "Tau":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if i != unit_id:
+                    if self.search_attachments_at_pos(planet_id, i, "Honor Blade"):
+                        attack_value += 1
         if self.get_brutal_given_pos(planet_id, unit_id):
             attack_value = attack_value + card.get_damage()
         return attack_value
