@@ -3885,6 +3885,9 @@ class Game:
         self.create_reactions_phase_begins()
 
     async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
+        other_player = self.p1
+        if player.name_player == self.name_1:
+            other_player = self.p2
         if card.get_faction() == "Astra Militarum":
             for i in range(len(player.attachments_at_planet[planet_chosen])):
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
@@ -3898,6 +3901,10 @@ class Game:
         slaanesh_temptation = False
         if card.check_for_a_trait("Elite"):
             self.discounts_applied += player.master_warpsmith_count
+        else:
+            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
+                    self.discounts_applied = self.discounts_applied - 2
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
                 if i != planet_chosen:
@@ -3914,6 +3921,9 @@ class Game:
             self.discounts_applied -= 1
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
+        other_player = self.p1
+        if player.name_player == self.name_1:
+            other_player = self.p2
         if card.get_faction() == "Astra Militarum":
             for i in range(len(player.attachments_at_planet[planet_chosen])):
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
@@ -3943,6 +3953,10 @@ class Game:
             self.available_discounts += player.muster_the_guard_count
         if card.check_for_a_trait("Elite"):
             self.available_discounts += player.master_warpsmith_count
+        else:
+            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
+                    self.available_discounts = self.available_discounts - 2
         slaanesh_temptation = False
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
