@@ -3698,7 +3698,8 @@ class Game:
         return False
 
     async def complete_destruction_checks(self):
-        if not self.reactions_needing_resolving:
+        if not self.reactions_needing_resolving and not self.interrupts_waiting_on_resolution \
+                and not self.resolving_search_box:
             self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
             self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
             self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
