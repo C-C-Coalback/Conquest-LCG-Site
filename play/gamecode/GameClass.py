@@ -259,7 +259,8 @@ class Game:
             "Mont'ka Strike", "Biomass Sacrifice", "Rapid Assault", "Eldritch Storm", "Sudden Adaptation",
             "Path of the Leader", "Bolster the Defense", "Warp Rift"
         ]
-        self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean"]
+        self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
+                                 "Sickening Helbrute"]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""

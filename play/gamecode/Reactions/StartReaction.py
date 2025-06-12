@@ -1315,6 +1315,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Shadowsun plays attachment from hand or discard?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+        elif current_reaction == "Sickening Helbrute":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+            self.delete_reaction()
         elif current_reaction == "Sootblade Assashun":
             self.location_of_indirect = "PLANET"
             self.indirect_exhaust_only = True

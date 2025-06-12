@@ -710,6 +710,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         .get_card_type() != "Warlord":
                                     attack_value += self.banshee_power_sword_extra_attack
                                     self.banshee_power_sword_extra_attack = 0
+                                for i in range(len(primary_player.cards_in_play[self.defender_planet + 1])):
+                                    if primary_player.get_ability_given_pos(
+                                            self.defender_planet, i) == "Sickening Helbrute":
+                                        self.create_reaction("Sickening Helbrute", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              self.defender_position))
+                                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                    if secondary_player.get_ability_given_pos(
+                                            self.defender_planet, i) == "Sickening Helbrute":
+                                        self.create_reaction("Sickening Helbrute", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              self.defender_position))
                                 if attack_value > 0:
                                     att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
                                                                                      self.attacker_position)
