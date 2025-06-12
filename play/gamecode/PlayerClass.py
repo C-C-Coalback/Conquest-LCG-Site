@@ -136,6 +136,8 @@ class Player:
         self.hit_by_gorgul = False
         self.concealing_darkness_active = False
         self.defensive_protocols_active = False
+        self.death_serves_used = False
+        self.highest_death_serves_value = 0
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -2821,6 +2823,13 @@ class Player:
                     self.game.create_reaction("Blood Claw Pack", self.name_player,
                                               (int(self.number), planet_pos, i))
 
+    def does_own_interrupt_exist(self, reaction_name):
+        for i in range(len(self.game.interrupts_waiting_on_resolution)):
+            if self.game.interrupts_waiting_on_resolution[i] == reaction_name:
+                if self.game.player_resolving_interrupts[i] == self.name_player:
+                    return True
+        return False
+
     def does_own_reaction_exist(self, reaction_name):
         for i in range(len(self.game.reactions_needing_resolving)):
             if self.game.reactions_needing_resolving[i] == reaction_name:
@@ -3613,6 +3622,15 @@ class Player:
                             if self.get_ready_given_pos(-2, i):
                                 self.game.create_reaction("Secluded Apothecarion", self.name_player,
                                                           (int(self.number), -2, i))
+            if self.check_for_trait_given_pos(-2, card_pos, "Vehicle"):
+                if not self.does_own_interrupt_exist("Death Serves the Emperor"):
+                    if self.search_hand_for_card("Death Serves the Emperor"):
+                        if not self.death_serves_used:
+                            self.game.create_interrupt("Death Serves the Emperor", self.name_player,
+                                                       (int(self.number), -1, -1))
+                            cost = self.get_cost_given_pos(-2, card_pos)
+                            if cost > self.highest_death_serves_value:
+                                self.highest_death_serves_value = cost
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
             self.game.queued_sound = "destroy"
@@ -3802,6 +3820,14 @@ class Player:
                             self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                       (int(self.number), -1, -1))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
+                if not self.does_own_interrupt_exist("Death Serves the Emperor"):
+                    if self.search_hand_for_card("Death Serves the Emperor"):
+                        if not self.death_serves_used:
+                            self.game.create_interrupt("Death Serves the Emperor", self.name_player,
+                                                       (int(self.number), -1, -1))
+                            cost = self.get_cost_given_pos(planet_num, card_pos)
+                            if cost > self.highest_death_serves_value:
+                                self.highest_death_serves_value = cost
                 if not self.does_own_reaction_exist("The Bloodrunna"):
                     for i in range(len(self.cards_in_play[planet_num + 1])):
                         if i != card_pos:

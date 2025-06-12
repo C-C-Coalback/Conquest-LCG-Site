@@ -34,6 +34,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.return_card_to_hand(planet_pos, unit_pos)
             self.reset_choices_available()
             self.delete_interrupt()
+        elif current_interrupt == "Death Serves the Emperor":
+            primary_player.add_resources(primary_player.highest_death_serves_value)
+            primary_player.discard_card_name_from_hand("Death Serves the Emperor")
+            self.delete_interrupt()
         elif current_interrupt == "Gorgul Da Slaya":
             secondary_player.hit_by_gorgul = True
             self.mask_jain_zar_check_interrupts(primary_player, secondary_player)

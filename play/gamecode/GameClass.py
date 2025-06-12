@@ -5590,6 +5590,8 @@ class Game:
                 await CommandPhase.interpret_command_state(self, ret_val)
         if not self.interrupts_waiting_on_resolution:
             self.last_player_who_resolved_interrupt = ""
+            self.p1.highest_death_serves_value = 0
+            self.p2.highest_death_serves_value = 0
         if self.positions_of_units_to_take_damage:
             print("Entering better shield mode")
             pos_holder = self.positions_of_units_to_take_damage[0]
@@ -5994,6 +5996,8 @@ class Game:
         self.p2.used_reanimation_protocol = False
         self.p1.accept_any_challenge_used = False
         self.p2.accept_any_challenge_used = False
+        self.p1.death_serves_used = False
+        self.p2.death_serves_used = False
         self.mode = "Normal"
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()
