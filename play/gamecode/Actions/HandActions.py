@@ -792,6 +792,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             planet_pos, unit_pos = self.position_of_actioned_card
             primary_player.ready_given_pos(planet_pos, unit_pos)
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            self.mask_jain_zar_check_actions(primary_player, secondary_player)
             self.action_cleanup()
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))

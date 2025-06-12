@@ -903,6 +903,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                         self.position_of_actioned_card[1], 1)
                     primary_player.set_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                               self.position_of_actioned_card[1], "red")
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "+1 ATK Warrior":
         if game_update_string[1] == primary_player.number:
@@ -1141,6 +1142,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1], 999, healing=True)
                 primary_player.sacrifice_card_in_hq(unit_pos)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Repent!":
@@ -1173,6 +1175,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.ready_given_pos(self.position_of_actioned_card[0],
                                                self.position_of_actioned_card[1])
                 primary_player.sacrifice_card_in_hq(unit_pos)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Squadron Redeployment":

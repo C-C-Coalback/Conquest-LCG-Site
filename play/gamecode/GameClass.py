@@ -1620,6 +1620,27 @@ class Game:
         elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
+    def mask_jain_zar_check_actions(self, primary_player, secondary_player):
+        planet_pos, unit_pos = self.position_of_actioned_card
+        if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
+            if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                     (int(primary_player.number), planet_pos, unit_pos))
+
+    def mask_jain_zar_check_interrupts(self, primary_player, secondary_player):
+        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+        if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
+            if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                     (int(primary_player.number), planet_pos, unit_pos))
+
+    def mask_jain_zar_check_reactions(self, primary_player, secondary_player):
+        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
+            if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                     (int(primary_player.number), planet_pos, unit_pos))
+
     async def resolve_storm_of_silence(self, name, game_update_string, primary_player,
                                        secondary_player, may_nullify=True):
         if game_update_string[1] == "0":
@@ -1853,6 +1874,7 @@ class Game:
         self.action_chosen = ""
         self.player_with_action = ""
         self.mode = "Normal"
+        self.position_of_actioned_card = (-1, -1)
         self.omega_ambush_active = False
         self.p1.harbinger_of_eternity_active = False
         self.p2.harbinger_of_eternity_active = False
@@ -2569,9 +2591,8 @@ class Game:
                         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict)
                         primary_player.add_card_to_planet(card, planet)
                         primary_player.discard.remove(target_choice)
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
                     elif self.choice_context == "Visions of Agony Discard:":
                         secondary_player.discard_card_from_hand(int(game_update_string[1]))
@@ -2862,6 +2883,9 @@ class Game:
                             primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 1,
                                                                 can_shield=False, is_reassign=True)
                             primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
+                            if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
+                                self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                     (int(primary_player.number), hurt_planet, hurt_pos))
                             self.amount_that_can_be_removed_by_shield[0] -= 1
                         elif game_update_string[1] == "2":
                             self.damage_moved_to_old_one_eye += 2
@@ -2869,6 +2893,9 @@ class Game:
                             primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 2,
                                                                 can_shield=False, is_reassign=True)
                             primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
+                            if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
+                                self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                     (int(primary_player.number), hurt_planet, hurt_pos))
                             self.amount_that_can_be_removed_by_shield[0] -= 2
                         self.misc_target_planet = -1
                         self.misc_target_unit = -1
@@ -4403,6 +4430,9 @@ class Game:
                                     if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                                         primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                        if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                            self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                                 (int(primary_player.number), planet_pos, unit_pos))
                                         self.amount_that_can_be_removed_by_shield[0] = \
                                             self.amount_that_can_be_removed_by_shield[0] - 1
                                         if primary_player.get_damage_given_pos(planet_pos, unit_pos) == \
@@ -4419,6 +4449,9 @@ class Game:
                                         if self.amount_that_can_be_removed_by_shield == 1:
                                             damage_to_remove = 1
                                         primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
+                                        if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                            self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                                 (int(primary_player.number), planet_pos, unit_pos))
                                         self.amount_that_can_be_removed_by_shield[0] = \
                                             self.amount_that_can_be_removed_by_shield[0] - damage_to_remove
                                         if self.amount_that_can_be_removed_by_shield[0] < 1:
@@ -4434,6 +4467,11 @@ class Game:
                                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                             primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
                                                 misc_ability_used = True
+                                            if secondary_player.search_card_at_planet(planet_pos,
+                                                                                      "The Mask of Jain Zar"):
+                                                self.create_reaction("The Mask of Jain Zar",
+                                                                     secondary_player.name_player,
+                                                                     (int(primary_player.number), planet_pos, unit_pos))
                                             self.amount_that_can_be_removed_by_shield[0] = \
                                                 self.amount_that_can_be_removed_by_shield[0] - 1
                                             if self.amount_that_can_be_removed_by_shield[0] < 1:
@@ -4449,6 +4487,9 @@ class Game:
                                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, damage,
                                                                     can_shield=False, is_reassign=True)
                                 primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                    self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
             elif len(game_update_string) == 5:
                 if planet_pos == -2:

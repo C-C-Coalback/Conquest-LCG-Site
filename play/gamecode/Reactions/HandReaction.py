@@ -8,6 +8,10 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if primary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                self.create_reaction("The Mask of Jain Zar", primary_player.name_player,
+                                     (int(secondary_player.number), planet_pos, unit_pos))
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Banshee Power Sword":
             hand_pos = int(game_update_string[2])
@@ -52,4 +56,5 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                     primary_player.add_card_to_planet(card, planet_pos)
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()

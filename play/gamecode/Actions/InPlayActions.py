@@ -36,12 +36,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if player_owning_card.spend_resources(1):
                             player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
                                                                               2, expiration="EOP")
-                            self.player_with_action = ""
-                            self.action_chosen = ""
-                            self.mode = "Normal"
-                            if self.phase == "DEPLOY":
-                                self.player_with_deploy_turn = secondary_player.name_player
-                                self.number_with_deploy_turn = secondary_player.get_number()
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                            self.action_cleanup()
                             await self.send_update_message("Haemonculus buffed")
                     elif ability == "Virulent Spore Sacs":
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -52,9 +48,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 secondary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
                             secondary_player.assign_damage_to_pos(planet_pos, i, 1, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
-                        self.player_with_action = ""
-                        self.action_chosen = ""
-                        self.mode = "Normal"
+                        self.action_cleanup()
                     elif ability == "The Glovodan Eagle":
                         primary_player.return_card_to_hand(planet_pos, unit_pos)
                         self.action_cleanup()
@@ -82,6 +76,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
                     elif ability == "Boss Zugnog":
                         if not card_chosen.get_once_per_phase_used():
@@ -154,6 +149,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             card_chosen.set_once_per_phase_used(True)
                             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, "NEXT")
                             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
                     elif ability == "Ravenwing Escort":
                         if card_chosen.get_ready():
@@ -185,6 +181,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 await self.send_update_message(
                                     "No valid targets for Dread Monolith; better luck next time!"
                                 )
+                                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                 self.action_cleanup()
                     elif ability == "Pathfinder Shi Or'es":
                         if not card_chosen.get_once_per_phase_used():
@@ -249,7 +246,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                             if self.infested_planets[planet_pos]:
                                 self.infested_planets[planet_pos] = False
-                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos , True)
+                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                 self.action_cleanup()
                                 self.need_to_resolve_battle_ability = True
                                 self.battle_ability_to_resolve = self.planet_array[planet_pos]
@@ -467,6 +465,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
     elif self.action_chosen == "Air Caste Courier":
         print("ACC")
@@ -480,6 +479,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if primary_player.move_attachment_card(origin_pla, origin_pos, origin_att,
                                                            planet_pos, unit_pos):
                         primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
@@ -671,6 +671,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                     primary_player.increase_attack_of_unit_at_pos(warlord_planet, warlord_pos, 3, expiration="NEXT")
                     primary_player.reset_aiming_reticle_in_play(warlord_planet, warlord_pos)
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "A Thousand Cuts":
         if game_update_string[1] == "1":
@@ -758,21 +759,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                    self.position_of_actioned_card[1])
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     self.action_cleanup()
     elif self.action_chosen == "Calculated Strike":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         can_continue = True
         if player_being_hit.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
@@ -801,14 +795,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 planet, position, attachment_position = self.position_of_selected_attachment
@@ -947,6 +933,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if self.position_of_actioned_card != (-1, -1):
                     primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if not self.chosen_first_card:
@@ -1113,7 +1100,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_second_card = True
                         if self.position_of_actioned_card != (-1, -1):
                             primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
-                        self.position_of_actioned_card = (-1, -1)
+                        try:
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                        except:
+                            pass
                         self.action_cleanup()
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
@@ -1272,6 +1262,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         og_pla, og_pos = self.position_of_actioned_card
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        if secondary_player.search_card_at_planet(og_pla, "The Mask of Jain Zar"):
+                            self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                 (int(primary_player.number), og_pla, og_pos))
                         self.action_cleanup()
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
@@ -1357,9 +1350,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1], 999, healing=True)
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
-                self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Chaplain Mavros":
         if primary_player.get_number() == game_update_string[1]:
             if self.get_blue_icon(planet_pos):
@@ -1368,6 +1360,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
                     primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "Ancient Keeper of Secrets":
         if primary_player.get_number() == game_update_string[1]:
@@ -1377,7 +1370,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.ready_given_pos(self.position_of_actioned_card[0],
                                                self.position_of_actioned_card[1])
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Squadron Redeployment":
@@ -1654,7 +1647,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if can_continue:
                         secondary_player.cards_in_play[planet_pos + 1][unit_pos].emperor_champion_active = True
                         primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
-                        self.position_of_actioned_card = (-1, -1)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
     elif self.action_chosen == "Teleportarium":
         if primary_player.get_number() == game_update_string[1]:
@@ -1755,8 +1748,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_returning = self.p1
             else:
                 player_returning = self.p2
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             can_continue = True
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
@@ -2018,6 +2009,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             pos = pos - 1
                         primary_player.reset_aiming_reticle_in_play(pla, pos)
                         primary_player.draw_card()
+                        self.position_of_actioned_card = (pla, pos)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
         if game_update_string[1] == "1":

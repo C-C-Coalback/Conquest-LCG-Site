@@ -39,15 +39,18 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     primary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
             elif game_update_string[1] == secondary_player.number:
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     secondary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Seraphim Superior Allegra":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     primary_player.ready_given_pos(-2, unit_pos)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
             if not self.alaitoc_shrine_activated:
@@ -85,6 +88,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if game_update_string[1] == secondary_player.get_number():
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     secondary_player.destroy_card_in_hq(unit_pos)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Vow of Honor":
             if primary_player.headquarters[unit_pos].valid_target_vow_of_honor:
@@ -103,6 +107,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Support":
                 if player_being_hit.check_for_trait_given_pos(-2, unit_pos, "Location"):
                     player_being_hit.destroy_card_in_hq(unit_pos)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
             if not self.chosen_first_card and not self.chosen_second_card:

@@ -61,13 +61,16 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Rumbling Tomb Stalker":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Illuminor Szeras":
             primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Blood Rain Tempest":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -77,10 +80,12 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Corrupted Clawed Fiend":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.rout_unit(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Leman Russ Conqueror":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Neophyte Apprentice":
             self.resolving_search_box = True
@@ -131,10 +136,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.card_type_of_searched_card = None
             self.faction_of_searched_card = None
             self.no_restrictions_on_chosen_card = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Experimental Devilfish":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_unit_by_name("Experimental Devilfish", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Ardent Auxiliaries":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -144,6 +151,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     am_present = True
             if am_present:
                 primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Obedience":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -188,6 +196,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Space Wolves Predator":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.permitted_commit_locs_warlord[planet_pos] = False
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
             self.chosen_first_card = False
@@ -201,6 +210,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos != -2:
                 primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Ichor Gauntlet":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
@@ -227,6 +237,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 card = FindCard.find_card(primary_player.discard[last_card_discard], self.card_array, self.cards_dict)
                 cost = card.get_cost()
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Patrolling Wraith":
             await secondary_player.reveal_hand()
@@ -236,6 +247,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     secondary_player.discard_card_from_hand(i)
                     i = i - 1
                 i = i + 1
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Ravenous Haruspex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -243,6 +255,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
                     primary_player.set_once_per_phase_used_given_pos(planet_pos, i, True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Parasitic Infection":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -324,6 +337,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
         elif self.reactions_needing_resolving[0] == "Piranha Hunter":
             primary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Forward Barracks":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -343,11 +357,13 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if i != unit_pos:
                     if primary_player.get_faction_given_pos(planet_pos, i) == "Tau":
                         primary_player.cards_in_play[planet_pos + 1][i].extra_attack_until_end_of_phase += 1
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Uber Grotesque":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Shrieking Harpy":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -356,6 +372,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                         secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
                         secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sautekh Complex":
             self.resolving_search_box = True
@@ -366,6 +383,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Old Zogwort":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
             if primary_player.enemy_has_wyrdboy_stikk:
@@ -391,6 +409,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = primary_player.name_player
             self.choice_context = "Which deck to use Biel-Tan Warp Spiders:"
             self.resolving_search_box = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coteaz's Henchmen":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
@@ -410,6 +429,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Zogwort's Runtherders":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Zogwort's Hovel":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -423,6 +443,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
         elif current_reaction == "Kroot Guerrilla":
             primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Blitza-Bommer":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -430,9 +451,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.location_of_indirect = "PLANET"
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
             self.planet_of_indirect = planet_pos
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Epistolary Vezuel":
             primary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Fulgaris":
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
@@ -444,6 +467,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Goff Brawlers":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -452,6 +476,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.location_of_indirect = "PLANET"
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
             self.planet_of_indirect = planet_pos
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Fenrisian Wolf":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -478,6 +503,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             if not self.infested_planets[planet_pos]:
                 self.infest_planet(planet_pos)
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
             else:
                 self.resolving_search_box = True
@@ -527,10 +553,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             damage = int(damage / 2)
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage, healing=True)
             primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Scything Hormagaunts":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.infest_planet(planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "The Bloodrunna":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -539,6 +567,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Outflank'em":
             if primary_player.resources > 0:
@@ -698,10 +727,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.player_with_combat_turn = primary_player.get_name_player()
                 self.need_to_move_to_hq = True
                 self.attack_being_resolved = False
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Sniper Drone Team":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Tactical Withdrawal":
             self.misc_target_planet = -1
@@ -738,6 +769,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Talyesin's Spiders":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.attacker_planet)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Hostile Acquisition":
             if primary_player.resources > 0:
@@ -785,10 +817,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             if 7 > planet_2 > -1:
                 if self.planets_in_play_array[planet_2]:
                     primary_player.summon_token_at_planet("Termagant", planet_2)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Packmaster Kith":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Khymera", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Bone Sabres":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -799,22 +833,27 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Termagant", planet_pos)
             if self.infested_planets[planet_pos]:
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Xavaes Split-Tongue":
             primary_player.summon_token_at_hq("Cultist")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Captain Cato Sicarius":
             primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Termagant Sentry":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if primary_player.cards_in_play[planet_pos + 1][i].get_ability() == "Termagant Sentry":
                     primary_player.ready_given_pos(planet_pos, i)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Termagant Horde":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Cadian Mortar Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -881,6 +920,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
                     if secondary_player.get_ready_given_pos(planet_pos, i):
                         secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -913,6 +953,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                     secondary_player.cards_in_play[planet_pos + 1][i].lost_keywords_eop = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Salamander Flamer Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -929,13 +970,16 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if salamander_id in secondary_player.cards_in_play[i + 1][j].hit_by_which_salamanders:
                         secondary_player.assign_damage_to_pos(
                             i, j, 1, context="Salamander Flamer Squad", rickety_warbuggy=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kith's Khymeramasters":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Khymera", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Murder of Razorwings":
             secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
@@ -945,6 +989,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     primary_player.cards.append(card.get_name())
                     del primary_player.discard[i]
                 i = i - 1
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weirdboy Maniak":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -953,6 +998,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     primary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Ravening Psychopath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -986,9 +1032,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             current_damage = primary_player.get_damage_given_pos(warlord_planet, warlord_pos)
             primary_player.set_damage_given_pos(warlord_planet, warlord_pos,
                                                 current_damage + self.damage_amounts_baarzul[0])
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Burst Forth":
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+        elif current_reaction == "The Mask of Jain Zar":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
         elif current_reaction == "Blood Axe Strategist":
             self.choices_available = ["HQ", "Adjacent Planet"]
             self.choice_context = "Blood Axe Strategist Destination"
@@ -998,20 +1049,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Deathwing Terminators":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Archon Salaine Morn":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
             if not primary_player.get_once_per_phase_used_given_pos(warlord_planet, warlord_pos):
                 primary_player.set_once_per_phase_used_given_pos(warlord_planet, warlord_pos, True)
                 primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Dying Sun Marauder":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Wildrider Vyper":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -1097,6 +1152,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
                     primary_player.ready_given_pos(planet_pos, i)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Deathly Web Shrine":
             if not primary_player.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
@@ -1162,6 +1218,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.card_type_of_searched_card = "Attachment"
             self.faction_of_searched_card = None
             self.no_restrictions_on_chosen_card = False
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Shrine of Warpflame":
             self.resolving_search_box = True
@@ -1172,6 +1229,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Syren Zythlex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Canoptek Scarab Swarm":
             seen_a_canoptek = False
@@ -1210,6 +1268,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Kroot Hunter":
             primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Raiding Portal":
             if not primary_player.exhaust_card_in_hq_given_name("Raiding Portal"):

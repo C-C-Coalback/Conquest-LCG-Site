@@ -36,4 +36,5 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Gorgul Da Slaya":
             secondary_player.hit_by_gorgul = True
+            self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
             self.delete_interrupt()
