@@ -840,14 +840,24 @@ class Game:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayActions.update_game_event_action_in_play(self, name, game_update_string)
                 elif game_update_string[0] == "RESERVE":
-                    if self.action_chosen == "No Surprises":
+                    planet_pos = int(game_update_string[2])
+                    unit_pos = int(game_update_string[3])
+                    if not self.action_chosen:
+                        if game_update_string[1] == primary_player.number:
+                            if primary_player.cards_in_reserve[planet_pos][unit_pos].get_ability() \
+                                    == "XV25 Stealth Squad" and self.phase == "COMBAT":
+                                cost = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                if primary_player.spend_resources(cost):
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    self.action_cleanup()
+                    elif self.action_chosen == "No Surprises":
                         if game_update_string[1] == "1":
                             target = self.p1
                         else:
                             target = self.p2
                         target.discard.append(
-                            target.cards_in_reserve[int(game_update_string[2])][int(game_update_string[3])].get_name())
-                        del target.cards_in_reserve[int(game_update_string[2])][int(game_update_string[3])]
+                            target.cards_in_reserve[planet_pos][unit_pos].get_name())
+                        del target.cards_in_reserve[planet_pos][unit_pos]
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         self.action_cleanup()
