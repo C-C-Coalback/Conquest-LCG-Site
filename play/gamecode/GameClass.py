@@ -2488,6 +2488,19 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         await self.update_game_event_action(name, game_update_string)
+                    elif self.choice_context == "Kabalite Blackguard Amount":
+                        if game_update_string[1] == "0":
+                            pass
+                        elif game_update_string[1] == "1":
+                            if secondary_player.spend_resources(1):
+                                primary_player.add_resources(1)
+                        elif game_update_string[1] == "2":
+                            if secondary_player.spend_resources(2):
+                                primary_player.add_resources(2)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
                     elif self.choice_context == "Deploy into reserve?":
                         if self.choices_available[int(game_update_string[1])] == "Normal Deploy":
                             self.deepstrike_allowed = False
@@ -5881,6 +5894,9 @@ class Game:
     def check_reactions_from_winning_combat(self, winner, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
+            for i in range(len(winner.cards_in_play[planet_id + 1])):
+                if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
+                    reactions.append("Kabalite Blackguard")
             if winner.search_card_in_hq("Clearing the Path"):
                 if winner.check_for_warlord(planet_id):
                     reactions.append("Clearing the Path")

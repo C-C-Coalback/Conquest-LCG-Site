@@ -1319,6 +1319,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "Kabalite Blackguard":
+            self.choices_available = ["0", "1", "2"]
+            if secondary_player.resources < 2:
+                self.choices_available.remove("2")
+            if secondary_player.resources < 1:
+                self.choices_available.remove("1")
+            self.choice_context = "Kabalite Blackguard Amount"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Cloud of Flies":
             self.location_of_indirect = "PLANET"
             self.planet_of_indirect = self.positions_of_unit_triggering_reaction[0][1]
