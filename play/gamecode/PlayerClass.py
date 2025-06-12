@@ -1298,7 +1298,8 @@ class Player:
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
-                print("\nBone Sabres detected\n")
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Kroot Hunting Rifle":
+                on_kill_effects.append("Kroot Hunting Rifle")
         if other_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
             if self.search_card_in_hq("Holding Cell"):
                 on_kill_effects.append("Holding Cell")

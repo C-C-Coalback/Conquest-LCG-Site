@@ -1319,6 +1319,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "Kroot Hunting Rifle":
+            primary_player.add_resources(1)
+            self.delete_reaction()
         elif current_reaction == "Kabalite Blackguard":
             self.choices_available = ["0", "1", "2"]
             if secondary_player.resources < 2:
