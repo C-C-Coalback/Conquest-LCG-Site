@@ -3,7 +3,7 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-Full Warlord cycle + 2 first deluxe expansions supported.
+Warlord and Planetfall cycles + 2 first deluxe expansions supported.
 
 # What is this?
 
@@ -14,20 +14,8 @@ Here is a link to The Hive Tyrant's tutorial for the game: https://www.youtube.c
 
 # What is the current progress?
 
-Currently we have: async chat rooms; login/logout; deck-building; async lobbies. Only thing really left to do is the actual game.
-
-Current game progress: Everything, except:
-
-- ~~shielding~~
-- ~~card text~~ (See the spreadsheet)
-- ~~action windows~~
-- ~~attachment support~~
-- a victory/loss screen
-- ~~some targeting follicles so that players can see what planets/units are being targeted~~
-- ~~proper god damn multithreading~~
-- Better deck building/selecting interface (low priority)
-- ???
-- and more!
+See the online spreadsheet: 
+https://docs.google.com/spreadsheets/d/19WVZDINaXXJkV-hodJnYNgk2xx7UQQGF9aBtdWPVL_k/edit?gid=0#gid=0
 
 # How can I run it myself?
 
