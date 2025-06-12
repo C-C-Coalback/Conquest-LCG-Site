@@ -4185,6 +4185,7 @@ class Game:
                         hand_pos = int(game_update_string[2])
                         tank = primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank")
                         shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos, tank=tank)
+                        card_name = primary_player.cards[hand_pos]
                         alt_shield_check = False
                         self.pos_shield_card = hand_pos
                         if alt_shields and not primary_player.hit_by_gorgul:
@@ -4268,6 +4269,13 @@ class Game:
                                                         self.amount_that_can_be_removed_by_shield[0] - amount_to_remove
                                                     primary_player.remove_damage_from_pos(planet_pos, unit_pos,
                                                                                           amount_to_remove)
+                                            if card_name == "Quantum Shielding":
+                                                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos,
+                                                                                            "Vehicle"):
+                                                    self.create_interrupt("Quantum Shielding",
+                                                                          primary_player.name_player,
+                                                                          (int(primary_player.number),
+                                                                           planet_pos, unit_pos))
                                         primary_player.discard_card_from_hand(hand_pos)
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"

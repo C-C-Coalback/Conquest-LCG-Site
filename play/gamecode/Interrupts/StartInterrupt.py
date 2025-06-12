@@ -38,6 +38,13 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.add_resources(primary_player.highest_death_serves_value)
             primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
+        elif current_interrupt == "Quantum Shielding":
+            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+            card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict)
+            primary_player.attach_card(card, planet_pos, unit_pos)
+            if "Quantum Shielding" in primary_player.discard:
+                primary_player.discard.remove("Quantum Shielding")
+            self.delete_interrupt()
         elif current_interrupt == "Gorgul Da Slaya":
             secondary_player.hit_by_gorgul = True
             self.mask_jain_zar_check_interrupts(primary_player, secondary_player)

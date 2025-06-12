@@ -3833,6 +3833,7 @@ class Player:
             if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
                 if not self.does_own_reaction_exist("Invasion Site"):
                     if self.search_card_in_hq("Invasion Site"):
+                        self.attach_card()
                         self.game.create_reaction("Invasion Site", self.name_player,
                                                   (int(self.number), -1, -1))
                         cost = self.get_cost_given_pos(planet_num, card_pos)
