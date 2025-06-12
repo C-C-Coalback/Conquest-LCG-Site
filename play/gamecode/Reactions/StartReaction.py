@@ -1329,7 +1329,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     i_site_loc = i
             if i_site_loc != -1:
                 primary_player.add_resources(primary_player.highest_death_serves_value)
-                primary_player.sacrifice_card_in_hq(i)
+                primary_player.sacrifice_card_in_hq(i_site_loc)
             self.delete_reaction()
         elif current_reaction == "Lictor Vine Lurker":
             secondary_player.discard_card_at_random()
