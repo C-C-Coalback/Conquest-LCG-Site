@@ -8,6 +8,7 @@ from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, 
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts
+from .Intercept import InPlayIntercept, HQIntercept
 
 
 def create_planets(planet_array_objects):
@@ -192,9 +193,12 @@ class Game:
         self.nullified_card_name = ""
         self.nullify_enabled = True
         self.nullify_string = ""
+        self.intercept_active = False
+        self.name_player_intercept = ""
         self.communications_relay_enabled = True
         self.slumbering_gardens_enabled = True
         self.colony_shield_generator_enabled = True
+        self.intercept_enabled = True
         self.backlash_enabled = True
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
@@ -1949,6 +1953,7 @@ class Game:
                             self.searing_brand_cancel_enabled = False
                             self.slumbering_gardens_enabled = False
                             self.colony_shield_generator_enabled = False
+                            self.intercept_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
@@ -1957,9 +1962,13 @@ class Game:
                             self.slumbering_gardens_enabled = True
                             self.colony_shield_generator_enabled = True
                             self.backlash_enabled = True
+                            self.intercept_enabled = True
                         elif chosen_choice == "Communications Relay":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Communications Relay?"
+                        elif chosen_choice == "Intercept":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Intercept?"
                         elif chosen_choice == "Jain Zar":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Jain Zar?"
@@ -1998,6 +2007,24 @@ class Game:
                                                                    secondary_player)
                     elif self.choice_context == "Use Immortal Loyalist?":
                         await self.resolve_immortal_loyalist(name, game_update_string, primary_player, secondary_player)
+                    elif self.choice_context == "Use Intercept?":
+                        if game_update_string[1] == "0":
+                            self.reset_choices_available()
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.get_ability_given_pos(-2, i) == "Intercept":
+                                    if primary_player.get_ready_given_pos(-2, i):
+                                        primary_player.exhaust_given_pos(-2, i)
+                                        new_pos = i
+                            self.intercept_active = True
+                            self.name_player_intercept = primary_player.name_player
+                        elif game_update_string[1] == "1":
+                            self.reset_choices_available()
+                            self.intercept_enabled = False
+                            new_string_list = self.nullify_string.split(sep="/")
+                            print("String used:", new_string_list)
+                            await self.update_game_event(secondary_player.name_player, new_string_list,
+                                                         same_thread=True)
+                            self.intercept_enabled = True
                     elif self.choice_context == "Urien's Oubliette":
                         if game_update_string[1] == "0":
                             primary_player.discard_top_card_deck()
@@ -5251,6 +5278,42 @@ class Game:
                                 self.resolving_search_box = False
                                 self.reset_choices_available()
 
+    def complete_intercept(self):
+        self.p1.reset_all_aiming_reticles_play_hq()
+        self.p2.reset_all_aiming_reticles_play_hq()
+        self.intercept_active = False
+        self.name_player_intercept = ""
+
+    async def resolve_intercept(self, name, game_update_string):
+        if name == self.name_player_intercept:
+            if name == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    self.intercept_active = False
+                    self.name_player_intercept = ""
+                    self.intercept_enabled = False
+                    new_string_list = self.nullify_string.split(sep="/")
+                    print("String used:", new_string_list)
+                    await self.update_game_event(secondary_player.name_player, new_string_list,
+                                                 same_thread=True)
+                    self.intercept_enabled = True
+            if len(game_update_string) == 3:
+                if game_update_string[0] == "HQ":
+                    if game_update_string[1] == primary_player.number:
+                        await HQIntercept.update_intercept_hq(self, primary_player, secondary_player,
+                                                              name, game_update_string, self.nullified_card_name)
+            if len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    if game_update_string[1] == primary_player.number:
+                        await InPlayIntercept.update_intercept_in_play(
+                            self, primary_player, secondary_player,
+                            name, game_update_string, self.nullified_card_name)
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -5263,6 +5326,8 @@ class Game:
             print("String validated as ok")
             if self.choosing_unit_for_nullify:
                 await self.nullification_unit(name, game_update_string)
+            elif self.intercept_active:
+                await self.resolve_intercept(name, game_update_string)
             elif self.xv805_enforcer_active:
                 await self.resolve_xv805_enforcer(name, game_update_string)
             elif self.resolving_consumption:

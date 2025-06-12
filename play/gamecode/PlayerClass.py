@@ -2331,8 +2331,14 @@ class Player:
                         return True
         return False
 
+    def intercept_check(self):
+        possible_interrupts = []
+        if self.search_card_in_hq("Intercept", ready_relevant=True):
+            possible_interrupts.append("Intercept")
+        return possible_interrupts
+
     def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False,
-                                      targeting_support=False):
+                                      targeting_support=False, intercept_possible=False):
         possible_interrupts = []
         if targeting_support:
             if self.game.colony_shield_generator_enabled:
@@ -2348,6 +2354,8 @@ class Player:
                 if self.game.slumbering_gardens_enabled:
                     if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
                         possible_interrupts.append("Slumbering Gardens")
+            if intercept_possible:
+                possible_interrupts + self.intercept_check()
             if self.game.communications_relay_enabled:
                 if self.communications_relay_check(planet_pos, unit_pos):
                     possible_interrupts.append("Communications Relay")
