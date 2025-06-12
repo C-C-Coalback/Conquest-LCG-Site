@@ -2337,6 +2337,12 @@ class Player:
             possible_interrupts.append("Intercept")
         return possible_interrupts
 
+    def storm_of_silence_check(self):
+        if self.resources > 1:
+            if self.search_hand_for_card("Storm of Silence"):
+                return True
+        return False
+
     def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False,
                                       targeting_support=False, intercept_possible=False):
         possible_interrupts = []
@@ -2356,6 +2362,9 @@ class Player:
                         possible_interrupts.append("Slumbering Gardens")
             if intercept_possible:
                 possible_interrupts + self.intercept_check()
+            if self.game.storm_of_silence_enabled:
+                if self.storm_of_silence_check():
+                    possible_interrupts.append("Storm of Silence")
             if self.game.communications_relay_enabled:
                 if self.communications_relay_check(planet_pos, unit_pos):
                     possible_interrupts.append("Communications Relay")

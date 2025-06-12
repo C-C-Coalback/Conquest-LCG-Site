@@ -87,6 +87,7 @@ class Game:
         self.cards_need_sending_outside_normal_sends = False
         self.hqs_need_sending_outside_normal_sends = False
         self.actions_allowed = True
+        self.storm_of_silence_friendly_unit = True
         self.player_with_action = ""
         self.action_chosen = ""
         self.available_discounts = 0
@@ -196,6 +197,7 @@ class Game:
         self.intercept_active = False
         self.name_player_intercept = ""
         self.communications_relay_enabled = True
+        self.storm_of_silence_enabled = True
         self.slumbering_gardens_enabled = True
         self.colony_shield_generator_enabled = True
         self.intercept_enabled = True
@@ -269,7 +271,8 @@ class Game:
                                  "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
                                  "Imperial Fists Siege Force", "Prodigal Sons Disciple", "Fire Prism",
                                  "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion", ]
-        self.nullifying_backlash = ""
+        self.nullifying_backlash = False
+        self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
         self.name_player_using_nullify = ""
         self.name_player_using_backlash = ""
@@ -1229,7 +1232,7 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
-        if self.nullifying_backlash:
+        if self.nullifying_backlash or self.nullifying_storm_of_silence:
             if self.name_player_using_backlash == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -1241,6 +1244,9 @@ class Game:
                 if primary_player.search_hand_for_card("Banshee Assault Squad"):
                     self.create_reaction("Banshee Assault Squad", primary_player.name_player,
                                          (int(primary_player.number), -1, -1))
+            if self.nullifying_storm_of_silence:
+                self.nullifying_storm_of_silence = False
+                await self.complete_storm_of_silence(primary_player, secondary_player)
             if self.nullifying_backlash:
                 self.nullifying_backlash = False
                 await self.complete_backlash(primary_player, secondary_player)
@@ -1336,7 +1342,42 @@ class Game:
             if secondary_player.search_hand_for_card("Banshee Assault Squad"):
                 self.create_reaction("Banshee Assault Squad", secondary_player.name_player,
                                      (int(secondary_player.number), -1, -1))
-            if self.nullifying_backlash:
+            if self.nullifying_storm_of_silence:
+                print("got to correct SoS Nullify")
+                primary_player.discard_card_name_from_hand("Storm of Silence")
+                primary_player.spend_resources(2)
+                self.reset_choices_available()
+                self.nullifying_storm_of_silence = False
+                new_string_list = self.nullify_string.split(sep="/")
+                print("String used:", new_string_list)
+                resolve_nullify_discard = False
+                await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+                while self.nullify_count > 0:
+                    if self.name_player_using_backlash == self.name_1:
+                        card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                        if self.p2.aiming_reticle_coords_hand is not None:
+                            if self.p2.aiming_reticle_coords_hand > card_pos_discard:
+                                self.p2.aiming_reticle_coords_hand -= 1
+                        self.nullify_count -= 1
+                        if self.nullify_count > 0:
+                            card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                            if self.p1.aiming_reticle_coords_hand is not None:
+                                if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                                    self.p1.aiming_reticle_coords_hand -= 1
+                            self.nullify_count -= 1
+                    else:
+                        card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                        if self.p1.aiming_reticle_coords_hand is not None:
+                            if self.p1.aiming_reticle_coords_hand > card_pos_discard:
+                                self.p1.aiming_reticle_coords_hand -= 1
+                        self.nullify_count -= 1
+                        if self.nullify_count > 0:
+                            card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                            if self.p2.aiming_reticle_coords_hand is not None:
+                                if self.p2.aiming_reticle_coords_hand > card_pos_discard:
+                                    self.p2.aiming_reticle_coords_hand -= 1
+                            self.nullify_count -= 1
+            elif self.nullifying_backlash:
                 primary_player.discard_card_name_from_hand("Backlash")
                 if primary_player.urien_relevant:
                     primary_player.spend_resources(1)
@@ -1347,7 +1388,6 @@ class Game:
                 print("String used:", new_string_list)
                 resolve_nullify_discard = False
                 await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-                self.nullifying_backlash = True
                 while self.nullify_count > 0:
                     if self.name_player_using_backlash == self.name_1:
                         card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
@@ -1500,16 +1540,54 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0])
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
+    async def complete_storm_of_silence(self, primary_player, secondary_player):
+        self.reset_choices_available()
+        primary_player.spend_resources(2)
+        primary_player.discard_card_name_from_hand("Storm of Silence")
+        if primary_player.search_hand_for_card("Banshee Assault Squad"):
+            self.create_reaction("Banshee Assault Squad", primary_player.name_player,
+                                 (int(primary_player.number), -1, -1))
+        if self.storm_of_silence_friendly_unit:
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            if not primary_player.get_ready_given_pos(warlord_pla, warlord_pos):
+                primary_player.ready_given_pos(warlord_pla, warlord_pos)
+        if self.nullify_context == "Event Action":
+            secondary_player.aiming_reticle_coords_hand = None
+            secondary_player.aiming_reticle_coords_hand_2 = None
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            self.amount_spend_for_tzeentch_firestorm = 0
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "In Play Action":
+            secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                          self.position_of_actioned_card[1])
+            self.action_chosen = ""
+            self.player_with_action = ""
+            self.mode = "Normal"
+            if self.nullified_card_name == "Zarathur's Flamers":
+                secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1])
+            self.position_of_actioned_card = (-1, -1)
+        elif self.nullify_context == "Reaction":
+            self.delete_reaction()
+        elif self.nullify_context == "Reaction Event":
+            self.delete_reaction()
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+            await self.resolve_battle_conclusion(secondary_player, game_string="")
+
     async def complete_backlash(self, primary_player, secondary_player):
-        self.choices_available = []
-        self.choice_context = ""
-        self.name_player_making_choices = ""
+        self.reset_choices_available()
         primary_player.spend_resources(1)
         primary_player.discard_card_name_from_hand("Backlash")
         if primary_player.urien_relevant:
             primary_player.spend_resources(1)
         print(self.nullified_card_name)
         print(self.nullify_context)
+        if primary_player.search_hand_for_card("Banshee Assault Squad"):
+            self.create_reaction("Banshee Assault Squad", primary_player.name_player,
+                                 (int(primary_player.number), -1, -1))
         if self.nullify_context == "Event Action":
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
@@ -1541,6 +1619,28 @@ class Game:
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
         elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
             await self.resolve_battle_conclusion(secondary_player, game_string="")
+
+    async def resolve_storm_of_silence(self, name, game_update_string, primary_player,
+                                       secondary_player, may_nullify=True):
+        if game_update_string[1] == "0":
+            if secondary_player.nullify_check() and may_nullify:
+                self.nullifying_storm_of_silence = True
+                self.name_player_using_backlash = primary_player.name_player
+                await self.send_update_message(
+                    primary_player.name_player + " wants to play Storm of Silence; "
+                                                 "Nullify window offered.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Nullify?"
+            else:
+                await self.complete_storm_of_silence(primary_player, secondary_player)
+        elif game_update_string[1] == "1":
+            self.reset_choices_available()
+            self.storm_of_silence_enabled = False
+            new_string_list = self.nullify_string.split(sep="/")
+            print("String used:", new_string_list)
+            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+            self.storm_of_silence_enabled = True
 
     async def resolve_backlash(self, name, game_update_string, primary_player, secondary_player, may_nullify=True):
         if game_update_string[1] == "0":
@@ -1984,6 +2084,9 @@ class Game:
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Backlash?"
+                        elif chosen_choice == "Storm of Silence":
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Use Storm of Silence?"
                         elif chosen_choice == "Immortal Loyalist":
                             self.choices_available = ["Yes", "No"]
                             self.choice_context = "Use Immortal Loyalist?"
@@ -2159,6 +2262,8 @@ class Game:
                         self.reset_choices_available()
                     elif self.choice_context == "Use Backlash?":
                         await self.resolve_backlash(name, game_update_string, primary_player, secondary_player)
+                    elif self.choice_context == "Use Storm of Silence?":
+                        await self.resolve_storm_of_silence(name, game_update_string, primary_player, secondary_player)
                     elif self.choice_context == "Use Communications Relay?":
                         await self.resolve_communications_relay(name, game_update_string,
                                                                 primary_player, secondary_player)
