@@ -1322,6 +1322,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Lictor Vine Lurker":
+            secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Kabalite Blackguard":
             self.choices_available = ["0", "1", "2"]
             if secondary_player.resources < 2:

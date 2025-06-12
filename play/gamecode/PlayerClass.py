@@ -362,6 +362,9 @@ class Player:
         if ability == "Deathwing Terminators":
             self.game.create_reaction("Deathwing Terminators", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Lictor Vine Lurker":
+            self.game.create_reaction("Lictor Vine Lurker", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Mandrake Cutthroat":
             self.game.create_reaction("Mandrake Cutthroat", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
