@@ -302,7 +302,14 @@ class Player:
         return self.cards_in_reserve[planet_id][unit_id].get_card_type()
 
     def get_deepstrike_value_given_pos(self, planet_id, unit_id):
-        return self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
+        ds_value = self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
+        other_player = self.game.p1
+        if other_player.name_player == self.name_player:
+            other_player = self.game.p2
+        for i in range(len(other_player.cards_in_play[planet_id + 1])):
+            if other_player.get_ability_given_pos(planet_id, i) == "Catachan Tracker":
+                ds_value += 2
+        return ds_value
 
     def deepstrike_event(self, planet_id, unit_id):
         ability = self.cards_in_reserve[planet_id][unit_id].get_name()
