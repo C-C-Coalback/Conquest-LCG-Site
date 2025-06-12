@@ -138,6 +138,7 @@ class Player:
         self.defensive_protocols_active = False
         self.death_serves_used = False
         self.highest_death_serves_value = 0
+        self.highest_cost_invasion_site = 0
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -3829,6 +3830,14 @@ class Player:
                         if not already_weirdboy_stikk:
                             self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                       (int(self.number), -1, -1))
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
+                if not self.does_own_reaction_exist("Invasion Site"):
+                    if self.search_card_in_hq("Invasion Site"):
+                        self.game.create_reaction("Invasion Site", self.name_player,
+                                                  (int(self.number), -1, -1))
+                        cost = self.get_cost_given_pos(planet_num, card_pos)
+                        if cost > self.highest_cost_invasion_site:
+                            self.highest_cost_invasion_site = cost
             if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):

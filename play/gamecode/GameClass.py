@@ -5666,6 +5666,8 @@ class Game:
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal" and not self.xv805_enforcer_active:
             if not self.reactions_needing_resolving and not self.resolving_search_box:
+                self.p1.highest_cost_invasion_site = 0
+                self.p2.highest_cost_invasion_site = 0
                 self.p1.stored_targets_the_emperor_protects = []
                 self.p2.stored_targets_the_emperor_protects = []
                 self.p1.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]

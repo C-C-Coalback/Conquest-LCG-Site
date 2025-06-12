@@ -1322,6 +1322,15 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Invasion Site":
+            i_site_loc = -1
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_ability_given_pos(-2, i) == "Invasion Site":
+                    i_site_loc = i
+            if i_site_loc != -1:
+                primary_player.add_resources(primary_player.highest_death_serves_value)
+                primary_player.sacrifice_card_in_hq(i)
+            self.delete_reaction()
         elif current_reaction == "Lictor Vine Lurker":
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
