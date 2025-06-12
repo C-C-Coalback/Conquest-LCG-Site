@@ -491,7 +491,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.flamers_damage_active = True
                                 self.id_of_the_active_flamer = \
                                     player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
-                                        salamanders_flamers_id_number
+                                    salamanders_flamers_id_number
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
@@ -685,10 +685,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if not secondary_player.get_ready_given_pos(self.defender_planet,
                                                                                 self.defender_position):
                                         attack_value += 2
+                                if primary_player.get_ability_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Dark Angels Vindicator":
+                                    command = secondary_player.get_command_given_pos(self.defender_planet,
+                                                                                     self.defender_position)
+                                    if secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                self.defender_position) == "Warlord":
+                                        command = command - 999
+                                    attack_value += 2 * command
                                 for i in range(
                                         len(primary_player.
-                                                    cards_in_play[self.attacker_planet + 1][self.attacker_position]
-                                                    .get_attachments())):
+                                            cards_in_play[self.attacker_planet + 1][self.attacker_position]
+                                            .get_attachments())):
                                     if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position] \
                                             .get_attachments()[i].get_ability() == "Hidden Strike Chainsword":
                                         if secondary_player.get_card_type_given_pos(
