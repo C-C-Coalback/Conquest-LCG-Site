@@ -325,7 +325,7 @@ def dark_eldar_cards_init():
         CardClasses.SupportCard("Abomination Workshop", "HEADQUARTERS ACTION: Sacrifice this support to have each "
                                                         "player discard cards from his hand until he has cards "
                                                         "equal to or less than the highest printed cost among "
-                                                        "units he controls.", "Location.", 1, faction, "Common",
+                                                        "units he controls.", "Location.", 2, faction, "Common",
                                 False, action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
         CardClasses.ArmyCard("Beastmaster Harvester", "Deep Strike (4).\n"
                                                       "Reaction: After you Deep Strike this unit, put 2 Khymera "

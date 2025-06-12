@@ -109,6 +109,20 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.misc_target_planet = -1
                             self.chosen_first_card = False
+                    elif ability == "Abomination Workshop":
+                        primary_player.sacrifice_card_in_hq(unit_pos)
+                        self.misc_counter = primary_player.get_highest_cost_units()
+                        self.chosen_first_card = False
+                        self.action_chosen = ability
+                        if self.misc_counter >= len(primary_player.cards):
+                            self.chosen_first_card = True
+                            self.player_with_action = secondary_player.name_player
+                            self.misc_counter = secondary_player.get_highest_cost_units()
+                            if self.misc_counter >= len(secondary_player.cards):
+                                self.player_with_action = primary_player.name_player
+                                self.action_cleanup()
+                                await self.send_update_message("Abomination Workshop could not discard any cards. "
+                                                               "Did you mean to do that?")
                     elif ability == "Vile Laboratory":
                         if card.get_ready():
                             self.action_chosen = ability

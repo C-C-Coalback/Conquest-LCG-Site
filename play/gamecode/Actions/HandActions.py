@@ -8,6 +8,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    hand_pos = int(game_update_string[2])
     card = primary_player.get_card_in_hand(int(game_update_string[2]))
     ability = card.get_ability()
     urien_rel = primary_player.urien_relevant
@@ -785,6 +786,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.add_card_to_planet(card, self.misc_target_planet)
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
                     self.action_cleanup()
+    elif self.action_chosen == "Abomination Workshop":
+        primary_player.discard_card_from_hand(hand_pos)
+        if self.misc_counter >= len(primary_player.cards):
+            if self.chosen_first_card:
+                self.player_with_action = primary_player.name_player
+                self.action_cleanup()
+            self.chosen_first_card = True
+            self.player_with_action = secondary_player.name_player
+            self.misc_counter = secondary_player.get_highest_cost_units()
+            if self.misc_counter >= len(secondary_player.cards):
+                self.player_with_action = primary_player.name_player
+                self.action_cleanup()
     elif self.action_chosen == "Talyesin's Warlocks":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card.check_for_a_trait("Warrior"):
