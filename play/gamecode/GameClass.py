@@ -153,6 +153,7 @@ class Game:
         self.indirect_exhaust_only = False
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.faction_of_cards_for_indirect = ""
+        self.forbidden_traits_indirect = ""
         self.planet_of_indirect = -1
         self.first_card_damaged = True
         self.cato_stronghold_activated = False
@@ -4748,7 +4749,11 @@ class Game:
                                             int(game_update_string[2]), int(game_update_string[3])) \
                                             in self.valid_targets_for_indirect and \
                                             (not self.indirect_exhaust_only or not player.get_ready_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3]))):
+                                                int(game_update_string[2]), int(game_update_string[3]))) and \
+                                            (self.forbidden_traits_indirect == ""
+                                             or not player.check_for_trait_given_pos(
+                                                int(game_update_string[2]), int(game_update_string[3]),
+                                                self.forbidden_traits_indirect)):
                                         if player.get_faction_given_pos(
                                                 int(game_update_string[2]), int(game_update_string[3])) == \
                                                 self.faction_of_cards_for_indirect or not \
@@ -4759,6 +4764,7 @@ class Game:
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
             self.indirect_exhaust_only = False
+            self.forbidden_traits_indirect = ""
             self.p1.total_indirect_damage = 0
             self.p2.total_indirect_damage = 0
 

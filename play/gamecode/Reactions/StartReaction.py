@@ -1319,6 +1319,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "Cloud of Flies":
+            self.location_of_indirect = "PLANET"
+            self.planet_of_indirect = self.positions_of_unit_triggering_reaction[0][1]
+            self.valid_targets_for_indirect = ["Army", "Warlord", "Synapse", "Token"]
+            primary_player.indirect_damage_applied = 0
+            primary_player.total_indirect_damage = 2
+            secondary_player.indirect_damage_applied = 0
+            secondary_player.total_indirect_damage = 2
+            self.forbidden_traits_indirect = "Nurgle"
+            self.delete_reaction()
         elif current_reaction == "Sootblade Assashun":
             self.location_of_indirect = "PLANET"
             self.indirect_exhaust_only = True

@@ -3742,6 +3742,9 @@ class Player:
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Resurrection Orb":
                     self.game.create_reaction("Resurrection Orb", self.name_player,
                                               (int(self.number), planet_num, i))
+                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Cloud of Flies":
+                    self.game.create_reaction("Cloud of Flies", self.name_player,
+                                              (int(self.number), planet_num, i))
 
     def search_for_preemptive_destroy_interrupts(self):
         for i in range(len(self.headquarters)):
