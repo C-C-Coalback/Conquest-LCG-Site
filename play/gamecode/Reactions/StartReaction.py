@@ -1315,6 +1315,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Shadowsun plays attachment from hand or discard?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+        elif current_reaction == "Sootblade Assashun":
+            self.location_of_indirect = "PLANET"
+            self.indirect_exhaust_only = True
+            self.planet_of_indirect = self.positions_of_unit_triggering_reaction[0][1]
+            self.valid_targets_for_indirect = ["Army", "Warlord", "Synapse", "Token"]
+            secondary_player.indirect_damage_applied = 0
+            secondary_player.total_indirect_damage = 2
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Mark of Chaos":
             if self.positions_of_unit_triggering_reaction[0][0] == 1:
                 secondary_player = self.p2

@@ -150,6 +150,7 @@ class Game:
         self.misc_player_storage = ""
         self.last_defender_position = (-1, -1, -1)
         self.location_of_indirect = ""
+        self.indirect_exhaust_only = False
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.faction_of_cards_for_indirect = ""
         self.planet_of_indirect = -1
@@ -4730,7 +4731,9 @@ class Game:
                                 if game_update_string[1] == player.get_number():
                                     if player.get_card_type_given_pos(
                                             int(game_update_string[2]), int(game_update_string[3])) \
-                                            in self.valid_targets_for_indirect:
+                                            in self.valid_targets_for_indirect and \
+                                            (not self.indirect_exhaust_only or not player.get_ready_given_pos(
+                                                int(game_update_string[2]), int(game_update_string[3]))):
                                         if player.get_faction_given_pos(
                                                 int(game_update_string[2]), int(game_update_string[3])) == \
                                                 self.faction_of_cards_for_indirect or not \
@@ -4740,6 +4743,7 @@ class Game:
         if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
+            self.indirect_exhaust_only = False
             self.p1.total_indirect_damage = 0
             self.p2.total_indirect_damage = 0
 
