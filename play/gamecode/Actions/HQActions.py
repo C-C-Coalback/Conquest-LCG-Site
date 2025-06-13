@@ -266,6 +266,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.jungle_trench_count += 1
                             await self.send_update_message("Jungle Trenches active: " + str(self.jungle_trench_count))
                             self.action_cleanup()
+                    elif ability == "Fungal Turf":
+                        primary_player.sacrifice_card_in_hq(unit_pos)
+                        self.action_chosen = ability
+                        self.misc_counter = primary_player.get_highest_cost_units()
+                        await self.send_update_message(str(self.misc_counter) + " Snotlings left to place.")
+                        if self.misc_counter < 1:
+                            await self.send_update_message("Highest cost 0; no Snotlings for you.")
                     elif ability == "Hallow Librarium":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))

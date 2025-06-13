@@ -682,22 +682,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
             new_pos = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
             primary_player.ready_given_pos(chosen_planet, new_pos)
             self.action_cleanup()
+    elif self.action_chosen == "Fungal Turf":
+        primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
+        self.misc_counter = self.misc_counter - 1
+        await self.send_update_message(str(self.misc_counter) + " Snotlings left to place.")
+        if self.misc_counter == 0:
+            self.action_cleanup()
     elif self.action_chosen == "Snotling Attack":
-        if self.number_with_deploy_turn == "1":
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
         self.misc_counter = self.misc_counter - 1
         if self.misc_counter == 0:
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
-            self.card_pos_to_deploy = -1
-            self.player_with_action = ""
-            self.action_chosen = ""
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.number
-            self.mode = "Normal"
+            self.action_cleanup()
