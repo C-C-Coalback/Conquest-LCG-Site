@@ -2093,10 +2093,12 @@ class Game:
                             self.slumbering_gardens_enabled = False
                             self.colony_shield_generator_enabled = False
                             self.intercept_enabled = False
+                            self.storm_of_silence_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.communications_relay_enabled = True
+                            self.storm_of_silence_enabled = True
                             self.searing_brand_cancel_enabled = True
                             self.slumbering_gardens_enabled = True
                             self.colony_shield_generator_enabled = True
