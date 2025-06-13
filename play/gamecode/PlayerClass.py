@@ -360,6 +360,9 @@ class Player:
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Scorpion Striker":
+            self.game.create_reaction("Scorpion Striker", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Beastmaster Harvester":
             self.game.create_reaction("Beastmaster Harvester", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
