@@ -1660,10 +1660,8 @@ class Player:
         return None
 
     def discard_card_at_random(self):
-        print("")
         if self.cards:
-            pos = random.randint(1, len(self.cards) - 1)
-            print(pos)
+            pos = random.randint(0, len(self.cards) - 1)
             self.discard_card_from_hand(pos)
 
     def reset_defense_batteries(self):
