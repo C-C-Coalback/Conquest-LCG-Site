@@ -3646,6 +3646,10 @@ class Player:
                             cost = self.get_cost_given_pos(-2, card_pos)
                             if cost > self.highest_death_serves_value:
                                 self.highest_death_serves_value = cost
+            if self.check_for_trait_given_pos(-2, card_pos, "Dark Angels"):
+                if self.search_card_in_hq("Standard of Devastation"):
+                    self.game.create_reaction("Standard of Devastation", self.name_player,
+                                              (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
             self.game.queued_sound = "destroy"
@@ -3845,6 +3849,10 @@ class Player:
                         cost = self.get_cost_given_pos(planet_num, card_pos)
                         if cost > self.highest_cost_invasion_site:
                             self.highest_cost_invasion_site = cost
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Dark Angels"):
+                if self.search_card_in_hq("Standard of Devastation"):
+                    self.game.create_reaction("Standard of Devastation", self.name_player,
+                                              (int(self.number), -1, -1))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):

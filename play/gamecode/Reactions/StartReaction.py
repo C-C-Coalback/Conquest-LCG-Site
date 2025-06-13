@@ -268,6 +268,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             if planet_pos != -2:
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Standard of Devastation":
+            await self.send_update_message("Standard of Devastation used; Space Marines army units "
+                                           "have received +1 ATK.")
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_card_type_given_pos(-2, i) == "Army":
+                    if primary_player.get_faction_given_pos(-2, i) == "Space Marines":
+                        primary_player.increase_attack_of_unit_at_pos(-2, i, 1, expiration="EOP")
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.get_card_type_given_pos(i, j) == "Army":
+                        if primary_player.get_faction_given_pos(i, j) == "Space Marines":
+                            primary_player.increase_attack_of_unit_at_pos(i, j, 1, expiration="EOP")
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
