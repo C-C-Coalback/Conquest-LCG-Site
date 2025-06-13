@@ -1373,7 +1373,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if primary_player.get_ability_given_pos(-2, i) == "Invasion Site":
                     i_site_loc = i
             if i_site_loc != -1:
-                primary_player.add_resources(primary_player.highest_death_serves_value)
+                primary_player.add_resources(primary_player.highest_cost_invasion_site)
                 primary_player.sacrifice_card_in_hq(i_site_loc)
             self.delete_reaction()
         elif current_reaction == "Vha'shaelhur":
