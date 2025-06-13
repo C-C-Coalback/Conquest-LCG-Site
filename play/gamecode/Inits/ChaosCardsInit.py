@@ -322,7 +322,7 @@ def chaos_cards_init():
                              7, faction, "Common", 2, 9, 2, False, brutal=True),
         CardClasses.ArmyCard("Purveyor of Hubris", "Interrupt: When your opponent deploys a non-Elite unit at this "
                                                    "planet, increase its cost by 2.", "Soldier. Slaanesh.",
-                             4, faction, "Chaos", 3, 4, 2, False),
+                             4, faction, "Common", 3, 4, 2, False),
         CardClasses.AttachmentCard("Cloud of Flies", "Attach to a Nurgle army unit you control.\n"
                                                      "Reaction: After a combat round begins at this planet, "
                                                      "each player deals 2 indirect damage among non-Nurgle units "
