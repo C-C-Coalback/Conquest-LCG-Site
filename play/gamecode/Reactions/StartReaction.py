@@ -1331,6 +1331,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.add_resources(primary_player.highest_death_serves_value)
                 primary_player.sacrifice_card_in_hq(i_site_loc)
             self.delete_reaction()
+        elif current_reaction == "Vha'shaelhur":
+            primary_player.summon_token_at_hq("Cultist", 1)
+            self.delete_reaction()
         elif current_reaction == "Lictor Vine Lurker":
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

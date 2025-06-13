@@ -3833,7 +3833,6 @@ class Player:
             if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
                 if not self.does_own_reaction_exist("Invasion Site"):
                     if self.search_card_in_hq("Invasion Site"):
-                        self.attach_card()
                         self.game.create_reaction("Invasion Site", self.name_player,
                                                   (int(self.number), -1, -1))
                         cost = self.get_cost_given_pos(planet_num, card_pos)
@@ -3885,6 +3884,11 @@ class Player:
                     if other_player.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
                         self.game.create_reaction("Shrieking Exarch", other_player.name_player,
                                                   (int(other_player.number), planet_num, i))
+                    if other_player.get_ability_given_pos(planet_num, i, bloodied_relevant=True) == "Vha'shaelhur":
+                        if other_player.cards_in_play[planet_num + 1][i].resolving_attack:
+                            if not other_player.check_if_already_have_reaction("Vha'shaelhur"):
+                                self.game.create_reaction("Vha'shaelhur", other_player.name_player,
+                                                          (int(other_player.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Carnivore Pack":
                 self.game.create_reaction("Carnivore Pack", self.name_player,
                                           (int(self.number), -1, -1))
