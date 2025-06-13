@@ -4489,6 +4489,26 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0]:
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Follower of Gork":
+                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                            if planet_pos == hurt_planet:
+                                if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Elite"):
+                                    if primary_player.cards_in_play[hurt_planet + 1][
+                                            hurt_pos].follower_of_gork_available:
+                                        primary_player.cards_in_play[hurt_planet + 1][
+                                            hurt_pos].follower_of_gork_available = False
+                                        damage_to_remove = 2
+                                        if self.amount_that_can_be_removed_by_shield == 1:
+                                            damage_to_remove = 1
+                                        primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
+                                        if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                            self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                                 (int(primary_player.number), hurt_planet, hurt_pos))
+                                        self.amount_that_can_be_removed_by_shield[0] = \
+                                            self.amount_that_can_be_removed_by_shield[0] - damage_to_remove
+                                        if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                            primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                            await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Enginseer Mechanic":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                             if planet_pos == hurt_planet:
@@ -4889,6 +4909,8 @@ class Game:
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         secondary_player.reset_card_name_misc_ability("Blood Angels Veterans")
+        primary_player.reset_card_name_misc_ability("Follower of Gork")
+        secondary_player.reset_card_name_misc_ability("Follower of Gork")
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
             if player_num == 1:

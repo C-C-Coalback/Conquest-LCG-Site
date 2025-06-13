@@ -63,6 +63,7 @@ class Card:
         self.techmarine_aspirant_available = True
         self.lost_keywords_eop = False
         self.cannot_ready_phase = False
+        self.follower_of_gork_available = True
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

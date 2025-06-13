@@ -1609,6 +1609,13 @@ class Player:
                 j = j + 1
 
     def reset_card_name_misc_ability(self, card_name):
+        if card_name == "Follower of Gork":
+            for i in range(len(self.headquarters)):
+                self.headquarters[i].follower_of_gork_available = False
+            for i in range(7):
+                for j in range(len(self.cards_in_play[i + 1])):
+                    self.cards_in_play[i + 1][j].follower_of_gork_available = False
+            return None
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == card_name:
                 self.headquarters[i].misc_ability_used = False
