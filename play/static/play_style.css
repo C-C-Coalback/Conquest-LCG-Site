@@ -117,7 +117,7 @@ h4 {
     top: 0%;
     right: 0%;
     height:25vh;
-    width:15vw;
+    width: min(15vw, 18.4vh);
 }
 
 .Card-div {
