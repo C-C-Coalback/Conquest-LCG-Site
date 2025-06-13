@@ -327,6 +327,17 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].reset_action_data()
                         active_games[self.game_position].action_cleanup()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "cards-deck" and len(message) == 3:
+                        if message[2] == "1":
+                            amount = len(active_games[self.game_position].p1.deck)
+                            await self.receive_game_update(
+                                "Num cards in P1's deck: " + str(amount)
+                            )
+                        elif message[2] == "2":
+                            amount = len(active_games[self.game_position].p2.deck)
+                            await self.receive_game_update(
+                                "Num cards in P2's deck: " + str(amount)
+                            )
                     elif message[1] == "show-discard" and len(message) == 3:
                         if message[2] == "1":
                             discard = active_games[self.game_position].p1.discard
