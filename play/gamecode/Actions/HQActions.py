@@ -189,6 +189,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 2, "NEXT")
                             primary_player.assign_damage_to_pos(-2, unit_pos, 2)
                             self.action_cleanup()
+                    elif ability == "Raging Krootox":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            amount = primary_player.resources
+                            primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, amount, "EOP")
+                            await self.send_update_message("Raging Krootox gained +" + str(amount) + " ATK.")
+                            self.action_cleanup()
                     elif ability == "Wisdom of the Serpent":
                         if card.get_ready():
                             card.exhaust_card()
