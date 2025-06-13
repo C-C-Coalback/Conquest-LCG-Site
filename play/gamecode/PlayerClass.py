@@ -264,7 +264,7 @@ class Player:
                 else:
                     single_card_string += "E|"
                 card_type = current_card.get_card_type()
-                if card_type == "Warlord" or card_type == "Army" or card_type == "Token":
+                if card_type == "Warlord" or card_type == "Army" or card_type == "Token" or card_type == "Synapse":
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                 else:
                     single_card_string += "0"
