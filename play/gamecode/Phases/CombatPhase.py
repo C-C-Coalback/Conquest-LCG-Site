@@ -743,160 +743,159 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.create_reaction("Sickening Helbrute", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               self.defender_position))
-                                if attack_value > 0:
-                                    att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
-                                                                                     self.attacker_position)
-                                    def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
-                                                                                       self.defender_position)
-                                    att_ignores_flying = primary_player.get_ignores_flying_given_pos(
-                                        self.attacker_planet, self.attacker_position)
-                                    if primary_player.get_ability_given_pos(
-                                            self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
-                                        if secondary_player.cards_in_play[
-                                            self.defender_planet + 1][self.defender_position] \
-                                                .get_card_type() != "Warlord":
-                                            secondary_player.exhaust_given_pos(self.defender_planet,
-                                                                               self.defender_position)
+                                att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
+                                                                                 self.attacker_position)
+                                def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                                   self.defender_position)
+                                att_ignores_flying = primary_player.get_ignores_flying_given_pos(
+                                    self.attacker_planet, self.attacker_position)
+                                if primary_player.get_ability_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
                                     if secondary_player.cards_in_play[
                                         self.defender_planet + 1][self.defender_position] \
-                                            .get_card_type() == "Warlord":
-                                        if secondary_player.search_card_in_hq("Zogwort's Hovel"):
-                                            self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
-                                                                 (int(secondary_player.number), self.defender_planet,
-                                                                  -1))
-                                    if secondary_player.get_ability_given_pos(
-                                            self.defender_planet, self.defender_position) == "Firedrake Terminators":
-                                        self.create_reaction("Firedrake Terminators", secondary_player.name_player,
-                                                             (int(primary_player.number), self.attacker_planet,
-                                                              self.attacker_position))
-                                    if secondary_player.search_attachments_at_pos(
-                                            self.defender_planet, self.defender_position, "The Black Sword"
-                                    ):
-                                        self.create_reaction("The Black Sword", secondary_player.name_player,
-                                                             (int(primary_player.number), self.attacker_planet,
-                                                              self.attacker_position))
-                                    # Flying check
-                                    if def_flying and not att_flying and not att_ignores_flying:
-                                        attack_value = int(attack_value / 2 + (attack_value % 2))
-                                    self.damage_on_unit_before_new_damage = \
-                                        secondary_player.get_damage_given_pos(self.defender_planet,
-                                                                              self.defender_position)
-                                    primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
-                                                                                                  self.attacker_position
-                                                                                                  )
-                                    if primary_player.check_for_trait_given_pos(self.attacker_planet,
-                                                                                self.attacker_position, "Space Wolves"):
-                                        if primary_player.search_card_in_hq("Ragnar's Warcamp"):
-                                            if primary_player.check_for_warlord(self.attacker_planet):
-                                                if secondary_player.get_card_type_given_pos(
-                                                        self.defender_planet, self.defender_position) == "Warlord":
-                                                    attack_value = attack_value * 2
-                                    if secondary_player.check_for_trait_given_pos(self.defender_planet,
-                                                                                  self.defender_position, "Vehicle"):
-                                        if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                                self.attacker_position) \
-                                                == "Tankbusta Bommaz":
-                                            attack_value = attack_value * 2
+                                            .get_card_type() != "Warlord":
+                                        secondary_player.exhaust_given_pos(self.defender_planet,
+                                                                           self.defender_position)
+                                if secondary_player.cards_in_play[
+                                    self.defender_planet + 1][self.defender_position] \
+                                        .get_card_type() == "Warlord":
+                                    if secondary_player.search_card_in_hq("Zogwort's Hovel"):
+                                        self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              -1))
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Firedrake Terminators":
+                                    self.create_reaction("Firedrake Terminators", secondary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                if secondary_player.search_attachments_at_pos(
+                                        self.defender_planet, self.defender_position, "The Black Sword"
+                                ):
+                                    self.create_reaction("The Black Sword", secondary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                # Flying check
+                                if def_flying and not att_flying and not att_ignores_flying:
+                                    attack_value = int(attack_value / 2 + (attack_value % 2))
+                                self.damage_on_unit_before_new_damage = \
+                                    secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                          self.defender_position)
+                                primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
+                                                                                              self.attacker_position
+                                                                                              )
+                                if primary_player.check_for_trait_given_pos(self.attacker_planet,
+                                                                            self.attacker_position, "Space Wolves"):
+                                    if primary_player.search_card_in_hq("Ragnar's Warcamp"):
+                                        if primary_player.check_for_warlord(self.attacker_planet):
+                                            if secondary_player.get_card_type_given_pos(
+                                                    self.defender_planet, self.defender_position) == "Warlord":
+                                                attack_value = attack_value * 2
+                                if secondary_player.check_for_trait_given_pos(self.defender_planet,
+                                                                              self.defender_position, "Vehicle"):
                                     if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                             self.attacker_position) \
-                                            == "Stalking Ur-Ghul":
-                                        if secondary_player.get_card_type_given_pos(self.defender_planet,
-                                                                                    self.defender_position) \
-                                                == "Warlord":
+                                            == "Tankbusta Bommaz":
+                                        attack_value = attack_value * 2
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
+                                        == "Stalking Ur-Ghul":
+                                    if secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                self.defender_position) \
+                                            == "Warlord":
+                                        attack_value = attack_value - 5
+                                    elif secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                  self.defender_position) \
+                                            == "Army":
+                                        if secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                                 self.defender_position) == 0:
                                             attack_value = attack_value - 5
-                                        elif secondary_player.get_card_type_given_pos(self.defender_planet,
-                                                                                      self.defender_position) \
-                                                == "Army":
-                                            if secondary_player.get_damage_given_pos(self.defender_planet,
-                                                                                     self.defender_position) == 0:
-                                                attack_value = attack_value - 5
-                                    if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                            self.attacker_position) \
-                                            == "Roghrax Bloodhand":
-                                        if self.bloodthirst_active[self.attacker_planet]:
-                                            attack_value = attack_value * 2
-                                    self.attacker_location = (int(primary_player.number), self.attacker_planet,
-                                                              self.attacker_position)
-                                    if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                            self.attacker_position) \
-                                            == "Burna Boyz":
-                                        self.create_reaction("Burna Boyz", primary_player.name_player,
-                                                             (int(primary_player.number), self.attacker_planet,
-                                                              self.attacker_position))
-                                    self.last_defender_position = (secondary_player.number,
-                                                                   self.defender_planet, self.defender_position)
-                                    if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                            self.attacker_position) \
-                                            == "Torquemada Coteaz":
-                                        primary_player.reset_card_name_misc_ability("Torquemada Coteaz")
-                                    enemy_unit_damage = secondary_player.get_damage_given_pos(self.defender_planet,
-                                                                                              self.defender_position)
-                                    can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                            self.attacker_position,
-                                                                                            enemy_unit_damage)
-                                    shadow_field = False
-                                    if primary_player.get_cost_given_pos(
-                                            self.attacker_planet, self.attacker_position) < 3 \
-                                            and primary_player.get_card_type_given_pos(
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
+                                        == "Roghrax Bloodhand":
+                                    if self.bloodthirst_active[self.attacker_planet]:
+                                        attack_value = attack_value * 2
+                                self.attacker_location = (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position)
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
+                                        == "Burna Boyz":
+                                    self.create_reaction("Burna Boyz", primary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                self.last_defender_position = (secondary_player.number,
+                                                               self.defender_planet, self.defender_position)
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
+                                        == "Torquemada Coteaz":
+                                    primary_player.reset_card_name_misc_ability("Torquemada Coteaz")
+                                enemy_unit_damage = secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                                          self.defender_position)
+                                can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                        self.attacker_position,
+                                                                                        enemy_unit_damage)
+                                shadow_field = False
+                                if primary_player.get_cost_given_pos(
+                                        self.attacker_planet, self.attacker_position) < 3 \
+                                        and primary_player.get_card_type_given_pos(
                                         self.attacker_planet, self.attacker_position) == "Army":
-                                        shadow_field = True
-                                    preventable = True
-                                    if primary_player.search_attachments_at_pos(
-                                            self.attacker_planet, self.attacker_position, "Acid Maw"):
-                                        preventable = False
-                                    took_damage, bodyguards = secondary_player.assign_damage_to_pos(
-                                        self.defender_planet, self.defender_position, damage=attack_value,
-                                        att_pos=self.attacker_location, can_shield=can_shield,
-                                        shadow_field_possible=shadow_field, rickety_warbuggy=True,
-                                        preventable=preventable
+                                    shadow_field = True
+                                preventable = True
+                                if primary_player.search_attachments_at_pos(
+                                        self.attacker_planet, self.attacker_position, "Acid Maw"):
+                                    preventable = False
+                                if preventable and primary_player.get_card_type_given_pos(
+                                        self.attacker_planet, self.attacker_position) != "Warlord":
+                                    attack_value = attack_value - self.jungle_trench_count
+                                took_damage, bodyguards = secondary_player.assign_damage_to_pos(
+                                    self.defender_planet, self.defender_position, damage=attack_value,
+                                    att_pos=self.attacker_location, can_shield=can_shield,
+                                    shadow_field_possible=shadow_field, rickety_warbuggy=True,
+                                    preventable=preventable
+                                )
+                                if self.manual_bodyguard_resolution:
+                                    await self.send_update_message(
+                                        "Too many Bodyguards! Proceeding to manual bodyguard reassignment."
                                     )
-                                    if self.manual_bodyguard_resolution:
-                                        await self.send_update_message(
-                                            "Too many Bodyguards! Proceeding to manual bodyguard reassignment."
-                                        )
-                                        await self.send_update_message(
-                                            "Damage left to reassign: " + str(self.damage_bodyguard)
-                                        )
-                                    else:
-                                        print(took_damage)
-                                        if primary_player.get_ability_given_pos(
-                                                self.attacker_planet, self.attacker_position) == "XV8-05 Enforcer":
-                                            if self.positions_of_units_to_take_damage:
-                                                self.xv805_enforcer_active = True
-                                                self.asking_if_use_xv805_enforcer = True
-                                                self.asking_amount_xv805_enforcer = False
-                                                self.player_using_xv805 = primary_player.name_player
-                                                d_i = len(self.positions_of_units_to_take_damage) - 1
-                                                self.damage_index_xv805 = d_i
-                                                self.amount_xv805_enforcer = \
-                                                    self.amount_that_can_be_removed_by_shield[d_i]
-                                                self.og_pos_xv805_target = (chosen_planet, chosen_unit)
-                                        if took_damage:
-                                            if primary_player.get_ability_given_pos(
-                                                    self.attacker_planet,
-                                                    self.attacker_position) == "Rumbling Tomb Stalker":
-                                                if primary_player.get_damage_given_pos(self.attacker_planet,
-                                                                                       self.attacker_position) > 0:
-                                                    self.create_reaction("Rumbling Tomb Stalker",
-                                                                         primary_player.name_player,
-                                                                         (int(primary_player.number),
-                                                                          self.attacker_planet,
-                                                                          self.attacker_position))
-                                            if bodyguards == 0:
-                                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                            self.defender_position,
-                                                                                            "red")
-                                            else:
-                                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                            self.defender_position,
-                                                                                            "blue")
-                                            self.damage_from_attack = True
-                                        else:
-                                            primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
-                                                                                        self.attacker_position)
+                                    await self.send_update_message(
+                                        "Damage left to reassign: " + str(self.damage_bodyguard)
+                                    )
                                 else:
-                                    primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
-                                                                                self.attacker_position)
+                                    print(took_damage)
+                                    if primary_player.get_ability_given_pos(
+                                            self.attacker_planet, self.attacker_position) == "XV8-05 Enforcer":
+                                        if self.positions_of_units_to_take_damage:
+                                            self.xv805_enforcer_active = True
+                                            self.asking_if_use_xv805_enforcer = True
+                                            self.asking_amount_xv805_enforcer = False
+                                            self.player_using_xv805 = primary_player.name_player
+                                            d_i = len(self.positions_of_units_to_take_damage) - 1
+                                            self.damage_index_xv805 = d_i
+                                            self.amount_xv805_enforcer = \
+                                                self.amount_that_can_be_removed_by_shield[d_i]
+                                            self.og_pos_xv805_target = (chosen_planet, chosen_unit)
+                                    if took_damage:
+                                        if primary_player.get_ability_given_pos(
+                                                self.attacker_planet,
+                                                self.attacker_position) == "Rumbling Tomb Stalker":
+                                            if primary_player.get_damage_given_pos(self.attacker_planet,
+                                                                                   self.attacker_position) > 0:
+                                                self.create_reaction("Rumbling Tomb Stalker",
+                                                                     primary_player.name_player,
+                                                                     (int(primary_player.number),
+                                                                      self.attacker_planet,
+                                                                      self.attacker_position))
+                                        if bodyguards == 0:
+                                            secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                        self.defender_position,
+                                                                                        "red")
+                                        else:
+                                            secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                        self.defender_position,
+                                                                                        "blue")
+                                        self.damage_from_attack = True
+                                    else:
+                                        primary_player.reset_aiming_reticle_in_play(self.attacker_planet,
+                                                                                    self.attacker_position)
                                 self.reset_combat_positions()
                                 self.shining_blade_active = False
                                 self.number_with_combat_turn = secondary_player.get_number()

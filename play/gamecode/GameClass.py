@@ -350,6 +350,7 @@ class Game:
         self.bloodrain_tempest_active = False
         self.shrieking_exarch_cost_payed = False
         self.paying_shrieking_exarch_cost = False
+        self.jungle_trench_count = 0
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -4581,6 +4582,7 @@ class Game:
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     def combat_reset_eocr_values(self):
+        self.jungle_trench_count = 0
         self.p1.reset_eocr_values()
         self.p2.reset_eocr_values()
 
