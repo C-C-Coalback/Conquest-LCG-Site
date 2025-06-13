@@ -4603,6 +4603,16 @@ class Game:
                                             primary_player.set_damage_given_pos(
                                                 planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                    elif attachment.get_ability() == "Armored Shell" and \
+                                            attachment.name_owner == primary_player.name_player:
+                                        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                            damage_to_remove = 0
+                                            if self.amount_that_can_be_removed_by_shield[0] > 2:
+                                                damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
+                                            if damage_to_remove > 0:
+                                                self.amount_that_can_be_removed_by_shield[0] = 2
+                                                primary_player.remove_damage_from_pos(planet_pos, unit_pos,
+                                                                                      damage_to_remove)
 
     def combat_reset_eocr_values(self):
         self.jungle_trench_count = 0
