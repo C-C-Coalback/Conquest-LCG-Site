@@ -794,39 +794,67 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Mars Alpha Exterminator":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == secondary_player.get_number():
+                    can_continue = True
+                    card_type = secondary_player.get_card_type_given_pos(planet_pos, unit_pos)
+                    cost = secondary_player.get_cost_given_pos(planet_pos, unit_pos)
+                    if (card_type == "Army" and cost < 3) or card_type == "Token":
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif possible_interrupts:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                        if can_continue:
+                            secondary_player.destroy_card_in_play(planet_pos, unit_pos)
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Nahumekh":
-            if game_update_string[1] == "1":
-                player_being_hit = self.p1
-            else:
-                player_being_hit = self.p2
-            can_continue = True
-            if game_update_string[1] != primary_player.get_number():
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Reaction"
-            if can_continue:
-                if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    player_being_hit.apply_negative_health_eop(planet_pos, unit_pos,
-                                                               primary_player.nahumekh_value)
-                    name = player_being_hit.get_name_given_pos(planet_pos, unit_pos)
-                    await self.send_update_message(
-                        name + " received -" + str(primary_player.nahumekh_value) + " HP."
-                    )
-                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                    self.delete_reaction()
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == "1":
+                    player_being_hit = self.p1
+                else:
+                    player_being_hit = self.p2
+                can_continue = True
+                if game_update_string[1] != primary_player.get_number():
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
+                if can_continue:
+                    if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        player_being_hit.apply_negative_health_eop(planet_pos, unit_pos,
+                                                                   primary_player.nahumekh_value)
+                        name = player_being_hit.get_name_given_pos(planet_pos, unit_pos)
+                        await self.send_update_message(
+                            name + " received -" + str(primary_player.nahumekh_value) + " HP."
+                        )
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Tactical Withdrawal":
             if self.chosen_first_card:
                 if game_update_string[1] == primary_player.get_number():

@@ -516,6 +516,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
                                     player.discard_top_card_deck()
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Mars Alpha Exterminator":
+                                self.create_reaction("Mars Alpha Exterminator", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position,
                                                             bloodied_relevant=True) \
                                     == "Ku'gath Plaguefather":
