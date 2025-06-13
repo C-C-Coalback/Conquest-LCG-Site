@@ -212,6 +212,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await self.send_update_message("Raging Krootox gained +" + str(amount) + " ATK.")
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                    elif ability == "Dread Command Barge":
+                        self.action_chosen = ability
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        self.chosen_first_card = False
                     elif ability == "Alluring Daemonette":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)

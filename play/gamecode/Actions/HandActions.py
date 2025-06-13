@@ -773,6 +773,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+    elif self.action_chosen == "Dread Command Barge":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_faction() != "Necrons":
+                primary_player.discard_card_from_hand(int(game_update_string[2]))
+                self.chosen_first_card = True
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))

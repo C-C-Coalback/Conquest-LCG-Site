@@ -248,7 +248,8 @@ def necrons_cards_init():
         CardClasses.ArmyCard("Dread Command Barge", "No Wargear Attachments.\n"
                                                     "COMMAND ACTION: Discard a non-Necrons card from your hand "
                                                     "to move this unit to an adjacent planet.", "Vehicle.",
-                             4, faction, "Common", 3, 3, 3, False, wargear_attachments_permitted=False),
+                             4, faction, "Common", 3, 3, 3, False, wargear_attachments_permitted=False,
+                             action_in_play=True, allowed_phases_in_play="COMMAND"),
         CardClasses.ArmyCard("Shard of the Deceiver", "X is equal to the number of cards in your discard pile.\n"
                                                       "FORCED REACTION: After a phase or combat round at this planet "
                                                       "begins, discard a card. If you have no cards in your hand, "

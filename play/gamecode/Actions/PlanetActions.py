@@ -688,6 +688,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
         await self.send_update_message(str(self.misc_counter) + " Snotlings left to place.")
         if self.misc_counter == 0:
             self.action_cleanup()
+    elif self.action_chosen == "Dread Command Barge":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.position_of_actioned_card
+            if abs(og_pla - chosen_planet) == 1:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Snotling Attack":
         primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
         self.misc_counter = self.misc_counter - 1
