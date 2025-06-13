@@ -157,6 +157,24 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Daemonic Incursion":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.resolving_search_box = True
+                        self.what_to_do_with_searched_card = "DRAW"
+                        self.traits_of_searched_card = "Daemon"
+                        self.card_type_of_searched_card = "Army"
+                        self.faction_of_searched_card = None
+                        self.max_cost_of_searched_card = 99
+                        self.all_conditions_searched_card_required = True
+                        self.no_restrictions_on_chosen_card = False
+                        primary_player.number_cards_to_search = 6
+                        if len(primary_player.deck) > 5:
+                            self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                        self.name_player_who_is_searching = primary_player.name_player
+                        self.number_who_is_searching = primary_player.number
+                        self.action_cleanup()
                     elif ability == "A Thousand Cuts":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
