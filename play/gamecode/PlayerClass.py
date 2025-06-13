@@ -1468,6 +1468,9 @@ class Player:
                             if card.get_ability() == "Imperial Fists Siege Force":
                                 self.game.create_reaction("Imperial Fists Siege Force", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Hydrae Stalker":
+                                self.game.create_reaction("Hydrae Stalker", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Imperial Fists Devastators":
                                 if self.game.get_blue_icon(position):
                                     self.game.create_reaction("Imperial Fists Devastators", self.name_player,
