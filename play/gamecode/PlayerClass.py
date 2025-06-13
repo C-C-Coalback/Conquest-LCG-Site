@@ -1532,6 +1532,11 @@ class Player:
                                         if self.get_ready_given_pos(-2, i):
                                             self.game.create_reaction("Loamy Broodhive", self.name_player,
                                                                       (int(self.number), position, location_of_unit))
+                            if card.check_for_a_trait("Daemon"):
+                                for i in range(len(self.headquarters)):
+                                    if self.get_ability_given_pos(-2, i) == "Tower of Worship":
+                                        self.game.create_reaction("Tower of Worship", self.name_player,
+                                                                  (int(self.number), -2, i))
                             if card.get_faction() != "Necrons":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):
