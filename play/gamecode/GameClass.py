@@ -258,7 +258,8 @@ class Game:
             "Squiggify", "The Emperor's Warrant", "For the Tau'va", "Summary Execution", "Bond of Brotherhood",
             "Sowing Chaos", "Blood For The Blood God!", "Inevitable Betrayal", "Rok Bombardment", "Mind War",
             "Mont'ka Strike", "Biomass Sacrifice", "Rapid Assault", "Eldritch Storm", "Sudden Adaptation",
-            "Path of the Leader", "Bolster the Defense", "Warp Rift"
+            "Path of the Leader", "Bolster the Defense", "Warp Rift", "No Surprises", "A Thousand Cuts",
+            "Keep Firing!", "Vivisection", "Repent!", "Ominous Wind", "Daemonic Incursion", "Piercing Wail"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver"]
@@ -273,7 +274,10 @@ class Game:
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
                                  "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
                                  "Imperial Fists Siege Force", "Prodigal Sons Disciple", "Fire Prism",
-                                 "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion", ]
+                                 "Invasive Genestealers", "Kabalite Harriers", "The Emperor's Champion",
+                                 "8th Company Assault Squad", "Crush of Sky-Slashers", "Vezuel's Hunters",
+                                 "Mandrake Cutthroat", "Shrieking Exarch", "Mars Alpha Exterminator",
+                                 "Hydrae Stalker"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
