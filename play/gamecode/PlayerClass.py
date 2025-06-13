@@ -1396,7 +1396,7 @@ class Player:
         if unit_only:
             if card.get_card_type() != "Army":
                 return False
-        self.headquarters.append(card)
+        self.add_to_hq(card)
         del self.cards[hand_pos]
         return True
 
