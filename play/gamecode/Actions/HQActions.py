@@ -1049,8 +1049,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.misc_counter = 0
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].get_card_type() == "Synapse" or \
                     primary_player.headquarters[unit_pos].get_card_type() == "Warlord":
                 primary_player.headquarters[unit_pos].brutal_eocr = True
@@ -1061,6 +1059,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.player_with_action = ""
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Alluring Daemonette":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    if primary_player.sacrifice_card_in_hq(unit_pos):
+                        self.chosen_first_card = True
     elif self.action_chosen == "Death Korps Engineers":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

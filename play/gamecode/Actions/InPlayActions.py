@@ -204,6 +204,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.misc_target_planet = planet_pos
+                    elif ability == "Alluring Daemonette":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.chosen_first_card = False
                     elif ability == "Mekaniak Repair Krew":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -794,6 +800,39 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_chosen == "Alluring Daemonette":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        self.chosen_first_card = True
+                        og_pla, og_pos = self.position_of_actioned_card
+                        if og_pla == planet_pos:
+                            if og_pos > unit_pos:
+                                self.position_of_actioned_card = (og_pla, og_pos - 1)
+        elif game_update_string[1] == secondary_player.get_number():
+            og_pla, og_pos = self.position_of_actioned_card
+            if abs(og_pla - planet_pos) == 1:
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    can_continue = True
+                    if self.slumbering_gardens_enabled:
+                        if secondary_player.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = ["Slumbering Gardens"]
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "In Play Action"
+                    if can_continue:
+                        secondary_player.move_unit_to_planet(planet_pos, unit_pos, og_pla)
+                        primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                        self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
