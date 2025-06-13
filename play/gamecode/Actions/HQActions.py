@@ -1060,6 +1060,23 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         self.misc_counter = 0
+    elif self.action_chosen == "Piercing Wail":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if player_being_hit.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
+                can_continue = True
+                if player_being_hit.name_player == secondary_player.name_player:
+                    if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                if can_continue:
+                    player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                    if not self.chosen_first_card:
+                        self.chosen_first_card = True
+                    else:
+                        self.action_cleanup()
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.headquarters[unit_pos].get_card_type() == "Synapse" or \

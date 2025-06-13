@@ -157,6 +157,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Piercing Wail":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.misc_counter = primary_player.get_highest_cost_units()
+                        await self.send_update_message("You many exhaust units with a "
+                                                       "maximum cost of " + str(self.misc_counter))
+                        self.chosen_first_card = False
                     elif ability == "Daemonic Incursion":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.resolving_search_box = True

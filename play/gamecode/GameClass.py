@@ -819,6 +819,9 @@ class Game:
                     elif self.action_chosen == "Biomass Sacrifice":
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.action_cleanup()
+                    elif self.action_chosen == "Piercing Wail":
+                        await self.send_update_message("Finished " + self.action_chosen)
+                        self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
                         self.action_cleanup()

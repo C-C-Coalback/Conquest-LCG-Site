@@ -833,6 +833,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "Piercing Wail":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if player_being_hit.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
+                can_continue = True
+                if player_being_hit.name_player == secondary_player.name_player:
+                    if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                if can_continue:
+                    player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                    if not self.chosen_first_card:
+                        self.chosen_first_card = True
+                    else:
+                        self.action_cleanup()
     elif self.action_chosen == "Command-Link Drone":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
