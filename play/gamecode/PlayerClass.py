@@ -2160,7 +2160,8 @@ class Player:
                         return True
         return False
 
-    def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True):
+    def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True,
+                              ready_relevant=False):
         if not ability_checking:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 current_name = self.cards_in_play[planet_id + 1][i].get_name()
@@ -2178,11 +2179,12 @@ class Player:
             current_name = self.cards_in_play[planet_id + 1][i].get_ability()
             print(current_name, name_of_card)
             if current_name == name_of_card:
-                if not bloodied_relevant:
+                if not ready_relevant or self.get_ready_given_pos(planet_id, i):
+                    if not bloodied_relevant:
+                        return True
+                    if self.cards_in_play[planet_id + 1][i].get_bloodied():
+                        return False
                     return True
-                if self.cards_in_play[planet_id + 1][i].get_bloodied():
-                    return False
-                return True
             if self.search_attachments_at_pos(planet_id, i, name_of_card):
                 return True
         return False
