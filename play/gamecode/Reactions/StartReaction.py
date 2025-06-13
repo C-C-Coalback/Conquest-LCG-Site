@@ -281,6 +281,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                         if primary_player.get_faction_given_pos(i, j) == "Space Marines":
                             primary_player.increase_attack_of_unit_at_pos(i, j, 1, expiration="EOP")
             self.delete_reaction()
+        elif current_reaction == "Beastmaster Harvester":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.summon_token_at_planet("Khymera", planet_pos)
+            primary_player.summon_token_at_planet("Khymera", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
