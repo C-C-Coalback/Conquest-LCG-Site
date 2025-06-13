@@ -1378,6 +1378,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Vha'shaelhur":
             primary_player.summon_token_at_hq("Cultist", 1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif current_reaction == "Slavering Mawloc":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos != -2:
+                primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Tower of Worship":
             primary_player.summon_token_at_hq("Cultist", 1)
