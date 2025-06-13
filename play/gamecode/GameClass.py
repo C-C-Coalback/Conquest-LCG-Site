@@ -261,7 +261,7 @@ class Game:
             "Path of the Leader", "Bolster the Defense", "Warp Rift"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
-                                 "Sickening Helbrute"]
+                                 "Sickening Helbrute", "Shard of the Deceiver"]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""

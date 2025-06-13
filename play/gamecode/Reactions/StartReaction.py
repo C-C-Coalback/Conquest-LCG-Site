@@ -1389,6 +1389,11 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Tower of Worship":
             primary_player.summon_token_at_hq("Cultist", 1)
             self.delete_reaction()
+        elif current_reaction == "Shard of the Deceiver":
+            if not primary_player.cards:
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
+                self.delete_reaction()
         elif current_reaction == "Lictor Vine Lurker":
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

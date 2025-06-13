@@ -2901,6 +2901,8 @@ class Player:
                     attack_value += 2
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
+            if card.get_ability() == "Shard of the Deceiver":
+                attack_value += len(self.discard)
             if card.get_ability() == "Destroyer Cultist":
                 attack_value += self.count_non_necron_factions()
             if card.get_ability() == "Virulent Plague Squad":
@@ -2914,6 +2916,8 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
+        if card.get_ability() == "Shard of the Deceiver":
+            attack_value += len(self.discard)
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
@@ -3324,6 +3328,8 @@ class Player:
             if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
+            if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
+                health += len(self.discard)
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -3337,6 +3343,8 @@ class Player:
         if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
                 health += 1
+        if card.get_ability() == "Shard of the Deceiver":
+            health += len(self.discard)
         if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
             if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
                 health += 1
@@ -3499,6 +3507,8 @@ class Player:
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
                     self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Shard of the Deceiver":
+                self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Weight of the Aeons":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Weight of the Aeons", self.name_player, (int(self.number), -2, i))
@@ -3529,6 +3539,8 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":
                         self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Shard of the Deceiver":
+                    self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Seer Adept":
                     if phase == "COMMAND":
                         enemy_player = self.game.p1
@@ -3769,6 +3781,8 @@ class Player:
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Crush of Sky-Slashers":
                 self.game.create_reaction("Crush of Sky-Slashers", self.name_player, (int(self.number), planet_num, i))
+            if self.cards_in_play[planet_num + 1][i].get_ability() == "Shard of the Deceiver":
+                self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Sathariel the Invokator":
                 self.game.create_reaction("Sathariel the Invokator", self.name_player,
                                           (int(self.number), planet_num, i))
