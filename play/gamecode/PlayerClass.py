@@ -3489,6 +3489,9 @@ class Player:
                         j = j - 1
                     j = j + 1
                 i = i + 1
+        if self.search_hand_for_card("Hunter's Ploy"):
+            if phase == "HEADQUARTERS":
+                self.game.create_reaction("Hunter's Ploy", self.name_player, (int(self.number), -1, -1))
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":

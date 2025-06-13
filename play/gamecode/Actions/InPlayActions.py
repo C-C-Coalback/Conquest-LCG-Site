@@ -210,6 +210,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             amount = primary_player.resources
                             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, amount, "EOP")
                             await self.send_update_message("Raging Krootox gained +" + str(amount) + " ATK.")
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
                     elif ability == "Alluring Daemonette":
                         if not card_chosen.get_once_per_phase_used():

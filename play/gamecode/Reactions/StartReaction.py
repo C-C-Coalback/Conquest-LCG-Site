@@ -287,6 +287,32 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Khymera", planet_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Hunter's Ploy":
+            self.chosen_first_card = False
+            can_continue = True
+            if self.nullify_enabled:
+                if secondary_player.nullify_check():
+                    await self.send_update_message(primary_player.name_player + " wants to play " + current_reaction +
+                                                   "; Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = current_reaction
+                    self.cost_card_nullified = 0
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                    can_continue = False
+            if can_continue:
+                primary_player.discard_card_name_from_hand("Hunter's Ploy")
+                amount = primary_player.get_highest_cost_units()
+                primary_player.add_resources(amount)
+                amount = secondary_player.get_highest_cost_units()
+                secondary_player.add_resources(amount)
+                if primary_player.search_hand_for_card("Hunter's Ploy"):
+                    self.create_reaction("Hunter's Ploy", primary_player.name_player,
+                                         (int(primary_player.number), -1, -1))
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
