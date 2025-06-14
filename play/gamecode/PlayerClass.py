@@ -139,6 +139,7 @@ class Player:
         self.death_serves_used = False
         self.highest_death_serves_value = 0
         self.highest_cost_invasion_site = 0
+        self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -4080,6 +4081,9 @@ class Player:
         if planet_num == -2:
             self.add_card_in_hq_to_discard(card_pos)
             return None
+        other_player = self.game.p1
+        if other_player.name_player == self.name_player:
+            other_player = self.game.p2
         card = self.cards_in_play[planet_num + 1][card_pos]
         card_name = card.get_name()
         if card.get_card_type() == "Army":
@@ -4113,10 +4117,20 @@ class Player:
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
             self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), planet_num, -1))
+        condition_present = False
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Mark of Chaos":
                 owner = card.get_attachments()[i].name_owner
                 self.game.create_reaction("Mark of Chaos", owner, (int(self.number), planet_num, -1))
+            if card.get_attachments()[i].check_for_a_trait("Condition"):
+                condition_present = True
+        if condition_present:
+            if not self.game.infested_planets[planet_num]:
+                if other_player.search_card_in_hq("Prey on the Weak", ready_relevant=True):
+                    other_player.valid_prey_on_the_weak[planet_num] = True
+                    if not other_player.check_if_already_have_interrupt("Prey on the Weak"):
+                        self.game.create_interrupt("Prey on the Weak", other_player.name_player,
+                                                   (int(other_player.number), -1, -1))
         if card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier"):
             for i in range(len(self.cards)):
                 if self.cards[i] == "Elysian Assault Team":
@@ -4398,13 +4412,6 @@ class Player:
             if self.game.phase == "HEADQUARTERS":
                 for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
                     self.cards_in_play[planet_id + 1][i].get_attachments()[j].ready_card()
-
-    def set_once_per_round_used_given_pos(self, planet_id, unit_id, new_val):
-        if planet_id == -2:
-            self.headquarters[unit_id].set_once_per_round_used(new_val)
-            return None
-        self.cards_in_play[planet_id + 1][unit_id].set_once_per_round_used(new_val)
-        return None
 
     def refresh_all_once_per_round(self):
         for i in range(len(self.headquarters)):

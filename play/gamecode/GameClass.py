@@ -5737,6 +5737,8 @@ class Game:
                 ret_val = CommandPhase.try_entire_command(self, self.last_planet_checked_command_struggle)
                 await CommandPhase.interpret_command_state(self, ret_val)
         if not self.interrupts_waiting_on_resolution:
+            self.p1.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
+            self.p2.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
             self.last_player_who_resolved_interrupt = ""
             self.p1.highest_death_serves_value = 0
             self.p2.highest_death_serves_value = 0

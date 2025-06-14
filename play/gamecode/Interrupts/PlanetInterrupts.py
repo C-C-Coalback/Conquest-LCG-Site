@@ -7,6 +7,7 @@ from .. import FindCard
 async def resolve_planet_interrupt(self, name, game_update_string, primary_player, secondary_player):
     print("planets interrupt")
     chosen_planet = int(game_update_string[1])
+    current_interrupt = self.interrupts_waiting_on_resolution[0]
     if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
         print("check planet")
         if primary_player.valid_planets_berzerker_warriors[chosen_planet]:
@@ -33,6 +34,10 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             else:
                 await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                       discounts=self.discounts_applied)
+    elif current_interrupt == "Prey on the Weak":
+        if primary_player.valid_prey_on_the_weak[chosen_planet]:
+            self.infest_planet(chosen_planet)
+            self.delete_interrupt()
     elif self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
         print("reanimating warriors")
         if not self.asked_if_resolve_effect:

@@ -64,6 +64,7 @@ class Card:
         self.lost_keywords_eop = False
         self.cannot_ready_phase = False
         self.follower_of_gork_available = True
+        self.once_per_game_used = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
