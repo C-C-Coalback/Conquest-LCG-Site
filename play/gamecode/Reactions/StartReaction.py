@@ -257,7 +257,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                     primary_player.set_once_per_phase_used_given_pos(planet_pos, i, True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Parasitic Infection":
+        elif current_reaction == "Parasitic Infection":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if num == 1:
+                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.advance_damage_aiming_reticle()
+            elif num == 2:
+                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.advance_damage_aiming_reticle()
+            if planet_pos != -2:
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Savage Parasite":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
                 self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)

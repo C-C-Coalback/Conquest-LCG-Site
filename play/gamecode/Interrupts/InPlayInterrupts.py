@@ -110,6 +110,20 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                             secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
                             self.delete_interrupt()
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+    elif current_interrupt == "Savage Parasite":
+        player_owning_card = self.p1
+        if player_owning_card.get_number() != game_update_string[1]:
+            player_owning_card = self.p2
+        not_own_card = True
+        if player_owning_card.name_player == primary_player.name_player:
+            not_own_card = False
+        card = FindCard.find_card("Savage Parasite", self.card_array, self.cards_dict)
+        if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_card):
+            self.delete_interrupt()
+            try:
+                primary_player.discard.remove("Savage Parasite")
+            except ValueError:
+                pass
     elif current_interrupt == "No Mercy":
         if game_update_string[1] == primary_player.number:
             planet_pos = int(game_update_string[2])

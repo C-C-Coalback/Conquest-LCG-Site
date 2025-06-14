@@ -34,6 +34,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.return_card_to_hand(planet_pos, unit_pos)
             self.reset_choices_available()
             self.delete_interrupt()
+        elif current_interrupt == "Savage Parasite":
+            if "Savage Parasite" not in primary_player.discard:
+                self.delete_interrupt()
+                await self.send_update_message("No Savage Parasite present in discard")
         elif current_interrupt == "Death Serves the Emperor":
             primary_player.add_resources(primary_player.highest_death_serves_value)
             primary_player.discard_card_name_from_hand("Death Serves the Emperor")

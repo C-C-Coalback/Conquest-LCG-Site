@@ -3247,23 +3247,36 @@ class Player:
             i = i + 1
         return None
 
+    def discard_attachment_at_pos(self, planet_pos, unit_pos, attachment_pos):
+        if planet_pos == -2:
+            name_attachment = self.headquarters[unit_pos].get_attachments()[attachment_pos].get_name()
+            name_owner = self.headquarters[unit_pos].get_attachments()[attachment_pos].name_owner
+            if name_owner == self.game.name_1:
+                self.game.p1.discard.append(name_attachment)
+            else:
+                self.game.p2.discard.append(name_attachment)
+            if name_attachment == "Savage Parasite":
+                self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
+            del self.headquarters[unit_pos].get_attachments()[attachment_pos]
+            return None
+        name_attachment = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_name()
+        name_owner = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner
+        if name_owner == self.game.name_1:
+            self.game.p1.discard.append(name_attachment)
+        else:
+            self.game.p2.discard.append(name_attachment)
+        if name_attachment == "Savage Parasite":
+            self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
+        del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+        return None
+
     def discard_attachments_from_card(self, planet_pos, unit_pos):
         if planet_pos == -2:
             while self.headquarters[unit_pos].get_attachments():
-                if self.headquarters[unit_pos].get_attachments()[0].name_owner == self.game.name_1:
-                    self.game.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
-                else:
-                    self.game.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
-                del self.headquarters[unit_pos].get_attachments()[0]
+                self.discard_attachment_at_pos(planet_pos, unit_pos, 0)
             return None
         while self.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
-            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].name_owner == self.game.name_1:
-                self.game.p1.discard.append(
-                    self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
-            else:
-                self.game.p2.discard.append(
-                    self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0].get_name())
-            del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[0]
+            self.discard_attachment_at_pos(planet_pos, unit_pos, 0)
         return None
 
     def increase_indirect_damage_at_pos(self, planet_pos, card_pos, amount):
@@ -3549,6 +3562,9 @@ class Player:
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
+                    if self.headquarters[i].get_attachments()[j].get_ability() == "Savage Parasite":
+                        name_owner = self.headquarters[i].get_attachments()[j].name_owner
+                        self.game.create_reaction("Savage Parasite", name_owner, (int(self.number), -2, i))
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
                         if self.headquarters[i].get_damage() > 0:
                             owner = self.headquarters[i].get_attachments()[j].name_owner
@@ -3597,6 +3613,9 @@ class Player:
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
                             name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
                             self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), i, j))
+                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Savage Parasite":
+                            name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
+                            self.game.create_reaction("Savage Parasite", name_owner, (int(self.number), i, j))
                     if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Royal Phylactery":
                         if self.cards_in_play[i + 1][j].get_damage() > 0:
                             owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner

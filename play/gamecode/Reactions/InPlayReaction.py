@@ -1447,12 +1447,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.deck.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
                         elif self.misc_counter == 1:
                             card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.discard.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
