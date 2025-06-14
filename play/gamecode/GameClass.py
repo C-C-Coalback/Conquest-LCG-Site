@@ -2857,6 +2857,7 @@ class Game:
                         if not self.choices_available:
                             self.resolving_search_box = False
                             self.reset_choices_available()
+                            self.delete_reaction()
                     elif self.choice_context == "Target Shrine of Warpflame:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
@@ -3698,14 +3699,10 @@ class Game:
 
     def fall_back_check(self, player):
         if player.search_hand_for_card("Fall Back!"):
-            if player.resources > 0:
-                if player.urien_relevant:
-                    if player.resources < 2:
-                        return False
-                for card_name in player.stored_cards_recently_discarded:
-                    card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
-                    if card.check_for_a_trait("Elite"):
-                        return True
+            for card_name in player.stored_cards_recently_discarded:
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                if card.check_for_a_trait("Elite"):
+                    return True
         return False
 
     async def complete_destruction_checks(self):
