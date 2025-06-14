@@ -2931,6 +2931,9 @@ class Player:
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.attack_set_eop != -1:
             return card.attack_set_eop
+        other_player = self.game.p1
+        if other_player.name_player == self.name_player:
+            other_player = self.game.p2
         attack_value = card.get_attack()
         if card.get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
@@ -3005,7 +3008,10 @@ class Player:
                     support_count += 1
             attack_value += support_count * 2
         attachments = card.get_attachments()
+        condition_present = False
         for i in range(len(attachments)):
+            if attachments[i].check_for_a_trait("Condition"):
+                condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
             if attachments[i].get_ability() == "Noxious Fleshborer":
@@ -3027,6 +3033,10 @@ class Player:
                                 other_ready_unit_present = True
                     if not other_ready_unit_present:
                         attack_value += 5
+        if condition_present:
+            for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                if other_player.get_ability_given_pos(planet_id, i) == "Swarming Rippers":
+                    attack_value = attack_value - 1
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
             if self.get_ability_given_pos(planet_id, unit_id) != "Broderick Worr":
                 if self.game.get_green_icon(planet_id):
