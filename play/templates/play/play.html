@@ -440,9 +440,9 @@
                     }
                 } else if (split_data[1] === "RESOURCES") {
                     if (split_data[2] === "1") {
-                        document.getElementById('resources-player-1').innerHTML = `<h1>` + split_data[3] + `</h1>`;
+                        document.getElementById('resources-player-1').innerHTML = `<h1 style="color: #ffff00">` + split_data[3] + `</h1>`;
                     } else if (split_data[2] === "2") {
-                        document.getElementById('resources-player-2').innerHTML = `<h1>` + split_data[3] + `</h1>`;
+                        document.getElementById('resources-player-2').innerHTML = `<h1 style="color: #ffff00">` + split_data[3] + `</h1>`;
                     }
                 } else if (split_data[1] === "IN_PLAY") {
                     var target_planet_id = "player-" + split_data[2] + "-cards-planet-" + split_data[3];

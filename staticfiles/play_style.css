@@ -4,7 +4,7 @@ h4 {
 
 .box {
     position: relative;
-    height: 88vh;
+    height: 98vh;
     width: 97vw;
     border: 5px solid blue;
     overflow: hidden;
@@ -13,7 +13,7 @@ h4 {
 #in-play-box {
     position: absolute;
     top: 25%;
-    height: calc(40vh + 30px);
+    height: calc(48vh + 10px);
     width: 80vw;
     border-width: 10px;
     border-style: dashed;
@@ -21,7 +21,7 @@ h4 {
     overflow: hidden;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 19vh 10vh 19vh;
     grid-template-areas:
     "play10 play11 play12 play13 play14 play15 play16"
     "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
@@ -347,10 +347,10 @@ h4 {
     border-style: double;
     border-color: lightblue;
     background: rgba(47, 40, 153, 0.3);
-    height:14vh;
-    max-height: 14vh;
+    height:18vh;
+    max-height: 18vh;
     overflow-x:auto;
-    overflow-y:auto;
+    overflow-y:hidden;
     white-space:nowrap;
     display:grid;
     grid-template-rows: auto auto;
@@ -368,10 +368,10 @@ h4 {
     border-style: double;
     border-color: lightblue;
     background: rgba(47, 40, 153, 0.3);
-    height:14vh;
-    max-height: 14vh;
+    height:18vh;
+    max-height: 18vh;
     overflow-x:auto;
-    overflow-y:auto;
+    overflow-y:hidden;
     white-space:nowrap;
     display:grid;
     grid-template-rows: auto auto;
@@ -409,22 +409,22 @@ h4 {
 
 #resources-player-2 {
     position:absolute;
-    bottom:calc(13% + 20px);
+    bottom:calc(7vh + 20px);
 }
 
 #resources-player-1 {
     position:absolute;
-    top:calc(13% + 10px);
+    top:calc(7vh + 20px);
 }
 
 #pass-player-1 {
     position:absolute;
-    top:calc(13% + 0px);
+    top:calc(7vh + 20px);
 }
 
 #pass-player-2 {
     position:absolute;
-    bottom:calc(13% + 0px);
+    bottom:calc(7vh + 20px);
 }
 
 #request-action-div {
