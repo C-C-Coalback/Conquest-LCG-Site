@@ -76,6 +76,11 @@
     <div style="margin-left: 25px;">
      Private
     </div>
+    <br>
+    <input id="apokacb" type="checkbox" style="float: left; margin-top: 5px;>">
+    <div style="margin-left: 25px;">
+     Apoka Errata
+    </div>
 </div>
 <script>
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
@@ -105,13 +110,15 @@
             } else if (split_string[0] == "Create spec") {
                 addSpec(split_string[1], split_string[2], split_string[3]);
             } else {
-                addLobby(split_string[1], split_string[2])
+                addLobby(split_string[1], split_string[2], split_string[3], split_string[4])
             }
         };
 
         document.querySelector('#create-lobby-submit').onclick = function(e) {
+            const private = document.getElementById("cb").checked
+            const apoka = document.getElementById("apokacb").checked
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby"
+                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString()
             }));
         };
 
@@ -128,9 +135,8 @@
         }
 
         function startGame(clicked_id) {
-            const checked = document.getElementById("cb").checked
             lobbySocket.send(JSON.stringify({
-                'message': "Start game/" + clicked_id + "/" + checked.toString()
+                'message': "Start game/" + clicked_id
             }));
         }
 
@@ -172,10 +178,23 @@
             document.body.appendChild(ourAudio);
         }
 
-        function addLobby(nameOfPlayerOne, nameOfPlayerTwo) {
-            document.getElementById("add_to_me").innerHTML +=
-                `<div class="box">` + nameOfPlayerOne + `<br>VS<br>`+ nameOfPlayerTwo + `
-                </div>`;
+        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka) {
+            var stringToAdd = "";
+            stringToAdd = `<div class="box">` + nameOfPlayerOne + `<br>VS<br>`+ nameOfPlayerTwo + `
+                </div><details><summary>Settings</summary>`;
+            if (private === "Private") {
+                stringToAdd += "Private";
+            } else {
+                stringToAdd += "Public";
+            }
+            stringToAdd += "<br>";
+            if (apoka === "Apoka") {
+                stringToAdd += "Apoka Errata";
+            } else {
+                stringToAdd += "No Errata";
+            }
+            stringToAdd += "</details>";
+            document.getElementById("add_to_me").innerHTML += stringToAdd;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
                     `<button id=` + nameOfPlayerOne + ` onclick="joinLobby(this.id)">

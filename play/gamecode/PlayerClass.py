@@ -193,6 +193,10 @@ class Player:
             await self.game.send_search()
             await self.game.send_info_box()
             self.game.phase = "DEPLOY"
+            if self.game.apoka_active:
+                await self.game.send_update_message("Apoka Errata is active")
+            else:
+                await self.game.send_update_message("No Errata is active")
             await self.game.send_update_message(
                 self.game.name_1 + " may mulligan their opening hand.")
         self.condition_player_main.notify_all()

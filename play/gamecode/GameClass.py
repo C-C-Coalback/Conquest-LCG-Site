@@ -24,11 +24,12 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict):
+    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
         self.planet_cards_array = planet_array
+        self.apoka_active = apoka
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
