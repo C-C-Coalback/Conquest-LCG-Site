@@ -1461,7 +1461,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if self.chosen_first_card:
                 num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
                 if secondary_player.number == game_update_string[1]:
-                    if origin_planet == planet_pos:
+                    if abs(origin_planet - planet_pos) == 1:
                         if self.misc_counter == 0:
                             card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
