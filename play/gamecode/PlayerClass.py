@@ -143,6 +143,7 @@ class Player:
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
             self.cards_in_reserve[planet_pos].append(copy.deepcopy(card))
+            self.game.queued_sound = "onplay"
             return True
         return False
 
@@ -1084,6 +1085,7 @@ class Player:
                 elif self.number == "2":
                     name_owner = self.game.p1.name_player
             target_card.add_attachment(card, name_owner=name_owner)
+            self.game.queued_sound = "onplay"
             return True
         allowed_types = card.type_of_units_allowed_for_attachment
         if type_of_card not in allowed_types:
@@ -1131,6 +1133,7 @@ class Player:
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
         target_card.add_attachment(card, name_owner=name_owner)
+        self.game.queued_sound = "onplay"
         return True
 
     def enemy_holding_cell_check(self, card_name):
