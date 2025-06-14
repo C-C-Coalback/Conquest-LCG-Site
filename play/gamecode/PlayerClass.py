@@ -85,7 +85,8 @@ class Player:
         self.mulligan_done = False
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
                              "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor"]
-        self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord"]
+        self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord", "Subject Omega-X62113",
+                                     "Parasite of Mortrex", "Magus Harid"]
         self.synapse_name = ""
         self.warlord_faction = ""
         self.consumption_sacs_list = [True, True, True, True, True, True, True]
