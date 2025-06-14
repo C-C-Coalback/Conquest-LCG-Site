@@ -180,6 +180,38 @@ h4 {
     height: 2.6vw;
 }
 
+.Exhausted-Card + .Exhausted-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Card + .Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Attachment-Card + .Exhausted-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Attachment-Card + .Exhausted-Card {
+    margin-left: 1vw;
+}
+
+.Card + .Exhausted-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Card + .Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Attachment-Card + .Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Attachment-Card + .Card {
+    margin-left: 1vw;
+}
+
 .Attachment-Card + .Exhausted-Attachment-Card {
     margin-left: 1vw;
 }
