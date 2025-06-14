@@ -317,6 +317,38 @@ def tyranids_cards_init():
                                                     "Reaction: After attached unit is assigned damage by an attack, "
                                                     "prevent all but 2 of that damage.", "Wargear. Biomorph.",
                                    2, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
-                                   must_be_own_unit=True)
+                                   must_be_own_unit=True),
+        CardClasses.WarlordCard("Parasite of Mortrex", "Flying.\n"
+                                                       "Reaction: After this warlord is declared as an attacker, "
+                                                       "search your discard pile or your deck for a Condition "
+                                                       "attachment. Reveal it, and put it into play attached to "
+                                                       "an eligible enemy unit at this planet. "
+                                                       "Then, shuffle your deck.", "Creature. Kraken.",
+                                faction, 1, 7, 1, 5, "Flying. Bloodied.", 6, 6,
+                                ["4x Savage Parasite", "2x Swarming Rippers", "1x Sweep Attack",
+                                 "1x Prey on the Weak"], flying=True),
+        CardClasses.AttachmentCard("Savage Parasite", "Attach to a non-warlord unit.\n"
+                                                      "Reaction: After the combat phase begins, put 1 Termagant "
+                                                      "token into play at this planet, and deal attached "
+                                                      "unit 1 damage.\n"
+                                                      "Interrupt: When this attachment leaves play, "
+                                                      "attach it to a target eligible unit instead.", "Condition.",
+                                   6, faction, "Signature", 1, False,
+                                   type_of_units_allowed_for_attachment="Army/Synapse/Token"),
+        CardClasses.ArmyCard("Swarming Rippers", "Each enemy unit with 1 or more Condition attachments "
+                                                 "at this planet gets -1 ATK.", "Creature. Swarm.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.EventCard("Sweep Attack", "Reaction: After your warlord commits to a planet, "
+                                              "search your discard pile or your deck for a Condition attachment. "
+                                              "Reveal it, and put it into play attached to an eligible "
+                                              "enemy unit at an adjacent planet. Then, shuffle your deck.", "Tactic.",
+                              0, faction, "Signature", 3, False),
+        CardClasses.SupportCard("Prey on the Weak", "Interrupt: When an enemy unit with a Condition attachment leaves "
+                                                    "play from a planet, exhaust this support to infest that planet. "
+                                                    "\nAction: Sacrifice a Synapse unit to put a Synapse unit "
+                                                    "with a different name into play at your HQ "
+                                                    "from the card collection. (Limit once per game.)", "Upgrade.",
+                                1, faction, "Signature", False, action_in_play=True,
+                                allowed_phases_in_play="ALL")
     ]
     return tyranids_card_array

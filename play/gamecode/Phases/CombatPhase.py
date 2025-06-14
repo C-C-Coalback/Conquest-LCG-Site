@@ -517,6 +517,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 for _ in range(3):
                                     player.discard_top_card_deck()
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Parasite of Mortrex":
+                                if not player.get_once_per_round_used_given_pos(self.attacker_planet,
+                                                                                self.attacker_position):
+                                    self.create_reaction("Parasite of Mortrex", player.name_player,
+                                                         (int(player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Mars Alpha Exterminator":
                                 self.create_reaction("Mars Alpha Exterminator", player.name_player,
                                                      (int(player.number), self.attacker_planet,

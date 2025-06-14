@@ -1437,6 +1437,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
                             self.delete_reaction()
+        elif current_reaction == "Parasite of Mortrex":
+            if self.chosen_first_card:
+                num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+                if secondary_player.number == game_update_string[1]:
+                    if origin_planet == planet_pos:
+                        if self.misc_counter == 0:
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
+                                primary_player.deck.remove(self.misc_player_storage)
+                                primary_player.shuffle_deck()
+                                self.delete_reaction()
+                        elif self.misc_counter == 1:
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
+                                primary_player.discard.remove(self.misc_player_storage)
+                                primary_player.shuffle_deck()
+                                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:

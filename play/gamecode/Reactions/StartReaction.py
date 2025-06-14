@@ -1309,6 +1309,15 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Use Fall Back?"
                 self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif current_reaction == "Parasite of Mortrex":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+            self.chosen_first_card = False
+            self.misc_counter = -1
+            self.choices_available = ["Deck", "Discard"]
+            self.choice_context = "Parasite of Mortrex: Search which area?"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif self.reactions_needing_resolving[0] == "The Emperor Protects":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]
