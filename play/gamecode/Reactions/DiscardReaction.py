@@ -26,6 +26,15 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         self.misc_player_storage = card.get_name()
                         self.chosen_first_card = True
                         self.misc_counter = 1
+        elif current_reaction == "Sweep Attack":
+            if not self.chosen_first_card:
+                if chosen_discard == int(primary_player.number):
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.check_for_a_trait("Condition") and card.get_card_type() == "Attachment":
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                        self.misc_player_storage = card.get_name()
+                        self.chosen_first_card = True
+                        self.misc_counter = 1
         elif current_reaction == "Clearing the Path":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

@@ -2260,6 +2260,24 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         await self.send_update_message("Choose planet to remove from play")
+                    elif self.choice_context == "Sweep Attack: Search which area?":
+                        if game_update_string[1] == "0":
+                            self.choices_available = []
+                            self.choice_context = "Attachment from Deck: (Sweep Attack)"
+                            for i in range(len(primary_player.deck)):
+                                card_name = primary_player.deck[i]
+                                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                                if card.get_card_type() == "Attachment" and card.check_for_a_trait("Condition"):
+                                    if card_name not in self.choices_available:
+                                        self.choices_available.append(card_name)
+                            if not self.choices_available:
+                                self.choices_available = ["Deck", "Discard"]
+                                self.choice_context = "Sweep Attack: Search which area?"
+                                await self.send_update_message("No cards in your deck are a valid target for "
+                                                               "Sweep Attack. Please choose the discard.")
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Parasite of Mortrex: Search which area?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -2278,6 +2296,13 @@ class Game:
                         else:
                             self.reset_choices_available()
                             self.resolving_search_box = False
+                    elif self.choice_context == "Attachment from Deck: (Sweep Attack)":
+                        self.misc_player_storage = self.choices_available[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.chosen_first_card = True
+                        self.resolving_search_box = False
+                        self.misc_counter = 0
+                        await self.send_update_message("Attaching a " + self.misc_player_storage + ".")
                     elif self.choice_context == "Attachment from Deck: (PoM)":
                         self.misc_player_storage = self.choices_available[int(game_update_string[1])]
                         self.reset_choices_available()
