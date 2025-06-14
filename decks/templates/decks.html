@@ -964,6 +964,10 @@
                 }
             } else if (split_data[0] === "Support"){
                 var cardName = split_data[1];
+                if (split_data[1] === "'idden Base") {
+                    split_data[1] = "idden Base";
+                    card_name = "'idden Base";
+                }
                 var idName = split_data[1].split(' ').join('_');
                 var countName = idName + "-Count";
                 var holderName = idName + "-Holder";

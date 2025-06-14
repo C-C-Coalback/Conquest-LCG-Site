@@ -333,6 +333,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
             elif split_message[0] == "SEND DECK":
                 message_to_send = ""
                 split_message[1] = split_message[1].replace("\"Subject: &Omega;-X62113\"", "")
+                split_message[1] = split_message[1].replace("idden Base", "'idden Base")
                 split_message[1] = split_message[1].replace("\"", "")
                 deck = clean_sent_deck(split_message[1])
                 print(deck)
