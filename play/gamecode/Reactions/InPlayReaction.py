@@ -5,6 +5,9 @@ from ..Phases import CombatPhase
 async def resolve_in_play_reaction(self, name, game_update_string, primary_player, secondary_player):
     planet_pos = int(game_update_string[2])
     unit_pos = int(game_update_string[3])
+    player_owning_card = self.p1
+    if game_update_string[1] == "2":
+        player_owning_card = self.p2
     print("Check what player")
     print(self.player_who_resolves_reaction)
     current_reaction = self.reactions_needing_resolving[0]
@@ -143,12 +146,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if player_being_hit.get_damage_given_pos(planet_pos, unit_pos) > 0:
                         can_continue = True
                         if player_being_hit.number == secondary_player.number:
-                            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                                can_continue = False
-                                await self.send_update_message(
-                                    "Immune to enemy card abilities.")
-                            elif possible_interrupts:
+                            can_continue = True
+                            possible_interrupts = []
+                            if player_owning_card.name_player == primary_player.name_player:
+                                possible_interrupts = secondary_player.intercept_check()
+                            if player_owning_card.name_player == secondary_player.name_player:
+                                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                    planet_pos, unit_pos, intercept_possible=True)
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.send_update_message("Immune to enemy card abilities.")
+                            if possible_interrupts and can_continue:
                                 can_continue = False
                                 await self.send_update_message("Some sort of interrupt may be used.")
                                 self.choices_available = possible_interrupts
@@ -170,12 +178,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -199,12 +211,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -229,24 +245,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Ally"):
                     can_continue = True
-                    if player_being_hit.number == secondary_player.number:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -265,12 +284,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if secondary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
                             can_continue = True
-                            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                                can_continue = False
-                                await self.send_update_message(
-                                    "Immune to enemy card abilities.")
-                            elif possible_interrupts:
+                            possible_interrupts = []
+                            if player_owning_card.name_player == primary_player.name_player:
+                                possible_interrupts = secondary_player.intercept_check()
+                            if player_owning_card.name_player == secondary_player.name_player:
+                                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                    planet_pos, unit_pos, intercept_possible=True)
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.send_update_message("Immune to enemy card abilities.")
+                            if possible_interrupts and can_continue:
                                 can_continue = False
                                 await self.send_update_message("Some sort of interrupt may be used.")
                                 self.choices_available = possible_interrupts
@@ -296,24 +319,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     can_continue = True
-                    if player_being_hit.number == secondary_player.number:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         att_value = primary_player.get_attack_given_pos(att_pla, att_pos)
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value)
@@ -324,10 +350,33 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if primary_player.number == game_update_string[1]:
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines" \
                             and primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        primary_player.spend_resources(1)
-                        primary_player.discard_card_name_from_hand("Vengeance!")
-                        primary_player.ready_given_pos(planet_pos, unit_pos)
-                        self.delete_reaction()
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 1
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction Event"
+                        if can_continue:
+                            primary_player.spend_resources(1)
+                            primary_player.discard_card_name_from_hand("Vengeance!")
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Commander Starblaze":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
@@ -370,12 +419,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if secondary_player.get_number() == game_update_string[1]:
                 if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
                     can_continue = True
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message(
-                            "Immune to enemy card abilities.")
-                    elif possible_interrupts:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -415,27 +468,29 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if player_being_hit.get_damage_given_pos(planet_pos, unit_pos) == 0:
                     can_continue = True
-                    if player_being_hit.number == secondary_player.number:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
-                        self.advance_damage_aiming_reticle()
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
@@ -447,24 +502,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 faction = player_being_hit.get_faction_given_pos(planet_pos, unit_pos)
                 if faction not in ["Chaos", "Astra Militarum", "Space Marines"]:
                     can_continue = True
-                    if player_being_hit.number == secondary_player.number:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Veteran Barbrus",
                                                               rickety_warbuggy=True)
@@ -479,12 +537,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -509,12 +571,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -536,12 +602,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos):
                             can_continue = True
-                            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                                can_continue = False
-                                await self.send_update_message(
-                                    "Immune to enemy card abilities.")
-                            elif possible_interrupts:
+                            possible_interrupts = []
+                            if player_owning_card.name_player == primary_player.name_player:
+                                possible_interrupts = secondary_player.intercept_check()
+                            if player_owning_card.name_player == secondary_player.name_player:
+                                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                    planet_pos, unit_pos, intercept_possible=True)
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.send_update_message("Immune to enemy card abilities.")
+                            if possible_interrupts and can_continue:
                                 can_continue = False
                                 await self.send_update_message("Some sort of interrupt may be used.")
                                 self.choices_available = possible_interrupts
@@ -573,13 +643,46 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if not target_player.get_ready_given_pos(planet_pos, unit_pos) and\
                         target_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
                     can_continue = True
-                    if target_player.name_player == secondary_player.name_player:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
+                    if can_continue:
+                        target_player.ready_given_pos(planet_pos, unit_pos)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
+        elif current_reaction == "Kommando Sneakaz":
+            if game_update_string[1] == primary_player.get_number():
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -591,28 +694,25 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
-                    if can_continue:
-                        target_player.ready_given_pos(planet_pos, unit_pos)
-                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                        self.delete_reaction()
-        elif current_reaction == "Kommando Sneakaz":
-            if game_update_string[1] == primary_player.get_number():
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
-                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
-                        primary_player.ready_given_pos(planet_pos, unit_pos)
-                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
-                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                        self.delete_reaction()
+                        if can_continue:
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Invasive Genestealers":
             if game_update_string[1] == secondary_player.get_number():
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     can_continue = True
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message(
-                            "Immune to enemy card abilities.")
-                    elif possible_interrupts:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -675,13 +775,30 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         player_being_hit = self.p2
                     can_continue = True
-                    if player_being_hit.name_player == secondary_player.name_player:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
-                        if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                            secondary_player.apply_negative_health_eop(planet_pos, unit_pos, 1)
+                        if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                            player_being_hit.apply_negative_health_eop(planet_pos, unit_pos, 1)
                             primary_player.reset_aiming_reticle_in_play(current_planet, current_pos)
                             self.misc_target_unit = (-1, -1)
                             self.chosen_first_card = False
@@ -705,26 +822,30 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if self.misc_target_planet == planet_pos:
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                     can_continue = True
-                    if player_being_hit.name_player == secondary_player.name_player:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
                         elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
                             can_continue = False
                             await self.send_update_message("Immune to enemy events.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 2
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction Event"
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 2
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
                     if can_continue:
                         primary_player.spend_resources(2)
                         primary_player.discard_card_name_from_hand("Made Ta Fight")
@@ -737,23 +858,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     player_exhausting_unit = self.p2
                 can_continue = True
-                if player_exhausting_unit.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
-                    elif possible_interrupts:
-                        can_continue = False
-                        await self.send_update_message("Some sort of interrupt may be used.")
-                        self.choices_available = possible_interrupts
-                        self.choices_available.insert(0, "No Interrupt")
-                        self.name_player_making_choices = secondary_player.name_player
-                        self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
-                        self.cost_card_nullified = 0
-                        self.nullify_string = "/".join(game_update_string)
-                        self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "Reaction"
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction"
                 if can_continue:
                     if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
                         if player_exhausting_unit.cards_in_play[planet_pos + 1][unit_pos]. \
@@ -772,11 +897,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == secondary_player.get_number():
                     can_continue = True
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
-                    elif possible_interrupts:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -802,23 +932,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if not player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         can_continue = True
-                        if game_update_string[1] != primary_player.get_number():
-                            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
                             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                 can_continue = False
                                 await self.send_update_message("Immune to enemy card abilities.")
-                            elif possible_interrupts:
-                                can_continue = False
-                                await self.send_update_message("Some sort of interrupt may be used.")
-                                self.choices_available = possible_interrupts
-                                self.choices_available.insert(0, "No Interrupt")
-                                self.name_player_making_choices = secondary_player.name_player
-                                self.choice_context = "Interrupt Effect?"
-                                self.nullified_card_name = self.reactions_needing_resolving[0]
-                                self.cost_card_nullified = 0
-                                self.nullify_string = "/".join(game_update_string)
-                                self.first_player_nullified = primary_player.name_player
-                                self.nullify_context = "Reaction"
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
                         if can_continue:
                             player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -832,23 +966,28 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if player_being_hit.get_cost_given_pos(planet_pos, unit_pos) < 3:
                         can_continue = True
-                        if game_update_string[1] != primary_player.get_number():
-                            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
                             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                 can_continue = False
                                 await self.send_update_message("Immune to enemy card abilities.")
-                            elif possible_interrupts:
-                                can_continue = False
-                                await self.send_update_message("Some sort of interrupt may be used.")
-                                self.choices_available = possible_interrupts
-                                self.choices_available.insert(0, "No Interrupt")
-                                self.name_player_making_choices = secondary_player.name_player
-                                self.choice_context = "Interrupt Effect?"
-                                self.nullified_card_name = self.reactions_needing_resolving[0]
-                                self.cost_card_nullified = 0
-                                self.nullify_string = "/".join(game_update_string)
-                                self.first_player_nullified = primary_player.name_player
-                                self.nullify_context = "Reaction"
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
                         if can_continue:
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -856,15 +995,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Mars Alpha Exterminator":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == secondary_player.get_number():
-                    can_continue = True
                     card_type = secondary_player.get_card_type_given_pos(planet_pos, unit_pos)
                     cost = secondary_player.get_cost_given_pos(planet_pos, unit_pos)
                     if (card_type == "Army" and cost < 3) or card_type == "Token":
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message("Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -888,23 +1032,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     can_continue = True
-                    if game_update_string[1] != primary_player.get_number():
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.apply_negative_health_eop(planet_pos, unit_pos,
                                                                    primary_player.nahumekh_value)
@@ -931,11 +1079,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
             if game_update_string[1] != primary_player.get_number():
                 can_continue = True
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
                     can_continue = False
                     await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
@@ -979,33 +1132,35 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         player_being_hit.rout_unit(planet_pos, unit_pos)
         elif self.reactions_needing_resolving[0] == "Superiority":
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
                 player_being_hit = self.p2
             can_continue = True
-            if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
                 elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Reaction Event"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.reactions_needing_resolving[0]
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Reaction Event"
             if can_continue:
                 if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                     player_being_hit.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
@@ -1018,8 +1173,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Venomthrope Polluter":
             if game_update_string[1] == primary_player.number:
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if primary_player.check_for_warlord(planet_pos):
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                         dest_planet = self.positions_of_unit_triggering_reaction[0][1]
@@ -1035,23 +1188,28 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     player_owning_card = secondary_player
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
                     if player_owning_card.name_player == secondary_player.name_player:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = "Commissarial Bolt Pistol"
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = "Commissarial Bolt Pistol"
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
                         self.delete_reaction()
@@ -1075,14 +1233,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
                 if self.cato_stronghold_activated:
-                    planet_pos = int(game_update_string[2])
-                    unit_pos = int(game_update_string[3])
                     if planet_pos in self.allowed_planets_cato_stronghold:
                         if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            primary_player.ready_given_pos(planet_pos, unit_pos)
-                            self.delete_reaction()
-                            self.allowed_planets_cato_stronghold = []
-                            self.cato_stronghold_activated = False
+                            can_continue = True
+                            possible_interrupts = []
+                            if player_owning_card.name_player == primary_player.name_player:
+                                possible_interrupts = secondary_player.intercept_check()
+                            if player_owning_card.name_player == secondary_player.name_player:
+                                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                    planet_pos, unit_pos, intercept_possible=True)
+                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                    can_continue = False
+                                    await self.send_update_message("Immune to enemy card abilities.")
+                            if possible_interrupts and can_continue:
+                                primary_player.ready_given_pos(planet_pos, unit_pos)
+                                self.delete_reaction()
+                                self.allowed_planets_cato_stronghold = []
+                                self.cato_stronghold_activated = False
                         else:
                             await self.send_update_message("Unit already ready")
         elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
@@ -1101,9 +1268,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
                 if self.attacker_planet == int(game_update_string[2]):
-                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
-                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                    self.delete_reaction()
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Masked Hunter":
             if primary_player.get_number() == game_update_string[1]:
                 dest = self.positions_of_unit_triggering_reaction[0][1]
@@ -1115,13 +1293,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Shrieking Exarch":
             if secondary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                     can_continue = True
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message(
-                            "Immune to enemy card abilities.")
-                    elif possible_interrupts:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -1165,25 +1347,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_update_message("Can't select last defender")
                 else:
                     can_continue = True
-                    if player_being_hit.name_player == secondary_player.name_player:
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
-                                                                               target_unit_pos):
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Reaction"
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
                     if can_continue:
                         attack = primary_player.get_attack_given_pos(origin_planet, origin_pos)
                         player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack)
@@ -1211,13 +1395,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     target_unit_pos = int(game_update_string[3])
                     if secondary_player.get_card_type_given_pos(origin_planet, target_unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(origin_planet,
-                                                                               target_unit_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -1274,14 +1461,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.cards_in_play[target_planet + 1][
                             target_pos].get_card_type() == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                             move_from_planet=True)
-                        if secondary_player.get_immune_to_enemy_card_abilities(target_planet,
-                                                                               target_pos):
-                            can_continue = False
-                            await self.send_update_message(
-                                "Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts

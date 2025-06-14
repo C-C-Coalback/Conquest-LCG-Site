@@ -43,8 +43,23 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     self.delete_interrupt()
     elif current_interrupt == "Vanguard Soldiers":
         if game_update_string[1] == primary_player.number:
-            primary_player.ready_given_pos(planet_pos, unit_pos)
-            self.delete_interrupt()
+            can_continue = True
+            possible_interrupts = secondary_player.intercept_check()
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.reactions_needing_resolving[0]
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Interrupt"
+            if can_continue:
+                primary_player.ready_given_pos(planet_pos, unit_pos)
+                self.delete_interrupt()
     elif current_interrupt == "Reanimating Warriors":
         print("reanimating warriors")
         if not self.asked_if_resolve_effect:

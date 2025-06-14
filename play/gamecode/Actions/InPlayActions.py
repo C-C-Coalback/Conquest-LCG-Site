@@ -298,36 +298,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     self.action_chosen = ""
                                     self.mode = "Normal"
     elif self.action_chosen == "Twisted Laboratory":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                 intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "In Play Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "In Play Action"
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                 player_being_hit.set_blanked_given_pos(planet_pos, unit_pos, exp="EOP")
@@ -336,14 +332,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 await self.send_update_message(
                     "Twisted Laboratory used on " + player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
                     + ", located at planet " + str(planet_pos) + ", position " + str(unit_pos))
-                self.position_of_actioned_card = (-1, -1)
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
-                if self.phase == "DEPLOY":
-                    if not secondary_player.has_passed:
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.get_number()
+                self.action_cleanup()
     elif self.action_chosen == "Ravenwing Escort":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -395,46 +384,38 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.chosen_second_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Inquisitorial Fortress":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
         if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             can_continue = True
-            if player_being_hit.name_player == secondary_player.name_player:
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                     intercept_possible=True,
                                                                                      move_from_planet=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "In Play Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
             if can_continue:
                 player_being_hit.rout_unit(planet_pos, unit_pos)
                 self.action_cleanup()
     elif self.action_chosen == "Hate":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -443,37 +424,37 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if primary_player.resources >= player_being_hit.get_cost_given_pos(planet_pos, unit_pos) and \
                 primary_player.enslaved_faction == player_being_hit.get_faction_given_pos(planet_pos, unit_pos):
             can_continue = True
-            if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                     intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
                 elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Event Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(planet_pos, unit_pos))
             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
             if not primary_player.harbinger_of_eternity_active:
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.get_number()
+            self.action_cleanup()
     elif self.action_chosen == "Canoptek Spyder":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -516,11 +497,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_color = None
                 primary_player.aiming_reticle_coords_hand = None
                 self.card_pos_to_deploy = -1
-                self.player_with_action = ""
-                self.action_chosen = ""
-                self.player_with_deploy_turn = secondary_player.name_player
-                self.number_with_deploy_turn = secondary_player.number
-                self.mode = self.stored_mode
+                self.action_cleanup()
                 await primary_player.dark_eldar_event_played()
     elif self.action_chosen == "Even the Odds":
         if self.chosen_first_card:
@@ -545,9 +522,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                dest_planet, dest_pos):
                         player_owning_card.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                         self.chosen_second_card = True
-                        self.action_chosen = ""
-                        self.player_with_action = ""
-                        self.mode = "Normal"
+                        sself.action_cleanup()
                         self.chosen_second_card = True
                         self.misc_target_attachment = (-1, -1, -1)
                         self.misc_player_storage = ""
@@ -577,43 +552,36 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.player_with_action = ""
                 self.mode = "Normal"
     elif self.action_chosen == "Particle Whip":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "In Play Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "In Play Action"
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                 if not player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Elite"):
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
-                    player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
                     self.misc_counter = 0
                     self.action_cleanup()
     elif self.action_chosen == "Doombolt":
@@ -621,13 +589,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy events.")
-                elif possible_interrupts:
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, move_from_planet=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                if possible_interrupts and can_continue:
                     can_continue = False
                     await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
@@ -654,15 +629,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if primary_player.check_for_warlord(planet_pos):
             if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 if player_being_hit.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                         context="Searing Brand")
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
-                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy events.")
-                    elif possible_interrupts:
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True, context="Searing Brand")
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -674,14 +654,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Event Action"
-                if can_continue:
-                    if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False)
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
-                        await primary_player.dark_eldar_event_played()
-                        primary_player.torture_event_played("Searing Brand")
-                        self.action_cleanup()
+                    if can_continue:
+                        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False)
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            primary_player.aiming_reticle_coords_hand = None
+                            await primary_player.dark_eldar_event_played()
+                            primary_player.torture_event_played("Searing Brand")
+                            self.action_cleanup()
     elif self.action_chosen == "Torquemada Coteaz":
         if planet_pos == self.position_of_actioned_card[0]:
             if game_update_string[1] == primary_player.get_number():
@@ -696,29 +676,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        can_continue = True
         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
             if not player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
-                if player_being_hit.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
-                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")
-                    elif possible_interrupts:
-                        can_continue = False
-                        await self.send_update_message("Some sort of interrupt may be used.")
-                        self.choices_available = possible_interrupts
-                        self.choices_available.insert(0, "No Interrupt")
-                        self.name_player_making_choices = secondary_player.name_player
-                        self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.action_chosen
-                        self.cost_card_nullified = 0
-                        self.nullify_string = "/".join(game_update_string)
-                        self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "Event Action"
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
                 if can_continue:
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
                     primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
@@ -732,35 +716,65 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank"):
                 if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                    primary_player.ready_given_pos(planet_pos, unit_pos)
-                    self.action_cleanup()
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                    if can_continue:
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        can_continue = True
         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-            if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Event Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
             if can_continue:
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
                 player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -786,26 +800,30 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             player_being_hit = self.p2
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 1
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 1
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "Event Action"
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_limited():
                 player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
@@ -935,12 +953,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Gauss Flayer":
         if secondary_player.get_number() == game_update_string[1]:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                 can_continue = True
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
                     can_continue = False
                     await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
@@ -978,23 +1001,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "In Play Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
                                                         rickety_warbuggy=True)
@@ -1018,23 +1045,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             else:
                 player_owning_card = self.p2
             can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "In Play Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False)
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -1061,9 +1092,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             else:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        primary_player.ready_given_pos(planet_pos, unit_pos)
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
-                        self.action_cleanup()
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "In Play Action"
+                        if can_continue:
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
+                            self.action_cleanup()
     elif self.action_chosen == "Hyperphase Sword":
         print("cool sword")
         if self.chosen_first_card:
@@ -1076,14 +1130,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
                     self.action_cleanup()
     elif self.action_chosen == "Suppressive Fire":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -1092,45 +1138,39 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             if planet_pos == self.misc_target_planet:
                 can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
                     elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")
-                    elif possible_interrupts:
-                        can_continue = False
-                        await self.send_update_message("Some sort of interrupt may be used.")
-                        self.choices_available = possible_interrupts
-                        self.choices_available.insert(0, "No Interrupt")
-                        self.name_player_making_choices = secondary_player.name_player
-                        self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.action_chosen
-                        self.cost_card_nullified = 0
-                        self.nullify_string = "/".join(game_update_string)
-                        self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "Event Action"
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.chosen_second_card = True
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
-                        self.action_chosen = ""
-                        self.player_with_action = ""
-                        self.mode = "Normal"
+                        self.action_cleanup()
                         self.misc_target_planet = -1
     elif self.action_chosen == "Captain Markis":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         if planet_pos == self.position_of_actioned_card[0]:
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
@@ -1145,23 +1185,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
             else:
                 can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
-                    elif possible_interrupts:
-                        can_continue = False
-                        await self.send_update_message("Some sort of interrupt may be used.")
-                        self.choices_available = possible_interrupts
-                        self.choices_available.insert(0, "No Interrupt")
-                        self.name_player_making_choices = secondary_player.name_player
-                        self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.action_chosen
-                        self.cost_card_nullified = 0
-                        self.nullify_string = "/".join(game_update_string)
-                        self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "In Play Action"
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
                 if can_continue:
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                         player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
@@ -1175,32 +1219,70 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_cleanup()
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
-                primary_player.ready_given_pos(planet_pos, unit_pos)
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                    self.action_cleanup()
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Dark Cunning":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                primary_player.ready_given_pos(planet_pos, unit_pos)
-                if self.infested_planets[planet_pos]:
-                    primary_player.add_resources(1)
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+                if can_continue:
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                    if self.infested_planets[planet_pos]:
+                        primary_player.add_resources(1)
+                    self.action_cleanup()
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Aun'shi's Sanctum":
         ethereal_present = False
         for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
@@ -1214,25 +1296,77 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                     if primary_player.check_for_warlord(planet_pos):
-                        command = 2 * primary_player.get_command_given_pos(planet_pos, unit_pos)
-                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
-                                                                      command, expiration="EOP")
-                        name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
-                        await self.send_update_message(
-                            name_card + " gained +" + str(command) + " ATK from Rally the Charge!"
-                        )
-                        self.action_cleanup()
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy events.")
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Event Action"
+                        if can_continue:
+                            command = 2 * primary_player.get_command_given_pos(planet_pos, unit_pos)
+                            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
+                                                                          command, expiration="EOP")
+                            name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            primary_player.aiming_reticle_coords_hand = None
+                            await self.send_update_message(
+                                name_card + " gained +" + str(command) + " ATK from Rally the Charge!"
+                            )
+                            self.action_cleanup()
     elif self.action_chosen == "Ethereal Wisdom":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Tau":
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Ethereal"
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += 1
-                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                    primary_player.aiming_reticle_coords_hand = None
-                    self.action_cleanup()
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy events.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                    if can_continue:
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Ethereal"
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += 1
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.action_cleanup()
     elif self.action_chosen == "Clogged with Corpses":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
@@ -1247,9 +1381,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eocr = True
                 card_name = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name()
                 await self.send_update_message("Made " + card_name + " Brutal for one combat round.")
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
+                self.action_cleanup()
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Craftworld Gate":
@@ -1257,11 +1389,34 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
-                primary_player.return_card_to_hand(planet_pos, unit_pos)
-                self.action_cleanup()
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                    self.action_cleanup()
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Khymera Den":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
@@ -1296,26 +1451,28 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if not player_being_hit.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                     can_continue = True
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                    if player_being_hit.name_player == secondary_player.name_player:
+                    possible_interrupts = []
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
                         elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy events.")
-                        elif possible_interrupts:
-                            can_continue = False
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = possible_interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.action_chosen
-                            self.cost_card_nullified = 0
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Event Action"
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
                     if can_continue:
                         damage = player_being_hit.get_damage_given_pos(planet_pos, unit_pos)
                         player_being_hit.set_damage_given_pos(planet_pos, unit_pos, damage + self.misc_counter)
@@ -1342,11 +1499,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
             can_continue = True
             if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
                     can_continue = False
                     await self.send_update_message("Some sort of interrupt may be used.")
                     self.choices_available = possible_interrupts
@@ -1359,7 +1522,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "In Play Action"
             if can_continue:
-                highest_cost = player_being_hit.get_highest_cost_units()
+                highest_cost = primary_player.get_highest_cost_units()
                 player_being_hit.increase_health_of_unit_at_pos(planet_pos, unit_pos, highest_cost, expiration="EOP")
                 name_unit = player_being_hit.get_name_given_pos(planet_pos, unit_pos)
                 await self.send_update_message(name_unit + " gained +" + str(highest_cost) + " HP.")
@@ -1508,9 +1671,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await self.send_update_message(
                             name + " gained " + self.misc_target_choice + "."
                         )
-                        self.mode = "Normal"
-                        self.player_with_action = ""
-                        self.action_chosen = ""
+                        self.action_cleanup()
                         self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Mycetic Spores":
         if self.unit_to_move_position == [-1, -1]:
@@ -1562,27 +1723,30 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             can_continue = False
         elif unit_count < unit_cost:
             can_continue = False
-        elif player_being_routed.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                 move_from_planet=True)
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "Event Action"
         if can_continue:
             if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                 player_being_routed.rout_unit(planet_pos, unit_pos)
@@ -1660,19 +1824,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_being_routed = self.p1
         else:
             player_being_routed = self.p2
-        can_continue = True
-        if player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
-            can_continue = False
-        elif player_being_routed.name_player == secondary_player.name_player and can_continue:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                 move_from_planet=True)
-            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                can_continue = False
-                await self.send_update_message("Immune to enemy card abilities.")
-            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
-                can_continue = False
-                await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
+        if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+            can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy card abilities.")
+                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy events.")
+            if possible_interrupts and can_continue:
                 can_continue = False
                 await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = possible_interrupts
@@ -1684,23 +1850,28 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
-        if can_continue:
-            if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
-                player_being_routed.rout_unit(planet_pos, unit_pos)
-                self.action_cleanup()
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
-                await primary_player.dark_eldar_event_played()
+            if can_continue:
+                if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+                    player_being_routed.rout_unit(planet_pos, unit_pos)
+                    self.action_cleanup()
+                    primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                    primary_player.aiming_reticle_coords_hand = None
+                    await primary_player.dark_eldar_event_played()
     elif self.action_chosen == "The Emperor's Champion":
         if game_update_string[1] == secondary_player.get_number() and planet_pos == self.position_of_actioned_card[0]:
-            can_continue = True
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
-                    elif possible_interrupts:
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
                         await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
@@ -1750,23 +1921,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             player_receiving_damage = self.p2
         can_continue = True
-        if player_receiving_damage.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "In Play Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "In Play Action"
         if can_continue:
             if planet_pos == self.position_of_actioned_card[0]:
                 hitting_self = False
@@ -1817,26 +1992,30 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             else:
                 player_returning = self.p2
             can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
                 elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Event Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
             if can_continue:
                 card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
                 if card.get_card_type() == "Army":
@@ -1850,29 +2029,31 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_returning = self.p1
         else:
             player_returning = self.p2
-        planet_pos = int(game_update_string[2])
-        unit_pos = int(game_update_string[3])
         can_continue = True
+        possible_interrupts = []
+        if player_owning_card.name_player == primary_player.name_player:
+            possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
             elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
-            elif possible_interrupts:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.action_chosen
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "Event Action"
         if can_continue:
             card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
             if card.get_card_type() == "Army":
@@ -1882,11 +2063,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                     self.card_pos_to_deploy = -1
-                    self.player_with_action = ""
-                    self.action_chosen = ""
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.number
-                    self.mode = self.stored_mode
+                    self.action_cleanup()
     elif self.action_chosen == "Noble Deed":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -1901,14 +2078,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if self.misc_target_planet == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message("Immune to enemy card abilities.")
-                        elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message("Immune to enemy events.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                            elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy events.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -2018,11 +2200,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                     if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                            can_continue = False
-                            await self.send_update_message("Immune to enemy card abilities.")
-                        elif possible_interrupts:
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
                             can_continue = False
                             await self.send_update_message("Some sort of interrupt may be used.")
                             self.choices_available = possible_interrupts
@@ -2128,23 +2315,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_receiving_buff = self.p2
         can_continue = True
         if not secondary_player.check_for_warlord(planet_pos):
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "In Play Action"
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "In Play Action"
             if can_continue:
                 player_receiving_buff.increase_attack_of_unit_at_pos(planet_pos, unit_pos, -2,
                                                                      expiration="EOP")
@@ -2159,29 +2350,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        can_continue = True
         if not player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle") and \
                 player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-            if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                if secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy events.")
+            can_continue = True
+            possible_interrupts = []
+            if player_owning_card.name_player == primary_player.name_player:
+                possible_interrupts = secondary_player.intercept_check()
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
-                elif possible_interrupts:
+                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                     can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Event Action"
+                    await self.send_update_message("Immune to enemy events.")
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = self.action_chosen
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Event Action"
             if can_continue:
                 player_being_hit.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Squig"
                 player_being_hit.set_blanked_given_pos(planet_pos, unit_pos)
@@ -2203,7 +2398,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if player_owning_card.name_player == primary_player.name_player:
             possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
+                                                                                 intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
@@ -2232,21 +2428,35 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.position_of_actioned_card = (-1, -1)
             self.action_cleanup()
     elif self.action_chosen == "Tellyporta Pad":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if game_update_string[1] == primary_player.get_number():
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
             card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
             if card.get_faction() == "Orks":
                 if card.get_is_unit():
-                    primary_player.move_unit_to_planet(planet_pos, unit_pos,
-                                                       self.round_number)
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
-                    self.position_of_actioned_card = (-1, -1)
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "In Play Action"
+                    if can_continue:
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos,
+                                                           self.round_number)
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.action_cleanup()

@@ -2381,8 +2381,9 @@ class Player:
 
     def intercept_check(self):
         possible_interrupts = []
-        if self.search_card_in_hq("Intercept", ready_relevant=True):
-            possible_interrupts.append("Intercept")
+        if self.game.intercept_enabled:
+            if self.search_card_in_hq("Intercept", ready_relevant=True):
+                possible_interrupts.append("Intercept")
         return possible_interrupts
 
     def storm_of_silence_check(self):
@@ -2409,7 +2410,9 @@ class Player:
                     if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
                         possible_interrupts.append("Slumbering Gardens")
             if intercept_possible:
-                possible_interrupts + self.intercept_check()
+                if self.game.intercept_enabled:
+                    if self.search_card_in_hq("Intercept", ready_relevant=True):
+                        possible_interrupts.append("Intercept")
             if self.game.storm_of_silence_enabled:
                 if self.storm_of_silence_check():
                     possible_interrupts.append("Storm of Silence")
