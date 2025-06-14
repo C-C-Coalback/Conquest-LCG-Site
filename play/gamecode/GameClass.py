@@ -2310,6 +2310,15 @@ class Game:
                         self.resolving_search_box = False
                         self.misc_counter = 0
                         await self.send_update_message("Attaching a " + self.misc_player_storage + ".")
+                    elif self.choice_context == "Choose a new Synapse: (PotW)":
+                        chosen_synapse = self.choices_available[int(game_update_string[1])]
+                        card = FindCard.find_card(chosen_synapse, self.card_array, self.cards_dict)
+                        primary_player.add_to_hq(card)
+                        og_pla, og_pos = self.position_of_actioned_card
+                        primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        self.action_cleanup()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Choose card to discard for Searing Brand":
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1

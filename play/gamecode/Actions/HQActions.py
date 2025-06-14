@@ -196,6 +196,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, amount, "EOP")
                             await self.send_update_message("Raging Krootox gained +" + str(amount) + " ATK.")
                             self.action_cleanup()
+                    elif ability == "Prey on the Weak":
+                        if not primary_player.headquarters[unit_pos].once_per_game_used:
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Wisdom of the Serpent":
                         if card.get_ready():
                             card.exhaust_card()
@@ -540,6 +544,22 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
                     self.action_cleanup()
+    elif self.action_chosen == "Prey on the Weak":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Synapse":
+                name_synapse = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                og_pla, og_pos = self.position_of_actioned_card
+                if unit_pos < og_pos:
+                    self.position_of_actioned_card = (og_pla, og_pos - 1)
+                self.choice_context = "Choose a new Synapse: (PotW)"
+                self.choices_available = primary_player.synapse_list
+                try:
+                    self.choices_available.remove(name_synapse)
+                except ValueError:
+                    pass
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
     elif self.action_chosen == "Despise":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.headquarters[unit_pos].check_for_a_trait("Ally"):

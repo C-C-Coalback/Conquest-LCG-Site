@@ -998,6 +998,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if player_getting_attachment.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_chosen == "Prey on the Weak":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Synapse":
+                name_synapse = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                self.choice_context = "Choose a new Synapse: (PotW)"
+                self.choices_available = primary_player.synapse_list
+                try:
+                    self.choices_available.remove(name_synapse)
+                except ValueError:
+                    pass
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True
