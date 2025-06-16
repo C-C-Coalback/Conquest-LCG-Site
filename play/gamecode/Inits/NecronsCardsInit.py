@@ -254,6 +254,10 @@ def necrons_cards_init():
                                                       "FORCED REACTION: After a phase or combat round at this planet "
                                                       "begins, discard a card. If you have no cards in your hand, "
                                                       "discard this unit.", "C'tan. Elite.",
-                             7, faction, "Common", 0, 0, 2, False)
+                             7, faction, "Common", 0, 0, 2, False),
+        CardClasses.ArmyCard("Triarch Stalkers Procession", "No Wargear Attachments.\n"
+                                                            "Forced Reaction: After you deploy this unit, "
+                                                            "have your opponent draw 2 cards.", "Vehicle.",
+                             3, faction, "Common", 4, 6, 2, False, wargear_attachments_permitted=False)
     ]
     return necrons_card_array

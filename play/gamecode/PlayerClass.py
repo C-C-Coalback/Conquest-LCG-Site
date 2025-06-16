@@ -1489,6 +1489,9 @@ class Player:
                                         damage_on_play -= 1
                                 else:
                                     self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                            other_player = self.game.p1
+                            if other_player.name_player == self.name_player:
+                                other_player = self.game.p2
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -1502,6 +1505,9 @@ class Player:
                                 if self.game.get_blue_icon(position):
                                     self.game.create_reaction("Imperial Fists Devastators", self.name_player,
                                                               (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Triarch Stalkers Procession":
+                                other_player.draw_card()
+                                other_player.draw_card()
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
