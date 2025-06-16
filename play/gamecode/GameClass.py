@@ -1318,14 +1318,24 @@ class Game:
                 self.nullify_enabled = False
                 await StartReaction.start_resolving_reaction(self, "", [])
                 self.nullify_enabled = True
+            elif self.nullify_context == "Interrupt Event":
+                self.nullify_enabled = False
+                await StartInterrupt.start_resolving_interrupt(self, "", [])
+                self.nullify_enabled = False
+            elif self.nullify_context == "Interrupt":
+                self.nullify_enabled = False
+                await StartInterrupt.start_resolving_interrupt(self, "", [])
+                self.nullify_enabled = False
+            elif self.nullify_context == "Reaction":
+                self.nullify_enabled = False
+                await StartReaction.start_resolving_reaction(self, "", [])
+                self.nullify_enabled = True
             elif self.nullify_context == "Primal Howl":
                 primary_player.discard_card_name_from_hand("Primal Howl")
                 for _ in range(3):
                     primary_player.draw_card()
             elif self.nullify_context == "No Mercy":
-                self.choices_available = []
-                self.choice_context = ""
-                self.name_player_making_choices = ""
+                self.reset_choices_available()
                 await self.send_update_message("No Mercy window offered")
                 self.create_interrupt("No Mercy", self.first_player_nullified,
                                       (-1, -1, -1))
@@ -1477,6 +1487,12 @@ class Game:
                             self.create_reaction("Cry of the Wind", primary_player.name_player,
                                                  (int(primary_player.number), -1, -1))
                     self.delete_reaction()
+                elif self.nullify_context == "Reaction":
+                    self.delete_reaction()
+                elif self.nullify_context == "Interrupt":
+                    self.delete_interrupt()
+                elif self.nullify_context == "Interrupt Event":
+                    self.delete_interrupt()
                 elif self.nullify_context == "Win Battle Reaction Event":
                     if self.nullified_card_name in self.list_reactions_on_winning_combat:
                         if primary_player.search_hand_for_card(self.nullified_card_name):
@@ -2147,6 +2163,12 @@ class Game:
                                 num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
                                 primary_player.discard_attachment_name_from_card(planet_pos, unit_pos,
                                                                                  "Ulthwe Spirit Stone")
+                            elif self.interrupts_waiting_on_resolution[0] == "Trazyn the Infinite":
+                                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                                if planet_pos == -2:
+                                    primary_player.headquarters[unit_pos].misc_ability_used = True
+                                else:
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Jain Zar?":
@@ -5062,6 +5084,80 @@ class Game:
                         valid_players.append(crushing_player.name_player)
         return sources, valid_players
 
+    async def update_interrupts(self, name, game_update_string, count=0):
+        print("updating")
+        if self.interrupts_waiting_on_resolution and not self.already_resolving_interrupt \
+                and not self.already_resolving_reaction and not self.resolving_search_box:
+            print("not already resolving")
+            if count < 10:
+                p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
+                print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
+                if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
+                    self.last_player_who_resolved_interrupt != self.name_1) or \
+                        (p_one_count > 0 and p_two_count == 0):
+                    print("\n\nInterrupts update UPDATE P1\n\n")
+                    self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_1)
+                    if p_one_count > 1:
+                        if self.asking_which_interrupt:
+                            self.choices_available = self.get_name_interrupts_of_players_interrupts(self.name_1)
+                            self.choice_context = "Choose Which Interrupt"
+                            self.name_player_making_choices = self.name_1
+                        elif not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0]
+                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.asking_if_interrupt = True
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_interrupt = True
+                            self.reset_choices_available()
+                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
+                    else:
+                        interrupt_pos = self.stored_interrupt_indexes[0]
+                        self.move_interrupt_to_front(interrupt_pos)
+                        self.asking_which_interrupt = False
+                        if not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0]
+                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.asking_if_interrupt = True
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_interrupt = True
+                            self.reset_choices_available()
+                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
+                else:
+                    self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_2)
+                    if p_two_count > 1:
+                        if self.asking_which_interrupt:
+                            self.choices_available = self.get_name_interrupts_of_players_interrupts(self.name_2)
+                            self.choice_context = "Choose Which Interrupt"
+                            self.name_player_making_choices = self.name_2
+                        elif not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0]
+                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.asking_if_interrupt = True
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_interrupt = True
+                            self.reset_choices_available()
+                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
+                    else:
+                        interrupt_pos = self.stored_interrupt_indexes[0]
+                        self.move_interrupt_to_front(interrupt_pos)
+                        self.asking_which_interrupt = False
+                        if not self.has_chosen_to_resolve:
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0]
+                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.asking_if_interrupt = True
+                        elif self.has_chosen_to_resolve:
+                            self.has_chosen_to_resolve = False
+                            self.already_resolving_interrupt = True
+                            self.reset_choices_available()
+                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
+
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
             # print(self.already_resolving_reaction)
@@ -5438,80 +5534,6 @@ class Game:
                 if not already_present:
                     self.create_reaction("The Emperor Protects", self.name_2, (2, -1, -1))
 
-    async def update_interrupts(self, name, game_update_string, count=0):
-        print("updating")
-        if self.interrupts_waiting_on_resolution and not self.already_resolving_interrupt \
-                and not self.already_resolving_reaction:
-            print("not already resolving")
-            if count < 10:
-                p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
-                print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
-                if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
-                    self.last_player_who_resolved_interrupt != self.name_1) or \
-                        (p_one_count > 0 and p_two_count == 0):
-                    print("\n\nInterrupts update UPDATE P1\n\n")
-                    self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_1)
-                    if p_one_count > 1:
-                        if self.asking_which_interrupt:
-                            self.choices_available = self.get_name_interrupts_of_players_interrupts(self.name_1)
-                            self.choice_context = "Choose Which Interrupt"
-                            self.name_player_making_choices = self.name_1
-                        elif not self.has_chosen_to_resolve:
-                            self.choices_available = ["Yes", "No"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
-                            self.asking_if_interrupt = True
-                        elif self.has_chosen_to_resolve:
-                            self.has_chosen_to_resolve = False
-                            self.already_resolving_interrupt = True
-                            self.reset_choices_available()
-                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
-                    else:
-                        interrupt_pos = self.stored_interrupt_indexes[0]
-                        self.move_interrupt_to_front(interrupt_pos)
-                        self.asking_which_interrupt = False
-                        if not self.has_chosen_to_resolve:
-                            self.choices_available = ["Yes", "No"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
-                            self.asking_if_interrupt = True
-                        elif self.has_chosen_to_resolve:
-                            self.has_chosen_to_resolve = False
-                            self.already_resolving_interrupt = True
-                            self.reset_choices_available()
-                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
-                else:
-                    self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_2)
-                    if p_two_count > 1:
-                        if self.asking_which_interrupt:
-                            self.choices_available = self.get_name_interrupts_of_players_interrupts(self.name_2)
-                            self.choice_context = "Choose Which Interrupt"
-                            self.name_player_making_choices = self.name_2
-                        elif not self.has_chosen_to_resolve:
-                            self.choices_available = ["Yes", "No"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
-                            self.asking_if_interrupt = True
-                        elif self.has_chosen_to_resolve:
-                            self.has_chosen_to_resolve = False
-                            self.already_resolving_interrupt = True
-                            self.reset_choices_available()
-                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
-                    else:
-                        interrupt_pos = self.stored_interrupt_indexes[0]
-                        self.move_interrupt_to_front(interrupt_pos)
-                        self.asking_which_interrupt = False
-                        if not self.has_chosen_to_resolve:
-                            self.choices_available = ["Yes", "No"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
-                            self.asking_if_interrupt = True
-                        elif self.has_chosen_to_resolve:
-                            self.has_chosen_to_resolve = False
-                            self.already_resolving_interrupt = True
-                            self.reset_choices_available()
-                            await StartInterrupt.start_resolving_interrupt(self, name, game_update_string)
-
     def change_to_reserve(self, game_update_string):
         if len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
@@ -5749,6 +5771,8 @@ class Game:
         if not self.interrupts_waiting_on_resolution:
             self.p1.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
             self.p2.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
+            self.p1.valid_surrogate_host = [False, False, False, False, False, False, False]
+            self.p2.valid_surrogate_host = [False, False, False, False, False, False, False]
             self.last_player_who_resolved_interrupt = ""
             self.p1.highest_death_serves_value = 0
             self.p2.highest_death_serves_value = 0
@@ -5861,7 +5885,12 @@ class Game:
                 self.unit_will_move_after_attack = False
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
+        await self.update_interrupts(name, game_update_string)
+        await self.update_interrupts(name, game_update_string)
+        await self.update_reactions(name, game_update_string)
+        await self.update_reactions(name, game_update_string)
         print("---\nDEBUG INFO\n---")
+        print(self.interrupts_waiting_on_resolution)
         print(self.reactions_needing_resolving)
         print(self.choices_available)
         if self.phase == "DEPLOY":

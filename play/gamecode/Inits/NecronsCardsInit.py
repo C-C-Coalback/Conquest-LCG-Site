@@ -271,6 +271,26 @@ def necrons_cards_init():
         CardClasses.AttachmentCard("Traumatophobia", "Attach to an enemy army unit.\n"
                                                      "Attached unit gains Lumbering.", "Power.",
                                    2, faction, "Common", 2, False, must_be_enemy_unit=True,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.WarlordCard("Trazyn the Infinite", "Interrupt: When your warlord would be defeated, move it to "
+                                                       "a target planet to remove all damagge from it instead.",
+                                "Substitute.", faction, 2, 2, 2, 7, "Bloodied.", 7, 7,
+                                ["4x Acquisition Phalanx", "1x Reign of Solemnace",
+                                 "2x Surrogate Host", "1x Third Eye of Trazyn"]),
+        CardClasses.ArmyCard("Acquisition Phalanx", "Reaction: After a unit you control moves to this planet, "
+                                                    "this unit gets +1 ATK and +1 HP until the end of the phase.",
+                             "Soldier.", 2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.EventCard("Surrogate Host", "Interrupt: When a unit you control is destroyed, move your warlord "
+                                                "to the same planet.", "Tactic.",
+                              0, faction, "Signature", 1, False),
+        CardClasses.SupportCard("Reign of Solemnace", "Each army unit you control at a planet with your warlord "
+                                                      "gets +1HP.", "Tomb World.", 1, faction, "Signature", False),
+        CardClasses.AttachmentCard("Third Eye of Trazyn", "Attach to your warlord.\n"
+                                                          "Attached unit gets +1 HP.\n"
+                                                          "Combat Reaction: After your warlord moves to a planet, "
+                                                          "exhaust this attachment to move an army unit you control "
+                                                          "at that planet to an adjacent planet.", "Wargear.",
+                                   1, faction, "Signature", 3, False, extra_health=1,
+                                   must_be_own_unit=True, type_of_units_allowed_for_attachment="Warlord")
     ]
     return necrons_card_array

@@ -141,6 +141,7 @@ class Player:
         self.highest_death_serves_value = 0
         self.highest_cost_invasion_site = 0
         self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
+        self.valid_surrogate_host = [False, False, False, False, False, False, False]
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -1721,6 +1722,15 @@ class Player:
                         self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
                         self.game.player_who_resolves_reaction.append(self.name_player)
                         self.game.allowed_units_alaitoc_shrine.append([int(self.number), destination, new_pos])
+            for i in range(len(self.cards_in_play[destination + 1])):
+                if self.game.phase != "COMMAND":
+                    if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
+                        self.game.create_reaction("Acquisition Phalanx", self.name_player,
+                                                  (int(self.number), destination, i))
+            if self.game.phase == "COMBAT":
+                if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn", ready_relevant=True):
+                    self.game.create_reaction("Third Eye of Trazyn", self.name_player,
+                                              (int(self.number), destination, new_pos))
             self.remove_card_from_hq(origin_position)
         else:
             if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
@@ -1741,10 +1751,18 @@ class Player:
                             already_cry = True
                 if not already_cry:
                     self.game.create_reaction("Cry of the Wind", self.name_player, (int(self.number), -1, -1))
+            for i in range(len(self.cards_in_play[destination + 1])):
+                if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
+                    self.game.create_reaction("Acquisition Phalanx", self.name_player,
+                                              (int(self.number), destination, i))
             if self.game.phase == "COMBAT":
                 if self.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
                     self.game.create_reaction("Deathly Web Shrine", self.name_player,
                                               (int(self.number), destination, -1))
+            if self.game.phase == "COMBAT":
+                if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn"):
+                    self.game.create_reaction("Third Eye of Trazyn", self.name_player,
+                                              (int(self.number), destination, new_pos))
             self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
             if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
                 already_banner = False
@@ -3424,6 +3442,11 @@ class Player:
         elif self.check_for_trait_given_pos(planet_id, unit_id, "Psyker"):
             if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
                 health += 1
+        if card.get_card_type() == "Army":
+            if self.search_card_in_hq("Reign of Solemnace"):
+                warlord_pla, warlord_pos = self.get_location_of_warlord()
+                if warlord_pla == planet_id:
+                    health += 1
         if card.get_ability() == "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 health += 4
@@ -3889,11 +3912,17 @@ class Player:
             if self.check_if_card_is_destroyed(-2, i):
                 if self.search_attachments_at_pos(-2, i, "Ulthwe Spirit Stone"):
                     self.game.create_interrupt("Ulthwe Spirit Stone", self.name_player, (int(self.number), -2, i))
+                if self.get_ability_given_pos(-2, i, bloodied_relevant=True) == "Trazyn the Infinite"\
+                        and not self.headquarters[i].misc_ability_used:
+                    self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.check_if_card_is_destroyed(i, j):
                     if self.search_attachments_at_pos(i, j, "Ulthwe Spirit Stone"):
                         self.game.create_interrupt("Ulthwe Spirit Stone", self.name_player, (int(self.number), i, j))
+                    if self.get_ability_given_pos(i, j, bloodied_relevant=True) == "Trazyn the Infinite"\
+                            and not self.cards_in_play[i + 1][j].misc_ability_used:
+                        self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), i, j))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if planet_num == -2:
@@ -4040,6 +4069,13 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
                 self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
                                           (int(self.number), -1, -1))
+            if self.search_hand_for_card("Surrogate Host"):
+                warlord_pla, warlord_pos = self.get_location_of_warlord()
+                if warlord_pla != planet_num:
+                    self.valid_surrogate_host[planet_num] = True
+                    if not self.check_if_already_have_interrupt("Surrogate Host"):
+                        self.game.create_interrupt("Surrogate Host", self.name_player,
+                                                   (int(self.number), -1, -1))
             if self.get_faction_given_pos(planet_num, card_pos) == "Space Marines":
                 already_apoth = False
                 for i in range(len(self.game.reactions_needing_resolving)):

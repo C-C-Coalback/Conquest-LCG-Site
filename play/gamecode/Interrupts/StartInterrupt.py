@@ -44,6 +44,24 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.add_resources(primary_player.highest_death_serves_value)
             primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
+        elif current_interrupt == "Surrogate Host":
+            can_continue = True
+            if secondary_player.nullify_check() and self.nullify_enabled:
+                can_continue = False
+                await self.send_update_message(
+                    primary_player.name_player + " wants to play " + current_interrupt + "; "
+                                                 "Nullify window offered.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Nullify?"
+                self.nullified_card_pos = -1
+                self.nullified_card_name = current_interrupt
+                self.cost_card_nullified = 1
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Interrupt Event"
+            if can_continue:
+                primary_player.discard_card_name_from_hand("Surrogate Host")
         elif current_interrupt == "Quantum Shielding":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict)

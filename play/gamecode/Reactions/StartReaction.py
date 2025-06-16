@@ -1282,6 +1282,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Use Shrine of Warpflame?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.delete_reaction()
+        elif current_reaction == "Acquisition Phalanx":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            await self.send_update_message("Acquistion Phalanx gained +1 ATK and +1 HP")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Syren Zythlex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
@@ -1320,6 +1327,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Use Fall Back?"
                 self.name_player_making_choices = self.player_who_resolves_reaction[0]
+        elif current_reaction == "Third Eye of Trazyn":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            self.misc_target_planet = planet_pos
+            primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Third Eye of Trazyn")
+            self.chosen_first_card = False
         elif current_reaction == "Sweep Attack":
             self.chosen_first_card = False
             self.misc_counter = -1

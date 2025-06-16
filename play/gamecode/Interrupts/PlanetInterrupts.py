@@ -38,6 +38,17 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
             self.infest_planet(chosen_planet)
             self.delete_interrupt()
+    elif current_interrupt == "Trazyn the Infinite":
+        origin_planet, origin_pos = primary_player.get_location_of_warlord()
+        if chosen_planet != origin_planet:
+            primary_player.remove_damage_from_pos(origin_planet, origin_pos, 999)
+            primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+            self.delete_interrupt()
+    elif current_interrupt == "Surrogate Host":
+        origin_planet, origin_pos = primary_player.get_location_of_warlord()
+        if primary_player.valid_surrogate_host[chosen_planet]:
+            primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+            self.delete_interrupt()
     elif self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
         print("reanimating warriors")
         if not self.asked_if_resolve_effect:

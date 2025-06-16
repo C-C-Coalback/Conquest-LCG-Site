@@ -1457,6 +1457,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 primary_player.aiming_reticle_coords_discard = None
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+        elif current_reaction == "Third Eye of Trazyn":
+            if not self.chosen_first_card:
+                if game_update_string[1] == primary_player.number:
+                    if self.misc_target_planet == planet_pos:
+                        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.chosen_first_card = True
         elif current_reaction == "Sweep Attack":
             if self.chosen_first_card:
                 num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]

@@ -132,6 +132,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                         i = i - 1
                     i = i + 1
                 self.delete_reaction()
+    elif current_reaction == "Third Eye of Trazyn":
+        if self.chosen_first_card:
+            if abs(self.misc_target_planet - chosen_planet) == 1:
+                og_pla, og_pos = self.misc_target_unit
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Spore Chimney":
         self.infest_planet(int(game_update_string[1]))
         self.delete_reaction()
