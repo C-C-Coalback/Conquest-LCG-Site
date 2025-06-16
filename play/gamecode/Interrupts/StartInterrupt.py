@@ -64,7 +64,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Surrogate Host")
         elif current_interrupt == "Quantum Shielding":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
-            card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict)
+            card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             primary_player.attach_card(card, planet_pos, unit_pos)
             if "Quantum Shielding" in primary_player.discard:
                 primary_player.discard.remove("Quantum Shielding")

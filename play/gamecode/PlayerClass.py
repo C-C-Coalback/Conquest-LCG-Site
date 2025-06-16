@@ -33,10 +33,14 @@ def clean_received_deck(raw_deck):
 
 
 class Player:
-    def __init__(self, name, number, card_array, cards_dict, game):
+    def __init__(self, name, number, card_array, cards_dict, apoka_errata_cards, game):
         self.game = game
         self.card_array = card_array
         self.cards_dict = cards_dict
+        self.apoka_errata_cards = apoka_errata_cards
+        self.cards_that_have_errata = []
+        for i in range(len(self.apoka_errata_cards)):
+            self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())
         self.number = str(number)
         self.name_player = name
         self.position_activated = []
@@ -155,7 +159,9 @@ class Player:
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
-        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array, self.cards_dict)))
+        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array, self.cards_dict,
+                                                                  self.apoka_errata_cards, self.cards_that_have_errata
+                                                                  )))
         self.warlord_faction = self.headquarters[0].get_faction()
         if self.headquarters[0].get_name() == "Urien Rakarth":
             self.urien_relevant = True
@@ -173,7 +179,9 @@ class Player:
             while i < len(self.deck):
                 if self.deck[i] in self.synapse_list:
                     self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array,
-                                                                              self.cards_dict)))
+                                                                              self.cards_dict,
+                                                                              self.apoka_errata_cards,
+                                                                              self.cards_that_have_errata)))
                     del self.deck[i]
                 i = i + 1
         self.shuffle_deck()
@@ -247,6 +255,9 @@ class Player:
         card_string = ""
         if self.cards:
             card_array = self.cards.copy()
+            for i in range(len(card_array)):
+                if card_array[i] in self.cards_that_have_errata:
+                    card_array[i] = card_array[i] + "_apoka"
             if self.aiming_reticle_color is None:
                 pass
             else:
@@ -268,6 +279,8 @@ class Player:
             for i in range(len(self.headquarters)):
                 current_card = self.headquarters[i]
                 single_card_string = current_card.get_name()
+                if single_card_string in self.cards_that_have_errata:
+                    single_card_string += "_apoka"
                 single_card_string = single_card_string + "|"
                 if current_card.ready:
                     single_card_string += "R|"
@@ -292,6 +305,8 @@ class Player:
                 for a in range(len(attachments_list)):
                     single_card_string += "|"
                     single_card_string += attachments_list[a].get_name()
+                    if attachments_list[a].get_name() in self.cards_that_have_errata:
+                        single_card_string += "_apoka"
                     single_card_string += "+"
                     if attachments_list[a].get_ready():
                         single_card_string += "R"
@@ -414,6 +429,8 @@ class Player:
                     for i in range(len(self.cards_in_play[planet_id + 1])):
                         current_card = self.cards_in_play[planet_id + 1][i]
                         single_card_string = current_card.get_name()
+                        if single_card_string in self.cards_that_have_errata:
+                            single_card_string += "_apoka"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"
@@ -435,6 +452,8 @@ class Player:
                         for a in range(len(attachments_list)):
                             single_card_string += "|"
                             single_card_string += attachments_list[a].get_name()
+                            if attachments_list[a].get_name() in self.cards_that_have_errata:
+                                single_card_string += "_apoka"
                             single_card_string += "+"
                             if attachments_list[a].get_ready():
                                 single_card_string += "R"
@@ -444,6 +463,8 @@ class Player:
                     for i in range(len(self.cards_in_reserve[planet_id])):
                         current_card = self.cards_in_reserve[planet_id][i]
                         single_card_string = current_card.get_name()
+                        if single_card_string in self.cards_that_have_errata:
+                            single_card_string += "_apoka"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"
@@ -628,7 +649,8 @@ class Player:
             print("Deck is empty, you lose!")
             return None
         else:
-            card = FindCard.find_card(self.deck[0], self.card_array, self.cards_dict)
+            card = FindCard.find_card(self.deck[0], self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             return card
 
     def draw_card(self):
@@ -747,7 +769,8 @@ class Player:
 
     def get_shields_given_pos(self, pos_in_hand, planet_pos=None, tank=False):
         shield_card_name = self.cards[pos_in_hand]
-        card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict)
+        card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict,
+                                         self.apoka_errata_cards, self.cards_that_have_errata)
         shields = card_object.get_shields()
         if card_object.get_card_type() == "Support":
             if self.grigory_maksim_relevant:
@@ -990,7 +1013,8 @@ class Player:
             i = len(self.discard) - 1
             found = False
             while i > -1 and not found:
-                card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
+                card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict,
+                                          self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_card_type() == "Event":
                     self.cards.append(card.get_name())
                     del self.discard[i]
@@ -1011,7 +1035,8 @@ class Player:
             if played_card == "SUCCESS":
                 return "SUCCESS/Support"
             return played_card
-        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict)
+        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         if card.card_type == "Support":
             print("Need to play support card")
             played_card = self.play_card(-2, card=card)
@@ -1021,11 +1046,13 @@ class Player:
         return "SUCCESS/Not Support"
 
     def get_card_in_hand(self, position_hand):
-        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict)
+        card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         return card
 
     def get_card_in_discard(self, position_discard):
-        card = FindCard.find_card(self.discard[position_discard], self.card_array, self.cards_dict)
+        card = FindCard.find_card(self.discard[position_discard], self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         return card
 
     def get_discard(self):
@@ -1391,7 +1418,8 @@ class Player:
     def count_tortures_in_discard(self):
         count = 0
         for i in range(len(self.discard)):
-            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
+            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             if card.check_for_a_trait("Torture"):
                 count += 1
         return count
@@ -1425,7 +1453,8 @@ class Player:
                         self.game.create_reaction("Hypex Injector", self.name_player, (int(other_player.number), i, j))
 
     def put_card_in_hand_into_hq(self, hand_pos, unit_only=True):
-        card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array, self.cards_dict))
+        card = copy.deepcopy(FindCard.find_card(self.cards[hand_pos], self.card_array, self.cards_dict,
+                                                self.apoka_errata_cards, self.cards_that_have_errata))
         if unit_only:
             if card.get_card_type() != "Army":
                 return False
@@ -3151,7 +3180,8 @@ class Player:
     def count_units_in_discard(self):
         count = 0
         for i in range(len(self.discard)):
-            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict)
+            card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             if card.get_card_type() == "Army":
                 count = count + 1
         return count
@@ -3866,7 +3896,8 @@ class Player:
     def get_card_top_discard(self):
         if self.discard:
             card_name = self.discard[-1]
-            card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+            card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             return card
         return None
 
@@ -4149,13 +4180,15 @@ class Player:
                 self.destroy_card_in_play(planet_num, i)
 
     def summon_token_at_planet(self, token_name, planet_num):
-        card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
+        card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         if card.get_name() != "FINAL CARD":
             if self.count_copies_in_play(card.get_name()) < 10:
                 self.add_card_to_planet(card, planet_num)
 
     def summon_token_at_hq(self, token_name, amount=1):
-        card = FindCard.find_card(token_name, self.card_array, self.cards_dict)
+        card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         if card.get_name() != "FINAL CARD":
             for _ in range(amount):
                 if self.count_copies_in_play(card.get_name()) < 10:

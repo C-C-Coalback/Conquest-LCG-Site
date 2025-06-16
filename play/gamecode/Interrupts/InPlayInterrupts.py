@@ -117,7 +117,8 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         not_own_card = True
         if player_owning_card.name_player == primary_player.name_player:
             not_own_card = False
-        card = FindCard.find_card("Savage Parasite", self.card_array, self.cards_dict)
+        card = FindCard.find_card("Savage Parasite", self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_card):
             self.delete_interrupt()
             try:

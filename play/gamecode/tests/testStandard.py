@@ -13,6 +13,7 @@ cards_dict = {}
 for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
+apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
 
 first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt')
@@ -27,7 +28,7 @@ with open(second_deck_location, 'r') as file:
 class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_basic(self):
         random.seed(42)
-        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         self.assertEqual(len(test_game.p1.cards), 7)
@@ -49,7 +50,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_assign_damage(self):
         random.seed(42)
-        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         test_game.p1.draw_card()

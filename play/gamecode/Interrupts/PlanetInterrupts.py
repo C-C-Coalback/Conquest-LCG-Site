@@ -11,7 +11,8 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
     if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
         print("check planet")
         if primary_player.valid_planets_berzerker_warriors[chosen_planet]:
-            card = FindCard.find_card("Berzerker Warriors", self.card_array, self.cards_dict)
+            card = FindCard.find_card("Berzerker Warriors", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             self.card_to_deploy = card
             self.card_pos_to_deploy = primary_player.aiming_reticle_coords_hand
             self.planet_pos_to_deploy = chosen_planet

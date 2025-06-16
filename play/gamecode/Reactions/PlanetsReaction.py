@@ -36,7 +36,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.delete_reaction()
     elif current_reaction == "Banshee Assault Squad":
         primary_player.remove_card_name_from_hand("Banshee Assault Squad")
-        card = FindCard.find_card("Banshee Assault Squad", self.card_array, self.cards_dict)
+        card = FindCard.find_card("Banshee Assault Squad", self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
         primary_player.add_card_to_planet(card, chosen_planet)
         self.delete_reaction()
         if primary_player.search_hand_for_card("Banshee Assault Squad"):
@@ -82,7 +83,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     elif current_reaction == "Sacaellum's Finest":
         if self.get_green_icon(chosen_planet):
             primary_player.remove_card_name_from_hand("Sacaellum's Finest")
-            card = FindCard.find_card("Sacaellum's Finest", self.card_array, self.cards_dict)
+            card = FindCard.find_card("Sacaellum's Finest", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             primary_player.add_card_to_planet(card, chosen_planet)
             self.sacaellums_finest_active = True
             self.delete_reaction()
@@ -108,7 +110,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if self.chosen_first_card:
             if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:
                 card_name = primary_player.cards[primary_player.aiming_reticle_coords_hand]
-                card = FindCard.find_card(card_name, self.card_array, self.cards_dict)
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
+                                          self.apoka_errata_cards, self.cards_that_have_errata)
                 primary_player.add_card_to_planet(card, chosen_planet)
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None

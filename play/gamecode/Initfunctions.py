@@ -1,6 +1,6 @@
 from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     DarkEldarCardsInit, EldarCardsInit, TauCardsInit, SpaceMarinesCardsInit, AstraMilitarumCardsInit, \
-    TyranidsCardsInit, NecronsCardsInit, TokensCardsInit
+    TyranidsCardsInit, NecronsCardsInit, TokensCardsInit, ApokaErrataCardsInit
 
 
 def init_player_cards():
@@ -25,3 +25,8 @@ def init_player_cards():
 def init_planet_cards():
     planet_cards_array = PlanetCardsInit.planet_cards_init()
     return planet_cards_array
+
+
+def init_apoka_errata_cards():
+    apoka_errata_cards_array = ApokaErrataCardsInit.apoka_errata_cards_init()
+    return apoka_errata_cards_array

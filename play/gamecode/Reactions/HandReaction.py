@@ -21,7 +21,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             if self.location_hand_attachment_shadowsun == -1:
                 hand_pos = int(game_update_string[2])
                 card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
-                                          self.cards_dict)
+                                          self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
                         card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                     self.location_hand_attachment_shadowsun = hand_pos
@@ -31,7 +31,8 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             hand_pos = int(game_update_string[2])
             if primary_player.cards[hand_pos] == "Elysian Assault Team":
                 planet_pos = self.positions_of_unit_triggering_reaction[0][1]
-                card = FindCard.find_card("Elysian Assault Team", self.card_array, self.cards_dict)
+                card = FindCard.find_card("Elysian Assault Team", self.card_array, self.cards_dict,
+                                          self.apoka_errata_cards, self.cards_that_have_errata)
                 primary_player.add_card_to_planet(card, planet_pos)
                 del primary_player.cards[hand_pos]
                 more = False

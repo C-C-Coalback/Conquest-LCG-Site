@@ -169,7 +169,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     cards_discard.append(primary_player.discard[last_element])
                             self.choices_available = []
                             for i in range(len(cards_discard)):
-                                card = FindCard.find_card(cards_discard[i], self.card_array, self.cards_dict)
+                                card = FindCard.find_card(cards_discard[i], self.card_array, self.cards_dict,
+                                                          self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.get_is_unit() and card.get_faction() == "Necrons":
                                     if not card.check_for_a_trait("Vehicle"):
                                         self.choices_available.append(card.get_name())
@@ -2150,7 +2151,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
     elif self.action_chosen == "Lethal Toxin Sacs":
         if game_update_string[1] == primary_player.get_number():
-            card = FindCard.find_card("Lethal Toxin Sacs", self.card_array, self.cards_dict)
+            card = FindCard.find_card("Lethal Toxin Sacs", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             played_card = primary_player. \
                 play_attachment_card_to_in_play(card, planet_pos, unit_pos, army_unit_as_attachment=False, discounts=0)
             if played_card:
@@ -2302,7 +2304,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_receiving_attachment = self.p2
         if primary_player.aiming_reticle_coords_hand_2 is not None:
             hand_pos = primary_player.aiming_reticle_coords_hand_2
-            card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict)
+            card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             army_unit_as_attachment = False
             discounts = primary_player.search_hq_for_discounts("", "",
                                                                is_attachment=True)

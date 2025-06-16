@@ -9,11 +9,13 @@ import threading
 import logging
 import datetime
 
+
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
 for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
+apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
 active_lobbies = [[], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
@@ -223,11 +225,16 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         global card_array
         global planet_array
         global cards_dict
+        global apoka_errata_cards_array
         for i in range(len(active_games)):
             if active_games[i].game_id == game_id:
                 new_game_id = game_id + random.choice('0123456789ABCDEF')
                 return self.create_game(name_1, name_2, new_game_id, apoka)
-        active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict, apoka))
+        card_errata = []
+        if apoka:
+            card_errata = apoka_errata_cards_array
+        active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict,
+                                           apoka, card_errata))
         return game_id
 
 
@@ -408,7 +415,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                     elif message[1] == "addcard" and len(message) > 3:
                         card_name = message[3]
                         card = FindCard.find_card(card_name, active_games[self.game_position].card_array,
-                                                  active_games[self.game_position].cards_dict)
+                                                  active_games[self.game_position].cards_dict,
+                                                  active_games[self.game_position].apoka_errata_cards,
+                                                  active_games[self.game_position].cards_that_have_errata)
                         if card.get_shields() != -1:
                             if message[2] == "1":
                                 active_games[self.game_position].p1.cards.append(card.get_name())

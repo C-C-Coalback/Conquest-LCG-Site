@@ -334,7 +334,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.choice_context = "Repair Bay"
                             self.name_player_making_choices = primary_player.name_player
                             for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict)
+                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
+                                                          self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.check_for_a_trait("Drone") or card.check_for_a_trait("Pilot"):
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
@@ -1378,7 +1379,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
             hand_pos = primary_player.aiming_reticle_coords_hand_2
             planet_pos = -2
             unit_pos = int(game_update_string[2])
-            card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict)
+            card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
             army_unit_as_attachment = False
             discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
             if card.get_ability() == "Gun Drones" or \

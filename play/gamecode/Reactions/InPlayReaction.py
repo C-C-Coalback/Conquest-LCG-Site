@@ -50,7 +50,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_receiving_attachment = secondary_player
                         not_own_attachment = True
                     card = FindCard.find_card(primary_player.cards[self.location_hand_attachment_shadowsun],
-                                              self.card_array, self.cards_dict)
+                                              self.card_array, self.cards_dict,
+                                              self.apoka_errata_cards, self.cards_that_have_errata)
                     army_unit_as_attachment = False
                     if card.get_name() == "Shadowsun's Stealth Cadre":
                         army_unit_as_attachment = True
@@ -75,7 +76,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_receiving_attachment = secondary_player
                     own_attachment = False
                 card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array,
-                                          self.cards_dict)
+                                          self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
                 army_unit_as_attachment = False
                 if card.get_name() == "Shadowsun's Stealth Cadre":
                     army_unit_as_attachment = True
@@ -1443,14 +1444,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.number == game_update_string[1]:
                     if origin_planet == planet_pos:
                         if self.misc_counter == 0:
-                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict,
+                                                      self.apoka_errata_cards, self.cards_that_have_errata)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.deck.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
                         elif self.misc_counter == 1:
-                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict,
+                                                      self.apoka_errata_cards, self.cards_that_have_errata)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.discard.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()
@@ -1471,7 +1474,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.number == game_update_string[1]:
                     if abs(origin_planet - planet_pos) == 1:
                         if self.misc_counter == 0:
-                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict,
+                                                      self.apoka_errata_cards, self.cards_that_have_errata)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.deck.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()
@@ -1479,7 +1483,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 primary_player.aiming_reticle_coords_hand = None
                                 self.delete_reaction()
                         elif self.misc_counter == 1:
-                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict)
+                            card = FindCard.find_card(self.misc_player_storage, self.card_array, self.cards_dict,
+                                                      self.apoka_errata_cards, self.cards_that_have_errata)
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.discard.remove(self.misc_player_storage)
                                 primary_player.shuffle_deck()

@@ -250,7 +250,7 @@ def tau_cards_init():
                                                            "be targeted instead (ignoring targeting restrictions).",
                                 "Upgrade.", 0, faction, "Common", False),
         CardClasses.ArmyCard("Kroot Hunter", "Reaction: After you deploy this unit at a "
-                                             "Material planet (red), gain 1 resource.", "Scout. Ally. Kroot.",
+                                             "Material planet (red), gain 1 resource.", "Scout. Ally.",
                              1, faction, "Common", 2, 2, 0, False),
         CardClasses.EventCard("War of Ideas", "Interrupt: When a command struggle resolves at a planet, "
                                               "exhausted army units you control count their command "
