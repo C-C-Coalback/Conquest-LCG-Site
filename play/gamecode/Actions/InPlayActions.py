@@ -254,6 +254,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Replicating Scarabs":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Techmarine Aspirant":
                         if primary_player.resources > 0:
                             self.action_chosen = ability
@@ -1011,6 +1015,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     pass
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+    elif self.action_chosen == "Replicating Scarabs":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                    self.action_cleanup()
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True

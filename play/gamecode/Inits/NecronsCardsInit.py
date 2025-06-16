@@ -263,6 +263,10 @@ def necrons_cards_init():
                                                   "Interrupt: When you deploy a Necrons unit, deal 1 damage to "
                                                   "this unit and the deployed unit to reduce its cost by 1. "
                                                   "Then discard the top card of your deck.", "Drone.",
-                             2, faction, "Common", 0, 4, 1, False, applies_discounts=[True, 1, True])
+                             2, faction, "Common", 0, 4, 1, False, applies_discounts=[True, 1, True]),
+        CardClasses.ArmyCard("Replicating Scarabs", "Combat Action: Exhaust this unit to remove 1 damage from "
+                                                    "a Necrons army unit at this planet.", "Drone.",
+                             2, faction, "Common", 1, 3, 0, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return necrons_card_array
