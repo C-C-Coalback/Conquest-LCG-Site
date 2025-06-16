@@ -267,6 +267,10 @@ def necrons_cards_init():
         CardClasses.ArmyCard("Replicating Scarabs", "Combat Action: Exhaust this unit to remove 1 damage from "
                                                     "a Necrons army unit at this planet.", "Drone.",
                              2, faction, "Common", 1, 3, 0, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT")
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.AttachmentCard("Traumatophobia", "Attach to an enemy army unit.\n"
+                                                     "Attached unit gains Lumbering.", "Power.",
+                                   2, faction, "Common", 2, False, must_be_enemy_unit=True,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return necrons_card_array

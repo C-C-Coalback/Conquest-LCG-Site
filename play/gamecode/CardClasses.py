@@ -244,7 +244,8 @@ class UnitCard(Card):
                  , allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
-                 mobile=False, ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1):
+                 mobile=False, ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1,
+                 lumbering=False):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited, deepstrike=deepstrike)
@@ -300,6 +301,15 @@ class UnitCard(Card):
         self.attack_set_eop = -1
         self.unstoppable = unstoppable
         self.lost_ranged_eop = False
+        self.lumbering = lumbering
+
+    def get_lumbering(self):
+        if self.blanked_eop:
+            return False
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Traumatophobia":
+                return True
+        return self.lumbering
 
     def exhaust_first_attachment_name(self, card_name):
         for i in range(len(self.attachments)):
@@ -713,7 +723,7 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1):
+                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1, lumbering=False):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -721,7 +731,8 @@ class ArmyCard(UnitCard):
                          wargear_attachments_permitted=wargear_attachments_permitted, no_attachments=no_attachments,
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
-                         ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable, deepstrike=deepstrike)
+                         ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable, deepstrike=deepstrike,
+                         lumbering=lumbering)
 
     def print_info(self):
         if self.unique:

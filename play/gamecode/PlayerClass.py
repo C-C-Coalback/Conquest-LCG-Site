@@ -3846,6 +3846,13 @@ class Player:
                     self.game.create_reaction("Fenrisian Wolf", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Kroot Guerrilla":
                 self.game.create_reaction("Kroot Guerrilla", self.name_player, (int(self.number), planet_num, i))
+            if self.get_lumbering_given_pos(planet_num, i):
+                self.exhaust_given_pos(planet_num, i, card_effect=True)
+
+    def get_lumbering_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_lumbering()
+        return self.cards_in_play[planet_id + 1][unit_id].get_lumbering()
 
     def resolve_combat_round_begins(self, planet_num):
         for i in range(len(self.headquarters)):
