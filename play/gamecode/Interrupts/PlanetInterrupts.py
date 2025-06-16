@@ -22,7 +22,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
             hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits())
-            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits())
+            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
             same_planet_dis, same_planet_auto_dis = \
                 primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
             self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis

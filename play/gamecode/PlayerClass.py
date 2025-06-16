@@ -2295,6 +2295,10 @@ class Player:
                             print("ready")
                             self.set_aiming_reticle_in_play(-2, i, "green")
                             discounts_available += self.headquarters[i].get_discount_amount()
+                elif self.headquarters[i].get_ability() == "Parasitic Scarabs":
+                    if faction_of_card == "Necrons":
+                        discounts_available += 1
+                        self.set_aiming_reticle_in_play(-2, i, "green")
                 elif self.headquarters[i].get_ability() == "Digestion Pool":
                     if self.headquarters[i].get_ready():
                         if planet_chosen is not None:
@@ -2327,7 +2331,7 @@ class Player:
                         self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
-    def search_planet_for_discounts(self, planet_pos, traits):
+    def search_planet_for_discounts(self, planet_pos, traits, faction_of_card):
         discounts_available = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if "Daemon" in traits:
@@ -2339,6 +2343,10 @@ class Player:
                 elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
                     self.set_aiming_reticle_in_play(planet_pos, i, "green")
+            elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Parasitic Scarabs":
+                if faction_of_card == "Necrons":
+                    discounts_available += 1
+                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
         return discounts_available
 
     def reset_all_aiming_reticles_play_hq(self):
@@ -2348,10 +2356,10 @@ class Player:
             for i in range(len(self.cards_in_play[j + 1])):
                 self.reset_aiming_reticle_in_play(j, i)
 
-    def search_all_planets_for_discounts(self, traits):
+    def search_all_planets_for_discounts(self, traits, faction_of_card):
         discounts_available = 0
         for i in range(7):
-            discounts_available += self.search_planet_for_discounts(i, traits)
+            discounts_available += self.search_planet_for_discounts(i, traits, faction_of_card)
         return discounts_available
 
     def search_same_planet_for_discounts(self, faction_of_card, planet_pos):
@@ -2564,6 +2572,13 @@ class Player:
             if self.headquarters[pos].aiming_reticle_color == "green":
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
+        if self.headquarters[pos].get_ability() == "Parasitic Scarabs":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                discount += 1
+                self.reset_aiming_reticle_in_play(-2, pos)
+                self.assign_damage_to_pos(-2, pos, 1)
+                self.game.damage_for_unit_to_take_on_play.append(1)
+                self.discard_top_card_deck()
         if self.headquarters[pos].get_ability() == "Sae'lum Enclave":
             if self.headquarters[pos].aiming_reticle_color == "green":
                 self.exhaust_given_pos(-2, pos)
@@ -2821,6 +2836,13 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 discount += 1
+        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Parasitic Scarabs":
+            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+                discount += 1
+                self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                self.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.game.damage_for_unit_to_take_on_play.append(1)
+                self.discard_top_card_deck()
         if "Daemon" in traits:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
                 discount += 1

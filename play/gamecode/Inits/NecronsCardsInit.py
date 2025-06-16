@@ -258,6 +258,11 @@ def necrons_cards_init():
         CardClasses.ArmyCard("Triarch Stalkers Procession", "No Wargear Attachments.\n"
                                                             "Forced Reaction: After you deploy this unit, "
                                                             "have your opponent draw 2 cards.", "Vehicle.",
-                             3, faction, "Common", 4, 6, 2, False, wargear_attachments_permitted=False)
+                             3, faction, "Common", 4, 6, 2, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Parasitic Scarabs", "No Wargear attachments.\n"
+                                                  "Interrupt: When you deploy a Necrons unit, deal 1 damage to "
+                                                  "this unit and the deployed unit to reduce its cost by 1. "
+                                                  "Then discard the top card of your deck.", "Drone.",
+                             2, faction, "Common", 0, 4, 1, False, applies_discounts=[True, 1, True])
     ]
     return necrons_card_array

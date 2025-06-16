@@ -34,6 +34,7 @@ class Game:
         self.name_1 = player_one_name
         self.name_2 = player_two_name
         self.current_game_event_p1 = ""
+        self.damage_is_taken_one_at_a_time = True
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
@@ -99,7 +100,6 @@ class Game:
         self.ranged_skirmish_active = False
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
-        self.damage_is_taken_one_at_a_time = False
         self.damage_left_to_take = 0
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
@@ -4064,7 +4064,8 @@ class Game:
                             slaanesh_temptation = True
         if slaanesh_temptation:
             self.available_discounts -= 1
-        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play)
+        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play,
+                                                                            card.get_faction())
         self.available_discounts += temp_av_disc
 
     def create_reactions_phase_begins(self):
