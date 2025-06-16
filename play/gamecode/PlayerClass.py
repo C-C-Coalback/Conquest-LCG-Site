@@ -84,7 +84,9 @@ class Player:
         self.warlord_just_got_destroyed = False
         self.mulligan_done = False
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
-                             "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor"]
+                             "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor",
+                             "Aberrant Alpha", "Vanguarding Horror", "Praetorian Shadow",
+                             "Ardaci-strain Broodlord"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord", "Subject Omega-X62113",
                                      "Parasite of Mortrex", "Magus Harid"]
         self.synapse_name = ""
@@ -320,6 +322,15 @@ class Player:
         for i in range(len(other_player.cards_in_play[planet_id + 1])):
             if other_player.get_ability_given_pos(planet_id, i) == "Catachan Tracker":
                 ds_value += 2
+        vanguarding_horror = False
+        if planet_id != 0:
+            if self.search_card_at_planet(planet_id - 1, "Vanguarding Horror"):
+                vanguarding_horror = True
+        if not vanguarding_horror and planet_id != 6:
+            if self.search_card_at_planet(planet_id + 1, "Vanguarding Horror"):
+                vanguarding_horror = True
+        if vanguarding_horror:
+            ds_value = ds_value - 1
         return ds_value
 
     def deepstrike_event(self, planet_id, unit_id):
@@ -2987,6 +2998,18 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
+        if card.get_card_type() == "Warlord":
+            found_praetorian_shadow = False
+            if self.search_card_at_planet(planet_id, "Praetorian Shadow"):
+                found_praetorian_shadow = True
+            if not found_praetorian_shadow and planet_id != 0:
+                if self.search_card_at_planet(planet_id - 1, "Praetorian Shadow"):
+                    found_praetorian_shadow = True
+            if not found_praetorian_shadow and planet_id != 6:
+                if self.search_card_at_planet(planet_id + 1, "Praetorian Shadow"):
+                    found_praetorian_shadow = True
+            if found_praetorian_shadow:
+                attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
@@ -3446,6 +3469,9 @@ class Player:
             if self.search_card_in_hq("Reign of Solemnace"):
                 warlord_pla, warlord_pos = self.get_location_of_warlord()
                 if warlord_pla == planet_id:
+                    health += 1
+            if self.game.infested_planets[planet_id]:
+                if self.search_for_card_everywhere("Aberrant Alpha"):
                     health += 1
         if card.get_ability() == "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):

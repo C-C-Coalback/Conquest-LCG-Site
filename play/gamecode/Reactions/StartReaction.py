@@ -357,7 +357,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Noxious Fleshborer":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.infest_planet(planet_pos)
+            self.infest_planet(planet_pos, primary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Straken's Command Squad":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -557,7 +557,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Toxic Venomthrope":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if not self.infested_planets[planet_pos]:
-                self.infest_planet(planet_pos)
+                self.infest_planet(planet_pos, primary_player)
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
@@ -613,7 +613,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Scything Hormagaunts":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.infest_planet(planet_pos)
+            self.infest_planet(planet_pos, primary_player)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "The Bloodrunna":

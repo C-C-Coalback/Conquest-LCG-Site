@@ -132,6 +132,20 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                         i = i - 1
                     i = i + 1
                 self.delete_reaction()
+    elif current_reaction == "Ardaci-strain Broodlord":
+        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        if abs(chosen_planet - planet_pos) == 1:
+            if not self.infested_planets[chosen_planet]:
+                self.infest_planet(chosen_planet, primary_player)
+                primary_player.draw_card()
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.get_ability_given_pos(-2, i) == "Ardaci-strain Broodlord":
+                        primary_player.set_once_per_phase_used_given_pos(-2, i, True)
+                for i in range(7):
+                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                        if primary_player.get_ability_given_pos(i, j) == "Ardaci-strain Broodlord":
+                            primary_player.set_once_per_phase_used_given_pos(i, j, True)
+                self.delete_reaction()
     elif current_reaction == "Third Eye of Trazyn":
         if self.chosen_first_card:
             if abs(self.misc_target_planet - chosen_planet) == 1:
@@ -139,6 +153,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Spore Chimney":
-        self.infest_planet(int(game_update_string[1]))
+    elif current_reaction == "Spore Chimney":
+        self.infest_planet(chosen_planet, primary_player)
         self.delete_reaction()

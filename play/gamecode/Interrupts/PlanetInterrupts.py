@@ -36,7 +36,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
                                                       discounts=self.discounts_applied)
     elif current_interrupt == "Prey on the Weak":
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
-            self.infest_planet(chosen_planet)
+            self.infest_planet(chosen_planet, primary_player)
             self.delete_interrupt()
     elif current_interrupt == "Trazyn the Infinite":
         origin_planet, origin_pos = primary_player.get_location_of_warlord()

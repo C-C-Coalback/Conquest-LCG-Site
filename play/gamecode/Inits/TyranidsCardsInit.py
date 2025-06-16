@@ -349,6 +349,22 @@ def tyranids_cards_init():
                                                     "with a different name into play at your HQ "
                                                     "from the card collection. (Limit once per game.)", "Upgrade.",
                                 1, faction, "Signature", False, action_in_play=True,
-                                allowed_phases_in_play="ALL")
+                                allowed_phases_in_play="ALL"),
+        CardClasses.SynapseCard("Ardaci-strain Broodlord", "Reaction: After you infest a planet, draw a card and "
+                                                           "infest an adjacent planet. (Limit once per phase.)",
+                                "Creature. Genestealer. Elite.", 1, 4, 1, True),
+        CardClasses.SynapseCard("Aberrant Alpha", "Each army unit you control at an infested planet gets +1 HP.",
+                                "Genestealer. Elite.", 1, 4, 1, True),
+        CardClasses.SynapseCard("Praetorian Shadow", "While this unit is at the same or adjacent planet as "
+                                                     "your warlord, your warlord gets +1 ATK.\n"
+                                                     "Reaction: After your warlord is assigned damage, exhaust this "
+                                                     "unit to prevent 1 of that damage.", "Creature. Elite.",
+                                1, 5, 1, True),
+        CardClasses.SynapseCard("Vanguarding Horror", "Reduce the Deep Strike value of each card you control at "
+                                                      "each adjacent planet by 1.\n"
+                                                      "Combat Action: Exhaust this unit to move a card in reserve "
+                                                      "either: from this planet to an adjacent planet or "
+                                                      "from an adjacent planet to this planet.", "Creature. Elite.",
+                                1, 4, 1, True, action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return tyranids_card_array

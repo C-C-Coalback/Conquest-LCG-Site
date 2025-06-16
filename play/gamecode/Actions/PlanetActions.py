@@ -142,7 +142,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if self.infested_planets[adj_2]:
                 adj_2_infested = True
         if adj_1_infested or adj_2_infested:
-            self.infest_planet(chosen_planet)
+            self.infest_planet(chosen_planet, primary_player)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             self.mode = "Normal"
             self.action_chosen = ""
@@ -392,8 +392,21 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if primary_player.check_for_trait_given_pos(chosen_planet, i, "Genestealer"):
                     num_genestealers += 1
             if num_genestealers > 1:
-                self.infest_planet(chosen_planet)
+                self.infest_planet(chosen_planet, primary_player)
         self.action_cleanup()
+    elif self.action_chosen == "Vanguarding Horror":
+        if self.chosen_first_card:
+            if abs(chosen_planet - self.misc_target_planet):
+                planet_pos, unit_pos = self.misc_target_unit
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = None
+                primary_player.cards_in_reserve[chosen_planet].append(
+                    primary_player.cards_in_reserve[planet_pos][unit_pos]
+                )
+                del primary_player.cards_in_reserve[planet_pos][unit_pos]
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                self.action_cleanup()
     elif self.action_chosen == "Archon's Palace":
         self.misc_target_planet = chosen_planet
         self.choices_available = ["Cards", "Resources"]

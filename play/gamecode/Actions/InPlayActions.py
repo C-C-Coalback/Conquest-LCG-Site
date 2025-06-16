@@ -41,7 +41,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await self.send_update_message("Haemonculus buffed")
                     elif ability == "Virulent Spore Sacs":
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
-                        self.infest_planet(planet_pos)
+                        self.infest_planet(planet_pos, player_owning_card)
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                             secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
                             if i == 0:
@@ -258,6 +258,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
+                    elif ability == "Vanguarding Horror":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            self.misc_target_planet = planet_pos
                     elif ability == "Techmarine Aspirant":
                         if primary_player.resources > 0:
                             self.action_chosen = ability
@@ -298,9 +304,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                                   unit_pos, "red")
                                     player_owning_card.ready_given_pos(planet_pos, unit_pos)
                                     card_chosen.set_once_per_phase_used(True)
-                                    self.player_with_action = ""
-                                    self.action_chosen = ""
-                                    self.mode = "Normal"
+                                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                                    self.action_cleanup()
     elif self.action_chosen == "Twisted Laboratory":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
