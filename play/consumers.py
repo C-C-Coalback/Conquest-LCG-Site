@@ -6,7 +6,7 @@ from .gamecode import GameClass
 import os
 from .gamecode import Initfunctions, FindCard
 import threading
-import logging
+import traceback
 import datetime
 
 
@@ -309,6 +309,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data): # noqa
         global active_games
         global chat_messages
+        global logger
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print(message)
@@ -324,10 +325,14 @@ class GameConsumer(AsyncWebsocketConsumer):
                 try:
                     await active_games[current_game_id].update_game_event(self.name, message[1:])
                 except:
+                    try:
+                        with open("errorslog.txt", "a") as f:
+                            f.write(traceback.format_exc())
+                    except:
+                        pass
                     await self.receive_game_update(
                         "An error has occurred on the server side. Your game may become unstable or unplayable."
                     )
-                    logging.exception('..')
         if message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
             try:
@@ -341,6 +346,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                         for i in range(len(active_games)):
                             if active_games[i].game_id == self.room_name:
                                 await active_games[i].send_planet_array()
+                    elif message[1] == "Error":
+                        raise ValueError
                     elif message[1] == "force-quit-reactions":
                         await self.receive_game_update("FORCEFULLY QUITTING REACTIONS")
                         active_games[self.game_position].reset_reactions_data()
@@ -394,7 +401,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                     elif (message[1] == "loaddeck" or message[1] == "LOADDECK") and len(message) > 2:
                         deck_name = message[2]
                         print(deck_name)
-                        path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + deck_name
+                        path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + \
+                            self.user.username + "/" + deck_name
                         print(path_to_player_decks)
                         if os.path.exists(path_to_player_decks):
                             print("Success")
@@ -407,11 +415,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     if active_games[i].name_1 == self.name:
                                         print("Need to load player one's deck")
                                         if not active_games[i].p1.deck_loaded:
-                                            await active_games[i].p1.setup_player(deck_content, active_games[i].planet_array)
+                                            await active_games[i].p1.setup_player(deck_content,
+                                                                                  active_games[i].planet_array)
                                     elif active_games[i].name_2 == self.name:
                                         print("Need to load player two's deck")
                                         if not active_games[i].p2.deck_loaded:
-                                            await active_games[i].p2.setup_player(deck_content, active_games[i].planet_array)
+                                            await active_games[i].p2.setup_player(deck_content,
+                                                                                  active_games[i].planet_array)
                     elif message[1] == "addcard" and len(message) > 3:
                         card_name = message[3]
                         card = FindCard.find_card(card_name, active_games[self.game_position].card_array,
@@ -488,7 +498,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             int(unit_position[2]))
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name, {"type": "chat.message", "message": "Incorrect clear usage"}
+                                    self.room_group_name, {"type": "chat.message", "message": "server: "
+                                                                                              "Incorrect clear usage"}
                                 )
                     elif message[1] == "infest-planet" and len(message) > 2:
                         planet_pos = int(message[2])
@@ -522,7 +533,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             int(unit_position[2]))
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name, {"type": "chat.message", "message": "Incorrect ready usage"}
+                                    self.room_group_name, {"type": "chat.message", "message": "server: "
+                                                                                              "Incorrect ready usage"}
                                 )
                     elif message[1] == "exhaust-card" and len(message) > 3:
                         unit_position = message[2:]
@@ -548,7 +560,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                                             int(unit_position[2]))
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name, {"type": "chat.message", "message": "Incorrect exhaust usage"}
+                                    self.room_group_name, {"type": "chat.message", "message": "server: Incorrect exhaust usage"}
                                 )
                     elif message[1] == "set-damage" and len(message) > 3:
                         unit_position = message[2:]
@@ -581,7 +593,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                             except:
                                 await self.channel_layer.group_send(
                                     self.room_group_name,
-                                    {"type": "chat.message", "message": "Incorrect SET-DAMAGE usage"}
+                                    {"type": "chat.message", "message": "server: Incorrect SET-DAMAGE usage"}
                                 )
                 else:
                     message = self.name + ": " + "/".join(message)
@@ -595,8 +607,14 @@ class GameConsumer(AsyncWebsocketConsumer):
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
             except:
+                try:
+                    with open("errorslog.txt", "a") as f:
+                        f.write(traceback.format_exc())
+                except:
+                    pass
                 await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "chat.message", "message": "Something went wrong during command"}
+                    self.room_group_name, {"type": "chat.message", "message": "server: "
+                                                                              "Something went wrong during command"}
                 )
         condition_games.notify_all()
         condition_games.release()
