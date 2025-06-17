@@ -795,6 +795,9 @@ class Game:
                     elif self.action_chosen == "Seer's Exodus":
                         await self.send_update_message("Stopping Seer's Exodus")
                         self.action_cleanup()
+                    elif self.action_chosen == "Rapid Evolution":
+                        await self.send_update_message("Stopping Rapid Evolution")
+                        self.action_cleanup()
                     elif self.action_chosen == "Despise":
                         await self.send_update_message(
                             self.player_with_action + " does not sacrifice a card for Despise."
@@ -6032,6 +6035,20 @@ class Game:
         await self.update_interrupts(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
+        if self.p1.lost_due_to_deck and not self.p1.already_lost_due_to_deck:
+            await self.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_2 + "; " + self.name_1 + " was unable to draw a card from their deck."
+                                               "----GAME END----"
+            )
+            self.p1.already_lost_due_to_deck = True
+        if self.p2.lost_due_to_deck and not self.p2.already_lost_due_to_deck:
+            await self.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_1 + "; " + self.name_2 + " was unable to draw a card from their deck."
+                                                                    "----GAME END----"
+            )
+            self.p2.already_lost_due_to_deck = True
         print("---\nDEBUG INFO\n---")
         print(self.interrupts_waiting_on_resolution)
         print(self.reactions_needing_resolving)

@@ -190,6 +190,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Rapid Evolution":
+                        if primary_player.can_play_limited:
+                            self.action_chosen = ability
+                            primary_player.can_play_limited = True
+                            self.misc_counter = [0, 0, 0]
+                            primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Know No Fear":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
@@ -781,9 +787,25 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+    elif self.action_chosen == "Rapid Evolution":
+        if card.get_card_type() == "Army":
+            if self.misc_counter[0] < 2:
+                self.misc_counter[0] = self.misc_counter[0] + 1
+                primary_player.discard_card_from_hand(hand_pos)
+                self.action_chosen = "Rapid Evolution Termagant"
+                await self.send_update_message("Please choose a planet to place a Termagant")
+        elif card.get_card_type() == "Attachment":
+            if self.misc_counter[1] < 2:
+                self.misc_counter[1] = self.misc_counter[1] + 1
+                primary_player.discard_card_from_hand(hand_pos)
+                primary_player.draw_card()
+        elif card.get_card_type() == "Support":
+            if self.misc_counter[2] < 2:
+                self.misc_counter[2] = self.misc_counter[2] + 1
+                primary_player.discard_card_from_hand(hand_pos)
+                primary_player.add_resources(1)
     elif self.action_chosen == "Dread Command Barge":
         if not self.chosen_first_card:
-            card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card.get_faction() != "Necrons":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True

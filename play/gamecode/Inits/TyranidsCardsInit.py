@@ -414,6 +414,15 @@ def tyranids_cards_init():
                                          "Action: Exhaust a target army unit. "
                                          "Then, you may sacrifice a unit to rout it.", "Tactic.",
                               2, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.EventCard("Rapid Evolution", "Limited.\n"
+                                                 "Deploy Action: Discard one or more cards from your hand. "
+                                                 "For each unit discarded, put a Termagant "
+                                                 "token into play at a planet. "
+                                                 "For each attachment, draw a card."
+                                                 "For each support, gain 1 resource."
+                                                 "(Limit 2 per type)", "Power.",
+                              0, faction, "Common", 2, False, limited=True,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY")
     ]
     return tyranids_card_array

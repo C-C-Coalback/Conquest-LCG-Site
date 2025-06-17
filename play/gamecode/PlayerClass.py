@@ -86,6 +86,8 @@ class Player:
         self.stored_cards_recently_destroyed = []
         self.num_nullify_played = 0
         self.warlord_just_got_destroyed = False
+        self.lost_due_to_deck = False
+        self.already_lost_due_to_deck = False
         self.mulligan_done = False
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
                              "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor",
@@ -659,6 +661,7 @@ class Player:
 
     def draw_card(self):
         if not self.deck:
+            self.lost_due_to_deck = True
             print("Deck is empty, you lose!")
         else:
             self.cards.append(self.deck[0])

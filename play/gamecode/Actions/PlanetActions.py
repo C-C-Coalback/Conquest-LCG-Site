@@ -590,6 +590,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.mode = "Normal"
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
+    elif self.action_chosen == "Rapid Evolution Termagant":
+        primary_player.summon_token_at_planet("Termagant", chosen_planet)
+        self.action_chosen = "Rapid Evolution"
+        await self.send_update_message("You many now continue with Rapid Evolution")
     elif self.action_chosen == "Soul Seizure":
         if self.chosen_first_card:
             card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
