@@ -409,6 +409,11 @@ def tyranids_cards_init():
         CardClasses.EventCard("Contaminated Convoys", "Reaction: After a phase begins, until the end of this phase, "
                                                       "when an enemy army unit enters play at a planet, put a "
                                                       "Termagant token into play at the same planet and infest it.",
-                              "Tactic.", 1, faction, "Common", 1, False)
+                              "Tactic.", 1, faction, "Common", 1, False),
+        CardClasses.EventCard("Overrun", "If all effects of this event are cancelled, draw 2 cards.\n"
+                                         "Action: Exhaust a target army unit. "
+                                         "Then, you may sacrifice a unit to rout it.", "Tactic.",
+                              2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tyranids_card_array

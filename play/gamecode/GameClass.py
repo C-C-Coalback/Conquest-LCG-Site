@@ -1553,6 +1553,13 @@ class Game:
                             self.create_reaction(self.nullified_card_name, primary_player.name_player,
                                                  (int(primary_player.number), -1, -1))
                     self.delete_reaction()
+                elif self.nullify_context == "Event Action":
+                    self.action_cleanup()
+                elif self.nullify_context == "In Play Action":
+                    self.action_cleanup()
+                if self.nullified_card_name == "Overrun":
+                    primary_player.draw_card()
+                    primary_player.draw_card()
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
         if resolve_nullify_discard:
@@ -1646,6 +1653,9 @@ class Game:
         if self.nullify_context == "Event Action":
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
+            if self.nullified_card_name == "Overrun":
+                secondary_player.draw_card()
+                secondary_player.draw_card()
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
@@ -1681,13 +1691,13 @@ class Game:
             self.create_reaction("Banshee Assault Squad", primary_player.name_player,
                                  (int(primary_player.number), -1, -1))
         if self.nullify_context == "Event Action":
+            if self.nullified_card_name == "Overrun":
+                secondary_player.draw_card()
+                secondary_player.draw_card()
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            self.amount_spend_for_tzeentch_firestorm = 0
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+            self.action_cleanup()
         elif self.nullify_context == "In Play Action":
             secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                           self.position_of_actioned_card[1])
@@ -1843,6 +1853,9 @@ class Game:
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
                 secondary_player.aiming_reticle_coords_hand_2 = None
+                if self.nullified_card_name == "Overrun":
+                    secondary_player.draw_card()
+                    secondary_player.draw_card()
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -1887,6 +1900,9 @@ class Game:
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
                 secondary_player.aiming_reticle_coords_hand_2 = None
+                if self.nullified_card_name == "Overrun":
+                    secondary_player.draw_card()
+                    secondary_player.draw_card()
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -1930,6 +1946,9 @@ class Game:
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
                 secondary_player.aiming_reticle_coords_hand_2 = None
+                if self.nullified_card_name == "Overrun":
+                    secondary_player.draw_card()
+                    secondary_player.draw_card()
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -2430,6 +2449,10 @@ class Game:
                             if len(self.choices_available) < 4:
                                 self.choices_available.append(str(i))
                         self.choice_context = "How Many Cards? (Slake the Thirst):"
+                    elif self.choice_context == "Overrun: Followup Rout?":
+                        self.reset_choices_available()
+                        if game_update_string[1] == "1":
+                            self.action_cleanup()
                     elif self.choice_context == "How Many Cards? (Slake the Thirst):":
                         num_cards = int(game_update_string[1])
                         if self.misc_target_choice == "0":
