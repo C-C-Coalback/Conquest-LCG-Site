@@ -2727,9 +2727,14 @@ class Player:
         if planet_pos == -2:
             if expiration == "EOP":
                 self.headquarters[unit_pos].increase_extra_health_until_end_of_phase(amount)
+            elif expiration == "EOG":
+                self.headquarters[unit_pos].increase_extra_health_until_end_of_game(amount)
             return None
         if expiration == "EOP":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_phase(amount)
+        elif expiration == "EOG":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_game(amount)
+        return None
 
     def increase_attack_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
         if planet_pos == -2:
@@ -2739,6 +2744,8 @@ class Player:
                 self.headquarters[unit_pos].increase_extra_attack_until_next_attack(amount)
             elif expiration == "EOP":
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_phase(amount)
+            elif expiration == "EOG":
+                self.headquarters[unit].increase_extra_attack_until_end_of_game(amount)
             return None
         if expiration == "EOB":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
@@ -2746,6 +2753,8 @@ class Player:
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_next_attack(amount)
         elif expiration == "EOP":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_phase(amount)
+        elif expiration == "EOG":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_game(amount)
         return None
 
     def increase_attack_of_all_units_at_hq(self, amount, required_faction=None, expiration="EOB"):
@@ -3999,6 +4008,11 @@ class Player:
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         self.cards_in_play[i + 1][j].misc_ability_used = True
                         self.game.create_interrupt("Icy Trygon", self.name_player, (int(self.number), i, j))
+                    if self.get_ability_given_pos(i, j) == "Growing Tide"\
+                            and not self.cards_in_play[i + 1][j].misc_ability_used:
+                        if i == self.game.round_number:
+                            self.cards_in_play[i + 1][j].misc_ability_used = True
+                            self.game.create_interrupt("Growing Tide", self.name_player, (int(self.number), i, j))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if planet_num == -2:
@@ -4406,6 +4420,11 @@ class Player:
                         self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.remove_card_from_play(planet_id, unit_id)
+        last_element_index = len(self.headquarters) - 1
+        if self.get_ability_given_pos(-2, last_element_index) == "Growing Tide":
+            if planet_id == self.game.round_number:
+                self.game.create_interrupt("Growing Tide", self.name_player,
+                                           (int(self.number), -2, last_element_index))
         return True
 
     def resolve_combat_round_ends_effects(self, planet_id):
@@ -4496,6 +4515,8 @@ class Player:
 
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.get_ability_given_pos(planet_id, unit_id) == "Growing Tide":
+                return False
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
             enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
                                                                                    "Umbral Preacher")

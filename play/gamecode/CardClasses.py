@@ -269,6 +269,8 @@ class UnitCard(Card):
         self.extra_attack_until_end_of_battle = 0
         self.extra_attack_until_next_attack = 0
         self.extra_attack_until_end_of_phase = 0
+        self.extra_attack_until_end_of_game = 0
+        self.positive_hp_until_eog = 0
         self.by_base_ranged = ranged
         self.ranged = ranged
         self.wargear_attachments_permitted = wargear_attachments_permitted
@@ -568,11 +570,24 @@ class UnitCard(Card):
     def reset_brutal(self):
         self.brutal = self.by_base_brutal
 
+    def get_extra_attack_until_end_of_game(self):
+        return self.extra_attack_until_end_of_game
+
+    def get_extra_health_until_end_of_game(self):
+        return self.positive_hp_until_eog
+
+    def increase_extra_attack_until_end_of_game(self, value):
+        self.extra_attack_until_end_of_game += value
+
+    def increase_extra_health_until_end_of_game(self, value):
+        self.positive_hp_until_eog += value
+
     def get_attack(self):
         attack = self.attack
         attack += self.get_extra_attack_until_end_of_battle()
         attack += self.get_extra_attack_until_next_attack()
         attack += self.get_extra_attack_until_end_of_phase()
+        attack += self.get_extra_attack_until_end_of_game()
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 attack += self.attachments[i].get_extra_attack()
@@ -587,6 +602,7 @@ class UnitCard(Card):
         health -= self.negative_hp_until_eop
         health += self.positive_hp_until_eop
         health += self.positive_hp_until_eob
+        health += self.positive_hp_until_eog
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 health += self.attachments[i].get_extra_health()

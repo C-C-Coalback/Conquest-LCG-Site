@@ -382,6 +382,11 @@ def tyranids_cards_init():
         CardClasses.ArmyCard("Emergent Cultists", "While at an infested planet, this unit gets +1 HP.\n"
                                                   "Reaction: After you deploy this unit, "
                                                   "exhaust a target enemy support card.", "Hybrid. Genestealer.",
-                             2, faction, "Common", 3, 2, 1, False)
+                             2, faction, "Common", 3, 2, 1, False),
+        CardClasses.ArmyCard("Growing Tide", "No Attachments. Cannot Retreat.\n"
+                                             "Interrupt: When this unit leaves the first planet, move it to an "
+                                             "adjacent planet to remove all damage from it and give it +1 ATK "
+                                             "and +1 HP until the end of the game instead.", "Swarm.",
+                             2, faction, "Common", 1, 1, 1, False, no_attachments=True)
     ]
     return tyranids_card_array
