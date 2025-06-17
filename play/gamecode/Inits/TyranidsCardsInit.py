@@ -396,6 +396,14 @@ def tyranids_cards_init():
                                                              "planets are already infested, gain 2 resources instead.",
                                    "Location.", 1, faction, "Common", 1, False,
                                    limited=True, limit_one_per_unit=True, planet_attachment=True,
-                                   action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
+                                   action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.AttachmentCard("Adaptative Thorax Swarm", "Attach to an army unit.\n"
+                                                              "Attached unit gets +1 ATK and +1 HP per planet "
+                                                              "in your victory display.\n"
+                                                              "Reaction: After the first round begins, reveal this card "
+                                                              "from your hand and up to two cards from your hand, "
+                                                              "put them on the bottom of your deck in any order and "
+                                                              "draw the same amount of cards.", "Biomorph.",
+                                   1, faction, "Common", 2, True, type_of_units_allowed_for_attachment="Army")
     ]
     return tyranids_card_array

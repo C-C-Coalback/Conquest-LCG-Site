@@ -1301,6 +1301,20 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Adaptative Thorax Swarm":
+            self.misc_counter = 0
+            first_index = -1
+            for i in range(len(primary_player.cards)):
+                if primary_player.cards[i] == "Adaptative Thorax Swarm":
+                    if first_index == -1:
+                        first_index = i
+            if first_index == -1:
+                self.delete_reaction()
+                await self.send_update_message("Adaptative Thorax Swarm not found in hand")
+            else:
+                primary_player.aiming_reticle_coords_hand = first_index
+                primary_player.aiming_reticle_color = "blue"
+                self.misc_player_storage = [first_index]
         elif current_reaction == "Seething Mycetic Spore":
             self.misc_counter = 0
             self.misc_player_storage = ""

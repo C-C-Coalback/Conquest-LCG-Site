@@ -42,6 +42,33 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                         more = True
                 if not more:
                     self.delete_reaction()
+        elif current_reaction == "Adaptative Thorax Swarm":
+            if hand_pos not in self.misc_player_storage:
+                primary_player.aiming_reticle_coords_hand_2 = hand_pos
+                self.misc_player_storage.append(hand_pos)
+                if len(self.misc_player_storage) > 2:
+                    names_list = []
+                    i = 0
+                    while i < len(self.misc_player_storage):
+                        names_list.append(primary_player.cards[self.misc_player_storage[i]])
+                        primary_player.remove_card_from_hand(self.misc_player_storage[i])
+                        primary_player.deck.append(self.misc_player_storage[i])
+                        j = i + 1
+                        while j < len(self.misc_player_storage):
+                            if self.misc_player_storage[j] > self.misc_player_storage[i]:
+                                self.misc_player_storage[j] = self.misc_player_storage[j] - 1
+                            j = j + 1
+                        i = i + 1
+                    cards_removed = ", ".join(names_list)
+                    await self.send_update_message("Cards put on bottom of deck: " + cards_removed)
+                    for _ in range(len(self.misc_player_storage)):
+                        primary_player.draw_card()
+                    primary_player.aiming_reticle_coords_hand = None
+                    primary_player.aiming_reticle_coords_hand_2 = None
+                    if primary_player.search_hand_for_card("Adaptative Thorax Swarm"):
+                        self.create_reaction("Adaptative Thorax Swarm", primary_player.name_player,
+                                             (int(primary_player.number), -1, -1))
+                    self.delete_reaction()
         elif current_reaction == "Seething Mycetic Spore":
             card = primary_player.get_card_in_hand(hand_pos)
             if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != self.misc_player_storage:

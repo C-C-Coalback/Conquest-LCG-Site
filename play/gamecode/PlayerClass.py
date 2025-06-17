@@ -3131,6 +3131,12 @@ class Player:
         attachments = card.get_attachments()
         condition_present = False
         for i in range(len(attachments)):
+            if attachments[i].get_ability() == "Adaptative Thorax Swarm":
+                if attachments[i].name_owner == self.name_player:
+                    attack_value += len(self.victory_display)
+                else:
+                    other_player = self.get_other_player()
+                    attack_value += len(other_player.victory_display)
             if attachments[i].check_for_a_trait("Condition"):
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
@@ -3483,6 +3489,12 @@ class Player:
                 return True
         return False
 
+    def get_other_player(self):
+        other_player = self.game.p1
+        if other_player.name_player == self.name_player:
+            other_player = self.game.p2
+        return other_player
+
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
@@ -3495,6 +3507,14 @@ class Player:
                     health += 4
             if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
                 health += len(self.discard)
+            for i in range(len(self.headquarters[unit_id].get_attachments())):
+                attachment = self.headquarters[unit_id].get_attachments()[i]
+                if attachment.get_ability() == "Adaptative Thorax Swarm":
+                    if attachment.name_owner == self.name_player:
+                        health += len(self.victory_display)
+                    else:
+                        other_player = self.get_other_player()
+                        health += len(other_player.victory_display)
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -3563,6 +3583,12 @@ class Player:
                 health = health - hunt_count
         attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
         for i in range(len(attachments)):
+            if attachments[i].get_ability() == "Adaptative Thorax Swarm":
+                if attachments[i].name_owner == self.name_player:
+                    health += len(self.victory_display)
+                else:
+                    other_player = self.get_other_player()
+                    health += len(other_player.victory_display)
             if attachments[i].get_ability() == "Noxious Fleshborer":
                 if self.game.infested_planets[planet_id]:
                     health += 1

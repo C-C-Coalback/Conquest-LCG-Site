@@ -2573,6 +2573,10 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.send_update_message(
                                 "Both players setup, good luck and have fun!")
+                            if self.p1.search_hand_for_card("Adaptative Thorax Swarm"):
+                                self.create_reaction("Adaptative Thorax Swarm", self.name_1, (1, -1, -1))
+                            if self.p2.search_hand_for_card("Adaptative Thorax Swarm"):
+                                self.create_reaction("Adaptative Thorax Swarm", self.name_2, (2, -1, -1))
                             if self.p1.warlord_faction == "Necrons":
                                 await self.create_necrons_wheel_choice(self.p1)
                             elif self.p2.warlord_faction == "Necrons":
@@ -4828,6 +4832,28 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    elif self.reactions_needing_resolving[0] == "Adaptative Thorax Swarm":
+                        i = 0
+                        names_list = []
+                        while i < len(self.misc_player_storage):
+                            names_list.append(primary_player.cards[self.misc_player_storage[i]])
+                            primary_player.remove_card_from_hand(self.misc_player_storage[i])
+                            primary_player.deck.append(self.misc_player_storage[i])
+                            j = i + 1
+                            while j < len(self.misc_player_storage):
+                                if self.misc_player_storage[j] > self.misc_player_storage[i]:
+                                    self.misc_player_storage[j] = self.misc_player_storage[j] - 1
+                                j = j + 1
+                            i = i + 1
+                        cards_removed = ", ".join(names_list)
+                        await self.send_update_message("Cards put on bottom of deck: " + cards_removed)
+                        for _ in range(len(self.misc_player_storage)):
+                            primary_player.draw_card()
+                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.aiming_reticle_coords_hand_2 = None
+                        if primary_player.search_hand_for_card("Adaptative Thorax Swarm"):
+                            self.create_reaction("Adaptative Thorax Swarm", primary_player.name_player,
+                                                 (int(primary_player.number), -1, -1))
                     if self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
                         primary_player.aiming_reticle_coords_hand = None
                         self.reset_choices_available()
