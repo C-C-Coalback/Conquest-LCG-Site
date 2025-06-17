@@ -428,12 +428,6 @@ def tyranids_cards_init():
                                                      "moves this unit to an adjacent planet. Then you may deal 1 "
                                                      "damage to this unit to deal 1 damage to a non-unique "
                                                      "unit at that planet.", "Creature. Drone.",
-                             1, faction, "Common", 0, 2, 1, False),
-        CardClasses.ArmyCard("Goliath Rockgrinder", "While at an infested planet, this unit gets +2 HP.\n"
-                                                    "Reaction: After this unit destroys an enemy unit, "
-                                                    "put X Termagant tokens into play at this planet. "
-                                                    "X is the printed HP value of that enemy unit. "
-                                                    "(Limit once per phase.)", "Genestealer. Vehicle. Elite.",
-                             5, faction, "Common", 3, 5, 2, False)
+                             1, faction, "Common", 0, 2, 1, False)
     ]
     return tyranids_card_array
