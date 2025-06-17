@@ -1306,6 +1306,15 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Contaminated Convoys")
                 primary_player.contaminated_convoys = True
             self.delete_reaction()
+        elif current_reaction == "Drifting Spore Mines":
+            if planet_pos != 6 or self.planets_in_play_array[5]:
+                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                self.player_who_resolves_reaction[0] = secondary_player.name_player
+                self.chosen_first_card = False
+                await self.send_update_message(secondary_player.name_player + ", please move the unit.")
+            else:
+                self.delete_reaction()
+                await self.send_update_message("No planet to move the unit to.")
         elif current_reaction == "Adaptative Thorax Swarm":
             self.misc_counter = 0
             first_index = -1

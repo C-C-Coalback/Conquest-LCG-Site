@@ -1499,6 +1499,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                     await self.send_update_message(card_name + " gained +2 ATK from Banner!")
                     self.delete_reaction()
+        elif current_reaction == "Drifting Spore Mines":
+            if planet_pos == self.misc_target_unit[0]:
+                if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
+                                                            shadow_field_possible=True)
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Cry of the Wind":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:

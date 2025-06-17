@@ -3755,6 +3755,9 @@ class Player:
                         self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Shard of the Deceiver":
                     self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Drifting Spore Mines":
+                    if phase == "COMBAT":
+                        self.game.create_reaction("Drifting Spore Mines", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Seer Adept":
                     if phase == "COMMAND":
                         enemy_player = self.game.p1
