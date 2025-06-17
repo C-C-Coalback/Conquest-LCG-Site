@@ -360,6 +360,7 @@ class Game:
         self.shrieking_exarch_cost_payed = False
         self.paying_shrieking_exarch_cost = False
         self.jungle_trench_count = 0
+        self.cards_with_dash_cost = ["Seething Mycetic Spore"]
 
     async def send_queued_sound(self):
         if self.queued_sound:

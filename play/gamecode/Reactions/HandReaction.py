@@ -3,6 +3,7 @@ from .. import FindCard
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
     current_reaction = self.reactions_needing_resolving[0]
+    hand_pos = int(game_update_string[2])
     if game_update_string[1] == primary_player.get_number():
         print("hand reaction num ok")
         if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
@@ -40,6 +41,16 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     if primary_player.cards[i] == "Elysian Assault Team":
                         more = True
                 if not more:
+                    self.delete_reaction()
+        elif current_reaction == "Seething Mycetic Spore":
+            card = primary_player.get_card_in_hand(hand_pos)
+            if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != self.misc_player_storage:
+                primary_player.add_card_to_planet(card, self.misc_target_planet)
+                primary_player.remove_card_from_hand(hand_pos)
+                self.misc_counter += 1
+                self.misc_player_storage = card.get_name()
+                if self.misc_counter > 1:
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))

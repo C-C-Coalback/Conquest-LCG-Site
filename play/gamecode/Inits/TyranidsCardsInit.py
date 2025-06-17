@@ -365,6 +365,12 @@ def tyranids_cards_init():
                                                       "Combat Action: Exhaust this unit to move a card in reserve "
                                                       "either: from this planet to an adjacent planet or "
                                                       "from an adjacent planet to this planet.", "Creature. Elite.",
-                                1, 4, 1, True, action_in_play=True, allowed_phases_in_play="COMBAT")
+                                1, 4, 1, True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Seething Mycetic Spore", "Deep Strike (1).\n"
+                                                       "Reaction: After you Deep Strike this unit, put 2 army units "
+                                                       "into play from your hand or discard pile at this planet. "
+                                                       "They must have different names and a printed cost of "
+                                                       "1 or less.", "Creature. Transport.",
+                             0, faction, "Common", 1, 3, 0, False, deepstrike=1)
     ]
     return tyranids_card_array

@@ -2,6 +2,7 @@ from .. import FindCard
 
 
 async def start_resolving_reaction(self, name, game_update_string):
+    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
     if self.player_who_resolves_reaction[0] == self.name_1:
         primary_player = self.p1
         secondary_player = self.p2
@@ -1297,10 +1298,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Syren Zythlex":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Seething Mycetic Spore":
+            self.misc_counter = 0
+            self.misc_player_storage = ""
+            self.misc_target_planet = planet_pos
         elif self.reactions_needing_resolving[0] == "Canoptek Scarab Swarm":
             seen_a_canoptek = False
             allowed_cards = []

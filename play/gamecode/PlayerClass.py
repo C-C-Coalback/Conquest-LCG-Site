@@ -394,6 +394,9 @@ class Player:
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Seething Mycetic Spore":
+            self.game.create_reaction("Seething Mycetic Spore", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Slavering Mawloc":
             self.game.create_reaction("Slavering Mawloc", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
@@ -762,6 +765,9 @@ class Player:
 
     def remove_card_from_hand(self, card_pos):
         del self.cards[card_pos]
+
+    def remove_card_from_discard(self, card_pos):
+        del self.discard[card_pos]
 
     def remove_card_name_from_hand(self, name):
         if name in self.cards:
