@@ -1315,13 +1315,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
                 await self.send_update_message("No planet to move the unit to.")
-        elif current_reaction == "Goliath Rockgrinder":
-            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-            for _ in range(self.goliath_rockgrinder_value):
-                primary_player.summon_token_at_planet("Termagant", planet_pos)
-            self.goliath_rockgrinder_value = 0
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
         elif current_reaction == "Adaptative Thorax Swarm":
             self.misc_counter = 0
             first_index = -1
