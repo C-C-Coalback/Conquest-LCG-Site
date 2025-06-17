@@ -1285,6 +1285,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Griffon Escort":
             self.game.create_reaction("Griffon Escort", self.name_player,
                                       (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Spreading Genestealer Brood":
+            self.game.create_reaction("Spreading Genestealer Brood", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
             self.game.create_reaction("Swordwind Farseer", self.name_player,
                                       (int(self.number), position, last_element_index))

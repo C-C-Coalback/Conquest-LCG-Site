@@ -371,6 +371,9 @@ def tyranids_cards_init():
                                                        "into play from your hand or discard pile at this planet. "
                                                        "They must have different names and a printed cost of "
                                                        "1 or less.", "Creature. Transport.",
-                             0, faction, "Common", 1, 3, 0, False, deepstrike=1)
+                             0, faction, "Common", 1, 3, 0, False, deepstrike=1),
+        CardClasses.ArmyCard("Spreading Genestealer Brood", "Reaction: After this unit enters play, put a Brood "
+                                                            "unit into play from your discard pile at this planet.",
+                             "Creature. Genestealer. Brood.", 1, faction, "Common", 1, 1, 1, False)
     ]
     return tyranids_card_array
