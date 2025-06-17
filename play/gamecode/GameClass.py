@@ -105,6 +105,7 @@ class Game:
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
         self.damage_left_to_take = 0
+        self.goliath_rockgrinder_value = 0
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None

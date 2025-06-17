@@ -1384,6 +1384,10 @@ class Player:
             on_kill_effects.append("Patrolling Wraith")
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Salvaged Battlewagon":
             on_kill_effects.append("Salvaged Battlewagon")
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Goliath Rockgrinder":
+            if not self.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                on_kill_effects.append("Goliath Rockgrinder")
+                self.game.goliath_rockgrinder_value = other_player.cards_in_play[def_pla + 1][def_pos].health
         for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
                 on_kill_effects.append("Bone Sabres")
@@ -3557,6 +3561,9 @@ class Player:
         if card.get_ability() == "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 health += 4
+        if card.get_ability() == "Goliath Rockgrinder":
+            if self.game.infested_planets[planet_id]:
+                health += 2
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
