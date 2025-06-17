@@ -70,6 +70,14 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if "Quantum Shielding" in primary_player.discard:
                 primary_player.discard.remove("Quantum Shielding")
             self.delete_interrupt()
+        elif current_interrupt == "Icy Trygon":
+            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = False
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
+            primary_player.discard_attachments_from_card(planet_pos, unit_pos)
+            primary_player.cards_in_reserve[planet_pos].append(primary_player.cards_in_play[planet_pos + 1][unit_pos])
+            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+            self.delete_interrupt()
         elif current_interrupt == "Gorgul Da Slaya":
             secondary_player.hit_by_gorgul = True
             self.mask_jain_zar_check_interrupts(primary_player, secondary_player)

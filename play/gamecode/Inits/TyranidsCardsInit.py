@@ -374,6 +374,10 @@ def tyranids_cards_init():
                              0, faction, "Common", 1, 3, 0, False, deepstrike=1),
         CardClasses.ArmyCard("Spreading Genestealer Brood", "Reaction: After this unit enters play, put a Brood "
                                                             "unit into play from your discard pile at this planet.",
-                             "Creature. Genestealer. Brood.", 1, faction, "Common", 1, 1, 1, False)
+                             "Creature. Genestealer. Brood.", 1, faction, "Common", 1, 1, 1, False),
+        CardClasses.ArmyCard("Icy Trygon", "Deep Strike (1).\n"
+                                           "Interrupt: When this unit would be destroyed by taking damage, remove "
+                                           "all damage from it and put it into reserve at this planet instead.",
+                             "Creature.", 3, faction, "Common", 2, 4, 1, False, deepstrike=1)
     ]
     return tyranids_card_array

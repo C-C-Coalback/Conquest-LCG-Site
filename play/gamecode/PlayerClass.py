@@ -3989,6 +3989,10 @@ class Player:
                     if self.get_ability_given_pos(i, j, bloodied_relevant=True) == "Trazyn the Infinite"\
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), i, j))
+                    if self.get_ability_given_pos(i, j) == "Icy Trygon"\
+                            and not self.cards_in_play[i + 1][j].misc_ability_used:
+                        self.cards_in_play[i + 1][j].misc_ability_used = True
+                        self.game.create_interrupt("Icy Trygon", self.name_player, (int(self.number), i, j))
 
     def destroy_card_in_play(self, planet_num, card_pos):
         if planet_num == -2:
