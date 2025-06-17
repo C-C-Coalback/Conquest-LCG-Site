@@ -423,6 +423,11 @@ def tyranids_cards_init():
                                                  "For each support, gain 1 resource."
                                                  "(Limit 2 per type)", "Power.",
                               0, faction, "Common", 2, False, limited=True,
-                              action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Drifting Spore Mines", "Forced Reaction: After the combat phase begins, your opponent "
+                                                     "moves this unit to an adjacent planet. Then you may deal 1 "
+                                                     "damage to this unit to deal 1 damage to a non-unique "
+                                                     "unit at that planet.", "Creature. Drone.",
+                             1, faction, "Common", 0, 2, 1, False)
     ]
     return tyranids_card_array

@@ -267,7 +267,7 @@ class Game:
             "Keep Firing!", "Vivisection", "Repent!", "Ominous Wind", "Daemonic Incursion", "Piercing Wail"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
-                                 "Sickening Helbrute", "Shard of the Deceiver"]
+                                 "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines"]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
@@ -3141,6 +3141,16 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
+                    elif self.choice_context == "Damage Drifting Spore Mines?":
+                        planet_pos, unit_pos = self.misc_target_unit
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.chosen_first_card = True
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        if game_update_string[1] == "0":
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        else:
+                            self.delete_reaction()
                     elif self.choice_context == "Spore Burst":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = []

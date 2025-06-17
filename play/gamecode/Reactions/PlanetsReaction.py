@@ -4,6 +4,7 @@ from .. import FindCard
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
     chosen_planet = int(game_update_string[1])
     current_reaction = self.reactions_needing_resolving[0]
+    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
     if self.reactions_needing_resolving[0] == "Blackmane's Hunt":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])
@@ -116,6 +117,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.delete_reaction()
+    elif current_reaction == "Drifting Spore Mines":
+        if not self.chosen_first_card:
+            if abs(chosen_planet - planet_pos) == 1:
+                secondary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+                last_element_index = len(secondary_player.cards_in_play[chosen_planet + 1]) - 1
+                self.misc_target_unit = (chosen_planet, last_element_index)
+                self.player_who_resolves_reaction[0] = secondary_player.name_player
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Damage Drifting Spore Mines?"
+                self.resolving_search_box = True
+                self.name_player_making_choices = secondary_player.name_player
     elif current_reaction == "Declare the Crusade":
         planet_to_add = self.misc_target_choice
         planet_to_remove = self.planet_array[chosen_planet]
