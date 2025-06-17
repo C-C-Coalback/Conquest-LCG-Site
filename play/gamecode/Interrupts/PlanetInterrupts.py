@@ -2,6 +2,7 @@ import copy
 
 from ..Phases import DeployPhase
 from .. import FindCard
+from .. import CardClasses
 
 
 async def resolve_planet_interrupt(self, name, game_update_string, primary_player, secondary_player):
@@ -45,6 +46,11 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             primary_player.remove_damage_from_pos(origin_planet, origin_pos, 999)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.delete_interrupt()
+    elif current_interrupt == "Magus Harid: Final Form":
+        card = CardClasses.WarlordCard("Termagant", "", "Termagant", "Tyranids", 1, 1, 1, 1, "", 6, 6, [])
+        card.aiming_reticle_color = "red"
+        primary_player.add_card_to_planet(card, chosen_planet)
+        self.delete_interrupt()
     elif current_interrupt == "Surrogate Host":
         origin_planet, origin_pos = primary_player.get_location_of_warlord()
         if primary_player.valid_surrogate_host[chosen_planet]:

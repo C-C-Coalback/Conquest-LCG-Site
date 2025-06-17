@@ -167,6 +167,7 @@ class Player:
                                                                   self.apoka_errata_cards, self.cards_that_have_errata
                                                                   )))
         self.warlord_faction = self.headquarters[0].get_faction()
+        self.headquarters[0].name_owner = self.name_player
         if self.headquarters[0].get_name() == "Urien Rakarth":
             self.urien_relevant = True
         if self.headquarters[0].get_name() == "Gorzod":
@@ -3895,11 +3896,19 @@ class Player:
 
     def destroy_card_in_hq(self, card_pos):
         if self.headquarters[card_pos].get_card_type() == "Warlord":
-            if not self.headquarters[card_pos].get_bloodied():
-                self.headquarters[card_pos].bloody_warlord()
-            else:
+            if self.headquarters[card_pos].get_name() == "Termagant":
                 self.add_card_in_hq_to_discard(card_pos)
                 self.warlord_just_got_destroyed = True
+            elif not self.headquarters[card_pos].get_bloodied():
+                self.headquarters[card_pos].bloody_warlord()
+            else:
+                if self.get_ability_given_pos(-2, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
+                    self.game.create_interrupt("Magus Harid: Final Form", self.name_player,
+                                               (int(self.number), -1, -1))
+                    self.add_card_in_hq_to_discard(card_pos)
+                else:
+                    self.add_card_in_hq_to_discard(card_pos)
+                    self.warlord_just_got_destroyed = True
         else:
             if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
@@ -4087,12 +4096,20 @@ class Player:
             self.destroy_card_in_hq(card_pos)
             return None
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
-            if not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
+            if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
+                self.add_card_in_play_to_discard(planet_num, card_pos)
+                self.warlord_just_got_destroyed = True
+            elif not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
                 self.bloody_warlord_given_pos(planet_num, card_pos)
                 self.warlord_just_got_bloodied = True
             else:
-                self.add_card_in_play_to_discard(planet_num, card_pos)
-                self.warlord_just_got_destroyed = True
+                if self.get_ability_given_pos(planet_num, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
+                    self.game.create_interrupt("Magus Harid: Final Form", self.name_player,
+                                               (int(self.number), -1, -1))
+                    self.add_card_in_play_to_discard(planet_num, card_pos)
+                else:
+                    self.add_card_in_play_to_discard(planet_num, card_pos)
+                    self.warlord_just_got_destroyed = True
         else:
             other_player = self.game.p1
             if other_player.name_player == self.name_player:

@@ -5175,6 +5175,13 @@ class Game:
                     player = self.p2
                 if player.magus_harid_waiting_cards:
                     del player.magus_harid_waiting_cards[0]
+            if self.interrupts_waiting_on_resolution[0] == "Magus Harid: Final Form":
+                player = self.p1
+                if self.player_resolving_interrupts[0] == self.name_2:
+                    player = self.p2
+                warlord_pla, warlord_pos = player.get_location_of_warlord()
+                if warlord_pla == -1 or warlord_pos == -1:
+                    player.warlord_just_got_destroyed = True
             self.asking_which_interrupt = True
             self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
             del self.interrupts_waiting_on_resolution[0]
