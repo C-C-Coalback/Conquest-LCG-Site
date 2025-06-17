@@ -599,6 +599,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
             self.action_cleanup()
+    elif self.action_chosen == "Rain of Mycetic Spores":
+        if abs(self.misc_target_planet - chosen_planet) == 1:
+            if not self.infested_planets[chosen_planet]:
+                self.infest_planet(chosen_planet, primary_player)
+                self.action_cleanup()
     elif self.action_chosen == "Nurgling Bomb":
         found_nurgling_bomb_target_p1 = False
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):

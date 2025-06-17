@@ -387,6 +387,15 @@ def tyranids_cards_init():
                                              "Interrupt: When this unit leaves the first planet, move it to an "
                                              "adjacent planet to remove all damage from it and give it +1 ATK "
                                              "and +1 HP until the end of the game instead.", "Swarm.",
-                             2, faction, "Common", 1, 1, 1, False, no_attachments=True)
+                             2, faction, "Common", 1, 1, 1, False, no_attachments=True),
+        CardClasses.AttachmentCard("Rain of Mycetic Spores", "Limited.\n"
+                                                             "Attach to a planet. (Limit 1 per planet)\n"
+                                                             "Headquarters Action: Exhaust this attachment to infest "
+                                                             "attached planet. If the planet is already infested, "
+                                                             "infest an adjacent planet instead. If all adjacent "
+                                                             "planets are already infested, gain 2 resources instead.",
+                                   "Location.", 1, faction, "Common", 1, False,
+                                   limited=True, limit_one_per_unit=True, planet_attachment=True,
+                                   action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
     ]
     return tyranids_card_array

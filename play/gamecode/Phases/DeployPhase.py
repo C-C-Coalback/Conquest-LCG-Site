@@ -201,6 +201,13 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             if card.get_unique():
                                 if player.search_for_unique_card(card.get_name()):
                                     can_continue = False
+                            if card.get_limited():
+                                if not player.can_play_limited:
+                                    can_continue = False
+                            if card.limit_one_per_unit:
+                                for i in range(len(player.attachments_at_planet[planet_chosen])):
+                                    if player.attachments_at_planet[planet_chosen][i].get_name() == card.get_name():
+                                        can_continue = False
                             if card.red_required:
                                 if not self.get_red_icon(planet_chosen):
                                     can_continue = False

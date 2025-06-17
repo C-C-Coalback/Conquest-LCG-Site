@@ -902,7 +902,36 @@ class Game:
                         player_with_attach = self.p1
                     else:
                         player_with_attach = self.p2
-                    if self.action_chosen == "Subdual":
+                    if not self.action_chosen:
+                        if player_with_attach.attachments_at_planet[pos_planet][
+                                pos_attachment].get_ability() == "Rain of Mycetic Spores":
+                            if primary_player.number == game_update_string[2]:
+                                if player_with_attach.attachments_at_planet[pos_planet][
+                                        pos_attachment].get_ready():
+                                    player_with_attach.attachments_at_planet[pos_planet][
+                                        pos_attachment].exhaust_card()
+                                    if not self.infested_planets[pos_planet]:
+                                        await self.send_update_message("Infested planet")
+                                        self.infest_planet(pos_planet, player_with_attach)
+                                        self.action_cleanup()
+                                    else:
+                                        previous_planet_infested = True
+                                        next_planet_infested = True
+                                        if pos_planet != 0:
+                                            if self.planets_in_play_array[pos_planet - 1]:
+                                                previous_planet_infested = self.infested_planets[pos_planet - 1]
+                                        if pos_planet != 6:
+                                            if self.planets_in_play_array[pos_planet + 1]:
+                                                next_planet_infested = self.infested_planets[pos_planet + 1]
+                                        if previous_planet_infested and next_planet_infested:
+                                            await self.send_update_message("Gained 2 resources")
+                                            player_with_attach.add_resources(2)
+                                            self.action_cleanup()
+                                        else:
+                                            await self.send_update_message("Infest adjacent planet")
+                                            self.action_chosen = "Rain of Mycetic Spores"
+                                            self.misc_target_planet = pos_planet
+                    elif self.action_chosen == "Subdual":
                         player_with_attach.deck.insert(
                             0, player_with_attach.attachments_at_planet[pos_planet][pos_attachment].get_name())
                         del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
