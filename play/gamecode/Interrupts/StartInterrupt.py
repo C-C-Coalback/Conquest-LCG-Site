@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def start_resolving_interrupt(self, name, game_update_string):
@@ -8,6 +9,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
     current_interrupt = self.interrupts_waiting_on_resolution[0]
     if not self.resolving_search_box:
         if self.interrupts_waiting_on_resolution[0] == "Interrogator Acolyte":
@@ -82,6 +84,37 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 await self.send_update_message("No planet to move to!")
             self.delete_interrupt()
+        elif current_interrupt == "Magus Harid":
+            self.misc_player_storage = "RESOLVING MAGUS HARID"
+            card_name = primary_player.magus_harid_waiting_cards[0]
+            await self.send_update_message("Magus is deploying a " + card_name)
+            card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            self.card_to_deploy = card
+            self.misc_target_planet = planet_pos
+            if card.get_card_type() == "Army":
+                self.planet_pos_to_deploy = planet_pos
+                self.traits_of_card_to_play = card.get_traits()
+                self.faction_of_card_to_play = card.get_faction()
+                self.name_of_card_to_play = card.get_name()
+                self.discounts_applied = 0
+                hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
+                hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits(),
+                                                                planet_chosen=planet_pos)
+                in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+                same_planet_dis, same_planet_auto_dis = \
+                    primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+                self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+                if self.available_discounts > self.discounts_applied:
+                    self.stored_mode = self.mode
+                    self.mode = "DISCOUNT"
+                    self.planet_aiming_reticle_position = planet_pos
+                    self.planet_aiming_reticle_active = True
+                else:
+                    await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                          discounts=self.discounts_applied)
+            else:
+                pass
         elif current_interrupt == "Icy Trygon":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = False

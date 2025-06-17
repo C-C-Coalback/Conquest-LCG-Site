@@ -69,6 +69,12 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                         self.create_reaction("Adaptative Thorax Swarm", primary_player.name_player,
                                              (int(primary_player.number), -1, -1))
                     self.delete_reaction()
+        elif current_reaction == "Magus Harid":
+            if not self.chosen_first_card:
+                self.misc_player_storage = hand_pos
+                self.chosen_first_card = True
+                primary_player.aiming_reticle_coords_hand = hand_pos
+                primary_player.aiming_reticle_color = "blue"
         elif current_reaction == "Seething Mycetic Spore":
             card = primary_player.get_card_in_hand(hand_pos)
             if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != self.misc_player_storage:

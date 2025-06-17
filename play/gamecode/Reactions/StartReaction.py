@@ -1315,6 +1315,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
                 await self.send_update_message("No planet to move the unit to.")
+        elif current_reaction == "Magus Harid":
+            self.chosen_first_card = False
         elif current_reaction == "Goliath Rockgrinder":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for _ in range(self.goliath_rockgrinder_value):

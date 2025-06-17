@@ -65,6 +65,7 @@ class Card:
         self.cannot_ready_phase = False
         self.follower_of_gork_available = True
         self.once_per_game_used = False
+        self.from_magus_harid = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
@@ -77,9 +78,10 @@ class Card:
     def get_attachments(self):
         return self.attachments
 
-    def add_attachment(self, attachment_card, name_owner=""):
+    def add_attachment(self, attachment_card, name_owner="", is_magus=False):
         self.attachments.append(copy.deepcopy(attachment_card))
         self.attachments[-1].name_owner = name_owner
+        self.attachments[-1].from_magus_harid = is_magus
 
     def get_damage(self):
         return 0
@@ -304,6 +306,7 @@ class UnitCard(Card):
         self.unstoppable = unstoppable
         self.lost_ranged_eop = False
         self.lumbering = lumbering
+        self.valid_target_magus_harid = False
 
     def get_lumbering(self):
         if self.blanked_eop:
@@ -424,9 +427,10 @@ class UnitCard(Card):
     def get_attachments(self):
         return self.attachments
 
-    def add_attachment(self, attachment_card, name_owner=""):
+    def add_attachment(self, attachment_card, name_owner="", is_magus=False):
         self.attachments.append(copy.deepcopy(attachment_card))
         self.attachments[-1].name_owner = name_owner
+        self.attachments[-1].from_magus_harid = is_magus
 
     def set_ranged(self, new_val):
         self.ranged = new_val

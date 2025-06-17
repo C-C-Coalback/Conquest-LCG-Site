@@ -2002,6 +2002,18 @@ class Game:
                 self.number_with_deploy_turn = "1"
 
     def move_interrupt_to_front(self, interrupt_pos):
+        if self.interrupts_waiting_on_resolution[interrupt_pos] == "Magus Harid":
+            count_harid = 0
+            i = 0
+            while i < interrupt_pos:
+                if self.interrupts_waiting_on_resolution[i] == "Magus Harid" \
+                        and self.player_resolving_interrupts[0] == self.player_resolving_interrupts[i]:
+                    count_harid += 1
+                i += 1
+            player = self.p1
+            if player.name_player == self.name_2:
+                player = self.p2
+            player.magus_harid_waiting_cards.insert(0, player.magus_harid_waiting_cards.pop(count_harid))
         self.interrupts_waiting_on_resolution.insert(
             0, self.interrupts_waiting_on_resolution.pop(interrupt_pos)
         )
@@ -5138,17 +5150,31 @@ class Game:
             del self.player_who_resolves_reaction[0]
             del self.positions_of_unit_triggering_reaction[0]
         if not self.reactions_needing_resolving:
+            for i in range(len(self.p1.headquarters)):
+                if self.p1.check_is_unit_at_pos(-2, i):
+                    self.p1.headquarters[i].valid_target_magus_harid = False
+            for i in range(len(self.p2.headquarters)):
+                if self.p2.check_is_unit_at_pos(-2, i):
+                    self.p2.headquarters[i].valid_target_magus_harid = False
             for i in range(7):
                 for j in range(len(self.p1.cards_in_play[i + 1])):
                     self.p1.cards_in_play[i + 1][j].valid_target_ashen_banner = False
+                    self.p1.cards_in_play[i + 1][j].valid_target_magus_harid = False
             for i in range(7):
                 for j in range(len(self.p2.cards_in_play[i + 1])):
                     self.p2.cards_in_play[i + 1][j].valid_target_ashen_banner = False
+                    self.p2.cards_in_play[i + 1][j].valid_target_magus_harid = False
             self.p1.reset_defense_batteries()
             self.p2.reset_defense_batteries()
 
     def delete_interrupt(self):
         if self.interrupts_waiting_on_resolution:
+            if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+                player = self.p1
+                if self.player_resolving_interrupts[0] == self.name_2:
+                    player = self.p2
+                if player.magus_harid_waiting_cards:
+                    del player.magus_harid_waiting_cards[0]
             self.asking_which_interrupt = True
             self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
             del self.interrupts_waiting_on_resolution[0]

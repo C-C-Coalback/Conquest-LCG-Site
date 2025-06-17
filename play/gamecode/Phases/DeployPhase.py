@@ -253,13 +253,26 @@ async def update_game_event_deploy_section(self, name, game_update_string):
 
 async def deploy_card_routine(self, name, planet_pos, discounts=0):
     print("Deploy card at planet", planet_pos)
+    primary_player = self.p1
+    secondary_player = self.p2
     if self.phase != "DEPLOY":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
+        is_an_interrupt = False
+        if self.interrupts_waiting_on_resolution:
+            if self.interrupts_waiting_on_resolution[0] == "Magus Harid" or \
+                    self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+                is_an_interrupt = True
+                primary_player = self.p1
+                secondary_player = self.p2
+                if self.player_resolving_interrupts[0] == self.name_2:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+        if not is_an_interrupt:
+            if self.player_with_action == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
     else:
         if self.number_with_deploy_turn == "1":
             primary_player = self.p1
@@ -283,7 +296,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              is_owner_of_card=own_card)
     if played_card == "SUCCESS":
         self.queued_sound = "onplay"
-        if not self.action_chosen or self.action_chosen == "Ambush":
+        if (not self.action_chosen or self.action_chosen == "Ambush") \
+                and not self.misc_player_storage == "RESOLVING MAGUS HARID":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
@@ -304,6 +318,10 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if self.interrupts_waiting_on_resolution:
         if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
             self.delete_interrupt()
+        if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+            primary_player.discard.remove(self.card_to_deploy.get_name())
+            self.delete_interrupt()
+            self.action_cleanup()
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     self.card_to_deploy = None
@@ -344,7 +362,19 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         player_gaining_attachment = self.p1
     else:
         player_gaining_attachment = self.p2
-    card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+    card = None
+    magus_harid = False
+    if self.interrupts_waiting_on_resolution:
+        if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+            card = self.card_to_deploy
+            magus_harid = True
+            primary_player = self.p1
+            secondary_player = self.p2
+            if self.player_resolving_interrupts[0] == self.name_2:
+                primary_player = self.p2
+                secondary_player = self.p1
+    if card is None:
+        card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
     discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
     can_continue = False
     army_unit_as_attachment = False
@@ -389,3 +419,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 self.card_type_of_selected_card_in_hand = ""
                 self.faction_of_card_to_play = ""
                 self.name_of_card_to_play = ""
+                if magus_harid:
+                    primary_player.discard.remove(primary_player.magus_harid_waiting_cards[0])
+                    self.delete_interrupt()
+                    self.action_cleanup()

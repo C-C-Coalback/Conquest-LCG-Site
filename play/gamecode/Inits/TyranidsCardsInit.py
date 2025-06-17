@@ -434,6 +434,38 @@ def tyranids_cards_init():
                                                     "put X Termagant tokens into play at this planet. "
                                                     "X is the printed HP value of that enemy unit. "
                                                     "(Limit once per phase.)", "Genestealer. Vehicle. Elite.",
-                             5, faction, "Common", 3, 5, 2, False)
+                             5, faction, "Common", 3, 5, 2, False),
+        CardClasses.WarlordCard("Magus Harid", "Reaction: After an enemy unit enters play, put a card from your hand "
+                                               "facedown attached to that unit. Then draw a card. "
+                                               "(Limit once per round.)\n"
+                                               "As an interrupt when that unit leaves play, you may deploy the "
+                                               "facedown card at the same planet.", "Hybrid. Genestealer.",
+                                faction, 2, 7, 2, 4,
+                                "Bloodied. Interrupt: When this unit is defeated, discard it and put a Termagant "
+                                "token into play at a target planet, this token is considered a warlord. "
+                                "If it is defeated you lose the game.", 6, 6,
+                                ["4x Genestealer Hybrids", "2x Accelerated Gestation",
+                                 "1x Banner of the Cult", "1x Imperial Bastion"]),
+        CardClasses.ArmyCard("Genestealer Hybrids", "Cannot be deployed from your hand.\n"
+                                                    "Each other unit you control at this planet "
+                                                    "cannot be damaged by Area Effect.\n"
+                                                    "This unit must be declared as a defender, if able.",
+                             "Hybrid. Genestealer.", 2, faction, "Signature", 2, 4, 1, False),
+        CardClasses.SupportCard("Imperial Bastion", "Your warlord's ability can trigger twice "
+                                                    "per round instead of once.\n"
+                                                    "Combat Action: Exhaust this support to deal 1 damage to a "
+                                                    "unit with a facedown attached card.", "Location. Genestealer.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("Banner of the Cult", "Attach to an army unit you control.\n"
+                                                         "Interrupt: When attached unit leaves play, "
+                                                         "exhaust a target enemy army unit at this planet "
+                                                         "and return this card to your hand.", "Standard. Genestealer.",
+                                   0, faction, "Signature", 3, False, must_be_own_unit=True,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Accelerated Gestation", "Action: Reveal a facedown card you control attached to a unit. "
+                                                       "If it is a unit, deploy it at this planet and deal 1 "
+                                                       "unpreventable damage to attached unit. (Max 1 per round.)",
+                              "Tactic. Genestealer.", 0, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tyranids_card_array

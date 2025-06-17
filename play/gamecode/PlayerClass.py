@@ -151,6 +151,7 @@ class Player:
         self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
         self.valid_surrogate_host = [False, False, False, False, False, False, False]
         self.contaminated_convoys = False
+        self.magus_harid_waiting_cards = []
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -315,6 +316,11 @@ class Player:
                         single_card_string += "R"
                     else:
                         single_card_string += "E"
+                    single_card_string += "+"
+                    if attachments_list[a].from_magus_harid:
+                        single_card_string += "M+" + attachments_list[a].name_owner
+                    else:
+                        single_card_string += "R+"
                 card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
@@ -465,6 +471,11 @@ class Player:
                                 single_card_string += "R"
                             else:
                                 single_card_string += "E"
+                            single_card_string += "+"
+                            if attachments_list[a].from_magus_harid:
+                                single_card_string += "M+" + attachments_list[a].name_owner
+                            else:
+                                single_card_string += "R+"
                         card_strings.append(single_card_string)
                     for i in range(len(self.cards_in_reserve[planet_id])):
                         current_card = self.cards_in_reserve[planet_id][i]
@@ -568,17 +579,19 @@ class Player:
             await self.game.send_update_message(joined_string)
 
     def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False,
-                                   limit_phase_rel=False):
+                                   limit_phase_rel=False, limit_round_rel=False, bloodied_relevant=False):
         for i in range(len(self.headquarters)):
-            if self.get_ability_given_pos(-2, i) == card_name:
-                if not limit_phase_rel or not self.headquarters[i].once_per_phase_used:
+            if self.get_ability_given_pos(-2, i, bloodied_relevant=bloodied_relevant) == card_name:
+                if (not limit_phase_rel or not self.headquarters[i].once_per_phase_used) and \
+                        (not limit_round_rel or not self.headquarters[i].once_per_round_used):
                     return True
             if self.search_attachments_at_pos(-2, i, card_name, ready_relevant=ready_relevant):
                 return True
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
-                if self.get_ability_given_pos(i, j) == card_name:
-                    if not limit_phase_rel or not self.cards_in_play[i + 1][j].once_per_phase_used:
+                if self.get_ability_given_pos(i, j, bloodied_relevant=bloodied_relevant) == card_name:
+                    if (not limit_phase_rel or not self.cards_in_play[i + 1][j].once_per_phase_used) and \
+                            (not limit_round_rel or not self.cards_in_play[i + 1][j].once_per_round_used):
                         return True
                 if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant,
                                                   must_match_name=must_own):
@@ -989,6 +1002,7 @@ class Player:
         self.headquarters.append(copy.deepcopy(card_object))
         last_element_index = len(self.headquarters) - 1
         self.headquarters[last_element_index].name_owner = self.name_player
+        other_player = self.get_other_player()
         if self.get_card_type_given_pos(-2, last_element_index) == "Army":
             if self.search_card_in_hq("Dissection Chamber"):
                 self.assign_damage_to_pos(-2, last_element_index, 1)
@@ -997,6 +1011,10 @@ class Player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_in_hq("Dissection Chamber"):
                 self.assign_damage_to_pos(-2, last_element_index, 1)
+        if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
+            if not other_player.check_if_already_have_reaction("Magus Harid"):
+                self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
+            self.headquarters[last_element_index].valid_target_magus_harid = True
         if self.get_ability_given_pos(-2, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
@@ -1262,6 +1280,11 @@ class Player:
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
+        other_player = self.get_other_player()
+        if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
+            if not other_player.check_if_already_have_reaction("Magus Harid"):
+                self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
+            self.cards_in_play[position + 1][last_element_index].valid_target_magus_harid = True
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
         if self.get_card_type_given_pos(position, last_element_index) == "Army":
@@ -4320,6 +4343,17 @@ class Player:
                 self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "Mark of Slaanesh":
                 self.game.create_interrupt("Mark of Slaanesh", owner, (int(self.number), planet_num, -1))
+            if card.get_attachments()[i].from_magus_harid:
+                att_card_type = card.get_attachments()[i].get_card_type()
+                if att_card_type == "Army" or att_card_type == "Attachment":
+                    if owner == other_player.name_player:
+                        other_player.magus_harid_waiting_cards.append(card.get_attachments()[i].get_name())
+                        self.game.create_interrupt("Magus Harid", other_player.name_player,
+                                                   (int(other_player.number), planet_num, -1))
+                    else:
+                        self.magus_harid_waiting_cards.append(card.get_attachments()[i].get_name())
+                        self.game.create_interrupt("Magus Harid", self.name_player,
+                                                   (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":

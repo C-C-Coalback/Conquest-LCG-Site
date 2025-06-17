@@ -485,17 +485,30 @@
                             for (var j = 5; j < card_data_split.length; j++) {
                                 var attachment_string_id = (j-5).toString();
                                 var attachment_data_split = card_data_split[j].split("+");
-                                var attachment_name = attachment_data_split[0];
+                                var attachment_name = attachment_data_split[0].split(' ').join('_');
                                 var attachment_ready = attachment_data_split[1];
+                                var is_magus = attachment_data_split[2];
+                                var user_magus = attachment_data_split[3];
                                 var attachment_class = "Attachment-Card";
+                                var att_deepstrike = "False";
+                                var attachment_original_text = "";
+                                var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                                if (is_magus === "M") {
+                                    if (user_magus == "{{ user.username }}") {
+                                        attachment_original_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                                        attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                                    }
+                                    attachment_name = "Cardback";
+                                    att_deepstrike = "True";
+                                }
                                 attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-5).toString() + "/" + attachment_string_id;
-                                var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
+                                var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                                 var attachment_rotation = "";
                                 if (attachment_ready === "E") {
                                     attachment_class = "Exhausted-Attachment-Card";
                                     attachment_rotation = " style='transform:rotate(90deg);'"
                                 }
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             }
                             var style_string = "";
                             if (card_data_split.length > 5) {
@@ -541,20 +554,32 @@
                             rotation = " style='transform:rotate(90deg);'";
                         }
                         for (var j = 5; j < card_data_split.length; j++) {
-                            console.log(card_data_split[j]);
                             var attachment_string_id = (j-5).toString();
                             var attachment_data_split = card_data_split[j].split("+");
-                            var attachment_name = attachment_data_split[0];
+                            var attachment_name = attachment_data_split[0].split(' ').join('_');
                             var attachment_ready = attachment_data_split[1];
+                            var is_magus = attachment_data_split[2];
+                            var user_magus = attachment_data_split[3];
                             var attachment_class = "Attachment-Card";
+                            var att_deepstrike = "False";
+                            var attachment_original_text = "";
+                            var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                            if (is_magus === "M") {
+                                if (user_magus == "{{ user.username }}") {
+                                    attachment_original_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                                    attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                                }
+                                attachment_name = "Cardback";
+                                att_deepstrike = "True";
+                            }
                             attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-3).toString() + "/" + attachment_string_id;
-                            var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
+                            var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                             var attachment_rotation = "";
                             if (attachment_ready === "E") {
                                 attachment_class = "Exhausted-Attachment-Card";
                                 attachment_rotation = " style='transform:rotate(90deg);'"
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
                         var style_string = "";
                         if (card_data_split.length > 5) {

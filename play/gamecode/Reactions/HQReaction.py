@@ -84,6 +84,20 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
                 if not more:
                     self.delete_reaction()
+    elif current_reaction == "Magus Harid":
+        if self.chosen_first_card:
+            if game_update_string[1] == secondary_player.number:
+                if secondary_player.headquarters[unit_pos].valid_target_magus_harid:
+                    card = primary_player.get_card_in_hand(self.misc_player_storage)
+                    secondary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player,
+                                                                           is_magus=True)
+                    primary_player.remove_card_from_hand(self.misc_player_storage)
+                    primary_player.draw_card()
+                    primary_player.aiming_reticle_coords_hand = None
+                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                    primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
     elif current_reaction == "Vow of Honor":
         if primary_player.headquarters[unit_pos].valid_target_vow_of_honor:
             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 3, expiration="NEXT")

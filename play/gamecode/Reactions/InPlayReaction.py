@@ -1492,6 +1492,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                                 primary_player.aiming_reticle_coords_hand = None
                                 self.delete_reaction()
+        elif current_reaction == "Magus Harid":
+            if self.chosen_first_card:
+                if secondary_player.number == game_update_string[1]:
+                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_magus_harid:
+                        card = primary_player.get_card_in_hand(self.misc_player_storage)
+                        secondary_player.cards_in_play[planet_pos + 1][unit_pos].add_attachment(
+                            card, name_owner=primary_player.name_player, is_magus=True)
+                        primary_player.remove_card_from_hand(self.misc_player_storage)
+                        primary_player.draw_card()
+                        primary_player.aiming_reticle_coords_hand = None
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:

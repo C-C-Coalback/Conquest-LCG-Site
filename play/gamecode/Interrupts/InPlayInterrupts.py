@@ -1,6 +1,7 @@
 import copy
 
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def resolve_in_play_interrupt(self, name, game_update_string, primary_player, secondary_player):
@@ -125,6 +126,9 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 primary_player.discard.remove("Savage Parasite")
             except ValueError:
                 pass
+    elif current_interrupt == "Magus Harid":
+        if planet_pos == self.misc_target_planet:
+            await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string)
     elif current_interrupt == "No Mercy":
         if game_update_string[1] == primary_player.number:
             planet_pos = int(game_update_string[2])
