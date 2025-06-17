@@ -400,10 +400,15 @@ def tyranids_cards_init():
         CardClasses.AttachmentCard("Adaptative Thorax Swarm", "Attach to an army unit.\n"
                                                               "Attached unit gets +1 ATK and +1 HP per planet "
                                                               "in your victory display.\n"
-                                                              "Reaction: After the first round begins, reveal this card "
+                                                              "Reaction: After the first round begins, "
+                                                              "reveal this card "
                                                               "from your hand and up to two cards from your hand, "
                                                               "put them on the bottom of your deck in any order and "
                                                               "draw the same amount of cards.", "Biomorph.",
-                                   1, faction, "Common", 2, True, type_of_units_allowed_for_attachment="Army")
+                                   1, faction, "Common", 2, True, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Contaminated Convoys", "Reaction: After a phase begins, until the end of this phase, "
+                                                      "when an enemy army unit enters play at a planet, put a "
+                                                      "Termagant token into play at the same planet and infest it.",
+                              "Tactic.", 1, faction, "Common", 1, False)
     ]
     return tyranids_card_array

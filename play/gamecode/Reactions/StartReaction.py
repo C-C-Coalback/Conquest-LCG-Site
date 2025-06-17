@@ -1301,6 +1301,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Contaminated Convoys":
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Contaminated Convoys")
+                primary_player.contaminated_convoys = True
+            self.delete_reaction()
         elif current_reaction == "Adaptative Thorax Swarm":
             self.misc_counter = 0
             first_index = -1

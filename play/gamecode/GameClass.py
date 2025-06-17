@@ -4049,6 +4049,8 @@ class Game:
         self.p2.muster_the_guard_count = 0
         self.p1.master_warpsmith_count = 0
         self.p2.master_warpsmith_count = 0
+        self.p1.contaminated_convoys = False
+        self.p2.contaminated_convoys = False
         self.bloodrain_tempest_active = False
         last_phase = self.phase
         self.phase = new_val

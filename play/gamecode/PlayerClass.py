@@ -148,6 +148,7 @@ class Player:
         self.highest_cost_invasion_site = 0
         self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
         self.valid_surrogate_host = [False, False, False, False, False, False, False]
+        self.contaminated_convoys = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -1268,6 +1269,9 @@ class Player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_in_hq("Dissection Chamber"):
                 self.assign_damage_to_pos(position, last_element_index, 1)
+            if enemy_player.contaminated_convoys:
+                self.game.infest_planet(position, enemy_player)
+                enemy_player.summon_token_at_planet("Termagant", position)
         if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(position, last_element_index, 2, preventable=False)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
@@ -3705,6 +3709,8 @@ class Player:
         if self.search_hand_for_card("Hunter's Ploy"):
             if phase == "HEADQUARTERS":
                 self.game.create_reaction("Hunter's Ploy", self.name_player, (int(self.number), -1, -1))
+        if self.search_hand_for_card("Contaminated Convoys"):
+            self.game.create_reaction("Contaminated Convoys", self.name_player, (int(self.number), -1, -1))
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
