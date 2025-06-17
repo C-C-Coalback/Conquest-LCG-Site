@@ -378,6 +378,10 @@ def tyranids_cards_init():
         CardClasses.ArmyCard("Icy Trygon", "Deep Strike (1).\n"
                                            "Interrupt: When this unit would be destroyed by taking damage, remove "
                                            "all damage from it and put it into reserve at this planet instead.",
-                             "Creature.", 3, faction, "Common", 2, 4, 1, False, deepstrike=1)
+                             "Creature.", 3, faction, "Common", 2, 4, 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Emergent Cultists", "While at an infested planet, this unit gets +1 HP.\n"
+                                                  "Reaction: After you deploy this unit, "
+                                                  "exhaust a target enemy support card.", "Hybrid. Genestealer.",
+                             2, faction, "Common", 3, 2, 1, False)
     ]
     return tyranids_card_array

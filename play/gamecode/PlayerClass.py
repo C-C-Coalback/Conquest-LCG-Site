@@ -1561,6 +1561,9 @@ class Player:
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Emergent Cultists":
+                                self.game.create_reaction("Emergent Cultists", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Klaivex Warleader":
                                 if self.game.phase == "COMBAT":
                                     self.game.create_reaction("Klaivex Warleader", self.name_player,
@@ -3495,6 +3498,9 @@ class Player:
                 health += 1
         if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
+                health += 1
+        if self.game.infested_planets[planet_id]:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Emergent Cultists":
                 health += 1
         if card.get_ability() == "Shard of the Deceiver":
             health += len(self.discard)

@@ -437,12 +437,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 await self.send_update_message("First planet not in play")
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
-            if self.number_with_deploy_turn == "1":
-                primary_player = self.p1
-                secondary_player = self.p2
-            else:
-                primary_player = self.p2
-                secondary_player = self.p1
             if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                 secondary_player.discard_card_at_random()
