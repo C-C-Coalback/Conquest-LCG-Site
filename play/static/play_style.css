@@ -139,8 +139,8 @@ h4 {
 .Exhausted-Card {
     position: relative;
     top:-1vh;
-    width:9vh;
-    height:6.63vh;
+    height:9vh;
+    width:6.63vh;
 }
 
 .Damage {
@@ -162,8 +162,8 @@ h4 {
     position: absolute;
     top: 0;
     left: 0;
-    width: 9vh;
-    height: 6.63vh;
+    height:9vh;
+    width:6.63vh;
 }
 
 .Planet-Attachment-Card {
@@ -176,8 +176,8 @@ h4 {
 .Exhausted-Planet-Attachment-Card {
     position: absolute;
     pointer-events:auto;
-    width: 4vh;
-    height: 2.6vw;
+    height: 4vh;
+    width: 2.6vw;
 }
 
 .Exhausted-Card + .Exhausted-Attachment-Card {
