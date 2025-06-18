@@ -758,16 +758,21 @@ class Game:
                                 self.mode = "Normal"
 
     async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction="",
-                          shadow_field_possible=False, rickety_warbuggy=False):
+                          shadow_field_possible=False, rickety_warbuggy=False, actual_aoe=False):
         secondary_player.suffer_area_effect(chosen_planet, amount_aoe, faction=faction,
                                             shadow_field_possible=shadow_field_possible,
-                                            rickety_warbuggy=rickety_warbuggy)
+                                            rickety_warbuggy=rickety_warbuggy, actual_area_effect=True)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
         if self.number_of_units_left_to_suffer_damage > 0:
-            secondary_player.set_aiming_reticle_in_play(chosen_planet, 0, "red")
             for i in range(1, self.number_of_units_left_to_suffer_damage):
-                secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                genestealer_hybrids_relevant = False
+                if actual_aoe:
+                    for j in range(len(self.cards_in_play[chosen_planet + 1])):
+                        if self.get_ability_given_pos(chosen_planet, j) == "Genestealer Hybrids" and i != j:
+                            genestealer_hybrids_relevant = True
+                if not genestealer_hybrids_relevant:
+                    secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.player_with_action:

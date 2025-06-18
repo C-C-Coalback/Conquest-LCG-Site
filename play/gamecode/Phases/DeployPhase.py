@@ -110,7 +110,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.resolving_search_box = True
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                        elif card.get_name() in self.cards_with_dash_cost:
+                        elif card.get_name() in self.cards_with_dash_cost or card.get_name() == "Genestealer Hybrids":
                             self.card_pos_to_deploy = -1
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         elif card.get_card_type() == "Army":
@@ -320,6 +320,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.delete_interrupt()
         if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
             primary_player.discard.remove(self.card_to_deploy.get_name())
+            self.misc_player_storage = ""
             self.delete_interrupt()
             self.action_cleanup()
     self.damage_for_unit_to_take_on_play = []
@@ -421,5 +422,6 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 self.name_of_card_to_play = ""
                 if magus_harid:
                     primary_player.discard.remove(primary_player.magus_harid_waiting_cards[0])
+                    self.misc_player_storage = ""
                     self.delete_interrupt()
                     self.action_cleanup()

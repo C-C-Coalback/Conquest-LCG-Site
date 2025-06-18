@@ -3515,11 +3515,18 @@ class Player:
             self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
-    def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False, rickety_warbuggy=False):
+    def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False, rickety_warbuggy=False,
+                           actual_area_effect=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
-            self.assign_damage_to_pos(planet_id, i, amount, context=faction,
-                                      shadow_field_possible=shadow_field_possible,
-                                      rickety_warbuggy=rickety_warbuggy)
+            genestealer_hybrids_relevant = False
+            if actual_area_effect:
+                for j in range(len(self.cards_in_play[planet_id + 1])):
+                    if self.get_ability_given_pos(planet_id, j) == "Genestealer Hybrids" and i != j:
+                        genestealer_hybrids_relevant = True
+            if not genestealer_hybrids_relevant:
+                self.assign_damage_to_pos(planet_id, i, amount, context=faction,
+                                          shadow_field_possible=shadow_field_possible,
+                                          rickety_warbuggy=rickety_warbuggy)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):

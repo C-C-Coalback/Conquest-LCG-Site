@@ -184,11 +184,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if primary_player.get_cost_given_pos(
                                         self.attacker_planet, self.attacker_position) < 3 \
                                         and primary_player.get_card_type_given_pos(
-                                    self.attacker_planet, self.attacker_position) == "Army":
+                                        self.attacker_planet, self.attacker_position) == "Army":
                                     shadow_field = True
                                 await self.aoe_routine(primary_player, secondary_player, chosen_planet,
                                                        amount_aoe, faction=faction,
-                                                       shadow_field_possible=shadow_field)
+                                                       shadow_field_possible=shadow_field,
+                                                       actual_aoe=True)
                                 self.reset_combat_positions()
                                 self.number_with_combat_turn = secondary_player.get_number()
                                 self.player_with_combat_turn = secondary_player.get_name_player()
@@ -617,29 +618,37 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                self.attacker_position)
                             can_continue = True
                             exa = secondary_player.search_card_at_planet(self.defender_planet, "Dire Avenger Exarch")
+                            print("Found exarch", exa)
+                            is_ready_lych = (secondary_player.get_ability_given_pos(
+                                    self.defender_planet, self.defender_position) != "Lychguard Sentinel" or
+                                not secondary_player.get_ready_given_pos(
+                                    self.defender_planet, self.defender_position))
+                            is_fl = secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz"
+                            is_exa_can = not (exa and secondary_player.check_for_trait_given_pos(
+                                        self.defender_planet, self.defender_position, "Warrior"))
+                            is_gene_hybrid = secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) != "Genestealer Hybrids"
+                            print(is_ready_lych, is_fl, is_exa_can)
                             if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                     .get_ability() == "Honored Librarian":
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if secondary_player.cards_in_play[self.defender_planet + 1][i] \
                                             .get_ability() != "Honored Librarian":
                                         can_continue = False
-                            if (secondary_player.get_ability_given_pos(
-                                    self.defender_planet, self.defender_position) != "Lychguard Sentinel" or
-                                not secondary_player.get_ready_given_pos(
-                                    self.defender_planet, self.defender_position)) and \
-                                    secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz" and \
-                                    (exa and not secondary_player.check_for_trait_given_pos(
-                                        self.defender_planet, self.defender_position, "Warrior")):
+                            if is_ready_lych and is_fl and is_exa_can and is_gene_hybrid:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if (secondary_player.get_ability_given_pos(
                                             self.defender_planet, i) == "Lychguard Sentinel" and
                                         secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
                                             secondary_player.get_ability_given_pos(
                                                 self.defender_planet, i) == "Front Line 'Ard Boyz" or \
+                                            secondary_player.get_ability_given_pos(
+                                                self.defender_planet, i) == "Genestealer Hybrids" or \
                                             (exa and secondary_player.check_for_trait_given_pos(
                                                 self.defender_planet, i, "Warrior")):
                                         can_continue = False
+                                        print("Found FL")
                             if self.may_move_defender:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if i != self.defender_position:
