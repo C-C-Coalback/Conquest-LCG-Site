@@ -404,6 +404,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     elif ability == "Death Korps Engineers":
                         self.action_chosen = ability
                         player_owning_card.sacrifice_card_in_play(-2, unit_pos)
+                    elif ability == "Imperial Bastion":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Teleportarium":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -813,6 +817,20 @@ async def update_game_event_action_hq(self, name, game_update_string):
             self.mode = "Normal"
             self.player_with_deploy_turn = secondary_player.name_player
             self.number_with_deploy_turn = secondary_player.get_number()
+    elif self.action_chosen == "Imperial Bastion":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        if player_being_hit.check_is_unit_at_pos(planet_pos, unit_pos):
+            attachments = player_being_hit.headquarters[unit_pos].get_attachments()
+            magus_card = False
+            for i in range(len(attachments)):
+                if attachments[i].from_magus_harid:
+                    magus_card = True
+            if magus_card:
+                player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.action_cleanup()
     elif self.action_chosen == "Twisted Laboratory":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

@@ -1108,6 +1108,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.position_of_actioned_card = (-1, -1)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+    elif self.action_chosen == "Imperial Bastion":
+        if game_update_string[1] == "1":
+            player_being_hit = self.p1
+        else:
+            player_being_hit = self.p2
+        attachments = player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_attachments()
+        magus_card = False
+        for i in range(len(attachments)):
+            if attachments[i].from_magus_harid:
+                magus_card = True
+        if magus_card:
+            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if not self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:
