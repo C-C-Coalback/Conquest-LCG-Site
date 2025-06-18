@@ -573,7 +573,7 @@ def resolve_winnings(self, winner, loser, planet_id):
                                          (int(winner.get_number()), planet_id, -1))
         attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
         for j in range(len(attachments)):
-            if attachments[j].get_ability() == "Noxious Fleshborer":
+            if attachments[j].get_ability() == "Noxious Fleshborer" and not attachments[j].from_magus_harid:
                 if not already_noxious and not self.infested_planets[planet_id]:
                     already_noxious = True
                     own = attachments[j].name_owner

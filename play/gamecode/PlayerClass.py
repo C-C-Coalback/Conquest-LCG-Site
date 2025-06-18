@@ -1184,7 +1184,7 @@ class Player:
         if card.limit_one_per_unit:
             attachments_active = target_card.get_attachments()
             for i in range(len(attachments_active)):
-                if attachments_active[i].get_name() == card.get_name():
+                if attachments_active[i].get_name() == card.get_name() and not attachments_active[i].from_magus_harid:
                     print("Limit one per unit")
                     return False
         if target_card.get_no_attachments():
@@ -1197,7 +1197,7 @@ class Player:
         if card.get_name() == "The Shining Blade":
             if not target_card.get_mobile():
                 return False
-        if card.get_name() == "Flesh Hooks":
+        if card.get_name() == "Flesh Hooks" and not card.from_magus_harid:
             if target_card.get_cost() > 2:
                 return False
         name_owner = self.name_player
@@ -2641,7 +2641,8 @@ class Player:
     def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil, ready_relevant=False, must_match_name=False):
         if planet_pos == -2:
             for i in range(len(self.headquarters[unit_pos].get_attachments())):
-                if self.headquarters[unit_pos].get_attachments()[i].get_ability() == card_abil:
+                if self.headquarters[unit_pos].get_attachments()[i].get_ability() == card_abil and not \
+                        self.headquarters[unit_pos].get_attachments()[i].from_magus_harid:
                     if not must_match_name or \
                             self.headquarters[unit_pos].get_attachments()[i].name_owner == self.name_player:
                         if not ready_relevant:
@@ -3166,7 +3167,7 @@ class Player:
         attachments = card.get_attachments()
         condition_present = False
         for i in range(len(attachments)):
-            if attachments[i].get_ability() == "Adaptative Thorax Swarm":
+            if attachments[i].get_ability() == "Adaptative Thorax Swarm" and not attachments[i].from_magus_harid:
                 if attachments[i].name_owner == self.name_player:
                     attack_value += len(self.victory_display)
                 else:
@@ -3176,7 +3177,7 @@ class Player:
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
-            if attachments[i].get_ability() == "Noxious Fleshborer":
+            if attachments[i].get_ability() == "Noxious Fleshborer" and not attachments[i].from_magus_harid:
                 if self.game.infested_planets[planet_id]:
                     attack_value += 1
             if attachments[i].get_ability() == "Frostfang":
@@ -3621,13 +3622,13 @@ class Player:
                 health = health - hunt_count
         attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
         for i in range(len(attachments)):
-            if attachments[i].get_ability() == "Adaptative Thorax Swarm":
+            if attachments[i].get_ability() == "Adaptative Thorax Swarm" and not attachments[i].from_magus_harid:
                 if attachments[i].name_owner == self.name_player:
                     health += len(self.victory_display)
                 else:
                     other_player = self.get_other_player()
                     health += len(other_player.victory_display)
-            if attachments[i].get_ability() == "Noxious Fleshborer":
+            if attachments[i].get_ability() == "Noxious Fleshborer" and not attachments[i].from_magus_harid:
                 if self.game.infested_planets[planet_id]:
                     health += 1
             if attachments[i].get_ability() == "Frostfang":
@@ -3768,10 +3769,12 @@ class Player:
                     self.game.create_reaction("Blood Rain Tempest", self.name_player, (int(self.number), -2, i))
             for j in range(len(self.headquarters[i].get_attachments())):
                 if phase == "COMBAT":
-                    if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection":
+                    if self.headquarters[i].get_attachments()[j].get_ability() == "Parasitic Infection" and not \
+                            self.headquarters[i].get_attachments()[j].from_magus_harid:
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), -2, i))
-                    if self.headquarters[i].get_attachments()[j].get_ability() == "Savage Parasite":
+                    if self.headquarters[i].get_attachments()[j].get_ability() == "Savage Parasite" and not \
+                            self.headquarters[i].get_attachments()[j].from_magus_harid:
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Savage Parasite", name_owner, (int(self.number), -2, i))
                     if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
@@ -3822,10 +3825,12 @@ class Player:
                             self.game.p1.suffer_area_effect(i, 1, rickety_warbuggy=True)
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     if phase == "COMBAT":
-                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection":
+                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection" \
+                                and not self.cards_in_play[i + 1][j].get_attachments()[k].from_magus_harid:
                             name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
                             self.game.create_reaction("Parasitic Infection", name_owner, (int(self.number), i, j))
-                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Savage Parasite":
+                        if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Savage Parasite" \
+                                and not self.cards_in_play[i + 1][j].get_attachments()[k].from_magus_harid:
                             name_owner = self.cards_in_play[i + 1][j].get_attachments()[k].name_owner
                             self.game.create_reaction("Savage Parasite", name_owner, (int(self.number), i, j))
                     if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Royal Phylactery":

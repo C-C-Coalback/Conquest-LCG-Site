@@ -4837,7 +4837,8 @@ class Game:
                                                 planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                                     elif attachment.get_ability() == "Armored Shell" and \
-                                            attachment.name_owner == primary_player.name_player:
+                                            attachment.name_owner == primary_player.name_player and \
+                                            not attachment.from_magus_harid:
                                         if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                             damage_to_remove = 0
                                             if self.amount_that_can_be_removed_by_shield[0] > 2:

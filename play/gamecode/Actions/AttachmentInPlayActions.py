@@ -21,7 +21,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         other_player = self.p1
     if not self.action_chosen:
         print("action not chosen")
-        if card_chosen.get_has_action_while_in_play():
+        if card_chosen.get_has_action_while_in_play() and not card_chosen.from_magus_harid:
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 ability = card_chosen.get_ability()

@@ -594,7 +594,8 @@ class UnitCard(Card):
         attack += self.get_extra_attack_until_end_of_game()
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
-                attack += self.attachments[i].get_extra_attack()
+                if not self.attachments[i].from_magus_harid:
+                    attack += self.attachments[i].get_extra_attack()
             elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
                 attack += 2
         if self.get_ability() == "Fire Warrior Strike Team":
@@ -609,7 +610,8 @@ class UnitCard(Card):
         health += self.positive_hp_until_eog
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
-                health += self.attachments[i].get_extra_health()
+                if not self.attachments[i].from_magus_harid:
+                    health += self.attachments[i].get_extra_health()
             elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
                 health += 2
         for i in range(len(self.attachments)):
@@ -630,7 +632,8 @@ class UnitCard(Card):
             return 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
-                command += self.attachments[i].get_extra_command()
+                if not self.attachments[i].from_magus_harid:
+                    command += self.attachments[i].get_extra_command()
             if self.attachments[i].get_ability() == "Auxiliary Armor":
                 if self.get_faction() != "Tau":
                     command += 1
