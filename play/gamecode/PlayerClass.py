@@ -4216,7 +4216,8 @@ class Player:
                     for i in range(len(self.cards_in_play[planet_num + 1])):
                         if i != card_pos:
                             for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
-                                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability():
+                                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability()\
+                                        == "The Bloodrunna":
                                     if not self.cards_in_play[planet_num + 1][i].\
                                             get_attachments()[j].once_per_phase_used:
                                         self.game.create_reaction("The Bloodrunna", self.name_player,
@@ -4224,7 +4225,8 @@ class Player:
                 if not other_player.does_own_reaction_exist("The Bloodrunna"):
                     for i in range(len(other_player.cards_in_play[planet_num + 1])):
                         for j in range(len(other_player.cards_in_play[planet_num + 1][i].get_attachments())):
-                            if other_player.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability():
+                            if other_player.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability()\
+                                    == "The Bloodrunna":
                                 if not other_player.cards_in_play[planet_num + 1][i].\
                                         get_attachments()[j].once_per_phase_used:
                                     self.game.create_reaction("The Bloodrunna", other_player.name_player,
