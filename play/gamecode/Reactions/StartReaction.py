@@ -1316,6 +1316,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
                 await self.send_update_message("No planet to move the unit to.")
         elif current_reaction == "Magus Harid":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            if primary_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.headquarters[i].get_ability() == "Imperial Bastion":
+                        primary_player.headquarters[i].once_per_round_used = True
             self.chosen_first_card = False
         elif current_reaction == "Goliath Rockgrinder":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

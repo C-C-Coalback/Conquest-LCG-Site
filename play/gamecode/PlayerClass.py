@@ -583,6 +583,12 @@ class Player:
                                    limit_phase_rel=False, limit_round_rel=False, bloodied_relevant=False):
         for i in range(len(self.headquarters)):
             if self.get_ability_given_pos(-2, i, bloodied_relevant=bloodied_relevant) == card_name:
+                if card_name == "Magus Harid":
+                    for j in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, j) == "Imperial Bastion":
+                            if self.headquarters[i].once_per_round_used:
+                                if not self.headquarters[j].once_per_round_used:
+                                    return True
                 if (not limit_phase_rel or not self.headquarters[i].once_per_phase_used) and \
                         (not limit_round_rel or not self.headquarters[i].once_per_round_used):
                     return True
@@ -591,6 +597,12 @@ class Player:
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.get_ability_given_pos(i, j, bloodied_relevant=bloodied_relevant) == card_name:
+                    if card_name == "Magus Harid":
+                        for k in range(len(self.headquarters)):
+                            if self.get_ability_given_pos(-2, k) == "Imperial Bastion":
+                                if self.cards_in_play[i + 1][j].once_per_round_used:
+                                    if not self.cards_in_play[i + 1][j].once_per_round_used:
+                                        return True
                     if (not limit_phase_rel or not self.cards_in_play[i + 1][j].once_per_phase_used) and \
                             (not limit_round_rel or not self.cards_in_play[i + 1][j].once_per_round_used):
                         return True
