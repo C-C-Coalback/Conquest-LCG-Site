@@ -4890,7 +4890,7 @@ class Game:
                         while i < len(self.misc_player_storage):
                             names_list.append(primary_player.cards[self.misc_player_storage[i]])
                             primary_player.remove_card_from_hand(self.misc_player_storage[i])
-                            primary_player.deck.append(self.misc_player_storage[i])
+                            primary_player.deck.append(names_list[i])
                             j = i + 1
                             while j < len(self.misc_player_storage):
                                 if self.misc_player_storage[j] > self.misc_player_storage[i]:
