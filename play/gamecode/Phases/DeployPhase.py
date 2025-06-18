@@ -309,6 +309,17 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 del secondary_player.discard[self.anrakyr_unit_position]
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
+        elif self.action_chosen == "Accelerated Gestation":
+            og_pla, og_pos, og_att = self.misc_target_attachment
+            num = self.misc_target_player
+            if num == int(primary_player.get_number()):
+                del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
+                if not primary_player.get_immune_to_enemy_events(og_pla, og_pos):
+                    primary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False)
+            else:
+                del secondary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
+                if not secondary_player.get_immune_to_enemy_events(og_pla, og_pos):
+                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False)
     self.bigga_is_betta_active = False
     if played_card == "SUCCESS":
         if damage_to_take > 0:

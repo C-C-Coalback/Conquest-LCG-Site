@@ -488,6 +488,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     j = j + 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Accelerated Gestation":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Ominous Wind":
                         self.misc_counter = primary_player.get_highest_cost_units()
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

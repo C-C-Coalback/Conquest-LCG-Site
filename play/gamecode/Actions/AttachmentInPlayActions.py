@@ -1,4 +1,6 @@
 from ..CardClasses import ArmyCard
+from ..Phases import DeployPhase
+from .. import FindCard
 
 
 async def update_game_event_action_attachment_in_play(self, name, game_update_string):
@@ -160,6 +162,39 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             await self.send_update_message(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
+    elif self.action_chosen == "Accelerated Gestation":
+        if card_chosen.from_magus_harid and card_chosen.name_owner == primary_player.get_name_player():
+            if card_chosen.get_card_type() == "Army":
+                self.misc_target_player = int(player_owning_card.get_number())
+                self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                card_name = card_chosen.get_name()
+                await self.send_update_message("Accelerated Gestation is deploying a " + card_name)
+                card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
+                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                self.card_to_deploy = card
+                self.misc_target_planet = planet_pos
+                self.planet_pos_to_deploy = planet_pos
+                self.traits_of_card_to_play = card.get_traits()
+                self.faction_of_card_to_play = card.get_faction()
+                self.name_of_card_to_play = card.get_name()
+                self.discounts_applied = 0
+                hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
+                hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits(),
+                                                                planet_chosen=planet_pos)
+                in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+                same_planet_dis, same_planet_auto_dis = \
+                    primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+                self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+                if self.available_discounts > self.discounts_applied:
+                    self.stored_mode = self.mode
+                    self.mode = "DISCOUNT"
+                    self.planet_aiming_reticle_position = planet_pos
+                    self.planet_aiming_reticle_active = True
+                else:
+                    await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                          discounts=self.discounts_applied)
+            else:
+                await self.send_update_message("That's not an army unit.")
     elif self.action_chosen == "Subdual":
         if card_chosen.name_owner == self.name_1:
             self.p1.deck.insert(0, card_chosen.get_name())
