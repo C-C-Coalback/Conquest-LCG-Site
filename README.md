@@ -23,6 +23,8 @@ First run "py -m pip install -r requirements.txt" to install dependencies.
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
 
+Then, you need to run "py manage.py makemigrations", followed by "py manage.py migrate" to create the user database.
+
 To run tests, navigate to the all_tests.py file and run "py all_tests.py".
 
 If you are wanting to run this for development purposes,
