@@ -4384,6 +4384,9 @@ class Player:
                 self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "Mark of Slaanesh":
                 self.game.create_interrupt("Mark of Slaanesh", owner, (int(self.number), planet_num, -1))
+            if card.get_attachments()[i].get_ability() == "Banner of the Cult" \
+                    and not card.get_attachments()[i].from_magus_harid:
+                self.game.create_interrupt("Banner of the Cult", owner, (int(self.number), planet_num, -1))
             if card.get_attachments()[i].from_magus_harid:
                 att_card_type = card.get_attachments()[i].get_card_type()
                 if att_card_type == "Army" or att_card_type == "Attachment":
