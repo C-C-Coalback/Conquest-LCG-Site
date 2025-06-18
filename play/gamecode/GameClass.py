@@ -2377,6 +2377,16 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         await self.send_update_message("Choose planet to remove from play")
+                    elif self.choice_context == "Sacrifice Hive Ship Tendrils?":
+                        self.reset_choices_available()
+                        self.chosen_first_card = False
+                        if game_update_string[1] == "0":
+                            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            self.misc_counter = primary_player.headquarters[unit_pos].counter
+                            primary_player.sacrifice_card_in_hq(unit_pos)
+                        else:
+                            self.delete_reaction()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Sweep Attack: Search which area?":
                         if game_update_string[1] == "0":
                             self.choices_available = []

@@ -117,6 +117,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.delete_reaction()
+    elif current_reaction == "Hive Ship Tendrils":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_discard(primary_player.aiming_reticle_coords_discard)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+            primary_player.aiming_reticle_coords_discard = None
+            self.delete_reaction()
     elif current_reaction == "Drifting Spore Mines":
         if not self.chosen_first_card:
             if abs(chosen_planet - planet_pos) == 1:

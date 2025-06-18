@@ -294,6 +294,8 @@ class Player:
                 card_type = current_card.get_card_type()
                 if card_type == "Warlord" or card_type == "Army" or card_type == "Token" or card_type == "Synapse":
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                elif current_card.get_name() == "Hive Ship Tendrils":
+                    single_card_string += str(current_card.counter)
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -4471,6 +4473,10 @@ class Player:
         if card.get_card_type() == "Army":
             if self.check_for_warlord(planet_num):
                 self.stored_targets_the_emperor_protects.append(card_name)
+        if card.has_hive_mind:
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
+                    self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
         self.discard_attachments_from_card(planet_num, card_pos)
         self.remove_card_from_play(planet_num, card_pos)
 
@@ -4512,6 +4518,10 @@ class Player:
                 if self.game.name_1 == self.name_player:
                     dis_player = self.game.p2
                 dis_player.discard.append(card_name)
+        if card.has_hive_mind:
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
+                    self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
         self.discard_attachments_from_card(-2, card_pos)
         self.remove_card_from_hq(card_pos)
 

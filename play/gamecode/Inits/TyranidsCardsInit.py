@@ -466,6 +466,13 @@ def tyranids_cards_init():
                                                        "If it is a unit, deploy it at this planet and deal 1 "
                                                        "unpreventable damage to attached unit. (Max 1 per round.)",
                               "Tactic. Genestealer.", 0, faction, "Signature", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Hive Ship Tendrils", "Reaction: After a unit you control with the Hive Mind "
+                                                      "specialization leaves play, put an infestation token on "
+                                                      "this support. Then you may sacrifice this support to put a "
+                                                      "unit with the Hive Mind specialization and printed cost "
+                                                      "equal or lower to the number of tokens on this support "
+                                                      "into play from your discard pile at a planet.", "Location.",
+                                0, faction, "Common", True)
     ]
     return tyranids_card_array

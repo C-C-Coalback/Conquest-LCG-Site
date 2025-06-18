@@ -1322,6 +1322,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if primary_player.headquarters[i].get_ability() == "Imperial Bastion":
                         primary_player.headquarters[i].once_per_round_used = True
             self.chosen_first_card = False
+        elif current_reaction == "Hive Ship Tendrils":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.choices_available = ["Sacrifice", "Don't"]
+            self.choice_context = "Sacrifice Hive Ship Tendrils?"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Goliath Rockgrinder":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for _ in range(self.goliath_rockgrinder_value):

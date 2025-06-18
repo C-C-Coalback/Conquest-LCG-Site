@@ -38,6 +38,13 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter > 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Hive Ship Tendrils":
+            if not self.chosen_first_card:
+                if chosen_discard == int(primary_player.number):
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.get_card_type() == "Army" and card.has_hive_mind:
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                        self.chosen_first_card = True
         elif current_reaction == "Spreading Genestealer Brood":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
