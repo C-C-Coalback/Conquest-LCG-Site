@@ -770,6 +770,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if can_continue:
                 player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 primary_player.discard_card_name_from_hand("Overrun")
+                primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
     elif self.action_chosen == "Overrun Rout":
         if game_update_string[1] == primary_player.get_number():

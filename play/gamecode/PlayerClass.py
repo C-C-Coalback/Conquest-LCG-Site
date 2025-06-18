@@ -4394,6 +4394,9 @@ class Player:
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
             self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), planet_num, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Growing Tide":
+            if self.game.round_number == planet_num:
+                self.game.create_interrupt("Growing Tide", self.name_player, (int(self.number), planet_num, -1))
         condition_present = False
         for i in range(len(card.get_attachments())):
             if card.get_attachments()[i].get_ability() == "Mark of Chaos":

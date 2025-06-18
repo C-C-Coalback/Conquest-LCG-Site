@@ -756,6 +756,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if can_continue:
                 player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 primary_player.discard_card_name_from_hand("Overrun")
+                primary_player.aiming_reticle_coords_hand = None
                 if player_being_hit.name_player == secondary_player.name_player:
                     self.choices_available = ["Sacrifice to Rout", "No Sacrifice"]
                     self.choice_context = "Overrun: Followup Rout?"

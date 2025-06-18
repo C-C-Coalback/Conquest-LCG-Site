@@ -455,7 +455,7 @@ def tyranids_cards_init():
                                                     "per round instead of once.\n"
                                                     "Combat Action: Exhaust this support to deal 1 damage to a "
                                                     "unit with a facedown attached card.", "Location. Genestealer.",
-                                1, faction, "Signature", False),
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.AttachmentCard("Banner of the Cult", "Attach to an army unit you control.\n"
                                                          "Interrupt: When attached unit leaves play, "
                                                          "exhaust a target enemy army unit at this planet "
