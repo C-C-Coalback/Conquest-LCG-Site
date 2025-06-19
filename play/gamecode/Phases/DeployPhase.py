@@ -296,7 +296,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              is_owner_of_card=own_card)
     if played_card == "SUCCESS":
         self.queued_sound = "onplay"
-        if (not self.action_chosen or self.action_chosen == "Ambush") \
+        if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":

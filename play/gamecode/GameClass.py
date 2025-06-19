@@ -5131,7 +5131,6 @@ class Game:
                         primary_player.mobile_resolved = True
                         self.unit_to_move_position = [-1, -1]
                         await self.send_update_message(self.p1.name_player + " finished mobile")
-
                 elif len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
                         planet_pos = int(game_update_string[1])
