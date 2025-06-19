@@ -68,6 +68,12 @@ def apoka_errata_cards_init():
         CardClasses.ArmyCard("Ardent Auxiliaries", "This unit is an Astra Militarum unit in addition to Tau.\n"
                                                    "Reaction: After this unit commits to a planet, if you control an "
                                                    "Astra Militarum unit at this planet, ready this unit.", "Soldier.",
-                             2, "Tau", "Signature", 2, 2, 1, False)
+                             2, "Tau", "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("Endless Legions", "Reaction: After a Necrons unit enters your discard pile from play, "
+                                                   "exhaust this support and place 2 units from your discard pile at "
+                                                   "the bottom of your deck to Rally 6 a Necrons unit with a printed "
+                                                   "cost of 3 or lower, put it into play exhausted at a planet "
+                                                   "where no battle is taking place.",
+                                "Upgrade.", 1, "Necrons", "Common", False)
     ]
     return apoka_errata_cards_array

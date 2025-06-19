@@ -832,6 +832,7 @@ class Player:
         return None
 
     def discard_card_name_from_hand(self, card_name):
+        self.move_synapse_to_hq()
         for i in range(len(self.cards)):
             if self.cards[i] == card_name:
                 self.discard_card_from_hand(i)
@@ -1986,10 +1987,14 @@ class Player:
 
     def move_synapse_to_hq(self):
         for i in range(7):
-            for j in range(len(self.cards_in_play[i + 1])):
+            j = 0
+            hard_stop = 100
+            while j < len(self.cards_in_play[i + 1]) and hard_stop > 0:
                 if self.cards_in_play[i + 1][j].get_card_type() == "Synapse":
                     self.move_unit_at_planet_to_hq(i, j)
-                    return None
+                    j = j - 1
+                j = j + 1
+                hard_stop = hard_stop - 1
         return None
 
     def check_savage_warrior_prime_present(self, planet):

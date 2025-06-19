@@ -291,6 +291,117 @@ def necrons_cards_init():
                                                           "exhaust this attachment to move an army unit you control "
                                                           "at that planet to an adjacent planet.", "Wargear.",
                                    1, faction, "Signature", 3, False, extra_health=1,
-                                   must_be_own_unit=True, type_of_units_allowed_for_attachment="Warlord")
+                                   must_be_own_unit=True, type_of_units_allowed_for_attachment="Warlord"),
+        CardClasses.WarlordCard("Imotekh the Stormlord", "Combat Action: Remove a non-unique non-Eilte card in your "
+                                                         "discard pile from the game to switch its textbox "
+                                                         "(except for Traits) with a non-unique non-Elite card "
+                                                         "of the same type under your control until the "
+                                                         "end of the phase. (Limit once per phase.)",
+                                "Phaeron. Sautekh.", faction, 2, 7, 1, 6, "Bloodied.", 7, 7,
+                                ["4x Court of the Stormlord", "1x Sautekh Royal Crypt",
+                                 "2x The Strength of the Enemy", "1x Supreme Strategist"],
+                                action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Court of the Stormlord", "Reaction: After this unit enters play, look at the top 3 "
+                                                       "cards of your deck. Put 1 on the top of your deck, "
+                                                       "1 on the bottom of your deck and 1 in your discard pile.",
+                             "Soldier. Sautekh.", 3, faction, "Signature", 3, 3, 1, False),
+        CardClasses.SupportCard("Sautekh Royal Crypt", "Reaction: After your opponent sets his command dial, exhaust "
+                                                       "this support to name a planet. If your opponent commits "
+                                                       "his warlord to that planet this phase, deal 1 damage to 1 "
+                                                       " enemy unit at that planet and each adjacent planet.",
+                                "Location.", 1, faction, "Signature", False),
+        CardClasses.EventCard("The Strength of the Enemy", "Combat Action: Replace the text box of an army unit you "
+                                                           "control with the printed text box of an enemy army unit "
+                                                           "at the same planet until the end of the phase. "
+                                                           "Then treat that enemy unit text box as if it were blank "
+                                                           "until the end of the phase. (Except for Traits.)",
+                              "Tactic.", 2, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.AttachmentCard("Supreme Strategist", "Attach to a planet. Each Sautekh unit you control at "
+                                                         "this planet gets +1 ATK.\n"
+                                                         "Reaction: After the deploy phase begins, for each unit "
+                                                         "at this planet, its controller must choose to either rout it "
+                                                         "or exhaust it. Then discard this attachment.",
+                                   "Stratagem.", 2, faction, "Signature", 3, False, planet_attachment=True),
+        CardClasses.WarlordCard("Etekh the Awakener", "Deploy Action: Choose a trait other than Elite, each army unit "
+                                                      "in your deck (anywhere) is considered to have that trait until "
+                                                      "the end of the round. (Limit once per phase.)",
+                                "Phaeron. Suhbekhar.", faction, 2, 6, 1, 6,
+                                "Bloodied.\n"
+                                "Deploy Action: Choose a trait other than Elite, each army unit "
+                                "in your deck (anywhere) is considered to have that trait until "
+                                "the end of the round. (Limit once per phase.)", 7, 7,
+                                ["4x Convoking Praetorians", "1x Hollow Sun",
+                                 "2x Eldritch Reaping", "1x Crown of Control"],
+                                action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.ArmyCard("Convoking Praetorians", "Reaction: After this unit enters play, "
+                                                      "change your enslavement dial.", "Soldier. Suhbekhar.",
+                             1, faction, "Signature", 1, 3, 1, False),
+        CardClasses.EventCard("Eldritch Reaping", "Action: Your opponent announces a number between 0 and 5. "
+                                                  "Then you choose another number. The player with the highest number "
+                                                  "must deal an equal amount of indirect damage among units he "
+                                                  "controls, if that player is you, draw 2 cards and gain 2 resources.",
+                              "Tactic.", 0, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Crown of Control", "Attach to your warlord.\n"
+                                                       "Attached unit gains Sweep (1).\n"
+                                                       "Action: Exhaust this attachment to remove up to 2 damage "
+                                                       "among units you control at this planet.", "Wargear.",
+                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   action_in_play=True, allowed_phases_in_play="ALL", must_be_own_unit=True),
+        CardClasses.SupportCard("Hollow Sun", "While you control no unit of a faction, you may ignore your "
+                                              "enslavement dial while deploying for that faction.", "Tomb World.",
+                                1, faction, "Signature", False),
+        CardClasses.ArmyCard("Tomb Blade Diversionist", "No Wargear attachments.\n"
+                                                        "Reaction: After an enemy army unit resolves an attack "
+                                                        "at this planet, if this unit wasn't chosen as a defender, "
+                                                        "deal 1 damage to the attacker.", "Vehicle.",
+                             3, faction, "Common", 2, 3, 1, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Raving Cryptek", "To deploy a unit at this planet, your opponent must reveal two "
+                                               "units he can deploy from his hand. Choose one, its cost is "
+                                               "increased by 2. Then your opponent decides which of those units "
+                                               "to deploy.", "Soldier.",
+                             3, faction, "Common", 3, 3, 1, False),
+        CardClasses.ArmyCard("Ghost Ark of Orikan", "No Wargear attachments.\n"
+                                                    "Reaction: After a Necrons Soldier or Warrior unit you control at "
+                                                    "this planet is destroyed by an attack, put a target Necrons "
+                                                    "Soldier or Warrior unit with lower printed cost into play "
+                                                    "from your discard pile exhausted at the same planet.",
+                             "Vehicle. Transport.", 4, faction, "Common", 2, 5, 1, False,
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Flayed Ones Revenants", "As an additional cost to put this unit into play, discard 2 "
+                                                      "cards from your hand or pay 2 resources to discard the top "
+                                                      "8 cards of your deck.\n"
+                                                      "Reaction: After this unit leaves play as a result of an "
+                                                      "enemy card effect, draw 2 cards and gain 2 resources.",
+                             "Warrior.", 4, faction, "Common", 6, 6, 2, False),
+        CardClasses.SupportCard("Endless Legions", "Reaction: After a Necrons unit enters your discard pile from play, "
+                                                   "exhaust this support and place 2 units from your discard pile at "
+                                                   "the bottom of your deck to Rally 6 a Necrons unit with a printed "
+                                                   "cost of 3 or lower, put it into play at a target planet.",
+                                "Upgrade.", 1, faction, "Common", False),
+        CardClasses.SupportCard("World Engine Beam", "Combat Action: Deal any amount of indirect damage that can "
+                                                     "not be reduced or prevented to a unit you control to place "
+                                                     "or remove the same amount of resources on this support. "
+                                                     "Each player may use this ability once per phase.\n"
+                                                     "Interrupt: When this support has 8 resources on it, sacrifice it "
+                                                     "to destroy a non-unique unit, a support or an attachment.",
+                                "World Engine.", 2, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Optimized Protocol", "Reaction: After a unit you control enters play from your discard "
+                                                    "pile at a planet, put a target Necrons unit with printed cost "
+                                                    "3 or lower into play from your discard pile at the same planet.",
+                              "Tactic.", 1, faction, "Common", 2, False),
+        CardClasses.EventCard("Necrodermis", "Play only during a battle.\n"
+                                             "Interrupt: When your warlord would be defeated by taking damage, "
+                                             "remove all damage from it instead. At the end of the phase or when "
+                                             "another event named \"Necrodermis\" is played, you lose the game.",
+                              "Tactic.", 1, faction, "Common", 2, False),
+        CardClasses.AttachmentCard("Dynastic Weaponry", "Attach to a Necrons army unit. Limit 1 per unit.\n"
+                                                        "Attached unit gets +1 ATK.\n"
+                                                        "Reaction: After a unit enters play from your discard pile, "
+                                                        "put this card into play from your discard pile attached to "
+                                                        "that unit, if eligible.", "Upgrade.",
+                                   0, faction, "Common", 2, False)
     ]
     return necrons_card_array
