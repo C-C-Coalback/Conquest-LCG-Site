@@ -5149,8 +5149,7 @@ class Game:
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         if int(game_update_string[1]) == int(primary_player.number):
-                            self.unit_to_move_position[0] = int(game_update_string[2])
-                            self.unit_to_move_position[1] = int(game_update_string[3])
+                            self.unit_to_move_position = (int(game_update_string[2]), int(game_update_string[3]))
                             primary_player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                       self.unit_to_move_position[1], "blue")
         else:
