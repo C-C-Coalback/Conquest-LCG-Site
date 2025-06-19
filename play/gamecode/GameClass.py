@@ -5352,8 +5352,7 @@ class Game:
         primary_player.reset_card_name_misc_ability("Follower of Gork")
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
         if self.amount_that_can_be_removed_by_shield[0] > 2:
-            player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
-            secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
             if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
                 damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
