@@ -7,3 +7,4 @@
 db.sqlite3
 db2.sqlite3
 /errorslog.txt
+/staticfiles/images/CroppedImages/
