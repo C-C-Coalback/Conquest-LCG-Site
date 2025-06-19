@@ -1057,6 +1057,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_first_card = False
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
             self.misc_counter = 0
+        elif current_reaction == "Shedding Hive Crone":
+            num_termagants = 3
+            if self.infested_planets[planet_pos]:
+                num_termagants = 4
+            for i in range(num_termagants):
+                primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
             while i > -1:

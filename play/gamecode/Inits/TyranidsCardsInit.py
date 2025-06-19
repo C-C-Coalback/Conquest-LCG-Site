@@ -484,6 +484,11 @@ def tyranids_cards_init():
                                                  "Reaction: After you deep strike this unit, move a non-Elite army "
                                                  "unit you control or up to 4 Termagants you control to this planet. "
                                                  "Then infest this planet.", "Creature. Kraken. Elite.",
-                             5, faction, "Common", 4, 4, 1, False, deepstrike=3)
+                             5, faction, "Common", 4, 4, 1, False, deepstrike=3),
+        CardClasses.ArmyCard("Shedding Hive Crone", "Flying.\n"
+                                                    "Reaction: After an attack by this unit against an army unit "
+                                                    "doesn't destroy it, put 3 Termagant tokens into play at this "
+                                                    "planet. If the planet is infested, put 4 tokens instead.",
+                             "Creature. Kraken. Elite.", 7, faction, "Common", 6, 7, 1, False, flying=True)
     ]
     return tyranids_card_array
