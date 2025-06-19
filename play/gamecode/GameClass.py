@@ -22,6 +22,7 @@ def create_planets(planet_array_objects):
         planets_in_play_return.append(planet_names[i])
     return planets_in_play_return
 
+
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka,
                  apoka_errata_cards):
@@ -364,6 +365,7 @@ class Game:
         self.cards_with_dash_cost = ["Seething Mycetic Spore"]
         self.stored_discard_and_target = []  # (effect name, player num)
         self.interrupts_discard_enemy_allowed = True
+        self.queued_moves = []  # (player num, planet pos, unit pos, destination)
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -2207,6 +2209,30 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         self.delete_reaction()
+                    elif self.choice_context == "Interrupt Enemy Movement Effect?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        num, og_pla, og_pos, dest = self.queued_moves[0]
+                        del self.queued_moves[0]
+                        if chosen_choice == "No Interrupt":
+                            relevant_player = self.p1
+                            if num == 2:
+                                relevant_player = self.p2
+                            relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True)
+                        elif chosen_choice == "Strangleweb Termagant":
+                            found_strangleweb = False
+                            for i in range(len(primary_player.cards_in_play[og_pla + 1])):
+                                if primary_player.get_ability_given_pos(og_pla, i) == "Strangleweb Termagant":
+                                    if not found_strangleweb:
+                                        found_strangleweb = True
+                                        primary_player.exhaust_given_pos(og_pla, i)
+                            if not found_strangleweb:
+                                relevant_player = self.p1
+                                if num == 2:
+                                    relevant_player = self.p2
+                                relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True)
+                        if not self.queued_moves:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Interrupt Enemy Discard Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "No Interrupt":
@@ -5371,7 +5397,8 @@ class Game:
     async def update_interrupts(self, name, game_update_string, count=0):
         print("updating")
         if self.interrupts_waiting_on_resolution and not self.already_resolving_interrupt \
-                and not self.already_resolving_reaction and not self.resolving_search_box:
+                and not self.already_resolving_reaction and not self.resolving_search_box \
+                and not self.queued_moves:
             print("not already resolving")
             if count < 10:
                 p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
@@ -5449,7 +5476,7 @@ class Game:
             # print(self.interrupts_waiting_on_resolution)
             if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
                     self.resolving_search_box and not self.interrupts_waiting_on_resolution \
-                    and not self.positions_of_units_to_take_damage:
+                    and not self.positions_of_units_to_take_damage and not self.queued_moves:
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
                 if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
@@ -6037,7 +6064,7 @@ class Game:
         await self.update_interrupts(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
-        if not self.reactions_needing_resolving:
+        if not self.reactions_needing_resolving and not self.queued_moves:
             self.last_player_who_resolved_reaction = ""
             if self.reactions_on_winning_combat_being_executed:
                 if self.name_player_who_won_combat == self.name_1:
@@ -6048,7 +6075,7 @@ class Game:
                     loser = self.p1
                 await self.resolve_winning_combat(winner, loser)
             if self.resolve_remaining_cs_after_reactions and not self.positions_of_units_to_take_damage \
-                    and not self.interrupts_waiting_on_resolution:
+                    and not self.interrupts_waiting_on_resolution and not self.queued_moves:
                 self.resolve_remaining_cs_after_reactions = False
                 ret_val = CommandPhase.try_entire_command(self, self.last_planet_checked_command_struggle)
                 await CommandPhase.interpret_command_state(self, ret_val)
@@ -6084,7 +6111,7 @@ class Game:
                 await self.destroy_check_all_cards()
         if not self.positions_of_units_to_take_damage and not self.interrupts_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
-                self.mode == "Normal" and not self.xv805_enforcer_active:
+                self.mode == "Normal" and not self.xv805_enforcer_active and not self.queued_moves:
             if not self.reactions_needing_resolving and not self.resolving_search_box:
                 self.p1.highest_cost_invasion_site = 0
                 self.p2.highest_cost_invasion_site = 0

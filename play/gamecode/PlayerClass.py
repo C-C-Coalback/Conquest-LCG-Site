@@ -1815,7 +1815,7 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].valid_defense_battery_target = False
 
-    def move_unit_to_planet(self, origin_planet, origin_position, destination):
+    def move_unit_to_planet(self, origin_planet, origin_position, destination, force=False):
         if origin_planet == -2:
             headquarters_list = self.headquarters
             if self.headquarters[origin_position].get_card_type() == "Army":
@@ -1846,8 +1846,19 @@ class Player:
                     self.game.create_reaction("Third Eye of Trazyn", self.name_player,
                                               (int(self.number), destination, new_pos))
             self.remove_card_from_hq(origin_position)
+            return True
         else:
             if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
+                other_player = self.get_other_player()
+                if other_player.search_card_at_planet(origin_planet, "Strangleweb Termagant", ready_relevant=True) \
+                        and not force:
+                    self.game.choices_available = ["No Interrupt", "Strangleweb Termagant"]
+                    self.game.name_player_making_choices = other_player.name_player
+                    self.game.choice_context = "Interrupt Enemy Movement Effect?"
+                    self.game.resolving_search_box = True
+                    self.game.queued_moves.append((int(self.number), origin_planet,
+                                                   origin_position, destination))
+                    return False
                 if self.defense_battery_check(origin_planet) or self.defense_battery_check(destination):
                     self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
@@ -1902,6 +1913,7 @@ class Player:
                                               (int(other_player.number), origin_planet, i))
         if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":
             self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
+        return True
 
     def commit_warlord_to_planet_from_planet(self, origin_planet, dest_planet):
         self.warlord_commit_location = dest_planet

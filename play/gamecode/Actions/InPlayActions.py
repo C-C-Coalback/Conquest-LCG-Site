@@ -554,7 +554,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 i = 0
                 while i < len(primary_player.cards_in_play[planet_pos + 1]):
                     if primary_player.cards_in_play[planet_pos + 1][i].aiming_reticle_color == "blue":
-                        primary_player.move_unit_to_planet(planet_pos, i, self.round_number)
+                        primary_player.move_unit_to_planet(planet_pos, i, self.round_number, force=True)
                         i = i - 1
                     i = i + 1
                 for j in range(len(primary_player.cards_in_play[self.round_number + 1])):

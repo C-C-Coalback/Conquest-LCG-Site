@@ -495,6 +495,9 @@ def tyranids_cards_init():
                                                    "at the same planet under the control of the controller of "
                                                    "the destroyed unit. Then if that unit had 1 or more attachments, "
                                                    "pay 1 resource, if able.", "Hybrid. Genestealer.",
-                             3, faction, "Common", 3, 4, 1, False)
+                             3, faction, "Common", 3, 4, 1, False),
+        CardClasses.ArmyCard("Strangleweb Termagant", "Interrupt: When an enemy army unit would move from this planet "
+                                                      "to another planet, exhaust this unit to cancel that move.",
+                             "Creature. Termagant.", 1, faction, "Common", 0, 2, 1, False)
     ]
     return tyranids_card_array

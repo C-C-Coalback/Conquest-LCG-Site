@@ -309,7 +309,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data): # noqa
         global active_games
         global chat_messages
-        global logger
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print(message)
@@ -364,6 +363,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update("FORCEFULLY QUITTING ACTION")
                         active_games[self.game_position].reset_action_data()
                         active_games[self.game_position].action_cleanup()
+                        await active_games[self.game_position].send_info_box()
+                    elif message[1] == "force-quit-moves":
+                        await self.receive_game_update("FORCEFULLY QUITTING MOVES")
+                        active_games[self.game_position].queued_moves = []
+                        if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
+                            active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
                     elif message[1] == "cards-deck" and len(message) == 3:
                         if message[2] == "1":
