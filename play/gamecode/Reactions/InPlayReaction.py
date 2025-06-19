@@ -972,6 +972,47 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if self.misc_counter > 3:
                     self.infest_planet(self.misc_target_planet, primary_player)
                     self.delete_reaction()
+        elif current_reaction == "Erupting Aberrants":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction"
+                if can_continue:
+                    has_attachments = False
+                    if player_owning_card.cards_in_play[planet_pos + 1][unit_pos]:
+                        has_attachments = True
+                    player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
+                    card = self.preloaded_find_card("Erupting Aberrants")
+                    player_owning_card.add_card_to_planet(card, planet_pos)
+                    last_element_index = len(player_owning_card.cards_in_play[planet_pos + 1]) - 1
+                    player_owning_card.cards_in_play[planet_pos + 1][last_element_index].name_owner = \
+                        primary_player.name_player
+                    if has_attachments:
+                        primary_player.spend_resources(1)
+                    primary_player.cards.remove("Erupting Aberrants")
+                    self.delete_reaction()
+                    if primary_player.search_hand_for_card("Erupting Aberrants"):
+                        self.game.create_reaction("Erupting Aberrants", primary_player.name_player,
+                                                  (int(primary_player.number), -1, -1))
         elif current_reaction == "Hydrae Stalker":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
@@ -980,7 +1021,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_being_hit = self.p2
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if player_being_hit.get_cost_given_pos(planet_pos, unit_pos) < 3:
-                        can_continue = True
                         can_continue = True
                         possible_interrupts = []
                         if player_owning_card.name_player == primary_player.name_player:

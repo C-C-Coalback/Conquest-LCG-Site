@@ -4804,6 +4804,10 @@ class Player:
         print("Attempting to capture planet.")
         print("Planet to capture:", planet_name)
         i = 0
+        other_player = self.get_other_player()
+        if other_player.search_hand_for_card("Erupting Aberrants"):
+            self.game.create_reaction("Erupting Aberrants", other_player.name_player,
+                                      (int(other_player.number), -1, -1))
         for letter in planet_name:
             if letter == "_":
                 planet_name = planet_name.replace(letter, " ")

@@ -489,6 +489,12 @@ def tyranids_cards_init():
                                                     "Reaction: After an attack by this unit against an army unit "
                                                     "doesn't destroy it, put 3 Termagant tokens into play at this "
                                                     "planet. If the planet is infested, put 4 tokens instead.",
-                             "Creature. Kraken. Elite.", 7, faction, "Common", 6, 7, 1, False, flying=True)
+                             "Creature. Kraken. Elite.", 7, faction, "Common", 6, 7, 1, False, flying=True),
+        CardClasses.ArmyCard("Erupting Aberrants", "Reaction: After your opponent captures a planet, destroy a "
+                                                   "target army unit and put this unit into play from your hand "
+                                                   "at the same planet under the control of the controller of "
+                                                   "the destroyed unit. Then if that unit had 1 or more attachments, "
+                                                   "pay 1 resource, if able.", "Hybrid. Genestealer.",
+                             3, faction, "Common", 3, 4, 1, False)
     ]
     return tyranids_card_array
