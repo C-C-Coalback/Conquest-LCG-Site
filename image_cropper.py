@@ -28,14 +28,14 @@ def crop_images(card_array, cards_dict):
                 (left, upper, right, lower) = (0, 0, width, height * 0.59)
                 im_crop = im.crop((left, upper, right, lower))
                 im_crop = im_crop.convert("RGB")
-                im_crop.save(output_path + current_image + "_Cropped.jpg")
+                im_crop.save(output_path + current_image + ".jpg")
         else:
             with Image.open(path + current_image + ".jpg") as im:
                 width, height = im.size
                 (left, upper, right, lower) = (0, height * 0.05, width, height * 0.64)
                 im_crop = im.crop((left, upper, right, lower))
                 im_crop = im_crop.convert("RGB")
-                im_crop.save(output_path + current_image + "_Cropped.jpg")
+                im_crop.save(output_path + current_image + ".jpg")
 
 
 crop_images(card_array, cards_dict)
