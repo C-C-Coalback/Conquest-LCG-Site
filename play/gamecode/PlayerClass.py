@@ -1780,11 +1780,15 @@ class Player:
         i = 0
         while i < len(self.headquarters):
             self.headquarters[i].resolving_attack = False
+            if self.headquarters[i].get_ability() == "Tomb Blade Diversionist":
+                self.headquarters[i].misc_ability_used = False
             i += 1
         for i in range(7):
             j = 0
             while j < len(self.cards_in_play[i + 1]):
                 self.cards_in_play[i + 1][j].resolving_attack = False
+                if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Diversionist":
+                    self.cards_in_play[i + 1][j].misc_ability_used = False
                 j = j + 1
 
     def ethereal_movement_resolution(self):

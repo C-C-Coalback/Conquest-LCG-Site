@@ -721,6 +721,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.queued_sound = "necrons_attack"
                                 if faction in self.gunfire_weapon_sounds:
                                     self.queued_sound = "gunfire_attack"
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Tomb Blade Diversionist":
+                                    secondary_player.cards_in_play[
+                                        self.defender_planet + 1][self.defender_position].misc_ability_used = True
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                         self.attacker_position) == "Starbane's Council":
                                     if not secondary_player.get_ready_given_pos(self.defender_planet,

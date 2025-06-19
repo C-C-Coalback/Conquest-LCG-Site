@@ -1055,8 +1055,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
         elif current_reaction == "Tunneling Mawloc":
             self.chosen_first_card = False
-            self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+            self.misc_target_planet = planet_pos
             self.misc_counter = 0
+        elif current_reaction == "Tomb Blade Diversionist":
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+            self.delete_reaction()
         elif current_reaction == "Shedding Hive Crone":
             num_termagants = 3
             if self.infested_planets[planet_pos]:

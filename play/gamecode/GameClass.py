@@ -6174,6 +6174,12 @@ class Game:
                         self.p1.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_1
+                            if self.p1.get_card_type_given_pos(planet, i) == "Army":
+                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                    if self.p2.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":
+                                        if not self.p2.cards_in_play[planet + 1][j].misc_ability_used:
+                                            self.create_reaction("Tomb Blade Diversionist", self.name_2,
+                                                                 (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
@@ -6197,6 +6203,12 @@ class Game:
                         self.p2.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_2
+                            if self.p2.get_card_type_given_pos(planet, i) == "Army":
+                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                    if self.p1.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":
+                                        if not self.p1.cards_in_play[planet + 1][j].misc_ability_used:
+                                            self.create_reaction("Tomb Blade Diversionist", self.name_1,
+                                                                 (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
