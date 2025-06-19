@@ -413,6 +413,9 @@ class Player:
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Tunneling Mawloc":
+            self.game.create_reaction("Tunneling Mawloc", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Seething Mycetic Spore":
             self.game.create_reaction("Seething Mycetic Spore", self.name_player,
                                       (int(self.number), planet_id, last_element_index))

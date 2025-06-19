@@ -69,6 +69,20 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if card_type == "Warlord" or card_type == "Synapse":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
             self.delete_reaction()
+    elif current_reaction == "Tunneling Mawloc":
+        card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
+        if card_type == "Army":
+            if not self.chosen_first_card:
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                self.infest_planet(self.misc_target_planet, primary_player)
+                self.delete_reaction()
+        elif card_type == "Token":
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+            self.misc_counter += 1
+            self.chosen_first_card = True
+            if self.misc_counter > 3:
+                self.infest_planet(self.misc_target_planet, primary_player)
+                self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Murder Cogitator":
         if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
             if primary_player.headquarters[unit_pos].get_ready():

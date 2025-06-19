@@ -479,6 +479,11 @@ def tyranids_cards_init():
                                               "Interrupt: When your opponent triggers an ability that discards a "
                                               "card from your hand, put this unit into play at a planet to draw "
                                               "two cards.", "Hybrid. Genestealer.",
-                             2, faction, "Common", 2, 3, 1, False)
+                             2, faction, "Common", 2, 3, 1, True),
+        CardClasses.ArmyCard("Tunneling Mawloc", "Deep Strike (3).\n"
+                                                 "Reaction: After you deep strike this unit, move a non-Elite army "
+                                                 "unit you control or up to 4 Termagants you control to this planet. "
+                                                 "Then infest this planet.", "Creature. Kraken. Elite.",
+                             5, faction, "Common", 4, 4, 1, False, deepstrike=3)
     ]
     return tyranids_card_array

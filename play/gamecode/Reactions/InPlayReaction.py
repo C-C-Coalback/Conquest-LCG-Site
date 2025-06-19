@@ -958,6 +958,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Tunneling Mawloc":
+            card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
+            if card_type == "Army":
+                if not self.chosen_first_card:
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                    self.infest_planet(self.misc_target_planet, primary_player)
+                    self.delete_reaction()
+            elif card_type == "Token":
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                self.misc_counter += 1
+                self.chosen_first_card = True
+                if self.misc_counter > 3:
+                    self.infest_planet(self.misc_target_planet, primary_player)
+                    self.delete_reaction()
         elif current_reaction == "Hydrae Stalker":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":

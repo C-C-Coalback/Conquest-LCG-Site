@@ -1053,6 +1053,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 secondary_player.discard_card_at_random()
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Tunneling Mawloc":
+            self.chosen_first_card = False
+            self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+            self.misc_counter = 0
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
             while i > -1:

@@ -5003,6 +5003,8 @@ class Game:
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
+                        self.infest_planet(self.misc_target_planet, primary_player)
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
                     if self.reactions_needing_resolving[0] != "Warlock Destructor":
