@@ -74,6 +74,18 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                         action_in_play=True, allowed_phases_in_play="ALL")
                         primary_player.add_card_to_planet(card, planet_pos)
                         self.action_cleanup()
+                    elif ability == "Pulsating Carapace":
+                        if card_chosen.get_ready():
+                            if primary_player.get_name_player() == self.player_with_action:
+                                self.choices_available = ["Infest planet", "Heal 2 damage"]
+                                self.choice_context = "Pulsating Carapace choice"
+                                self.misc_target_planet = planet_pos
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                                self.misc_target_player = int(player_owning_card.get_number())
+                                self.name_player_making_choices = primary_player.get_name_player()
+                                self.resolving_search_box = True
+                                card_chosen.exhaust_card()
+                                self.action_cleanup()
                     elif ability == "Drone Defense System":
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):

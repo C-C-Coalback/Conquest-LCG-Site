@@ -2395,6 +2395,18 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Pulsating Carapace choice":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "Infest planet":
+                            self.infest_planet(self.misc_target_planet, primary_player)
+                        else:
+                            target_player = self.p1
+                            if self.misc_target_player == 2:
+                                target_player = self.p2
+                            planet_pos, unit_pos = self.misc_target_unit
+                            target_player.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
                     elif self.choice_context == "Select new synapse (RSN):":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(chosen_choice)
@@ -5339,6 +5351,12 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         primary_player.reset_card_name_misc_ability("Follower of Gork")
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
+        if self.amount_that_can_be_removed_by_shield[0] > 2:
+            player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
+            secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
+                damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
+                primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
             secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

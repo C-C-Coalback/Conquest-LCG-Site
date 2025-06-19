@@ -155,6 +155,7 @@ class Player:
         self.planet_absorption_played = False
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
+        self.preparation_cards = ["Pulsating Carapace"]
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -198,11 +199,27 @@ class Player:
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
         self.resources = self.headquarters[0].get_starting_resources()
-        for i in range(self.headquarters[0].get_starting_cards()):
-            self.draw_card()
+        preparation_cards_exist = False
+        for i in range(len(self.preparation_cards)):
+            if self.preparation_cards[i] in self.deck:
+                preparation_cards_exist = True
+        if not preparation_cards_exist:
+            for i in range(self.headquarters[0].get_starting_cards()):
+                self.draw_card()
+        else:
+            num_cards_left = self.headquarters[0].get_starting_cards()
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.preparation_cards:
+                    self.cards.append(self.deck[i])
+                    del self.deck[i]
+                    num_cards_left = num_cards_left - 1
+                    i = i - 1
+                i = i + 1
+            for i in range(num_cards_left):
+                self.draw_card()
         print(self.resources)
         print(self.deck)
-        print(self.cards_in_play)
         print(self.cards)
         self.print_headquarters()
         await self.send_hand()
@@ -649,8 +666,24 @@ class Player:
             self.deck.append(self.cards[0])
             del self.cards[0]
         self.shuffle_deck()
-        for i in range(num_cards):
-            self.draw_card()
+        preparation_cards_exist = False
+        for i in range(len(self.preparation_cards)):
+            if self.preparation_cards[i] in self.deck:
+                preparation_cards_exist = True
+        if not preparation_cards_exist:
+            for i in range(num_cards):
+                self.draw_card()
+        else:
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.preparation_cards:
+                    self.cards.append(self.deck[i])
+                    del self.deck[i]
+                    num_cards = num_cards - 1
+                    i = i - 1
+                i = i + 1
+            for i in range(num_cards):
+                self.draw_card()
 
     def get_headquarters(self):
         return self.headquarters

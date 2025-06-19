@@ -510,6 +510,12 @@ def tyranids_cards_init():
                                                              "commit this unit to an adjacent planet. At the end "
                                                              "of the round, discard any synapse unit not from "
                                                              "your deck you control.", "Tactic.",
-                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.AttachmentCard("Pulsating Carapace", "Attach to a Behemoth warlord unit.\n"
+                                                         "Reduce all damage taken by attached unit to 2.\n"
+                                                         "Action: Exhaust this attachment to remove 2 damage from "
+                                                         "attached unit or infest this planet.", "Biomorph.",
+                                   2, faction, "Common", 1, False, action_in_play=True, allowed_phases_in_play="ALL",
+                                   type_of_units_allowed_for_attachment="Warlord", required_traits="Behemoth")
     ]
     return tyranids_card_array
