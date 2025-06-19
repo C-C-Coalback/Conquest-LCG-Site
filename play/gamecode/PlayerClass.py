@@ -153,6 +153,8 @@ class Player:
         self.contaminated_convoys = False
         self.magus_harid_waiting_cards = []
         self.planet_absorption_played = False
+        self.reinforced_synaptic_network_played = False
+        self.allowed_units_rsn = copy.copy(self.synapse_list)
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -184,10 +186,12 @@ class Player:
             i = 0
             while i < len(self.deck):
                 if self.deck[i] in self.synapse_list:
+                    self.allowed_units_rsn.remove(self.deck[i])
                     self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array,
                                                                               self.cards_dict,
                                                                               self.apoka_errata_cards,
                                                                               self.cards_that_have_errata)))
+                    self.headquarters[1].name_owner = self.name_player
                     del self.deck[i]
                 i = i + 1
         self.shuffle_deck()
@@ -1978,7 +1982,7 @@ class Player:
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
             for i in range(len(self.headquarters)):
-                if self.headquarters[i].get_card_type() == "Synapse":
+                if self.headquarters[i].get_card_type() == "Synapse" and self.headquarters[i].from_deck:
                     if self.headquarters[i].get_ability() == "Gravid Tervigon":
                         self.game.create_reaction("Gravid Tervigon", self.name_player,
                                                   (int(self.number), self.synapse_commit_location, -1))

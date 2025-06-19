@@ -1,4 +1,5 @@
 from .. import FindCard
+import copy
 
 
 async def update_game_event_action_hand(self, name, game_update_string, may_nullify=True):
@@ -770,6 +771,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.resolving_search_box = True
                             for i in range(len(primary_player.victory_display)):
                                 self.choices_available.append(primary_player.victory_display[i].get_name())
+                        self.action_cleanup()
+                    elif ability == "Reinforced Synaptic Network":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        primary_player.reinforced_synaptic_network_played = True
+                        self.choices_available = copy.copy(primary_player.allowed_units_rsn)
+                        self.choice_context = "Select new synapse (RSN):"
+                        self.name_player_making_choices = primary_player.name_player
+                        self.resolving_search_box = True
                         self.action_cleanup()
                     elif ability == "Visions of Agony":
                         if secondary_player.cards:

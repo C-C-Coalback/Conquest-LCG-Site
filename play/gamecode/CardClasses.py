@@ -66,6 +66,7 @@ class Card:
         self.follower_of_gork_available = True
         self.once_per_game_used = False
         self.from_magus_harid = False
+        self.from_deck = True
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

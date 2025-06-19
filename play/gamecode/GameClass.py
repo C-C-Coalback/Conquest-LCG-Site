@@ -269,7 +269,8 @@ class Game:
             "Keep Firing!", "Vivisection", "Repent!", "Ominous Wind", "Daemonic Incursion", "Piercing Wail"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
-                                 "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines"]
+                                 "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
+                                 "Reinforced Synaptic Network"]
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
@@ -2394,6 +2395,15 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Select new synapse (RSN):":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        card = self.preloaded_find_card(chosen_choice)
+                        primary_player.add_to_hq(card)
+                        last_element_index = len(primary_player.headquarters) - 1
+                        primary_player.allowed_units_rsn.remove(chosen_choice)
+                        primary_player.headquarters[last_element_index].from_deck = False
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Deepstrike cards?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             await self.send_update_message("Please choose cards to deepstrike")
@@ -6530,6 +6540,22 @@ class Game:
                 + self.name_2 + " lost from Planet Absorption."
                                 "----GAME END----"
             )
+        if self.p1.reinforced_synaptic_network_played:
+            i = 0
+            while i < len(self.p1.headquarters):
+                if self.p1.headquarters[i].get_card_type() == "Synapse" and not self.p1.headquarters[i].from_deck:
+                    self.p1.add_card_in_hq_to_discard(i)
+                    i = i - 1
+                i = i + 1
+            self.p1.reinforced_synaptic_network_played = False
+        if self.p2.reinforced_synaptic_network_played:
+            i = 0
+            while i < len(self.p2.headquarters):
+                if self.p2.headquarters[i].get_card_type() == "Synapse" and not self.p2.headquarters[i].from_deck:
+                    self.p2.add_card_in_hq_to_discard(i)
+                    i = i - 1
+                i = i + 1
+            self.p2.reinforced_synaptic_network_played = False
         self.p1.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.p2.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.p1.illegal_commits_warlord = 0

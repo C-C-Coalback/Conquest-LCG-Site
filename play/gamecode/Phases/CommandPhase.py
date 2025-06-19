@@ -182,6 +182,12 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.resolve_enemy_warlord_committed_to_planet(self.p1.warlord_commit_location)
                     self.p1.commit_synapse_to_planet()
                     self.p2.commit_synapse_to_planet()
+                    for i in range(len(self.p1.headquarters)):
+                        if self.p1.get_card_type_given_pos(-2, i) == "Synapse":
+                            self.create_reaction("Reinforced Synaptic Network", self.name_1, (1, -2, i))
+                    for i in range(len(self.p2.headquarters)):
+                        if self.p2.get_card_type_given_pos(-2, i) == "Synapse":
+                            self.create_reaction("Reinforced Synaptic Network", self.name_2, (2, -2, i))
                     planets_committed_to = [self.p1.warlord_commit_location, self.p2.warlord_commit_location,
                                             self.p1.synapse_commit_location, self.p2.synapse_commit_location]
                     planets_committed_to = [x for x in planets_committed_to if x != -1]

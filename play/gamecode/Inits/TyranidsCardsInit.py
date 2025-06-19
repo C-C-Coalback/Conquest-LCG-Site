@@ -503,6 +503,13 @@ def tyranids_cards_init():
                                                    "a planet in your victory display from the game. When this round "
                                                    "ends or when another event named \"Planet Absorption\" is played, "
                                                    "you lost the game. Max 1 per round.", "Tactic.",
-                              0, faction, "Common", 2, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              0, faction, "Common", 2, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.EventCard("Reinforced Synaptic Network", "Deploy Action: Put a synapse unit into play at "
+                                                             "your HQ from the card collection (only once per "
+                                                             "synapse). When your warlord commits to a planet, "
+                                                             "commit this unit to an adjacent planet. At the end "
+                                                             "of the round, discard any synapse unit not from "
+                                                             "your deck you control.", "Tactic.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
     ]
     return tyranids_card_array
