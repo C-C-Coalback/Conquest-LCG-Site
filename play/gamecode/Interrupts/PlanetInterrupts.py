@@ -46,7 +46,11 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             primary_player.remove_damage_from_pos(origin_planet, origin_pos, 999)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             last_element_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
-            self.recently_damaged_units[i] = (int(primary_player.number), chosen_planet, last_element_index)
+            try:
+                if self.recently_damaged_units:
+                    self.recently_damaged_units[0] = (int(primary_player.number), chosen_planet, last_element_index)
+            except:
+                pass
             self.delete_interrupt()
     elif current_interrupt == "Magus Harid: Final Form":
         card = CardClasses.WarlordCard("Termagant", "", "Termagant", "Tyranids", 1, 1, 1, 1, "", 6, 6, [])
