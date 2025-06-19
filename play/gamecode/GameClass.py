@@ -2773,6 +2773,17 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
+                    elif self.choice_context == "Absorb a planet:":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        self.planets_removed_from_game.append(chosen_choice)
+                        position_planet = -1
+                        for i in range(len(primary_player.victory_display)):
+                            if primary_player.victory_display[i].get_name() == chosen_choice:
+                                position_planet = i
+                        del primary_player.victory_display[position_planet]
+                        self.resolving_search_box = False
+                        await primary_player.send_victory_display()
+                        self.reset_choices_available()
                     elif self.choice_context == "Target Dark Possession:":
                         primary_player.force_due_to_dark_possession = True
                         primary_player.cards.append(self.choices_available[int(game_update_string[1])])
@@ -6502,9 +6513,23 @@ class Game:
         del secondary_player.cards_in_play[planet_pos + 1][unit_pos]
         return None
 
-    def reset_values_for_new_round(self):
+    async def reset_values_for_new_round(self):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        if self.p1.planet_absorption_played:
+            await self.game.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_2 + "; "
+                + self.name_1 + " lost from Planet Absorption."
+                                "----GAME END----"
+            )
+        if self.p2.planet_absorption_played:
+            await self.game.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_1 + "; "
+                + self.name_2 + " lost from Planet Absorption."
+                                "----GAME END----"
+            )
         self.p1.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.p2.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.p1.illegal_commits_warlord = 0

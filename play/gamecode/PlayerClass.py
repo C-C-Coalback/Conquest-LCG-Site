@@ -152,6 +152,7 @@ class Player:
         self.valid_surrogate_host = [False, False, False, False, False, False, False]
         self.contaminated_convoys = False
         self.magus_harid_waiting_cards = []
+        self.planet_absorption_played = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):

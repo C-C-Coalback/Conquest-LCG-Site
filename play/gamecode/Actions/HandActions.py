@@ -750,6 +750,27 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     self.player_with_deploy_turn = secondary_player.name_player
                                     self.number_with_deploy_turn = secondary_player.number
                                     await primary_player.dark_eldar_event_played()
+                    elif ability == "Planet Absorption":
+                        if primary_player.planet_absorption_played or secondary_player.planet_absorption_played:
+                            await self.send_update_message(
+                                "----GAME END----"
+                                "Victory for " + secondary_player.name_player + "; "
+                                + primary_player.name_player + " played a second Planet Absorption."
+                                "----GAME END----"
+                            )
+                        primary_player.draw_card()
+                        primary_player.draw_card()
+                        primary_player.draw_card()
+                        primary_player.add_resources(3)
+                        primary_player.discard_card_from_hand(hand_pos)
+                        if primary_player.victory_display:
+                            self.choices_available = []
+                            self.name_player_making_choices = primary_player.name_player
+                            self.choice_context = "Absorb a planet:"
+                            self.resolving_search_box = True
+                            for i in range(len(primary_player.victory_display)):
+                                self.choices_available.append(primary_player.victory_display[i].get_name())
+                        self.action_cleanup()
                     elif ability == "Visions of Agony":
                         if secondary_player.cards:
                             interrupts = secondary_player.search_triggered_interrupts_enemy_discard()

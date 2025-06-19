@@ -498,6 +498,11 @@ def tyranids_cards_init():
                              3, faction, "Common", 3, 4, 1, False),
         CardClasses.ArmyCard("Strangleweb Termagant", "Interrupt: When an enemy army unit would move from this planet "
                                                       "to another planet, exhaust this unit to cancel that move.",
-                             "Creature. Termagant.", 1, faction, "Common", 0, 2, 1, False)
+                             "Creature. Termagant.", 1, faction, "Common", 0, 2, 1, False),
+        CardClasses.EventCard("Planet Absorption", "Deploy Action: Gain 3 resources and draw 3 cards. Then remove "
+                                                   "a planet in your victory display from the game. When this round "
+                                                   "ends or when another event named \"Planet Absorption\" is played, "
+                                                   "you lost the game. Max 1 per round.", "Tactic.",
+                              0, faction, "Common", 2, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
     ]
     return tyranids_card_array
