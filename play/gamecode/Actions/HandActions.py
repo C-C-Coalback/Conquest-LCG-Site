@@ -752,10 +752,20 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     await primary_player.dark_eldar_event_played()
                     elif ability == "Visions of Agony":
                         if secondary_player.cards:
-                            self.choices_available = secondary_player.cards
-                            self.choice_context = "Visions of Agony Discard:"
+                            interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                            self.name_player_making_choices = primary_player.name_player
+                            if interrupts:
+                                await self.send_update_message("Some sort of interrupt may be used.")
+                                self.choices_available = interrupts
+                                self.choices_available.insert(0, "No Interrupt")
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Interrupt Enemy Discard Effect?"
+                                self.resolving_search_box = True
+                                self.stored_discard_and_target.append((ability, primary_player.number))
+                            else:
+                                self.choices_available = secondary_player.cards
+                                self.choice_context = "Visions of Agony Discard:"
+                                self.name_player_making_choices = primary_player.name_player
                         else:
                             primary_player.add_resources(cost, refund=True)
                             await self.send_update_message("No cards to look at with Visions of Agony")

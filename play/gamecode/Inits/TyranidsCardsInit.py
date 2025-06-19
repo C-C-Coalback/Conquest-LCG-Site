@@ -473,6 +473,12 @@ def tyranids_cards_init():
                                                       "unit with the Hive Mind specialization and printed cost "
                                                       "equal or lower to the number of tokens on this support "
                                                       "into play from your discard pile at a planet.", "Location.",
-                                0, faction, "Common", True)
+                                0, faction, "Common", True),
+        CardClasses.ArmyCard("Vale Tenndrac", "Reaction: After this unit enters play, put 1 Termagant token into "
+                                              "play at this planet and each adjacent infested planet.\n"
+                                              "Interrupt: When your opponent triggers an ability that discards a "
+                                              "card from your hand, put this unit into play at a planet to draw "
+                                              "two cards.", "Hybrid. Genestealer.",
+                             2, faction, "Common", 2, 3, 1, False)
     ]
     return tyranids_card_array

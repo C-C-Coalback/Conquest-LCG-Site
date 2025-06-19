@@ -443,18 +443,23 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if game_update_string[1] == self.number_with_deploy_turn:
             if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                secondary_player.discard_card_at_random()
-                primary_player.draw_card()
-                primary_player.draw_card()
-                primary_player.aiming_reticle_color = None
+                interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                 primary_player.aiming_reticle_coords_hand = None
-                self.card_pos_to_deploy = -1
-                self.player_with_action = ""
-                self.action_chosen = ""
-                self.player_with_deploy_turn = secondary_player.name_player
-                self.number_with_deploy_turn = secondary_player.number
-                self.mode = self.stored_mode
-                await primary_player.dark_eldar_event_played()
+                if interrupts:
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Enemy Discard Effect?"
+                    self.resolving_search_box = True
+                    self.stored_discard_and_target.append((self.action_chosen, primary_player.number))
+                else:
+                    secondary_player.discard_card_at_random()
+                    primary_player.draw_card()
+                    primary_player.draw_card()
+                    self.card_pos_to_deploy = -1
+                    self.action_cleanup()
+                    await primary_player.dark_eldar_event_played()
     elif self.action_chosen == "Webway Passage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

@@ -492,23 +492,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_cleanup()
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
-            if self.number_with_deploy_turn == "1":
-                primary_player = self.p1
-                secondary_player = self.p2
-            else:
-                primary_player = self.p2
-                secondary_player = self.p1
             if primary_player.sacrifice_card_in_play(int(game_update_string[2]),
                                                      int(game_update_string[3])):
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                secondary_player.discard_card_at_random()
-                primary_player.draw_card()
-                primary_player.draw_card()
-                primary_player.aiming_reticle_color = None
+                interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                 primary_player.aiming_reticle_coords_hand = None
-                self.card_pos_to_deploy = -1
-                self.action_cleanup()
-                await primary_player.dark_eldar_event_played()
+                if interrupts:
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Enemy Discard Effect?"
+                    self.resolving_search_box = True
+                    self.stored_discard_and_target.append((self.action_chosen, primary_player.number))
+                else:
+                    secondary_player.discard_card_at_random()
+                    primary_player.draw_card()
+                    primary_player.draw_card()
+                    primary_player.aiming_reticle_color = None
+                    self.card_pos_to_deploy = -1
+                    self.action_cleanup()
+                    await primary_player.dark_eldar_event_played()
     elif self.action_chosen == "Even the Odds":
         if self.chosen_first_card:
             if self.misc_player_storage == game_update_string[1]:

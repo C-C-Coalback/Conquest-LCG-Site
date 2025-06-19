@@ -362,6 +362,8 @@ class Game:
         self.paying_shrieking_exarch_cost = False
         self.jungle_trench_count = 0
         self.cards_with_dash_cost = ["Seething Mycetic Spore"]
+        self.stored_discard_and_target = []  # (effect name, player num)
+        self.interrupts_discard_enemy_allowed = True
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -2066,8 +2068,18 @@ class Game:
                 winner.add_resources(1)
             await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Barlus":
-            loser.discard_card_at_random()
-            await self.resolve_battle_conclusion(name, game_update_string)
+            interrupts = loser.search_triggered_interrupts_enemy_discard()
+            if interrupts:
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = loser.name_player
+                self.choice_context = "Interrupt Enemy Discard Effect?"
+                self.resolving_search_box = True
+                self.stored_discard_and_target.append(("Barlus", winner.number))
+            else:
+                loser.discard_card_at_random()
+                await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Elouith":
             if len(winner.deck) > 2:
                 winner.number_cards_to_search = 3
@@ -2195,13 +2207,49 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         self.delete_reaction()
+                    elif self.choice_context == "Interrupt Enemy Discard Effect?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "No Interrupt":
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.interrupts_discard_enemy_allowed = False
+                            await self.complete_enemy_discard(primary_player, secondary_player)
+                            self.interrupts_discard_enemy_allowed = True
+                        elif chosen_choice == "Vale Tenndrac":
+                            self.choices_available = []
+                            self.choice_context = "Target Planet Vale Tenndrac"
+                            for i in range(len(self.planets_in_play_array)):
+                                if self.planets_in_play_array[i]:
+                                    self.choices_available.append(primary_player.cards_in_play[0][i])
+                            if not self.choices_available:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                self.interrupts_discard_enemy_allowed = False
+                                await self.complete_enemy_discard(primary_player, secondary_player)
+                                self.interrupts_discard_enemy_allowed = True
+                    elif self.choice_context == "Target Planet Vale Tenndrac":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        i = 0
+                        found_planet = False
+                        while i < 7 and not found_planet:
+                            if primary_player.cards_in_play[0][i] == chosen_choice:
+                                found_planet = True
+                                card = self.preloaded_find_card("Vale Tenndrac")
+                                primary_player.add_card_to_planet(card, i)
+                                primary_player.draw_card()
+                                primary_player.draw_card()
+                                primary_player.remove_card_name_from_hand("Vale Tenndrac")
+                            i += 1
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.interrupts_discard_enemy_allowed = False
+                        await self.complete_enemy_discard(primary_player, secondary_player)
+                        self.interrupts_discard_enemy_allowed = True
                     elif self.choice_context == "Interrupt Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         print("Choice chosen:", chosen_choice)
                         if chosen_choice == "No Interrupt":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.communications_relay_enabled = False
                             self.backlash_enabled = False
                             self.searing_brand_cancel_enabled = False
@@ -2836,9 +2884,8 @@ class Game:
                         secondary_player.discard_card_from_hand(int(game_update_string[1]))
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played("Visions of Agony")
@@ -3578,6 +3625,29 @@ class Game:
                         else:
                             await self.send_update_message("Too few cards in deck")
 
+    async def complete_enemy_discard(self, secondary_player, primary_player):
+        effect, number = self.stored_discard_and_target[0]
+        if effect == "Barlus":
+            secondary_player.discard_card_at_random()
+            await self.resolve_battle_conclusion("", [])
+        elif effect == "Murder of Razorwings":
+            secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif effect == "Pact of the Haemonculi":
+            secondary_player.discard_card_at_random()
+            primary_player.draw_card()
+            primary_player.draw_card()
+            self.card_pos_to_deploy = -1
+            self.action_cleanup()
+            await primary_player.dark_eldar_event_played()
+        elif effect == "Visions of Agony":
+            self.choices_available = secondary_player.cards
+            self.choice_context = "Visions of Agony Discard:"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        del self.stored_discard_and_target[0]
+
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if self.yvarn_active:
             if name == self.name_1:
@@ -3863,6 +3933,10 @@ class Game:
             i = i + 1
         if self.damage_from_atrox:
             await self.resolve_battle_conclusion(self.player_resolving_battle_ability, "")
+
+    def preloaded_find_card(self, card_name):
+        return FindCard.find_card(card_name, self.card_array, self.cards_dict,
+                                  self.apoka_errata_cards, self.cards_that_have_errata)
 
     async def resolve_on_kill_effects(self, i):
         print("--------\nON KILL EFFECTS\n--------")

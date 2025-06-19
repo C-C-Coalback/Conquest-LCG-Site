@@ -277,6 +277,13 @@ class Player:
             self.last_hand_string = card_string
             await self.game.send_update_message(card_string)
 
+    def search_triggered_interrupts_enemy_discard(self):
+        interrupts = []
+        if self.game.interrupts_discard_enemy_allowed:
+            if self.search_hand_for_card("Vale Tenndrac"):
+                interrupts.append("Vale Tenndrac")
+        return interrupts
+
     async def send_hq(self, force=False):
         joined_string = ""
         if self.headquarters:
@@ -1342,6 +1349,9 @@ class Player:
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
             self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
                                                                             last_element_index))
+        elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Vale Tenndrac":
+            self.game.create_reaction("Vale Tenndrac", self.name_player, (int(self.number), position,
+                                                                          last_element_index))
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Standard Bearer":
             self.game.create_reaction("Standard Bearer", self.name_player,
                                       (int(self.number), position, last_element_index))

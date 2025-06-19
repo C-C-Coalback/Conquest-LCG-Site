@@ -1040,9 +1040,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Murder of Razorwings":
-            secondary_player.discard_card_at_random()
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
+            interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
+            if interrupts:
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Enemy Discard Effect?"
+                self.resolving_search_box = True
+                self.stored_discard_and_target.append((current_reaction, primary_player.number))
+            else:
+                secondary_player.discard_card_at_random()
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
             while i > -1:
@@ -1328,6 +1338,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Sacrifice Hive Ship Tendrils?"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Vale Tenndrac":
+            primary_player.summon_token_at_planet("Termagant", planet_pos)
+            if planet_pos != 0:
+                if self.infested_planets[planet_pos - 1] and self.planets_in_play_array[planet_pos - 1]:
+                    primary_player.summon_token_at_planet("Termagant", planet_pos - 1)
+            if planet_pos != 6:
+                if self.infested_planets[planet_pos + 1] and self.planets_in_play_array[planet_pos + 1]:
+                    primary_player.summon_token_at_planet("Termagant", planet_pos + 1)
+            self.delete_reaction()
         elif current_reaction == "Goliath Rockgrinder":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for _ in range(self.goliath_rockgrinder_value):
