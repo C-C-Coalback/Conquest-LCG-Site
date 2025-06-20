@@ -613,7 +613,7 @@
                     var full_string = `<details><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
-                            full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);">`
+                            full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);"><br>`
                         }
                     }
                     full_string += `</details>`;

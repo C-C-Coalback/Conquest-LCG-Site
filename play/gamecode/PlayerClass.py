@@ -325,6 +325,8 @@ class Player:
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                 elif current_card.get_name() == "Hive Ship Tendrils":
                     single_card_string += str(current_card.counter)
+                elif current_card.get_name() == "Promethium Mine":
+                    single_card_string += str(current_card.counter)
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -1083,6 +1085,9 @@ class Player:
             self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
+        elif self.get_ability_given_pos(-2, last_element_index) == "Flayed Ones Revenants":
+            self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
+                                       (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Salamander Flamer Squad":
             self.headquarters[last_element_index].salamanders_flamers_id_number = self.game.current_flamers_id
             self.game.current_flamers_id += 1
@@ -1364,6 +1369,9 @@ class Player:
                 enemy_player.summon_token_at_planet("Termagant", position)
         if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(position, last_element_index, 2, preventable=False)
+        if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
+            self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
+                                       (int(self.number), position, last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id

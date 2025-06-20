@@ -7,7 +7,7 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
-from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts
+from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
 
 
@@ -305,6 +305,7 @@ class Game:
         self.auto_card_destruction = True
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
+        self.forced_interrupts = ["Flayed Ones Revenants"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.searing_brand_cancel_enabled = True
@@ -3570,22 +3571,31 @@ class Game:
                             self.action_cleanup()
                     elif self.choice_context == "Drudgery":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         self.resolving_search_box = False
 
                     elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?" or \
                             self.choice_context == "Homing Beacon: Gain Card or Resource?":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         self.resolving_search_box = False
                         if game_update_string[1] == "0":
                             primary_player.draw_card()
                         elif game_update_string[1] == "1":
                             primary_player.add_resources(1)
                         self.delete_reaction()
+                    elif self.choice_context == "Flayed Ones Revenants additional costs":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if target_choice == "Discard Cards":
+                            pass
+                        else:
+                            if primary_player.spend_resources(2):
+                                for _ in range(8):
+                                    primary_player.discard_top_card_deck()
+                                self.delete_interrupt()
+                            else:
+                                await self.send_update_message("Not enough resources. Discard cards instead.")
                     elif self.choice_context == "Warlock Destructor: pay fee or discard?":
                         self.reset_choices_available()
                         self.resolving_search_box = False
@@ -5265,6 +5275,15 @@ class Game:
         print("Resolving effect")
         if name == self.player_resolving_interrupts[0]:
             print("name check ok")
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    current_interrupt = self.interrupts_waiting_on_resolution[0]
+                    if current_interrupt == "Flayed Ones Revenants":
+                        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                        primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
+                        await self.send_update_message("Did not pay the additional cost; "
+                                                       "card added to discard.")
+                    self.delete_interrupt()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetInterrupts.resolve_planet_interrupt(self, name, game_update_string,
@@ -5277,6 +5296,10 @@ class Game:
                 if game_update_string[0] == "HQ":
                     await HQInterrupts.resolve_hq_interrupt(self, name, game_update_string,
                                                             primary_player, secondary_player)
+                elif game_update_string[0] == "HAND":
+                    if game_update_string[1] == primary_player.number:
+                        await HandInterrupts.resolve_hand_interrupt(self, name, game_update_string,
+                                                                    primary_player, secondary_player)
 
     def fury_search(self, player_with_cato, player_without_cato):
         if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
@@ -5461,6 +5484,8 @@ class Game:
                             self.name_player_making_choices = self.name_1
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.interrupts_waiting_on_resolution[0]
                             self.name_player_making_choices = self.player_resolving_interrupts[0]
                             self.asking_if_interrupt = True
@@ -5475,6 +5500,8 @@ class Game:
                         self.asking_which_interrupt = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.interrupts_waiting_on_resolution[0]
                             self.name_player_making_choices = self.player_resolving_interrupts[0]
                             self.asking_if_interrupt = True
@@ -5531,7 +5558,6 @@ class Game:
                     print("\n\nREACTION UPDATE P1\n\n")
                     self.stored_reaction_indexes = self.get_positions_of_players_reactions(self.name_1)
                     if p_one_count > 1:
-
                         if self.asking_which_reaction:
                             self.choices_available = self.get_name_reactions_of_players_reactions(self.name_1)
                             self.choice_context = "Choose Which Reaction"

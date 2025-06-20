@@ -64,6 +64,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 self.nullify_context = "Interrupt Event"
             if can_continue:
                 primary_player.discard_card_name_from_hand("Surrogate Host")
+        elif current_interrupt == "Flayed Ones Revenants":
+            self.choices_available = ["Discard Cards", "Pay Resources"]
+            self.choice_context = "Flayed Ones Revenants additional costs"
+            self.name_player_making_choices = primary_player.name_player
+            self.misc_counter = 0
+            self.resolving_search_box = True
         elif current_interrupt == "Quantum Shielding":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict,
