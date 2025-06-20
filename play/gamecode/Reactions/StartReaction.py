@@ -327,6 +327,27 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.create_reaction("Hunter's Ploy", primary_player.name_player,
                                          (int(primary_player.number), -1, -1))
                 self.delete_reaction()
+        elif current_reaction == "Optimized Protocol":
+            can_continue = True
+            if primary_player.resources < 1:
+                can_continue = False
+                self.delete_reaction()
+            elif self.nullify_enabled:
+                if secondary_player.nullify_check():
+                    await self.send_update_message(primary_player.name_player + " wants to play " + current_reaction +
+                                                   "; Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = current_reaction
+                    self.cost_card_nullified = 1
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                    can_continue = False
+            if can_continue:
+                primary_player.spend_resources(1)
+                primary_player.discard_card_name_from_hand("Optimized Protocol")
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
@@ -342,6 +363,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
                         not card.check_for_a_trait("Elite"):
                     primary_player.add_card_to_planet(card, planet_pos)
+                    position_of_unit = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                    if primary_player.search_hand_for_card("Optimized Protocol"):
+                        self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                             (int(primary_player.get_number()), planet_pos, position_of_unit))
                     del primary_player.discard[-1]
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weight of the Aeons":

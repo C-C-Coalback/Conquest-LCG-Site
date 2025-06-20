@@ -253,6 +253,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
 
 async def deploy_card_routine(self, name, planet_pos, discounts=0):
     print("Deploy card at planet", planet_pos)
+    planet_pos = int(planet_pos)
     primary_player = self.p1
     secondary_player = self.p2
     if self.phase != "DEPLOY":
@@ -287,9 +288,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     self.bigga_is_betta_active = True
     own_card = True
     if self.action_chosen == "Anrakyr the Traveller":
-        if self.anrakyr_deck_choice == secondary_player:
+        if self.anrakyr_deck_choice == secondary_player.get_name_player():
             own_card = False
-    played_card, position_of_unit = primary_player.play_card(int(planet_pos),
+    played_card, position_of_unit = primary_player.play_card(planet_pos,
                                                              card=self.card_to_deploy,
                                                              discounts=discounts,
                                                              damage_to_take=damage_to_take,
@@ -302,6 +303,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         elif self.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = -1
+            if primary_player.search_hand_for_card("Optimized Protocol"):
+                self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                     (int(primary_player.get_number()), planet_pos, position_of_unit))
         elif self.action_chosen == "Anrakyr the Traveller":
             if self.anrakyr_deck_choice == primary_player.name_player:
                 del primary_player.discard[self.anrakyr_unit_position]
@@ -309,6 +313,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 del secondary_player.discard[self.anrakyr_unit_position]
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
+            if primary_player.search_hand_for_card("Optimized Protocol"):
+                self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                     (int(primary_player.get_number()), planet_pos, position_of_unit))
         elif self.action_chosen == "Accelerated Gestation":
             og_pla, og_pos, og_att = self.misc_target_attachment
             num = self.misc_target_player
@@ -324,7 +331,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card == "SUCCESS":
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
-            primary_player.set_aiming_reticle_in_play(int(planet_pos), position_of_unit, "red")
+            primary_player.set_aiming_reticle_in_play(planet_pos, position_of_unit, "red")
     self.action_cleanup()
     if self.interrupts_waiting_on_resolution:
         if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":

@@ -402,6 +402,7 @@ def necrons_cards_init():
                                                         "Reaction: After a unit enters play from your discard pile, "
                                                         "put this card into play from your discard pile attached to "
                                                         "that unit, if eligible.", "Upgrade.",
-                                   0, faction, "Common", 2, False)
+                                   0, faction, "Common", 2, False, limit_one_per_unit=True, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Army", unit_must_match_faction=True)
     ]
     return necrons_card_array

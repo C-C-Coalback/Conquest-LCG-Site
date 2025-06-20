@@ -2925,11 +2925,13 @@ class Game:
                         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
                         primary_player.add_card_to_planet(card, pla)
+                        position_of_unit = len(primary_player.cards_in_play[pla + 1]) - 1
+                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                            self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                                 (int(primary_player.get_number()), pla, position_of_unit))
                         primary_player.discard.remove(target_choice)
                         self.delete_reaction()
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                     elif self.choice_context == "Target Dread Monolith:":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         planet, pos = self.position_of_actioned_card
@@ -2937,6 +2939,10 @@ class Game:
                         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
                         primary_player.add_card_to_planet(card, planet)
+                        position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                            self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                                 (int(primary_player.get_number()), planet, position_of_unit))
                         primary_player.discard.remove(target_choice)
                         self.reset_choices_available()
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)

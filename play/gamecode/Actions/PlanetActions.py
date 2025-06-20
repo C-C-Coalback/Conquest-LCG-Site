@@ -516,8 +516,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
             )
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
-            self.mode = "DISCOUNT"
-            self.planet_aiming_reticle_position = int(game_update_string[1])
             if self.discounts_applied >= self.available_discounts:
                 added_card_to_planet = False
                 own_card = True
@@ -530,11 +528,18 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     self.queued_sound = "onplay"
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
+                    position_of_unit = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+                    if primary_player.search_hand_for_card("Optimized Protocol"):
+                        self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                             (int(primary_player.get_number()), chosen_planet, position_of_unit))
                     self.action_cleanup()
                     if self.anrakyr_deck_choice == primary_player.name_player:
                         del primary_player.discard[self.anrakyr_unit_position]
                     else:
                         del secondary_player.discard[self.anrakyr_unit_position]
+            else:
+                self.mode = "DISCOUNT"
+                self.planet_aiming_reticle_position = int(game_update_string[1])
     elif self.action_chosen == "Warp Rift":
         if not self.chosen_first_card:
             self.chosen_first_card = True
