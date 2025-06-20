@@ -7,6 +7,10 @@ from ..Phases import DeployPhase
 async def resolve_in_play_interrupt(self, name, game_update_string, primary_player, secondary_player):
     planet_pos = int(game_update_string[2])
     unit_pos = int(game_update_string[3])
+    if game_update_string[1] == primary_player.number:
+        player_owning_card = primary_player
+    else:
+        player_owning_card = secondary_player
     print("Check what player")
     print(self.player_who_resolves_reaction)
     current_interrupt = self.interrupts_waiting_on_resolution[0]
@@ -35,6 +39,10 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if attached_all:
                     primary_player.cards_in_play[og_pla + 1][og_pos].attachments = []
                 self.delete_interrupt()
+    elif current_interrupt == "World Engine Beam":
+        if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+            player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
+            self.delete_interrupt()
     elif current_interrupt == "Mark of Slaanesh":
         if game_update_string[1] == primary_player.number:
             dest_planet = self.positions_of_units_interrupting[0][1]

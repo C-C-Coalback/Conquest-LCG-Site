@@ -1516,6 +1516,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "World Engine Beam":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                self.misc_target_unit = (planet_pos, unit_pos)
+                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                health_remaining = primary_player.get_health_given_pos(planet_pos, unit_pos)
+                health_remaining = health_remaining - primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                self.choices_available = []
+                for i in range(health_remaining):
+                    self.choices_available.append(str(i + 1))
+                self.choice_context = "Amount of damage (WEB)"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
     elif self.action_chosen == "Khymera Den":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])

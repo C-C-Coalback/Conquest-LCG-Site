@@ -7,7 +7,8 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
-from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts
+from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
+    AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
 
 
@@ -1149,7 +1150,6 @@ class Game:
                     self.cards_in_search_box = []
                     if self.resolving_search_box:
                         self.resolving_search_box = False
-
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HQ":
                     if self.number_who_is_searching == game_update_string[1]:
@@ -2186,6 +2186,30 @@ class Game:
                         reaction_pos = self.stored_reaction_indexes[reaction_pos]
                         self.move_reaction_to_front(reaction_pos)
                         self.has_chosen_to_resolve = False
+                    elif self.choice_context == "Increase or Decrease (WEB)?":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        await self.send_update_message("Select unit for World Engine Beam")
+                    elif self.choice_context == "Amount of damage (WEB)":
+                        amount_damage = int(self.choices_available[int(game_update_string[1])])
+                        planet_pos, unit_pos = self.misc_target_unit
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, amount_damage, preventable=False)
+                        player_with_web = self.misc_target_player
+                        og_pla, og_pos = self.position_of_actioned_card
+                        target_player = self.p2
+                        if player_with_web == self.name_1:
+                            target_player = self.p1
+                        if self.misc_target_choice == "Increase":
+                            target_player.headquarters[og_pos].counter += amount_damage
+                        else:
+                            target_player.headquarters[og_pos].counter = \
+                                target_player.headquarters[og_pos].counter - amount_damage
+                            if target_player.headquarters[og_pos].counter < 0:
+                                target_player.headquarters[og_pos].counter = 0
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.action_cleanup()
                     elif self.choice_context == "Nurgling Bomb Choice:":
                         planet, unit = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet, unit)
@@ -5351,6 +5375,32 @@ class Game:
                     if game_update_string[1] == primary_player.number:
                         await HandInterrupts.resolve_hand_interrupt(self, name, game_update_string,
                                                                     primary_player, secondary_player)
+            if len(game_update_string) == 5:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "HQ":
+                        await AttachmentHQInterrupts.resolve_hq_attachment_interrupt(self, name, game_update_string,
+                                                                                     primary_player, secondary_player)
+                    if game_update_string[1] == "PLANETS":
+                        player_num = int(game_update_string[2])
+                        planet_pos = int(game_update_string[3])
+                        attachment_pos = int(game_update_string[4])
+                        current_interrupt = self.interrupts_waiting_on_resolution[0]
+                        if player_num == 1:
+                            player_with_attach = self.p1
+                        else:
+                            player_with_attach = self.p2
+                        if current_interrupt == "World Engine Beam":
+                            player_with_attach.discard.append(
+                                player_with_attach.attachments_at_planet[planet_pos][attachment_pos].get_name())
+                            del player_with_attach.attachments_at_planet[planet_pos][attachment_pos]
+                            self.delete_interrupt()
+
+            if len(game_update_string) == 6:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "IN_PLAY":
+                        await AttachmentInPlayInterrupts.resolve_in_play_attachment_interrupt(
+                            self, name, game_update_string, primary_player, secondary_player
+                        )
 
     def fury_search(self, player_with_cato, player_without_cato):
         if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
@@ -6214,6 +6264,19 @@ class Game:
             self.last_player_who_resolved_interrupt = ""
             self.p1.highest_death_serves_value = 0
             self.p2.highest_death_serves_value = 0
+            i = 0
+            if not self.positions_of_units_to_take_damage:
+                while i < len(self.p1.headquarters):
+                    if self.p1.headquarters[i].get_ability() == "World Engine Beam":
+                        if self.p1.headquarters[i].counter > 7:
+                            self.create_interrupt("World Engine Beam", self.name_1, (1, -2, i))
+                    i = i + 1
+                i = 0
+                while i < len(self.p2.headquarters):
+                    if self.p2.headquarters[i].get_ability() == "World Engine Beam":
+                        if self.p2.headquarters[i].counter > 7:
+                            self.create_interrupt("World Engine Beam", self.name_2, (2, -2, i))
+                    i = i + 1
         if self.positions_of_units_to_take_damage:
             print("Entering better shield mode")
             pos_holder = self.positions_of_units_to_take_damage[0]

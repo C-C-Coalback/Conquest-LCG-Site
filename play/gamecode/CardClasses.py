@@ -68,6 +68,8 @@ class Card:
         self.from_magus_harid = False
         self.from_deck = True
         self.valid_target_dynastic_weaponry = False
+        self.world_engine_enemy = False
+        self.world_engine_owner = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:

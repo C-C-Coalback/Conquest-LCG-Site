@@ -329,6 +329,8 @@ class Player:
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Promethium Mine":
                     single_card_string += str(current_card.counter)
+                elif current_card.get_name() == "World Engine Beam":
+                    single_card_string += str(current_card.counter)
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -3028,9 +3030,13 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].set_once_per_phase_used(False)
+                self.headquarters[i].world_engine_owner = False
+                self.headquarters[i].world_engine_enemy = False
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].set_once_per_phase_used(False)
+                self.cards_in_play[planet_pos + 1][unit_pos].world_engine_owner = False
+                self.cards_in_play[planet_pos + 1][unit_pos].world_engine_enemy = False
 
     def perform_discount_at_pos_hand(self, pos, faction_of_card):
         discount = 0

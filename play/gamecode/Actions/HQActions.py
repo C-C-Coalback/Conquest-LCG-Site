@@ -13,6 +13,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
     unit_pos = int(game_update_string[2])
     if not self.action_chosen:
         self.position_of_actioned_card = (-2, int(game_update_string[2]))
+        if int(game_update_string[1]) != int(primary_player.get_number()):
+            card = secondary_player.headquarters[self.position_of_actioned_card[1]]
+            if card.get_ability() == "World Engine Beam" and not card.world_engine_enemy:
+                card.world_engine_enemy = True
+                self.action_chosen = "World Engine Beam"
+                self.choices_available = ["Increase", "Decrease"]
+                self.name_player_making_choices = primary_player.name_player
+                self.choice_context = "Increase or Decrease (WEB)?"
+                self.misc_target_player = secondary_player.name_player
+                self.resolving_search_box = True
         if int(game_update_string[1]) == int(primary_player.get_number()):
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
             ability = card.get_ability()
@@ -30,6 +40,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             card.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                    elif ability == "World Engine Beam" and not card.world_engine_owner:
+                        card.world_engine_owner = True
+                        self.action_chosen = "World Engine Beam"
+                        self.choices_available = ["Increase", "Decrease"]
+                        self.name_player_making_choices = primary_player.name_player
+                        self.choice_context = "Increase or Decrease (WEB)?"
+                        self.misc_target_player = primary_player.name_player
+                        self.resolving_search_box = True
                     elif ability == "Awakening Cavern":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -490,6 +508,19 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         else:
                             del primary_player.cards_in_play[other_pla + 1][other_pos]
                     self.action_cleanup()
+    elif self.action_chosen == "World Engine Beam":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                self.misc_target_unit = (planet_pos, unit_pos)
+                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                health_remaining = primary_player.get_health_given_pos(planet_pos, unit_pos)
+                health_remaining = health_remaining - primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                self.choices_available = []
+                for i in range(health_remaining):
+                    self.choices_available.append(str(i + 1))
+                self.choice_context = "Amount of damage (WEB)"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

@@ -112,6 +112,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.name_player_making_choices = primary_player.name_player
             self.misc_counter = 0
             self.resolving_search_box = True
+        elif current_interrupt == "World Engine Beam":
+            primary_player.sacrifice_card_in_hq(unit_pos)
         elif current_interrupt == "Quantum Shielding":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict,
