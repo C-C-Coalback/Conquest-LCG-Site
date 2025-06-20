@@ -170,6 +170,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "Reaction"
                         if can_continue:
+                            if player_being_hit.name_player == secondary_player.name_player:
+                                if secondary_player.get_ability_given_pos(
+                                        planet_pos, unit_pos) == "Flayed Ones Revenants":
+                                    self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                         (int(secondary_player.number), planet_pos, -1))
                             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
@@ -268,6 +273,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        if player_being_hit.name_player == secondary_player.name_player:
+                            if secondary_player.get_ability_given_pos(
+                                    planet_pos, unit_pos) == "Flayed Ones Revenants":
+                                self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                     (int(secondary_player.number), planet_pos, -1))
                         player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
@@ -1000,6 +1010,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     has_attachments = False
                     if player_owning_card.cards_in_play[planet_pos + 1][unit_pos]:
                         has_attachments = True
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        if secondary_player.get_ability_given_pos(
+                                planet_pos, unit_pos) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, -1))
                     player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
                     card = self.preloaded_find_card("Erupting Aberrants")
                     player_owning_card.add_card_to_planet(card, planet_pos)
@@ -1076,6 +1091,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
+                            if player_owning_card.name_player == secondary_player.name_player:
+                                if secondary_player.get_ability_given_pos(
+                                        planet_pos, unit_pos) == "Flayed Ones Revenants":
+                                    self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                         (int(secondary_player.number), planet_pos, -1))
                             secondary_player.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()

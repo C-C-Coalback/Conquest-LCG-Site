@@ -1530,6 +1530,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                 self.delete_reaction()
+        elif current_reaction == "Flayed Ones Revenants":
+            primary_player.draw_card()
+            primary_player.draw_card()
+            primary_player.add_resources(2)
+            self.delete_reaction()
         elif current_reaction == "Lictor Vine Lurker":
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

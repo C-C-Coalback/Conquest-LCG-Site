@@ -4055,6 +4055,9 @@ class Player:
                         self.destroy_card_in_hq(i)
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
+                        if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                 (int(secondary_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -4064,6 +4067,9 @@ class Player:
                         self.destroy_card_in_hq(i)
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
+                        if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                 (int(secondary_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -4073,6 +4079,9 @@ class Player:
                         self.destroy_card_in_hq(i)
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
+                        if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                 (int(secondary_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -4081,6 +4090,9 @@ class Player:
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 elif not self.get_immune_to_enemy_events(-2, i, power=True):
+                    if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
+                        self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                             (int(secondary_player.number), -2, -1))
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 i = i + 1
@@ -4391,6 +4403,9 @@ class Player:
                         self.destroy_card_in_play(planet_num, i)
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(planet_num, i):
+                        if self.get_ability_given_pos(planet_num, i) == "Flayed Ones Revenants":
+                            self.game.create_reaction("Flayed Ones Revenants", self.name_player,
+                                                      (int(self.number), planet_num, -1))
                         self.destroy_card_in_play(planet_num, i)
                         i = i - 1
                 i = i + 1

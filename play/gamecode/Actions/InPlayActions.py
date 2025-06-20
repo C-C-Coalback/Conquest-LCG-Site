@@ -460,6 +460,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_context = "Event Action"
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(planet_pos, unit_pos))
+            if player_being_hit.name_player == secondary_player.name_player:
+                if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Flayed Ones Revenants":
+                    self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                         (int(secondary_player.number), planet_pos, -1))
             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
             if not primary_player.harbinger_of_eternity_active:
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)

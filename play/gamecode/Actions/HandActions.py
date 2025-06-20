@@ -484,6 +484,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     if secondary_player.get_card_type_given_pos(i, j) == "Army":
                                         if secondary_player.get_cost_given_pos(i, j) < 3:
                                             if not secondary_player.get_immune_to_enemy_events(i, j):
+                                                if secondary_player.get_ability_given_pos(
+                                                        i, j) == "Flayed Ones Revenants":
+                                                    self.create_reaction("Flayed Ones Revenants",
+                                                                         secondary_player.name_player,
+                                                                         (int(secondary_player.number), i, -1))
                                                 secondary_player.destroy_card_in_play(i, j)
                                                 j = j - 1
                                     j = j + 1
