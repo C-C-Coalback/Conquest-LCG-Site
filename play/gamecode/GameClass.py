@@ -1132,11 +1132,24 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.number_who_is_searching == "1":
                         self.p1.bottom_remaining_cards()
+                        if self.faction_of_searched_card == "Necrons":
+                            if self.reactions_needing_resolving:
+                                if self.reactions_needing_resolving[0] == "Endless Legions":
+                                    if self.p1.search_card_in_hq("Endless Legions", ready_relevant=True):
+                                        self.create_reaction("Endless Legions", self.name_1, (1, -1, -1))
+                                    self.delete_reaction()
                     else:
                         self.p2.bottom_remaining_cards()
+                        if self.faction_of_searched_card == "Necrons":
+                            if self.reactions_needing_resolving:
+                                if self.reactions_needing_resolving[0] == "Endless Legions":
+                                    if self.p2.search_card_in_hq("Endless Legions", ready_relevant=True):
+                                        self.create_reaction("Endless Legions", self.name_2, (1, -1, -1))
+                                    self.delete_reaction()
                     self.cards_in_search_box = []
                     if self.resolving_search_box:
                         self.resolving_search_box = False
+
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HQ":
                     if self.number_who_is_searching == game_update_string[1]:
@@ -1179,6 +1192,9 @@ class Game:
                                     self.mode = "Normal"
                                     self.player_with_action = ""
                                     self.action_chosen = ""
+                            elif self.what_to_do_with_searched_card == "STORE":
+                                self.misc_target_choice = self.p1.deck[int(game_update_string[1])]
+                                del self.p1.deck[int(game_update_string[1])]
                             elif self.what_to_do_with_searched_card == "DISCARD":
                                 if self.searching_enemy_deck:
                                     self.p2.discard_card_from_deck(int(game_update_string[1]))
@@ -1216,6 +1232,9 @@ class Game:
                                     self.mode = "Normal"
                                     self.player_with_action = ""
                                     self.action_chosen = ""
+                            elif self.what_to_do_with_searched_card == "STORE":
+                                self.misc_target_choice = self.p2.deck[int(game_update_string[1])]
+                                del self.p2.deck[int(game_update_string[1])]
                             elif self.what_to_do_with_searched_card == "DISCARD":
                                 if self.searching_enemy_deck:
                                     self.p1.discard_card_from_deck(int(game_update_string[1]))

@@ -46,6 +46,31 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                                                  (int(primary_player.get_number()), planet, position_of_unit))
                         primary_player.remove_card_from_discard(pos_discard)
                         self.delete_reaction()
+        elif current_reaction == "Endless Legions":
+            if not self.chosen_first_card:
+                if chosen_discard == int(primary_player.number):
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.get_is_unit():
+                        self.misc_counter += 1
+                        primary_player.deck.append(card.get_name())
+                        primary_player.remove_card_from_discard(pos_discard)
+                        if self.misc_counter > 1:
+                            self.chosen_first_card = True
+                            self.resolving_search_box = True
+                            self.what_to_do_with_searched_card = "STORE"
+                            self.traits_of_searched_card = None
+                            self.card_type_of_searched_card = "Army"
+                            self.faction_of_searched_card = "Necrons"
+                            self.max_cost_of_searched_card = 3
+                            self.all_conditions_searched_card_required = True
+                            self.no_restrictions_on_chosen_card = False
+                            primary_player.number_cards_to_search = 6
+                            if len(primary_player.deck) > 5:
+                                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                            else:
+                                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                            self.name_player_who_is_searching = primary_player.name_player
+                            self.number_who_is_searching = primary_player.number
         elif current_reaction == "Optimized Protocol":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

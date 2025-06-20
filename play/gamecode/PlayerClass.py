@@ -773,6 +773,10 @@ class Player:
 
     def bottom_remaining_cards(self):
         if self.game.bottom_cards_after_search:
+            if self.number_cards_to_search > len(self.deck):
+                self.number_cards_to_search = len(self.deck) - 1
+                if self.number_cards_to_search == -1:
+                    self.number_cards_to_search = 0
             self.deck = self.deck[self.number_cards_to_search:] + self.deck[:self.number_cards_to_search]
         self.game.bottom_cards_after_search = True
 
@@ -4526,6 +4530,10 @@ class Player:
                                                    (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
+        if self.get_faction_given_pos(planet_num, card_pos) == "Necrons":
+            if self.search_card_in_hq("Endless Legions", ready_relevant=True):
+                self.game.create_reaction("Endless Legions", self.name_player,
+                                          (int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
@@ -4631,6 +4639,10 @@ class Player:
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
         if card.get_ability() == "Vanguard Soldiers":
             self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), -2, -1))
+        if self.get_faction_given_pos(-2, card_pos) == "Necrons":
+            if self.search_card_in_hq("Endless Legions", ready_relevant=True):
+                self.game.create_reaction("Endless Legions", self.name_player,
+                                          (int(self.number), -1, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.discard.append(card_name)

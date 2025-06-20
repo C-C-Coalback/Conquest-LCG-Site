@@ -31,7 +31,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         primary_player.summon_token_at_planet("Snotlings", chosen_planet)
         self.delete_reaction()
     elif current_reaction == "Blood Axe Strategist":
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
         if abs(planet_pos - chosen_planet) == 1:
             primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
             self.delete_reaction()
@@ -46,7 +45,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                                  (int(primary_player.number), -1, -1))
     elif current_reaction == "Tactical Withdrawal":
         if not self.chosen_first_card:
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(planet_pos - chosen_planet) == 1:
                 self.misc_target_planet = chosen_planet
                 self.chosen_first_card = True
@@ -107,6 +105,12 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     self.chosen_first_card = False
                     self.misc_target_unit = (-1, -1)
+    elif current_reaction == "Endless Legions":
+        if self.chosen_first_card:
+            card_name = self.misc_target_choice
+            card = self.preloaded_find_card(card_name)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            self.delete_reaction()
     elif current_reaction == "Reinforced Synaptic Network":
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
         if abs(warlord_pla - chosen_planet) == 1:
@@ -170,7 +174,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     i = i + 1
                 self.delete_reaction()
     elif current_reaction == "Ardaci-strain Broodlord":
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
         if abs(chosen_planet - planet_pos) == 1:
             if not self.infested_planets[chosen_planet]:
                 self.infest_planet(chosen_planet, primary_player)

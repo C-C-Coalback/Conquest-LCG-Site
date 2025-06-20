@@ -20,22 +20,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.max_cost_of_searched_card = 2
             self.all_conditions_searched_card_required = True
             self.no_restrictions_on_chosen_card = False
-            if self.player_who_resolves_reaction[0] == self.name_1:
-                self.p1.number_cards_to_search = 6
-                if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
-                else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
-                self.name_player_who_is_searching = self.p1.name_player
-                self.number_who_is_searching = str(self.p1.number)
+            primary_player.number_cards_to_search = 6
+            if len(primary_player.deck) > 5:
+                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
             else:
-                self.p2.number_cards_to_search = 6
-                if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
-                else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
-                self.name_player_who_is_searching = self.p2.name_player
-                self.number_who_is_searching = str(self.p2.number)
+                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Genestealer Brood":
             self.resolving_search_box = True
@@ -64,6 +55,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.number_who_is_searching = str(self.p2.number)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Endless Legions":
+            self.misc_counter = 0
+            self.chosen_first_card = False
+            primary_player.exhaust_card_in_hq_given_name("Endless Legions")
         elif current_reaction == "Rumbling Tomb Stalker":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
