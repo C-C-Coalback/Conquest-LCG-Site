@@ -133,6 +133,7 @@ class Game:
         self.name_player_making_choices = ""
         self.choice_context = ""
         self.damage_from_atrox = False
+        self.ghost_ark_of_orikan = -1
         self.damage_on_units_hq_before_new_damage = []
         self.unit_to_move_position = [-1, -1]
         self.yvarn_active = False
@@ -4014,6 +4015,15 @@ class Game:
                     self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
 
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
+                if (primary_player.check_for_trait_given_pos(planet, pos, "Warrior") or
+                        primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
+                        primary_player.get_faction_given_pos(planet, pos) == "Necrons":
+                    if primary_player.search_card_at_planet(planet, "Ghost Ark of Orikan"):
+                        if primary_player.get_cost_given_pos(planet, pos) > 0:
+                            self.create_reaction("Ghost Ark of Orikan", primary_player.name_player,
+                                                 (int(primary_player.number), planet, -1))
+                            self.ghost_ark_of_orikan = primary_player.get_cost_given_pos(planet, pos)
+
                 if primary_player.search_hand_for_card("Vengeance!"):
                     self.create_reaction("Vengeance!", primary_player.name_player,
                                          (int(primary_player.number), planet, pos))

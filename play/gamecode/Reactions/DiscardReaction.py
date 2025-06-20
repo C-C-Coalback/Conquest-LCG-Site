@@ -26,6 +26,16 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         self.misc_player_storage = card.get_name()
                         self.chosen_first_card = True
                         self.misc_counter = 1
+        elif current_reaction == "Ghost Ark of Orikan":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
+                        (card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier")):
+                    if card.get_cost() < self.ghost_ark_of_orikan:
+                        num, planet, unit = self.positions_of_unit_triggering_reaction[0]
+                        primary_player.add_card_to_planet(card, planet)
+                        primary_player.remove_card_from_discard(pos_discard)
+                        self.delete_reaction()
         elif current_reaction == "Seething Mycetic Spore":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
