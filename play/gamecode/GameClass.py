@@ -2926,6 +2926,12 @@ class Game:
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
                         primary_player.add_card_to_planet(card, pla)
                         position_of_unit = len(primary_player.cards_in_play[pla + 1]) - 1
+                        primary_player.cards_in_play[pla + 1][position_of_unit]. \
+                            valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                     (int(primary_player.get_number()), pla, position_of_unit))
                         if primary_player.search_hand_for_card("Optimized Protocol"):
                             self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), pla, position_of_unit))
@@ -2940,6 +2946,12 @@ class Game:
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
                         primary_player.add_card_to_planet(card, planet)
                         position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                            valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                     (int(primary_player.get_number()), planet, position_of_unit))
                         if primary_player.search_hand_for_card("Optimized Protocol"):
                             self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet, position_of_unit))
@@ -5345,6 +5357,10 @@ class Game:
             if self.reactions_needing_resolving[0] == "Ba'ar Zul the Hate-Bound":
                 if self.damage_amounts_baarzul:
                     del self.damage_amounts_baarzul[0]
+            if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+                self.need_to_reset_tomb_blade_squadron = True
+            if self.reactions_needing_resolving[0] == "Dynastic Weaponry":
+                self.need_to_reset_tomb_blade_squadron = True
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
             self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
@@ -6212,9 +6228,19 @@ class Game:
                 self.p1.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
                 self.p2.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
             if self.need_to_reset_tomb_blade_squadron:
+                self.delete_reaction()
                 self.need_to_reset_tomb_blade_squadron = False
                 self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
                 self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
+                for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].valid_target_dynastic_weaponry = False
+                for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].valid_target_dynastic_weaponry = False
+                for i in range(7):
+                    for j in range(len(self.p1.cards_in_play[i + 1])):
+                        self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+                    for j in range(len(self.p2.cards_in_play[i + 1])):
+                        self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
                 self.flamers_damage_active = False

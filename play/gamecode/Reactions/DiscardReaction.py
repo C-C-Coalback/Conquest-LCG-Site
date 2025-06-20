@@ -35,6 +35,12 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         num, planet, unit = self.positions_of_unit_triggering_reaction[0]
                         primary_player.add_card_to_planet(card, planet)
                         position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                            valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                     (int(primary_player.get_number()), planet, position_of_unit))
                         if primary_player.search_hand_for_card("Optimized Protocol"):
                             self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet, position_of_unit))
@@ -47,6 +53,12 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     num, planet, unit = self.positions_of_unit_triggering_reaction[0]
                     primary_player.add_card_to_planet(card, planet)
                     position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                    primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                        valid_target_dynastic_weaponry = True
+                    if "Dynastic Weaponry" in primary_player.discard:
+                        if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                            self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                 (int(primary_player.get_number()), planet, position_of_unit))
                     if primary_player.search_hand_for_card("Optimized Protocol"):
                         self.create_reaction("Optimized Protocol", primary_player.name_player,
                                              (int(primary_player.get_number()), planet, position_of_unit))

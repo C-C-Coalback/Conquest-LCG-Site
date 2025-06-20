@@ -1099,6 +1099,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Dynastic Weaponry":
+            if "Dynastic Weaponry" not in primary_player.discard:
+                self.delete_reaction()
+            elif player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_dynastic_weaponry:
+                card = self.preloaded_find_card("Dynastic Weaponry")
+                if player_owning_card.attach_card(card, planet_pos, unit_pos):
+                    primary_player.discard.remove("Dynastic Weaponry")
+                    if "Dynastic Weaponry" in primary_player.discard:
+                        self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                             (int(primary_player.get_number()), planet, position_of_unit))
+                    self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Nahumekh":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
