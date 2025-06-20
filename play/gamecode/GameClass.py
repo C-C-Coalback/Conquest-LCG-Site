@@ -4296,6 +4296,20 @@ class Game:
                 await self.create_necrons_wheel_choice(self.p1)
             elif self.p2.warlord_faction == "Necrons":
                 await self.create_necrons_wheel_choice(self.p2)
+        if self.p1.played_necrodermis:
+            await self.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_2 + "; "
+                + self.name_1 + " played a Necrodermis this phase."
+                                "----GAME END----"
+            )
+        if self.p2.played_necrodermis:
+            await self.send_update_message(
+                "----GAME END----"
+                "Victory for " + self.name_1 + "; "
+                + self.name_2 + " played a Necrodermis this phase."
+                                "----GAME END----"
+            )
         self.create_reactions_phase_begins()
 
     async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):

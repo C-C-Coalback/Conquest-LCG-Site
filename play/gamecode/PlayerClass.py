@@ -156,6 +156,8 @@ class Player:
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
         self.preparation_cards = ["Pulsating Carapace"]
+        self.played_necrodermis = False
+        self.necrodermis_allowed = True
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -4191,6 +4193,19 @@ class Player:
                 if self.get_ability_given_pos(-2, i, bloodied_relevant=True) == "Trazyn the Infinite"\
                         and not self.headquarters[i].misc_ability_used:
                     self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), -2, i))
+                if self.get_card_type_given_pos(-2, i) == "Warlord":
+                    if self.headquarters[i].get_bloodied():
+                        if self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                            if self.search_hand_for_card("Necrodermis"):
+                                self.game.create_interrupt("Necrodermis", self.name_player,
+                                                           (int(self.number), -2, i))
+                                self.necrodermis_allowed = False
+                            # elif self.search_for_card_everywhere("Harbinger of Eternity"):
+                            #     if "Necrodermis" in self.discard:
+                            #         self.game.create_interrupt("Necrodermis", self.name_player,
+                            #                                    (int(self.number), -2, i))
+                            #         self.necrodermis_allowed = False
+
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.check_if_card_is_destroyed(i, j):
@@ -4199,6 +4214,18 @@ class Player:
                     if self.get_ability_given_pos(i, j, bloodied_relevant=True) == "Trazyn the Infinite"\
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), i, j))
+                    if self.get_card_type_given_pos(i, j) == "Warlord":
+                        if self.cards_in_play[i + 1][j].get_bloodied():
+                            if self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                                if self.search_hand_for_card("Necrodermis"):
+                                    self.game.create_interrupt("Necrodermis", self.name_player,
+                                                               (int(self.number), i, j))
+                                    self.necrodermis_allowed = False
+                                # elif self.search_for_card_everywhere("Harbinger of Eternity"):
+                                #     if "Necrodermis" in self.discard:
+                                #         self.game.create_interrupt("Necrodermis", self.name_player,
+                                #                                    (int(self.number), i, j))
+                                #         self.necrodermis_allowed = False
                     if self.get_ability_given_pos(i, j) == "Icy Trygon"\
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         self.cards_in_play[i + 1][j].misc_ability_used = True

@@ -58,12 +58,54 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 self.choice_context = "Use Nullify?"
                 self.nullified_card_pos = -1
                 self.nullified_card_name = current_interrupt
-                self.cost_card_nullified = 1
+                self.cost_card_nullified = 0
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Interrupt Event"
             if can_continue:
                 primary_player.discard_card_name_from_hand("Surrogate Host")
+        elif current_interrupt == "Necrodermis":
+            if primary_player.resources > 0:
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play " + current_interrupt + "; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = current_interrupt
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Interrupt Event"
+                else:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Necrodermis")
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        if primary_player.played_necrodermis:
+                            await self.send_update_message(
+                                "----GAME END----"
+                                "Victory for " + secondary_player.name_player + "; "
+                                + primary_player.name_player + " played a second Necrodermis whilst "
+                                + primary_player.name_player + "already have one active."
+                                                               "----GAME END----"
+                            )
+                        elif secondary_player.played_necrodermis:
+                            await self.send_update_message(
+                                "----GAME END----"
+                                "Victory for " + primary_player.name_player + "; "
+                                + primary_player.name_player + " played a second Necrodermis whilst "
+                                + secondary_player.name_player + "already have one active."
+                                                                 "----GAME END----"
+                            )
+                        primary_player.played_necrodermis = True
+                        self.delete_interrupt()
+                    else:
+                        self.delete_interrupt()
+            else:
+                self.delete_interrupt()
         elif current_interrupt == "Flayed Ones Revenants":
             self.choices_available = ["Discard Cards", "Pay Resources"]
             self.choice_context = "Flayed Ones Revenants additional costs"
