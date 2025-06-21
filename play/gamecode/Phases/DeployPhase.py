@@ -1,3 +1,6 @@
+import copy
+
+
 async def update_game_event_deploy_section(self, name, game_update_string):
     print("Need to run deploy turn code.")
     print(self.player_with_deploy_turn, self.number_with_deploy_turn)
@@ -169,8 +172,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                 if self.card_pos_to_deploy != -1 and not self.paying_shrieking_exarch_cost:
                     if self.number_with_deploy_turn == "1":
                         player = self.p1
+                        other_player = self.p2
                     else:
                         player = self.p2
+                        other_player = self.p1
                     planet_chosen = int(game_update_string[1])
                     card = player.get_card_in_hand(self.card_pos_to_deploy)
                     if self.deepstrike_deployment_active:
@@ -181,20 +186,36 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.deepstrike_deployment_active = False
                             self.action_cleanup()
                     elif card.get_card_type() == "Army":
-                        self.discounts_applied = 0
-                        await self.calculate_available_discounts_unit(planet_chosen, card, player)
-                        await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
-                        if card.check_for_a_trait("Elite"):
-                            player.master_warpsmith_count = 0
-                        self.card_to_deploy = card
-                        if self.available_discounts > self.discounts_applied:
-                            self.stored_mode = self.mode
-                            self.mode = "DISCOUNT"
-                            self.planet_aiming_reticle_position = int(game_update_string[1])
-                            self.planet_aiming_reticle_active = True
+                        if other_player.search_card_at_planet(planet_chosen, "Raving Cryptek"):
+                            await self.send_update_message("Raving Cryptek detected! Please choose two")
+                            self.choices_available = []
+                            for i in range(len(player.cards)):
+                                card = self.preloaded_find_card(player.cards[i])
+                                if card.get_is_unit():
+                                    self.choices_available.append(card.get_name())
+                            if len(self.choices_available) < 2:
+                                await self.send_update_message("Not enough units to satisfy Raving Cryptek.")
+                                self.choices_available = []
+                            else:
+                                self.choice_context = "Raving Cryptek: Choose first card"
+                                self.name_player_making_choices = player.name_player
+                                self.resolving_search_box = True
+                                self.misc_target_planet = planet_chosen
                         else:
-                            await deploy_card_routine(self, name, game_update_string[1],
-                                                      discounts=self.discounts_applied)
+                            self.discounts_applied = 0
+                            await self.calculate_available_discounts_unit(planet_chosen, card, player)
+                            await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
+                            if card.check_for_a_trait("Elite"):
+                                player.master_warpsmith_count = 0
+                            self.card_to_deploy = card
+                            if self.available_discounts > self.discounts_applied:
+                                self.stored_mode = self.mode
+                                self.mode = "DISCOUNT"
+                                self.planet_aiming_reticle_position = int(game_update_string[1])
+                                self.planet_aiming_reticle_active = True
+                            else:
+                                await deploy_card_routine(self, name, game_update_string[1],
+                                                          discounts=self.discounts_applied)
                     elif card.get_card_type() == "Attachment":
                         if card.planet_attachment:
                             can_continue = True

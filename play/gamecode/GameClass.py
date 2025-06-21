@@ -2255,6 +2255,52 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         self.delete_reaction()
+                    elif self.choice_context == "Raving Cryptek: Choose first card":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        del self.choices_available[int(game_update_string[1])]
+                        self.choice_context = "Raving Cryptek: Choose second card"
+                    elif self.choice_context == "Raving Cryptek: Choose second card":
+                        second_choice = self.choices_available[int(game_update_string[1])]
+                        self.choices_available = [second_choice, self.misc_target_choice]
+                        await self.send_update_message(primary_player.name_player + " reveals " +
+                                                       self.misc_target_choice + " and " + second_choice +
+                                                       ". Please choose one to give +2 cost.")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Raving Cryptek: Increase cost"
+                    elif self.choice_context == "Raving Cryptek: Increase cost":
+                        self.misc_target_choice = game_update_string[1]
+                        if game_update_string[1] == "0":
+                            await self.send_update_message(
+                                "The first choice's (" + self.choices_available[int(game_update_string[1])] +
+                                ") cost has been increased by two. Please choose which card to deploy."
+                            )
+                        elif game_update_string[1] == "1":
+                            await self.send_update_message(
+                                "The second choice's (" + self.choices_available[int(game_update_string[1])] +
+                                ") cost has been increased by two. Please choose which card to deploy."
+                            )
+                        self.choice_context = "Raving Cryptek: Deploy choice"
+                        self.name_player_making_choices = secondary_player.name_player
+                    elif self.choice_context == "Raving Cryptek: Deploy choice":
+                        target_choice = self.choices_available[int(game_update_string[1])]
+                        self.card_to_deploy = self.preloaded_find_card(target_choice)
+                        card = self.card_to_deploy
+                        self.discounts_applied = 0
+                        if game_update_string[1] == self.misc_target_choice:
+                            self.discounts_applied = -2
+                        await self.calculate_available_discounts_unit(self.misc_target_planet, card, primary_player)
+                        await self.calculate_automatic_discounts_unit(self.misc_target_planet, card, primary_player)
+                        self.reset_choices_available()
+                        if card.check_for_a_trait("Elite"):
+                            primary_player.master_warpsmith_count = 0
+                        if self.available_discounts > (self.discounts_applied + 2):
+                            self.stored_mode = self.mode
+                            self.mode = "DISCOUNT"
+                            self.planet_aiming_reticle_position = self.misc_target_planet
+                            self.planet_aiming_reticle_active = True
+                        else:
+                            await DeployPhase.deploy_card_routine(self, name, self.misc_target_planet,
+                                                                  discounts=self.discounts_applied)
                     elif self.choice_context == "Interrupt Enemy Movement Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         num, og_pla, og_pos, dest = self.queued_moves[0]
