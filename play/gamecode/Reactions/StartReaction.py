@@ -194,6 +194,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.permitted_commit_locs_warlord[planet_pos] = False
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Convoking Praetorians":
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            await self.create_necrons_wheel_choice(primary_player)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
             self.chosen_first_card = False
             self.chosen_second_card = False

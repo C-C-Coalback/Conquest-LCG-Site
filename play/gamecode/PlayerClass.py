@@ -1094,6 +1094,9 @@ class Player:
             self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
+        if self.get_ability_given_pos(-2, last_element_index) == "Convoking Praetorians":
+            self.game.create_reaction("Convoking Praetorians", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         elif self.get_ability_given_pos(-2, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), -2, last_element_index))
@@ -1395,6 +1398,9 @@ class Player:
                                       (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Griffon Escort":
             self.game.create_reaction("Griffon Escort", self.name_player,
+                                      (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Convoking Praetorians":
+            self.game.create_reaction("Convoking Praetorians", self.name_player,
                                       (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Spreading Genestealer Brood":
             self.game.create_reaction("Spreading Genestealer Brood", self.name_player,
