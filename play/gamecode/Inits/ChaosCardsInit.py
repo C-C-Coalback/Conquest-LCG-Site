@@ -42,7 +42,7 @@ def chaos_cards_init():
                              "Common", 9, 4, 1, False, ""),
         CardClasses.ArmyCard("Splintered Path Acolyte", "Interrupt: When you deploy a Daemon unit, "
                                                         "sacrifice this unit to "
-                                                        "reduce its cost by 2.", "Cultist, Tzeentch",
+                                                        "reduce its cost by 2.", "Cultist. Tzeentch",
                              1, "Chaos", "Common", 1, 1, 1,
                              False, ""),
         CardClasses.ArmyCard("Khorne Berzerker", "Brutal.", "Khorne. Warrior. World Eaters.",

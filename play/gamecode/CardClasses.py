@@ -189,8 +189,10 @@ class Card:
     def get_traits(self):
         return self.traits
 
-    def check_for_a_trait(self, trait_to_find):
+    def check_for_a_trait(self, trait_to_find, etekh_trait=""):
         extra_traits = ""
+        if self.get_card_type() == "Army":
+            extra_traits = etekh_trait
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Lucky Warpaint":
                 extra_traits += "Blue."

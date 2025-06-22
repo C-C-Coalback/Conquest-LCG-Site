@@ -860,7 +860,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
-            if card.get_card_type() == "Army" and card.check_for_a_trait("Kabalite"):
+            if card.get_card_type() == "Army" and card.check_for_a_trait("Kabalite", primary_player.etekh_trait):
                 if card.get_cost() < 4:
                     self.chosen_first_card = True
                     primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
@@ -908,7 +908,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.action_cleanup()
     elif self.action_chosen == "Talyesin's Warlocks":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
-        if card.check_for_a_trait("Warrior"):
+        if card.check_for_a_trait("Warrior", primary_player.etekh_trait):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             planet_pos, unit_pos = self.position_of_actioned_card
             primary_player.ready_given_pos(planet_pos, unit_pos)

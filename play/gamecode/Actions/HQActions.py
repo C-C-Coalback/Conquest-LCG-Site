@@ -23,9 +23,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.choice_context = "Increase or Decrease (WEB)?"
                 self.misc_target_player = secondary_player.name_player
                 self.resolving_search_box = True
-        if int(game_update_string[1]) == int(primary_player.get_number()):
+        if game_update_string[1] == primary_player.get_number():
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
             ability = card.get_ability()
+            print("Ability:", ability)
             if card.get_has_action_while_in_play():
                 if card.get_allowed_phases_while_in_play() == self.phase or \
                         card.get_allowed_phases_while_in_play() == "ALL":
@@ -354,7 +355,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.check_for_a_trait("Drone") or card.check_for_a_trait("Pilot"):
+                                if card.check_for_a_trait("Drone", primary_player.etekh_trait) or \
+                                        card.check_for_a_trait("Pilot", primary_player.etekh_trait):
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -364,6 +366,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 self.choice_context = ""
                                 self.name_player_making_choices = ""
                             self.action_cleanup()
+                    elif ability == "Etekh the Awakener":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            self.choices_available = self.all_traits
+                            self.choice_context = "Choose trait: (EtA)"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                            self.action_chosen = ability
                     elif ability == "Starblaze's Outpost":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, unit_pos)
@@ -597,7 +607,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.resolving_search_box = True
     elif self.action_chosen == "Despise":
         if primary_player.get_number() == game_update_string[1]:
-            if primary_player.headquarters[unit_pos].check_for_a_trait("Ally"):
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Ally", primary_player.etekh_trait):
                 if primary_player.sacrifice_card_in_hq(unit_pos):
                     self.player_with_action = secondary_player.name_player
                     primary_player.sacced_card_for_despise = True
@@ -607,7 +617,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Fetid Haze":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.headquarters[unit_pos].get_is_unit():
-                if primary_player.headquarters[unit_pos].check_for_a_trait("Nurgle"):
+                if primary_player.headquarters[unit_pos].check_for_a_trait("Nurgle", primary_player.etekh_trait):
                     damage = primary_player.get_damage_given_pos(-2, unit_pos)
                     primary_player.remove_damage_from_pos(-2, unit_pos, 999, healing=True)
                     self.action_cleanup()
@@ -905,7 +915,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             player_being_hit = self.p2
         unit_pos = int(game_update_string[2])
         can_continue = True
-        if not player_being_hit.headquarters[unit_pos].check_for_a_trait("Vehicle") and \
+        if not player_being_hit.headquarters[unit_pos].check_for_a_trait("Vehicle", player_being_hit.etekh_trait) and \
                 player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Army":
             if player_being_hit.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
@@ -985,7 +995,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             planet_pos = -2
             unit_pos = int(game_update_string[2])
             if not self.chosen_first_card:
-                if primary_player.headquarters[unit_pos].check_for_a_trait("Drone"):
+                if primary_player.headquarters[unit_pos].check_for_a_trait("Drone", primary_player.etekh_trait):
                     if primary_player.sacrifice_card_in_hq(unit_pos):
                         self.chosen_first_card = True
             else:
@@ -1132,7 +1142,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.headquarters[unit_pos].get_is_unit():
-                    if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal"):
+                    if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal", primary_player.etekh_trait):
                         self.misc_target_unit = (-2, unit_pos)
                         self.chosen_first_card = True
                         primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
@@ -1284,7 +1294,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2
             unit_pos = int(game_update_string[2])
-            if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal"):
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal", primary_player.etekh_trait):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.chosen_first_card = True
@@ -1302,7 +1312,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             unit_pos = int(game_update_string[2])
-            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist", primary_player.etekh_trait):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
@@ -1335,7 +1345,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Ancient Keeper of Secrets":
         if primary_player.get_number() == game_update_string[1]:
             unit_pos = int(game_update_string[2])
-            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist"):
+            if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist", primary_player.etekh_trait):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 primary_player.ready_given_pos(self.position_of_actioned_card[0],

@@ -30,7 +30,8 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
                 if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
-                        (card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier")):
+                        (card.check_for_a_trait("Warrior", primary_player.etekh_trait) or
+                         card.check_for_a_trait("Soldier", primary_player.etekh_trait)):
                     if card.get_cost() < self.ghost_ark_of_orikan:
                         num, planet, unit = self.positions_of_unit_triggering_reaction[0]
                         primary_player.add_card_to_planet(card, planet)
@@ -111,7 +112,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Spreading Genestealer Brood":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
-                if card.get_is_unit() and card.check_for_a_trait("Brood"):
+                if card.get_is_unit() and card.check_for_a_trait("Brood", primary_player.etekh_trait):
                     primary_player.add_card_to_planet(card, self.positions_of_unit_triggering_reaction[0][1])
                     primary_player.remove_card_from_discard(pos_discard)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)

@@ -63,6 +63,22 @@ class Game:
         self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
         self.planet_pos_to_deploy = -1
+        self.all_traits = []
+        for i in range(len(self.card_array)):
+            card = self.preloaded_find_card(self.card_array[i].get_name())
+            traits = card.get_traits()
+            traits = traits.split(".")
+            for trait in traits:
+                done_trimming = False
+                while not done_trimming:
+                    if len(trait) == 0:
+                        done_trimming = True
+                    elif trait[0] == " ":
+                        trait = trait[1:]
+                    else:
+                        done_trimming = True
+                if trait not in self.all_traits and trait:
+                    self.all_traits.append(trait)
         self.last_planet_checked_for_battle = -1
         self.number_with_combat_turn = "1"
         self.player_with_combat_turn = self.name_1
@@ -2526,6 +2542,12 @@ class Game:
                                 primary_player.has_passed = False
                                 secondary_player.has_passed = False
                                 await self.send_update_message("Deepstrike is complete")
+                    elif self.choice_context == "Choose trait: (EtA)":
+                        primary_player.etekh_trait = self.choices_available[int(game_update_string[1])]
+                        await self.send_update_message("Granted the " + primary_player.etekh_trait + " trait.")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.action_cleanup()
                     elif self.choice_context == "Ymgarl Factor gains:":
                         planet_pos, unit_pos = self.misc_target_unit
                         if self.choices_available[int(game_update_string[1])] == "+2 ATK":
@@ -3373,7 +3395,7 @@ class Game:
                             for i in range(len(primary_player.discard)):
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.check_for_a_trait("Tzeentch"):
+                                if card.check_for_a_trait("Tzeentch", primary_player.etekh_trait):
                                     self.choices_available.append(card.get_name())
                             if not self.choices_available:
                                 await self.send_update_message(
@@ -5037,7 +5059,8 @@ class Game:
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Enginseer Mechanic":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                             if planet_pos == hurt_planet:
-                                if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Vehicle"):
+                                if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait(
+                                        "Vehicle", primary_player.etekh_trait):
                                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                         damage_to_remove = 2
@@ -5057,7 +5080,7 @@ class Game:
                                 hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                                 if planet_pos == hurt_planet:
                                     if not primary_player.cards_in_play[hurt_planet + 1][hurt_pos] \
-                                            .check_for_a_trait("Vehicle"):
+                                            .check_for_a_trait("Vehicle", primary_player.etekh_trait):
                                         if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                             primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
@@ -6355,20 +6378,19 @@ class Game:
                 self.p2.stored_targets_the_emperor_protects = []
                 self.p1.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
                 self.p2.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
-            if self.need_to_reset_tomb_blade_squadron:
-                self.delete_reaction()
-                self.need_to_reset_tomb_blade_squadron = False
-                self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
-                self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
-                for i in range(len(self.p1.headquarters)):
-                    self.p1.headquarters[i].valid_target_dynastic_weaponry = False
-                for i in range(len(self.p2.headquarters)):
-                    self.p2.headquarters[i].valid_target_dynastic_weaponry = False
-                for i in range(7):
-                    for j in range(len(self.p1.cards_in_play[i + 1])):
-                        self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
-                    for j in range(len(self.p2.cards_in_play[i + 1])):
-                        self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+                if self.need_to_reset_tomb_blade_squadron:
+                    self.need_to_reset_tomb_blade_squadron = False
+                    self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
+                    self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
+                    for i in range(len(self.p1.headquarters)):
+                        self.p1.headquarters[i].valid_target_dynastic_weaponry = False
+                    for i in range(len(self.p2.headquarters)):
+                        self.p2.headquarters[i].valid_target_dynastic_weaponry = False
+                    for i in range(7):
+                        for j in range(len(self.p1.cards_in_play[i + 1])):
+                            self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+                        for j in range(len(self.p2.cards_in_play[i + 1])):
+                            self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
                 self.flamers_damage_active = False
@@ -6801,6 +6823,8 @@ class Game:
         self.p2.illegal_commits_synapse = 0
         self.p1.primal_howl_used = False
         self.p2.primal_howl_used = False
+        self.p1.etekh_trait = ""
+        self.p2.etekh_trait = ""
         self.p1.gut_and_pillage_used = False
         self.p2.gut_and_pillage_used = False
         self.p1.used_reanimation_protocol = False

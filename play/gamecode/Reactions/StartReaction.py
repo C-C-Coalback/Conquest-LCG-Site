@@ -199,6 +199,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_second_card = False
             self.need_to_reset_tomb_blade_squadron = True
             self.misc_target_unit = (-1, -1)
+            await self.send_update_message("You will need to press pass when you "
+                                           "are done resolving Tomb Blade Squadrons")
         elif current_reaction == "Omega Zero Command":
             primary_player.summon_token_at_planet("Guardsman", planet_id)
             self.delete_reaction()
@@ -612,7 +614,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_is_unit():
-                    if card.check_for_a_trait("Vehicle"):
+                    if card.check_for_a_trait("Vehicle", primary_player.etekh_trait):
                         if not card.check_for_a_trait("Elite"):
                             self.choices_available.append(card.get_name())
             if self.choices_available:
@@ -1001,11 +1003,13 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
+                if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
+                        "Spirit", primary_player.etekh_trait):
                     if primary_player.get_ready_given_pos(planet_pos, i):
                         primary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait("Spirit"):
+                if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
+                        "Spirit", primary_player.etekh_trait):
                     if secondary_player.get_ready_given_pos(planet_pos, i):
                         secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

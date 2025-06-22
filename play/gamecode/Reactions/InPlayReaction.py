@@ -1195,7 +1195,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             else:
                 player_being_hit = self.p2
             if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
-                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Ally"):
+                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
+                        "Ally", player_being_hit.etekh_trait):
                     can_continue = True
                     if player_being_hit.name_player == secondary_player.name_player:
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,

@@ -158,6 +158,7 @@ class Player:
         self.preparation_cards = ["Pulsating Carapace"]
         self.played_necrodermis = False
         self.necrodermis_allowed = True
+        self.etekh_trait = ""
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -927,8 +928,8 @@ class Player:
 
     def check_for_trait_given_pos(self, planet_id, unit_id, trait):
         if planet_id == -2:
-            return self.headquarters[unit_id].check_for_a_trait(trait)
-        return self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait(trait)
+            return self.headquarters[unit_id].check_for_a_trait(trait, self.etekh_trait)
+        return self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait(trait, self.etekh_trait)
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
@@ -1266,7 +1267,7 @@ class Player:
         if target_card.get_no_attachments():
             print("Unit may not have attachments")
             return False
-        if card.check_for_a_trait("Wargear."):
+        if card.check_for_a_trait("Wargear"):
             if not target_card.get_wargear_attachments_permitted():
                 print("Unit may not have wargear")
                 return False
@@ -1428,11 +1429,11 @@ class Player:
         elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
             self.game.create_reaction("Earth Caste Technician", self.name_player,
                                       (int(self.number), position, last_element_index))
-        if card.check_for_a_trait("Kabalite") or card.check_for_a_trait("Raider"):
+        if card.check_for_a_trait("Kabalite", self.etekh_trait) or card.check_for_a_trait("Raider", self.etekh_trait):
             if self.game.get_red_icon(position):
                 if self.search_for_card_everywhere("Archon Salaine Morn", limit_phase_rel=True):
                     self.game.create_reaction("Archon Salaine Morn", self.name_player, (int(self.number), -1, -1))
-        if card.check_for_a_trait("Kabalite"):
+        if card.check_for_a_trait("Kabalite", self.etekh_trait):
             for i in range(len(self.cards_in_play[position + 1])):
                 if self.get_ability_given_pos(position, i) == "Kabalite Harriers":
                     self.game.create_reaction("Kabalite Harriers", self.name_player,
@@ -1719,7 +1720,8 @@ class Player:
                                 if self.game.get_red_icon(position):
                                     self.game.create_reaction("Kroot Hunter", self.name_player,
                                                               (int(self.number), position, location_of_unit))
-                            if card.check_for_a_trait("Scout") and card.get_faction() != "Necrons":
+                            if card.check_for_a_trait("Scout", self.etekh_trait) \
+                                    and card.get_faction() != "Necrons":
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):
                                         if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
@@ -1741,7 +1743,7 @@ class Player:
                                         if self.get_ready_given_pos(-2, i):
                                             self.game.create_reaction("Loamy Broodhive", self.name_player,
                                                                       (int(self.number), position, location_of_unit))
-                            if card.check_for_a_trait("Daemon"):
+                            if card.check_for_a_trait("Daemon", self.etekh_trait):
                                 for i in range(len(self.headquarters)):
                                     if self.get_ability_given_pos(-2, i) == "Tower of Worship":
                                         self.game.create_reaction("Tower of Worship", self.name_player,
@@ -2353,7 +2355,7 @@ class Player:
         if card.get_ability() == "Standard Bearer":
             if self.warlord_faction != "Astra Militarum":
                 return True
-        if card.check_for_a_trait("Genestealer"):
+        if card.check_for_a_trait("Genestealer", self.etekh_trait):
             if self.subject_omega_relevant:
                 return True
         if card.get_faction() == "Eldar":
@@ -4586,15 +4588,8 @@ class Player:
                                     already_using_murder_cogitator = True
                         if not already_using_murder_cogitator:
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
-        if self.game.request_search_for_enemy_card_at_planet(self.number, -2, "Cato's Stronghold", ready_relevant=True):
-            self.game.reactions_needing_resolving.append("Cato's Stronghold")
-            self.game.allowed_planets_cato_stronghold.append(planet_num)
-            if self.number == "1":
-                self.game.positions_of_unit_triggering_reaction.append([2, -1, -1])
-                self.game.player_who_resolves_reaction.append(self.game.name_2)
-            else:
-                self.game.positions_of_unit_triggering_reaction.append([1, -1, -1])
-                self.game.player_who_resolves_reaction.append(self.game.name_1)
+        if other_player.search_card_in_hq("Cato's Stronghold", ready_relevant=True):
+            self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_card_type() != "Token":
@@ -4829,7 +4824,7 @@ class Player:
                 mork_count += 1
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_hq = len(self.headquarters) - 1
-        if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves"):
+        if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves", self.etekh_trait):
             mork_count = 0
         for i in range(mork_count):
             self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest", rickety_warbuggy=True)

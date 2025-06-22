@@ -356,7 +356,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if not self.chosen_first_card:
             valid = False
             for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Vehicle"):
+                if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
+                        "Vehicle", secondary_player.etekh_trait):
                     valid = True
             if valid:
                 self.chosen_first_card = True
@@ -623,14 +624,16 @@ async def update_game_event_action_planet(self, name, game_update_string):
         found_nurgling_bomb_target_p1 = False
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             primary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
-            if not primary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Nurgle"):
+            if not primary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
+                    "Nurgle", primary_player.etekh_trait):
                 primary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
                 primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                 found_nurgling_bomb_target_p1 = True
         found_nurgling_bomb_target_p2 = False
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             secondary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
-            if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait("Nurgle"):
+            if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
+                    "Nurgle", secondary_player.etekh_trait):
                 secondary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
                 secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                 found_nurgling_bomb_target_p2 = True

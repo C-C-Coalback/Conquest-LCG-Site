@@ -125,9 +125,9 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
                             get_card_type() != "Warlord":
                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                .check_for_a_trait("Warrior") or \
+                                .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
                                 primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
-                                        .check_for_a_trait("Soldier"):
+                                .check_for_a_trait("Soldier", primary_player.etekh_trait):
                             primary_player.aiming_reticle_coords_hand = None
                             primary_player.discard_card_from_hand(self.pos_shield_card)
                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

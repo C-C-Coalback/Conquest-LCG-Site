@@ -102,7 +102,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.chosen_first_card = True
         elif self.reactions_needing_resolving[0] == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
-            if card.check_for_a_trait("Space Wolves"):
+            if card.check_for_a_trait("Space Wolves", primary_player.etekh_trait):
                 if card.get_is_unit():
                     num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                     primary_player.add_card_to_planet(card, planet_pos)

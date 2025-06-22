@@ -501,7 +501,8 @@ h4 {
     top: 30vh;
     border: 5px solid red;
     max-width: 20vw;
-    overflow-y:hidden;
+    max-height: 20vh;
+    overflow-y:auto;
     overflow-x:auto;
     white-space:nowrap;
     display: flex;
