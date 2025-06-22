@@ -1154,6 +1154,11 @@ class Player:
             return played_card
         return "SUCCESS/Not Support"
 
+    def get_sweep_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].get_sweep()
+        return self.cards_in_play[planet_pos + 1][unit_pos].get_sweep()
+
     def get_card_in_hand(self, position_hand):
         card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)

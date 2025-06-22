@@ -181,6 +181,7 @@ class Game:
         self.forbidden_traits_indirect = ""
         self.planet_of_indirect = -1
         self.first_card_damaged = True
+        self.sweep_value = 0
         self.cato_stronghold_activated = False
         self.allowed_planets_cato_stronghold = []
         self.allowed_units_alaitoc_shrine = []
@@ -6420,6 +6421,16 @@ class Game:
                             self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
                         for j in range(len(self.p2.cards_in_play[i + 1])):
                             self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+            if not self.attack_being_resolved and not self.reactions_needing_resolving:
+                for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].valid_sweep_target = True
+                for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].valid_sweep_target = True
+                for i in range(7):
+                    for j in range(len(self.p1.cards_in_play[i + 1])):
+                        self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
+                    for j in range(len(self.p2.cards_in_play[i + 1])):
+                        self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
                 self.flamers_damage_active = False
@@ -6441,6 +6452,10 @@ class Game:
                                         if not self.p2.cards_in_play[planet + 1][j].misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_2,
                                                                  (1, planet, i))
+                            sweep = self.p1.get_sweep_given_pos(planet, i)
+                            if sweep > 0:
+                                self.create_reaction("Sweep", self.name_1, (1, planet, i))
+                                self.sweep_value = sweep
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
@@ -6470,6 +6485,10 @@ class Game:
                                         if not self.p1.cards_in_play[planet + 1][j].misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_1,
                                                                  (2, planet, i))
+                            sweep = self.p2.get_sweep_given_pos(planet, i)
+                            if sweep > 0:
+                                self.create_reaction("Sweep", self.name_2, (2, planet, i))
+                                self.sweep_value = sweep
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":

@@ -1189,6 +1189,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if can_continue:
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                     self.delete_reaction()
+        elif current_reaction == "Sweep":
+            if game_update_string[1] == secondary_player.number:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_sweep_target:
+                        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                        shadow = True
+                        if primary_player.get_card_type_given_pos(og_pla, og_pos) != "Army":
+                            shadow = False
+                        elif primary_player.get_cost_given_pos(og_pla, og_pos) > 2:
+                            shadow = False
+                        can_shield = True
+                        if primary_player.get_armorbane_given_pos(og_pla, og_pos):
+                            can_shield = False
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos,
+                                                              self.sweep_value, can_shield=can_shield,
+                                                              rickety_warbuggy=True, shadow_field_possible=shadow)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Imperial Fists Siege Force":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1

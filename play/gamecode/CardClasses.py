@@ -314,6 +314,7 @@ class UnitCard(Card):
         self.lumbering = lumbering
         self.valid_target_magus_harid = False
         self.sweep = sweep
+        self.valid_sweep_target = True
 
     def get_sweep(self):
         sweep = self.sweep
