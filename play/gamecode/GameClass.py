@@ -2551,6 +2551,32 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Eldritch Reaping: Enemy Announce":
+                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
+                        await self.send_update_message(primary_player.name_player + " selected " +
+                                                       self.misc_target_choice + ".")
+                        self.choice_context = "Eldritch Reaping: Own Announce"
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choices_available.remove(self.misc_target_choice)
+                    elif self.choice_context == "Eldritch Reaping: Own Announce":
+                        own_choice = self.choices_available[int(game_update_string[1])]
+                        enemy_choice = self.misc_target_choice
+                        if int(own_choice) > int(enemy_choice):
+                            primary_player.draw_card()
+                            primary_player.draw_card()
+                            primary_player.add_resources(2)
+                            primary_player.total_indirect_damage = int(own_choice)
+                            primary_player.indirect_damage_applied = 0
+                            self.valid_targets_for_indirect = ["Army", "Synapse", "Warlord", "Token"]
+                            self.location_of_indirect = "ALL"
+                        else:
+                            secondary_player.total_indirect_damage = int(own_choice)
+                            secondary_player.indirect_damage_applied = 0
+                            self.valid_targets_for_indirect = ["Army", "Synapse", "Warlord", "Token"]
+                            self.location_of_indirect = "ALL"
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.action_cleanup()
                     elif self.choice_context == "Ymgarl Factor gains:":
                         planet_pos, unit_pos = self.misc_target_unit
                         if self.choices_available[int(game_update_string[1])] == "+2 ATK":

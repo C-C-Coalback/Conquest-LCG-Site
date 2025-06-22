@@ -191,6 +191,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Eldritch Reaping":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.choices_available = ["0", "1", "2", "3", "4", "5"]
+                        self.choice_context = "Eldritch Reaping: Enemy Announce"
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.misc_target_choice = ""
+                        self.action_chosen = ability
                     elif ability == "Rapid Evolution":
                         if primary_player.can_play_limited:
                             self.action_chosen = ability
