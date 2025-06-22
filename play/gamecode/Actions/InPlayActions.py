@@ -351,6 +351,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
+    elif self.action_chosen == "Crown of Control":
+        if game_update_string[1] == primary_player.number:
+            if self.misc_target_planet == planet_pos:
+                if primary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                    self.misc_counter += 1
+                    if self.misc_counter > 1:
+                        self.action_cleanup()
     elif self.action_chosen == "Mont'ka Strike":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

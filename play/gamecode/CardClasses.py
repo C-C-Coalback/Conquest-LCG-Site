@@ -253,7 +253,7 @@ class UnitCard(Card):
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
                  mobile=False, ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1,
-                 lumbering=False):
+                 lumbering=False, sweep=0):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited, deepstrike=deepstrike)
@@ -313,6 +313,16 @@ class UnitCard(Card):
         self.lost_ranged_eop = False
         self.lumbering = lumbering
         self.valid_target_magus_harid = False
+        self.sweep = sweep
+
+    def get_sweep(self):
+        sweep = self.sweep
+        if self.blanked_eop:
+            return 0
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Crown of Control":
+                sweep += 1
+        return sweep
 
     def get_lumbering(self):
         if self.blanked_eop:
@@ -672,14 +682,15 @@ class WarlordCard(UnitCard):
                  armorbane=False, area_effect=0,
                  applies_discounts=None, action_in_hand=False, allowed_phases_in_hand=None,
                  action_in_play=False, allowed_phases_in_play=None, ranged=False,
-                 wargear_attachments_permitted=True, no_attachments=False, mobile=False):
+                 wargear_attachments_permitted=True, no_attachments=False, mobile=False,
+                 sweep=0):
         super().__init__(name, text, traits, -1, faction, "Signature", "Warlord", attack, health, 999,
                          True, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, ranged=ranged,
                          wargear_attachments_permitted=wargear_attachments_permitted,
                          no_attachments=no_attachments, additional_cards_command_struggle=0,
-                         additional_resources_command_struggle=0, mobile=mobile)
+                         additional_resources_command_struggle=0, mobile=mobile, sweep=sweep)
         self.bloodied = False
         self.bloodied_attack = bloodied_attack
         self.bloodied_health = bloodied_health
@@ -752,7 +763,8 @@ class ArmyCard(UnitCard):
                  allowed_phases_in_hand=None, action_in_play=False, allowed_phases_in_play=None,
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
-                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1, lumbering=False):
+                 ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1, lumbering=False,
+                 sweep=0):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -761,7 +773,7 @@ class ArmyCard(UnitCard):
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
                          ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable, deepstrike=deepstrike,
-                         lumbering=lumbering)
+                         lumbering=lumbering, sweep=sweep)
 
     def print_info(self):
         if self.unique:

@@ -129,13 +129,18 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             await self.send_update_message(ability + " activated")
                             self.chosen_first_card = False
                             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
+                    elif ability == "Crown of Control":
+                        if card_chosen.get_ready():
+                            card_chosen.exhaust_card()
+                            self.action_chosen = ability
+                            self.misc_target_planet = planet_pos
+                            self.misc_counter = 0
                     elif ability == "Mind Shackle Scarab":
                         if card_chosen.get_ready():
                             if primary_player.get_number() != player_owning_card.get_number():
                                 if secondary_player.get_faction_given_pos(planet_pos, unit_pos) \
                                         == primary_player.enslaved_faction:
                                     card_chosen.exhaust_card()
-                                    "Royal Phylactery"
                                     self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
                                     last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
                                     primary_player.cards_in_play[planet_pos + 1][last_el].mind_shackle_scarab_effect = True
