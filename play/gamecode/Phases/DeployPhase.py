@@ -120,7 +120,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             if (primary_player.warlord_faction == "Necrons" and (
                                     card.get_faction() == primary_player.enslaved_faction or
                                     card.get_faction() == "Necrons" or
-                                    card.get_faction() == "Neutral")) or primary_player.warlord_faction != "Necrons":
+                                    card.get_faction() == "Neutral" or
+                                    (primary_player.search_card_in_hq("Hollow Sun") and
+                                     primary_player.count_units_of_faction(card.get_faction()) == 0))) or\
+                                    primary_player.warlord_faction != "Necrons":
                                 if not primary_player.enemy_holding_cell_check(card.get_name()):
                                     if card.get_name() == "Shrieking Exarch" and not self.shrieking_exarch_cost_payed:
                                         if len(primary_player.cards) > 2:
