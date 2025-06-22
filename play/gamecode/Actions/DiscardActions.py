@@ -61,6 +61,17 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             await self.send_update_message(
                                 "Press the pass button to stop shuffling any more cards in."
                             )
+            elif ability == "Eldritch Reaping":
+                if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
+                    await self.send_update_message(
+                        name + " is playing a " + ability + " from the discard; card removed."
+                    )
+                    del primary_player.discard[pos_discard]
+                    self.choices_available = ["0", "1", "2", "3", "4", "5"]
+                    self.choice_context = "Eldritch Reaping: Enemy Announce"
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.misc_target_choice = ""
+                    self.action_chosen = ability
             elif ability == "Drudgery":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.can_play_limited:
