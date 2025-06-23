@@ -60,6 +60,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_counter = 0
             self.chosen_first_card = False
             primary_player.exhaust_card_in_hq_given_name("Endless Legions")
+        elif current_reaction == "Sautekh Royal Crypt":
+            primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
+        elif current_reaction == "Sautekh Royal Crypt Damage":
+            self.misc_misc = [False, False, False, False, False, False, False]
+            self.misc_misc[planet_pos] = True
+            if planet_pos > 0:
+                if self.planets_in_play_array[planet_pos - 1]:
+                    self.misc_misc[planet_pos - 1] = True
+            if planet_pos < 6:
+                if self.planets_in_play_array[planet_pos + 1]:
+                    self.misc_misc[planet_pos + 1] = True
+            message = "The following planets can be hit by Sautekh Royal Crypt: "
+            for i in range(len(self.misc_misc)):
+                if self.misc_misc[i]:
+                    message += primary_player.cards_in_play[0][i] + ", "
+            message += ". Press pass when done."
+            self.misc_misc_2 = []
+            await self.send_update_message(message)
         elif current_reaction == "Supreme Strategist":
             if primary_player.cards_in_play[planet_pos + 1]:
                 primary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")

@@ -159,6 +159,7 @@ class Player:
         self.played_necrodermis = False
         self.necrodermis_allowed = True
         self.etekh_trait = ""
+        self.sautekh_royal_crypt = -1
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -2089,6 +2090,11 @@ class Player:
         headquarters_list = self.get_headquarters()
         if planet_pos is None:
             planet_pos = self.warlord_commit_location + 1
+        if (planet_pos - 1) == self.sautekh_royal_crypt:
+            other_player = self.get_other_player()
+            self.game.create_reaction("Sautekh Royal Crypt Damage", other_player.name_player,
+                                      (int(other_player.number), planet_pos - 1, -1))
+        self.sautekh_royal_crypt = -1
         if only_warlord:
             for i in range(len(headquarters_list)):
                 if headquarters_list[i].get_card_type() == "Warlord":

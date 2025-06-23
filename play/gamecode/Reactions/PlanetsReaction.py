@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import CommandPhase
 
 
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -105,6 +106,12 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     self.chosen_first_card = False
                     self.misc_target_unit = (-1, -1)
+    elif current_reaction == "Sautekh Royal Crypt":
+        secondary_player.sautekh_royal_crypt = chosen_planet
+        await self.send_update_message(secondary_player.cards_in_play[0][chosen_planet] +
+                                       " was predicted as the warlord commit location.")
+        self.delete_reaction()
+        await CommandPhase.update_game_event_command_section(self, secondary_player.name_player, game_update_string)
     elif current_reaction == "Endless Legions":
         if self.chosen_first_card:
             card_name = self.misc_target_choice

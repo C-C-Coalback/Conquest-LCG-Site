@@ -1189,6 +1189,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if can_continue:
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                     self.delete_reaction()
+        elif current_reaction == "Sautekh Royal Crypt Damage":
+            if game_update_string[1] == secondary_player.number:
+                if self.misc_misc[planet_pos]:
+                    self.misc_misc_2.append((planet_pos, unit_pos))
+                    self.misc_misc[planet_pos] = False
+                    secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Sweep":
             if game_update_string[1] == secondary_player.number:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

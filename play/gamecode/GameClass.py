@@ -267,6 +267,8 @@ class Game:
         self.resolving_consumption = False
         self.stored_area_effect_value = 0
         self.kaerux_erameas_active = False
+        self.misc_misc = None
+        self.misc_misc_2 = None
         self.valid_targets_for_dark_possession = [
             "Drop Pod Assault", "Exterminatus", "Preemptive Barrage", "Suppressive Fire",
             "Battle Cry", "Snotling Attack", "Squig Bombin'", "Infernal Gateway",
@@ -5352,6 +5354,12 @@ class Game:
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
                         self.infest_planet(self.misc_target_planet, primary_player)
+                    if self.reactions_needing_resolving[0] == "Sautekh Royal Crypt Damage":
+                        for i in range(len(self.misc_misc_2)):
+                            planet_pos, unit_pos = self.misc_misc_2[i]
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        self.misc_misc = None
+                        self.misc_misc_2 = None
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
                     if self.reactions_needing_resolving[0] != "Warlock Destructor":

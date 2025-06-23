@@ -17,6 +17,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.p1.committed_warlord = True
                             await self.send_update_message(self.name_1 + " has chosen a planet to commit "
                                                                          "their warlord.")
+                            if self.p2.search_card_in_hq("Sautekh Royal Crypt", ready_relevant=True):
+                                self.create_reaction("Sautekh Royal Crypt", self.name_2,
+                                                     (2, -2, -1))
                             if self.p1.search_synapse_in_hq():
                                 await self.send_update_message(self.name_1 + " has a synapse; please"
                                                                              " commit this as well")
@@ -50,6 +53,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.p1.committed_warlord = True
                                 await self.send_update_message(self.name_1 + " has chosen a planet to commit "
                                                                              "their warlord.")
+                                if self.p2.search_card_in_hq("Sautekh Royal Crypt", ready_relevant=True):
+                                    self.create_reaction("Sautekh Royal Crypt", self.name_2,
+                                                         (2, -2, -1))
                                 if self.p1.search_synapse_in_hq():
                                     await self.send_update_message(self.name_1 + " has a synapse; please"
                                                                                  " commit this as well")
@@ -98,6 +104,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.p2.committed_warlord = True
                             await self.send_update_message(self.name_2 + " has chosen a planet to commit "
                                                                          "their warlord.")
+                            if self.p1.search_card_in_hq("Sautekh Royal Crypt", ready_relevant=True):
+                                self.create_reaction("Sautekh Royal Crypt", self.name_1,
+                                                     (1, -2, -1))
                             if self.p2.search_synapse_in_hq():
                                 await self.send_update_message(self.name_2 + " has a synapse; please"
                                                                              " commit this as well")
@@ -131,6 +140,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.p2.committed_warlord = True
                                 await self.send_update_message(self.name_2 + " has chosen a planet to commit "
                                                                              "their warlord.")
+                                if self.p1.search_card_in_hq("Sautekh Royal Crypt", ready_relevant=True):
+                                    self.create_reaction("Sautekh Royal Crypt", self.name_1,
+                                                         (1, -2, -1))
                                 if self.p2.search_synapse_in_hq():
                                     await self.send_update_message(self.name_2 + " has a synapse; please"
                                                                                  " commit this as well")
@@ -173,7 +185,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                             await self.send_update_message(
                                 self.name_2 + " has chosen a planet to commit their synapse.")
                 if self.p1.committed_warlord and self.p2.committed_warlord and \
-                        self.p1.committed_synapse and self.p2.committed_synapse:
+                        self.p1.committed_synapse and self.p2.committed_synapse \
+                        and not self.reactions_needing_resolving:
                     print("Both warlords need to be committed.")
                     print(self.p1.warlord_commit_location, self.p2.warlord_commit_location)
                     self.p1.commit_warlord_to_planet()
