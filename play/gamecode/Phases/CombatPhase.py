@@ -144,7 +144,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                              (int(primary_player.number), self.attacker_planet,
                                               self.attacker_position))
                         self.value_doom_siren = self.stored_area_effect_value
-                    self.resolving_area_effect = False
+                    self.area_effect_active = False
                     self.misc_misc = []
                     self.reset_combat_positions()
                     self.number_with_combat_turn = secondary_player.get_number()
@@ -421,6 +421,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 other_player.has_passed = False
                                 await self.send_update_message("Deepstrike is complete")
             if name == self.player_with_combat_turn:
+                print(self.number_with_combat_turn)
+                print(self.player_with_combat_turn)
+                print(self.attacker_position)
                 if self.mode == "RETREAT":
                     if game_update_string[1] == self.number_with_combat_turn:
                         print("Retreat unit", chosen_planet, chosen_unit)
@@ -475,7 +478,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                              (int(primary_player.number), self.attacker_planet,
                                                               self.attacker_position))
                                         self.value_doom_siren = self.stored_area_effect_value
-                                    self.resolving_area_effect = False
+                                    self.area_effect_active = False
                                     self.misc_misc = []
                                     self.reset_combat_positions()
                                     self.number_with_combat_turn = secondary_player.get_number()
