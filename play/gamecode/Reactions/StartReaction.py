@@ -1,4 +1,5 @@
 from .. import FindCard
+import copy
 
 
 async def start_resolving_reaction(self, name, game_update_string):
@@ -185,6 +186,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.ranged_skirmish_active = True
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
+        elif current_reaction == "Court of the Stormlord":
+            if len(primary_player.deck) > 2:
+                self.choices_available = copy.copy(primary_player.deck[:3])
+                self.choice_context = "Discard card (CotS)"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                await self.send_update_message("Not enough cards in deck for Court of the Stormlord")
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Pyrrhian Warscythe":
             primary_player.discard_top_card_deck()
             primary_player.discard_top_card_deck()

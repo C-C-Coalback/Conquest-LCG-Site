@@ -2518,6 +2518,20 @@ class Game:
                             target_player.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                         self.resolving_search_box = False
                         self.reset_choices_available()
+                    elif self.choice_context == "Discard card (CotS)":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        primary_player.discard.append(chosen_choice)
+                        del primary_player.deck[int(game_update_string[1])]
+                        del self.choices_available[int(game_update_string[1])]
+                        self.choice_context = "Bottom card (CotS)"
+                    elif self.choice_context == "Bottom card (CotS)":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        primary_player.deck.append(chosen_choice)
+                        del primary_player.deck[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.resolving_search_box = True
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
                     elif self.choice_context == "Select new synapse (RSN):":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(chosen_choice)
