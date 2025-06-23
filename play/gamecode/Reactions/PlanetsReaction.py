@@ -114,10 +114,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         await CommandPhase.update_game_event_command_section(self, secondary_player.name_player, game_update_string)
     elif current_reaction == "Endless Legions":
         if self.chosen_first_card:
-            card_name = self.misc_target_choice
-            card = self.preloaded_find_card(card_name)
-            primary_player.add_card_to_planet(card, chosen_planet)
-            self.delete_reaction()
+            if self.apoka:
+                if chosen_planet != self.last_planet_checked_for_battle:
+                    card_name = self.misc_target_choice
+                    card = self.preloaded_find_card(card_name)
+                    primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
+                    self.delete_reaction()
+            else:
+                card_name = self.misc_target_choice
+                card = self.preloaded_find_card(card_name)
+                primary_player.add_card_to_planet(card, chosen_planet)
+                self.delete_reaction()
     elif current_reaction == "Reinforced Synaptic Network":
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
         if abs(warlord_pla - chosen_planet) == 1:
