@@ -374,6 +374,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
                             self.action_chosen = ability
+                    elif ability == "Imotekh the Stormlord":
+                        if not card.get_once_per_phase_used():
+                            if not card.bloodied:
+                                card.set_once_per_phase_used(True)
+                                self.action_chosen = ability
+                                self.chosen_first_card = False
+                                self.misc_target_player = ""
+                                await self.send_update_message("Imotekh activated; only army units supported.")
                     elif ability == "Starblaze's Outpost":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, unit_pos)
@@ -531,6 +539,32 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.choice_context = "Amount of damage (WEB)"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+    elif self.action_chosen == "Imotekh the Stormlord":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not primary_player.get_unique_given_pos(planet_pos, unit_pos) and not\
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    og_card = self.preloaded_find_card(self.misc_target_player)
+                    primary_player.headquarters[unit_pos].new_armorbane = og_card.armorbane
+                    primary_player.headquarters[unit_pos].new_ambush = og_card.ambush
+                    primary_player.headquarters[unit_pos].new_mobile = og_card.mobile
+                    primary_player.headquarters[unit_pos].new_brutal = og_card.brutal
+                    primary_player.headquarters[unit_pos].new_sweep = og_card.sweep
+                    primary_player.headquarters[unit_pos].new_area_effect = og_card.area_effect
+                    primary_player.headquarters[unit_pos].new_ranged = og_card.ranged
+                    primary_player.headquarters[unit_pos].new_limited = og_card.limited
+                    primary_player.headquarters[unit_pos].new_lumbering = og_card.lumbering
+                    primary_player.headquarters[unit_pos].new_unstoppable = og_card.unstoppable
+                    primary_player.headquarters[unit_pos].new_flying = og_card.flying
+                    primary_player.headquarters[unit_pos].new_additional_resources_command_struggle = \
+                        og_card.additional_resources_command_struggle
+                    primary_player.headquarters[unit_pos].new_additional_cards_command_struggle = \
+                        og_card.additional_cards_command_struggle
+                    primary_player.headquarters[unit_pos].new_ability = self.misc_target_player
+                    card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                    self.action_cleanup()
+                    await self.send_update_message(card_name + " in headquarters gained " +
+                                                   self.misc_target_player + "'s text box!")
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

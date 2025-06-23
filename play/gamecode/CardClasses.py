@@ -70,6 +70,14 @@ class Card:
         self.valid_target_dynastic_weaponry = False
         self.world_engine_enemy = False
         self.world_engine_owner = False
+        self.new_ability = ""
+        self.new_limited = False
+        self.new_ranged = False
+        self.new_armorbane = False
+        self.new_area_effect = 0
+        self.new_sweep = 0
+        self.new_mobile = False
+        self.new_ambush = False
 
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
@@ -103,6 +111,8 @@ class Card:
         self.once_per_round_used = new_val
 
     def get_ambush(self):
+        if self.new_ability:
+            return self.new_ambush
         return self.ambush
 
     def set_sacrifice_end_of_phase(self, new_val):
@@ -130,6 +140,8 @@ class Card:
         self.counter -= 1
 
     def get_limited(self):
+        if self.new_ability:
+            return self.new_limited
         return self.limited
 
     def get_name(self):
@@ -138,6 +150,8 @@ class Card:
     def get_ability(self, bloodied_relevant=False):
         if self.blanked_eop:
             return "BLANKED"
+        if self.new_ability:
+            return self.new_ability
         if bloodied_relevant:
             if self.bloodied:
                 return self.ability + " BLOODIED"
@@ -315,9 +329,17 @@ class UnitCard(Card):
         self.valid_target_magus_harid = False
         self.sweep = sweep
         self.valid_sweep_target = True
+        self.new_lumbering = False
+        self.new_unstoppable = False
+        self.new_flying = False
+        self.new_additional_resources_command_struggle = 0
+        self.new_additional_cards_command_struggle = 0
+        self.new_brutal = False
 
     def get_sweep(self):
         sweep = self.sweep
+        if self.new_ability:
+            sweep = self.new_sweep
         if self.blanked_eop:
             return 0
         for i in range(len(self.attachments)):
@@ -331,6 +353,8 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Traumatophobia":
                 return True
+        if self.new_ability:
+            return self.new_lumbering
         return self.lumbering
 
     def exhaust_first_attachment_name(self, card_name):
@@ -349,6 +373,8 @@ class UnitCard(Card):
             return False
         if self.lost_keywords_eop:
             return False
+        if self.new_ability:
+            return self.new_unstoppable
         return self.unstoppable
 
     def get_has_hive_mind(self):
@@ -376,6 +402,8 @@ class UnitCard(Card):
     def get_ambush(self):
         if self.lost_keywords_eop:
             return False
+        if self.new_ability:
+            return self.new_ambush
         return self.ambush
 
     def get_extra_attack_until_end_of_phase(self):
@@ -423,16 +451,22 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Mobility":
                 return True
+        if self.new_ability:
+            return self.new_mobile
         return self.mobile
 
     def get_additional_resources_command_struggle(self):
         if self.blanked_eop:
             return 0
+        if self.new_ability:
+            return self.new_additional_resources_command_struggle
         return self.additional_resources_command_struggle
 
     def get_additional_cards_command_struggle(self):
         if self.blanked_eop:
             return 0
+        if self.new_ability:
+            return self.new_additional_cards_command_struggle
         return self.additional_cards_command_struggle
 
     def get_no_attachments(self):
@@ -467,6 +501,8 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "Bladed Lotus Rifle":
                 if self.check_for_a_trait("Kabalite"):
                     return True
+        if self.new_ability:
+            return self.new_ranged
         return self.ranged
 
     def get_ignores_flying(self):
@@ -504,6 +540,8 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "The Butcher's Nails":
                 if self.bloodied:
                     return True
+        if self.new_ability:
+            return self.new_armorbane
         return self.armorbane
 
     def get_by_base_area_effect(self):
@@ -515,6 +553,8 @@ class UnitCard(Card):
         if self.lost_keywords_eop:
             return 0
         area_effect = self.area_effect
+        if self.new_ability:
+            area_effect = self.new_area_effect
         area_effect += self.area_effect_eop
         area_effect += self.area_effect_eor
         area_effect += self.area_effect_eocr
@@ -541,6 +581,8 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Valkyris Pattern Jump Pack":
                 return True
+        if self.new_ability:
+            return self.new_flying
         return self.flying
 
     def set_flying(self, new_val):
@@ -583,6 +625,8 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "The Butcher's Nails":
                 if not self.bloodied:
                     return True
+        if self.new_ability:
+            return self.new_brutal
         return self.brutal
 
     def set_brutal(self, new_val):

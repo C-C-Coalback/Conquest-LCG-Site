@@ -1154,6 +1154,11 @@ class Player:
             return played_card
         return "SUCCESS/Not Support"
 
+    def get_unique_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].get_unique()
+        return self.cards_in_play[planet_pos + 1][unit_pos].get_unique()
+
     def get_sweep_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             return self.headquarters[unit_pos].get_sweep()
@@ -2996,6 +3001,7 @@ class Player:
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].negative_hp_until_eop = 0
                 self.headquarters[i].hit_by_which_salamanders = []
+                self.headquarters[i].new_ability = ""
                 self.headquarters[i].extra_command_eop = 0
                 self.headquarters[i].positive_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
@@ -3019,6 +3025,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_command_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].new_ability = ""
                 self.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].lost_ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders = []

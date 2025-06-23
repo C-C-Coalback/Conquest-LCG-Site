@@ -236,6 +236,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Death Korps Engineers":
                         self.action_chosen = ability
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
+                    elif ability == "Imotekh the Stormlord":
+                        if not card_chosen.get_once_per_phase_used():
+                            if not card_chosen.bloodied:
+                                card_chosen.set_once_per_phase_used(True)
+                                self.action_chosen = ability
+                                self.chosen_first_card = False
+                                self.misc_target_player = ""
+                                await self.send_update_message("Imotekh activated; only army units supported.")
                     elif ability == "Chaplain Mavros":
                         if primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used is False:
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used = 1
@@ -479,6 +487,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
             self.action_cleanup()
+    elif self.action_chosen == "Imotekh the Stormlord":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not primary_player.get_unique_given_pos(planet_pos, unit_pos) and not\
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    og_card = self.preloaded_find_card(self.misc_target_player)
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_armorbane = og_card.armorbane
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ambush = og_card.ambush
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_mobile = og_card.mobile
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_brutal = og_card.brutal
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_sweep = og_card.sweep
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_area_effect = og_card.area_effect
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ranged = og_card.ranged
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_limited = og_card.limited
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_lumbering = og_card.lumbering
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_unstoppable = og_card.unstoppable
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_flying = og_card.flying
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_additional_resources_command_struggle = \
+                        og_card.additional_resources_command_struggle
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_additional_cards_command_struggle = \
+                        og_card.additional_cards_command_struggle
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ability = self.misc_target_player
+                    card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                    self.action_cleanup()
+                    await self.send_update_message(card_name + " at " +
+                                                   primary_player.cards_in_play[0][planet_pos] + " gained " +
+                                                   self.misc_target_player + "'s text box!")
     elif self.action_chosen == "Canoptek Spyder":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():

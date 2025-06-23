@@ -156,6 +156,16 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.chosen_first_card = True
                         secondary_player.aiming_reticle_coords_discard = pos_discard
                         self.anrakyr_unit_position = pos_discard
+    elif self.action_chosen == "Imotekh the Stormlord":
+        if not self.chosen_first_card:
+            if chosen_discard == int(primary_player.number):
+                card = self.preloaded_find_card(primary_player.discard[pos_discard])
+                if card.get_card_type() == "Army":
+                    if not card.get_unique() and not card.check_for_a_trait("Elite"):
+                        self.misc_target_player = card.get_ability()
+                        self.chosen_first_card = True
+                        del primary_player.discard[pos_discard]
+                        await self.send_update_message("Granting the " + card.get_ability() + "'s text box.")
     elif self.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
             card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array, self.cards_dict,
