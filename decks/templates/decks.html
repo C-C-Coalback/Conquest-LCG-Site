@@ -945,7 +945,7 @@
                 numDecksLoaded = 1;
                 var message = "";
                 var cardName = split_data[2].split(' ').join('_');
-                var route_text = "/static/images/CroppedImages/" + cardName + ".jpg";
+                var route_text = "/static/images/CardImages/" + cardName + ".jpg";
                 message = `<div class=saved-deck-box>`;
                 message += `<img src=` + route_text + ` alt=` + route_text + ` class="Card-saved-box" />`;
                 message += `<p>` + split_data[1] + `</p>`;
@@ -961,10 +961,10 @@
                 document.getElementById("attachment-cards").innerHTML = `Attachments`;
                 document.getElementById("support-cards").innerHTML = `Supports`;
                 var warlordName = split_data[1];
-                route = "/static/images/CroppedImages/" + warlordName.split(' ').join('_') + ".jpg";
+                route = "/static/images/CardImages/" + warlordName.split(' ').join('_') + ".jpg";
                 notCheckedAlly();
                 document.getElementById('warlord-card').innerHTML = `<img id=` + warlordName.split(' ').join('_') + ` src=` + route + ` class="db-image">`
-                document.getElementById('synapse-card').innerHTML = `<img id="Cardback" src="/static/images/CroppedImages/Cardback.jpg" class="db-image">`
+                document.getElementById('synapse-card').innerHTML = `<img id="Cardback" src="/static/images/CardImages/Cardback.jpg" class="db-image">`
             } else if (split_data[0] === "SS") {
                 var cardName = split_data[1];
                 var idName = split_data[1].split(' ').join('_');
@@ -990,7 +990,7 @@
                 }
             } else if (split_data[0] === "Synapse"){
                 var synapseName = split_data[1].split(' ').join('_');
-                route = "/static/images/CroppedImages/" + synapseName + ".jpg";
+                route = "/static/images/CardImages/" + synapseName + ".jpg";
                 document.getElementById('synapse-card').innerHTML = `<img id=` + synapseName + ` src=` + route + ` class="db-image">`
             } else if (split_data[0] === "Army"){
                 var cardName = split_data[1];
