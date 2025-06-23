@@ -53,7 +53,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.return_card_to_hand(planet_pos, unit_pos)
                         self.action_cleanup()
                     elif ability == "Captain Markis":
-                        if not card_chosen.get_once_per_phase_used():
+                        if self.apoka:
+                            if not card_chosen.get_once_per_round_used():
+                                card_chosen.set_once_per_round_used(True)
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                self.chosen_second_card = False
+                                self.chosen_first_card = False
+                        elif not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

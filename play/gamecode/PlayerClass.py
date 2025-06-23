@@ -237,7 +237,7 @@ class Player:
             await self.game.send_search()
             await self.game.send_info_box()
             self.game.phase = "DEPLOY"
-            if self.game.apoka_active:
+            if self.game.apoka:
                 await self.game.send_update_message("Apoka Errata is active")
             else:
                 await self.game.send_update_message("No Errata is active")
@@ -798,6 +798,15 @@ class Player:
             if self.game.reactions_needing_resolving[i] == reaction_name:
                 if self.game.player_who_resolves_reaction[i] == self.name_player:
                     return True
+        return False
+
+    def check_if_already_have_reaction_of_position(self, reaction_name, pla, pos):
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    num, og_pla, og_pos = self.game.positions_of_unit_triggering_reaction[i]
+                    if num == int(self.number) and pla == og_pla and og_pos == pos:
+                        return True
         return False
 
     def check_if_already_have_interrupt(self, interrupt_name):
@@ -1789,8 +1798,20 @@ class Player:
                                     if other_player.get_ability_given_pos(position, i) == "Exploratory Drone":
                                         self.game.create_reaction("Exploratory Drone", other_player.name_player,
                                                                   (int(other_player.number), position, i))
-                            if self.game.request_search_for_enemy_card_at_planet(self.number, position,
-                                                                                 "Syren Zythlex"):
+                            other_player = self.get_other_player()
+                            syren_ok = False
+                            for i in range(len(other_player.cards_in_play[position + 1])):
+                                if other_player.get_ability_given_pos(position, i) == "Syren Zythlex":
+                                    if self.game.apoka:
+                                        if not other_player.get_once_per_phase_used_given_pos(position, i):
+                                            syren_ok = True
+                                            other_player.set_once_per_phase_used_given_pos(position, i, True)
+                                    else:
+                                        syren_ok = True
+                            if self.game.deploy_exhausted:
+                                self.exhaust_given_pos(position, location_of_unit)
+                                self.game.deploy_exhausted = False
+                            elif syren_ok:
                                 name = self.name_player
                                 if name == self.game.name_1:
                                     name = self.game.name_2
@@ -2827,6 +2848,7 @@ class Player:
                 if self.headquarters[pos].get_ready():
                     self.exhaust_given_pos(-2, pos)
                     discount += 2
+                    self.game.deploy_exhausted = True
         if self.headquarters[pos].get_ability() == "Bonesinger Choir":
             if self.headquarters[pos].aiming_reticle_color == "green":
                 self.exhaust_given_pos(-2, pos)
@@ -4091,7 +4113,7 @@ class Player:
             if self.check_for_trait_given_pos(-2, card_pos, "Vehicle"):
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):
-                        if not self.death_serves_used:
+                        if not self.death_serves_used or self.game.apoka:
                             self.game.create_interrupt("Death Serves the Emperor", self.name_player,
                                                        (int(self.number), -1, -1))
                             cost = self.get_cost_given_pos(-2, card_pos)
@@ -4377,7 +4399,7 @@ class Player:
             if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):
-                        if not self.death_serves_used:
+                        if not self.death_serves_used or self.game.apoka:
                             self.game.create_interrupt("Death Serves the Emperor", self.name_player,
                                                        (int(self.number), -1, -1))
                             cost = self.get_cost_given_pos(planet_num, card_pos)
@@ -4416,12 +4438,23 @@ class Player:
             if self.get_card_type_given_pos(planet_num, card_pos) == "Army":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
-                        self.game.create_reaction("Shrieking Exarch", self.name_player,
-                                                  (int(self.number), planet_num, i))
+                        if not self.game.apoka:
+                            self.game.create_reaction("Shrieking Exarch", self.name_player,
+                                                      (int(self.number), planet_num, i))
+                        elif not self.check_if_already_have_reaction_of_position("Shrieking Exarch", planet_num, i):
+                            if not self.get_once_per_phase_used_given_pos(planet_num, i):
+                                self.game.create_reaction("Shrieking Exarch", self.name_player,
+                                                          (int(self.number), planet_num, i))
                 for i in range(len(other_player.cards_in_play[planet_num + 1])):
                     if other_player.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
-                        self.game.create_reaction("Shrieking Exarch", other_player.name_player,
-                                                  (int(other_player.number), planet_num, i))
+                        if not self.game.apoka:
+                            self.game.create_reaction("Shrieking Exarch", other_player.name_player,
+                                                      (int(other_player.number), planet_num, i))
+                        elif not other_player.check_if_already_have_reaction_of_position(
+                                "Shrieking Exarch", planet_num, i):
+                            if not other_player.get_once_per_phase_used_given_pos(planet_num, i):
+                                self.game.create_reaction("Shrieking Exarch", other_player.name_player,
+                                                          (int(other_player.number), planet_num, i))
                     if other_player.get_ability_given_pos(planet_num, i, bloodied_relevant=True) == "Vha'shaelhur":
                         if other_player.cards_in_play[planet_num + 1][i].resolving_attack:
                             if not other_player.check_if_already_have_reaction("Vha'shaelhur"):

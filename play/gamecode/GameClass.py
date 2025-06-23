@@ -35,7 +35,7 @@ class Game:
         for i in range(len(self.apoka_errata_cards)):
             self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())
         self.planet_cards_array = planet_array
-        self.apoka_active = apoka
+        self.apoka = apoka
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
@@ -266,6 +266,8 @@ class Game:
         self.reset_resolving_attack_on_units = False
         self.resolving_consumption = False
         self.stored_area_effect_value = 0
+        self.area_effect_active = False
+        self.max_aoe_targets = 3
         self.kaerux_erameas_active = False
         self.misc_misc = None
         self.misc_misc_2 = None
@@ -292,9 +294,12 @@ class Game:
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
                                  "Reinforced Synaptic Network"]
+        if self.apoka:
+            self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
         self.anrakyr_deck_choice = self.name_1
         self.name_of_attacked_unit = ""
+        self.deploy_exhausted = False
         self.need_to_reset_tomb_blade_squadron = False
         self.resolve_kill_effects = True
         self.asked_if_resolve_effect = False
@@ -795,8 +800,8 @@ class Game:
             for i in range(1, self.number_of_units_left_to_suffer_damage):
                 genestealer_hybrids_relevant = False
                 if actual_aoe:
-                    for j in range(len(self.cards_in_play[chosen_planet + 1])):
-                        if self.get_ability_given_pos(chosen_planet, j) == "Genestealer Hybrids" and i != j:
+                    for j in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                        if secondary_player.get_ability_given_pos(chosen_planet, j) == "Genestealer Hybrids" and i != j:
                             genestealer_hybrids_relevant = True
                 if not genestealer_hybrids_relevant:
                     secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
@@ -3252,6 +3257,11 @@ class Game:
                         self.maksim_squadron_enabled = False
                         if game_update_string[1] == "0":
                             self.maksim_squadron_active = True
+                            if self.apoka:
+                                pos_holder = self.positions_of_units_to_take_damage[0]
+                                player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                                primary_player.draw_card()
                             self.reset_choices_available()
                             await self.better_shield_card_resolution(
                                 primary_player.name_player, self.last_shield_string, alt_shields=False)
@@ -4884,12 +4894,14 @@ class Game:
                                 if not self.choices_available:
                                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
                                             == "Maksim's Squadron":
-                                        if self.maksim_squadron_enabled and not primary_player.hit_by_gorgul:
-                                            self.last_shield_string = game_update_string
-                                            self.choice_context = "Use Maksim's Squadron?"
-                                            self.choices_available = ["Yes", "No"]
-                                            self.name_player_making_choices = primary_player.name_player
-                                            can_continue = False
+                                        if not self.apoka or not primary_player.get_once_per_phase_used_given_pos(
+                                                planet_pos, unit_pos):
+                                            if self.maksim_squadron_enabled and not primary_player.hit_by_gorgul:
+                                                self.last_shield_string = game_update_string
+                                                self.choice_context = "Use Maksim's Squadron?"
+                                                self.choices_available = ["Yes", "No"]
+                                                self.name_player_making_choices = primary_player.name_player
+                                                can_continue = False
                                 if can_continue:
                                     no_mercy_possible = False
                                     if can_no_mercy:

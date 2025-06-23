@@ -500,13 +500,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Uber Grotesque":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="EOP")
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Shrieking Exarch":
+            if self.apoka:
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
         elif self.reactions_needing_resolving[0] == "Shrieking Harpy":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if self.apoka:
+                secondary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if (secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and not
                         secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
@@ -1303,7 +1306,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if can_continue:
                     if primary_player.spend_resources(cost):
                         primary_player.discard_card_name_from_hand("Gut and Pillage")
-                        primary_player.add_resources(3)
+                        if self.apoka:
+                            primary_player.add_resources(2)
+                        else:
+                            primary_player.add_resources(3)
                         primary_player.gut_and_pillage_used = True
                         await primary_player.dark_eldar_event_played()
                     self.delete_reaction()
@@ -1591,7 +1597,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if primary_player.get_ability_given_pos(-2, i) == "Invasion Site":
                     i_site_loc = i
             if i_site_loc != -1:
-                primary_player.add_resources(primary_player.highest_cost_invasion_site)
+                if self.apoka:
+                    primary_player.add_resources(3)
+                else:
+                    primary_player.add_resources(primary_player.highest_cost_invasion_site)
                 primary_player.sacrifice_card_in_hq(i_site_loc)
             self.delete_reaction()
         elif current_reaction == "Vha'shaelhur":
@@ -1623,7 +1632,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Kabalite Blackguard":
             self.choices_available = ["0", "1", "2"]
-            if secondary_player.resources < 2:
+            if secondary_player.resources < 2 or self.apoka:
                 self.choices_available.remove("2")
             if secondary_player.resources < 1:
                 self.choices_available.remove("1")

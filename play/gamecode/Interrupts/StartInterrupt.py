@@ -43,8 +43,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Prey on the Weak":
             primary_player.exhaust_card_in_hq_given_name("Prey on the Weak")
         elif current_interrupt == "Death Serves the Emperor":
-            primary_player.add_resources(primary_player.highest_death_serves_value)
-            primary_player.discard_card_name_from_hand("Death Serves the Emperor")
+            if self.apoka:
+                primary_player.add_resources(2)
+                primary_player.discard_card_name_from_hand("Death Serves the Emperor")
+            else:
+                primary_player.add_resources(primary_player.highest_death_serves_value)
+                primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
         elif current_interrupt == "Surrogate Host":
             can_continue = True

@@ -109,6 +109,46 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player.has_passed = False
                             other_player.has_passed = False
                             await self.send_update_message("Deepstrike is complete")
+            elif self.area_effect_active:
+                if name == self.player_with_combat_turn:
+                    if self.number_with_combat_turn == "1":
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    for i in range(len(self.misc_misc)):
+                        planet_pos, unit_pos = self.misc_misc[i]
+                        can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                self.attacker_position)
+                        shadow_field = False
+                        if primary_player.get_cost_given_pos(
+                                self.attacker_planet, self.attacker_position) < 3 \
+                                and primary_player.get_card_type_given_pos(
+                            self.attacker_planet, self.attacker_position) == "Army":
+                            shadow_field = True
+                        preventable = True
+                        if primary_player.search_attachments_at_pos(
+                                self.attacker_planet, self.attacker_position, "Acid Maw"):
+                            preventable = False
+                        took_damage, bodyguards = secondary_player.assign_damage_to_pos(
+                            planet_pos, unit_pos, damage=self.stored_area_effect_value,
+                            att_pos=None, can_shield=can_shield,
+                            shadow_field_possible=shadow_field, rickety_warbuggy=True,
+                            preventable=preventable
+                        )
+                    if primary_player.search_attachments_at_pos(self.attacker_planet,
+                                                                self.attacker_position,
+                                                                "Doom Siren", must_match_name=True):
+                        self.create_reaction("Doom Siren", primary_player.name_player,
+                                             (int(primary_player.number), self.attacker_planet,
+                                              self.attacker_position))
+                        self.value_doom_siren = self.stored_area_effect_value
+                    self.resolving_area_effect = False
+                    self.misc_misc = []
+                    self.reset_combat_positions()
+                    self.number_with_combat_turn = secondary_player.get_number()
+                    self.player_with_combat_turn = secondary_player.get_name_player()
             elif name == self.player_with_combat_turn:
                 if self.number_with_combat_turn == "1":
                     self.number_with_combat_turn = "2"
@@ -173,26 +213,35 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
-                                if primary_player.search_attachments_at_pos(self.attacker_planet,
-                                                                            self.attacker_position,
-                                                                            "Doom Siren", must_match_name=True):
-                                    self.create_reaction("Doom Siren", primary_player.name_player,
-                                                         (int(primary_player.number), self.attacker_planet,
-                                                          self.attacker_position))
-                                    self.value_doom_siren = amount_aoe
-                                shadow_field = False
-                                if primary_player.get_cost_given_pos(
-                                        self.attacker_planet, self.attacker_position) < 3 \
-                                        and primary_player.get_card_type_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Army":
-                                    shadow_field = True
-                                await self.aoe_routine(primary_player, secondary_player, chosen_planet,
-                                                       amount_aoe, faction=faction,
-                                                       shadow_field_possible=shadow_field,
-                                                       actual_aoe=True)
-                                self.reset_combat_positions()
-                                self.number_with_combat_turn = secondary_player.get_number()
-                                self.player_with_combat_turn = secondary_player.get_name_player()
+                                if self.apoka:
+                                    self.area_effect_active = True
+                                    self.misc_counter = self.max_aoe_targets
+                                    self.stored_area_effect_value = amount_aoe
+                                    self.misc_misc = []
+                                    await self.send_update_message("You are using Apoka's version of AOE; please "
+                                                                   "select up to " + str(self.misc_counter)
+                                                                   + " targets.")
+                                else:
+                                    if primary_player.search_attachments_at_pos(self.attacker_planet,
+                                                                                self.attacker_position,
+                                                                                "Doom Siren", must_match_name=True):
+                                        self.create_reaction("Doom Siren", primary_player.name_player,
+                                                             (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position))
+                                        self.value_doom_siren = amount_aoe
+                                    shadow_field = False
+                                    if primary_player.get_cost_given_pos(
+                                            self.attacker_planet, self.attacker_position) < 3 \
+                                            and primary_player.get_card_type_given_pos(
+                                            self.attacker_planet, self.attacker_position) == "Army":
+                                        shadow_field = True
+                                    await self.aoe_routine(primary_player, secondary_player, chosen_planet,
+                                                           amount_aoe, faction=faction,
+                                                           shadow_field_possible=shadow_field,
+                                                           actual_aoe=True)
+                                    self.reset_combat_positions()
+                                    self.number_with_combat_turn = secondary_player.get_number()
+                                    self.player_with_combat_turn = secondary_player.get_name_player()
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
             print("Card in hand clicked on")
@@ -381,7 +430,58 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             else:
                                 player = self.p2
                             player.retreat_unit(chosen_planet, chosen_unit, exhaust=True)
-
+                elif self.area_effect_active:
+                    if self.number_with_combat_turn == "1":
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    if game_update_string[1] == secondary_player.number:
+                        chosen_planet = int(game_update_string[2])
+                        chosen_unit = int(game_update_string[3])
+                        if chosen_planet == self.last_planet_checked_for_battle:
+                            if not secondary_player.get_ability_given_pos(chosen_planet, chosen_unit) == \
+                                   "Genestealer Hybrids":
+                                if (chosen_planet, chosen_unit) not in self.misc_misc:
+                                    secondary_player.set_aiming_reticle_in_play(chosen_planet, chosen_unit)
+                                    self.misc_misc.append((chosen_planet, chosen_unit))
+                                    self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    for i in range(len(self.misc_misc)):
+                                        planet_pos, unit_pos = self.misc_misc[i]
+                                        can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                                self.attacker_position)
+                                        shadow_field = False
+                                        if primary_player.get_cost_given_pos(
+                                                self.attacker_planet, self.attacker_position) < 3 \
+                                                and primary_player.get_card_type_given_pos(
+                                                self.attacker_planet, self.attacker_position) == "Army":
+                                            shadow_field = True
+                                        preventable = True
+                                        if primary_player.search_attachments_at_pos(
+                                                self.attacker_planet, self.attacker_position, "Acid Maw"):
+                                            preventable = False
+                                        took_damage, bodyguards = secondary_player.assign_damage_to_pos(
+                                            planet_pos, unit_pos, damage=self.stored_area_effect_value,
+                                            att_pos=None, can_shield=can_shield,
+                                            shadow_field_possible=shadow_field, rickety_warbuggy=True,
+                                            preventable=preventable
+                                        )
+                                    if primary_player.search_attachments_at_pos(self.attacker_planet,
+                                                                                self.attacker_position,
+                                                                                "Doom Siren", must_match_name=True):
+                                        self.create_reaction("Doom Siren", primary_player.name_player,
+                                                             (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position))
+                                        self.value_doom_siren = self.stored_area_effect_value
+                                    self.resolving_area_effect = False
+                                    self.misc_misc = []
+                                    self.reset_combat_positions()
+                                    self.number_with_combat_turn = secondary_player.get_number()
+                                    self.player_with_combat_turn = secondary_player.get_name_player()
+                            else:
+                                await self.send_update_message("Immune to AOE")
                 elif self.attacker_position == -1:
                     if game_update_string[1] == self.number_with_combat_turn:
                         chosen_planet = int(game_update_string[2])
@@ -557,7 +657,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                                    == "Shrieking Harpy":
+                                    == "Shrieking Harpy" and \
+                                    (not self.apoka or not player.get_once_per_phase_used_given_pos(
+                                        self.attacker_planet, self.attacker_position)):
                                 if self.infested_planets[self.attacker_planet]:
                                     self.create_reaction(
                                         "Shrieking Harpy", player.name_player,
