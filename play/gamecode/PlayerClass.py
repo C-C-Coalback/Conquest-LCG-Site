@@ -3230,6 +3230,10 @@ class Player:
                 attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
+            for i in range(len(self.attachments_at_planet[planet_id])):
+                if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
+                    attack_value += 1
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
@@ -3922,6 +3926,10 @@ class Player:
                             self.game.create_reaction("Royal Phylactery", owner, (int(self.number), -2, i))
 
         for i in range(7):
+            for j in range(len(self.attachments_at_planet[i])):
+                if self.attachments_at_planet[i][j].get_ability() == "Supreme Strategist":
+                    if phase == "DEPLOY":
+                        self.game.create_reaction("Supreme Strategist", self.name_player, (int(self.number), i, j))
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":

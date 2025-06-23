@@ -2524,6 +2524,86 @@ class Game:
                         del primary_player.deck[int(game_update_string[1])]
                         del self.choices_available[int(game_update_string[1])]
                         self.choice_context = "Bottom card (CotS)"
+                    elif self.choice_context == "Rout or Exhaust (SS)":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        planet_pos, unit_pos = self.misc_target_unit
+                        if chosen_choice == "Rout":
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            primary_player.rout_unit(planet_pos, unit_pos)
+                            if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos:
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+                            elif not self.chosen_first_card:
+                                if secondary_player.cards_in_play[planet_pos + 1]:
+                                    secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
+                                    self.chosen_first_card = True
+                                    self.misc_target_unit = (planet_pos, 0)
+                                    self.choices_available = ["Exhaust", "Rout"]
+                                    self.choice_context = "Rout or Exhaust (SS)"
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    i = 0
+                                    while i < len(primary_player.attachments_at_planet[planet_pos]):
+                                        if primary_player.attachments_at_planet[planet_pos][
+                                                i].get_ability() == "Supreme Strategist":
+                                            primary_player.discard.append("Supreme Strategist")
+                                            del primary_player.attachments_at_planet[planet_pos][i]
+                                            i = i - 1
+                                        i = i + 1
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    self.delete_reaction()
+                            else:
+                                i = 0
+                                while i < len(secondary_player.attachments_at_planet[planet_pos]):
+                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
+                                            "Supreme Strategist":
+                                        secondary_player.discard.append("Supreme Strategist")
+                                        del secondary_player.attachments_at_planet[planet_pos][i]
+                                        i = i - 1
+                                    i = i + 1
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                self.delete_reaction()
+                        elif chosen_choice == "Exhaust":
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                            if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos + 1:
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos + 1, "red")
+                                self.misc_target_unit = (planet_pos, unit_pos + 1)
+                            elif not self.chosen_first_card:
+                                if secondary_player.cards_in_play[planet_pos + 1]:
+                                    secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
+                                    self.chosen_first_card = True
+                                    self.misc_target_unit = (planet_pos, 0)
+                                    self.choices_available = ["Exhaust", "Rout"]
+                                    self.choice_context = "Rout or Exhaust (SS)"
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    i = 0
+                                    while i < len(primary_player.attachments_at_planet[planet_pos]):
+                                        if primary_player.attachments_at_planet[planet_pos][
+                                                i].get_ability() == "Supreme Strategist":
+                                            primary_player.discard.append("Supreme Strategist")
+                                            del primary_player.attachments_at_planet[planet_pos][i]
+                                            i = i - 1
+                                        i = i + 1
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    self.delete_reaction()
+                            else:
+                                i = 0
+                                while i < len(secondary_player.attachments_at_planet[planet_pos]):
+                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
+                                            "Supreme Strategist":
+                                        secondary_player.discard.append("Supreme Strategist")
+                                        del secondary_player.attachments_at_planet[planet_pos][i]
+                                        i = i - 1
+                                    i = i + 1
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                self.delete_reaction()
                     elif self.choice_context == "Bottom card (CotS)":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.append(chosen_choice)

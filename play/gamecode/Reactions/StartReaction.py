@@ -60,6 +60,26 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_counter = 0
             self.chosen_first_card = False
             primary_player.exhaust_card_in_hq_given_name("Endless Legions")
+        elif current_reaction == "Supreme Strategist":
+            if primary_player.cards_in_play[planet_pos + 1]:
+                primary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
+                self.chosen_first_card = False
+                self.misc_target_unit = (planet_pos, 0)
+                self.choices_available = ["Exhaust", "Rout"]
+                self.choice_context = "Rout or Exhaust (SS)"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            elif secondary_player.cards_in_play[planet_pos + 1]:
+                secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
+                self.chosen_first_card = True
+                self.misc_target_unit = (planet_pos, 0)
+                self.choices_available = ["Exhaust", "Rout"]
+                self.choice_context = "Rout or Exhaust (SS)"
+                self.name_player_making_choices = secondary_player.name_player
+                self.resolving_search_box = True
+            else:
+                await self.send_update_message("No units present")
+                self.delete_reaction()
         elif current_reaction == "Rumbling Tomb Stalker":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
