@@ -128,6 +128,13 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.action_chosen = ability
                         primary_player.harbinger_of_eternity_active = True
                         del primary_player.discard[pos_discard]
+            elif ability == "The Strength of the Enemy":
+                if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
+                    if primary_player.spend_resources(2):
+                        del primary_player.discard[pos_discard]
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        await self.send_update_message("Please choose an enemy unit first.")
             elif ability == "Reanimation Protocol":
                 if not primary_player.used_reanimation_protocol:
                     if primary_player.search_for_card_everywhere("Harbinger of Eternity"):

@@ -198,6 +198,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.name_player_making_choices = secondary_player.name_player
                         self.misc_target_choice = ""
                         self.action_chosen = ability
+                    elif ability == "The Strength of the Enemy":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        await self.send_update_message("Please choose an enemy unit first.")
                     elif ability == "Rapid Evolution":
                         if primary_player.can_play_limited:
                             self.action_chosen = ability

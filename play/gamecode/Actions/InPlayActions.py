@@ -525,6 +525,42 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "The Strength of the Enemy":
+        if self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if self.misc_target_planet == planet_pos:
+                        og_card = self.preloaded_find_card(self.misc_target_player)
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_armorbane = og_card.armorbane
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ambush = og_card.ambush
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_mobile = og_card.mobile
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_brutal = og_card.brutal
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_sweep = og_card.sweep
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_area_effect = og_card.area_effect
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ranged = og_card.ranged
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_limited = og_card.limited
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_lumbering = og_card.lumbering
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_unstoppable = og_card.unstoppable
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_flying = og_card.flying
+                        primary_player.cards_in_play[planet_pos + 1][
+                            unit_pos].new_additional_resources_command_struggle = \
+                            og_card.additional_resources_command_struggle
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_additional_cards_command_struggle = \
+                            og_card.additional_cards_command_struggle
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ability = self.misc_target_player
+                        card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                        self.action_cleanup()
+                        await self.send_update_message(card_name + " at " +
+                                                       primary_player.cards_in_play[0][planet_pos] + " gained " +
+                                                       self.misc_target_player + "'s text box!")
+        else:
+            if game_update_string[1] == secondary_player.number:
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    self.misc_target_planet = planet_pos
+                    self.misc_target_player = secondary_player.get_name_given_pos(planet_pos, unit_pos)
+                    await self.send_update_message("Stealing " + self.misc_target_player + "'s text box.")
+                    secondary_player.set_blanked_given_pos(planet_pos, unit_pos)
+                    self.chosen_first_card = True
     elif self.action_chosen == "Air Caste Courier":
         print("ACC")
         if self.chosen_first_card:
