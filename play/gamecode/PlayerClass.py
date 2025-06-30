@@ -1768,9 +1768,8 @@ class Player:
                             if card.check_for_a_trait("Elite"):
                                 for i in range(len(self.headquarters)):
                                     if self.get_ability_given_pos(-2, i) == "Turbulent Rift":
-                                        if self.get_ready_given_pos(-2, i):
-                                            self.game.create_reaction("Turbulent Rift", self.name_player,
-                                                                      (int(self.number), position, location_of_unit))
+                                        self.game.create_reaction("Turbulent Rift", self.name_player,
+                                                                  (int(self.number), position, location_of_unit))
                                     if self.get_ability_given_pos(-2, i) == "Loamy Broodhive":
                                         if self.get_ready_given_pos(-2, i):
                                             self.game.create_reaction("Loamy Broodhive", self.name_player,

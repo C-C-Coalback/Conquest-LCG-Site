@@ -1091,7 +1091,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Turbulent Rift":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.exhaust_card_in_hq_given_name("Turbulent Rift")
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
             secondary_player.suffer_area_effect(planet_pos, 1)
             self.delete_reaction()
