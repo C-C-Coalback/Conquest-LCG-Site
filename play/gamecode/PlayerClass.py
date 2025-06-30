@@ -2848,7 +2848,8 @@ class Player:
                 if self.headquarters[pos].get_ready():
                     self.exhaust_given_pos(-2, pos)
                     discount += 2
-                    self.game.deploy_exhausted = True
+                    if self.game.apoka:
+                        self.game.deploy_exhausted = True
         if self.headquarters[pos].get_ability() == "Bonesinger Choir":
             if self.headquarters[pos].aiming_reticle_color == "green":
                 self.exhaust_given_pos(-2, pos)
