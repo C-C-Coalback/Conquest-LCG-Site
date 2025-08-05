@@ -5048,6 +5048,7 @@ class Game:
                 elif game_update_string[0] == "HQ":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
+                        hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                         if primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
                             print("is rockcrete bunker")
                             if primary_player.headquarters[hq_pos].get_ready():
@@ -5117,27 +5118,36 @@ class Game:
                                 primary_player.assign_damage_to_pos_hq(hq_pos, damage, can_shield=False)
                                 primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans":
-                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                            if planet_pos == hurt_planet and hurt_pos == unit_pos:
-                                if primary_player.get_ready_given_pos(hurt_planet, hurt_pos):
-                                    if not primary_player.headquarters[hurt_pos].misc_ability_used:
-                                        primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                        primary_player.headquarters[hurt_pos].misc_ability_used = True
-                                        self.amount_that_can_be_removed_by_shield[0] = \
-                                            self.amount_that_can_be_removed_by_shield[0] - 1
-                                        if self.amount_that_can_be_removed_by_shield[0] == 0:
-                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif planet_pos == hurt_planet and hurt_pos == unit_pos:
+                            if primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and\
+                                    primary_player.get_ready_given_pos(hurt_planet, hurt_pos) and not \
+                                    primary_player.headquarters[hurt_pos].misc_ability_used:
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                primary_player.headquarters[hurt_pos].misc_ability_used = True
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
+                                if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                            elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
+                                amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
+                                if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
+                                    amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
+                                primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
+                                await self.send_update_message("Faith is being used as a shield.\n" +
+                                                               str(amount_to_remove) + " damage is being removed.")
+                                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif primary_player.hit_by_gorgul:
                 await self.send_update_message("Gorgul da Slaya is in effect; "
                                                "your only choices are shield or pass.")
             elif len(game_update_string) == 4:
-                hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                 if game_update_string[0] == "IN_PLAY":
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
+                        hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                         if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
                             if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
                                 if self.damage_moved_to_old_one_eye == 0:
@@ -5159,21 +5169,30 @@ class Game:
                                     if self.amount_that_can_be_removed_by_shield[0] == 0:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans":
-                            hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                            if planet_pos == hurt_planet and hurt_pos == unit_pos:
-                                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                                    if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
-                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                                        primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
-                                        if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
-                                            self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
-                                                                 (int(primary_player.number), planet_pos, unit_pos))
-                                        self.amount_that_can_be_removed_by_shield[0] = \
-                                            self.amount_that_can_be_removed_by_shield[0] - 1
-                                        if self.amount_that_can_be_removed_by_shield[0] == 0:
-                                            primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
-                                            await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                        elif planet_pos == hurt_planet and hurt_pos == unit_pos:
+                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans" and \
+                                    primary_player.get_ready_given_pos(planet_pos, unit_pos) and not \
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                    self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
+                                if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                    primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                            elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
+                                amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
+                                if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
+                                    amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
+                                primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
+                                await self.send_update_message("Faith is being used as a shield.\n" +
+                                                               str(amount_to_remove) + " damage is being removed.")
+                                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Follower of Gork":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
                             if planet_pos == hurt_planet:
