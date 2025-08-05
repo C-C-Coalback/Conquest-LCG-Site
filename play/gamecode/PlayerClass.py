@@ -325,7 +325,7 @@ class Player:
                 else:
                     single_card_string += "E|"
                 card_type = current_card.get_card_type()
-                if card_type == "Warlord" or card_type == "Army" or card_type == "Token" or card_type == "Synapse":
+                if current_card.is_unit:
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                 elif current_card.get_name() == "Hive Ship Tendrils":
                     single_card_string += str(current_card.counter)
@@ -333,6 +333,11 @@ class Player:
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "World Engine Beam":
                     single_card_string += str(current_card.counter)
+                else:
+                    single_card_string += "0"
+                single_card_string += "|"
+                if current_card.is_unit:
+                    single_card_string += str(current_card.get_faith())
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -492,6 +497,8 @@ class Player:
                         else:
                             single_card_string += "E|"
                         single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                        single_card_string += "|"
+                        single_card_string += str(current_card.get_faith())
                         single_card_string += "|"
                         if current_card.get_card_type() == "Warlord":
                             if current_card.get_bloodied():
@@ -896,6 +903,11 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_damage()
         return self.cards_in_play[planet_id + 1][unit_id].get_damage()
+
+    def set_faith_given_pos(self, planet_id, unit_id, amount):
+        if planet_id == -2:
+            return self.headquarters[unit_id].set_faith(amount)
+        return self.cards_in_play[planet_id + 1][unit_id].set_faith(amount)
 
     def set_damage_given_pos(self, planet_id, unit_id, amount):
         if planet_id == -2:

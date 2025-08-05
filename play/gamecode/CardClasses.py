@@ -84,6 +84,9 @@ class Card:
             return False
         return True
 
+    def get_faith(self):
+        return 0
+
     def get_deepstrike_value(self):
         return self.deepstrike
 
@@ -335,6 +338,13 @@ class UnitCard(Card):
         self.new_additional_resources_command_struggle = 0
         self.new_additional_cards_command_struggle = 0
         self.new_brutal = False
+        self.faith = 0
+
+    def get_faith(self):
+        return self.faith
+
+    def set_faith(self, faith):
+        self.faith = faith
 
     def get_sweep(self):
         sweep = self.sweep

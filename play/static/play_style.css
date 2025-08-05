@@ -146,7 +146,18 @@ h4 {
 .Damage {
     position: absolute;
     opacity: 0.7;
+    width: 30px;
+    height: 30px;
     top: 0;
+    left: 0;
+}
+
+.Faith {
+    position: absolute;
+    opacity: 0.7;
+    width: 30px;
+    height: 30px;
+    top: 30px;
     left: 0;
 }
 
