@@ -1904,6 +1904,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_cleanup()
                         else:
                             await self.send_update_message(str(self.misc_counter) + " uses left of Rapid Assault")
+    elif self.action_chosen == "Holy Chapel":
+        if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum" or \
+                player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.misc_counter = self.misc_counter - 1
+                if self.misc_counter < 1:
+                    self.action_cleanup()
+                    await self.send_update_message("Completed Holy Chapel")
+                else:
+                    await self.send_update_message(str(self.misc_counter) + " targets left for Holy Chapel")
     elif self.action_chosen == "Move Psyker":
         if not self.chosen_first_card:
             if primary_player.number == game_update_string[1]:

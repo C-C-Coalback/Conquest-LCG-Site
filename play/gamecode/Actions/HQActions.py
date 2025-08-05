@@ -78,6 +78,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                    elif ability == "Holy Chapel":
+                        if card.get_ready():
+                            if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
+                                self.action_chosen = ability
+                                self.misc_counter = 4
+                                await self.send_update_message("4 targets left for Holy Chapel")
                     elif ability == "Ork Kannon":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -1099,13 +1105,26 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if primary_player.check_for_trait_given_pos(-2, unit_pos, "Warrior"):
                 primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 1, expiration="EOP")
                 self.action_cleanup()
+    elif self.action_chosen == "Holy Chapel":
+        if game_update_string[1] == "1":
+            target_player = self.p1
+        else:
+            target_player = self.p2
+        if target_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum" or \
+                target_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+            if target_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                target_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.misc_counter = self.misc_counter - 1
+                if self.misc_counter < 1:
+                    self.action_cleanup()
+                    await self.send_update_message("Completed Holy Chapel")
+                else:
+                    await self.send_update_message(str(self.misc_counter) + " targets left for Holy Chapel")
     elif self.action_chosen == "Subdual":
         if game_update_string[1] == "1":
             target_player = self.p1
         else:
             target_player = self.p2
-        planet_pos = -2
-        unit_pos = int(game_update_string[2])
         if target_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
             can_continue = True
             if target_player.name_player == secondary_player.name_player:

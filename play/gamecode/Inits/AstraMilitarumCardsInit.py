@@ -390,6 +390,10 @@ def astra_militarum_cards_init():
                                                  "Reaction: After another Astra Militarum Ecclesiarchy unit you "
                                                  "control at this planet is declared as an attacker, place 1 faith on"
                                                  " this unit and the attacker.",
-                             "Soldier. Officer. Ecclesiarchy.", 4, faction, "Loyal", 3, 4, 3, True)
+                             "Soldier. Officer. Ecclesiarchy.", 4, faction, "Loyal", 3, 4, 3, True),
+        CardClasses.SupportCard("Holy Chapel", "Action: Exhaust and Sacrifice this support to put 4 faith among "
+                                               "Astra Militarum or Space Marines army units.",
+                                "Location. Ecclesiarchy.", 1, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return astra_militarum_cards_array
