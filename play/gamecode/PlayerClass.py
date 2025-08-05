@@ -2401,6 +2401,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Treacherous Lhamaean":
             if self.warlord_faction != "Dark Eldar":
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Dominion Eugenia":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
             if self.game.bloodthirst_active[planet_id]:
                 return True
@@ -3281,6 +3284,9 @@ class Player:
                     attack_value += 2
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
+            if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                    attack_value += 1
             if card.get_ability() == "Shard of the Deceiver":
                 attack_value += len(self.discard)
             if card.get_ability() == "Destroyer Cultist":
@@ -3313,6 +3319,9 @@ class Player:
                 attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                attack_value += 1
         if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
@@ -3767,6 +3776,9 @@ class Player:
             if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
+            if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                    health += 1
             if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
                 health += len(self.discard)
             for i in range(len(self.headquarters[unit_id].get_attachments())):
@@ -3786,6 +3798,9 @@ class Player:
                 health += 1
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
+                health += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 health += 1
         if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
@@ -4757,8 +4772,8 @@ class Player:
                             if not already_using_murder_cogitator:
                                 self.game.create_reaction("Murder Cogitator", self.name_player,
                                                           (int(self.number), -2, -1))
-            if self.check_for_trait_given_pos(planet_num, card_pos, "Transport"):
-                if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
+            if self.check_for_trait_given_pos(-2, card_pos, "Transport"):
+                if self.get_faction_given_pos(-2, card_pos) == "Astra Militarum":
                     if self.search_for_card_everywhere("Commissar Somiel"):
                         self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
             for i in range(len(card.get_attachments())):

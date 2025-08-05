@@ -385,6 +385,11 @@ def astra_militarum_cards_init():
         CardClasses.ArmyCard("Tenacious Novice Squad", "While this unit has faith, it gets +1 ATK and +1 HP.\n"
                                                        "Reaction: After a warlord commits to this planet, "
                                                        "place 1 faith on an army unit at this planet.",
-                             "Soldier. Ecclesiarchy.", 1, faction, "Common", 1, 1, 1, False)
+                             "Soldier. Ecclesiarchy.", 1, faction, "Common", 1, 1, 1, False),
+        CardClasses.ArmyCard("Dominion Eugenia", "While this unit has faith, it gains Armorbane.\n"
+                                                 "Reaction: After another Astra Militarum Ecclesiarchy unit you "
+                                                 "control at this planet is declared as an attacker, place 1 faith on"
+                                                 " this unit and the attacker.",
+                             "Soldier. Officer. Ecclesiarchy.", 4, faction, "Loyal", 3, 4, 3, True)
     ]
     return astra_militarum_cards_array

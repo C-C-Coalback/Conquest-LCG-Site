@@ -605,6 +605,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
+                            if player.check_for_trait_given_pos(
+                                    self.attacker_planet, self.attacker_position, "Ecclesiarchy"):
+                                if player.get_faction_given_pos(
+                                        self.attacker_planet, self.attacker_position) == "Astra Militarum":
+                                    for i in range(len(player.cards_in_play[self.attacker_planet + 1])):
+                                        if i != self.attacker_position:
+                                            if player.get_ability_given_pos(
+                                                    self.attacker_planet, i
+                                            ) == "Dominion Eugenia":
+                                                self.create_reaction("Dominion Eugenia", player.name_player,
+                                                                     (int(player.number), self.attacker_planet,
+                                                                      self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Masked Hunter":
                                 self.create_reaction("Masked Hunter", player.name_player,

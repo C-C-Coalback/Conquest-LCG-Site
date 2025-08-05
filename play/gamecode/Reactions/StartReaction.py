@@ -1080,6 +1080,12 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Commissar Somiel":
             primary_player.summon_token_at_hq("Guardsman")
             self.delete_reaction()
+        elif current_reaction == "Dominion Eugenia":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_ability_given_pos(planet_pos, i) == "Dominion Eugenia":
+                    primary_player.increase_faith_given_pos(planet_pos, i, 1)
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Kabalite Halfborn":
             primary_player.draw_card()
             self.delete_reaction()
