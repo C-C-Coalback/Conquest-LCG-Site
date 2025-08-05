@@ -378,6 +378,9 @@ def astra_militarum_cards_init():
                                 2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Commissar Somiel", "Reaction: After an Astra Militarum Transport unit you control leaves"
                                                  " play, put a Guardsman token into play at your HQ.",
-                             "Soldier. Officer. Commissar.", 2, faction, "Loyal", 1, 2, 2, True)
+                             "Soldier. Officer. Commissar.", 2, faction, "Loyal", 1, 2, 2, True),
+        CardClasses.ArmyCard("Fanatical Sister Repentia", "Interrupt: When this unit uses Shield with Faith, "
+                                                          "double the number of faith on it.",
+                             "Soldier. Martyr. Ecclesiarchy.", 3, faction, "Common", 4, 2, 1, False)
     ]
     return astra_militarum_cards_array

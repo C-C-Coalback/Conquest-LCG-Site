@@ -5133,6 +5133,9 @@ class Game:
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
+                                if primary_player.get_ability_given_pos(
+                                        hurt_planet, hurt_pos) == "Fanatical Sister Repentia":
+                                    amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
                                     amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
@@ -5187,6 +5190,9 @@ class Game:
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                             elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
+                                if primary_player.get_ability_given_pos(
+                                        hurt_planet, hurt_pos) == "Fanatical Sister Repentia":
+                                    amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
                                     amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
