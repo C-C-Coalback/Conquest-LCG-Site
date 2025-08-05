@@ -4557,6 +4557,8 @@ class Game:
             print("resetting necrons enslaved factions")
             self.p1.chosen_enslaved_faction = False
             self.p2.chosen_enslaved_faction = False
+            self.p1.remove_all_faith_in_play()
+            self.p2.remove_all_faith_in_play()
             if self.p1.warlord_faction == "Necrons":
                 await self.create_necrons_wheel_choice(self.p1)
             elif self.p2.warlord_faction == "Necrons":
