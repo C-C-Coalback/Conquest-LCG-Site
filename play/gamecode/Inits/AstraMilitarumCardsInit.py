@@ -381,6 +381,10 @@ def astra_militarum_cards_init():
                              "Soldier. Officer. Commissar.", 2, faction, "Loyal", 1, 2, 2, True),
         CardClasses.ArmyCard("Fanatical Sister Repentia", "Interrupt: When this unit uses Shield with Faith, "
                                                           "double the number of faith on it.",
-                             "Soldier. Martyr. Ecclesiarchy.", 3, faction, "Common", 4, 2, 1, False)
+                             "Soldier. Martyr. Ecclesiarchy.", 3, faction, "Common", 4, 2, 1, False),
+        CardClasses.ArmyCard("Tenacious Novice Squad", "While this unit has faith, it gets +1 ATK and +1 HP.\n"
+                                                       "Reaction: After a warlord commits to this planet, "
+                                                       "place 1 faith on an army unit at this planet.",
+                             "Soldier. Ecclesiarchy.", 1, faction, "Common", 1, 1, 1, False)
     ]
     return astra_militarum_cards_array

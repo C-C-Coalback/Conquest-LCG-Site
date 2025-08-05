@@ -5139,6 +5139,7 @@ class Game:
                                 if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
                                     amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
+                                self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
                                 await self.send_update_message("Faith is being used as a shield.\n" +
                                                                str(amount_to_remove) + " damage is being removed.")
@@ -5196,6 +5197,7 @@ class Game:
                                 if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
                                     amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
+                                self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
                                 await self.send_update_message("Faith is being used as a shield.\n" +
                                                                str(amount_to_remove) + " damage is being removed.")

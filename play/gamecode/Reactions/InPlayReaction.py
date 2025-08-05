@@ -1392,6 +1392,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Tenacious Novice Squad":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
         elif current_reaction == "Masked Hunter":
             if primary_player.get_number() == game_update_string[1]:
                 dest = self.positions_of_unit_triggering_reaction[0][1]

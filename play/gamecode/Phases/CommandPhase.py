@@ -204,8 +204,12 @@ async def update_game_event_command_section(self, name, game_update_string):
                     planets_committed_to = [self.p1.warlord_commit_location, self.p2.warlord_commit_location,
                                             self.p1.synapse_commit_location, self.p2.synapse_commit_location]
                     planets_committed_to = [x for x in planets_committed_to if x != -1]
+                    warlord_planets_committed_to = [self.p1.warlord_commit_location, self.p2.warlord_commit_location]
+                    warlord_planets_committed_to = [x for x in warlord_planets_committed_to if x != -1]
                     self.p1.phoenix_attack_fighter_triggers(planets_committed_to)
                     self.p2.phoenix_attack_fighter_triggers(planets_committed_to)
+                    self.p1.create_warlord_committed_to_planet_reactions(warlord_planets_committed_to)
+                    self.p2.create_warlord_committed_to_planet_reactions(warlord_planets_committed_to)
                     self.p1.has_passed = False
                     self.p2.has_passed = False
                     self.committing_warlords = False

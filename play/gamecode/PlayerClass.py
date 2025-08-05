@@ -1189,6 +1189,9 @@ class Player:
             return self.headquarters[unit_pos].get_faith()
         return self.cards_in_play[planet_pos + 1][unit_pos].get_faith()
 
+    def place_faith_given_pos(self, planet_pos, unit_pos, faith):
+        self.increase_faith_given_pos(planet_pos, unit_pos, faith)
+
     def increase_faith_given_pos(self, planet_pos, unit_pos, faith):
         if planet_pos == -2:
             self.headquarters[unit_pos].increase_faith(faith)
@@ -2125,6 +2128,14 @@ class Player:
                 if self.get_ability_given_pos(planet_pos, i) == "Phoenix Attack Fighter":
                     self.game.create_reaction("Phoenix Attack Fighter", self.name_player,
                                               (int(self.number), planet_pos, i))
+
+    def create_warlord_committed_to_planet_reactions(self, planets_list):
+        for i in range(len(planets_list)):
+            planet_pos = planets_list[i]
+            for j in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.get_ability_given_pos(planet_pos, j) == "Tenacious Novice Squad":
+                    self.game.create_reaction("Tenacious Novice Squad", self.name_player,
+                                              (int(self.number), planet_pos, j))
 
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
