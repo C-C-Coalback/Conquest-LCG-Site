@@ -1184,6 +1184,38 @@ class Player:
             return self.headquarters[unit_pos].get_unique()
         return self.cards_in_play[planet_pos + 1][unit_pos].get_unique()
 
+    def get_faith_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].get_faith()
+        return self.cards_in_play[planet_pos + 1][unit_pos].get_faith()
+
+    def increase_faith_given_pos(self, planet_pos, unit_pos, faith):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].increase_faith(faith)
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].increase_faith(faith)
+        return None
+
+    def remove_faith_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].remove_all_faith()
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].remove_all_faith()
+        return None
+
+    def spend_faith_given_pos(self, planet_pos, unit_pos, faith):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].spend_faith(faith)
+        return self.cards_in_play[planet_pos + 1][unit_pos].spend_faith(faith)
+
+    def remove_all_faith_in_play(self):
+        for i in range(len(self.headquarters)):
+            if self.check_is_unit_at_pos(-2, i):
+                self.remove_faith_given_pos(-2, i)
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.remove_faith_given_pos(i, j)
+
     def get_sweep_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             return self.headquarters[unit_pos].get_sweep()

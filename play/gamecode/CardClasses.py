@@ -346,6 +346,18 @@ class UnitCard(Card):
     def set_faith(self, faith):
         self.faith = faith
 
+    def increase_faith(self, faith):
+        self.faith += faith
+
+    def remove_all_faith(self):
+        self.faith = 0
+
+    def spend_faith(self, faith):
+        if self.faith >= faith:
+            self.faith = self.faith - faith
+            return True
+        return False
+
     def get_sweep(self):
         sweep = self.sweep
         if self.new_ability:
