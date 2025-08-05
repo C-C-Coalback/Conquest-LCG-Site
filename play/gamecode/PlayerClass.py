@@ -4719,6 +4719,11 @@ class Player:
         if card.get_card_type() == "Army":
             if self.check_for_warlord(planet_num):
                 self.stored_targets_the_emperor_protects.append(card_name)
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Transport"):
+                if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
+                    if self.search_for_card_everywhere("Commissar Somiel"):
+                        self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
+
         if card.has_hive_mind:
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
@@ -4741,6 +4746,10 @@ class Player:
                             if not already_using_murder_cogitator:
                                 self.game.create_reaction("Murder Cogitator", self.name_player,
                                                           (int(self.number), -2, -1))
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Transport"):
+                if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
+                    if self.search_for_card_everywhere("Commissar Somiel"):
+                        self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
             for i in range(len(card.get_attachments())):
                 if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                     owner = card.get_attachments()[i].name_owner

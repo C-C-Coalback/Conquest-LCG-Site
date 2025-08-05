@@ -375,6 +375,9 @@ def astra_militarum_cards_init():
                              wargear_attachments_permitted=False),
         CardClasses.SupportCard("Jungle Trench", "Combat Action: Exhaust this support to prevent 1 damage from each "
                                                  "attack made by a non-warlord unit this combat round.", "Location.",
-                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMBAT")
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Commissar Somiel", "Reaction: After an Astra Militarum Transport unit you control leaves"
+                                                 " play, put a Guardsman token into play at your HQ.",
+                             "Soldier. Officer. Commissar.", 2, faction, "Loyal", 1, 2, 2, True)
     ]
     return astra_militarum_cards_array
