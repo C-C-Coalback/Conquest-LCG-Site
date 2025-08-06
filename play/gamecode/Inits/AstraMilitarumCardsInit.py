@@ -394,6 +394,12 @@ def astra_militarum_cards_init():
         CardClasses.SupportCard("Holy Chapel", "Action: Exhaust and Sacrifice this support to put 4 faith among "
                                                "Astra Militarum or Space Marines army units.",
                                 "Location. Ecclesiarchy.", 1, faction, "Common", False,
-                                action_in_play=True, allowed_phases_in_play="ALL")
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Holy Battery", "No Wargear Attachments.\n"
+                                             "While at a planet with a unit with faith you control, "
+                                             "this unit gets +1 ATK.\n"
+                                             "Reaction: After you use a shield card on this unit, place 1 faith on it.",
+                             "Tank. Vostroya. Vehicle.", 2, faction, "Loyal", 2, 2, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

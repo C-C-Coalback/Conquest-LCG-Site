@@ -4952,6 +4952,12 @@ class Game:
                                         primary_player.discard_card_from_hand(hand_pos)
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"
+                                        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                            if primary_player.get_ability_given_pos(
+                                                    planet_pos, unit_pos) == "Holy Battery":
+                                                self.create_reaction("Holy Battery", primary_player.name_player,
+                                                                     (int(primary_player.number),
+                                                                      planet_pos, unit_pos))
                                         if took_damage:
                                             if self.flamers_damage_active:
                                                 primary_player.cards_in_play[planet_pos + 1][

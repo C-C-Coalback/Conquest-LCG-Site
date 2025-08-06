@@ -3319,6 +3319,9 @@ class Player:
                 attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if self.get_ability_given_pos(planet_id, unit_id) == "Holy Battery":
+            if self.search_faith_at_planet(planet_id):
+                attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
@@ -4756,6 +4759,12 @@ class Player:
                     self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
         self.discard_attachments_from_card(planet_num, card_pos)
         self.remove_card_from_play(planet_num, card_pos)
+
+    def search_faith_at_planet(self, planet_pos):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.get_faith_given_pos(planet_pos, i) > 0:
+                return True
+        return False
 
     def add_card_in_hq_to_discard(self, card_pos):
         card = self.headquarters[card_pos]
