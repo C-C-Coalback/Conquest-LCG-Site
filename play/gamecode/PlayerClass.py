@@ -667,6 +667,13 @@ class Player:
                 return True
         return False
 
+    def sacrifice_card_in_hq_given_name(self, card_name):
+        for i in range(len(self.headquarters)):
+            if self.headquarters[i].get_name() == card_name:
+                self.sacrifice_card_in_hq(i)
+                return True
+        return False
+
     def move_to_top_of_discard(self, position):
         self.discard.append(self.discard.pop(position))
 
@@ -1976,6 +1983,10 @@ class Player:
             new_pos = len(self.cards_in_play[destination + 1]) - 1
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
+            if self.check_for_trait_given_pos(destination, new_pos, "Vostroya"):
+                if self.search_card_in_hq("Convent Prioris Advisor"):
+                    self.game.create_reaction("Convent Prioris Advisor", self.name_player,
+                                              (int(self.number), destination, new_pos))
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
                     alaitoc_shrine_already_present = False
@@ -1983,9 +1994,8 @@ class Player:
                         if self.game.reactions_needing_resolving[i] == "Alaitoc Shrine":
                             alaitoc_shrine_already_present = True
                     if not alaitoc_shrine_already_present:
-                        self.game.reactions_needing_resolving.append("Alaitoc Shrine")
-                        self.game.positions_of_unit_triggering_reaction.append([int(self.number), -1, -1])
-                        self.game.player_who_resolves_reaction.append(self.name_player)
+                        self.game.create_reaction("Alaitoc Shrine", self.name_player,
+                                                  (int(self.number), -1, -1))
                         self.game.allowed_units_alaitoc_shrine.append([int(self.number), destination, new_pos])
             for i in range(len(self.cards_in_play[destination + 1])):
                 if self.game.phase != "COMMAND":

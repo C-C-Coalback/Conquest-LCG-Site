@@ -400,6 +400,11 @@ def astra_militarum_cards_init():
                                              "this unit gets +1 ATK.\n"
                                              "Reaction: After you use a shield card on this unit, place 1 faith on it.",
                              "Tank. Vostroya. Vehicle.", 2, faction, "Loyal", 2, 2, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Convent Prioris Advisor", "Reaction: After a Vostroya unit moves to a planet, "
+                                                           "place 1 faith on it. Then you may sacrifice this support"
+                                                           " to place 1 faith on that unit and Rally 6 a support, "
+                                                           "add it to your hand.",
+                                "Advisor. Ecclesiarchy.", 0, faction, "Loyal", True)
     ]
     return astra_militarum_cards_array

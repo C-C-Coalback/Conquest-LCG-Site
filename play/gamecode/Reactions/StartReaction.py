@@ -1070,16 +1070,20 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif current_reaction == "The Black Sword":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
             self.delete_reaction()
         elif current_reaction == "Commissar Somiel":
             primary_player.summon_token_at_hq("Guardsman")
             self.delete_reaction()
+        elif current_reaction == "Convent Prioris Advisor":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Sacrifice Convent Prioris Advisor?"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Holy Battery":
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

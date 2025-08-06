@@ -2679,6 +2679,40 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Sacrifice Convent Prioris Advisor?":
+                        if self.choices_available[int(game_update_string[1])] == "Yes":
+                            i = 0
+                            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                            while i < len(self.reactions_needing_resolving):
+                                if i != 0:
+                                    if self.reactions_needing_resolving[i] == "Convent Prioris Advisor":
+                                        if self.player_who_resolves_reaction[i] == primary_player.name_player:
+                                            del self.reactions_needing_resolving[i]
+                                            del self.player_who_resolves_reaction[i]
+                                            del self.positions_of_unit_triggering_reaction[i]
+                                            i = i - 1
+                                i = i + 1
+                            primary_player.sacrifice_card_in_hq_given_name("Convent Prioris Advisor")
+                            self.reset_choices_available()
+                            self.delete_reaction()
+                            self.resolving_search_box = True
+                            primary_player.number_cards_to_search = 6
+                            if len(primary_player.deck) > 5:
+                                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                            else:
+                                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                            self.name_player_who_is_searching = primary_player.name_player
+                            self.number_who_is_searching = primary_player.number
+                            self.what_to_do_with_searched_card = "DRAW"
+                            self.traits_of_searched_card = None
+                            self.card_type_of_searched_card = "Support"
+                            self.faction_of_searched_card = None
+                            self.no_restrictions_on_chosen_card = False
+                        else:
+                            self.delete_reaction()
+                            self.resolving_search_box = False
+                            self.reset_choices_available()
                     elif self.choice_context == "Ymgarl Factor gains:":
                         planet_pos, unit_pos = self.misc_target_unit
                         if self.choices_available[int(game_update_string[1])] == "+2 ATK":
