@@ -405,6 +405,13 @@ def astra_militarum_cards_init():
                                                            "place 1 faith on it. Then you may sacrifice this support"
                                                            " to place 1 faith on that unit and Rally 6 a support, "
                                                            "add it to your hand.",
-                                "Advisor. Ecclesiarchy.", 0, faction, "Loyal", True)
+                                "Advisor. Ecclesiarchy.", 0, faction, "Loyal", True),
+        CardClasses.AttachmentCard("Departmento Munitorum Aid", "Attach to a Vehicle army unit.\n"
+                                                                "Attached unit gets +1 HP.\n"
+                                                                "Action: Exhaust this attachment and remove 1 damage "
+                                                                "from attached unit to retreat it.\n",
+                                   "Maintenance.", 0, faction, "Loyal", 2, False,
+                                   action_in_play=True, allowed_phases_in_play="ALL", extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Vehicle")
     ]
     return astra_militarum_cards_array

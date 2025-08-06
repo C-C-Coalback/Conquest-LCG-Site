@@ -63,6 +63,17 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                                 self.misc_target_player = player_owning_card.name_player
                                 await self.send_update_message(ability + " activated")
+                    elif ability == "Departmento Munitorum Aid":
+                        if primary_player.get_name_player() == player_owning_card.name_player:
+                            if card_chosen.get_ready():
+                                damage_before = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                                if damage_before > 0:
+                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                                    damage_after = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                                    if damage_after < damage_before:
+                                        card_chosen.exhaust_card()
+                                        primary_player.retreat_unit(planet_pos, unit_pos)
+                                        self.action_cleanup()
                     elif ability == "Blight Grenades":
                         player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
