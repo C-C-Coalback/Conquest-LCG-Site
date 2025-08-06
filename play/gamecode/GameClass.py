@@ -2197,6 +2197,11 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
+                    elif self.choice_context == "Krieg Armoured Regiment result:":
+                        self.reset_choices_available()
+                        self.delete_reaction()
+                        self.resolving_search_box = False
+                        primary_player.bottom_remaining_cards()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
                     if self.choice_context == "Choose Which Interrupt":
@@ -2679,6 +2684,20 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Krieg Armoured Regiment result:":
+                        card_name = self.choices_available[int(game_update_string[1])]
+                        card = self.preloaded_find_card(card_name)
+                        if card.get_is_unit():
+                            if card.check_for_a_trait("Tank") or card.check_for_a_trait("Vehicle") or \
+                                    card.check_for_a_trait("Krieg"):
+                                if card_name != "Krieg Armoured Regiment":
+                                    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                                    primary_player.add_card_to_planet(card, planet_pos)
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                    primary_player.bottom_remaining_cards()
+                                    self.delete_reaction()
                     elif self.choice_context == "Sacrifice Convent Prioris Advisor?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             i = 0

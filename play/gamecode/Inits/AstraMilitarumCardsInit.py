@@ -412,6 +412,12 @@ def astra_militarum_cards_init():
                                                                 "from attached unit to retreat it.\n",
                                    "Maintenance.", 0, faction, "Loyal", 2, False,
                                    action_in_play=True, allowed_phases_in_play="ALL", extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army", required_traits="Vehicle")
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Vehicle"),
+        CardClasses.ArmyCard("Krieg Armoured Regiment", "No Wargear Attachments.\n"
+                                                        "Reaction: After this unit leaves play, place it at the bottom"
+                                                        " of your deck to Rally 6 a Tank, Vehicle or Krieg unit with"
+                                                        " a different name, put it into play at the same planet.",
+                             "Vehicle. Tank. Elite.", 6, faction, "Loyal", 5, 6, 2, False,
+                             wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

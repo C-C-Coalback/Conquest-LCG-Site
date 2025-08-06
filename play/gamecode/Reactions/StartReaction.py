@@ -1078,6 +1078,28 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Commissar Somiel":
             primary_player.summon_token_at_hq("Guardsman")
             self.delete_reaction()
+        elif current_reaction == "Krieg Armoured Regiment":
+            "Fall Back!"
+            if "Krieg Armoured Regiment" in primary_player.discard and \
+                    "Krieg Armoured Regiment" in primary_player.stored_cards_recently_discarded:
+                primary_player.discard.remove("Krieg Armoured Regiment")
+                primary_player.deck.append("Krieg Armoured Regiment")
+                primary_player.number_cards_to_search = 6
+                self.resolving_search_box = True
+                try:
+                    primary_player.stored_cards_recently_discarded.remove("Krieg Armoured Regiment")
+                    primary_player.stored_cards_recently_destroyed.remove("Krieg Armoured Regiment")
+                except ValueError:
+                    pass
+                if len(primary_player.deck) > 5:
+                    self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                else:
+                    self.choices_available = primary_player.deck[0:len(primary_player.deck)]
+                self.choice_context = "Krieg Armoured Regiment result:"
+                self.name_player_making_choices = primary_player.name_player
+            else:
+                await self.send_update_message("No Krieg Armoured Regiment found in discard!")
+                self.delete_reaction()
         elif current_reaction == "Convent Prioris Advisor":
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             self.choices_available = ["Yes", "No"]

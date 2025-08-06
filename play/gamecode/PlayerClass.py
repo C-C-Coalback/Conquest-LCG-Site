@@ -4692,6 +4692,8 @@ class Player:
                                                    (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
+        if self.get_ability_given_pos(planet_num, card_pos) == "Krieg Armoured Regiment":
+            self.game.create_reaction("Krieg Armoured Regiment", self.name_player, (int(self.number), planet_num, -1))
         if self.get_faction_given_pos(planet_num, card_pos) == "Necrons":
             if self.search_card_in_hq("Endless Legions", ready_relevant=True):
                 self.game.create_reaction("Endless Legions", self.name_player,
