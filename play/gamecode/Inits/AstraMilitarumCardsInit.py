@@ -418,6 +418,10 @@ def astra_militarum_cards_init():
                                                         " of your deck to Rally 6 a Tank, Vehicle or Krieg unit with"
                                                         " a different name, put it into play at the same planet.",
                              "Vehicle. Tank. Elite.", 6, faction, "Loyal", 5, 6, 2, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Exalted Celestians", "While this unit has faith and is not a defender, "
+                                                   "it cannot be dealt damage.\n"
+                                                   "Reaction: After this unit exhausts, place 1 faith on it.",
+                             "Soldier. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False)
     ]
     return astra_militarum_cards_array

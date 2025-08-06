@@ -3201,17 +3201,23 @@ class Player:
             self.headquarters[unit_id].exhaust_card()
             new_state = self.headquarters[unit_id].get_ready()
             if previous_state and not new_state:
+                if self.get_ability_given_pos(planet_id, unit_id) == "Exalted Celestians":
+                    self.game.create_reaction("Exalted Celestians", self.name_player,
+                                              (int(self.number), planet_id, unit_id))
                 for i in range(len(self.headquarters[unit_id].get_attachments())):
                     if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
                         self.assign_damage_to_pos(-2, unit_id, 1)
             return None
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
-            if self.search_card_at_planet(planet_id, "Disciple of Excess"):
+            if self.search_card_at_planet(planet_id, "Disciple of Excess") and card_effect:
                 return None
         previous_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         self.cards_in_play[planet_id + 1][unit_id].exhaust_card()
         new_state = self.cards_in_play[planet_id + 1][unit_id].get_ready()
         if previous_state and not new_state:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Exalted Celestians":
+                self.game.create_reaction("Exalted Celestians", self.name_player,
+                                          (int(self.number), planet_id, unit_id))
             for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
                 if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
                     self.assign_damage_to_pos(planet_id, unit_id, 1)
@@ -3528,6 +3534,10 @@ class Player:
             if self.check_for_trait_given_pos(planet_id, unit_id, "Daemon"):
                 if self.the_princes_might_active[planet_id]:
                     return False, 0
+        if att_pos is None:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Exalted Celestians":
+                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                    return False, 0
         if rickety_warbuggy:
             if self.get_ability_given_pos(planet_id, unit_id) == "Rickety Warbuggy":
                 if self.get_enemy_has_init_for_cards(planet_id, unit_id):
@@ -3721,6 +3731,9 @@ class Player:
         return None
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context="", preventable=True):
+        if self.get_ability_given_pos(-2, unit_id) == "Exalted Celestians":
+            if self.get_faith_given_pos(-2, unit_id) > 0:
+                return False
         prior_damage = self.headquarters[unit_id].get_damage()
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         afterwards_damage = self.headquarters[unit_id].get_damage()

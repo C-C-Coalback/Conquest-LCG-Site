@@ -1110,6 +1110,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Exalted Celestians":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Dominion Eugenia":
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if primary_player.get_ability_given_pos(planet_pos, i) == "Dominion Eugenia":
