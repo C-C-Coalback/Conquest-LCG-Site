@@ -281,6 +281,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.misc_target_planet = planet_pos
+                    elif ability == "Evangelizing Ships":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.chosen_first_card = False
+                            await self.send_update_message("Please pay 1 faith")
                     elif ability == "Techmarine Aspirant":
                         if primary_player.resources > 0:
                             self.action_chosen = ability
@@ -1811,6 +1819,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Evangelizing Ships":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                await self.send_update_message("Faith paid, please continue.")
+                self.chosen_first_card = True
+                self.chosen_second_card = False
     elif self.action_chosen == "Squadron Redeployment":
         if self.unit_to_move_position == [-1, -1]:
             if game_update_string[1] == primary_player.get_number():

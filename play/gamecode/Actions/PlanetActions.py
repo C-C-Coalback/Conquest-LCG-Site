@@ -57,6 +57,20 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.action_cleanup()
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
+    elif self.action_chosen == "Evangelizing Ships":
+        if not self.chosen_second_card:
+            if not self.get_green_icon(chosen_planet):
+                primary_player.summon_token_at_planet("Guardsman", chosen_planet)
+                self.chosen_second_card = True
+                self.player_with_action = secondary_player.name_player
+                await self.send_update_message(secondary_player.name_player +
+                                               " must move the Evangelizing Ships to a planet.")
+        else:
+            og_pla, og_pos = self.position_of_actioned_card
+            if chosen_planet != og_pla:
+                secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                secondary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Saim-Hann Jetbike":
         if not self.chosen_first_card:
             og_pla, og_pos = self.position_of_actioned_card

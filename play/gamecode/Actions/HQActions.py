@@ -9,6 +9,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
     else:
         primary_player = self.p2
         secondary_player = self.p1
+    if game_update_string[1] == "1":
+        player_owning_card = self.p1
+    else:
+        player_owning_card = self.p2
     planet_pos = -2
     unit_pos = int(game_update_string[2])
     if not self.action_chosen:
@@ -25,6 +29,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.resolving_search_box = True
         if game_update_string[1] == primary_player.get_number():
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
+            card_chosen = card
             ability = card.get_ability()
             print("Ability:", ability)
             if card.get_has_action_while_in_play():
@@ -73,6 +78,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.unit_to_move_position = [-1, -1]
+                    elif ability == "Evangelizing Ships":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.chosen_first_card = False
+                            await self.send_update_message("Please pay 1 faith")
                     elif ability == "Twisted Laboratory":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -794,6 +807,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if can_continue:
                     player_being_hit.destroy_card_in_hq(unit_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Evangelizing Ships":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                await self.send_update_message("Faith paid, please continue.")
+                self.chosen_first_card = True
+                self.chosen_second_card = False
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

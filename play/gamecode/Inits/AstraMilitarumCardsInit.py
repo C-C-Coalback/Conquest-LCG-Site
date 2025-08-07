@@ -436,6 +436,11 @@ def astra_militarum_cards_init():
                                                            " at this planet, place 1 faith on an army unit at this"
                                                            " planet.", "Wargear. Weapon. Ecclesiarchy.",
                                    1, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
-                                   extra_attack=2, deepstrike=0)
+                                   extra_attack=2, deepstrike=0),
+        CardClasses.ArmyCard("Evangelizing Ships", "Combat Action: Pay 1 faith to put a Guardsman token into play at a"
+                                                   " non-green planet. Then your opponent moves this unit to a planet"
+                                                   " of his choice. (Limit once per phase.)",
+                             "Transport. Ecclesiarchy.", 2, faction, "Loyal", 1, 3, 1, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return astra_militarum_cards_array
