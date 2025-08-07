@@ -2016,8 +2016,8 @@ class Player:
             self.remove_card_from_hq(origin_position)
             return True
         else:
+            other_player = self.get_other_player()
             if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
-                other_player = self.get_other_player()
                 if other_player.search_card_at_planet(origin_planet, "Strangleweb Termagant", ready_relevant=True) \
                         and not force:
                     self.game.choices_available = ["No Interrupt", "Strangleweb Termagant"]
@@ -2029,6 +2029,13 @@ class Player:
                     return False
                 if self.defense_battery_check(origin_planet) or self.defense_battery_check(destination):
                     self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
+            if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() != "Warlord":
+                for i in range(len(other_player.cards_in_play[destination + 1])):
+                    for j in range(len(other_player.cards_in_play[destination + 1][i].attachments)):
+                        if other_player.cards_in_play[destination + 1][i].attachments[j].\
+                                get_ability() == "Sanctified Bolter":
+                            self.game.create_reaction("Sanctified Bolter", other_player.name_player,
+                                                      (int(other_player.number), destination, i))
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
                                                                      [origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1

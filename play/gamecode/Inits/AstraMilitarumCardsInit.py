@@ -454,6 +454,13 @@ def astra_militarum_cards_init():
                                                 "planet does not destroy the defender, place 1 faith on this unit and "
                                                 "it gets +1 ATK for its next attack this phase.",
                              "Vehicle. Martyr. Ecclesiarchy.", 3, faction, "Loyal", 2, 3, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Sanctified Bolter", "Attach to an army unit you control.\n"
+                                                        "Attached unit gets +1 ATK and +1 HP.\n"
+                                                        "Reaction: After a ranged skirmish at this planet begins, or"
+                                                        " an enemy non-warlord unit moves from another planet to this"
+                                                        " planet, place 2 faith among army units at this planet.",
+                                   "Wargear. Weapon.", 1, faction, "Loyal", 1, False, extra_attack=1, extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
     ]
     return astra_militarum_cards_array

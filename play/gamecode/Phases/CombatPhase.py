@@ -88,6 +88,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player.has_passed = False
                             other_player.has_passed = False
                             await self.send_update_message("Deepstrike is complete")
+                            self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                     else:
                         if self.num_player_deepstriking == "1":
                             player = self.p1
@@ -109,6 +110,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player.has_passed = False
                             other_player.has_passed = False
                             await self.send_update_message("Deepstrike is complete")
+                            self.start_ranged_skirmish(self.last_planet_checked_for_battle)
             elif self.area_effect_active:
                 if name == self.player_with_combat_turn:
                     if self.number_with_combat_turn == "1":
@@ -349,6 +351,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             player.has_passed = False
                                             other_player.has_passed = False
                                             await self.send_update_message("Deepstrike is complete")
+                                            self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                                 else:
                                     if player.cards_in_reserve[chosen_planet][chosen_unit].planet_attachment:
                                         player.add_attachment_to_planet(
@@ -371,6 +374,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 player.has_passed = False
                                                 other_player.has_passed = False
                                                 await self.send_update_message("Deepstrike is complete")
+                                                self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                                     else:
                                         self.choosing_target_for_deepstruck_attachment = True
                                         player.cards_in_reserve[chosen_planet][chosen_unit]. \
@@ -420,6 +424,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 player.has_passed = False
                                 other_player.has_passed = False
                                 await self.send_update_message("Deepstrike is complete")
+                                self.start_ranged_skirmish(self.last_planet_checked_for_battle)
             if name == self.player_with_combat_turn:
                 print(self.number_with_combat_turn)
                 print(self.player_with_combat_turn)

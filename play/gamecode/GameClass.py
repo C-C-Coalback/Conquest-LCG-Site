@@ -2652,6 +2652,7 @@ class Game:
                                 primary_player.has_passed = False
                                 secondary_player.has_passed = False
                                 await self.send_update_message("Deepstrike is complete")
+                                self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                     elif self.choice_context == "Choose trait: (EtA)":
                         primary_player.etekh_trait = self.choices_available[int(game_update_string[1])]
                         await self.send_update_message("Granted the " + primary_player.etekh_trait + " trait.")
@@ -5793,6 +5794,17 @@ class Game:
             del self.positions_of_units_interrupting[0]
         self.already_resolving_interrupt = False
 
+    def start_ranged_skirmish(self, planet_pos):
+        self.ranged_skirmish_active = True
+        for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
+            for j in range(len(self.p1.cards_in_play[planet_pos + 1][i].attachments)):
+                if self.p1.cards_in_play[planet_pos + 1][i].attachments[j].get_ability() == "Sanctified Bolter":
+                    self.create_reaction("Sanctified Bolter", self.name_1, (1, planet_pos, i))
+        for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
+            for j in range(len(self.p2.cards_in_play[planet_pos + 1][i].attachments)):
+                if self.p2.cards_in_play[planet_pos + 1][i].attachments[j].get_ability() == "Sanctified Bolter":
+                    self.create_reaction("Sanctified Bolter", self.name_2, (2, planet_pos, i))
+
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         self.guardian_mesh_armor_active = False
         self.maksim_squadron_active = False
@@ -7223,7 +7235,8 @@ class Game:
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
                         self.begin_combat_round()
-                        self.ranged_skirmish_active = True
+                        if not self.start_battle_deepstrike:
+                            self.start_ranged_skirmish(i)
                         return True
                 i = i + 1
         else:
@@ -7238,7 +7251,8 @@ class Game:
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
                         self.begin_combat_round()
-                        self.ranged_skirmish_active = True
+                        if not self.start_battle_deepstrike:
+                            self.start_ranged_skirmish(i)
                         return True
                 i = i - 1
         return False

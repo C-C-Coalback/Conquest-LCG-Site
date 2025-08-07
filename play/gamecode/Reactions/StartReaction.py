@@ -221,7 +221,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Holy Fusillade":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.ranged_skirmish_active = True
+            self.start_ranged_skirmish(self.last_planet_checked_for_battle)
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.delete_reaction()
         elif current_reaction == "Court of the Stormlord":
@@ -1114,6 +1114,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Sanctified Bolter":
+            self.misc_counter = 0
         elif current_reaction == "Penitent Engine":
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="NEXT")
