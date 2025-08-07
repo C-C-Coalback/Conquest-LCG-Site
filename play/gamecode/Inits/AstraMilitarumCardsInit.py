@@ -448,6 +448,12 @@ def astra_militarum_cards_init():
                                                      "X is the number of command struggles your opponent won this "
                                                      "phase minus 1. (Limit once per phase.)",
                              "Vehicle. Tank. Ecclesiarchy.", 3, faction, "Common", 3, 3, 1, False,
-                             action_in_play=True, allowed_phases_in_play="COMMAND")
+                             action_in_play=True, allowed_phases_in_play="COMMAND"),
+        CardClasses.ArmyCard("Penitent Engine", "No Wargear Attachments.\n"
+                                                "Reaction: After an attack resolved by a unit you control at this "
+                                                "planet does not destroy the defender, place 1 faith on this unit and "
+                                                "it gets +1 ATK for its next attack this phase.",
+                             "Vehicle. Martyr. Ecclesiarchy.", 3, faction, "Loyal", 2, 3, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

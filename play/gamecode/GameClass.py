@@ -5812,11 +5812,16 @@ class Game:
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
             secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-            if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
-                num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
-                if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+            num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
+            if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+                if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
                     self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
                                          (int(secondary_player.number), planet_pos, unit_pos))
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
+                        self.create_reaction("Penitent Engine", secondary_player.name_player,
+                                             (int(secondary_player.number), planet_pos, i))
+
         del self.damage_on_units_list_before_new_damage[0]
         del self.damage_is_preventable[0]
         del self.positions_of_units_to_take_damage[0]
