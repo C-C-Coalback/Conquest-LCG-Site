@@ -539,6 +539,8 @@ class Player:
                             single_card_string += "E|"
                         single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
                         single_card_string += "|"
+                        single_card_string += str(current_card.get_faith())
+                        single_card_string += "|"
                         single_card_string += "D"
                         single_card_string += "|"
                         if current_card.aiming_reticle_color is not None:

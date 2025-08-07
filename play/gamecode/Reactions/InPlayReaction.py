@@ -1398,6 +1398,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Revered Heavy Flamer":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.delete_reaction()
         elif current_reaction == "Sacred Rose Immolator":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.get_number() != game_update_string[1]:

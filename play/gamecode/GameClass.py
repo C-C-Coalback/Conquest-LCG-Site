@@ -4987,6 +4987,14 @@ class Game:
                                         took_damage = True
                                         if self.amount_that_can_be_removed_by_shield[0] == 0:
                                             took_damage = False
+                                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                                            for j in range(len(secondary_player.cards_in_play[
+                                                                   planet_pos + 1][i].attachments)):
+                                                if secondary_player.cards_in_play[planet_pos + 1][i].attachments[j].\
+                                                        get_ability() == "Revered Heavy Flamer":
+                                                    self.create_reaction("Revered Heavy Flamer",
+                                                                         secondary_player.name_player,
+                                                                         (int(secondary_player.number), planet_pos, i))
                                         if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                                             if primary_player.defensive_protocols_active:
                                                 amount_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1

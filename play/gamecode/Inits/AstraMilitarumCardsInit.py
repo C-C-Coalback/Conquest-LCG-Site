@@ -428,6 +428,14 @@ def astra_militarum_cards_init():
                                                       "planet, place 1 faith on it. Then deal 1 damage to up to 2 "
                                                       "different enemy units at this planet. (Limit twice per round.)",
                              "Vehicle. Transport. Ecclesiarchy.", 3, faction, "Common", 1, 3, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Revered Heavy Flamer", "Deep Strike (0).\n"
+                                                           "Attach to an army unit.\n"
+                                                           "Attached unit gets +2 ATK.\n"
+                                                           "Reaction: After your opponent uses a shield card on a unit"
+                                                           " at this planet, place 1 faith on an army unit at this"
+                                                           " planet.", "Wargear. Weapon. Ecclesiarchy.",
+                                   1, faction, "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   extra_attack=2, deepstrike=0)
     ]
     return astra_militarum_cards_array
