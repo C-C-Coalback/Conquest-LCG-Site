@@ -5460,6 +5460,14 @@ class Game:
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
                         self.misc_misc = None
                         self.misc_misc_2 = None
+                    if self.reactions_needing_resolving[0] == "Sacred Rose Immolator":
+                        if self.misc_misc is not None:
+                            for i in range(len(self.misc_misc)):
+                                current_pla, current_pos = self.misc_misc[i]
+                                secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
+                                                                      rickety_warbuggy=True)
+                        self.misc_misc = None
+                        primary_player.reset_all_aiming_reticles_play_hq()
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
                     if self.reactions_needing_resolving[0] != "Warlock Destructor":
@@ -6663,6 +6671,9 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Sacred Rose Immolator":
+                                if self.p1.cards_in_play[planet + 1][i].counter < 2:
+                                    self.create_reaction("Sacred Rose Immolator", self.name_1, (1, planet, i))
                             if self.p1.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p1.search_card_at_planet(planet, "Blood Axe Strategist"):
                                     self.create_reaction("Blood Axe Strategist", self.name_1, (1, planet, i))
@@ -6696,6 +6707,9 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p2.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Sacred Rose Immolator":
+                                if self.p2.cards_in_play[planet + 1][i].counter < 2:
+                                    self.create_reaction("Sacred Rose Immolator", self.name_2, (2, planet, i))
                             if self.p2.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p2.search_card_at_planet(planet, "Blood Axe Strategist"):
                                     self.create_reaction("Blood Axe Strategist", self.name_2, (2, planet, i))

@@ -1987,6 +1987,10 @@ class Player:
                 if self.search_card_in_hq("Convent Prioris Advisor"):
                     self.game.create_reaction("Convent Prioris Advisor", self.name_player,
                                               (int(self.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Sacred Rose Immolator":
+                if self.cards_in_play[destination + 1][new_pos].counter < 2:
+                    self.game.create_reaction("Sacred Rose Immolator", self.name_player,
+                                              (int(self.number), destination, new_pos))
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
                     alaitoc_shrine_already_present = False
@@ -2061,6 +2065,10 @@ class Player:
                                               (int(self.number), -1, -1))
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
                 self.game.create_reaction("Piranha Hunter", self.name_player, (int(self.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Sacred Rose Immolator":
+                if self.cards_in_play[destination + 1][new_pos].counter < 2:
+                    self.game.create_reaction("Sacred Rose Immolator", self.name_player,
+                                              (int(self.number), destination, new_pos))
             for i in range(len(self.cards_in_play[origin_planet + 1])):
                 if self.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
                     self.game.create_reaction("Wildrider Vyper", self.name_player,

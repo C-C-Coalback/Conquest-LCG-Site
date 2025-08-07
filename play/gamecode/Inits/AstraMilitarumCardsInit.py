@@ -422,6 +422,12 @@ def astra_militarum_cards_init():
         CardClasses.ArmyCard("Exalted Celestians", "While this unit has faith and is not a defender, "
                                                    "it cannot be dealt damage.\n"
                                                    "Reaction: After this unit exhausts, place 1 faith on it.",
-                             "Soldier. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False)
+                             "Soldier. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.ArmyCard("Sacred Rose Immolator", "No Wargear Attachments.\n"
+                                                      "Reaction: After this unit resolves its attack or moves to a "
+                                                      "planet, place 1 faith on it. Then deal 1 damage to up to 2 "
+                                                      "different enemy units at this planet. (Limit twice per round.)",
+                             "Vehicle. Transport. Ecclesiarchy.", 3, faction, "Common", 1, 3, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

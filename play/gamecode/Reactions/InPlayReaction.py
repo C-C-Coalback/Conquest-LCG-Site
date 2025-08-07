@@ -1398,6 +1398,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Sacred Rose Immolator":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.get_number() != game_update_string[1]:
+                    if (planet_pos, unit_pos) not in self.misc_misc:
+                        self.misc_misc.append((planet_pos, unit_pos))
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        if len(self.misc_misc) > 1:
+                            for i in range(len(self.misc_misc)):
+                                current_pla, current_pos = self.misc_misc[i]
+                                secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
+                                                                      rickety_warbuggy=True)
+                            self.misc_misc = None
+                            primary_player.reset_all_aiming_reticles_play_hq()
+                            self.delete_reaction()
         elif current_reaction == "Masked Hunter":
             if primary_player.get_number() == game_update_string[1]:
                 dest = self.positions_of_unit_triggering_reaction[0][1]
