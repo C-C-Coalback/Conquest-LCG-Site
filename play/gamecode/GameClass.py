@@ -7057,6 +7057,8 @@ class Game:
     async def reset_values_for_new_round(self):
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.p1.command_struggles_won_this_phase = 0
+        self.p2.command_struggles_won_this_phase = 0
         if self.p1.planet_absorption_played:
             await self.game.send_update_message(
                 "----GAME END----"

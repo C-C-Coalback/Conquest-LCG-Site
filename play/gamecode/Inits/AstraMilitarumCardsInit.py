@@ -441,6 +441,13 @@ def astra_militarum_cards_init():
                                                    " non-green planet. Then your opponent moves this unit to a planet"
                                                    " of his choice. (Limit once per phase.)",
                              "Transport. Ecclesiarchy.", 2, faction, "Loyal", 1, 3, 1, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT")
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Pattern IX Immolator", "No Wargear Attachments.\n"
+                                                     "Command Action: Deal X damage among enemy non-warlord units at "
+                                                     "this planet and place X faith among army units at this planet. "
+                                                     "X is the number of command struggles your opponent won this "
+                                                     "phase minus 1. (Limit once per phase.)",
+                             "Vehicle. Tank. Ecclesiarchy.", 3, faction, "Common", 3, 3, 1, False,
+                             action_in_play=True, allowed_phases_in_play="COMMAND")
     ]
     return astra_militarum_cards_array

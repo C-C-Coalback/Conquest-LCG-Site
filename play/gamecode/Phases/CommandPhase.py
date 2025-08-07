@@ -552,10 +552,12 @@ def receive_winnings(self):
     for i in range(len(self.total_gains_command_struggle)):
         if self.total_gains_command_struggle[i] is not None:
             if self.total_gains_command_struggle[i][0] == "1":
+                self.p1.command_struggles_won_this_phase += 1
                 self.p1.add_resources(self.total_gains_command_struggle[i][1])
                 for _ in range(self.total_gains_command_struggle[i][2]):
                     self.p1.draw_card()
             elif self.total_gains_command_struggle[i][0] == "2":
+                self.p2.command_struggles_won_this_phase += 1
                 self.p2.add_resources(self.total_gains_command_struggle[i][1])
                 for _ in range(self.total_gains_command_struggle[i][2]):
                     self.p2.draw_card()

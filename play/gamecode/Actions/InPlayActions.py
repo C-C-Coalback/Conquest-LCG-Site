@@ -147,6 +147,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                    elif ability == "Pattern IX Immolator":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
+                            if self.misc_counter < 1:
+                                await self.send_update_message("Opponent did not win enough command struggles for "
+                                                               "Pattern IX Immolator to do anything.")
+                                self.action_cleanup()
+                            else:
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.misc_misc = []
+                                self.action_chosen = ability
+                                self.chosen_first_card = False
+                                await self.send_update_message("Deal " + str(self.misc_counter) + " damage first.")
                     elif ability == "The Emperor's Champion":
                         if not card_chosen.once_per_combat_round_used:
                             card_chosen.once_per_combat_round_used = True
@@ -946,6 +960,39 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
                 self.action_cleanup()
+    elif self.action_chosen == "Pattern IX Immolator":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if not self.chosen_first_card:
+                if game_update_string[1] == secondary_player.get_number():
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.misc_misc.append((planet_pos, unit_pos))
+                        self.misc_counter = self.misc_counter - 1
+                        if self.misc_counter < 1:
+                            self.chosen_first_card = True
+                            self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
+                            await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+            else:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        while self.misc_misc:
+                            i = 0
+                            num_times_shown_up = 0
+                            current_pla, current_pos = self.misc_misc[0]
+                            while i < len(self.misc_misc):
+                                if self.misc_misc[i] == (current_pla, current_pos):
+                                    num_times_shown_up += 1
+                                    del self.misc_misc[i]
+                                    i = i - 1
+                                i = i + 1
+                            secondary_player.assign_damage_to_pos(current_pla, current_pos, num_times_shown_up,
+                                                                  rickety_warbuggy=True)
+                        self.misc_misc = None
+                        self.action_cleanup()
     elif self.action_chosen == "Mandragoran Immortals":
         if game_update_string[1] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:

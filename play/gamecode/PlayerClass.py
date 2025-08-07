@@ -160,6 +160,7 @@ class Player:
         self.necrodermis_allowed = True
         self.etekh_trait = ""
         self.sautekh_royal_crypt = -1
+        self.command_struggles_won_this_phase = 0
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
