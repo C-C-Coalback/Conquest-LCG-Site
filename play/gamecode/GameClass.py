@@ -404,6 +404,10 @@ class Game:
             await self.send_update_message("GAME_INFO/SOUND/" + self.queued_sound)
             self.queued_sound = ""
 
+    def get_planet_name(self, planet_pos):
+        planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        return planet_card.get_name()
+
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
         if planet_card.get_red():
@@ -7120,6 +7124,7 @@ class Game:
             print("Resolve battle ability of:", planet_name)
             self.need_to_resolve_battle_ability = True
             self.reactions_on_winning_combat_being_executed = False
+            self.reactions_on_winning_combat_permitted = True
             self.battle_ability_to_resolve = planet_name
             self.player_resolving_battle_ability = winner.name_player
             self.number_resolving_battle_ability = str(winner.number)
