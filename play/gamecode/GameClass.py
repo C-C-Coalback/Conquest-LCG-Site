@@ -2767,7 +2767,7 @@ class Game:
                             primary_player.discard_card_name_from_hand(card_name)
                         self.reset_choices_available()
                         self.action_cleanup()
-                        await primary_player.dark_eldar_event_played()
+                        await secondary_player.dark_eldar_event_played()
                         secondary_player.torture_event_played("Rakarth's Experimentations")
                     elif self.choice_context == "Which planet to add (DtC)":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]

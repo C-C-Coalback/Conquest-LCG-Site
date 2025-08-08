@@ -1224,12 +1224,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
-            while i > -1:
+            found_card = False
+            while i > -1 and not found_card:
                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_card_type() == "Event":
                     primary_player.cards.append(card.get_name())
                     del primary_player.discard[i]
+                    found_card = True
                 i = i - 1
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
