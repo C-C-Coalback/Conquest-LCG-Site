@@ -1116,6 +1116,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Sanctified Bolter":
             self.misc_counter = 0
+        elif current_reaction == "Sororitas Command Squad":
+            if num == 1:
+                if self.p1.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, self.sororitas_command_squad_value)
+            else:
+                if self.p2.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, self.sororitas_command_squad_value)
+            self.delete_reaction()
         elif current_reaction == "Eloquent Confessor":
             await self.send_update_message("Please pay 1 faith.")
         elif current_reaction == "Devoted Hospitaller":

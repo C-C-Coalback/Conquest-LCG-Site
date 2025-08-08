@@ -1060,6 +1060,47 @@ class Player:
                     pos -= 1
                     self.game.last_defender_position = (num, pla, pos)
 
+    def controls_no_ranged_units(self):
+        for i in range(len(self.headquarters)):
+            if self.check_is_unit_at_pos(-2, i):
+                if self.get_ranged_given_pos(-2, i):
+                    return False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ranged_given_pos(i, j):
+                    return False
+        return True
+
+    def adjust_own_damage(self, planet_pos, unit_pos):
+        i = 0
+        while i < len(self.game.amount_that_can_be_removed_by_shield):
+            num, pla, pos = self.game.positions_of_units_to_take_damage[i]
+            if num == int(self.number):
+                if pla == planet_pos:
+                    if pos > unit_pos:
+                        pos -= 1
+                        self.game.positions_of_units_to_take_damage[i] = (num, pla, pos)
+                    elif pos == unit_pos:
+                        if i == 0:
+                            del self.damage_on_units_list_before_new_damage[i]
+                            del self.damage_is_preventable[i]
+                            del self.positions_of_units_to_take_damage[i]
+                            del self.damage_can_be_shielded[i]
+                            del self.positions_attackers_of_units_to_take_damage[i]
+                            del self.card_names_triggering_damage[i]
+                            del self.amount_that_can_be_removed_by_shield[i]
+                            i = i - 1
+                        else:
+                            del self.damage_on_units_list_before_new_damage[i]
+                            del self.damage_is_preventable[i]
+                            del self.positions_of_units_to_take_damage[i]
+                            del self.damage_can_be_shielded[i]
+                            del self.positions_attackers_of_units_to_take_damage[i]
+                            del self.card_names_triggering_damage[i]
+                            del self.amount_that_can_be_removed_by_shield[i]
+                            i = i - 1
+            i += 1
+
     def adjust_own_reactions(self, planet_pos, unit_pos):
         i = 0
         while i < len(self.game.reactions_needing_resolving):
@@ -4708,6 +4749,7 @@ class Player:
         self.adjust_own_reactions(planet_num, card_pos)
         self.adjust_own_interrupts(planet_num, card_pos)
         self.adjust_last_def_pos(planet_num, card_pos)
+        self.adjust_own_damage(planet_num, card_pos)
 
     def remove_card_from_hq(self, card_pos):
         del self.headquarters[card_pos]
@@ -4749,6 +4791,8 @@ class Player:
                 self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "Mark of Slaanesh":
                 self.game.create_interrupt("Mark of Slaanesh", owner, (int(self.number), planet_num, -1))
+            if card.get_attachments()[i].get_ability() == "Transcendent Blessing":
+                self.game.create_interrupt("Transcendent Blessing", owner, (int(self.number), planet_num, -1))
             if card.get_attachments()[i].get_ability() == "Banner of the Cult" \
                     and not card.get_attachments()[i].from_magus_harid:
                 self.game.create_interrupt("Banner of the Cult", owner, (int(self.number), planet_num, -1))
@@ -4871,9 +4915,11 @@ class Player:
                     if self.search_for_card_everywhere("Commissar Somiel"):
                         self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
             for i in range(len(card.get_attachments())):
+                owner = card.get_attachments()[i].name_owner
                 if card.get_attachments()[i].get_ability() == "Straken's Cunning":
-                    owner = card.get_attachments()[i].name_owner
                     self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
+                if card.get_attachments()[i].get_ability() == "Transcendent Blessing":
+                    self.game.create_interrupt("Transcendent Blessing", owner, (int(self.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Kabalite Halfborn":

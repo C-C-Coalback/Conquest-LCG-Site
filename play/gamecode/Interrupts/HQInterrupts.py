@@ -36,6 +36,24 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                 player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Support":
             player_owning_card.destroy_card_in_hq(unit_pos)
             self.delete_interrupt()
+    elif current_interrupt == "Transcendent Blessing":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    self.chosen_first_card = True
+                    await self.send_update_message("Select target for the attachment.")
+        else:
+            card = self.preloaded_find_card("Transcendent Blessing")
+            player_getting_attachment = self.p1
+            if game_update_string[1] == "2":
+                player_getting_attachment = self.p2
+            not_own_attachment = False
+            if player_getting_attachment.number != primary_player.number:
+                not_own_attachment = True
+            if player_getting_attachment.attach_card(card, -2, unit_pos, not_own_attachment=not_own_attachment):
+                if "Transcendent Blessing" in primary_player.discard:
+                    primary_player.discard.remove("Transcendent Blessing")
+                self.delete_interrupt()
     elif current_interrupt == "Mucolid Spores":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":

@@ -79,6 +79,12 @@ class Card:
         self.new_mobile = False
         self.new_ambush = False
 
+    def get_once_per_game_used(self):
+        return self.once_per_game_used
+
+    def set_once_per_game_used(self, new_val):
+        self.once_per_game_used = new_val
+
     def get_has_deepstrike(self):
         if self.deepstrike == -1:
             return False

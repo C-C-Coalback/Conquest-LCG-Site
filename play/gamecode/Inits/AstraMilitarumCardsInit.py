@@ -470,6 +470,33 @@ def astra_militarum_cards_init():
         CardClasses.ArmyCard("Eloquent Confessor", "While this unit has faith, it gets +1 ATK.\n"
                                                    "Combat Reaction: After a non-warlord unit moves or enters play"
                                                    " at this planet, pay 1 faith to exhaust it.",
-                             "Priest. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False)
+                             "Priest. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.WarlordCard("Canoness Vardina", "Action: Place 2 faith among army units you control. "
+                                                    "If your warlord is at a planet with an enemy warlord, place 3 "
+                                                    "instead. (Limit once per round)", "Officer. Ecclesiarchy.",
+                                faction, 2, 6, 2, 6,
+                                "Bloodied.\n"
+                                "Action: Place 2 faith among Ecclesiarchy army units at this planet. "
+                                "(Limit once per game.)", 7, 7,
+                                ["4x Sororitas Command Squad", "2x Faith Denies Death",
+                                 "1x Supreme Appearance", "1x Transcendent Blessing"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Sororitas Command Squad", "Reaction: After you prevent damage assigned to this unit by "
+                                                        "a non-warlord unit, deal damage equal to the prevented damage"
+                                                        " to that enemy unit. (Limit once per phase.)",
+                             "Soldier. Ecclesiarchy.", 3, faction, "Signature", 3, 3, 1, False),
+        CardClasses.EventCard("Faith Denies Death", "Reaction: After an army unit with faith is assigned damage, "
+                                                    "pay 1 faith to prevent up to 5 of that damage.",
+                              "Prayer. Ecclesiarchy.", 0, faction, "Signature", 1, False),
+        CardClasses.SupportCard("Supreme Appearance", "Action: Exhaust and sacrifice this support to exhaust each "
+                                                      "non-warlord unit. Use this ability only if you control no "
+                                                      "Ranged units.", "Miracle.",
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Transcendent Blessing", "Attach to a non-warlord unit.\n"
+                                                            "Attached unit gets +1 ATK and +1 HP.\n"
+                                                            "Interrupt: When attached unit leaves play, pay 1 faith to "
+                                                            "attach this card to an eligible unit.", "Blessing.",
+                                   0, faction, "Signature", 3, False, extra_health=1, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Army/Token/Synapse")
     ]
     return astra_militarum_cards_array

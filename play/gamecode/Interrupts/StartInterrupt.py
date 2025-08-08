@@ -50,6 +50,9 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.add_resources(primary_player.highest_death_serves_value)
                 primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
+        elif current_interrupt == "Transcendent Blessing":
+            self.chosen_first_card = False
+            await self.send_update_message("Please pay 1 faith.")
         elif current_interrupt == "Surrogate Host":
             can_continue = True
             if secondary_player.nullify_check() and self.nullify_enabled:

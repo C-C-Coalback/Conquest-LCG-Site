@@ -204,7 +204,7 @@ class Game:
         self.name_attachment_discard_shadowsun = ""
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
-        self.alternative_shields = ["Indomitable", "Glorious Intervention"]
+        self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death"]
         self.last_shield_string = ""
         self.pos_shield_card = -1
         self.recently_damaged_units = []
@@ -248,6 +248,8 @@ class Game:
         self.name_player_manual_bodyguard = ""
         self.num_bodyguards = 0
         self.body_guard_positions = []
+        self.alt_shield_mode_active = False
+        self.alt_shield_name = ""
         self.damage_bodyguard = 0
         self.planet_bodyguard = -1
         self.last_player_who_resolved_reaction = ""
@@ -394,6 +396,7 @@ class Game:
         self.stored_discard_and_target = []  # (effect name, player num)
         self.interrupts_discard_enemy_allowed = True
         self.queued_moves = []  # (player num, planet pos, unit pos, destination)
+        self.sororitas_command_squad_value = 0
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -3869,9 +3872,47 @@ class Game:
                                 elif primary_player.spend_resources(1):
                                     primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                                     primary_player.aiming_reticle_color = "blue"
-                                    self.create_interrupt("Glorious Intervention", primary_player.name_player,
-                                                          (-1, -1, -1))
-                                    self.already_resolving_interrupt = True
+                                    self.alt_shield_name = "Glorious Intervention"
+                                    self.alt_shield_mode_active = True
+                            elif primary_player.cards[self.pos_shield_card] == "Faith Denies Death":
+                                if secondary_player.nullify_check():
+                                    await self.send_update_message(
+                                        primary_player.name_player + " wants to play Faith Denies Death; "
+                                                                     "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = self.pos_shield_card
+                                    self.nullified_card_name = "Glorious Intervention"
+                                    self.cost_card_nullified = 1
+                                    self.first_player_nullified = primary_player.name_player
+                                    self.nullify_context = "Glorious Intervention"
+                                else:
+                                    primary_player.aiming_reticle_coords_hand = self.pos_shield_card
+                                    primary_player.aiming_reticle_color = "blue"
+                                    self.alt_shield_name = "Faith Denies Death"
+                                    self.alt_shield_mode_active = True
+                    elif self.choice_context == "Faith Denies Death: Amount Blocked":
+                        amount = int(self.choices_available[int(game_update_string[1])])
+                        num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, amount)
+                        self.amount_that_can_be_removed_by_shield[0] = \
+                            self.amount_that_can_be_removed_by_shield[0] - amount
+                        primary_player.discard_card_from_hand(self.pos_shield_card)
+                        primary_player.aiming_reticle_coords_hand = None
+                        self.alt_shield_name = ""
+                        self.alt_shield_mode_active = False
+                        self.reset_choices_available()
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Sororitas Command Squad":
+                            if self.positions_attackers_of_units_to_take_damage[0]:
+                                if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                                    self.sororitas_command_squad_value = amount
+                                    primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                                    self.create_reaction("Sororitas Command Squad", primary_player.name_player,
+                                                         self.positions_attackers_of_units_to_take_damage[0])
+                        if self.amount_that_can_be_removed_by_shield[0] < 1:
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                     elif self.choice_context == "Awake the Sleepers":
                         target_name = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.append(target_name)
@@ -4933,6 +4974,13 @@ class Game:
                                             self.name_player_making_choices = name
                                             self.choice_context = "Use alternative shield effect?"
                                             self.last_shield_string = game_update_string
+                                elif primary_player.cards[hand_pos] == "Faith Denies Death":
+                                    if primary_player.get_faith_given_pos(planet_pos, unit_pos) > 0:
+                                        alt_shield_check = True
+                                        self.choices_available = ["Shield", "Effect"]
+                                        self.name_player_making_choices = name
+                                        self.choice_context = "Use alternative shield effect?"
+                                        self.last_shield_string = game_update_string
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
                             if self.damage_can_be_shielded[0]:
@@ -5119,7 +5167,20 @@ class Game:
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
                         hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                        if primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
+                        if self.alt_shield_mode_active:
+                            if self.alt_shield_name == "Faith Denies Death":
+                                if primary_player.spend_faith_given_pos(-2, hq_pos, 1) > 0:
+                                    self.choice_context = "Faith Denies Death: Amount Blocked"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.choices_available = [0, 1, 2, 3, 4, 5]
+                                    i = 0
+                                    while i < len(self.choices_available):
+                                        if self.choices_available[i] > self.amount_that_can_be_removed_by_shield[0]:
+                                            del self.choices_available[i]
+                                            i = i - 1
+                                        self.choices_available[i] = str(self.choices_available[i])
+                                        i = i + 1
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
                             print("is rockcrete bunker")
                             if primary_player.headquarters[hq_pos].get_ready():
                                 print("is ready")
@@ -5222,7 +5283,47 @@ class Game:
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
                         hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
+                        if self.alt_shield_mode_active:
+                            if self.alt_shield_name == "Glorious Intervention":
+                                if game_update_string[1] == primary_player.get_number():
+                                    pos_holder = self.positions_of_units_to_take_damage[0]
+                                    player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                                    sac_planet_pos = int(game_update_string[2])
+                                    sac_unit_pos = int(game_update_string[3])
+                                    print("Reached new GI code")
+                                    if sac_planet_pos == planet_pos:
+                                        if sac_unit_pos != unit_pos:
+                                            if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
+                                                    get_card_type() != "Warlord":
+                                                if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
+                                                        .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
+                                                        primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
+                                                                .check_for_a_trait("Soldier", primary_player.etekh_trait):
+                                                    primary_player.aiming_reticle_coords_hand = None
+                                                    primary_player.discard_card_from_hand(self.pos_shield_card)
+                                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                                    self.pos_shield_card = -1
+                                                    printed_atk = primary_player.cards_in_play[
+                                                        sac_planet_pos + 1][sac_unit_pos].attack
+                                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.amount_that_can_be_removed_by_shield[0])
+                                                    primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
+                                                    att_num, att_pla, att_pos = \
+                                                        self.positions_attackers_of_units_to_take_damage[0]
+                                                    secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
+                                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                            elif self.alt_shield_name == "Faith Denies Death":
+                                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1) > 0:
+                                    self.choice_context = "Faith Denies Death: Amount Blocked"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.choices_available = [0, 1, 2, 3, 4, 5]
+                                    i = 0
+                                    while i < len(self.choices_available):
+                                        if self.choices_available[i] > self.amount_that_can_be_removed_by_shield[0]:
+                                            del self.choices_available[i]
+                                            i = i - 1
+                                        self.choices_available[i] = str(self.choices_available[i])
+                                        i = i + 1
+                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
                             if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
                                 if self.damage_moved_to_old_one_eye == 0:
                                     self.choices_available = ["0", "1", "2"]
@@ -5264,6 +5365,15 @@ class Game:
                                     amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.amount_that_can_be_removed_by_shield[0]:
                                     amount_to_remove = self.amount_that_can_be_removed_by_shield[0]
+                                if primary_player.get_ability_given_pos(
+                                        hurt_planet, hurt_pos) == "Sororitas Command Squad":
+                                    if self.positions_attackers_of_units_to_take_damage[0]:
+                                        if not primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos):
+                                            primary_player.set_once_per_phase_used_given_pos(hurt_planet,
+                                                                                             hurt_pos, True)
+                                            self.sororitas_command_squad_value = amount_to_remove
+                                            self.create_reaction("Sororitas Command Squad", primary_player.name_player,
+                                                                 self.positions_attackers_of_units_to_take_damage[0])
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
                                 self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
@@ -5810,6 +5920,8 @@ class Game:
         self.maksim_squadron_active = False
         self.maksim_squadron_enabled = True
         self.guardian_mesh_armor_enabled = True
+        self.alt_shield_mode_active = False
+        self.alt_shield_name = ""
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")

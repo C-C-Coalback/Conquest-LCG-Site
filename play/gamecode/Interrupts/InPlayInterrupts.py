@@ -114,6 +114,24 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                         primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+    elif current_interrupt == "Transcendent Blessing":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    self.chosen_first_card = True
+                    await self.send_update_message("Select target for the attachment.")
+        else:
+            card = self.preloaded_find_card("Transcendent Blessing")
+            player_getting_attachment = self.p1
+            if game_update_string[1] == "2":
+                player_getting_attachment = self.p2
+            not_own_attachment = False
+            if player_getting_attachment.number != primary_player.number:
+                not_own_attachment = True
+            if player_getting_attachment.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+                if "Transcendent Blessing" in primary_player.discard:
+                    primary_player.discard.remove("Transcendent Blessing")
+                self.delete_interrupt()
     elif current_interrupt == "Glorious Intervention":
         if game_update_string[1] == primary_player.get_number():
             pos_holder = self.positions_of_units_to_take_damage[0]
@@ -126,7 +144,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                             get_card_type() != "Warlord":
                         if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                 .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
-                                primary_player.cards_in_play[sac_planet_pos + 1][unit_pos] \
+                                primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                 .check_for_a_trait("Soldier", primary_player.etekh_trait):
                             primary_player.aiming_reticle_coords_hand = None
                             primary_player.discard_card_from_hand(self.pos_shield_card)
