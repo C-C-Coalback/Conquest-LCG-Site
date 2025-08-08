@@ -466,6 +466,10 @@ def astra_militarum_cards_init():
                                                     "Reaction: After this unit enters play, place 2 faith among army"
                                                     " units you control. Then you may exhaust an enemy army unit at"
                                                     " this planet and deal damage equal to its ATK value to this unit.",
-                             "Novice. Ecclesiarchy.", 2, faction, "Loyal", 1, 2, 1, False)
+                             "Novice. Ecclesiarchy.", 2, faction, "Loyal", 1, 2, 1, False),
+        CardClasses.ArmyCard("Eloquent Confessor", "While this unit has faith, it gets +1 ATK.\n"
+                                                   "Combat Reaction: After a non-warlord unit moves or enters play"
+                                                   " at this planet, pay 1 faith to exhaust it.",
+                             "Priest. Ecclesiarchy.", 2, faction, "Common", 2, 2, 1, False)
     ]
     return astra_militarum_cards_array

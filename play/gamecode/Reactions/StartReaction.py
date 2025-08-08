@@ -1116,6 +1116,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Sanctified Bolter":
             self.misc_counter = 0
+        elif current_reaction == "Eloquent Confessor":
+            await self.send_update_message("Please pay 1 faith.")
         elif current_reaction == "Devoted Hospitaller":
             self.chosen_first_card = False
             self.misc_counter = 0

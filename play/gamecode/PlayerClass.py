@@ -1446,6 +1446,10 @@ class Player:
             if not other_player.check_if_already_have_reaction("Magus Harid"):
                 self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
             self.cards_in_play[position + 1][last_element_index].valid_target_magus_harid = True
+        if other_player.search_card_at_planet(position, "Eloquent Confessor"):
+            if self.game.phase == "COMBAT":
+                self.game.create_reaction("Eloquent Confessor", other_player.name_player,
+                                          (int(self.number), position, last_element_index))
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
         if self.get_card_type_given_pos(position, last_element_index) == "Army":
@@ -1993,6 +1997,7 @@ class Player:
     def move_unit_to_planet(self, origin_planet, origin_position, destination, force=False):
         if origin_planet == -2:
             headquarters_list = self.headquarters
+            other_player = self.get_other_player()
             if self.headquarters[origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(destination):
                     self.headquarters[origin_position].valid_defense_battery_target = True
@@ -2027,6 +2032,10 @@ class Player:
                 if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn", ready_relevant=True):
                     self.game.create_reaction("Third Eye of Trazyn", self.name_player,
                                               (int(self.number), destination, new_pos))
+                if other_player.search_card_at_planet(destination, "Eloquent Confessor"):
+                    if self.game.phase == "COMBAT":
+                        self.game.create_reaction("Eloquent Confessor", other_player.name_player,
+                                                  (int(other_player.number), destination, new_pos))
             self.remove_card_from_hq(origin_position)
             return True
         else:
@@ -2073,10 +2082,13 @@ class Player:
                 if self.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
                     self.game.create_reaction("Deathly Web Shrine", self.name_player,
                                               (int(self.number), destination, -1))
-            if self.game.phase == "COMBAT":
                 if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn"):
                     self.game.create_reaction("Third Eye of Trazyn", self.name_player,
                                               (int(self.number), destination, new_pos))
+                if other_player.search_card_at_planet(destination, "Eloquent Confessor"):
+                    if self.game.phase == "COMBAT":
+                        self.game.create_reaction("Eloquent Confessor", other_player.name_player,
+                                                  (int(other_player.number), destination, new_pos))
             self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
             if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
                 already_banner = False
@@ -3330,6 +3342,9 @@ class Player:
             if card.get_ability() == "Praetorian Ancient":
                 if self.count_units_in_discard() > 5:
                     attack_value += 2
+            if card.get_ability() == "Eloquent Confessor":
+                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                    attack_value += 1
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
@@ -3371,6 +3386,9 @@ class Player:
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                attack_value += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Eloquent Confessor":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
         if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
@@ -3812,7 +3830,9 @@ class Player:
 
     def check_if_trait_at_planet(self, planet_id, trait):
         if planet_id == -2:
-            return False
+            for i in range(len(self.headquarters)):
+                if self.check_for_trait_given_pos(-2, i, trait):
+                    return True
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.check_for_trait_given_pos(planet_id, i, trait):
                 return True
