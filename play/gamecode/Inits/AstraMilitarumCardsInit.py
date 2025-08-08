@@ -461,6 +461,11 @@ def astra_militarum_cards_init():
                                                         " an enemy non-warlord unit moves from another planet to this"
                                                         " planet, place 2 faith among army units at this planet.",
                                    "Wargear. Weapon.", 1, faction, "Loyal", 1, False, extra_attack=1, extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Devoted Hospitaller", "While you control a Commissar unit, you cannot deploy this unit.\n"
+                                                    "Reaction: After this unit enters play, place 2 faith among army"
+                                                    " units you control. Then you may exhaust an enemy army unit at"
+                                                    " this planet and deal damage equal to its ATK value to this unit.",
+                             "Novice. Ecclesiarchy.", 2, faction, "Loyal", 1, 2, 1, False)
     ]
     return astra_militarum_cards_array

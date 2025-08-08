@@ -98,6 +98,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
                 if not more:
                     self.delete_reaction()
+    elif current_reaction == "Devoted Hospitaller":
+        if not self.chosen_first_card:
+            if primary_player.get_number() == game_update_string[1]:
+                primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.misc_counter += 1
+                if self.misc_counter > 1:
+                    self.chosen_first_card = True
     elif current_reaction == "Magus Harid":
         if self.chosen_first_card:
             if game_update_string[1] == secondary_player.number:

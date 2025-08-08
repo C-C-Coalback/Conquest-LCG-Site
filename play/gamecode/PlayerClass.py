@@ -1703,18 +1703,29 @@ class Player:
                     else:
                         return "FAIL/Limited already played", -1
                 else:
+                    if card.get_ability() == "Devoted Hospitaller":
+                        if self.check_if_control_trait("Commissar"):
+                            return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                     if self.spend_resources(cost):
                         if self.add_to_hq(card):
                             self.cards.remove(card.get_name())
+                            location_of_unit = len(self.headquarters) - 1
                             print("Played card to HQ")
                             if card.get_ability() == "Murder of Razorwings":
-                                self.game.discard_card_at_random_from_opponent(self.number)
+                                self.game.create_reaction("Murder of Razorwings", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Devoted Hospitaller":
+                                self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
                 print("Insufficient resources")
                 return "FAIL/Insufficient resources", -1
             else:
+                if card.get_ability() == "Devoted Hospitaller":
+                    if self.check_if_control_trait("Commissar"):
+                        return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                 cost = card.get_cost() - discounts
                 if card.get_limited():
                     if self.can_play_limited and not self.enemy_holding_cell_check(card.get_name()):
@@ -1809,6 +1820,9 @@ class Player:
                                 if self.game.get_red_icon(position):
                                     self.game.create_reaction("Kroot Hunter", self.name_player,
                                                               (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Devoted Hospitaller":
+                                self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout", self.etekh_trait) \
                                     and card.get_faction() != "Necrons":
                                 for i in range(7):
@@ -3801,6 +3815,14 @@ class Player:
             return False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.check_for_trait_given_pos(planet_id, i, trait):
+                return True
+        return False
+
+    def check_if_control_trait(self, trait):
+        if self.check_if_trait_at_planet(-2, trait):
+            return True
+        for i in range(7):
+            if self.check_if_trait_at_planet(i, trait):
                 return True
         return False
 

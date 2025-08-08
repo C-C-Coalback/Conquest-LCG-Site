@@ -1403,6 +1403,24 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
+        elif current_reaction == "Devoted Hospitaller":
+            if not self.chosen_first_card:
+                if primary_player.get_number() == game_update_string[1]:
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter += 1
+                    if self.misc_counter > 1:
+                        self.chosen_first_card = True
+            else:
+                if secondary_player.get_number() == game_update_string[1]:
+                    og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    if og_pla == planet_pos:
+                        if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                                if not secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                    atk = secondary_player.get_attack_given_pos(planet_pos, unit_pos)
+                                    primary_player.assign_damage_to_pos(og_pla, og_pos, atk)
+                                    self.delete_reaction()
         elif current_reaction == "Sanctified Bolter":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
