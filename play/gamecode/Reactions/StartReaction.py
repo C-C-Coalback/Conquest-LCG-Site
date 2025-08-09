@@ -1235,8 +1235,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                 i = i - 1
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "23rd Mechanised Battalion":
+            if primary_player.retreat_unit(planet_pos, unit_pos):
+                for i in range(4):
+                    primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            last_el = len(primary_player.headquarters) - 1
+            primary_player.assign_damage_to_pos(-2, last_el, 5)
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weirdboy Maniak":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if unit_pos != i:
                     primary_player.assign_damage_to_pos(planet_pos, i, 1, rickety_warbuggy=True)

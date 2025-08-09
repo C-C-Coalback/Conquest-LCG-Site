@@ -497,6 +497,12 @@ def astra_militarum_cards_init():
                                                             "Interrupt: When attached unit leaves play, pay 1 faith to "
                                                             "attach this card to an eligible unit.", "Blessing.",
                                    0, faction, "Signature", 3, False, extra_health=1, extra_attack=1,
-                                   type_of_units_allowed_for_attachment="Army/Token/Synapse")
+                                   type_of_units_allowed_for_attachment="Army/Token/Synapse"),
+        CardClasses.ArmyCard("23rd Mechanised Battalion", "No Attachments. Cannot be targeted.\n"
+                                                          "Reaction: After the second combat round ends at this planet,"
+                                                          " if there is at least one enemy unit, retreat this unit to"
+                                                          " put 4 Guardsman tokens into play at this planet. "
+                                                          "Then deal 5 damage to this unit.", "Corps. Transport.",
+                             5, faction, "Loyal", 1, 12, 3, False, no_attachments=True)
     ]
     return astra_militarum_cards_array

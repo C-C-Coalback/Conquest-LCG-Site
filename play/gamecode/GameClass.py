@@ -182,6 +182,7 @@ class Game:
         self.planet_of_indirect = -1
         self.first_card_damaged = True
         self.sweep_value = 0
+        self.combat_round_number = 0
         self.cato_stronghold_activated = False
         self.allowed_planets_cato_stronghold = []
         self.allowed_units_alaitoc_shrine = []
@@ -7313,6 +7314,7 @@ class Game:
             self.number_with_initiative = "1"
 
     def begin_battle(self, planet_pos):
+        self.combat_round_number = 1
         self.last_planet_checked_for_battle = planet_pos
         self.p1.resolve_battle_begins(planet_pos)
         self.p2.resolve_battle_begins(planet_pos)

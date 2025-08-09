@@ -4997,6 +4997,10 @@ class Player:
             if self.get_ability_given_pos(planet_id, i) == "Anxious Infantry Platoon":
                 self.game.create_reaction("Anxious Infantry Platoon", self.name_player,
                                           (int(self.number), planet_id, i))
+            if self.get_ability_given_pos(planet_id, i) == "23rd Mechanised Battalion":
+                if self.game.combat_round_number == 3:
+                    self.game.create_reaction("23rd Mechanised Battalion", self.name_player,
+                                              (int(self.number), planet_id, i))
             if self.get_faction_given_pos(planet_id, i) == "Astra Militarum":
                 can_forward_barracks = True
         if can_forward_barracks:
