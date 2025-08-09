@@ -3980,6 +3980,9 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.search_synapse_at_planet(planet_id):
                         health += 2
+        if self.get_ability_given_pos(planet_id, unit_id) == "Armored Fist Squad":
+            if self.check_for_warlord(planet_id) or self.check_for_enemy_warlord(planet_id):
+                health += 2
         if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
             if self.get_cost_given_pos(planet_id, unit_id) < 3:
                 hunt_count = self.count_copies_at_planet(planet_id, "Hunting Acanthrites", ability=True)
@@ -5109,6 +5112,9 @@ class Player:
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ability_given_pos(planet_id, i) == "Morkai Rune Priest":
                 mork_count += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Armored Fist Squad":
+            self.game.create_interrupt("Armored Fist Squad", self.name_player,
+                                       (int(self.number), planet_id, -1))
         if self.number == "1":
             enemy_player = self.game.p2
         else:

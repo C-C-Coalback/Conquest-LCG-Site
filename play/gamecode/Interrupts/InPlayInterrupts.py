@@ -132,6 +132,11 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if "Transcendent Blessing" in primary_player.discard:
                     primary_player.discard.remove("Transcendent Blessing")
                 self.delete_interrupt()
+    elif current_interrupt == "Armored Fist Squad":
+        if planet_pos == self.positions_of_units_interrupting[0][1]:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                self.delete_interrupt()
     elif current_interrupt == "Glorious Intervention":
         if game_update_string[1] == primary_player.get_number():
             pos_holder = self.positions_of_units_to_take_damage[0]

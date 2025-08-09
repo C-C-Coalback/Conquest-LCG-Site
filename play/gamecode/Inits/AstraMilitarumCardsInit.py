@@ -503,6 +503,11 @@ def astra_militarum_cards_init():
                                                           " if there is at least one enemy unit, retreat this unit to"
                                                           " put 4 Guardsman tokens into play at this planet. "
                                                           "Then deal 5 damage to this unit.", "Corps. Transport.",
-                             5, faction, "Loyal", 1, 12, 3, False, no_attachments=True)
+                             5, faction, "Loyal", 1, 12, 3, False, no_attachments=True),
+        CardClasses.ArmyCard("Armored Fist Squad", "No Wargear attachments.\n"
+                                                   "This unit gets +2 HP while it is at a planet with a warlord.\n"
+                                                   "Interrupt: When this unit retreats, exhaust a non-warlord unit "
+                                                   "at this planet.", "Vehicle. Tank. Transport.",
+                             2, faction, "Common", 2, 2, 1, False, wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array
