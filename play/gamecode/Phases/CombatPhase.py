@@ -685,6 +685,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.create_reaction(
                                         "Shrieking Harpy", player.name_player,
                                         (int(player.number), self.attacker_planet, self.attacker_position))
+                            for i in range(len(other_player.cards_in_play[self.attacker_planet + 1])):
+                                current_name = other_player.cards_in_play[self.attacker_planet + 1][i].get_ability()
+                                if current_name == "Celestian Amelia":
+                                    if not other_player.get_once_per_phase_used_given_pos(self.attacker_planet, i):
+                                        self.create_reaction("Celestian Amelia", other_player.name_player,
+                                                             (int(other_player.number), self.attacker_planet, i))
                             if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
                                                                 "Pyrrhian Warscythe"):
                                 self.create_reaction("Pyrrhian Warscythe", player.name_player,

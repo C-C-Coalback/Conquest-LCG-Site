@@ -161,6 +161,7 @@ class Player:
         self.etekh_trait = ""
         self.sautekh_royal_crypt = -1
         self.command_struggles_won_this_phase = 0
+        self.celestian_amelia_active = False
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -2615,7 +2616,7 @@ class Player:
         return False
 
     def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True,
-                              ready_relevant=False):
+                              ready_relevant=False, once_per_phase_relevant=False):
         if not ability_checking:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 current_name = self.cards_in_play[planet_id + 1][i].get_name()
@@ -2638,6 +2639,8 @@ class Player:
                         return True
                     if self.cards_in_play[planet_id + 1][i].get_bloodied():
                         return False
+                    if not once_per_phase_relevant or not self.get_once_per_phase_used_given_pos(planet_id, i):
+                        return True
                     return True
             if self.search_attachments_at_pos(planet_id, i, name_of_card):
                 return True

@@ -513,6 +513,11 @@ def astra_militarum_cards_init():
                                                        "deploy this unit from your hand at the same planet. Then your "
                                                        "opponent must choose to either deal 2 damage to the attacker"
                                                        " or cancel the remainder of the attack.",
-                             "Soldier. Catachan.", 2, faction, "Common", 2, 2, 1, False)
+                             "Soldier. Catachan.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.ArmyCard("Celestian Amelia", "Reaction: After an enemy unit is declared as an attacker at this "
+                                                 "planet, while that unit is attacking, reduce all damage taken by "
+                                                 "other Astra Militarum units you control to 1. "
+                                                 "(Limit once per phase.)", "Soldier. Martyr. Ecclesiarchy.",
+                             3, faction, "Loyal", 3, 3, 1, True)
     ]
     return astra_militarum_cards_array

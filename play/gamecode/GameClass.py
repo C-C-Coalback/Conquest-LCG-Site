@@ -5966,6 +5966,13 @@ class Game:
             if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
                 damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
+        if self.amount_that_can_be_removed_by_shield[0] > 1:
+            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+            if primary_player.celestian_amelia_active \
+                    and primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Celesitan Amelia":
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                    damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
         if self.positions_attackers_of_units_to_take_damage[0] is not None:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
             secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -6813,6 +6820,8 @@ class Game:
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
+                self.p1.celestian_amelia_active = False
+                self.p2.celestian_amelia_active = False
                 self.flamers_damage_active = False
                 self.id_of_the_active_flamer = -1
                 planet = self.last_planet_checked_for_battle
