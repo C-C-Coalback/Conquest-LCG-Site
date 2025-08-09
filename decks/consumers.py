@@ -5,9 +5,11 @@ import os
 import copy
 
 cards_array = Initfunctions.init_player_cards()
+card_names = "CARD_NAMES"
 cards_dict = {}
 for key in range(len(cards_array)):
     cards_dict[cards_array[key].name] = cards_array[key]
+    card_names += "/" + cards_array[key].name
 planet_cards_array = Initfunctions.init_planet_cards()
 
 
@@ -176,6 +178,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print(self.room_name)
         print(self.name)
         await self.send_stored_decks()
+        message = card_names
+        await self.send(text_data=json.dumps({"message": message}))
 
     async def send_stored_decks(self):
         if not os.path.isdir("decks/DeckStorage/" + self.name):
