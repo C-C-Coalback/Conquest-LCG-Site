@@ -508,6 +508,11 @@ def astra_militarum_cards_init():
                                                    "This unit gets +2 HP while it is at a planet with a warlord.\n"
                                                    "Interrupt: When this unit retreats, exhaust a non-warlord unit "
                                                    "at this planet.", "Vehicle. Tank. Transport.",
-                             2, faction, "Common", 2, 2, 1, False, wargear_attachments_permitted=False)
+                             2, faction, "Common", 2, 2, 1, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Catachan Devils Patrol", "Interrupt: When a unit you control is chosen as a defender, "
+                                                       "deploy this unit from your hand at the same planet. Then your "
+                                                       "opponent must choose to either deal 2 damage to the attacker"
+                                                       " or cancel the remainder of the attack.",
+                             "Soldier. Catachan.", 2, faction, "Common", 2, 2, 1, False)
     ]
     return astra_militarum_cards_array

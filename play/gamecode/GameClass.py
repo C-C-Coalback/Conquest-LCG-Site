@@ -2469,6 +2469,14 @@ class Game:
                                     primary_player.headquarters[unit_pos].misc_ability_used = True
                                 else:
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+                                self.shadow_thorns_body_allowed = False
+                                _, current_planet, current_unit = self.last_defender_position
+                                last_game_update_string = ["IN_PLAY", primary_player.get_number(),
+                                                           str(current_planet),
+                                                           str(current_unit)]
+                                await CombatPhase.update_game_event_combat_section(
+                                    self, secondary_player.name_player, last_game_update_string)
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Jain Zar?":
@@ -2526,6 +2534,26 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Catachan Devils Patrol: make a choice":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "Take Damage":
+                            primary_player.assign_damage_to_pos(self.attacker_planet,
+                                                                self.attacker_position, 2,
+                                                                shadow_field_possible=True,
+                                                                rickety_warbuggy=True)
+                        else:
+                            primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                            if self.number_with_combat_turn == "1":
+                                self.number_with_combat_turn = "2"
+                                self.player_with_combat_turn = self.name_2
+                                self.p1.has_passed = True
+                                self.reset_combat_positions()
+                            else:
+                                self.number_with_combat_turn = "1"
+                                self.player_with_combat_turn = self.name_1
+                                self.p2.has_passed = True
+                                self.reset_combat_positions()
+                        self.reset_choices_available()
                     elif self.choice_context == "Pulsating Carapace choice":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Infest planet":

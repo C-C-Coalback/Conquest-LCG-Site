@@ -31,6 +31,36 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.aiming_reticle_color = "blue"
         elif current_interrupt == "Mucolid Spores":
             self.misc_counter = 0
+        elif current_interrupt == "Catachan Devils Patrol":
+            if "Catachan Devils Patrol" not in primary_player.cards:
+                self.delete_interrupt()
+            else:
+                for i in range(len(primary_player.cards)):
+                    if primary_player.cards[i] == "Catachan Devils Patrol":
+                        primary_player.aiming_reticle_coords_hand = i
+                card = self.preloaded_find_card("Catachan Devils Patrol")
+                self.card_to_deploy = card
+                self.card_pos_to_deploy = primary_player.aiming_reticle_coords_hand
+                self.planet_pos_to_deploy = planet_pos
+                self.traits_of_card_to_play = card.get_traits()
+                self.faction_of_card_to_play = card.get_faction()
+                self.name_of_card_to_play = card.get_name()
+                print("Trying to discount: ", card.get_name())
+                self.discounts_applied = 0
+                hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
+                hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits())
+                in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+                same_planet_dis, same_planet_auto_dis = \
+                    primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+                self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+                if self.available_discounts > self.discounts_applied:
+                    self.stored_mode = self.mode
+                    self.mode = "DISCOUNT"
+                    self.planet_aiming_reticle_position = int(game_update_string[1])
+                    self.planet_aiming_reticle_active = True
+                else:
+                    await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                          discounts=self.discounts_applied)
         elif current_interrupt == "Ulthwe Spirit Stone":
             num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             primary_player.return_card_to_hand(planet_pos, unit_pos)

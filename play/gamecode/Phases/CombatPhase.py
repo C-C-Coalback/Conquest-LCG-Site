@@ -836,6 +836,33 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.last_defender_position = (secondary_player.number,
                                                                        self.defender_planet,
                                                                        self.defender_position)
+                                elif "Catachan Devils Patrol" in secondary_player.cards:
+                                    card = self.preloaded_find_card("Catachan Devils Patrol")
+                                    self.discounts_applied = 0
+                                    hand_dis = secondary_player.search_hand_for_discounts(card.get_faction())
+                                    hq_dis = secondary_player.search_hq_for_discounts(card.get_faction(),
+                                                                                      card.get_traits())
+                                    in_play_dis = secondary_player.search_all_planets_for_discounts(card.get_traits(),
+                                                                                                    card.get_faction())
+                                    same_planet_dis, same_planet_auto_dis = \
+                                        secondary_player.search_same_planet_for_discounts(
+                                            card.get_faction(), self.defender_planet)
+                                    self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+                                    if self.available_discounts + secondary_player.resources >= card.get_cost():
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "Catachan Devils Patrol can be deployed"
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_interrupt(
+                                            "Catachan Devils Patrol", secondary_player.name_player,
+                                            (int(secondary_player.number), self.defender_planet, self.defender_position)
+                                        )
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
                             if can_continue:
                                 faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                                self.attacker_position)

@@ -291,6 +291,13 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 if self.player_resolving_interrupts[0] == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
+            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+                is_an_interrupt = True
+                primary_player = self.p1
+                secondary_player = self.p2
+                if self.player_resolving_interrupts[0] == self.name_2:
+                    primary_player = self.p2
+                    secondary_player = self.p1
         if not is_an_interrupt:
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
@@ -377,6 +384,12 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.misc_player_storage = ""
             self.delete_interrupt()
             self.action_cleanup()
+        elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+            self.delete_interrupt()
+            self.choices_available = ["Take Damage", "Cancel Attack"]
+            self.choice_context = "Catachan Devils Patrol: make a choice"
+            self.name_player_making_choices = secondary_player.get_name_player()
+            self.resolving_search_box = True
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     self.card_to_deploy = None
