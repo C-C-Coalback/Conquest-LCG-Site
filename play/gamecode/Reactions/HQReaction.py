@@ -105,6 +105,16 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.misc_counter += 1
                 if self.misc_counter > 1:
                     self.chosen_first_card = True
+    elif current_reaction == "Hydra Flak Tank":
+        if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            damage = 1
+            if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
+                damage = 2
+            elif player_owning_card.get_mobile_given_pos(planet_pos, unit_pos):
+                damage = 2
+            player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, damage, rickety_warbuggy=True)
+            self.delete_reaction()
     elif current_reaction == "Magus Harid":
         if self.chosen_first_card:
             if game_update_string[1] == secondary_player.number:

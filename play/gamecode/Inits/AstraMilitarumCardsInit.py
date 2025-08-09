@@ -518,6 +518,11 @@ def astra_militarum_cards_init():
                                                  "planet, while that unit is attacking, reduce all damage taken by "
                                                  "other Astra Militarum units you control to 1. "
                                                  "(Limit once per phase.)", "Soldier. Martyr. Ecclesiarchy.",
-                             3, faction, "Loyal", 3, 3, 1, True)
+                             3, faction, "Loyal", 3, 3, 1, True),
+        CardClasses.ArmyCard("Hydra Flak Tank", "No Wargear Attachments.\n"
+                                                "This unit deals double damage to enemy Flying or Mobile units.\n"
+                                                "Reaction: After a unit moves to or from this planet, deal it 1 damage."
+                                                " (Limit once per phase.)", "Vehicle. Tank. Krieg.",
+                             3, faction, "Common", 2, 3, 1, False, wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

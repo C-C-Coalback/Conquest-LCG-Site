@@ -1110,7 +1110,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, position_of_unit))
                     self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Nahumekh":
+        elif current_reaction == "Hydra Flak Tank":
+            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                damage = 1
+                if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
+                    damage = 2
+                elif player_owning_card.get_mobile_given_pos(planet_pos, unit_pos):
+                    damage = 2
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, damage, rickety_warbuggy=True)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+        elif current_reaction == "Nahumekh":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1

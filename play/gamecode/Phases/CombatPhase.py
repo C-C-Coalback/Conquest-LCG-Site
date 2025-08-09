@@ -974,6 +974,15 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         attack_value = attack_value * 2
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                         self.attacker_position) \
+                                        == "Hydra Flak Tank":
+                                    if secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                             self.defender_position):
+                                        attack_value = attack_value * 2
+                                    elif secondary_player.get_mobile_given_pos(self.defender_planet,
+                                                                               self.defender_position):
+                                        attack_value = attack_value * 2
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
                                         == "Stalking Ur-Ghul":
                                     if secondary_player.get_card_type_given_pos(self.defender_planet,
                                                                                 self.defender_position) \

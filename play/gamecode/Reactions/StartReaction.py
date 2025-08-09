@@ -1235,6 +1235,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                 i = i - 1
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Hydra Flak Tank":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
         elif current_reaction == "Celestian Amelia":
             primary_player.celestian_amelia_active = True
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
