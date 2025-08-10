@@ -5620,6 +5620,13 @@ class Game:
                                                                       rickety_warbuggy=True)
                         self.misc_misc = None
                         primary_player.reset_all_aiming_reticles_play_hq()
+                    if self.reactions_needing_resolving[0] == "Heavy Flamer Retributor":
+                        for i in range(len(self.misc_misc)):
+                            current_pla, current_pos = self.misc_misc[i]
+                            secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
+                                                                  rickety_warbuggy=True)
+                        self.misc_misc = None
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
                     if self.reactions_needing_resolving[0] != "Warlock Destructor":
@@ -6858,6 +6865,8 @@ class Game:
                                     self.create_reaction("Blood Axe Strategist", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Heavy Flamer Retributor":
+                                self.create_reaction("Heavy Flamer Retributor", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":
@@ -6894,6 +6903,8 @@ class Game:
                                     self.create_reaction("Blood Axe Strategist", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Heavy Flamer Retributor":
+                                self.create_reaction("Heavy Flamer Retributor", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":

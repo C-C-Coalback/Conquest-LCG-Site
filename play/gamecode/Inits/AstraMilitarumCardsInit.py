@@ -523,6 +523,11 @@ def astra_militarum_cards_init():
                                                 "This unit deals double damage to enemy Flying or Mobile units.\n"
                                                 "Reaction: After a unit moves to or from this planet, deal it 1 damage."
                                                 " (Limit once per phase.)", "Vehicle. Tank. Krieg.",
-                             3, faction, "Common", 2, 3, 1, False, wargear_attachments_permitted=False)
+                             3, faction, "Common", 2, 3, 1, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Heavy Flamer Retributor", "While this unit has faith, it cannot be routed.\n"
+                                                        "Reaction: After this unit resolves its attack, deal 1 damage "
+                                                        "to a number of different enemy units at this planet equal "
+                                                        "to faith on this unit.", "Soldier. Ecclesiarchy.",
+                             3, faction, "Common", 3, 2, 1, False)
     ]
     return astra_militarum_cards_array

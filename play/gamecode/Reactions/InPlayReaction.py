@@ -1110,6 +1110,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, position_of_unit))
                     self.delete_reaction()
+        elif current_reaction == "Heavy Flamer Retributor":
+            if secondary_player.get_number() == game_update_string[1]:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if (planet_pos, unit_pos) not in self.misc_misc:
+                        self.misc_misc.append((planet_pos, unit_pos))
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        if len(self.misc_misc) >= self.misc_counter:
+                            for i in range(len(self.misc_misc)):
+                                current_pla, current_pos = self.misc_misc[i]
+                                secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
+                                                                      rickety_warbuggy=True)
+                            self.misc_misc = None
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
         elif current_reaction == "Hydra Flak Tank":
             if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

@@ -5078,6 +5078,9 @@ class Player:
                                                       (int(self.number), i, j))
 
     def rout_unit(self, planet_id, unit_id):
+        if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                return False
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, "Disciple of Excess"):
                 return False
