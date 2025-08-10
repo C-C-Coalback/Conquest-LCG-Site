@@ -1235,6 +1235,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 i = i - 1
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Saint Erika":
+            self.chosen_first_card = False
+            await self.send_update_message("Please pay 1 faith.")
         elif current_reaction == "Patron Saint":
             self.misc_counter = 3
             self.chosen_first_card = False

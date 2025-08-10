@@ -4076,11 +4076,27 @@ class Player:
             return 1
         return 0
 
+    def check_if_control_faith(self):
+        for i in range(len(self.headquarters)):
+            if self.get_faith_given_pos(-2, i) > 0:
+                return True
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_faith_given_pos(i, j) > 0:
+                    return True
+        return False
+
     def check_if_card_is_destroyed(self, planet_id, unit_id):
         if planet_id == -2:
             if self.headquarters[unit_id].get_card_type() == "Support":
                 return False
+            if self.get_ability_given_pos(planet_id, unit_id) == "Saint Erika":
+                if not self.check_if_control_faith():
+                    return True
             return not self.check_damage_too_great_given_pos(planet_id, unit_id)
+        if self.get_ability_given_pos(planet_id, unit_id) == "Saint Erika":
+            if not self.check_if_control_faith():
+                return True
         return not self.check_damage_too_great_given_pos(planet_id, unit_id)
 
     def remove_damage_from_pos(self, planet_id, unit_id, amount, healing=False):
@@ -4840,6 +4856,13 @@ class Player:
                         self.game.create_reaction("Commissarial Bolt Pistol", self.name_player,
                                                   (int(self.number), planet_num, i))
                         print("created bolt pistol react")
+            if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
+                if not self.check_for_trait_given_pos(planet_num, card_pos, "Elysia") and not \
+                        self.check_for_trait_given_pos(planet_num, card_pos, "Saint"):
+                    for i in range(len(self.cards_in_play[planet_num + 1])):
+                        if self.get_ability_given_pos(planet_num, i) == "Saint Erika":
+                            self.game.create_reaction("Saint Erika", self.name_player,
+                                                      (int(self.number), planet_num, i))
         for i in range(len(card.get_attachments())):
             owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":

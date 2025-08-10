@@ -296,7 +296,7 @@ class Game:
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
-                                 "Reinforced Synaptic Network"]
+                                 "Reinforced Synaptic Network", "Saint Erika"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1

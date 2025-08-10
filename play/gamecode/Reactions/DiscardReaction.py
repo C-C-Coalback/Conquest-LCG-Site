@@ -17,6 +17,15 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         del primary_player.discard[pos_discard]
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Saint Erika":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_name() in primary_player.stored_cards_recently_discarded:
+                    if card.get_faction() == "Astra Militarum" and card.get_card_type() == "Army":
+                        if not card.check_for_a_trait("Elysia") and not card.check_for_a_trait("Saint"):
+                            primary_player.cards.append(card.get_name())
+                            del primary_player.discard[pos_discard]
+                            self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
             if not self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

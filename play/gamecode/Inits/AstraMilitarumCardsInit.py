@@ -534,6 +534,11 @@ def astra_militarum_cards_init():
                                              "damage from Astra Militarum army units and Ecclesiarchy units you "
                                              "control. Then place faith equal to the damage removed among army units "
                                              "you control.", "Saint. Elite. Ecclesiarchy.",
-                             5, faction, "Loyal", 4, 5, 2, False, deepstrike=3)
+                             5, faction, "Loyal", 4, 5, 2, False, deepstrike=3),
+        CardClasses.ArmyCard("Saint Erika", "If you don't control faith, destroy this unit.\n"
+                                            "Forced Reaction: After a non-Elysia, non-Saint Astra Militarum army unit"
+                                            " enters your discard pile from this planet, pay 1 faith to return that"
+                                            " unit to your hand.\n", "Saint. Martyr. Ecclesiarchy.",
+                             3, faction, "Loyal", 5, 5, 1, True)
     ]
     return astra_militarum_cards_array

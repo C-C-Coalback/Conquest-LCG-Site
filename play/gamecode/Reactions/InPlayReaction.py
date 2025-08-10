@@ -1146,6 +1146,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if self.misc_counter < 1:
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Saint Erika":
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    self.chosen_first_card = True
+                    await self.send_update_message("Select card in discard to bring back.")
         elif current_reaction == "Hydra Flak Tank":
             if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
