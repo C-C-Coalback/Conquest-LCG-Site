@@ -528,6 +528,12 @@ def astra_militarum_cards_init():
                                                         "Reaction: After this unit resolves its attack, deal 1 damage "
                                                         "to a number of different enemy units at this planet equal "
                                                         "to faith on this unit.", "Soldier. Ecclesiarchy.",
-                             3, faction, "Common", 3, 2, 1, False)
+                             3, faction, "Common", 3, 2, 1, False),
+        CardClasses.ArmyCard("Patron Saint", "Deep Strike (3).\n"
+                                             "Reaction: After you deploy or Deep Strike this unit, remove up to 3 "
+                                             "damage from Astra Militarum army units and Ecclesiarchy units you "
+                                             "control. Then place faith equal to the damage removed among army units "
+                                             "you control.", "Saint. Elite. Ecclesiarchy.",
+                             5, faction, "Loyal", 4, 5, 2, False, deepstrike=3)
     ]
     return astra_militarum_cards_array

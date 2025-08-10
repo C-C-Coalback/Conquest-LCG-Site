@@ -105,6 +105,28 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.misc_counter += 1
                 if self.misc_counter > 1:
                     self.chosen_first_card = True
+    elif current_reaction == "Patron Saint":
+        if game_update_string[1] == primary_player.get_number():
+            if not self.chosen_first_card:
+                if (primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and
+                    primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum") or \
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Ecclesiarchy"):
+                    before_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                    after_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                    if after_damage < before_damage:
+                        self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.chosen_first_card = True
+                        self.misc_counter = 3
+                        await self.send_update_message("Now place 3 faith.")
+            else:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
     elif current_reaction == "Hydra Flak Tank":
         if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

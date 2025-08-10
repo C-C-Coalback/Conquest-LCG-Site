@@ -5629,7 +5629,16 @@ class Game:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
-                    if self.reactions_needing_resolving[0] != "Warlock Destructor":
+
+                    # Decide whether to delete the reaction.
+                    if self.reactions_needing_resolving[0] == "Patron Saint" and not self.chosen_first_card:
+                        self.chosen_first_card = True
+                        self.misc_counter = 3 - self.misc_counter
+                        if self.misc_counter < 1:
+                            self.delete_reaction()
+                        else:
+                            await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+                    elif self.reactions_needing_resolving[0] != "Warlock Destructor":
                         self.delete_reaction()
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":

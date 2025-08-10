@@ -1235,6 +1235,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 i = i - 1
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Patron Saint":
+            self.misc_counter = 3
+            self.chosen_first_card = False
         elif current_reaction == "Heavy Flamer Retributor":
             self.misc_counter = primary_player.get_faith_given_pos(planet_pos, unit_pos)
             if self.misc_counter < 1:

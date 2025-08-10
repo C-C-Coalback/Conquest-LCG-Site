@@ -453,6 +453,9 @@ class Player:
         if ability == "Tunneling Mawloc":
             self.game.create_reaction("Tunneling Mawloc", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
+        if ability == "Patron Saint":
+            self.game.create_reaction("Patron Saint", self.name_player,
+                                      (int(self.number), planet_id, last_element_index))
         if ability == "Seething Mycetic Spore":
             self.game.create_reaction("Seething Mycetic Spore", self.name_player,
                                       (int(self.number), planet_id, last_element_index))
@@ -1171,6 +1174,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Convoking Praetorians":
             self.game.create_reaction("Convoking Praetorians", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
+            self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Court of the Stormlord":
             self.game.create_reaction("Court of the Stormlord", self.name_player,
                                       (int(self.number), -2, last_element_index))
@@ -1525,6 +1531,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Griffon Escort":
             self.game.create_reaction("Griffon Escort", self.name_player,
                                       (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Devoted Hospitaller":
+            self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Court of the Stormlord":
             self.game.create_reaction("Court of the Stormlord", self.name_player,
                                       (int(self.number), position, last_element_index))
@@ -1760,8 +1769,8 @@ class Player:
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
                                                           (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Devoted Hospitaller":
-                                self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                            if card.get_ability() == "Patron Saint":
+                                self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
@@ -1808,6 +1817,9 @@ class Player:
                                 other_player = self.game.p2
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Patron Saint":
+                                self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Imperial Fists Siege Force":
                                 self.game.create_reaction("Imperial Fists Siege Force", self.name_player,
@@ -1866,9 +1878,6 @@ class Player:
                                 if self.game.get_red_icon(position):
                                     self.game.create_reaction("Kroot Hunter", self.name_player,
                                                               (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Devoted Hospitaller":
-                                self.game.create_reaction("Devoted Hospitaller", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
                             if card.check_for_a_trait("Scout", self.etekh_trait) \
                                     and card.get_faction() != "Necrons":
                                 for i in range(7):
