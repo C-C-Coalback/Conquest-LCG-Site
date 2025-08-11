@@ -3748,9 +3748,16 @@ class Player:
                                                                        "Zarathur, High Sorcerer",
                                                                        bloodied_relevant=True)
         bodyguard_damage_list = []
+        for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
+            if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Until Justice is Done":
+                damage += 1
         og_damage = damage
         too_many_bodyguards = False
         if att_pos is not None:
+            if damage > 0:
+                if "Until Justice is Done" in self.cards:
+                    if self.check_for_trait_given_pos(planet_id, unit_id, "Ecclesiarchy"):
+                        self.game.create_reaction("Until Justice is Done", self.name_player, att_pos)
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if i != unit_id:
                     print("Get attachments")

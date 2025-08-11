@@ -563,6 +563,13 @@ def astra_militarum_cards_init():
                                                                 " tokens into play at a planet to put this card"
                                                                 " from your hand into play attached to a unit.",
                                    "Relic. Wargear. Weapon.", 1, faction, "Loyal", 2, True, extra_health=2,
-                                   type_of_units_allowed_for_attachment="Army/Synapse/Token", extra_attack=2)
+                                   type_of_units_allowed_for_attachment="Army/Synapse/Token", extra_attack=2),
+        CardClasses.AttachmentCard("Until Justice is Done", "Attach to an enemy army unit.\n"
+                                                            "Increase damage dealt to attached unit by 1.\n"
+                                                            "Reaction: After an Ecclesiarchy unit you control is "
+                                                            "assigned damage by an attack, put this card from "
+                                                            "your hand into play attached to the attacker.",
+                                   "Vow. Ecclesiarchy.", 2, faction, "Common", 1, False, must_be_enemy_unit=True,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return astra_militarum_cards_array
