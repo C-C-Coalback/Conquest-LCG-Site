@@ -1238,6 +1238,18 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Saint Erika":
             self.chosen_first_card = False
             await self.send_update_message("Please pay 1 faith.")
+        elif current_reaction == "Vengeful Seraphim":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+            else:
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Ready Vengeful Seraphim?"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
         elif current_reaction == "Patron Saint":
             self.misc_counter = 3
             self.chosen_first_card = False

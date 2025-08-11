@@ -539,6 +539,12 @@ def astra_militarum_cards_init():
                                             "Forced Reaction: After a non-Elysia, non-Saint Astra Militarum army unit"
                                             " enters your discard pile from this planet, pay 1 faith to return that"
                                             " unit to your hand.\n", "Saint. Martyr. Ecclesiarchy.",
-                             3, faction, "Loyal", 5, 5, 1, True)
+                             3, faction, "Loyal", 5, 5, 1, True),
+        CardClasses.ArmyCard("Vengeful Seraphim", "While this unit has faith, it gains Flying.\n"
+                                                  "Reaction: After an Ecclesiarchy unit you control at this planet is "
+                                                  "destroyed, this unit gets +1 ATK and +1 HP until the end of the"
+                                                  " phase. Then you may pay 1 faith to ready this unit. "
+                                                  "(Limit once per phase.)", "Soldier. Ecclesiarchy.",
+                             3, faction, "Common", 3, 2, 1, False)
     ]
     return astra_militarum_cards_array

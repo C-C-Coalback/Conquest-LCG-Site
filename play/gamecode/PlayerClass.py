@@ -2503,6 +2503,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Air Caste Courier":
             if self.warlord_faction != "Tau":
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Vengeful Seraphim":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                return True
         if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
             if self.search_card_at_planet(planet_id, "Soaring Gargoyles"):
                 return True
@@ -3400,6 +3403,14 @@ class Player:
             if self.game.interrupts_waiting_on_resolution[i] == reaction_name:
                 if self.game.player_resolving_interrupts[i] == self.name_player:
                     return True
+        return False
+
+    def does_own_positioned_reaction_exist(self, reaction_name, planet_pos, unit_pos):
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    if self.game.positions_of_unit_triggering_reaction[i] == (int(self.number), planet_pos, unit_pos):
+                        return True
         return False
 
     def does_own_reaction_exist(self, reaction_name):
@@ -4662,6 +4673,13 @@ class Player:
                         cost = self.get_cost_given_pos(planet_num, card_pos)
                         if cost > self.highest_cost_invasion_site:
                             self.highest_cost_invasion_site = cost
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Ecclesiarchy"):
+                for i in range(len(self.cards_in_play[planet_num + 1])):
+                    if self.get_ability_given_pos(planet_num, i) == "Vengeful Seraphim":
+                        if not self.get_once_per_phase_used_given_pos(planet_num, i):
+                            if not self.does_own_positioned_reaction_exist("Vengeful Seraphim", planet_num, i):
+                                self.game.create_reaction("Vengeful Seraphim", self.name_player,
+                                                          (int(self.number), planet_num, i))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Dark Angels"):
                 if self.search_card_in_hq("Standard of Devastation"):
                     self.game.create_reaction("Standard of Devastation", self.name_player,

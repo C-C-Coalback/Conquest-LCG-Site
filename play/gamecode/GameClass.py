@@ -2341,6 +2341,15 @@ class Game:
                         else:
                             await DeployPhase.deploy_card_routine(self, name, self.misc_target_planet,
                                                                   discounts=self.discounts_applied)
+                    elif self.choice_context == "Ready Vengeful Seraphim?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "Yes":
+                            pass
+                        else:
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Interrupt Enemy Movement Effect?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         num, og_pla, og_pos, dest = self.queued_moves[0]

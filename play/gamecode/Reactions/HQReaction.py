@@ -127,6 +127,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     if self.misc_counter < 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+    elif current_reaction == "Vengeful Seraphim":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.ready_given_pos(pla, pos)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
     elif current_reaction == "Saint Erika":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
