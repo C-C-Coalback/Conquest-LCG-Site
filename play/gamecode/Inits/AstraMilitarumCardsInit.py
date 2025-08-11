@@ -545,6 +545,9 @@ def astra_militarum_cards_init():
                                                   "destroyed, this unit gets +1 ATK and +1 HP until the end of the"
                                                   " phase. Then you may pay 1 faith to ready this unit. "
                                                   "(Limit once per phase.)", "Soldier. Ecclesiarchy.",
-                             3, faction, "Common", 3, 2, 1, False)
+                             3, faction, "Common", 3, 2, 1, False),
+        CardClasses.ArmyCard("Zealous Cantus", "Reaction: After an Ecclesiarchy or Grey Knights card enters your "
+                                               "discard pile, place 1 faith on an army unit. (Limit twice per faith.)",
+                             "Soldier. Ecclesiarchy.", 3, faction, "Common", 3, 3, 1, False)
     ]
     return astra_militarum_cards_array

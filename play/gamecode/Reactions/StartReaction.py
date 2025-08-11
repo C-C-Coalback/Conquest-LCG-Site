@@ -1238,6 +1238,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Saint Erika":
             self.chosen_first_card = False
             await self.send_update_message("Please pay 1 faith.")
+        elif current_reaction == "Zealous Cantus":
+            times_used = primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos)
+            if not times_used:
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, 1)
+            elif times_used == 1:
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, 2)
+            else:
+                self.delete_reaction()
         elif current_reaction == "Vengeful Seraphim":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")

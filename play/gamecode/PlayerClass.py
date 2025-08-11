@@ -4873,7 +4873,6 @@ class Player:
                             == "Commissarial Bolt Pistol":
                         self.game.create_reaction("Commissarial Bolt Pistol", self.name_player,
                                                   (int(self.number), planet_num, i))
-                        print("created bolt pistol react")
             if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
                 if not self.check_for_trait_given_pos(planet_num, card_pos, "Elysia") and not \
                         self.check_for_trait_given_pos(planet_num, card_pos, "Saint"):
@@ -4973,6 +4972,15 @@ class Player:
                     dis_player = self.game.p2
                 dis_player.discard.append(card_name)
         if card.get_card_type() == "Army":
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Ecclesiarchy") or \
+                    self.check_for_trait_given_pos(planet_num, card_pos, "Grey Knights"):
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Zealous Cantus":
+                        self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), -2, i))
+                for i in range(7):
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_ability_given_pos(i, j) == "Zealous Cantus":
+                            self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), i, j))
             if self.check_for_warlord(planet_num):
                 self.stored_targets_the_emperor_protects.append(card_name)
             if self.check_for_trait_given_pos(planet_num, card_pos, "Transport"):
@@ -4996,6 +5004,7 @@ class Player:
     def add_card_in_hq_to_discard(self, card_pos):
         card = self.headquarters[card_pos]
         card_name = card.get_name()
+        planet_num = -2
         if card.get_is_unit():
             if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
                 for i in range(len(self.headquarters)):
@@ -5018,6 +5027,16 @@ class Player:
                     self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
                 if card.get_attachments()[i].get_ability() == "Transcendent Blessing":
                     self.game.create_interrupt("Transcendent Blessing", owner, (int(self.number), -1, -1))
+        if card.get_card_type() == "Army":
+            if self.check_for_trait_given_pos(-2, card_pos, "Ecclesiarchy") or \
+                    self.check_for_trait_given_pos(-2, card_pos, "Grey Knights"):
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Zealous Cantus":
+                        self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), -2, i))
+                for i in range(7):
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_ability_given_pos(i, j) == "Zealous Cantus":
+                            self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), i, j))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Kabalite Halfborn":

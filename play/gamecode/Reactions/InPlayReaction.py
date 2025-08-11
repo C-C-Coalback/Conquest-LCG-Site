@@ -1153,6 +1153,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.ready_given_pos(pla, pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Zealous Cantus":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Saint Erika":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
