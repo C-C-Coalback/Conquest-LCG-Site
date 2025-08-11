@@ -310,6 +310,8 @@ class Player:
         if self.game.interrupts_discard_enemy_allowed:
             if self.search_hand_for_card("Vale Tenndrac"):
                 interrupts.append("Vale Tenndrac")
+            if self.search_hand_for_card("Blade of the Crimson Oath"):
+                interrupts.append("Blade of the Crimson Oath")
         return interrupts
 
     async def send_hq(self, force=False):

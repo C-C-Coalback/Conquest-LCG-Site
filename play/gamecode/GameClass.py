@@ -110,6 +110,7 @@ class Game:
         self.resources_need_sending_outside_normal_sends = False
         self.cards_need_sending_outside_normal_sends = False
         self.hqs_need_sending_outside_normal_sends = False
+        self.interrupting_discard_effect_active = False
         self.actions_allowed = True
         self.storm_of_silence_friendly_unit = True
         self.player_with_action = ""
@@ -2424,6 +2425,13 @@ class Game:
                                 self.interrupts_discard_enemy_allowed = False
                                 await self.complete_enemy_discard(primary_player, secondary_player)
                                 self.interrupts_discard_enemy_allowed = True
+                        elif chosen_choice == "Blade of the Crimson Oath":
+                            self.interrupting_discard_effect_active = "BCO"
+                            self.chosen_first_card = False
+                            await self.send_update_message("Please place 2 Guardsmen")
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.name_player_making_choices = primary_player.name_player
                     elif self.choice_context == "Target Planet Vale Tenndrac":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         i = 0
@@ -6669,6 +6677,42 @@ class Game:
                             self, primary_player, secondary_player,
                             name, game_update_string, self.nullified_card_name)
 
+    async def resolve_discard_interrupt(self, name, game_update_string):
+        if name == self.name_player_making_choices:
+            if name == self.name_1:
+                primary_player = self.p1
+                secondary_player = self.p2
+            else:
+                primary_player = self.p2
+                secondary_player = self.p1
+            if self.interrupting_discard_effect_active == "BCO":
+                if not self.chosen_first_card:
+                    if len(game_update_string) == 2:
+                        if game_update_string[0] == "PLANETS":
+                            primary_player.summon_token_at_planet("Guardsman", int(game_update_string[1]))
+                            primary_player.summon_token_at_planet("Guardsman", int(game_update_string[1]))
+                            self.chosen_first_card = True
+                            await self.send_update_message("Now attach the Blade of the Crimson Oath to a unit.")
+                else:
+                    if len(game_update_string) == 3:
+                        if game_update_string[0] == "HQ":
+                            if game_update_string[1] == primary_player.get_number():
+                                card = self.preloaded_find_card("Blade of the Crimson Oath")
+                                if primary_player.attach_card(card, -2, int(game_update_string[2])):
+                                    self.interrupting_discard_effect_active = False
+                                    self.interrupts_discard_enemy_allowed = False
+                                    await self.complete_enemy_discard(primary_player, secondary_player)
+                                    self.interrupts_discard_enemy_allowed = True
+                    elif len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == primary_player.get_number():
+                                card = self.preloaded_find_card("Blade of the Crimson Oath")
+                                if primary_player.attach_card(card, int(game_update_string[2]), int(game_update_string[3])):
+                                    self.interrupting_discard_effect_active = False
+                                    self.interrupts_discard_enemy_allowed = False
+                                    await self.complete_enemy_discard(primary_player, secondary_player)
+                                    self.interrupts_discard_enemy_allowed = True
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -6699,6 +6743,8 @@ class Game:
             elif self.choices_available:
                 print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
+            elif self.interrupting_discard_effect_active:
+                await self.resolve_discard_interrupt(name, game_update_string)
             elif self.resolving_nurgling_bomb:
                 await self.nurgling_bomb_resolution(name, game_update_string)
             elif self.interrupts_waiting_on_resolution:

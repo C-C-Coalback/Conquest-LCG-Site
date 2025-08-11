@@ -555,6 +555,14 @@ def astra_militarum_cards_init():
                                                                 "exhaust this attachment to reduce the cost by 1 plus "
                                                                 "the number of green planets in your opponent's "
                                                                 "victory display.", "Standard. Ecclesiarchy.",
-                                   1, faction, "Loyal", 2, True, limited=True, must_be_own_unit=True)
+                                   1, faction, "Loyal", 2, True, limited=True, must_be_own_unit=True),
+        CardClasses.AttachmentCard("Blade of the Crimson Oath", "Attach to a non-warlord unit.\n"
+                                                                "Attached unit gets +2 ATK and +2 HP.\n"
+                                                                "Interrupt: When your opponent triggers an ability that"
+                                                                " discards a card from your hand, put 2 Guardsman"
+                                                                " tokens into play at a planet to put this card"
+                                                                " from your hand into play attached to a unit.",
+                                   "Relic. Wargear. Weapon.", 1, faction, "Loyal", 2, True, extra_health=2,
+                                   type_of_units_allowed_for_attachment="Army/Synapse/Token", extra_attack=2)
     ]
     return astra_militarum_cards_array
