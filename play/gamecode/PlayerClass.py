@@ -2796,11 +2796,23 @@ class Player:
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 2
                         self.set_aiming_reticle_in_play(-2, i, "green")
+            if "Ecclesiarchy" in traits:
+                if self.search_attachments_at_pos(-2, i, "Banner of the Sacred Rose", ready_relevant=True):
+                    other_player = self.get_other_player()
+                    icons = other_player.get_icons_on_captured()
+                    discounts_available += icons[2] + 1
+                    self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
     def search_planet_for_discounts(self, planet_pos, traits, faction_of_card):
         discounts_available = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if "Ecclesiarchy" in traits:
+                if self.search_attachments_at_pos(planet_pos, i, "Banner of the Sacred Rose", ready_relevant=True):
+                    other_player = self.get_other_player()
+                    icons = other_player.get_icons_on_captured()
+                    discounts_available += icons[2] + 1
+                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
             if "Daemon" in traits:
                 if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
                     discounts_available += 1
@@ -3021,6 +3033,31 @@ class Player:
                     if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ready():
                         return True
         return False
+
+    def perform_discount_at_pos_hq_attachment(self, pos, att_pos, faction_of_card, traits, target_planet=None):
+        discount = 0
+        if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_attachments()[att_pos].get_ability() == "Banner of the Sacred Rose":
+                if "Ecclesiarchy" in traits:
+                    if self.headquarters[pos].get_attachments()[att_pos].get_ready():
+                        self.headquarters[pos].get_attachments()[att_pos].exhaust_card()
+                        other_player = self.get_other_player()
+                        icons = other_player.get_icons_on_captured()
+                        discount += icons[2] + 1
+        return discount
+
+    def perform_discount_at_pos_in_play_attachment(self, planet_pos, unit_pos, att_pos, traits):
+        discount = 0
+        if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[
+                    att_pos].get_ability() == "Banner of the Sacred Rose":
+                if "Ecclesiarchy" in traits:
+                    if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[att_pos].get_ready():
+                        self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[att_pos].exhaust_card()
+                        other_player = self.get_other_player()
+                        icons = other_player.get_icons_on_captured()
+                        discount += icons[2] + 1
+        return discount
 
     def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None):
         discount = 0

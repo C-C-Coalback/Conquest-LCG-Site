@@ -548,6 +548,13 @@ def astra_militarum_cards_init():
                              3, faction, "Common", 3, 2, 1, False),
         CardClasses.ArmyCard("Zealous Cantus", "Reaction: After an Ecclesiarchy or Grey Knights card enters your "
                                                "discard pile, place 1 faith on an army unit. (Limit twice per faith.)",
-                             "Soldier. Ecclesiarchy.", 3, faction, "Common", 3, 3, 1, False)
+                             "Soldier. Ecclesiarchy.", 3, faction, "Common", 3, 3, 1, False),
+        CardClasses.AttachmentCard("Banner of the Sacred Rose", "Limited.\n"
+                                                                "Attach to a unit you control.\n"
+                                                                "Interrupt: When you deploy an Ecclesiarchy unit, "
+                                                                "exhaust this attachment to reduce the cost by 1 plus "
+                                                                "the number of green planets in your opponent's "
+                                                                "victory display.", "Standard. Ecclesiarchy.",
+                                   1, faction, "Loyal", 2, True, limited=True, must_be_own_unit=True)
     ]
     return astra_militarum_cards_array

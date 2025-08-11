@@ -796,6 +796,36 @@ class Game:
                                 await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                                       discounts=self.discounts_applied)
                                 self.mode = "Normal"
+                elif len(game_update_string) == 5:
+                    if game_update_string[0] == "ATTACHMENT":
+                        if game_update_string[1] == "HQ":
+                            if game_update_string[2] == player.get_number():
+                                discount_received = player.perform_discount_at_pos_hq_attachment(
+                                    int(game_update_string[3]), int(game_update_string[4]),
+                                    self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits(),
+                                    self.planet_aiming_reticle_position)
+                                if discount_received > 0:
+                                    self.discounts_applied += discount_received
+                                if self.discounts_applied >= self.available_discounts:
+                                    await DeployPhase.deploy_card_routine(self, name,
+                                                                          self.planet_aiming_reticle_position,
+                                                                          discounts=self.discounts_applied)
+                                    self.mode = "Normal"
+                elif len(game_update_string) == 6:
+                    if game_update_string[0] == "ATTACHMENT":
+                        if game_update_string[1] == "IN_PLAY":
+                            if game_update_string[2] == player.get_number():
+                                if self.card_to_deploy.get_card_type() == "Army":
+                                    discount_received = player.perform_discount_at_pos_in_play_attachment(
+                                        int(game_update_string[3]), int(game_update_string[4]),
+                                        int(game_update_string[5]), self.card_to_deploy.get_traits())
+                                    if discount_received > 0:
+                                        self.discounts_applied += discount_received
+                                    if self.discounts_applied >= self.available_discounts:
+                                        await DeployPhase.deploy_card_routine(self, name,
+                                                                              self.planet_aiming_reticle_position,
+                                                                              discounts=self.discounts_applied)
+                                        self.mode = "Normal"
 
     async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction="",
                           shadow_field_possible=False, rickety_warbuggy=False, actual_aoe=False):
