@@ -394,6 +394,7 @@ class Game:
         self.shrieking_exarch_cost_payed = False
         self.paying_shrieking_exarch_cost = False
         self.jungle_trench_count = 0
+        self.may_block_with_ols = True
         self.cards_with_dash_cost = ["Seething Mycetic Spore"]
         self.stored_discard_and_target = []  # (effect name, player num)
         self.interrupts_discard_enemy_allowed = True
@@ -5330,7 +5331,14 @@ class Game:
                                 primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
-                            if primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and\
+                            if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
+                                primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
+                                    self.amount_that_can_be_removed_by_shield[0] > 1:
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                self.may_block_with_ols = False
+                            elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and\
                                     primary_player.get_ready_given_pos(hurt_planet, hurt_pos) and not \
                                     primary_player.headquarters[hurt_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
@@ -5425,7 +5433,14 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
-                            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans" and \
+                            if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
+                                primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
+                                    self.amount_that_can_be_removed_by_shield[0] > 1:
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                self.may_block_with_ols = False
+                            elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(planet_pos, unit_pos) and not \
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
@@ -6017,6 +6032,7 @@ class Game:
         self.maksim_squadron_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.alt_shield_mode_active = False
+        self.may_block_with_ols = True
         self.alt_shield_name = ""
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
@@ -6736,12 +6752,10 @@ class Game:
             elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
-                print("indirect code")
                 await self.apply_indirect_damage(name, game_update_string)
             elif self.mode == "DISCOUNT":
                 await self.update_game_event_applying_discounts(name, game_update_string)
             elif self.choices_available:
-                print("Need to resolve a choice")
                 await self.resolve_choice(name, game_update_string)
             elif self.interrupting_discard_effect_active:
                 await self.resolve_discard_interrupt(name, game_update_string)
@@ -6750,19 +6764,14 @@ class Game:
             elif self.interrupts_waiting_on_resolution:
                 await self.resolve_interrupts(name, game_update_string)
             elif self.positions_of_units_to_take_damage:
-                print("Using better shield mechanism")
                 await self.better_shield_card_resolution(name, game_update_string)
             elif self.resolving_kugath_nurglings:
                 await self.resolution_of_kugath_nurglings(name, game_update_string)
             elif self.reactions_needing_resolving:
-                print("Resolve reaction")
-                print(self.reactions_needing_resolving[0])
                 await self.resolve_reaction(name, game_update_string)
             elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-                print("Resolve mobile")
                 await self.resolve_mobile(name, game_update_string)
             elif self.battle_ability_to_resolve:
-                print("Resolve battle ability")
                 await self.resolve_battle_ability_routine(name, game_update_string)
             elif self.phase == "DEPLOY":
                 await DeployPhase.update_game_event_deploy_section(self, name, game_update_string)
@@ -7384,6 +7393,10 @@ class Game:
         self.p2.accept_any_challenge_used = False
         self.p1.death_serves_used = False
         self.p2.death_serves_used = False
+        self.p1.our_last_stand_used = False
+        self.p2.our_last_stand_used = False
+        self.p1.our_last_stand_bonus_active = False
+        self.p2.our_last_stand_bonus_active = False
         self.mode = "Normal"
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()

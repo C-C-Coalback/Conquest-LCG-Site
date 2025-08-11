@@ -93,6 +93,27 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["1", "2"]
                         self.choice_context = "Brutal Cunning: amount of damage"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Our Last Stand":
+                        if not primary_player.our_last_stand_used:
+                            primary_player.our_last_stand_used = True
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            for i in range(len(primary_player.cards_in_play[self.round_number + 1])):
+                                if primary_player.get_faction_given_pos(self.round_number, i) == "Astra Militarum":
+                                    primary_player.increase_faith_given_pos(self.round_number, i, 1)
+                            icons = secondary_player.get_icons_on_captured()
+                            if icons[0] > 1:
+                                if self.get_red_icon(self.round_number):
+                                    primary_player.our_last_stand_bonus_active = True
+                            if icons[1] > 1:
+                                if self.get_blue_icon(self.round_number):
+                                    primary_player.our_last_stand_bonus_active = True
+                            if icons[2] > 1:
+                                if self.get_green_icon(self.round_number):
+                                    primary_player.our_last_stand_bonus_active = True
+                            if primary_player.our_last_stand_bonus_active:
+                                await self.send_update_message("Warlord has gained the additional damage reduction "
+                                                               "bonus from Our Last Stand.")
+                            self.action_cleanup()
                     elif ability == "Summary Execution":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:

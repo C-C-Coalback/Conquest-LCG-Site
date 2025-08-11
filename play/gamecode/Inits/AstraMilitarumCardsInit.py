@@ -570,6 +570,13 @@ def astra_militarum_cards_init():
                                                             "assigned damage by an attack, put this card from "
                                                             "your hand into play attached to the attacker.",
                                    "Vow. Ecclesiarchy.", 2, faction, "Common", 1, False, must_be_enemy_unit=True,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Our Last Stand", "Action: Place 1 faith on each Astra Militarum unit you control at "
+                                                "the first planet. If that planet shares a common type with two planets"
+                                                " in your opponent's victory display your warlord gains: Interrupt:\" "
+                                                "When this unit is assigned damage, reduce that damage by 1 (min 1).\""
+                                                " until the end of the battle. Max 1 per round.",
+                              "Prayer. Ecclesiarchy.", 0, faction, "Loyal", 2, False, action_in_hand=True,
+                              allowed_phases_in_hand="ALL")
     ]
     return astra_militarum_cards_array

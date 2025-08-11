@@ -146,6 +146,8 @@ class Player:
         self.concealing_darkness_active = False
         self.defensive_protocols_active = False
         self.death_serves_used = False
+        self.our_last_stand_used = False
+        self.our_last_stand_bonus_active = False
         self.highest_death_serves_value = 0
         self.highest_cost_invasion_site = 0
         self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
