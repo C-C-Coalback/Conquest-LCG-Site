@@ -10,6 +10,7 @@ from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction,
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
     AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
+from . import CardClasses
 
 
 def create_planets(planet_array_objects):
@@ -2230,6 +2231,11 @@ class Game:
                         self.delete_reaction()
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                        primary_player.bottom_remaining_cards()
+                    elif self.choice_context == "Agra's Preachings choices":
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                         primary_player.shuffle_deck()
                     elif self.choice_context == "Prophetic Farseer Discard":
                         self.choice_context = "Prophetic Farseer Rearrange"
@@ -3230,6 +3236,21 @@ class Game:
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+                    elif self.choice_context == "Agra's Preachings choices":
+                        card_name = primary_player.deck[int(game_update_string[1])]
+                        card = self.preloaded_find_card(card_name)
+                        if card.get_card_type() == "Army" and card.get_faction() == "Astra Militarum" and not\
+                                card.check_for_a_trait("Elite"):
+                            card_at_planet = CardClasses.AttachmentCard(
+                                card_name, "", "", -1, "", "", -1, False, planet_attachment=True
+                            )
+                            primary_player.add_attachment_to_planet(self.misc_target_planet, card_at_planet)
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                            primary_player.bottom_remaining_cards()
+                            self.delete_reaction()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Prototype Crisis Suit choices":
                         num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                         card_name = primary_player.deck[int(game_update_string[1])]
@@ -4717,6 +4738,9 @@ class Game:
         sacrifice_locations = self.p1.sacrifice_check_eop()
         sacrifice_locations = self.p2.sacrifice_check_eop()
         self.conclude_mind_shackle_scarab()
+        if last_phase == "COMBAT":
+            self.p1.start_agras_preachings_deployment()
+            self.p2.start_agras_preachings_deployment()
         self.p1.reset_extra_attack_eop()
         self.p2.reset_extra_attack_eop()
         self.p1.reset_extra_abilities_eop()
@@ -7211,6 +7235,13 @@ class Game:
             print("Discard p1")
             self.p1.discard_card_at_random()
 
+    def check_reactions_from_losing_combat(self, winner, loser, planet_id):
+        reactions = []
+        if self.reactions_on_winning_combat_permitted:
+            if loser.search_card_in_hq("Agra's Preachings", ready_relevant=True):
+                reactions.append("Agra's Preachings")
+        return reactions
+
     def check_reactions_from_winning_combat(self, winner, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
@@ -7261,6 +7292,7 @@ class Game:
         self.name_player_who_won_combat = winner.name_player
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
         reactions_win = self.check_reactions_from_winning_combat(winner, self.last_planet_checked_for_battle)
+        reactions_lose = self.check_reactions_from_losing_combat(winner, loser, self.last_planet_checked_for_battle)
         if self.infested_planets[self.last_planet_checked_for_battle] and \
                 self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation \
                 and winner.warlord_faction != "Tyranids":
@@ -7270,12 +7302,14 @@ class Game:
             self.name_player_making_choices = winner.name_player
             await self.send_update_message(
                 winner.name_player + " has the right to clear infestation from " + planet_name)
-        elif reactions_win:
+        elif reactions_win or reactions_lose:
             await self.send_update_message("Reactions on winning combat detected.")
             self.reactions_on_winning_combat_being_executed = True
             self.reactions_on_winning_combat_permitted = False
             for i in range(len(reactions_win)):
                 self.create_reaction(reactions_win[i], winner.name_player, (int(winner.number), -1, -1))
+            for i in range(len(reactions_lose)):
+                self.create_reaction(reactions_lose[i], loser.name_player, (int(loser.number), -1, -1))
         else:
             self.already_asked_remove_infestation = False
             print("Resolve battle ability of:", planet_name)

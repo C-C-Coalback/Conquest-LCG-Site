@@ -1079,7 +1079,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_hq("Guardsman")
             self.delete_reaction()
         elif current_reaction == "Krieg Armoured Regiment":
-            "Fall Back!"
             if "Krieg Armoured Regiment" in primary_player.discard and \
                     "Krieg Armoured Regiment" in primary_player.stored_cards_recently_discarded:
                 primary_player.discard.remove("Krieg Armoured Regiment")
@@ -1208,6 +1207,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                 secondary_player.discard_card_at_random()
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Agra's Preachings Deploy":
+            card_name = primary_player.get_next_agras_preachings_name()
+            if card_name:
+                card = self.preloaded_find_card(card_name)
+                primary_player.delete_next_agras_preachings_name()
+                if primary_player.play_card(planet_pos, card, discounts=2):
+                    pass
+                else:
+                    primary_player.discard.append(card_name)
+            self.delete_reaction()
+        elif current_reaction == "Agra's Preachings":
+            primary_player.exhaust_card_in_hq_given_name("Agra's Preachings")
         elif current_reaction == "Wrathful Retribution":
             if primary_player.spend_resources(1):
                 primary_player.discard_card_name_from_hand("Wrathful Retribution")

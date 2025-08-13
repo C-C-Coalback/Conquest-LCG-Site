@@ -582,6 +582,13 @@ def astra_militarum_cards_init():
                                                       "a planet where a battle is taking place, place faith equal "
                                                       "to its printed cost among army units you control. "
                                                       "Then ready a non-Elite unit with faith.",
-                              "Prayer. Ecclesiarchy.", 1, faction, "Loyal", 2, False)
+                              "Prayer. Ecclesiarchy.", 1, faction, "Loyal", 2, False),
+        CardClasses.SupportCard("Agra's Preachings", "Limited.\n"
+                                                     "Reaction: After your opponent wins a battle, exhaust this support"
+                                                     " and target a planet with an enemy unit to rally 6 a non-Elite"
+                                                     " Astra Militarum unit, attach it to that planet. When the combat"
+                                                     " phase ends, deploy that unit at that planet and reduce its cost"
+                                                     " by 2. If you can't, discard it.",
+                                "Decree. Ecclesiarchy.", 1, faction, "Common", True, limited=True)
     ]
     return astra_militarum_cards_array

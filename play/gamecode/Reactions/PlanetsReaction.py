@@ -20,6 +20,18 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "Agra's Preachings":
+        if len(secondary_player.cards_in_play[chosen_planet + 1]) > 0:
+            if len(primary_player.deck) > 5:
+                self.choices_available = primary_player.deck[:6]
+                self.choice_context = "Agra's Preachings choices"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+                self.misc_counter = 0
+                self.misc_target_planet = chosen_planet
+                primary_player.number_cards_to_search = 6
+            else:
+                self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Foresight":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])

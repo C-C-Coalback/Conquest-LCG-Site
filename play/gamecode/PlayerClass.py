@@ -1038,6 +1038,28 @@ class Player:
         print("not enemy in play")
         return False
 
+    def start_agras_preachings_deployment(self):
+        for i in range(len(self.attachments_at_planet)):
+            for j in range(len(self.attachments_at_planet[i])):
+                if self.attachments_at_planet[i][j].shields == -1:
+                    self.game.create_reaction("Agra's Preachings Deploy", self.name_player,
+                                              (int(self.number), i, -1))
+
+    def get_next_agras_preachings_name(self):
+        for i in range(len(self.attachments_at_planet)):
+            for j in range(len(self.attachments_at_planet[i])):
+                if self.attachments_at_planet[i][j].shields == -1:
+                    return self.attachments_at_planet[i][j].name
+        return ""
+
+    def delete_next_agras_preachings_name(self):
+        for i in range(len(self.attachments_at_planet)):
+            for j in range(len(self.attachments_at_planet[i])):
+                if self.attachments_at_planet[i][j].shields == -1:
+                    del self.attachments_at_planet[i][j]
+                    return None
+        return None
+
     def search_for_unique_card(self, name):
         print("performing uniques search")
         for i in range(len(self.headquarters)):
