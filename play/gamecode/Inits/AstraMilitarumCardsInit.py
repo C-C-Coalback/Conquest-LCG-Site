@@ -577,6 +577,11 @@ def astra_militarum_cards_init():
                                                 "When this unit is assigned damage, reduce that damage by 1 (min 1).\""
                                                 " until the end of the battle. Max 1 per round.",
                               "Prayer. Ecclesiarchy.", 0, faction, "Loyal", 2, False, action_in_hand=True,
-                              allowed_phases_in_hand="ALL")
+                              allowed_phases_in_hand="ALL"),
+        CardClasses.EventCard("Wrathful Retribution", "Reaction: After an enemy unit moves to, or enters play at, "
+                                                      "a planet where a battle is taking place, place faith equal "
+                                                      "to its printed cost among army units you control. "
+                                                      "Then ready a non-Elite unit with faith.",
+                              "Prayer. Ecclesiarchy.", 1, faction, "Loyal", 2, False)
     ]
     return astra_militarum_cards_array

@@ -5,6 +5,9 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     planet_pos = -2
     unit_pos = int(game_update_string[2])
     current_reaction = self.reactions_needing_resolving[0]
+    player_owning_card = self.p1
+    if game_update_string[1] == "2":
+        player_owning_card = self.p2
     print('hq reaction')
     if self.reactions_needing_resolving[0] == "Power from Pain":
         if primary_player.headquarters[unit_pos].get_card_type() == "Army":
@@ -127,6 +130,11 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     if self.misc_counter < 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+    elif current_reaction == "Wrathful Retribution":
+        if player_owning_card.get_faith_given_pos(planet_pos, unit_pos) > 0:
+            if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                self.delete_reaction()
     elif current_reaction == "Zealous Cantus":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)

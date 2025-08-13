@@ -5969,6 +5969,11 @@ class Game:
                 self.need_to_reset_tomb_blade_squadron = True
             if self.reactions_needing_resolving[0] == "Dynastic Weaponry":
                 self.need_to_reset_tomb_blade_squadron = True
+            if self.reactions_needing_resolving[0] == "Wrathful Retribution":
+                if self.player_who_resolves_reaction[0] == self.name_1:
+                    self.p1.wrathful_retribution_value = 0
+                else:
+                    self.p2.wrathful_retribution_value = 0
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
             self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]

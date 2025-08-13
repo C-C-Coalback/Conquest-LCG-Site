@@ -1146,6 +1146,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if self.misc_counter < 1:
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Wrathful Retribution":
+            if not self.chosen_first_card:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                        self.misc_counter = self.misc_counter - 1
+                        if self.misc_counter < 1:
+                            self.chosen_first_card = True
+                            await self.send_update_message("Now ready unit with faith.")
+            else:
+                if player_owning_card.get_faith_given_pos(planet_pos, unit_pos) > 0:
+                    if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                        self.delete_reaction()
         elif current_reaction == "Vengeful Seraphim":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):

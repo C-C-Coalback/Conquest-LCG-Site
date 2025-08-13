@@ -1208,6 +1208,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                 secondary_player.discard_card_at_random()
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Wrathful Retribution":
+            if primary_player.spend_resources(1):
+                primary_player.discard_card_name_from_hand("Wrathful Retribution")
+                self.misc_counter = primary_player.wrathful_retribution_value
+                self.chosen_first_card = False
+                if self.misc_counter < 1:
+                    await self.send_update_message("No faith to place! Skipping to ready a unit with faith step.")
+                    self.chosen_first_card = True
+                else:
+                    await self.send_update_message("Please place " + str(self.misc_counter) + " faith.")
+            else:
+                self.delete_reaction()
         elif current_reaction == "Until Justice is Done":
             card = self.preloaded_find_card("Until Justice is Done")
             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):

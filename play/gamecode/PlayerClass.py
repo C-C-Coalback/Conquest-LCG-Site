@@ -164,6 +164,7 @@ class Player:
         self.sautekh_royal_crypt = -1
         self.command_struggles_won_this_phase = 0
         self.celestian_amelia_active = False
+        self.wrathful_retribution_value = 0
 
     def put_card_into_reserve(self, card, planet_pos):
         if self.spend_resources(1):
@@ -1524,6 +1525,14 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id
             self.game.current_flamers_id += 1
+        if self.game.last_planet_checked_for_battle == position:
+            if other_player.search_hand_for_card("Wrathful Retribution"):
+                if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
+                    self.game.create_reaction("Wrathful Retribution", other_player.name_player,
+                                              (int(other_player.number), -1, -1))
+                    cost_card_wrath = self.get_cost_given_pos(position, last_element_index)
+                    if other_player.wrathful_retribution_value < cost_card_wrath:
+                        other_player.wrathful_retribution_value = cost_card_wrath
         if sacrifice_end_of_phase:
             self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Heretek Inventor":
@@ -2074,6 +2083,14 @@ class Player:
             new_pos = len(self.cards_in_play[destination + 1]) - 1
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
+            if self.game.last_planet_checked_for_battle == destination:
+                if other_player.search_hand_for_card("Wrathful Retribution"):
+                    if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
+                        self.game.create_reaction("Wrathful Retribution", other_player.name_player,
+                                                  (int(other_player.number), -1, -1))
+                        cost_card_wrath = self.get_cost_given_pos(destination, new_pos)
+                        if other_player.wrathful_retribution_value < cost_card_wrath:
+                            other_player.wrathful_retribution_value = cost_card_wrath
             if self.check_for_trait_given_pos(destination, new_pos, "Vostroya"):
                 if self.search_card_in_hq("Convent Prioris Advisor"):
                     self.game.create_reaction("Convent Prioris Advisor", self.name_player,
@@ -2162,6 +2179,14 @@ class Player:
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
+            if self.game.last_planet_checked_for_battle == destination:
+                if other_player.search_hand_for_card("Wrathful Retribution"):
+                    if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
+                        self.game.create_reaction("Wrathful Retribution", other_player.name_player,
+                                                  (int(other_player.number), -1, -1))
+                        cost_card_wrath = self.get_cost_given_pos(destination, new_pos)
+                        if other_player.wrathful_retribution_value < cost_card_wrath:
+                            other_player.wrathful_retribution_value = cost_card_wrath
             if self.search_hand_for_card("Cry of the Wind"):
                 already_cry = False
                 self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
