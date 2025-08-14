@@ -43,6 +43,9 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_interrupt()
+        elif current_interrupt == "Seal of the Ebon Chalice":
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.ebon_chalice_value)
+            self.delete_interrupt()
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:
                 self.delete_interrupt()

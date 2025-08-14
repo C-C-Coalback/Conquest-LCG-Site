@@ -618,6 +618,13 @@ def astra_militarum_cards_init():
                                                    " and \"Interrupt: When this unit retreats, put 2 Guardsman tokens"
                                                    " into play at the same planet. (Limit once per phase.)\""
                                                    " until the end of the round.", "Location.",
-                                0, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMMAND")
+                                0, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMMAND"),
+        CardClasses.AttachmentCard("Seal of the Ebon Chalice", "Attach to an army unit. Attached unit gets +1 HP.\n"
+                                                               "Interrupt: When attached unit takes damage from a unit"
+                                                               " with a higher printed cost, deal to that unit damage"
+                                                               " equal to the difference between the units' "
+                                                               "printed costs.", "Award. Ecclesiarchy.",
+                                   1, faction, "Loyal", 2, False, type_of_units_allowed_for_attachment="Army",
+                                   extra_health=1)
     ]
     return astra_militarum_cards_array

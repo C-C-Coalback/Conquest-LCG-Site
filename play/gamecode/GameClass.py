@@ -339,6 +339,7 @@ class Game:
         self.forced_interrupts = ["Flayed Ones Revenants"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
+        self.ebon_chalice_value = 0
         self.searing_brand_cancel_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.guardian_mesh_armor_active = False
@@ -4916,6 +4917,15 @@ class Game:
             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                 self.create_reaction("Solarite Avetys", primary_player.name_player,
                                      (int(secondary_player.number), planet_pos, unit_pos))
+        cost_diff = secondary_player.get_cost_given_pos(att_pla, att_pos) - \
+            primary_player.get_cost_given_pos(planet_pos, unit_pos)
+        if cost_diff > 0:
+            for k in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments)):
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments[k].get_ability() == \
+                        "Seal of the Ebon Chalice":
+                    self.ebon_chalice_value = cost_diff
+                    self.create_interrupt("Seal of the Ebon Chalice", primary_player.name_player,
+                                          (int(secondary_player.number), att_pla, att_pos))
         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
@@ -6129,7 +6139,6 @@ class Game:
                     if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                         self.create_reaction("Penitent Engine", secondary_player.name_player,
                                              (int(secondary_player.number), planet_pos, i))
-
         del self.damage_on_units_list_before_new_damage[0]
         del self.damage_is_preventable[0]
         del self.positions_of_units_to_take_damage[0]
