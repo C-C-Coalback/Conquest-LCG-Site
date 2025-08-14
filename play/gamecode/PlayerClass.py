@@ -384,7 +384,7 @@ class Player:
 
     def discard_all_cards_in_reserve(self, planet_id):
         while self.cards_in_reserve[planet_id]:
-            self.discard.append(self.cards_in_reserve[planet_id][0].get_name())
+            self.add_card_to_discard(self.cards_in_reserve[planet_id][0].get_name())
             del self.cards_in_reserve[planet_id][0]
 
     def get_card_type_in_reserve(self, planet_id, unit_id):
@@ -425,7 +425,7 @@ class Player:
             self.game.create_reaction("Run Down", self.name_player, (int(self.number), planet_id, -1))
         if ability == "Burst Forth":
             self.game.create_reaction("Burst Forth", self.name_player, (int(self.number), planet_id, -1))
-        self.discard.append(ability)
+        self.add_card_to_discard(ability)
         self.after_any_deepstrike(planet_id)
         del self.cards_in_reserve[planet_id][unit_id]
 
@@ -687,7 +687,7 @@ class Player:
         return False
 
     def move_to_top_of_discard(self, position):
-        self.discard.append(self.discard.pop(position))
+        self.add_card_to_discard(self.discard.pop(position))
 
     def shuffle_card_in_discard_into_deck(self, position):
         self.deck.append(self.discard.pop(position))
@@ -798,7 +798,7 @@ class Player:
             print("??? HOW DID YOU GET HERE ???")
         else:
             if len(self.deck) > deck_pos:
-                self.discard.append(self.deck[deck_pos])
+                self.add_card_to_discard(self.deck[deck_pos])
                 del self.deck[deck_pos]
 
     def bottom_remaining_cards(self):
@@ -888,7 +888,7 @@ class Player:
 
     def discard_card_from_hand(self, card_pos):
         if len(self.cards) > card_pos:
-            self.discard.append(self.cards[card_pos])
+            self.add_card_to_discard(self.cards[card_pos])
             del self.cards[card_pos]
 
     def remove_card_from_hand(self, card_pos):
@@ -1355,12 +1355,12 @@ class Player:
         if planet == -2:
             card = self.headquarters[position]
             if discard:
-                self.discard.append(card.get_attachments()[attachment_position].get_name())
+                self.add_card_to_discard(card.get_attachments()[attachment_position].get_name())
             del card.get_attachments()[attachment_position]
         else:
             card = self.cards_in_play[planet + 1][position]
             if discard:
-                self.discard.append(card.get_attachments()[attachment_position].get_name())
+                self.add_card_to_discard(card.get_attachments()[attachment_position].get_name())
             del card.get_attachments()[attachment_position]
 
     def get_attachment_at_pos(self, planet, position, attachment_position):
@@ -3589,6 +3589,10 @@ class Player:
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
                     attack_value += 1
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Vostroya"):
+            if self.search_card_in_hq("Cardinal Agra Decree"):
+                if self.check_if_control_faith():
+                    attack_value += 1
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
@@ -3902,9 +3906,9 @@ class Player:
             while i < len(self.headquarters[unit_pos].get_attachments()):
                 if self.headquarters[unit_pos].get_attachments()[i].get_name() == name:
                     if self.headquarters[unit_pos].get_attachments()[i].name_owner == self.game.name_1:
-                        self.game.p1.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                        self.game.p1.add_card_to_discard(self.headquarters[unit_pos].get_attachments()[0].get_name())
                     else:
-                        self.game.p2.discard.append(self.headquarters[unit_pos].get_attachments()[0].get_name())
+                        self.game.p2.add_card_to_discard(self.headquarters[unit_pos].get_attachments()[0].get_name())
                     del self.headquarters[unit_pos].get_attachments()[i]
                     i = i - 1
                 i = i + 1
@@ -3913,10 +3917,10 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name() == name:
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].name_owner ==\
                         self.game.name_1:
-                    self.game.p1.discard.append(
+                    self.game.p1.add_card_to_discard(
                         self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name())
                 else:
-                    self.game.p2.discard.append(
+                    self.game.p2.add_card_to_discard(
                         self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name())
                 del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i]
                 i = i - 1
@@ -3928,9 +3932,9 @@ class Player:
             name_attachment = self.headquarters[unit_pos].get_attachments()[attachment_pos].get_name()
             name_owner = self.headquarters[unit_pos].get_attachments()[attachment_pos].name_owner
             if name_owner == self.game.name_1:
-                self.game.p1.discard.append(name_attachment)
+                self.game.p1.add_card_to_discard(name_attachment)
             else:
-                self.game.p2.discard.append(name_attachment)
+                self.game.p2.add_card_to_discard(name_attachment)
             if name_attachment == "Savage Parasite":
                 self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
             del self.headquarters[unit_pos].get_attachments()[attachment_pos]
@@ -3938,9 +3942,9 @@ class Player:
         name_attachment = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_name()
         name_owner = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner
         if name_owner == self.game.name_1:
-            self.game.p1.discard.append(name_attachment)
+            self.game.p1.add_card_to_discard(name_attachment)
         else:
-            self.game.p2.discard.append(name_attachment)
+            self.game.p2.add_card_to_discard(name_attachment)
         if name_attachment == "Savage Parasite":
             self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
         del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
@@ -4557,7 +4561,7 @@ class Player:
 
     def discard_top_card_deck(self):
         if self.deck:
-            self.discard.append(self.deck[0])
+            self.add_card_to_discard(self.deck[0])
             del self.deck[0]
             return True
         return False
@@ -4632,6 +4636,11 @@ class Player:
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Cloud of Flies":
                     self.game.create_reaction("Cloud of Flies", self.name_player,
                                               (int(self.number), planet_num, i))
+
+    def add_card_to_discard(self, card_name):
+        self.discard.append(card_name)
+        if card_name == "Cardinal Agra Decree":
+            self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
 
     def search_for_preemptive_destroy_interrupts(self):
         for i in range(len(self.headquarters)):
@@ -5066,13 +5075,13 @@ class Player:
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
-                self.discard.append(card_name)
+                self.add_card_to_discard(card_name)
                 self.cards_recently_discarded.append(card_name)
             else:
                 dis_player = self.game.p1
                 if self.game.name_1 == self.name_player:
                     dis_player = self.game.p2
-                dis_player.discard.append(card_name)
+                dis_player.add_card_to_discard(card_name)
         if card.get_card_type() == "Army":
             if self.check_for_trait_given_pos(planet_num, card_pos, "Ecclesiarchy") or \
                     self.check_for_trait_given_pos(planet_num, card_pos, "Grey Knights"):
@@ -5155,13 +5164,13 @@ class Player:
                                           (int(self.number), -1, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
-                self.discard.append(card_name)
+                self.add_card_to_discard(card_name)
                 self.cards_recently_discarded.append(card_name)
             else:
                 dis_player = self.game.p1
                 if self.game.name_1 == self.name_player:
                     dis_player = self.game.p2
-                dis_player.discard.append(card_name)
+                dis_player.add_card_to_discard(card_name)
         if card.has_hive_mind:
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":

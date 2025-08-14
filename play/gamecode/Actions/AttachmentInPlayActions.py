@@ -248,7 +248,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         if game_update_string[2] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:
                 if unit_pos == self.position_of_actioned_card[1]:
-                    player_owning_card.discard.append(card_chosen.get_name())
+                    player_owning_card.add_card_to_discard(card_chosen.get_name())
                     del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
                     player_owning_card.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     player_owning_card.ready_given_pos(planet_pos, unit_pos)

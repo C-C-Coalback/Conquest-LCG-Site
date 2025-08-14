@@ -43,6 +43,11 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
             player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
             self.delete_interrupt()
+    elif current_interrupt == "Cardinal Agra Decree":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            primary_player.draw_card()
+            self.delete_interrupt()
     elif current_interrupt == "Mark of Slaanesh":
         if game_update_string[1] == primary_player.number:
             dest_planet = self.positions_of_units_interrupting[0][1]

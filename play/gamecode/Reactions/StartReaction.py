@@ -1215,7 +1215,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if primary_player.play_card(planet_pos, card, discounts=2):
                     pass
                 else:
-                    primary_player.discard.append(card_name)
+                    primary_player.add_card_to_discard(card_name)
             self.delete_reaction()
         elif current_reaction == "Agra's Preachings":
             primary_player.exhaust_card_in_hq_given_name("Agra's Preachings")

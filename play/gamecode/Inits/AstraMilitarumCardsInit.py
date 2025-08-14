@@ -595,6 +595,11 @@ def astra_militarum_cards_init():
                                                     "planet. Move any faith on that unit to the targeted units and "
                                                     "they get +1 ATK for their next attack this phase. Then if the"
                                                     " destroyed card is a Martyr, draw 1 card.",
-                                "Decree. Ecclesiarchy.", 1, faction, "Loyal", False)
+                                "Decree. Ecclesiarchy.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("Cardinal Agra Decree", "While you control faith, each Vostroya"
+                                                        " unit you control gets +1 ATK.\n"
+                                                        "Interrupt: When this card enters your discard pile, draw a \n"
+                                                        "card and place 1 faith on an army unit.",
+                                "Decree. Ecclesiarchy.", 0, faction, "Loyal", True)
     ]
     return astra_militarum_cards_array

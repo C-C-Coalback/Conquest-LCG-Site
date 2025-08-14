@@ -31,6 +31,11 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                 self.delete_interrupt()
                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                          alt_shields=False, can_no_mercy=False)
+    elif current_interrupt == "Cardinal Agra Decree":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            primary_player.draw_card()
+            self.delete_interrupt()
     elif current_interrupt == "World Engine Beam":
         if not player_owning_card.headquarters[unit_pos].get_unique() or \
                 player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Support":

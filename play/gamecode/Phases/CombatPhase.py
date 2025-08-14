@@ -68,7 +68,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player = self.p2
                             other_player = self.p1
                         og_pla, og_pos = self.deepstruck_attachment_pos
-                        player.discard.append(player.cards_in_reserve[og_pla][og_pos].get_name())
+                        player.add_card_to_discard(player.cards_in_reserve[og_pla][og_pos].get_name())
                         del player.cards_in_reserve[og_pla][og_pos]
                         player.deepstrike_attachment_extras(og_pla)
                         self.choosing_target_for_deepstruck_attachment = False

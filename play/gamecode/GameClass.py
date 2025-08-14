@@ -1347,7 +1347,7 @@ class Game:
                             get_ability() == "Slaanesh's Temptation":
                         del self.p1.attachments_at_planet[self.last_planet_checked_for_battle][j]
                         j = j - 1
-                        self.p1.discard.append("Slaanesh's Temptation")
+                        self.p1.add_card_to_discard("Slaanesh's Temptation")
                     j = j + 1
                 j = 0
                 while j < len(self.p2.attachments_at_planet[self.last_planet_checked_for_battle]):
@@ -1355,7 +1355,7 @@ class Game:
                             get_ability() == "Slaanesh's Temptation":
                         del self.p2.attachments_at_planet[self.last_planet_checked_for_battle][j]
                         j = j - 1
-                        self.p2.discard.append("Slaanesh's Temptation")
+                        self.p2.add_card_to_discard("Slaanesh's Temptation")
                     j = j + 1
                 while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
                     if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
@@ -2622,7 +2622,7 @@ class Game:
                         self.reset_choices_available()
                     elif self.choice_context == "Discard card (CotS)":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
-                        primary_player.discard.append(chosen_choice)
+                        primary_player.add_card_to_discard(chosen_choice)
                         del primary_player.deck[int(game_update_string[1])]
                         del self.choices_available[int(game_update_string[1])]
                         self.choice_context = "Bottom card (CotS)"
@@ -2648,7 +2648,7 @@ class Game:
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
                                                 i].get_ability() == "Supreme Strategist":
-                                            primary_player.discard.append("Supreme Strategist")
+                                            primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1
                                         i = i + 1
@@ -2660,7 +2660,7 @@ class Game:
                                 while i < len(secondary_player.attachments_at_planet[planet_pos]):
                                     if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
                                             "Supreme Strategist":
-                                        secondary_player.discard.append("Supreme Strategist")
+                                        secondary_player.add_card_to_discard("Supreme Strategist")
                                         del secondary_player.attachments_at_planet[planet_pos][i]
                                         i = i - 1
                                     i = i + 1
@@ -2687,7 +2687,7 @@ class Game:
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
                                                 i].get_ability() == "Supreme Strategist":
-                                            primary_player.discard.append("Supreme Strategist")
+                                            primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1
                                         i = i + 1
@@ -2699,7 +2699,7 @@ class Game:
                                 while i < len(secondary_player.attachments_at_planet[planet_pos]):
                                     if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
                                             "Supreme Strategist":
-                                        secondary_player.discard.append("Supreme Strategist")
+                                        secondary_player.add_card_to_discard("Supreme Strategist")
                                         del secondary_player.attachments_at_planet[planet_pos][i]
                                         i = i - 1
                                     i = i + 1
@@ -3156,7 +3156,7 @@ class Game:
                         card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
                         if card.get_shields() > 0:
-                            secondary_player.discard.append(card_name)
+                            secondary_player.add_card_to_discard(card_name)
                             del secondary_player.deck[int(game_update_string[1])]
                             del self.choices_available[int(game_update_string[1])]
                         if not self.choices_available:
@@ -5984,7 +5984,7 @@ class Game:
                         else:
                             player_with_attach = self.p2
                         if current_interrupt == "World Engine Beam":
-                            player_with_attach.discard.append(
+                            player_with_attach.add_card_to_discard(
                                 player_with_attach.attachments_at_planet[planet_pos][attachment_pos].get_name())
                             del player_with_attach.attachments_at_planet[planet_pos][attachment_pos]
                             self.delete_interrupt()
