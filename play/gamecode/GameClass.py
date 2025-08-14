@@ -45,6 +45,7 @@ class Game:
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
+        self.units_immune_to_aoe = ["Undying Saint"]
         self.attack_being_resolved = False
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, apoka_errata_cards, self)
@@ -4754,6 +4755,10 @@ class Game:
             self.p2.refresh_once_per_phase_abilities()
         print("\nDEBUG NECRONS\n", self.phase, last_phase, "\n\n")
         if self.phase == "DEPLOY" and last_phase != "SETUP":
+            if "Undying Saint" in self.p1.discard:
+                self.create_reaction("Undying Saint", self.p1.name_player, (1, -1, -1))
+            if "Undying Saint" in self.p2.discard:
+                self.create_reaction("Undying Saint", self.p2.name_player, (2, -1, -1))
             print("resetting necrons enslaved factions")
             self.p1.chosen_enslaved_faction = False
             self.p2.chosen_enslaved_faction = False

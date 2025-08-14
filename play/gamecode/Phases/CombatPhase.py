@@ -450,45 +450,53 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         chosen_planet = int(game_update_string[2])
                         chosen_unit = int(game_update_string[3])
                         if chosen_planet == self.last_planet_checked_for_battle:
-                            if not secondary_player.get_ability_given_pos(chosen_planet, chosen_unit) == \
-                                   "Genestealer Hybrids":
-                                if (chosen_planet, chosen_unit) not in self.misc_misc:
-                                    secondary_player.set_aiming_reticle_in_play(chosen_planet, chosen_unit)
-                                    self.misc_misc.append((chosen_planet, chosen_unit))
-                                    self.misc_counter = self.misc_counter - 1
-                                if self.misc_counter < 1:
-                                    for i in range(len(self.misc_misc)):
-                                        planet_pos, unit_pos = self.misc_misc[i]
-                                        can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                                self.attacker_position)
-                                        shadow_field = False
-                                        if primary_player.get_cost_given_pos(
-                                                self.attacker_planet, self.attacker_position) < 3 \
-                                                and primary_player.get_card_type_given_pos(
-                                                self.attacker_planet, self.attacker_position) == "Army":
-                                            shadow_field = True
-                                        preventable = True
-                                        if primary_player.search_attachments_at_pos(
-                                                self.attacker_planet, self.attacker_position, "Acid Maw"):
-                                            preventable = False
-                                        took_damage, bodyguards = secondary_player.assign_damage_to_pos(
-                                            planet_pos, unit_pos, damage=self.stored_area_effect_value,
-                                            att_pos=None, can_shield=can_shield,
-                                            shadow_field_possible=shadow_field, rickety_warbuggy=True,
-                                            preventable=preventable
-                                        )
-                                    if primary_player.search_attachments_at_pos(self.attacker_planet,
-                                                                                self.attacker_position,
-                                                                                "Doom Siren", must_match_name=True):
-                                        self.create_reaction("Doom Siren", primary_player.name_player,
-                                                             (int(primary_player.number), self.attacker_planet,
-                                                              self.attacker_position))
-                                        self.value_doom_siren = self.stored_area_effect_value
-                                    self.area_effect_active = False
-                                    self.misc_misc = []
-                                    self.reset_combat_positions()
-                                    self.number_with_combat_turn = secondary_player.get_number()
-                                    self.player_with_combat_turn = secondary_player.get_name_player()
+                            if secondary_player.get_ability_given_pos(chosen_planet, chosen_unit) not in \
+                                    self.units_immune_to_aoe:
+                                genestealer_hybrids_relevant = False
+                                for j in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                                    if secondary_player.get_ability_given_pos(chosen_planet, j) == \
+                                            "Genestealer Hybrids" and chosen_unit != j:
+                                        genestealer_hybrids_relevant = True
+                                if not genestealer_hybrids_relevant:
+                                    if (chosen_planet, chosen_unit) not in self.misc_misc:
+                                        secondary_player.set_aiming_reticle_in_play(chosen_planet, chosen_unit)
+                                        self.misc_misc.append((chosen_planet, chosen_unit))
+                                        self.misc_counter = self.misc_counter - 1
+                                    if self.misc_counter < 1:
+                                        for i in range(len(self.misc_misc)):
+                                            planet_pos, unit_pos = self.misc_misc[i]
+                                            can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
+                                                                                                    self.attacker_position)
+                                            shadow_field = False
+                                            if primary_player.get_cost_given_pos(
+                                                    self.attacker_planet, self.attacker_position) < 3 \
+                                                    and primary_player.get_card_type_given_pos(
+                                                    self.attacker_planet, self.attacker_position) == "Army":
+                                                shadow_field = True
+                                            preventable = True
+                                            if primary_player.search_attachments_at_pos(
+                                                    self.attacker_planet, self.attacker_position, "Acid Maw"):
+                                                preventable = False
+                                            took_damage, bodyguards = secondary_player.assign_damage_to_pos(
+                                                planet_pos, unit_pos, damage=self.stored_area_effect_value,
+                                                att_pos=None, can_shield=can_shield,
+                                                shadow_field_possible=shadow_field, rickety_warbuggy=True,
+                                                preventable=preventable
+                                            )
+                                        if primary_player.search_attachments_at_pos(self.attacker_planet,
+                                                                                    self.attacker_position,
+                                                                                    "Doom Siren", must_match_name=True):
+                                            self.create_reaction("Doom Siren", primary_player.name_player,
+                                                                 (int(primary_player.number), self.attacker_planet,
+                                                                  self.attacker_position))
+                                            self.value_doom_siren = self.stored_area_effect_value
+                                        self.area_effect_active = False
+                                        self.misc_misc = []
+                                        self.reset_combat_positions()
+                                        self.number_with_combat_turn = secondary_player.get_number()
+                                        self.player_with_combat_turn = secondary_player.get_name_player()
+                                else:
+                                    await self.send_update_message("Genestealer Hybrids prevents AOE")
                             else:
                                 await self.send_update_message("Immune to AOE")
                 elif self.attacker_position == -1:

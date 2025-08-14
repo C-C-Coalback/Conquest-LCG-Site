@@ -600,6 +600,12 @@ def astra_militarum_cards_init():
                                                         " unit you control gets +1 ATK.\n"
                                                         "Interrupt: When this card enters your discard pile, draw a \n"
                                                         "card and place 1 faith on an army unit.",
-                                "Decree. Ecclesiarchy.", 0, faction, "Loyal", True)
+                                "Decree. Ecclesiarchy.", 0, faction, "Loyal", True),
+        CardClasses.ArmyCard("Undying Saint", "Lumbering.\n"
+                                              "Cannot be damaged by Area Effect.\n"
+                                              "Reaction: After the deploy phase begins, if this unit is in your "
+                                              "discard pile, put it into play at a target non-first planet (ignore "
+                                              "this restriction if your opponent has the initiative).",
+                             "Martyr. Ecclesiarchy.", 1, faction, "Loyal", 2, 1, 1, False, lumbering=True)
     ]
     return astra_militarum_cards_array

@@ -4021,9 +4021,10 @@ class Player:
                     if self.get_ability_given_pos(planet_id, j) == "Genestealer Hybrids" and i != j:
                         genestealer_hybrids_relevant = True
             if not genestealer_hybrids_relevant:
-                self.assign_damage_to_pos(planet_id, i, amount, context=faction,
-                                          shadow_field_possible=shadow_field_possible,
-                                          rickety_warbuggy=rickety_warbuggy)
+                if self.get_ability_given_pos(planet_id, i) not in self.game.units_immune_to_aoe:
+                    self.assign_damage_to_pos(planet_id, i, amount, context=faction,
+                                              shadow_field_possible=shadow_field_possible,
+                                              rickety_warbuggy=rickety_warbuggy)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):

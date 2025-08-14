@@ -20,6 +20,14 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "Undying Saint":
+        if self.round_number != chosen_planet or secondary_player.has_initiative:
+            if "Undying Saint" in primary_player.discard:
+                primary_player.add_card_to_planet(self.preloaded_find_card("Undying Saint"), chosen_planet)
+                primary_player.discard.remove("Undying Saint")
+            if "Undying Saint" in primary_player.discard:
+                self.create_reaction("Undying Saint", primary_player.name_player, (int(primary_player.number), -1, -1))
+            self.delete_reaction()
     elif current_reaction == "Agra's Preachings":
         if len(secondary_player.cards_in_play[chosen_planet + 1]) > 0:
             if len(primary_player.deck) > 5:
