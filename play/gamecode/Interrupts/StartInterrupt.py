@@ -39,6 +39,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.misc_target_planet = -1
             self.misc_target_unit = (-1, -1)
             await self.send_update_message("Select which unit to move faith from.")
+        elif current_interrupt == "Embarked Squads":
+            primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            self.delete_interrupt()
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:
                 self.delete_interrupt()

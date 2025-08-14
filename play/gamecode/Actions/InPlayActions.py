@@ -1115,6 +1115,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "Embarked Squads":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") and not \
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Upgrade"):
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].embarked_squads_active = True
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eor += "Upgrade. Transport."
+                    await self.send_update_message(primary_player.cards_in_play[planet_pos + 1][unit_pos].name +
+                                                   "gained the Embarked Squads effect!")
+                    primary_player.reset_all_aiming_reticles_play_hq()
+                    self.action_cleanup()
     elif self.action_chosen == "Piercing Wail":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

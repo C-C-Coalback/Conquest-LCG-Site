@@ -612,6 +612,12 @@ def astra_militarum_cards_init():
                                                          "ends, exhaust this unit to deal 3 damage to an enemy "
                                                          "non-warlord unit at that planet.",
                              "Vehicle. Artillery. Krieg.", 4, faction, "Common", 3, 4, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Embarked Squads", "Command Action: Exhaust this support to have a target, non-Upgrade,"
+                                                   " Vehicle unit you control gain the Upgrade and Transport traits"
+                                                   " and \"Interrupt: When this unit retreats, put 2 Guardsman tokens"
+                                                   " into play at the same planet. (Limit once per phase.)\""
+                                                   " until the end of the round.", "Location.",
+                                0, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="COMMAND")
     ]
     return astra_militarum_cards_array

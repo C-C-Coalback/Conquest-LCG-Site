@@ -170,6 +170,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 self.action_cleanup()
                                 await self.send_update_message("Abomination Workshop could not discard any cards. "
                                                                "Did you mean to do that?")
+                    elif ability == "Embarked Squads":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Vile Laboratory":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -1337,6 +1342,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
                     if primary_player.sacrifice_card_in_hq(unit_pos):
                         self.chosen_first_card = True
+    elif self.action_chosen == "Embarked Squads":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") and not \
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Upgrade"):
+                    primary_player.headquarters[unit_pos].embarked_squads_active = True
+                    primary_player.headquarters[unit_pos].extra_traits_eor += "Upgrade. Transport."
+                    await self.send_update_message(primary_player.headquarters[unit_pos].name +
+                                                   "gained the Embarked Squads effect!")
+                    primary_player.reset_all_aiming_reticles_play_hq()
+                    self.action_cleanup()
     elif self.action_chosen == "Death Korps Engineers":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

@@ -3200,6 +3200,8 @@ class Player:
                 self.headquarters[i].area_effect_eor = 0
                 self.headquarters[i].armorbane_eor = False
                 self.headquarters[i].mobile_eor = False
+                self.headquarters[i].extra_traits_eor = ""
+                self.headquarters[i].embarked_squads_active = False
                 if self.get_name_given_pos(-2, i) == "Caustic Tyrannofex":
                     self.headquarters[i].misc_ability_used = False
         for i in range(7):
@@ -3211,6 +3213,8 @@ class Player:
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
                 self.cards_in_play[i + 1][j].armorbane_eor = False
                 self.cards_in_play[i + 1][j].mobile_eor = False
+                self.cards_in_play[i + 1][j].extra_traits_eor = ""
+                self.cards_in_play[i + 1][j].embarked_squads_active = False
                 if self.get_name_given_pos(i, j) == "Caustic Tyrannofex":
                     self.cards_in_play[i + 1][j].misc_ability_used = False
 
@@ -5370,6 +5374,9 @@ class Player:
                 mork_count += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Armored Fist Squad":
             self.game.create_interrupt("Armored Fist Squad", self.name_player,
+                                       (int(self.number), planet_id, -1))
+        if self.cards_in_play[planet_id + 1][unit_id].embarked_squads_active:
+            self.game.create_interrupt("Embarked Squads", self.name_player,
                                        (int(self.number), planet_id, -1))
         if self.number == "1":
             enemy_player = self.game.p2

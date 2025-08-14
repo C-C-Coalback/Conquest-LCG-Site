@@ -54,6 +54,7 @@ class Card:
         self.valid_kugath_nurgling_target = False
         self.damage_from_kugath_nurgling = 0
         self.extra_traits_eop = ""
+        self.extra_traits_eor = ""
         self.ambush = ambush
         self.attachments = []
         self.deepstrike = deepstrike
@@ -78,6 +79,7 @@ class Card:
         self.new_sweep = 0
         self.new_mobile = False
         self.new_ambush = False
+        self.embarked_squads_active = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
@@ -224,7 +226,7 @@ class Card:
                     extra_traits += "Warrior. Psyker."
             if self.attachments[i].get_ability() == "Great Iron Gob":
                 extra_traits += "Nob."
-        return trait_to_find in (self.traits + self.extra_traits_eop + extra_traits)
+        return trait_to_find in (self.traits + self.extra_traits_eop + self.extra_traits_eor + extra_traits)
 
     def get_image_name(self):
         return self.image_name
