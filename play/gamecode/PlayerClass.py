@@ -4678,6 +4678,13 @@ class Player:
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         self.cards_in_play[i + 1][j].misc_ability_used = True
                         self.game.create_interrupt("Icy Trygon", self.name_player, (int(self.number), i, j))
+                    if self.get_faction_given_pos(i, j) == "Astra Militarum":
+                        if not self.check_if_already_have_interrupt("Blood of Martyrs"):
+                            for hq_pos in range(len(self.headquarters)):
+                                if self.get_ability_given_pos(-2, hq_pos) == "Blood of Martyrs":
+                                    if self.get_ready_given_pos(-2, hq_pos):
+                                        self.game.create_interrupt("Blood of Martyrs", self.name_player,
+                                                                   (int(self.number), -1, -1))
                     if self.get_ability_given_pos(i, j) == "Growing Tide"\
                             and not self.cards_in_play[i + 1][j].misc_ability_used:
                         if i == self.game.round_number:

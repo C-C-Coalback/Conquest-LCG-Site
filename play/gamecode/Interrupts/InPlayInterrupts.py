@@ -69,6 +69,58 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             if can_continue:
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
+    elif current_interrupt == "Blood of Martyrs":
+        if game_update_string[1] == primary_player.number:
+            if not self.chosen_first_card:
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                    if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                        self.misc_misc = []
+                        self.misc_counter = 3
+                        self.chosen_first_card = True
+                        self.chosen_second_card = False
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.misc_target_planet = planet_pos
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, color="red")
+                        await self.send_update_message("Now select up to three army units.")
+            elif not self.chosen_second_card:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if planet_pos == self.misc_target_planet:
+                        if (planet_pos, unit_pos) != self.misc_target_unit:
+                            if (planet_pos, unit_pos) not in self.misc_misc:
+                                self.misc_misc.append((planet_pos, unit_pos))
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    self.chosen_second_card = True
+                                    if primary_player.get_faith_given_pos(self.misc_target_unit[0],
+                                                                          self.misc_target_unit[1]) < 1:
+                                        await self.send_update_message("No faith to move; skipping directly to "
+                                                                       "increasing the attack of the units step.")
+                                        for i in range(len(self.misc_misc)):
+                                            primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
+                                                                                          self.misc_misc[i][1], 1,
+                                                                                          expiration="NEXT")
+                                        if primary_player.check_for_trait_given_pos(
+                                                self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                            primary_player.draw_card()
+                                        primary_player.reset_all_aiming_reticles_play_hq()
+                                        self.delete_interrupt()
+            else:
+                if (planet_pos, unit_pos) in self.misc_misc:
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    primary_player.spend_faith_given_pos(self.misc_target_unit[0], self.misc_target_unit[1], 1)
+                    if primary_player.get_faith_given_pos(self.misc_target_unit[0],
+                                                          self.misc_target_unit[1]) < 1:
+                        await self.send_update_message("No faith left, increasing the attack of the units.")
+                        for i in range(len(self.misc_misc)):
+                            primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
+                                                                          self.misc_misc[i][1], 1,
+                                                                          expiration="NEXT")
+                        if primary_player.check_for_trait_given_pos(
+                                self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                            primary_player.draw_card()
+                        primary_player.reset_all_aiming_reticles_play_hq()
+                        self.delete_interrupt()
     elif current_interrupt == "Banner of the Cult":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

@@ -5921,7 +5921,38 @@ class Game:
                         primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                         await self.send_update_message("Did not pay the additional cost; "
                                                        "card added to discard.")
-                    self.delete_interrupt()
+                    if current_interrupt == "Blood of Martyrs":
+                        if not self.chosen_first_card:
+                            self.delete_interrupt()
+                        elif not self.chosen_second_card:
+                            self.chosen_second_card = True
+                            await self.send_update_message("Targeted less than the maximum number of units.")
+                            if primary_player.get_faith_given_pos(self.misc_target_unit[0],
+                                                                  self.misc_target_unit[1]) < 1:
+                                await self.send_update_message("No faith to move; skipping directly to "
+                                                               "increasing the attack of the units step.")
+                                for i in range(len(self.misc_misc)):
+                                    primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
+                                                                                  self.misc_misc[i][1], 1,
+                                                                                  expiration="NEXT")
+                                if primary_player.check_for_trait_given_pos(
+                                        self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                    primary_player.draw_card()
+                                self.delete_interrupt()
+                                primary_player.reset_all_aiming_reticles_play_hq()
+                        else:
+                            await self.send_update_message("Increasing the attack of the units.")
+                            for i in range(len(self.misc_misc)):
+                                primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
+                                                                              self.misc_misc[i][1], 1,
+                                                                              expiration="NEXT")
+                            if primary_player.check_for_trait_given_pos(
+                                    self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                primary_player.draw_card()
+                            self.delete_interrupt()
+                            primary_player.reset_all_aiming_reticles_play_hq()
+                    else:
+                        self.delete_interrupt()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetInterrupts.resolve_planet_interrupt(self, name, game_update_string,

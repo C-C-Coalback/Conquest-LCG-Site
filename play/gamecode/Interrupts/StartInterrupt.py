@@ -31,6 +31,14 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.aiming_reticle_color = "blue"
         elif current_interrupt == "Mucolid Spores":
             self.misc_counter = 0
+        elif current_interrupt == "Blood of Martyrs":
+            self.misc_counter = 3
+            self.misc_misc = []
+            primary_player.exhaust_card_in_hq_given_name("Blood of Martyrs")
+            self.chosen_first_card = False
+            self.misc_target_planet = -1
+            self.misc_target_unit = (-1, -1)
+            await self.send_update_message("Select which unit to move faith from.")
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:
                 self.delete_interrupt()

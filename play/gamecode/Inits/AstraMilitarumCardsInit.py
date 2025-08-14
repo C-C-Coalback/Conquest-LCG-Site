@@ -589,6 +589,12 @@ def astra_militarum_cards_init():
                                                      " Astra Militarum unit, attach it to that planet. When the combat"
                                                      " phase ends, deploy that unit at that planet and reduce its cost"
                                                      " by 2. If you can't, discard it.",
-                                "Decree. Ecclesiarchy.", 1, faction, "Common", True, limited=True)
+                                "Decree. Ecclesiarchy.", 1, faction, "Common", True, limited=True),
+        CardClasses.SupportCard("Blood of Martyrs", "Interrupt: When an Astra Militarum unit you control is destroyed,"
+                                                    " exhaust this support and target up to 3 army units at the same "
+                                                    "planet. Move any faith on that unit to the targeted units and "
+                                                    "they get +1 ATK for their next attack this phase. Then if the"
+                                                    " destroyed card is a Martyr, draw 1 card.",
+                                "Decree. Ecclesiarchy.", 1, faction, "Loyal", False)
     ]
     return astra_militarum_cards_array
