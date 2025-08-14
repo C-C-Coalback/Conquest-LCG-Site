@@ -1207,6 +1207,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                 secondary_player.discard_card_at_random()
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Siege Regiment Manticore":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
         elif current_reaction == "Agra's Preachings Deploy":
             card_name = primary_player.get_next_agras_preachings_name()
             if card_name:

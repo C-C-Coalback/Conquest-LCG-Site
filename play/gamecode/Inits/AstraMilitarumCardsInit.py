@@ -606,6 +606,12 @@ def astra_militarum_cards_init():
                                               "Reaction: After the deploy phase begins, if this unit is in your "
                                               "discard pile, put it into play at a target non-first planet (ignore "
                                               "this restriction if your opponent has the initiative).",
-                             "Martyr. Ecclesiarchy.", 1, faction, "Loyal", 2, 1, 1, False, lumbering=True)
+                             "Martyr. Ecclesiarchy.", 1, faction, "Loyal", 2, 1, 1, False, lumbering=True),
+        CardClasses.ArmyCard("Siege Regiment Manticore", "No Wargear Attachments.\n"
+                                                         "Reaction: After the ranged skirmish at an adjacent planet "
+                                                         "ends, exhaust this unit to deal 3 damage to an enemy "
+                                                         "non-warlord unit at that planet.",
+                             "Vehicle. Artillery. Krieg.", 4, faction, "Common", 3, 4, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return astra_militarum_cards_array

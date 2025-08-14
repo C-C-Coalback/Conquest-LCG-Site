@@ -136,6 +136,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Siege Regiment Manticore":
+            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            if abs(planet_pos - og_pla) == 1:
+                if game_update_string[1] == secondary_player.number:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Klaivex Warleader":
             att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
             if att_pla == planet_pos:

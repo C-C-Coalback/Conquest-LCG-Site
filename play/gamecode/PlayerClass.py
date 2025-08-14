@@ -2319,6 +2319,18 @@ class Player:
                 if not self.get_ready_given_pos(planet_pos, i):
                     self.game.create_reaction("Sniper Drone Team", self.name_player,
                                               (int(self.number), planet_pos, i))
+        if planet_pos != 0:
+            for i in range(len(self.cards_in_play[planet_pos])):
+                if self.get_ability_given_pos(planet_pos - 1, i) == "Siege Regiment Manticore":
+                    if self.get_ready_given_pos(planet_pos - 1, i):
+                        self.game.create_reaction("Siege Regiment Manticore", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
+        if planet_pos != 6:
+            for i in range(len(self.cards_in_play[planet_pos + 2])):
+                if self.get_ability_given_pos(planet_pos + 1, i) == "Siege Regiment Manticore":
+                    if self.get_ready_given_pos(planet_pos + 1, i):
+                        self.game.create_reaction("Siege Regiment Manticore", self.name_player,
+                                                  (int(self.number), planet_pos + 1, i))
 
     def phoenix_attack_fighter_triggers(self, planets_list):
         for planet_pos in planets_list:
