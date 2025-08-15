@@ -29,6 +29,33 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "Order of the Crimson Oath":
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "DRAW"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Army"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 99
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            if self.player_who_resolves_reaction[0] == self.name_1:
+                self.p1.number_cards_to_search = 6
+                if len(self.p1.deck) > 5:
+                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                else:
+                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                self.name_player_who_is_searching = self.p1.name_player
+                self.number_who_is_searching = str(self.p1.number)
+            else:
+                self.p2.number_cards_to_search = 6
+                if len(self.p2.deck) > 5:
+                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                else:
+                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                self.name_player_who_is_searching = self.p2.name_player
+                self.number_who_is_searching = str(self.p2.number)
+            self.misc_counter = 2
+            await self.send_update_message("Place 2 faith after the rally.")
         elif self.reactions_needing_resolving[0] == "Genestealer Brood":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"
@@ -1209,6 +1236,29 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
         elif current_reaction == "Siege Regiment Manticore":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
+        elif current_reaction == "Armour of Saint Katherine":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
+        elif current_reaction == "Heralding Cherubim":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+        elif current_reaction == "Miraculous Intervention":
+            if "Miraculous Intervention" in primary_player.cards and primary_player.resources > 0:
+                primary_player.spend_resources(1)
+                primary_player.add_card_to_discard("Miraculous Intervention")
+                warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                primary_player.increase_faith_given_pos(warlord_pla, warlord_pos, 2)
+                primary_player.commit_warlord_to_planet_from_planet(warlord_pla, self.last_planet_checked_for_battle)
+                self.create_reaction("Miraculous Intervention: Pay 1 Resource?", primary_player.name_player,
+                                     (int(primary_player.number), self.last_planet_checked_for_battle, -1))
+            self.delete_reaction()
+        elif current_reaction == "Miraculous Intervention: Pay 1 Resource?":
+            if primary_player.spend_resources(1):
+                unit_diff = secondary_player.count_units_at_planet(planet_pos)\
+                            - primary_player.count_units_at_planet(planet_pos)
+                if unit_diff > 0:
+                    for _ in range(unit_diff):
+                        primary_player.summon_token_at_planet("Guardsman", planet_pos)
+            self.delete_reaction()
         elif current_reaction == "Agra's Preachings Deploy":
             card_name = primary_player.get_next_agras_preachings_name()
             if card_name:

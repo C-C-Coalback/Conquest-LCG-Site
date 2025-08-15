@@ -39,6 +39,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.misc_target_planet = -1
             self.misc_target_unit = (-1, -1)
             await self.send_update_message("Select which unit to move faith from.")
+        elif current_interrupt == "Saint Celestine: Rebirth":
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 5)
+            primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
+            self.delete_interrupt()
         elif current_interrupt == "Embarked Squads":
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             primary_player.summon_token_at_planet("Guardsman", planet_pos)

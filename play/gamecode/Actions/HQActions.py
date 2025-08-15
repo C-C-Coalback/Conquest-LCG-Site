@@ -1353,6 +1353,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                    "gained the Embarked Squads effect!")
                     primary_player.reset_all_aiming_reticles_play_hq()
                     self.action_cleanup()
+    elif self.action_chosen == "Saint Celestine":
+        if self.chosen_first_card:
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                self.misc_counter = self.misc_counter - 1
+                if self.misc_counter < 1:
+                    card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                    del primary_player.cards[primary_player.aiming_reticle_coords_hand]
+                    target_planet = self.position_of_actioned_card[0]
+                    primary_player.add_card_to_planet(card, target_planet)
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.action_cleanup()
     elif self.action_chosen == "Death Korps Engineers":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

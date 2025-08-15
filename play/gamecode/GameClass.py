@@ -4646,6 +4646,8 @@ class Game:
                 "Both warlords just died. I guess it is a draw?"
                 "----GAME END----"
             )
+        self.p1.warlord_just_got_destroyed = False
+        self.p2.warlord_just_got_destroyed = False
         self.reset_resolving_attack_on_units = True
         if self.resolving_kugath_nurglings:
             self.set_targeting_icons_kugath_nurglings()
@@ -4890,6 +4892,11 @@ class Game:
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
 
+    def checks_on_damage(self, primary_player, secondary_player, planet_pos, unit_pos):
+        if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Armour of Saint Katherine"):
+            self.create_reaction("Armour of Saint Katherine", primary_player.name_player,
+                                 (int(primary_player.number), planet_pos, unit_pos))
+
     def checks_on_damage_from_attack(self, primary_player, secondary_player, planet_pos, unit_pos):
         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Neophyte Apprentice":
@@ -5027,6 +5034,7 @@ class Game:
                     if self.flamers_damage_active:
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders.append(
                             self.id_of_the_active_flamer)
+                    self.checks_on_damage(primary_player, secondary_player, planet_pos, unit_pos)
                     if self.positions_attackers_of_units_to_take_damage[0] is not None:
                         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
                         self.damage_taken_was_from_attack.append(True)
@@ -5223,6 +5231,8 @@ class Game:
                                                                           primary_player.name_player,
                                                                           (int(primary_player.number), planet_pos,
                                                                            unit_pos))
+                                            self.checks_on_damage(primary_player, secondary_player, planet_pos,
+                                                                  unit_pos)
                                             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                                 att_num, att_pla, att_pos = \
                                                     self.positions_attackers_of_units_to_take_damage[0]
@@ -6083,6 +6093,15 @@ class Game:
                 warlord_pla, warlord_pos = player.get_location_of_warlord()
                 if warlord_pla == -1 or warlord_pos == -1:
                     player.warlord_just_got_destroyed = True
+            if self.interrupts_waiting_on_resolution[0] == "Saint Celestine: Rebirth":
+                player = self.p1
+                if self.player_resolving_interrupts[0] == self.name_2:
+                    player = self.p2
+                warlord_pla, warlord_pos = player.get_location_of_warlord()
+                if warlord_pla == -1 or warlord_pos == -1:
+                    player.warlord_just_got_destroyed = True
+                else:
+                    player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
             self.asking_which_interrupt = True
             self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
             del self.interrupts_waiting_on_resolution[0]
@@ -7285,6 +7304,8 @@ class Game:
         if self.reactions_on_winning_combat_permitted:
             if loser.search_card_in_hq("Agra's Preachings", ready_relevant=True):
                 reactions.append("Agra's Preachings")
+            if loser.search_card_in_hq("Order of the Crimson Oath"):
+                reactions.append("Order of the Crimson Oath")
         return reactions
 
     def check_reactions_from_winning_combat(self, winner, planet_id):

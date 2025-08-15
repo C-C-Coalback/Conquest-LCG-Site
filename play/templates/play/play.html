@@ -516,7 +516,13 @@
                                     attachment_rotation = " style='transform:rotate(90deg);'"
                                     attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                                 }
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                                var attachment_style_string = "";
+                                if (rotation === "") {
+                                    attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
+                                } else {
+                                    attachment_style_string = ` "margin-left: ` + (j - 6).toString() + `vw"`;
+                                }
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             }
                             var style_string = "";
                             if (card_data_split.length > 6) {
@@ -595,14 +601,20 @@
                                 attachment_rotation = " style='transform:rotate(90deg);'"
                                 attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                            var attachment_style_string = "";
+                            if (attachment_rotation === "") {
+                                attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
+                            } else {
+                                attachment_style_string = ` "margin-left: ` + (j - 6).toString() + `vw"`;
+                            }
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
                         var style_string = "";
                         if (card_data_split.length > 6) {
                             if (rotation === "") {
-                                style_string = ` style="margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                             } else {
-                                style_string = ` "margin-left: ` + (card_data_split.length - 5).toString() + `vw"`;
+                                style_string = ` "margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                             }
                         }
                         full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`

@@ -20,6 +20,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "Heralding Cherubim":
+        p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+        if warlord_pla != -2:
+            if abs(warlord_pla - chosen_planet) == 1:
+                primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                self.delete_reaction()
     elif current_reaction == "Undying Saint":
         if self.round_number != chosen_planet or secondary_player.has_initiative:
             if "Undying Saint" in primary_player.discard:

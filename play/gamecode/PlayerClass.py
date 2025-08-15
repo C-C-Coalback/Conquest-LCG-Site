@@ -1621,6 +1621,11 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].exhaust_card()
         return last_element_index
 
+    def get_once_per_game_used_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_once_per_game_used()
+        return self.cards_in_play[planet_id + 1][unit_id].get_once_per_game_used()
+
     def get_once_per_phase_used_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_once_per_phase_used()
@@ -1630,6 +1635,13 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_once_per_round_used()
         return self.cards_in_play[planet_id + 1][unit_id].get_once_per_round_used()
+
+    def set_once_per_game_used_given_pos(self, planet_id, unit_id, new_val):
+        if planet_id == -2:
+            self.headquarters[unit_id].set_once_per_game_used(new_val)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].set_once_per_game_used(new_val)
+        return None
 
     def set_once_per_phase_used_given_pos(self, planet_id, unit_id, new_val):
         if planet_id == -2:
@@ -2266,6 +2278,8 @@ class Player:
 
     def commit_warlord_to_planet_from_planet(self, origin_planet, dest_planet):
         self.warlord_commit_location = dest_planet
+        if origin_planet == -2:
+            self.commit_warlord_to_planet(dest_planet, only_warlord=True)
         i = 0
         warlord_committed = False
         while i < len(self.cards_in_play[origin_planet + 1]) and not warlord_committed:
@@ -2281,7 +2295,15 @@ class Player:
                     self.game.create_reaction("Ragnar Blackmane", self.name_player,
                                               [int(self.number), dest_planet, -1])
                 self.move_unit_to_planet(origin_planet, i, dest_planet)
+                for j in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, j) == "Heralding Cherubim":
+                        self.game.create_reaction("Heralding Cherubim", self.name_player,
+                                                  (int(self.number), -2, j))
                 for j in range(7):
+                    for k in range(len(self.cards_in_play[j + 1])):
+                        if self.get_ability_given_pos(j, k) == "Heralding Cherubim":
+                            self.game.create_reaction("Heralding Cherubim", self.name_player,
+                                                      (int(self.number), j, k))
                     if j != dest_planet:
                         for k in range(len(self.cards_in_play[j + 1])):
                             if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
@@ -2397,7 +2419,15 @@ class Player:
                         self.game.create_reaction("Old Zogwort", self.name_player,
                                                   (int(self.number), planet_pos - 1, i))
                     self.move_unit_to_planet(-2, i, planet_pos - 1)
+                    for j in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, j) == "Heralding Cherubim":
+                            self.game.create_reaction("Heralding Cherubim", self.name_player,
+                                                      (int(self.number), -2, j))
                     for j in range(7):
+                        for k in range(len(self.cards_in_play[j + 1])):
+                            if self.get_ability_given_pos(j, k) == "Heralding Cherubim":
+                                self.game.create_reaction("Heralding Cherubim", self.name_player,
+                                                          (int(self.number), j, k))
                         if j != planet_pos - 1:
                             for k in range(len(self.cards_in_play[j + 1])):
                                 if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
@@ -2502,6 +2532,9 @@ class Player:
             if self.cards_in_play[planet_id + 1][i].get_faction() == "Tyranids":
                 unit_count += 1
         return unit_count
+
+    def count_units_at_planet(self, planet_id):
+        return len(self.cards_in_play[planet_id + 1])
 
     def count_units_in_play_all(self):
         unit_count = 0
@@ -3868,6 +3901,9 @@ class Player:
                 damage += 1
         if self.search_attachments_at_pos(planet_id, unit_id, "Heavy Marker Drone"):
             damage = damage * 2
+        if damage > 3:
+            if self.search_attachments_at_pos(planet_id, unit_id, "Armour of Saint Katherine"):
+                damage = 3
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -4107,6 +4143,10 @@ class Player:
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
                 health += 1
+        if card.get_card_type() == "Warlord":
+            if self.game.round_number == planet_id:
+                if self.search_card_in_hq("Order of the Crimson Oath"):
+                    health += 2
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 health += 1
@@ -4472,6 +4512,7 @@ class Player:
         return True
 
     def destroy_card_in_hq(self, card_pos):
+        self.search_for_preemptive_destroy_interrupts()
         if self.headquarters[card_pos].get_card_type() == "Warlord":
             if self.headquarters[card_pos].get_name() == "Termagant":
                 self.add_card_in_hq_to_discard(card_pos)
@@ -4625,6 +4666,9 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_lumbering()
 
     def resolve_combat_round_begins(self, planet_num):
+        if not self.check_for_warlord(planet_num):
+            if "Miraculous Intervention" in self.cards:
+                self.game.create_reaction("Miraculous Intervention", self.name_player, (int(self.number), -1, -1))
         for i in range(len(self.headquarters)):
             self.headquarters[i].once_per_combat_round_used = False
             if self.headquarters[i].get_ability() == "Holy Fusillade":
@@ -4669,7 +4713,11 @@ class Player:
                     self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), -2, i))
                 if self.get_card_type_given_pos(-2, i) == "Warlord":
                     if self.headquarters[i].get_bloodied():
-                        if self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                        if self.get_ability_given_pos(-2, i) == "Saint Celestine" and not \
+                                self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(-2, i):
+                            self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
+                                                       (int(self.number), -2, i))
+                        elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
                             if self.search_hand_for_card("Necrodermis"):
                                 self.game.create_interrupt("Necrodermis", self.name_player,
                                                            (int(self.number), -2, i))
@@ -4690,7 +4738,12 @@ class Player:
                         self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), i, j))
                     if self.get_card_type_given_pos(i, j) == "Warlord":
                         if self.cards_in_play[i + 1][j].get_bloodied():
-                            if self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                            if self.get_ability_given_pos(planet_num, card_pos) == "Saint Celestine" and not \
+                                    self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(planet_num,
+                                                                                                     card_pos):
+                                self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
+                                                           (int(self.number), planet_num, card_pos))
+                            elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
                                 if self.search_hand_for_card("Necrodermis"):
                                     self.game.create_interrupt("Necrodermis", self.name_player,
                                                                (int(self.number), i, j))

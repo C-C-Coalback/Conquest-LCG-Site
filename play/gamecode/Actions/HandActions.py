@@ -890,6 +890,21 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_faction() != "Necrons":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True
+    elif self.action_chosen == "Saint Celestine":
+        if not self.chosen_first_card:
+            if card.get_is_unit() and not card.check_for_a_trait("Elite"):
+                primary_player.aiming_reticle_coords_hand = hand_pos
+                primary_player.aiming_reticle_color = "blue"
+                self.chosen_first_card = True
+                self.misc_counter = card.get_cost()
+                if self.misc_counter < 1:
+                    target_planet = self.position_of_actioned_card[0]
+                    del primary_player.cards[hand_pos]
+                    primary_player.add_card_to_planet(card, target_planet)
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.action_cleanup()
+                else:
+                    await self.send_update_message("Please pay " + str(self.misc_counter) + " faith.")
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))

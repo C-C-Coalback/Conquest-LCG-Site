@@ -191,54 +191,6 @@ h4 {
     width: 2.6vw;
 }
 
-.Exhausted-Card + .Exhausted-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Card + .Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Attachment-Card + .Exhausted-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Attachment-Card + .Exhausted-Card {
-    margin-left: 1vw;
-}
-
-.Card + .Exhausted-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Card + .Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Attachment-Card + .Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Attachment-Card + .Card {
-    margin-left: 1vw;
-}
-
-.Attachment-Card + .Exhausted-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Attachment-Card + .Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Attachment-Card + .Exhausted-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Attachment-Card + .Attachment-Card {
-    margin-left: 1vw;
-}
-
 .Planet-Attachment-Card + .Planet-Attachment-Card {
     margin-left: 1vw;
 }

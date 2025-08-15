@@ -136,6 +136,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Order of the Crimson Oath":
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.delete_reaction()
         elif current_reaction == "Siege Regiment Manticore":
             _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(planet_pos - og_pla) == 1:

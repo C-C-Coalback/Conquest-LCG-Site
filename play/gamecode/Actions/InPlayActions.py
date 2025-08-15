@@ -300,6 +300,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Saint Celestine":
+                        if not card_chosen.get_once_per_phase_used():
+                            if not card_chosen.bloodied:
+                                card_chosen.set_once_per_phase_used(True)
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                self.chosen_first_card = False
                     elif ability == "Ravenous Flesh Hounds":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -670,7 +678,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                dest_planet, dest_pos):
                         player_owning_card.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                         self.chosen_second_card = True
-                        sself.action_cleanup()
+                        self.action_cleanup()
                         self.chosen_second_card = True
                         self.misc_target_attachment = (-1, -1, -1)
                         self.misc_player_storage = ""
@@ -1588,6 +1596,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if ethereal_present:
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.action_cleanup()
+    elif self.action_chosen == "Saint Celestine":
+        if self.chosen_first_card:
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                self.misc_counter = self.misc_counter - 1
+                if self.misc_counter < 1:
+                    card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                    del primary_player.cards[primary_player.aiming_reticle_coords_hand]
+                    target_planet = self.position_of_actioned_card[0]
+                    primary_player.add_card_to_planet(card, target_planet)
+                    primary_player.aiming_reticle_coords_hand = None
+                    self.action_cleanup()
     elif self.action_chosen == "Rally the Charge":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":

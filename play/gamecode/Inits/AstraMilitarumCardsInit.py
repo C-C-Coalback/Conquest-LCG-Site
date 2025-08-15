@@ -625,6 +625,38 @@ def astra_militarum_cards_init():
                                                                " equal to the difference between the units' "
                                                                "printed costs.", "Award. Ecclesiarchy.",
                                    1, faction, "Loyal", 2, False, type_of_units_allowed_for_attachment="Army",
-                                   extra_health=1)
+                                   extra_health=1),
+        CardClasses.WarlordCard("Saint Celestine", "Combat Action: Pay faith equal to the printed cost of a non-Elite "
+                                                   "unit in your hand to put it into play at this planet. "
+                                                   "If that unit is still in play at the end of the phase, "
+                                                   "discard it and draw a card. (Limit once per phase.)",
+                                "Saint. Ecclesiarchy.", faction, 2, 7, 2, 5,
+                                "Bloodied.\n"
+                                "Interrupt: When your warlord would be defeated by taking damage, remove all damage"
+                                " from it instead. Then deal it 5 damage. (Limit once per game.)", 7, 7,
+                                ["4x Heralding Cherubim", "2x Miraculous Intervention",
+                                 "1x Armour of Saint Katherine", "1x Order of the Crimson Oath"],
+                                action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Heralding Cherubim", "Reaction: After your warlord commits to a planet, "
+                                                   "place 1 faith on this unit. "
+                                                   "Then you may move this unit to a planet adjacent to your warlord.",
+                             "Herald. Ecclesiarchy.", 2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.AttachmentCard("Armour of Saint Katherine", "Attach to your warlord.\n"
+                                                                "Reduce all damage dealt to attached unit to 3.\n"
+                                                                "Reaction: After attached unit takes damage, "
+                                                                "place 1 faith on it.", "Wargear. Armor.",
+                                   0, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True),
+        CardClasses.EventCard("Miraculous Intervention", "Reaction: After a combat round begins at a planet, commit "
+                                                         "your warlord to that planet and place 2 faith on it. "
+                                                         "Then you may pay 1 resource to put Guardsman tokens into "
+                                                         "play at that planet until you control at least as many "
+                                                         "units as your opponent at that planet.",
+                              "Prayer. Ecclesiarchy.", 1, faction, "Signature", 1, False),
+        CardClasses.SupportCard("Order of the Crimson Oath", "While at the first planet, your warlord gets +2 HP.\n"
+                                                             "Reaction: After your opponent wins a battle, Rally 6 a"
+                                                             " unit, add it to your hand. Then place 2 faith among"
+                                                             " army units you control.",
+                                "Location. Ecclesiarchy.", 0, faction, "Signature", False)
     ]
     return astra_militarum_cards_array
