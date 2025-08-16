@@ -29,6 +29,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "First Line Rhinos":
+            primary_player.number_cards_to_search = 6
+            self.resolving_search_box = True
+            if len(primary_player.deck) > 5:
+                self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+            else:
+                self.choices_available = primary_player.deck[0:len(primary_player.deck)]
+            self.choice_context = "First Line Rhinos Rally"
+            self.name_player_making_choices = primary_player.name_player
         elif current_reaction == "Order of the Crimson Oath":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"

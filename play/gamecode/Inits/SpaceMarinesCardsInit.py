@@ -364,6 +364,14 @@ def space_marines_cards_init():
         CardClasses.SupportCard("Standard of Devastation", "Reaction: After a Dark Angels unit you control is "
                                                            "destroyed, each other Space Marines army unit "
                                                            "you control gets +1 ATK until the end of the phase.",
-                                "Relic. Upgrade.", 3, faction, "Common", True)
+                                "Relic. Upgrade.", 3, faction, "Common", True),
+        CardClasses.ArmyCard("First Line Rhinos", "No Wargear Attachments.\n"
+                                                  "Reaction: After you deploy this unit, Rally 6 a non-Vehicle "
+                                                  "Space Marines unit with printed cost 3 or lower, "
+                                                  "attach it to this unit."
+                                                  " When this unit leaves play, as an interrupt, put the attached unit"
+                                                  " into play exhausted at the same planet.",
+                             "Vehicle. Ultramarines.", 2, faction, "Loyal", 2, 2, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return space_marines_card_array

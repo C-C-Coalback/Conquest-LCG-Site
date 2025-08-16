@@ -39,6 +39,14 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.misc_target_planet = -1
             self.misc_target_unit = (-1, -1)
             await self.send_update_message("Select which unit to move faith from.")
+        elif current_interrupt == "First Line Rhinos":
+            extra_info = self.extra_interrupt_info[0]
+            if extra_info is not None:
+                card = self.preloaded_find_card(extra_info)
+                primary_player.add_card_to_planet(card, planet_pos, already_exhausted=True)
+                if extra_info in primary_player.discard:
+                    primary_player.discard.remove(extra_info)
+            self.delete_interrupt()
         elif current_interrupt == "Saint Celestine: Rebirth":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 5)

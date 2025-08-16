@@ -204,6 +204,7 @@ class Game:
         self.interrupts_waiting_on_resolution = []
         self.player_resolving_interrupts = []
         self.positions_of_units_interrupting = []
+        self.extra_interrupt_info = []
         self.location_hand_attachment_shadowsun = -1
         self.name_attachment_discard_shadowsun = ""
         self.units_damaged_by_attack = []
@@ -476,6 +477,7 @@ class Game:
         self.interrupts_waiting_on_resolution = []
         self.player_resolving_interrupts = []
         self.positions_of_units_interrupting = []
+        self.extra_interrupt_info = []
         self.active_effects = []
 
     def reset_reactions_data(self):
@@ -2124,6 +2126,9 @@ class Game:
         self.positions_of_units_interrupting.insert(
             0, self.positions_of_units_interrupting.pop(interrupt_pos)
         )
+        self.extra_interrupt_info.insert(
+            0, self.extra_interrupt_info.pop(interrupt_pos)
+        )
         self.asking_if_interrupt = True
 
     def move_reaction_to_front(self, reaction_pos):
@@ -3414,6 +3419,21 @@ class Game:
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
+                    elif self.choice_context == "First Line Rhinos Rally":
+                        _, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                        card_name = self.choices_available[int(game_update_string[1])]
+                        card = self.preloaded_find_card(card_name)
+                        if card.get_faction() == "Space Marines" and card.get_card_type() == "Army" and not \
+                                card.check_for_a_trait("Vehicle") and card.get_cost() < 4:
+                            attachment_card = CardClasses.AttachmentCard(
+                                card_name, "", "", 0, "Space Marines", "Common", 0, False)
+                            attachment_card.from_front_line_rhinos = True
+                            primary_player.attach_card(attachment_card, pla, pos)
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.bottom_remaining_cards()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.delete_reaction()
                     elif self.choice_context == "Use Maksim's Squadron?":
                         self.maksim_squadron_enabled = False
                         if game_update_string[1] == "0":
@@ -4982,7 +5002,7 @@ class Game:
                         (int(primary_player.number), planet_pos, unit_pos)
                     )
 
-    def create_interrupt(self, name_interrupt, name_player, pos_interrupter):
+    def create_interrupt(self, name_interrupt, name_player, pos_interrupter, extra_info=None):
         if name_player == self.name_1:
             player = self.p1
         else:
@@ -4991,6 +5011,7 @@ class Game:
             self.interrupts_waiting_on_resolution.append(name_interrupt)
             self.player_resolving_interrupts.append(name_player)
             self.positions_of_units_interrupting.append(pos_interrupter)
+            self.extra_interrupt_info.append(extra_info)
 
     async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
         if name == self.player_who_is_shielding:
@@ -6107,6 +6128,7 @@ class Game:
             del self.interrupts_waiting_on_resolution[0]
             del self.player_resolving_interrupts[0]
             del self.positions_of_units_interrupting[0]
+            del self.extra_interrupt_info[0]
         self.already_resolving_interrupt = False
 
     def start_ranged_skirmish(self, planet_pos):

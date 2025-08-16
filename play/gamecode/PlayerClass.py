@@ -1171,6 +1171,7 @@ class Player:
                             del self.game.interrupts_waiting_on_resolution[i]
                             del self.game.positions_of_units_interrupting[i]
                             del self.game.player_resolving_interrupts[i]
+                            del self.game.extra_interrupt_info[i]
                             i = i - 1
             i += 1
 
@@ -1819,6 +1820,9 @@ class Player:
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "First Line Rhinos":
+                                self.game.create_reaction("First Line Rhinos", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
@@ -1878,6 +1882,9 @@ class Player:
                                 if self.game.get_blue_icon(position):
                                     self.game.create_reaction("Imperial Fists Devastators", self.name_player,
                                                               (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "First Line Rhinos":
+                                self.game.create_reaction("First Line Rhinos", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Triarch Stalkers Procession":
                                 other_player.draw_card()
                                 other_player.draw_card()
@@ -5074,6 +5081,9 @@ class Player:
             if card.get_attachments()[i].get_ability() == "Banner of the Cult" \
                     and not card.get_attachments()[i].from_magus_harid:
                 self.game.create_interrupt("Banner of the Cult", owner, (int(self.number), planet_num, -1))
+            if card.get_attachments()[i].from_front_line_rhinos:
+                self.game.create_interrupt("First Line Rhinos", owner, (int(self.number), planet_num, -1),
+                                           extra_info=card.get_attachments()[i].get_name())
             if card.get_attachments()[i].from_magus_harid:
                 att_card_type = card.get_attachments()[i].get_card_type()
                 if att_card_type == "Army" or att_card_type == "Attachment":
