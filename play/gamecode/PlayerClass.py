@@ -5376,6 +5376,12 @@ class Player:
                             self.game.create_reaction("Taurox APC", self.name_player,
                                                       (int(self.number), i, j))
 
+    def special_get_card_type_given_pos(self, sent_in_value):
+        if sent_in_value is None:
+            return ""
+        _, planet_pos, unit_pos = sent_in_value
+        return self.get_card_type_given_pos(planet_pos, unit_pos)
+
     def search_ready_card_at_planet(self, planet_pos):
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if self.get_ready_given_pos(planet_pos, i):

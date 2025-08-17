@@ -5456,14 +5456,16 @@ class Game:
                                                 if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                         .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
                                                         primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                                                .check_for_a_trait("Soldier", primary_player.etekh_trait):
+                                                        .check_for_a_trait("Soldier", primary_player.etekh_trait):
                                                     primary_player.aiming_reticle_coords_hand = None
                                                     primary_player.discard_card_from_hand(self.pos_shield_card)
                                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                                     self.pos_shield_card = -1
                                                     printed_atk = primary_player.cards_in_play[
                                                         sac_planet_pos + 1][sac_unit_pos].attack
-                                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.amount_that_can_be_removed_by_shield[0])
+                                                    primary_player.remove_damage_from_pos(
+                                                        planet_pos, unit_pos,
+                                                        self.amount_that_can_be_removed_by_shield[0])
                                                     primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
                                                     att_num, att_pla, att_pos = \
                                                         self.positions_attackers_of_units_to_take_damage[0]
@@ -5523,6 +5525,21 @@ class Game:
                                 if self.amount_that_can_be_removed_by_shield[0] == 0:
                                     primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                            elif primary_player.get_ability_given_pos(
+                                    hurt_planet, hurt_pos) == "Evanescent Players" and not \
+                                    primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos) and \
+                                    self.amount_that_can_be_removed_by_shield[0] > 2 and \
+                                    secondary_player.special_get_card_type_given_pos(
+                                        self.positions_attackers_of_units_to_take_damage[0]
+                                    ) == "Army":
+                                damage_prevented = self.amount_that_can_be_removed_by_shield[0] - 2
+                                self.amount_that_can_be_removed_by_shield[0] = 2
+                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_prevented)
+                                _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                secondary_player.assign_damage_to_pos(att_pla, att_pos, damage_prevented,
+                                                                      rickety_warbuggy=True,
+                                                                      shadow_field_possible=True)
+                                primary_player.set_once_per_phase_used_given_pos(hurt_planet, hurt_pos, True)
                             elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
                                 if primary_player.get_ability_given_pos(

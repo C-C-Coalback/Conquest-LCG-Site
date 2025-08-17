@@ -347,6 +347,11 @@ def eldar_cards_init():
         CardClasses.EventCard("Piercing Wail", "Deploy Action: Exhaust up to 2 units each with printed cost X or lower."
                                                " X is equal to the highest printed cost among units you control.",
                               "Power.", 4, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Evanescent Players", "Deep Strike (1).\n"
+                                                   "Interrupt: When this unit is assigned damage by an enemy army unit,"
+                                                   " prevent all but 2 of that damage. Then deal damage to that unit"
+                                                   " damage equal to the damage prevented. (Limit once per phase.)",
+                             "Psyker. Harlequin.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=1)
     ]
     return eldar_cards_array
