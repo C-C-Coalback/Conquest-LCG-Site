@@ -320,6 +320,8 @@ class Player:
                 interrupts.append("Vale Tenndrac")
             if self.search_hand_for_card("Blade of the Crimson Oath"):
                 interrupts.append("Blade of the Crimson Oath")
+            if self.search_hand_for_card("Shas'el Lyst"):
+                interrupts.append("Shas'el Lyst")
         return interrupts
 
     async def send_hq(self, force=False):
@@ -2827,6 +2829,14 @@ class Player:
         if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
             for i in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
+                    return True
+        if planet_pos != -2:
+            if self.search_card_at_planet(planet_pos, "Shas'el Lyst", ready_relevant=True):
+                other_player = self.get_other_player()
+                if other_player.spend_resources(1):
+                    self.game.queued_message = "Important info: Shas'el Lyst made " + other_player.name_player + \
+                                               " spend 1 resource!"
+                else:
                     return True
         return False
 
@@ -5413,6 +5423,8 @@ class Player:
         last_element_hq = len(self.headquarters) - 1
         self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
+        if self.search_hand_for_card("Shas'el Lyst"):
+            self.game.create_interrupt("Shas'el Lyst", self.name_player, (int(self.number), -1, -1))
         return True
 
     def get_keywords_given_pos(self, planet_pos, unit_pos):

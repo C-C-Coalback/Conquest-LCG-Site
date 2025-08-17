@@ -40,6 +40,12 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
             self.infest_planet(chosen_planet, primary_player)
             self.delete_interrupt()
+    elif current_interrupt == "Shas'el Lyst":
+        card = self.preloaded_find_card("Shas'el Lyst")
+        primary_player.add_card_to_planet(card, chosen_planet)
+        if "Shas'el Lyst" in primary_player.cards:
+            primary_player.cards.remove("Shas'el Lyst")
+        self.delete_interrupt()
     elif current_interrupt == "The Shadow Suit":
         if not self.chosen_first_card:
             if not secondary_player.search_ready_card_at_planet(chosen_planet):

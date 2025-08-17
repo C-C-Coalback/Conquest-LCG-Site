@@ -304,6 +304,12 @@ def tau_cards_init():
                              no_attachments=True, action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.EventCard("Hunter's Ploy", "Reaction: After the headquarters phase begins, each player gains "
                                                "resources equal to the highest printed cost among units he controls.",
-                              "Tactic.", 0, faction, "Common", 1, False)
+                              "Tactic.", 0, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Shas'el Lyst", "While this unit is ready, as an additional cost to target units you "
+                                             "control at this planet, your opponent must pay 1 resource.\n"
+                                             "Interrupt: When your opponent triggers an ability that discards a card "
+                                             "from your hand or routs a unit you control, put this unit from your "
+                                             "hand into play at a planet.", "Soldier. Hero.",
+                             2, faction, "Loyal", 2, 3, 1, True)
     ]
     return tau_cards_array

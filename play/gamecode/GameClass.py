@@ -374,6 +374,7 @@ class Game:
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
                                                  "Declare the Crusade", "Gut and Pillage"]
         self.queued_sound = ""
+        self.queued_message = ""
         self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
         self.gunfire_weapon_sounds = ["Astra Militarum", "Orks", "Dark Eldar", "Tyranids", "Neutral"]
         self.deepstrike_allowed = True
@@ -404,6 +405,11 @@ class Game:
         self.interrupts_discard_enemy_allowed = True
         self.queued_moves = []  # (player num, planet pos, unit pos, destination)
         self.sororitas_command_squad_value = 0
+
+    async def send_queued_message(self):
+        if self.queued_message:
+            await self.send_update_message(self.queued_message)
+            self.queued_message = ""
 
     async def send_queued_sound(self):
         if self.queued_sound:
@@ -2427,6 +2433,18 @@ class Game:
                             self.interrupts_discard_enemy_allowed = False
                             await self.complete_enemy_discard(primary_player, secondary_player)
                             self.interrupts_discard_enemy_allowed = True
+                        elif chosen_choice == "Shas'el Lyst":
+                            self.choices_available = []
+                            self.choice_context = "Target Planet Shas'el Lyst"
+                            for i in range(len(self.planets_in_play_array)):
+                                if self.planets_in_play_array[i]:
+                                    self.choices_available.append(primary_player.cards_in_play[0][i])
+                            if not self.choices_available:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                self.interrupts_discard_enemy_allowed = False
+                                await self.complete_enemy_discard(primary_player, secondary_player)
+                                self.interrupts_discard_enemy_allowed = True
                         elif chosen_choice == "Vale Tenndrac":
                             self.choices_available = []
                             self.choice_context = "Target Planet Vale Tenndrac"
@@ -2446,6 +2464,22 @@ class Game:
                             self.reset_choices_available()
                             self.resolving_search_box = False
                             self.name_player_making_choices = primary_player.name_player
+                    elif self.choice_context == "Target Planet Shas'el Lyst":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        i = 0
+                        found_planet = False
+                        while i < 7 and not found_planet:
+                            if primary_player.cards_in_play[0][i] == chosen_choice:
+                                found_planet = True
+                                card = self.preloaded_find_card("Shas'el Lyst")
+                                primary_player.add_card_to_planet(card, i)
+                                primary_player.remove_card_name_from_hand("Shas'el Lyst")
+                            i += 1
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.interrupts_discard_enemy_allowed = False
+                        await self.complete_enemy_discard(primary_player, secondary_player)
+                        self.interrupts_discard_enemy_allowed = True
                     elif self.choice_context == "Target Planet Vale Tenndrac":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         i = 0
@@ -7217,6 +7251,7 @@ class Game:
         await self.p2.send_resources()
         await self.send_planet_array()
         await self.send_queued_sound()
+        await self.send_queued_message()
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
