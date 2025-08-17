@@ -40,6 +40,22 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
             self.infest_planet(chosen_planet, primary_player)
             self.delete_interrupt()
+    elif current_interrupt == "The Shadow Suit":
+        if not self.chosen_first_card:
+            if not secondary_player.search_ready_card_at_planet(chosen_planet):
+                card = self.preloaded_find_card("The Shadow Suit")
+                if "The Shadow Suit" in primary_player.discard:
+                    primary_player.discard.remove("The Shadow Suit")
+                primary_player.put_card_into_reserve(card, chosen_planet, payment=False)
+                self.delete_interrupt()
+            else:
+                await self.send_update_message(primary_player.name_player + " is trying to put The Shadow Suit into "
+                                                                            "reserve at " +
+                                               primary_player.cards_in_play[0][chosen_planet] + ". You may exhaust a " +
+                                               "unit at that planet to cancel this effect.")
+                self.player_resolving_interrupts[0] = secondary_player.name_player
+                self.chosen_first_card = True
+                self.misc_target_planet = chosen_planet
     elif current_interrupt == "Trazyn the Infinite":
         origin_planet, origin_pos = primary_player.get_location_of_warlord()
         if chosen_planet != origin_planet:

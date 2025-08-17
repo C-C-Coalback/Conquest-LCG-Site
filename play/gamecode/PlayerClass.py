@@ -166,7 +166,12 @@ class Player:
         self.celestian_amelia_active = False
         self.wrathful_retribution_value = 0
 
-    def put_card_into_reserve(self, card, planet_pos):
+
+
+    def put_card_into_reserve(self, card, planet_pos, payment=True):
+        if not payment:
+            self.cards_in_reserve[planet_pos].append(copy.deepcopy(card))
+            return True
         if self.spend_resources(1):
             self.cards_in_reserve[planet_pos].append(copy.deepcopy(card))
             self.game.queued_sound = "onplay"
@@ -5100,6 +5105,8 @@ class Player:
             owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                 self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
+            if card.get_attachments()[i].get_ability() == "The Shadow Suit":
+                self.game.create_interrupt("The Shadow Suit", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":
                 self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "Mark of Slaanesh":
@@ -5246,6 +5253,10 @@ class Player:
                     self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
                 if card.get_attachments()[i].get_ability() == "Transcendent Blessing":
                     self.game.create_interrupt("Transcendent Blessing", owner, (int(self.number), -1, -1))
+                if card.get_attachments()[i].get_ability() == "The Shadow Suit":
+                    self.game.create_interrupt("The Shadow Suit", owner, (int(self.number), -1, -1))
+                if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":
+                    self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
         if card.get_card_type() == "Army":
             if self.check_for_trait_given_pos(-2, card_pos, "Ecclesiarchy") or \
                     self.check_for_trait_given_pos(-2, card_pos, "Grey Knights"):
@@ -5364,6 +5375,12 @@ class Player:
                         if self.cards_in_play[i + 1][j].get_ability() == "Taurox APC":
                             self.game.create_reaction("Taurox APC", self.name_player,
                                                       (int(self.number), i, j))
+
+    def search_ready_card_at_planet(self, planet_pos):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.get_ready_given_pos(planet_pos, i):
+                return True
+        return False
 
     def rout_unit(self, planet_id, unit_id):
         if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":

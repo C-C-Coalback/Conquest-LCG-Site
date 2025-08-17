@@ -5967,6 +5967,12 @@ class Game:
                         primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                         await self.send_update_message("Did not pay the additional cost; "
                                                        "card added to discard.")
+                    if current_interrupt == "The Shadow Suit":
+                        if self.chosen_first_card:
+                            card = self.preloaded_find_card("The Shadow Suit")
+                            if "The Shadow Suit" in secondary_player.discard:
+                                secondary_player.discard.remove("The Shadow Suit")
+                            secondary_player.put_card_into_reserve(card, chosen_planet, payment=False)
                     if current_interrupt == "Blood of Martyrs":
                         if not self.chosen_first_card:
                             self.delete_interrupt()

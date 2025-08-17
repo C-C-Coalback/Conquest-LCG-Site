@@ -39,6 +39,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.misc_target_planet = -1
             self.misc_target_unit = (-1, -1)
             await self.send_update_message("Select which unit to move faith from.")
+        elif current_interrupt == "The Shadow Suit":
+            self.chosen_first_card = False
         elif current_interrupt == "First Line Rhinos":
             extra_info = self.extra_interrupt_info[0]
             if extra_info is not None:

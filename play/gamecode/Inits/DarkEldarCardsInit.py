@@ -333,6 +333,14 @@ def dark_eldar_cards_init():
                              "Warrior. Beastmaster. Elite.", 5, faction, "Common", 2, 5, 2, False, deepstrike=4),
         CardClasses.ArmyCard("Hydrae Stalker", "Reaction: After you deploy this unit, deal 2 damage to a target unit "
                                                "with printed cost 2 or lower.", "Warrior. Wych. Raider.",
-                             3, faction, "Common", 2, 3, 0, False)
+                             3, faction, "Common", 2, 3, 0, False),
+        CardClasses.AttachmentCard("The Shadow Suit", "Deep Strike (0).\n"
+                                                      "Attach to an army unit.\n"
+                                                      "Attached unit gets +2 ATK and +1 HP.\n"
+                                                      "Interrupt: When attached unit leaves play, put this card in "
+                                                      "reserve at a planet. Your opponent may exhaust a unit at that"
+                                                      " planet to cancel this effect.", "Wargear. Weapon.",
+                                   2, faction, "Loyal", 2, True, deepstrike=0, extra_health=1, extra_attack=2,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return dark_eldar_cards_array
