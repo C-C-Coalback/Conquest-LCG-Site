@@ -449,18 +449,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
                         not card.check_for_a_trait("Elite"):
-                    primary_player.add_card_to_planet(card, planet_pos)
-                    position_of_unit = len(primary_player.cards_in_play[planet_pos + 1]) - 1
-                    primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
-                        valid_target_dynastic_weaponry = True
-                    if "Dynastic Weaponry" in primary_player.discard:
-                        if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                            self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                    if primary_player.add_card_to_planet(card, planet_pos) != -1:
+                        position_of_unit = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                        primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
+                            valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                     (int(primary_player.get_number()), planet_pos, position_of_unit))
+                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                            self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet_pos, position_of_unit))
-                    if primary_player.search_hand_for_card("Optimized Protocol"):
-                        self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                             (int(primary_player.get_number()), planet_pos, position_of_unit))
-                    del primary_player.discard[-1]
+                        del primary_player.discard[-1]
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weight of the Aeons":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -843,18 +843,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                         if name_card in secondary_player.discard:
                             card = FindCard.find_card(name_card, self.card_array, self.cards_dict,
                                                       self.apoka_errata_cards, self.cards_that_have_errata)
-                            primary_player.add_card_to_planet(card, planet, is_owner_of_card=False)
-                            last_index = len(secondary_player.discard) - 1
-                            found = False
-                            while last_index > -1 and not found:
-                                if secondary_player.discard[last_index] == name_card:
-                                    del secondary_player.discard[last_index]
-                                    if name_card in secondary_player.cards_recently_discarded:
-                                        secondary_player.cards_recently_discarded.remove(name_card)
-                                    if name_card in secondary_player.cards_recently_destroyed:
-                                        secondary_player.cards_recently_destroyed.remove(name_card)
-                                    found = True
-                                last_index -= 1
+                            if primary_player.add_card_to_planet(card, planet, is_owner_of_card=False) != -1:
+                                last_index = len(secondary_player.discard) - 1
+                                found = False
+                                while last_index > -1 and not found:
+                                    if secondary_player.discard[last_index] == name_card:
+                                        del secondary_player.discard[last_index]
+                                        if name_card in secondary_player.cards_recently_discarded:
+                                            secondary_player.cards_recently_discarded.remove(name_card)
+                                        if name_card in secondary_player.cards_recently_destroyed:
+                                            secondary_player.cards_recently_destroyed.remove(name_card)
+                                        found = True
+                                    last_index -= 1
                         self.delete_reaction()
             else:
                 self.delete_reaction()

@@ -201,11 +201,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
             elif planet_pos != 6:
                 card = FindCard.find_card("Growing Tide", self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
-                primary_player.add_card_to_planet(card, planet_pos + 1)
-                last_element_index = len(primary_player.cards_in_play[planet_pos + 1]) - 1
-                primary_player.increase_attack_of_unit_at_pos(planet_pos + 1, last_element_index, 1, expiration="EOG")
-                primary_player.increase_health_of_unit_at_pos(planet_pos + 1, last_element_index, 1, expiration="EOG")
-                await self.send_update_message("The Growing Tide grows...")
+                if primary_player.add_card_to_planet(card, planet_pos + 1) != -1:
+                    last_element_index = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos + 1, last_element_index, 1, expiration="EOG")
+                    primary_player.increase_health_of_unit_at_pos(planet_pos + 1, last_element_index, 1, expiration="EOG")
+                    await self.send_update_message("The Growing Tide grows...")
             else:
                 await self.send_update_message("No planet to move to!")
             self.delete_interrupt()

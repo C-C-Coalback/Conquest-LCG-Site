@@ -152,6 +152,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
                         self.misc_target_planet = -1
+                    elif ability == "Imperial Blockade":
+                        extra_cost = 0
+                        for i in range(len(primary_player.discard)):
+                            if primary_player.discard[i] == "Imperial Blockade":
+                                extra_cost += 1
+                        if primary_player.spend_resources(extra_cost):
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            primary_player.draw_card()
+                            self.action_chosen = ability
                     elif ability == "Rok Bombardment":
                         if self.last_planet_checked_for_battle != -1:
                             secondary_player.rok_bombardment_active.append("Enemy")

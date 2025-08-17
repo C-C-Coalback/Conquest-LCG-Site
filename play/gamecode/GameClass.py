@@ -257,6 +257,7 @@ class Game:
         self.alt_shield_name = ""
         self.damage_bodyguard = 0
         self.planet_bodyguard = -1
+        self.imperial_blockades_active = [0, 0, 0, 0, 0, 0, 0]
         self.last_player_who_resolved_reaction = ""
         self.last_player_who_resolved_interrupt = ""
         self.infested_planets = [False, False, False, False, False, False, False]
@@ -2409,7 +2410,7 @@ class Game:
                             relevant_player = self.p1
                             if num == 2:
                                 relevant_player = self.p2
-                            relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True)
+                            relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True, card_effect=False)
                         elif chosen_choice == "Strangleweb Termagant":
                             found_strangleweb = False
                             for i in range(len(primary_player.cards_in_play[og_pla + 1])):
@@ -2421,7 +2422,7 @@ class Game:
                                 relevant_player = self.p1
                                 if num == 2:
                                     relevant_player = self.p2
-                                relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True)
+                                relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True, card_effect=False)
                         if not self.queued_moves:
                             self.reset_choices_available()
                             self.resolving_search_box = False
@@ -2825,6 +2826,7 @@ class Game:
                                 if card_name != "Krieg Armoured Regiment":
                                     num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                                     primary_player.add_card_to_planet(card, planet_pos)
+                                    del primary_player.deck[int(game_update_string[1])]
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
                                     primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
@@ -3366,18 +3368,18 @@ class Game:
                         self.resolving_search_box = False
                         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
-                        primary_player.add_card_to_planet(card, pla)
-                        position_of_unit = len(primary_player.cards_in_play[pla + 1]) - 1
-                        primary_player.cards_in_play[pla + 1][position_of_unit]. \
-                            valid_target_dynastic_weaponry = True
-                        if "Dynastic Weaponry" in primary_player.discard:
-                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                        if primary_player.add_card_to_planet(card, pla) != -1:
+                            position_of_unit = len(primary_player.cards_in_play[pla + 1]) - 1
+                            primary_player.cards_in_play[pla + 1][position_of_unit]. \
+                                valid_target_dynastic_weaponry = True
+                            if "Dynastic Weaponry" in primary_player.discard:
+                                if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                    self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                         (int(primary_player.get_number()), pla, position_of_unit))
+                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                                self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), pla, position_of_unit))
-                        if primary_player.search_hand_for_card("Optimized Protocol"):
-                            self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                                 (int(primary_player.get_number()), pla, position_of_unit))
-                        primary_player.discard.remove(target_choice)
+                            primary_player.discard.remove(target_choice)
                         self.delete_reaction()
                         self.reset_choices_available()
                     elif self.choice_context == "Target Dread Monolith:":
@@ -3386,18 +3388,18 @@ class Game:
                         primary_player.reset_aiming_reticle_in_play(planet, pos)
                         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                                   self.apoka_errata_cards, self.cards_that_have_errata)
-                        primary_player.add_card_to_planet(card, planet)
-                        position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
-                            valid_target_dynastic_weaponry = True
-                        if "Dynastic Weaponry" in primary_player.discard:
-                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                        if primary_player.add_card_to_planet(card, planet) != -1:
+                            position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                            primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                                valid_target_dynastic_weaponry = True
+                            if "Dynastic Weaponry" in primary_player.discard:
+                                if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                    self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                         (int(primary_player.get_number()), planet, position_of_unit))
+                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                                self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet, position_of_unit))
-                        if primary_player.search_hand_for_card("Optimized Protocol"):
-                            self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                                 (int(primary_player.get_number()), planet, position_of_unit))
-                        primary_player.discard.remove(target_choice)
+                            primary_player.discard.remove(target_choice)
                         self.reset_choices_available()
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
@@ -5896,7 +5898,8 @@ class Game:
                                 primary_player.set_available_mobile_given_pos(self.unit_to_move_position[0],
                                                                               self.unit_to_move_position[1], False)
                                 primary_player.move_unit_to_planet(self.unit_to_move_position[0],
-                                                                   self.unit_to_move_position[1], planet_pos)
+                                                                   self.unit_to_move_position[1],
+                                                                   planet_pos, card_effect=False)
                                 if not primary_player.search_cards_for_available_mobile():
                                     primary_player.mobile_resolved = True
                                 self.unit_to_move_position = [-1, -1]
@@ -5923,7 +5926,8 @@ class Game:
                                 secondary_player.set_available_mobile_given_pos(self.unit_to_move_position[0],
                                                                                 self.unit_to_move_position[1], False)
                                 secondary_player.move_unit_to_planet(self.unit_to_move_position[0],
-                                                                     self.unit_to_move_position[1], planet_pos)
+                                                                     self.unit_to_move_position[1],
+                                                                     planet_pos, card_effect=False)
                                 if not secondary_player.search_cards_for_available_mobile():
                                     secondary_player.mobile_resolved = True
                                 self.unit_to_move_position = [-1, -1]
@@ -7526,6 +7530,7 @@ class Game:
         return None
 
     async def reset_values_for_new_round(self):
+        self.imperial_blockades_active = [0, 0, 0, 0, 0, 0, 0]
         self.p1.has_passed = False
         self.p2.has_passed = False
         self.p1.command_struggles_won_this_phase = 0

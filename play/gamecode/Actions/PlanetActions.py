@@ -71,6 +71,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 secondary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+    elif self.action_chosen == "Imperial Blockade":
+        self.imperial_blockades_active[chosen_planet] = self.imperial_blockades_active[chosen_planet] + 1
+        self.action_cleanup()
     elif self.action_chosen == "Saim-Hann Jetbike":
         if not self.chosen_first_card:
             og_pla, og_pos = self.position_of_actioned_card
@@ -708,12 +711,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     primary_player.aiming_reticle_color = None
                     primary_player.aiming_reticle_coords_hand = None
                     self.card_pos_to_deploy = -1
-                    self.player_with_action = ""
-                    self.action_chosen = ""
-                    if self.phase == "DEPLOY":
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.number
-                    self.mode = "Normal"
+                    self.action_cleanup()
                 i = -1
             i = i - 1
         if not card_found:

@@ -43,18 +43,18 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                          card.check_for_a_trait("Soldier", primary_player.etekh_trait)):
                     if card.get_cost() < self.ghost_ark_of_orikan:
                         num, planet, unit = self.positions_of_unit_triggering_reaction[0]
-                        primary_player.add_card_to_planet(card, planet)
-                        position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
-                            valid_target_dynastic_weaponry = True
-                        if "Dynastic Weaponry" in primary_player.discard:
-                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                        if primary_player.add_card_to_planet(card, planet) != -1:
+                            position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                            primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                                valid_target_dynastic_weaponry = True
+                            if "Dynastic Weaponry" in primary_player.discard:
+                                if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                    self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                         (int(primary_player.get_number()), planet, position_of_unit))
+                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                                self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet, position_of_unit))
-                        if primary_player.search_hand_for_card("Optimized Protocol"):
-                            self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                                 (int(primary_player.get_number()), planet, position_of_unit))
-                        primary_player.remove_card_from_discard(pos_discard)
+                            primary_player.remove_card_from_discard(pos_discard)
                         self.delete_reaction()
         elif current_reaction == "Endless Legions":
             if not self.chosen_first_card:
@@ -86,18 +86,18 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 card = primary_player.get_card_in_discard(pos_discard)
                 if card.get_faction() == "Necrons" and card.get_cost() < 4 and card.get_is_unit():
                     num, planet, unit = self.positions_of_unit_triggering_reaction[0]
-                    primary_player.add_card_to_planet(card, planet)
-                    position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-                    primary_player.cards_in_play[planet + 1][position_of_unit]. \
-                        valid_target_dynastic_weaponry = True
-                    if "Dynastic Weaponry" in primary_player.discard:
-                        if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                            self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                    if primary_player.add_card_to_planet(card, planet) != -1:
+                        position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
+                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                            valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                                     (int(primary_player.get_number()), planet, position_of_unit))
+                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                            self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet, position_of_unit))
-                    if primary_player.search_hand_for_card("Optimized Protocol"):
-                        self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                             (int(primary_player.get_number()), planet, position_of_unit))
-                    primary_player.remove_card_from_discard(pos_discard)
+                        primary_player.remove_card_from_discard(pos_discard)
                     self.delete_reaction()
         elif current_reaction == "Seething Mycetic Spore":
             if chosen_discard == int(primary_player.number):

@@ -454,7 +454,7 @@ class Player:
 
     def deepstrike_unit(self, planet_id, unit_id):
         card = self.cards_in_reserve[planet_id][unit_id]
-        self.add_card_to_planet(card, planet_id)
+        self.add_card_to_planet(card, planet_id, triggered_card_effect=False)
         self.after_any_deepstrike(planet_id)
         del self.cards_in_reserve[planet_id][unit_id]
         last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
@@ -1522,10 +1522,19 @@ class Player:
         return self.cards_in_play[planet_pos + 1][unit_pos]
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
-                           is_owner_of_card=True):
+                           is_owner_of_card=True, triggered_card_effect=True):
         if card.get_unique():
             if self.search_for_unique_card(card.name):
                 return -1
+        if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait):
+            resources_to_spend = self.game.imperial_blockades_active[position]
+            if resources_to_spend:
+                if not self.spend_resources(resources_to_spend):
+                    self.game.queued_message = "Important Info: Imperial Blockade prevented a card from being added."
+                    return -1
+                else:
+                    self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
+                                               " resources were spent due to Imperial Blockade."
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
@@ -1848,7 +1857,8 @@ class Player:
                 if card.get_limited():
                     if self.can_play_limited and not self.enemy_holding_cell_check(card.get_name()):
                         if self.spend_resources(cost):
-                            if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
+                            if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card,
+                                                       triggered_card_effect=False) != -1:
                                 self.set_can_play_limited(False)
                                 print("Played card to planet", position)
                                 location_of_unit = len(self.cards_in_play[position + 1]) - 1
@@ -1866,7 +1876,8 @@ class Player:
                         return "FAIL/Limited already played", -1
                 elif not self.enemy_holding_cell_check(card.get_name()):
                     if self.spend_resources(cost):
-                        if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card) != -1:
+                        if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card,
+                                                   triggered_card_effect=False) != -1:
                             location_of_unit = len(self.cards_in_play[position + 1]) - 1
                             if damage_to_take > 0:
                                 if self.game.bigga_is_betta_active:
@@ -2111,10 +2122,19 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].valid_defense_battery_target = False
 
-    def move_unit_to_planet(self, origin_planet, origin_position, destination, force=False):
+    def move_unit_to_planet(self, origin_planet, origin_position, destination, force=False, card_effect=True):
         if origin_planet == -2:
             headquarters_list = self.headquarters
             other_player = self.get_other_player()
+            if card_effect:
+                if self.game.imperial_blockades_active[destination] > 0:
+                    resources_to_spend = self.game.imperial_blockades_active[destination]
+                    if not self.spend_resources(resources_to_spend):
+                        self.game.queued_message = "Important Info: Imperial Blockade prevented the move."
+                        return False
+                    else:
+                        self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
+                                                   " resources were spent due to Imperial Blockade."
             if self.headquarters[origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(destination):
                     self.headquarters[origin_position].valid_defense_battery_target = True
@@ -2189,6 +2209,16 @@ class Player:
                     self.game.queued_moves.append((int(self.number), origin_planet,
                                                    origin_position, destination))
                     return False
+            if card_effect:
+                if self.game.imperial_blockades_active[destination] > 0:
+                    resources_to_spend = self.game.imperial_blockades_active[destination]
+                    if not self.spend_resources(resources_to_spend):
+                        self.game.queued_message = "Important Info: Imperial Blockade prevented the move."
+                        return False
+                    else:
+                        self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
+                                                   " resources were spent due to Imperial Blockade."
+            if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(origin_planet) or self.defense_battery_check(destination):
                     self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
             for i in range(len(other_player.cards_in_play[destination + 1])):
@@ -2398,7 +2428,7 @@ class Player:
                     if self.headquarters[i].get_ability() == "Venomthrope Polluter":
                         self.game.create_reaction("Venomthrope Polluter", self.name_player,
                                                   (int(self.number), self.synapse_commit_location, -1))
-                    self.move_unit_to_planet(-2, i, self.synapse_commit_location)
+                    self.move_unit_to_planet(-2, i, self.synapse_commit_location, card_effect=False)
                     for j in range(len(self.headquarters)):
                         if self.headquarters[j].get_ability() == "Synaptic Link":
                             self.game.create_reaction("Synaptic Link", self.name_player, (int(self.number), -1, -1))
@@ -2487,7 +2517,7 @@ class Player:
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
-                    self.move_unit_to_planet(-2, i, planet_pos - 1)
+                    self.move_unit_to_planet(-2, i, planet_pos - 1, card_effect=False)
                     for j in range(7):
                         if j != planet_pos - 1:
                             for k in range(len(self.cards_in_play[j + 1])):
@@ -5399,6 +5429,8 @@ class Player:
         return False
 
     def rout_unit(self, planet_id, unit_id):
+        if planet_id == -2:
+            return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 return False
@@ -5409,6 +5441,15 @@ class Player:
             if self.get_all_attachments_at_pos(planet_id, unit_id):
                 if self.game.combat_round_number < 2:
                     return False
+        if self.game.imperial_blockades_active[planet_id] > 0:
+            other_player = self.get_other_player()
+            resources_to_spend = self.game.imperial_blockades_active[planet_id]
+            if not other_player.spend_resources(resources_to_spend):
+                self.game.queued_message = "Important Info: Imperial Blockade prevented the Rout."
+                return False
+            else:
+                self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
+                                           " resources were spent due to Imperial Blockade."
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
                 every_worr_check = self.search_for_card_everywhere("Broderick Worr")

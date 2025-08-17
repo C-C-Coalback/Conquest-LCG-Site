@@ -1036,17 +1036,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                  (int(secondary_player.number), planet_pos, -1))
                     player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
                     card = self.preloaded_find_card("Erupting Aberrants")
-                    player_owning_card.add_card_to_planet(card, planet_pos)
-                    last_element_index = len(player_owning_card.cards_in_play[planet_pos + 1]) - 1
-                    player_owning_card.cards_in_play[planet_pos + 1][last_element_index].name_owner = \
-                        primary_player.name_player
-                    if has_attachments:
-                        primary_player.spend_resources(1)
-                    primary_player.cards.remove("Erupting Aberrants")
+                    if player_owning_card.add_card_to_planet(card, planet_pos) != -1:
+                        last_element_index = len(player_owning_card.cards_in_play[planet_pos + 1]) - 1
+                        player_owning_card.cards_in_play[planet_pos + 1][last_element_index].name_owner = \
+                            primary_player.name_player
+                        if has_attachments:
+                            primary_player.spend_resources(1)
+                        primary_player.cards.remove("Erupting Aberrants")
+                        if primary_player.search_hand_for_card("Erupting Aberrants"):
+                            self.game.create_reaction("Erupting Aberrants", primary_player.name_player,
+                                                      (int(primary_player.number), -1, -1))
                     self.delete_reaction()
-                    if primary_player.search_hand_for_card("Erupting Aberrants"):
-                        self.game.create_reaction("Erupting Aberrants", primary_player.name_player,
-                                                  (int(primary_player.number), -1, -1))
         elif current_reaction == "Hydrae Stalker":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":

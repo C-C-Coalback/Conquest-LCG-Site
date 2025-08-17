@@ -83,7 +83,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         card = ArmyCard("The Glovodan Eagle", "Action: Return this unit to your hand.", "Familiar.",
                                         1, "Astra Militarum", "Signature", 1, 1, 0, True,
                                         action_in_play=True, allowed_phases_in_play="ALL")
-                        primary_player.add_card_to_planet(card, planet_pos)
+                        primary_player.add_card_to_planet(card, planet_pos, triggered_card_effect=False)
                         self.action_cleanup()
                     elif ability == "Pulsating Carapace":
                         if card_chosen.get_ready():
