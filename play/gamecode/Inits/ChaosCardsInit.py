@@ -350,6 +350,12 @@ def chaos_cards_init():
         CardClasses.AttachmentCard("Predatory Instinct", "Attach to a Chaos unit you control."
                                                          "Attached unit gains Area Effect (1).", "Skill.",
                                    2, faction, "Signature", 3, False,
-                                   unit_must_match_faction=True, must_be_own_unit=True)
+                                   unit_must_match_faction=True, must_be_own_unit=True),
+        CardClasses.ArmyCard("Charging Juggernaut", "While this unit has an attachment, it gets +1 HP and it cannot be"
+                                                    " routed until a combat round ended this round.\n"
+                                                    "Forced Reaction: After the deploy phase begins, move this unit to"
+                                                    " the first planet. Then deal 2 damage to an enemy unit"
+                                                    " at that planet.", "Daemon. Khorne.",
+                             3, faction, "Loyal", 4, 2, 1, False)
     ]
     return chaos_card_array

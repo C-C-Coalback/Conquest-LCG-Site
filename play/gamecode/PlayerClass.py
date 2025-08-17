@@ -1364,6 +1364,11 @@ class Player:
                 self.add_card_to_discard(card.get_attachments()[attachment_position].get_name())
             del card.get_attachments()[attachment_position]
 
+    def get_all_attachments_at_pos(self, planet, position):
+        if planet == -2:
+            return self.headquarters[position].get_attachments()
+        return self.cards_in_play[planet + 1][position].get_attachments()
+
     def get_attachment_at_pos(self, planet, position, attachment_position):
         if planet == -2:
             return self.headquarters[position].get_attachments()[attachment_position]
@@ -4130,6 +4135,9 @@ class Player:
                 if self.get_card_type_given_pos(-2, unit_id) != "Token":
                     if self.search_card_in_hq("Mork's Great Heap"):
                         health += 1
+            if self.headquarters[unit_id].get_ability() == "Charging Juggernaut":
+                if self.headquarters[unit_id].get_attachments():
+                    health += 1
             if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
@@ -4160,6 +4168,9 @@ class Player:
                 health += 1
         if card.get_ability() == "Improbable Runt Machine":
             health += min(len(card.get_attachments()), 3)
+        if card.get_ability() == "Charging Juggernaut":
+            if card.get_attachments():
+                health += 1
         if card.get_card_type() == "Warlord":
             if self.game.round_number == planet_id:
                 if self.search_card_in_hq("Order of the Crimson Oath"):
@@ -4389,6 +4400,9 @@ class Player:
             if self.headquarters[i].get_ability() == "Warlock Destructor":
                 if phase == "DEPLOY":
                     self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Charging Juggernaut":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Charging Juggernaut", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Blood Rain Tempest":
                 if phase == "COMBAT":
                     self.game.create_reaction("Blood Rain Tempest", self.name_player, (int(self.number), -2, i))
@@ -4416,6 +4430,9 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":
                         self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Charging Juggernaut":
+                    if phase == "DEPLOY":
+                        self.game.create_reaction("Charging Juggernaut", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Shard of the Deceiver":
                     self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Drifting Spore Mines":
@@ -5355,6 +5372,10 @@ class Player:
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, "Disciple of Excess"):
                 return False
+        if self.get_ability_given_pos(planet_id, unit_id) == "Charging Juggernaut":
+            if self.get_all_attachments_at_pos(planet_id, unit_id):
+                if self.game.combat_round_number < 2:
+                    return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
                 every_worr_check = self.search_for_card_everywhere("Broderick Worr")

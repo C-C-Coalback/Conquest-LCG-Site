@@ -96,6 +96,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_counter = 0
             self.chosen_first_card = False
             primary_player.exhaust_card_in_hq_given_name("Endless Legions")
+        elif current_reaction == "Charging Juggernaut":
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.round_number)
         elif current_reaction == "Sautekh Royal Crypt":
             primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
         elif current_reaction == "Sautekh Royal Crypt Damage":

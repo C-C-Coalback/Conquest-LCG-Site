@@ -125,6 +125,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           self.positions_of_unit_triggering_reaction[0][2], 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
                     self.delete_reaction()
+        elif current_reaction == "Charging Juggernaut":
+            if game_update_string[1] == secondary_player.number:
+                if self.round_number == planet_pos:
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
+                    self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
             if game_update_string[1] == primary_player.number:
                 if self.misc_target_planet == planet_pos:
