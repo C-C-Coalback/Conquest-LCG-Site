@@ -1,4 +1,5 @@
 from .. import FindCard
+from .. import CardClasses
 import copy
 
 
@@ -287,6 +288,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             if self.last_planet_checked_for_battle == -1:
                                 primary_player.exhaust_given_pos(-2, unit_pos)
                                 self.action_chosen = "Kaerux Erameas"
+                    elif ability == "Improbable Runt Machine":
+                        if not card_chosen.get_once_per_round_used():
+                            card_chosen.set_once_per_round_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Chaplain Mavros":
                         if primary_player.headquarters[unit_pos].once_per_phase_used is False:
                             primary_player.headquarters[unit_pos].once_per_phase_used = 1
@@ -927,6 +934,19 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 primary_player.discard_card_name_from_hand("Overrun")
                 primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
+    elif self.action_chosen == "Improbable Runt Machine":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Runt"):
+                name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                card_to_add = CardClasses.AttachmentCard(name_card, "", "Copilot.", 0, "Orks", "Common",
+                                                         0, False)
+                primary_player.attach_card(card_to_add, self.position_of_actioned_card[0],
+                                           self.position_of_actioned_card[1])
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                del primary_player.headquarters[unit_pos]
                 self.action_cleanup()
     elif self.action_chosen == "Overrun Rout":
         if game_update_string[1] == primary_player.get_number():

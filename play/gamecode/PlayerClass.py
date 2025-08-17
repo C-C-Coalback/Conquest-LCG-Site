@@ -2496,6 +2496,8 @@ class Player:
                     command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Improbable Runt Machine":
+            command += min(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments()), 3)
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
             if self.warlord_faction != "Orks":
                 command += 1
@@ -3602,6 +3604,8 @@ class Player:
                     attack_value += 1
             if card.get_ability() == "Shard of the Deceiver":
                 attack_value += len(self.discard)
+            if card.get_ability() == "Improbable Runt Machine":
+                attack_value += min(len(card.get_attachments()), 3)
             if card.get_ability() == "Destroyer Cultist":
                 attack_value += self.count_non_necron_factions()
             if card.get_ability() == "Virulent Plague Squad":
@@ -3653,6 +3657,8 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
                     attack_value += 1
+        if card.get_ability() == "Improbable Runt Machine":
+            attack_value += min(len(card.get_attachments()), 3)
         if card.get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 attack_value += 2
@@ -4127,6 +4133,8 @@ class Player:
             if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
+            if self.headquarters[unit_id].get_ability() == "Improbable Runt Machine":
+                health += min(len(self.headquarters[unit_id].get_attachments()), 3)
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
                 if self.get_faith_given_pos(planet_id, unit_id) > 0:
                     health += 1
@@ -4150,6 +4158,8 @@ class Player:
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
                 health += 1
+        if card.get_ability() == "Improbable Runt Machine":
+            health += min(len(card.get_attachments()), 3)
         if card.get_card_type() == "Warlord":
             if self.game.round_number == planet_id:
                 if self.search_card_in_hq("Order of the Crimson Oath"):
@@ -4706,7 +4716,8 @@ class Player:
                                               (int(self.number), planet_num, i))
 
     def add_card_to_discard(self, card_name):
-        self.discard.append(card_name)
+        if card_name not in ["Snotlings", "Guardsman", "Cultist", "Khymera", "Termagant"]:
+            self.discard.append(card_name)
         if card_name == "Cardinal Agra Decree":
             self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
 

@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import DeployPhase
+from .. import CardClasses
 import copy
 
 
@@ -322,6 +323,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.misc_target_planet = planet_pos
+                    elif ability == "Improbable Runt Machine":
+                        if not card_chosen.get_once_per_round_used():
+                            card_chosen.set_once_per_round_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Evangelizing Ships":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -916,6 +923,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                 og_pla, og_pos = self.misc_target_unit
                 secondary_player.rout_unit(og_pla, og_pos)
+                self.action_cleanup()
+    elif self.action_chosen == "Improbable Runt Machine":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Runt"):
+                name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                card_to_add = CardClasses.AttachmentCard(name_card, "", "Copilot.", 0, "Orks", "Common",
+                                                         0, False)
+                primary_player.attach_card(card_to_add, self.position_of_actioned_card[0],
+                                           self.position_of_actioned_card[1])
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                del primary_player.cards_in_play[planet_pos + 1][unit_pos]
                 self.action_cleanup()
     elif self.action_chosen == "Keep Firing!":
         if game_update_string[1] == primary_player.number:

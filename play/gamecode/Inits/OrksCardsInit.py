@@ -313,6 +313,13 @@ def orks_cards_init():
         CardClasses.SupportCard("Fungal Turf", "HEADQUARTERS ACTION: Sacrifice this support to put X Snotling tokens "
                                                "into play divided among any number of planets. "
                                                "X is the highest printed cost among units you control.", "Location.",
-                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
+                                2, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.ArmyCard("Improbable Runt Machine", "Flying.\n"
+                                                        "This unit gets +1 ATK, +1 HP and 1 command icon per attachment"
+                                                        " on it (Max 3).\n"
+                                                        "Action: Attach a Runt unit you control to this unit as a "
+                                                        "Copilot attachment. (Limit once per round.)",
+                             "Machine. Marvel.", 2, faction, "Loyal", 1, 1, 1, False, flying=True,
+                             action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return orks_card_array
