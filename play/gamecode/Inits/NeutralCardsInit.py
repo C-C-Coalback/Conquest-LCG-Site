@@ -58,6 +58,13 @@ def neutral_cards_init():
                                                    " a non-warlord card effect that moves a unit to that planet, rout"
                                                    " a unit or makes a non-Runt unit enter play.", "Tactic.",
                               0, "Neutral", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.SupportCard("Eldritch Council", "Reaction: After you deploy a non-Elite unit, exhaust this support"
+                                                    " to look at an amount of top cards of your equal to the unit's"
+                                                    " printed cost. Put up to 1 card on the bottom of your deck and"
+                                                    " place the remaining cards on top of your deck in any order. "
+                                                    "Then if your opponent has more cards in hand than you, draw a"
+                                                    " card.", "Relic.",
+                                0, "Neutral", "Common", True)
     ]
     return neutral_card_array

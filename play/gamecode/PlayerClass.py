@@ -1844,6 +1844,11 @@ class Player:
                             if card.get_ability() == "First Line Rhinos":
                                 self.game.create_reaction("First Line Rhinos", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
+                                if self.search_card_in_hq("Eldritch Council", ready_relevant=True):
+                                    self.game.create_reaction("Eldritch Council", self.name_player,
+                                                              (int(self.number), -1, -1))
+                                    self.game.eldritch_council_value = card.get_cost()
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
@@ -1977,6 +1982,11 @@ class Player:
                                         if self.get_ready_given_pos(-2, i):
                                             self.game.create_reaction("Loamy Broodhive", self.name_player,
                                                                       (int(self.number), position, location_of_unit))
+                            if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
+                                if self.search_card_in_hq("Eldritch Council", ready_relevant=True):
+                                    self.game.create_reaction("Eldritch Council", self.name_player,
+                                                              (int(self.number), -1, -1))
+                                    self.game.eldritch_council_value = card.get_cost()
                             if card.check_for_a_trait("Daemon", self.etekh_trait):
                                 for i in range(len(self.headquarters)):
                                     if self.get_ability_given_pos(-2, i) == "Tower of Worship":

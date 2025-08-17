@@ -372,6 +372,7 @@ class Game:
         self.omega_ambush_active = False
         self.shadow_thorns_body_allowed = True
         self.sacaellums_finest_active = False
+        self.eldritch_council_value = 0
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
                                                  "Declare the Crusade", "Gut and Pillage"]
         self.queued_sound = ""
@@ -2333,6 +2334,20 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "Eldritch Council: Choose Card":
+                        choice_pos = int(game_update_string[1])
+                        if choice_pos == 0:
+                            pass
+                        else:
+                            choice_pos = choice_pos - 1
+                            card_name = primary_player.deck[choice_pos]
+                            primary_player.deck.append(card_name)
+                            del primary_player.deck[choice_pos]
+                        if len(primary_player.cards) < len(secondary_player.cards):
+                            primary_player.draw_card()
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Choice Sacaellum Infestors":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]

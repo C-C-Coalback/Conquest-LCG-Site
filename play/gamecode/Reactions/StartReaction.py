@@ -98,6 +98,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_card_in_hq_given_name("Endless Legions")
         elif current_reaction == "Charging Juggernaut":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.round_number)
+        elif current_reaction == "Eldritch Council":
+            primary_player.exhaust_card_in_hq_given_name("Eldritch Council")
+            self.choices_available = ["Move Nothing"]
+            for i in range(self.eldritch_council_value):
+                if len(primary_player.deck) > i:
+                    self.choices_available.append(primary_player.deck[i])
+            self.choice_context = "Eldritch Council: Choose Card"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+            await self.send_update_message("Choose a card to move onto the bottom of your deck.")
         elif current_reaction == "Sautekh Royal Crypt":
             primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
         elif current_reaction == "Sautekh Royal Crypt Damage":
