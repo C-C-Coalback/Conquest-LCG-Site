@@ -370,6 +370,40 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "rearrange-deck" and len(message) == 4:
+                        try:
+                            print("got here")
+                            if not active_games[self.game_position].rearranging_deck:
+                                print("not rearranging")
+                                amount = int(message[3])
+                                if message[2] == "1":
+                                    if amount > 0:
+                                        active_games[self.game_position].rearranging_deck = True
+                                        active_games[self.game_position].name_player_rearranging_deck = \
+                                            active_games[self.game_position].name_1
+                                        active_games[self.game_position].deck_part_being_rearranged = \
+                                            active_games[self.game_position].p1.deck[:amount]
+                                        active_games[self.game_position].deck_part_being_rearranged.append("FINISH")
+                                        active_games[self.game_position].number_cards_to_rearrange = amount
+                                        await active_games[self.game_position].send_search()
+                                        await active_games[self.game_position].send_info_box()
+                                elif message[2] == "2":
+                                    if amount > 0:
+                                        active_games[self.game_position].rearranging_deck = True
+                                        active_games[self.game_position].name_player_rearranging_deck = \
+                                            active_games[self.game_position].name_2
+                                        active_games[self.game_position].deck_part_being_rearranged = \
+                                            active_games[self.game_position].p2.deck[:amount]
+                                        active_games[self.game_position].deck_part_being_rearranged.append("FINISH")
+                                        active_games[self.game_position].number_cards_to_rearrange = amount
+                                        await active_games[self.game_position].send_search()
+                                        await active_games[self.game_position].send_info_box()
+                        except Exception as e:
+                            print(e)
+                    elif message[1] == "stop-rearrange-deck":
+                        active_games[self.game_position].stop_rearranging_deck()
+                        await active_games[self.game_position].send_search()
+                        await active_games[self.game_position].send_info_box()
                     elif message[1] == "cards-deck" and len(message) == 3:
                         if message[2] == "1":
                             amount = len(active_games[self.game_position].p1.deck)

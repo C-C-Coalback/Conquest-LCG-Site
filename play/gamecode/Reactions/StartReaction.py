@@ -107,7 +107,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Eldritch Council: Choose Card"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
-            await self.send_update_message("Choose a card to move onto the bottom of your deck.")
+            await self.send_update_message("Choose a card to move onto the bottom of your deck. \n"
+                                           "IMPORTANT: If you would like to rearrange the top cards of your deck"
+                                           " BEFORE you draw a card, you must do so using the "
+                                           "/rearrange-deck/{player_number}/{cards_amount} command now.")
         elif current_reaction == "Sautekh Royal Crypt":
             primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
         elif current_reaction == "Sautekh Royal Crypt Damage":

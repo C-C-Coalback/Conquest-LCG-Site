@@ -201,6 +201,10 @@ class Game:
         self.searching_enemy_deck = False
         self.bottom_cards_after_search = True
         self.shadowsun_chose_hand = True
+        self.rearranging_deck = False
+        self.name_player_rearranging_deck = ""
+        self.deck_part_being_rearranged = []
+        self.number_cards_to_rearrange = 0
         self.interrupts_waiting_on_resolution = []
         self.player_resolving_interrupts = []
         self.positions_of_units_interrupting = []
@@ -554,7 +558,11 @@ class Game:
 
     async def send_search(self, force=False):
         card_string = ""
-        if self.cards_in_search_box and self.name_player_who_is_searching:
+        if self.rearranging_deck:
+            card_string = "/".join(self.deck_part_being_rearranged)
+            card_string = "GAME_INFO/CHOICE/" + self.name_player_rearranging_deck + "/" \
+                          + "Rearranging Deck" + "/" + card_string
+        elif self.cards_in_search_box and self.name_player_who_is_searching:
             card_string = "/".join(self.cards_in_search_box)
             card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/" \
                           + self.what_to_do_with_searched_card + "/" + card_string
@@ -575,7 +583,9 @@ class Game:
         elif self.resolving_consumption:
             info_string += "Unspecified/"
         elif self.manual_bodyguard_resolution:
-            info_string += self.name_player_manual_bodyguard
+            info_string += self.name_player_manual_bodyguard + "/"
+        elif self.rearranging_deck:
+            info_string += self.name_player_rearranging_deck + "/"
         elif self.cards_in_search_box:
             info_string += self.name_player_who_is_searching + "/"
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
@@ -633,6 +643,8 @@ class Game:
             info_string += "/"
         elif self.manual_bodyguard_resolution:
             info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard + "/"
+        elif self.rearranging_deck:
+            info_string += "Rearranging deck: " + self.name_player_rearranging_deck + "/"
         elif self.cards_in_search_box:
             info_string += "Searching: " + self.what_to_do_with_searched_card + "/"
             info_string += "User: " + self.name_player_who_is_searching + "/"
@@ -1077,6 +1089,8 @@ class Game:
                     return True
             if game_update_string[0] == "CHOICE":
                 if len(self.choices_available) > int(game_update_string[1]):
+                    return True
+                elif len(self.deck_part_being_rearranged) > int(game_update_string[1]):
                     return True
         if len(game_update_string) == 3:
             if game_update_string[0] == "HQ":
@@ -6920,6 +6934,38 @@ class Game:
                                     await self.complete_enemy_discard(primary_player, secondary_player)
                                     self.interrupts_discard_enemy_allowed = True
 
+    async def update_rearranging_deck(self, name, game_update_string):
+        if name == self.name_player_rearranging_deck:
+            if game_update_string[0] == "CHOICE":
+                choice_index = int(game_update_string[1])
+                if self.deck_part_being_rearranged[choice_index] == "FINISH":
+                    del self.deck_part_being_rearranged[choice_index]
+                    player = self.p1
+                    if name == self.name_2:
+                        player = self.p2
+                    for i in range(len(self.deck_part_being_rearranged)):
+                        player.deck[i] = self.deck_part_being_rearranged[i]
+                    self.stop_rearranging_deck()
+                else:
+                    self.deck_part_being_rearranged.insert(
+                        0, self.deck_part_being_rearranged.pop(choice_index)
+                    )
+
+    def stop_rearranging_deck(self):
+        if self.choice_context == "Eldritch Council: Choose Card":
+            player = self.p1
+            if self.name_player_rearranging_deck == self.name_2:
+                player = self.p2
+            new_choices = ["Move Nothing"]
+            for i in range(len(self.choices_available)):
+                new_choices.append(player.deck[i])
+            self.choices_available = new_choices
+            self.queued_message = "Now choose a card to place on the bottom of your deck."
+        self.rearranging_deck = False
+        self.name_player_rearranging_deck = ""
+        self.deck_part_being_rearranged = []
+        self.number_cards_to_rearrange = 0
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -6940,6 +6986,8 @@ class Game:
                 await self.consumption_resolution(name, game_update_string)
             elif self.manual_bodyguard_resolution:
                 await self.resolve_manual_bodyguard(name, game_update_string)
+            elif self.rearranging_deck:
+                await self.update_rearranging_deck(name, game_update_string)
             elif self.cards_in_search_box:
                 await self.resolve_card_in_search_box(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
