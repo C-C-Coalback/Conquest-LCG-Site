@@ -4752,6 +4752,8 @@ class Player:
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_lumbering()
+        if self.search_attachments_at_pos(planet_id, unit_id, "Centurion Warsuit"):
+            return True
         return self.cards_in_play[planet_id + 1][unit_id].get_lumbering()
 
     def resolve_combat_round_begins(self, planet_num):

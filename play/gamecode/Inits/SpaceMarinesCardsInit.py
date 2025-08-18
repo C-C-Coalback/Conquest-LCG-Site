@@ -372,6 +372,11 @@ def space_marines_cards_init():
                                                   " When this unit leaves play, as an interrupt, put the attached unit"
                                                   " into play exhausted at the same planet.",
                              "Vehicle. Ultramarines.", 2, faction, "Loyal", 2, 2, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Centurion Warsuit", "Attach to a non-Elite army unit you control.\n"
+                                                        "Attached unit gets +2 ATK, +4 HP and Lumbering.",
+                                   "Wargear.", 1, faction, "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army", forbidden_traits="Elite",
+                                   extra_attack=2, extra_health=4, must_be_own_unit=True)
     ]
     return space_marines_card_array
