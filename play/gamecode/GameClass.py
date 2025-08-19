@@ -411,6 +411,7 @@ class Game:
         self.interrupts_discard_enemy_allowed = True
         self.queued_moves = []  # (player num, planet pos, unit pos, destination)
         self.sororitas_command_squad_value = 0
+        self.retaliate_used = False
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -1741,7 +1742,7 @@ class Game:
     async def resolve_crushing_blow(self, primary_player, secondary_player):
         primary_player.discard_card_name_from_hand("Crushing Blow")
         planet_pos, unit_pos = self.furiable_unit_position
-        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False)
+        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False, by_enemy_unit=False)
         if not secondary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
             sources, valid_players = self.extra_damage_possible()
             if sources:
@@ -2301,7 +2302,8 @@ class Game:
                     elif self.choice_context == "Amount of damage (WEB)":
                         amount_damage = int(self.choices_available[int(game_update_string[1])])
                         planet_pos, unit_pos = self.misc_target_unit
-                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, amount_damage, preventable=False)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, amount_damage, preventable=False,
+                                                            by_enemy_unit=False)
                         player_with_web = self.misc_target_player
                         og_pla, og_pos = self.position_of_actioned_card
                         target_player = self.p2
@@ -2920,7 +2922,7 @@ class Game:
                     elif self.choice_context == "Suffer Rakarth's Experimentations":
                         if game_update_string[1] == "0":
                             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
-                            primary_player.assign_damage_to_pos(warlord_planet, warlord_pos, 1)
+                            primary_player.assign_damage_to_pos(warlord_planet, warlord_pos, 1, by_enemy_unit=False)
                         else:
                             card_name = self.choices_available[int(game_update_string[1])]
                             primary_player.discard_card_name_from_hand(card_name)
@@ -3795,7 +3797,7 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         if game_update_string[1] == "0":
-                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         else:
                             self.delete_reaction()
                     elif self.choice_context == "Spore Burst":
@@ -5534,7 +5536,8 @@ class Game:
                                                     primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
                                                     att_num, att_pla, att_pos = \
                                                         self.positions_attackers_of_units_to_take_damage[0]
-                                                    secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
+                                                    secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk,
+                                                                                          by_enemy_unit=False)
                                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif self.alt_shield_name == "Faith Denies Death":
                                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1) > 0:
@@ -5627,6 +5630,20 @@ class Game:
                                 await self.send_update_message("Faith is being used as a shield.\n" +
                                                                str(amount_to_remove) + " damage is being removed.")
                                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                            elif primary_player.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
+                                    self.positions_attackers_of_units_to_take_damage[0] and \
+                                    primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                self.retaliate_used = True
+                                retaliate_value = primary_player.get_retaliate_given_pos(planet_pos, unit_pos)
+                                shadow_field = False
+                                if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
+                                    shadow_field = True
+                                att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                secondary_player.assign_damage_to_pos(att_pla, att_pos, retaliate_value,
+                                                                      rickety_warbuggy=True,
+                                                                      shadow_field_possible=shadow_field)
+                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Follower of Gork":
                             hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
@@ -5823,7 +5840,7 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Sautekh Royal Crypt Damage":
                         for i in range(len(self.misc_misc_2)):
                             planet_pos, unit_pos = self.misc_misc_2[i]
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.misc_misc = None
                         self.misc_misc_2 = None
                     if self.reactions_needing_resolving[0] == "Sacred Rose Immolator":
@@ -6246,30 +6263,40 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         primary_player.reset_card_name_misc_ability("Follower of Gork")
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
-        if self.amount_that_can_be_removed_by_shield[0] > 2:
-            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
-            if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
-                damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
-                primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
-        if self.amount_that_can_be_removed_by_shield[0] > 1:
-            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
-            if primary_player.celestian_amelia_active \
-                    and primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Celesitan Amelia":
-                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
-                    damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+        if not self.retaliate_used:
+            if self.amount_that_can_be_removed_by_shield[0] > 2:
+                player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
+                    damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
-        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+            if self.amount_that_can_be_removed_by_shield[0] > 1:
+                player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                if primary_player.celestian_amelia_active \
+                        and primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Celesitan Amelia":
+                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                        damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
+            if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
+                secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
+                if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+                    if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
+                        self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
+                                             (int(secondary_player.number), planet_pos, unit_pos))
+                    for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
+                            self.create_reaction("Penitent Engine", secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, i))
+        else:
             player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
-            secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-            num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
-            if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
-                if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
-                    self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
-                                         (int(secondary_player.number), planet_pos, unit_pos))
-                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                    if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
-                        self.create_reaction("Penitent Engine", secondary_player.name_player,
-                                             (int(secondary_player.number), planet_pos, i))
+            if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
+                self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
+                                     (int(secondary_player.number), planet_pos, unit_pos))
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
+                    self.create_reaction("Penitent Engine", secondary_player.name_player,
+                                         (int(secondary_player.number), planet_pos, i))
         del self.damage_on_units_list_before_new_damage[0]
         del self.damage_is_preventable[0]
         del self.positions_of_units_to_take_damage[0]
@@ -6278,6 +6305,7 @@ class Game:
         del self.card_names_triggering_damage[0]
         del self.amount_that_can_be_removed_by_shield[0]
         self.damage_moved_to_old_one_eye = 0
+        self.retaliate_used = False
         if self.positions_of_units_to_take_damage:
             self.advance_damage_aiming_reticle()
         else:
@@ -6295,11 +6323,6 @@ class Game:
                 self.auto_card_destruction = False
                 self.choice_context = "Use an extra source of damage?"
                 self.name_player_making_choices = player_names[0]
-                """
-                self.choice_context = "Use The Fury of Sicarius?"
-                self.choices_available = ["Yes", "No"]
-                self.name_player_making_choices = player_with_cato.name_player
-                """
             else:
                 await self.destroy_check_all_cards()
 
@@ -6720,7 +6743,7 @@ class Game:
         while i < len(self.p1.cards_in_play[planet_id + 1]):
             if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
                 self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
-                self.p1.assign_damage_to_pos(planet_id, i, 1)
+                self.p1.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
                 self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
                 i = i - 1
             i += 1
@@ -6728,7 +6751,7 @@ class Game:
         while i < len(self.p2.cards_in_play[planet_id + 1]):
             if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
                 self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
-                self.p2.assign_damage_to_pos(planet_id, i, 1)
+                self.p2.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
                 self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
                 i = i - 1
             i += 1
@@ -7195,7 +7218,8 @@ class Game:
                                 self.create_reaction("Sweep", self.name_1, (1, planet, i))
                                 self.sweep_value = sweep
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
-                                self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                                self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
+                                                             by_enemy_unit=False)
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
@@ -7215,9 +7239,9 @@ class Game:
                                 self.create_reaction("Leman Russ Conqueror", self.name_1, (1, planet, i))
                             for rok in self.p1.rok_bombardment_active:
                                 if rok == "Own":
-                                    self.p1.assign_damage_to_pos(planet, i, 1)
+                                    self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                                 elif not self.p1.get_immune_to_enemy_events(planet, i):
-                                    self.p1.assign_damage_to_pos(planet, i, 1)
+                                    self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                     for i in range(len(self.p2.cards_in_play[planet + 1])):
                         self.p2.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
@@ -7233,7 +7257,8 @@ class Game:
                                 self.create_reaction("Sweep", self.name_2, (2, planet, i))
                                 self.sweep_value = sweep
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
-                                self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True)
+                                self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
+                                                             by_enemy_unit=False)
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p2.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
@@ -7253,9 +7278,9 @@ class Game:
                                 self.create_reaction("Leman Russ Conqueror", self.name_2, (2, planet, i))
                             for rok in self.p2.rok_bombardment_active:
                                 if rok == "Own":
-                                    self.p2.assign_damage_to_pos(planet, i, 1)
+                                    self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                                 elif not self.p2.get_immune_to_enemy_events(planet, i):
-                                    self.p2.assign_damage_to_pos(planet, i, 1)
+                                    self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                 if name_player_who_resolved_attack == self.name_1:
                     if self.p1.resources > 1 and self.p1.search_hand_for_card("Outflank'em"):
                         self.create_reaction("Outflank'em", self.name_1, (1, -1, -1))

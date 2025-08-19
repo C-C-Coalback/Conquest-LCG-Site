@@ -51,7 +51,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Saint Celestine: Rebirth":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
-            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 5)
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 5, by_enemy_unit=False)
             primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
             self.delete_interrupt()
         elif current_interrupt == "Embarked Squads":
@@ -59,7 +59,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_interrupt()
         elif current_interrupt == "Seal of the Ebon Chalice":
-            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.ebon_chalice_value)
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.ebon_chalice_value,
+                                                  by_enemy_unit=False)
             self.delete_interrupt()
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:

@@ -363,10 +363,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Parasitic Infection":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
-                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
             elif num == 2:
-                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
             if planet_pos != -2:
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
@@ -374,10 +374,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Savage Parasite":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
-                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
             elif num == 2:
-                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
             if planet_pos != -2:
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
@@ -1124,7 +1124,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif current_reaction == "The Black Sword":
-            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
             self.delete_reaction()
         elif current_reaction == "Commissar Somiel":
             primary_player.summon_token_at_hq("Guardsman")
@@ -1212,7 +1212,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Turbulent Rift":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             secondary_player.suffer_area_effect(planet_pos, 1)
             self.delete_reaction()
         elif current_reaction == "Squiggoth Brute":
@@ -1385,7 +1385,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 for i in range(4):
                     primary_player.summon_token_at_planet("Guardsman", planet_pos)
             last_el = len(primary_player.headquarters) - 1
-            primary_player.assign_damage_to_pos(-2, last_el, 5)
+            primary_player.assign_damage_to_pos(-2, last_el, 5, by_enemy_unit=False)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Weirdboy Maniak":
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
@@ -1397,7 +1397,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Ravening Psychopath":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True)
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
+                                                by_enemy_unit=False)
         elif current_reaction == "Holding Cell":
             found = False
             name_card = self.name_of_attacked_unit
@@ -1434,7 +1435,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
         elif current_reaction == "The Mask of Jain Zar":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.delete_reaction()
         elif current_reaction == "Blood Axe Strategist":
             self.choices_available = ["HQ", "Adjacent Planet"]
@@ -1813,6 +1814,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
+            self.delete_reaction()
+        elif current_reaction == "Avenging Squad":
+            primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Invasion Site":
             i_site_loc = -1

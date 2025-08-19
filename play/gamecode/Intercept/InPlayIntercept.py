@@ -58,7 +58,8 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Tzeentch's Firestorm":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm,
+                                            by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Archon's Terror":
@@ -164,7 +165,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Particle Whip":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
         self.misc_counter = 0
         self.action_cleanup()
         self.complete_intercept()
@@ -180,7 +181,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Noble Deed":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
         secondary_player.discard_card_from_hand(secondary_player.aiming_reticle_coords_hand)
         secondary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
@@ -188,7 +189,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
     elif name_effect == "Fenrisian Wolf":
         att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
         att_value = secondary_player.get_attack_given_pos(att_pla, att_pos)
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, att_value)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
         self.advance_damage_aiming_reticle()
         self.delete_reaction()
         self.complete_intercept()
@@ -220,18 +221,18 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Doombolt":
         damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, damage)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, damage, by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Searing Brand":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False, by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Nocturne-Ultima Storm Bolter":
         origin_planet = self.positions_of_unit_triggering_reaction[0][1]
         origin_pos = self.positions_of_unit_triggering_reaction[0][2]
         attack = secondary_player.get_attack_given_pos(origin_planet, origin_pos)
-        primary_player.assign_damage_to_pos(origin_planet, target_unit_pos, attack)
+        primary_player.assign_damage_to_pos(origin_planet, target_unit_pos, attack, by_enemy_unit=False)
         primary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
         self.delete_reaction()
         self.complete_intercept()
@@ -240,7 +241,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Made Ta Fight":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Squiggify":
@@ -256,7 +257,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Commissarial Bolt Pistol":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Mind War":
@@ -291,7 +292,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Chaplain Mavros":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
         primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
         self.mask_jain_zar_check_actions(secondary_player, primary_player)
         self.action_cleanup()
@@ -302,7 +303,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.mask_jain_zar_check_actions(secondary_player, primary_player)
         self.action_cleanup()
     elif name_effect == "Staff of Change":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Devourer Venomthrope":
@@ -313,7 +314,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
     elif name_effect == "Hallucinogen Grenade":
         primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
         atk = primary_player.cards_in_play[planet_pos + 1][unit_pos].attack
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "8th Company Assault Squad":
@@ -322,7 +323,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Kommando Sneakaz":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True, by_enemy_unit=False)
         primary_player.ready_given_pos(planet_pos, unit_pos)
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
@@ -358,7 +359,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "A Thousand Cuts":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
         secondary_player.deck.append(secondary_player.cards[secondary_player.aiming_reticle_coords_hand])
         secondary_player.remove_card_from_hand(secondary_player.aiming_reticle_coords_hand)
         secondary_player.shuffle_deck()
@@ -368,7 +369,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Missile Pod":
-        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
+        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Keep Firing!":

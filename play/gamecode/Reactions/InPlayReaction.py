@@ -305,7 +305,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Crush of Sky-Slashers":
             if game_update_string[1] == secondary_player.number:
@@ -372,7 +372,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.nullify_context = "Reaction"
                     if can_continue:
                         att_value = primary_player.get_attack_given_pos(att_pla, att_pos)
-                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value)
+                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
@@ -471,7 +471,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Venom":
             if not self.chosen_first_card:
@@ -726,7 +726,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_context = "Reaction"
                         if can_continue:
                             primary_player.ready_given_pos(planet_pos, unit_pos)
-                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Invasive Genestealers":
@@ -879,7 +879,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         primary_player.spend_resources(2)
                         primary_player.discard_card_name_from_hand("Made Ta Fight")
-                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                        player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter,
+                                                              by_enemy_unit=False)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -1418,7 +1419,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
             if int(primary_player.get_number()) == int(
@@ -1525,7 +1526,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                                 if not secondary_player.get_ready_given_pos(planet_pos, unit_pos):
                                     atk = secondary_player.get_attack_given_pos(planet_pos, unit_pos)
-                                    primary_player.assign_damage_to_pos(og_pla, og_pos, atk)
+                                    primary_player.assign_damage_to_pos(og_pla, og_pos, atk, by_enemy_unit=False)
                                     self.delete_reaction()
         elif current_reaction == "Sanctified Bolter":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -1636,7 +1637,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.nullify_context = "Reaction"
                     if can_continue:
                         attack = primary_player.get_attack_given_pos(origin_planet, origin_pos)
-                        player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack)
+                        player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack,
+                                                              by_enemy_unit=False)
                         player_being_hit.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Burna Boyz":
@@ -1701,7 +1703,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if game_update_string[1] == secondary_player.get_number():
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
             if self.chosen_first_card:

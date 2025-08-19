@@ -267,19 +267,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             for i in range(len(primary_player.headquarters)):
                                 if primary_player.headquarters[i].get_is_unit():
-                                    primary_player.assign_damage_to_pos(-2, i, 1)
+                                    primary_player.assign_damage_to_pos(-2, i, 1, by_enemy_unit=False)
                             for i in range(len(secondary_player.headquarters)):
                                 if not secondary_player.get_immune_to_enemy_events(-2, i):
                                     if secondary_player.headquarters[i].get_is_unit():
-                                        secondary_player.assign_damage_to_pos(-2, i, 1)
+                                        secondary_player.assign_damage_to_pos(-2, i, 1, by_enemy_unit=False)
                             for i in range(7):
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     if primary_player.cards_in_play[i + 1][j].get_is_unit():
-                                        primary_player.assign_damage_to_pos(i, j, 1)
+                                        primary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
                                 for j in range(len(secondary_player.cards_in_play[i + 1])):
                                     if secondary_player.cards_in_play[i + 1][j].get_is_unit():
                                         if not secondary_player.get_immune_to_enemy_events(i, j):
-                                            secondary_player.assign_damage_to_pos(i, j, 1)
+                                            secondary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
                             self.action_cleanup()
                     elif ability == "Battle Cry":
                         print("Resolve Battle Cry")

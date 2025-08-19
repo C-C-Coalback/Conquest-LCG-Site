@@ -190,7 +190,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, "NEXT")
-                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
                     elif ability == "Ravenwing Escort":
@@ -372,7 +372,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if not card_chosen.get_once_per_phase_used():
                             if player_owning_card.name_player == name:
                                 if not card_chosen.get_ready():
-                                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
+                                                                            by_enemy_unit=False)
                                     player_owning_card.set_aiming_reticle_in_play(planet_pos,
                                                                                   unit_pos, "red")
                                     player_owning_card.ready_given_pos(planet_pos, unit_pos)
@@ -440,7 +441,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, i)
                         total_atk += primary_player.cards_in_play[planet_pos + 1][unit_pos].attack
                 if not secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, total_atk)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, total_atk, by_enemy_unit=False)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
@@ -452,7 +453,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 else:
                     player_being_hit = self.p2
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.action_cleanup()
     elif self.action_chosen == "Fetid Haze":
         if primary_player.get_number() == game_update_string[1]:
@@ -708,7 +709,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     i = i + 1
                 for j in range(len(primary_player.cards_in_play[self.round_number + 1])):
                     if primary_player.cards_in_play[self.round_number + 1][j].aiming_reticle_color == "blue":
-                        primary_player.assign_damage_to_pos(self.round_number, j, 1, rickety_warbuggy=True)
+                        primary_player.assign_damage_to_pos(self.round_number, j, 1, rickety_warbuggy=True,
+                                                            by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
                 self.misc_counter = 0
                 self.action_chosen = ""
@@ -744,7 +746,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if can_continue:
             if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
                 if not player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Elite"):
-                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
                     self.misc_counter = 0
                     self.action_cleanup()
     elif self.action_chosen == "Doombolt":
@@ -779,7 +781,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_context = "Event Action"
                 if can_continue:
                     damage = secondary_player.get_damage_given_pos(planet_pos, unit_pos)
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, damage)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, damage, by_enemy_unit=False)
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
@@ -819,7 +821,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                     if can_continue:
                         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
-                            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False)
+                            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False,
+                                                                  by_enemy_unit=False)
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                             primary_player.aiming_reticle_coords_hand = None
                             await primary_player.dark_eldar_event_played()
@@ -867,7 +870,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
                 if can_continue:
-                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
                     primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.shuffle_deck()
@@ -1001,7 +1004,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
             if can_continue:
-                player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm)
+                player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm,
+                                                      by_enemy_unit=False)
                 player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
@@ -1351,7 +1355,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if attachments[i].from_magus_harid:
                 magus_card = True
         if magus_card:
-            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if not self.chosen_first_card:
@@ -1390,7 +1394,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
             if can_continue:
-                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False)
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, by_enemy_unit=False)
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                 self.chosen_second_card = True
                 self.action_chosen = ""
@@ -1904,8 +1908,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         atk2 = secondary_player.get_attack_given_pos(other_pla, other_pos)
                         secondary_player.exhaust_given_pos(other_pla, other_pos)
                         secondary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
-                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk2)
-                        secondary_player.assign_damage_to_pos(other_pla, other_pos, atk1)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk2, by_enemy_unit=False)
+                        secondary_player.assign_damage_to_pos(other_pla, other_pos, atk1, by_enemy_unit=False)
                         self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
         if primary_player.get_number() == game_update_string[1]:
@@ -1941,7 +1945,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
-                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
+                                                        by_enemy_unit=False)
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "Ancient Keeper of Secrets":
@@ -2186,7 +2191,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_context = "Event Action"
             if can_continue:
                 primary_player.discard_card_name_from_hand("The Emperor's Warrant")
-                player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
                 self.action_cleanup()
     elif self.action_chosen == "Archon's Terror":
         if game_update_string[1] == "1":
@@ -2473,7 +2478,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Event Action"
                         if can_continue:
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter,
+                                                                  by_enemy_unit=False)
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                             primary_player.aiming_reticle_coords_hand = None
                             self.action_cleanup()
@@ -2595,7 +2601,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             atk = secondary_player.cards_in_play[planet_pos + 1][unit_pos].attack
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, atk)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
                             self.action_cleanup()
     elif self.action_chosen == "Eldritch Storm":
         if secondary_player.get_number() == game_update_string[1]:
@@ -2624,7 +2630,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.nullify_context = "Event Action"
                         if can_continue:
                             self.misc_counter[planet_pos] = False
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
     elif self.action_chosen == "Seekers of Slaanesh":
         if self.misc_target_planet == planet_pos:
             if game_update_string[1] == primary_player.number:

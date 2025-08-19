@@ -377,6 +377,11 @@ def space_marines_cards_init():
                                                         "Attached unit gets +2 ATK, +4 HP and Lumbering.",
                                    "Wargear.", 1, faction, "Loyal", 2, False,
                                    type_of_units_allowed_for_attachment="Army", forbidden_traits="Elite",
-                                   extra_attack=2, extra_health=4, must_be_own_unit=True)
+                                   extra_attack=2, extra_health=4, must_be_own_unit=True),
+        CardClasses.ArmyCard("Avenging Squad", "Retaliate (1).\n"
+                                               "Reaction: After another unit you control at this planet is dealt damage"
+                                               " by an enemy unit, this unit gains Retaliate (1) until the end"
+                                               " of the phase.", "Soldier. Ultramarines.",
+                             1, faction, "Common", 1, 2, 1, False, retaliate=1)
     ]
     return space_marines_card_array

@@ -103,7 +103,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                     if not secondary_player.get_ready_given_pos(planet_pos, i):
-                                        secondary_player.assign_damage_to_pos(planet_pos, i, 2)
+                                        secondary_player.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
                                 self.action_cleanup()
                     elif ability == "Cenobyte Servitor":
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)

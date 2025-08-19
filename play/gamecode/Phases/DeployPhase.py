@@ -365,11 +365,13 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             if num == int(primary_player.get_number()):
                 del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
                 if not primary_player.get_immune_to_enemy_events(og_pla, og_pos):
-                    primary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False)
+                    primary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False,
+                                                        by_enemy_unit=False)
             else:
                 del secondary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
                 if not secondary_player.get_immune_to_enemy_events(og_pla, og_pos):
-                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False)
+                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False,
+                                                          by_enemy_unit=False)
     self.bigga_is_betta_active = False
     if played_card == "SUCCESS":
         if damage_to_take > 0:

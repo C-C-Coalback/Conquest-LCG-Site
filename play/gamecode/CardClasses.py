@@ -279,7 +279,7 @@ class UnitCard(Card):
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_resources_command_struggle=0, additional_cards_command_struggle=0,
                  mobile=False, ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1,
-                 lumbering=False, sweep=0):
+                 lumbering=False, sweep=0, retaliate=0):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
                          action_in_play, allowed_phases_in_play, limited, deepstrike=deepstrike)
@@ -348,6 +348,24 @@ class UnitCard(Card):
         self.new_additional_cards_command_struggle = 0
         self.new_brutal = False
         self.faith = 0
+        self.retaliate = retaliate
+        self.retaliate_eop = 0
+
+    def increase_retaliate_eop(self, value):
+        self.retaliate_eop += value
+
+    def reset_all_eop(self):
+        self.retaliate_eop = 0
+
+    def get_retaliate(self):
+        retaliate_value = self.retaliate
+        if self.blanked_eop:
+            retaliate_value = 0
+        retaliate_value = retaliate_value + self.retaliate_eop
+        return retaliate_value
+
+    def set_retaliate(self, retaliate):
+        self.retaliate = retaliate
 
     def get_faith(self):
         return self.faith
@@ -840,7 +858,7 @@ class ArmyCard(UnitCard):
                  limited=False, ranged=False, wargear_attachments_permitted=True, no_attachments=False,
                  additional_cards_command_struggle=0, additional_resources_command_struggle=0, mobile=False,
                  ambush=False, hive_mind=False, unstoppable=False, deepstrike=-1, lumbering=False,
-                 sweep=0):
+                 sweep=0, retaliate=0):
         super().__init__(name, text, traits, cost, faction, loyalty, "Army", attack, health, command,
                          unique, image_name, brutal, flying, armorbane, area_effect,
                          applies_discounts, action_in_hand, allowed_phases_in_hand,
@@ -849,7 +867,7 @@ class ArmyCard(UnitCard):
                          additional_cards_command_struggle=additional_cards_command_struggle,
                          additional_resources_command_struggle=additional_resources_command_struggle, mobile=mobile,
                          ambush=ambush, hive_mind=hive_mind, unstoppable=unstoppable, deepstrike=deepstrike,
-                         lumbering=lumbering, sweep=sweep)
+                         lumbering=lumbering, sweep=sweep, retaliate=retaliate)
 
     def print_info(self):
         if self.unique:

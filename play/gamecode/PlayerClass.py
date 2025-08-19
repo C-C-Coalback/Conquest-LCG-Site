@@ -597,7 +597,7 @@ class Player:
             if self.headquarters[i].get_is_unit():
                 damage = self.headquarters[i].get_indirect_damage()
                 if damage > 0:
-                    self.assign_damage_to_pos(-2, i, damage)
+                    self.assign_damage_to_pos(-2, i, damage, by_enemy_unit=False)
                     self.headquarters[i].reset_indirect_damage()
                     self.set_aiming_reticle_in_play(-2, i, "blue")
                     if self.game.first_card_damaged:
@@ -609,12 +609,24 @@ class Player:
                     damage = self.cards_in_play[i + 1][j].get_indirect_damage()
                     print("Indirect damage:", damage)
                     if damage > 0:
-                        self.assign_damage_to_pos(i, j, damage)
+                        self.assign_damage_to_pos(i, j, damage, by_enemy_unit=False)
                         self.cards_in_play[i + 1][j].reset_indirect_damage()
                         self.set_aiming_reticle_in_play(i, j, "blue")
                         if self.game.first_card_damaged:
                             self.game.first_card_damaged = False
                             self.set_aiming_reticle_in_play(i, j, "red")
+
+    def increase_retaliate_given_pos_eop(self, planet_id, unit_id, value):
+        if planet_id == -2:
+            self.headquarters[unit_ud].increase_retaliate_eop(value)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].increase_retaliate_eop(value)
+        return None
+
+    def get_retaliate_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_retaliate()
+        return self.cards_in_play[planet_id + 1][unit_id].get_retaliate()
 
     async def send_victory_display(self):
         if self.victory_display:
@@ -1120,22 +1132,23 @@ class Player:
                         self.game.positions_of_units_to_take_damage[i] = (num, pla, pos)
                     elif pos == unit_pos:
                         if i == 0:
-                            del self.damage_on_units_list_before_new_damage[i]
-                            del self.damage_is_preventable[i]
-                            del self.positions_of_units_to_take_damage[i]
-                            del self.damage_can_be_shielded[i]
-                            del self.positions_attackers_of_units_to_take_damage[i]
-                            del self.card_names_triggering_damage[i]
-                            del self.amount_that_can_be_removed_by_shield[i]
-                            i = i - 1
+                            if not self.game.retaliate_used:
+                                del self.game.damage_on_units_list_before_new_damage[i]
+                                del self.game.damage_is_preventable[i]
+                                del self.game.positions_of_units_to_take_damage[i]
+                                del self.game.damage_can_be_shielded[i]
+                                del self.game.positions_attackers_of_units_to_take_damage[i]
+                                del self.game.card_names_triggering_damage[i]
+                                del self.game.amount_that_can_be_removed_by_shield[i]
+                                i = i - 1
                         else:
-                            del self.damage_on_units_list_before_new_damage[i]
-                            del self.damage_is_preventable[i]
-                            del self.positions_of_units_to_take_damage[i]
-                            del self.damage_can_be_shielded[i]
-                            del self.positions_attackers_of_units_to_take_damage[i]
-                            del self.card_names_triggering_damage[i]
-                            del self.amount_that_can_be_removed_by_shield[i]
+                            del self.game.damage_on_units_list_before_new_damage[i]
+                            del self.game.damage_is_preventable[i]
+                            del self.game.positions_of_units_to_take_damage[i]
+                            del self.game.damage_can_be_shielded[i]
+                            del self.game.positions_attackers_of_units_to_take_damage[i]
+                            del self.game.card_names_triggering_damage[i]
+                            del self.game.amount_that_can_be_removed_by_shield[i]
                             i = i - 1
             i += 1
 
@@ -1192,18 +1205,18 @@ class Player:
         other_player = self.get_other_player()
         if self.get_card_type_given_pos(-2, last_element_index) == "Army":
             if self.search_card_in_hq("Dissection Chamber"):
-                self.assign_damage_to_pos(-2, last_element_index, 1)
+                self.assign_damage_to_pos(-2, last_element_index, 1, by_enemy_unit=False)
             enemy_player = self.game.p1
             if enemy_player.name_player == self.name_player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_in_hq("Dissection Chamber"):
-                self.assign_damage_to_pos(-2, last_element_index, 1)
+                self.assign_damage_to_pos(-2, last_element_index, 1, by_enemy_unit=False)
         if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
             if not other_player.check_if_already_have_reaction("Magus Harid"):
                 self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
             self.headquarters[last_element_index].valid_target_magus_harid = True
         if self.get_ability_given_pos(-2, last_element_index) == "Augmented Warriors":
-            self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False)
+            self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False, by_enemy_unit=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
             self.headquarters[last_element_index].set_counter(4)
         if self.get_ability_given_pos(-2, last_element_index) == "Convoking Praetorians":
@@ -1551,17 +1564,17 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
         if self.get_card_type_given_pos(position, last_element_index) == "Army":
             if self.search_card_in_hq("Dissection Chamber"):
-                self.assign_damage_to_pos(position, last_element_index, 1)
+                self.assign_damage_to_pos(position, last_element_index, 1, by_enemy_unit=False)
             enemy_player = self.game.p1
             if enemy_player.name_player == self.name_player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_in_hq("Dissection Chamber"):
-                self.assign_damage_to_pos(position, last_element_index, 1)
+                self.assign_damage_to_pos(position, last_element_index, 1, by_enemy_unit=False)
             if enemy_player.contaminated_convoys:
                 self.game.infest_planet(position, enemy_player)
                 enemy_player.summon_token_at_planet("Termagant", position)
         if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
-            self.assign_damage_to_pos(position, last_element_index, 2, preventable=False)
+            self.assign_damage_to_pos(position, last_element_index, 2, preventable=False, by_enemy_unit=False)
         if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), position, last_element_index))
@@ -1870,10 +1883,12 @@ class Player:
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
                                         while damage_on_play > 0:
-                                            self.assign_damage_to_pos(position, location_of_unit, 1)
+                                            self.assign_damage_to_pos(position, location_of_unit, 1,
+                                                                      by_enemy_unit=False)
                                             damage_on_play -= 1
                                     else:
-                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take,
+                                                                  by_enemy_unit=False)
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
@@ -1887,7 +1902,8 @@ class Player:
                             if damage_to_take > 0:
                                 if self.game.bigga_is_betta_active:
                                     while damage_on_play > 0:
-                                        self.assign_damage_to_pos(position, location_of_unit, 1)
+                                        self.assign_damage_to_pos(position, location_of_unit, 1,
+                                                                  by_enemy_unit=False)
                                         damage_on_play -= 1
                                 else:
                                     self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
@@ -3246,7 +3262,7 @@ class Player:
             if self.headquarters[pos].aiming_reticle_color == "green":
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
-                self.assign_damage_to_pos(-2, pos, 1)
+                self.assign_damage_to_pos(-2, pos, 1, by_enemy_unit=False)
                 self.game.damage_for_unit_to_take_on_play.append(1)
                 self.discard_top_card_deck()
         if self.headquarters[pos].get_ability() == "Sae'lum Enclave":
@@ -3531,7 +3547,7 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
                 discount += 1
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                self.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.game.damage_for_unit_to_take_on_play.append(1)
                 self.discard_top_card_deck()
         if "Daemon" in traits:
@@ -3554,7 +3570,7 @@ class Player:
                                               (int(self.number), planet_id, unit_id))
                 for i in range(len(self.headquarters[unit_id].get_attachments())):
                     if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
-                        self.assign_damage_to_pos(-2, unit_id, 1)
+                        self.assign_damage_to_pos(-2, unit_id, 1, by_enemy_unit=False)
             return None
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, "Disciple of Excess") and card_effect:
@@ -3568,7 +3584,7 @@ class Player:
                                           (int(self.number), planet_id, unit_id))
             for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
                 if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
-                    self.assign_damage_to_pos(planet_id, unit_id, 1)
+                    self.assign_damage_to_pos(planet_id, unit_id, 1, by_enemy_unit=False)
         return None
 
     def get_area_effect_given_pos(self, planet_id, unit_id):
@@ -3895,7 +3911,8 @@ class Player:
         return None
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
-                             context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False):
+                             context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False,
+                             by_enemy_unit=True):
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         if shadow_field_possible:
@@ -4015,6 +4032,13 @@ class Player:
             else:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
         if damage_on_card_after > damage_on_card_before:
+            if by_enemy_unit and not is_reassign:
+                for i in range(len(self.cards_in_play[planet_id + 1])):
+                    if self.get_ability_given_pos(planet_id, i) == "Avenging Squad":
+                        if i != unit_id:
+                            self.game.create_reaction("Avenging Squad", self.name_player,
+                                                      (int(self.number), planet_id, i))
+
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))

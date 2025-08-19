@@ -229,7 +229,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                             primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
                             att_num, att_pla, att_pos = \
                                 self.positions_attackers_of_units_to_take_damage[0]
-                            secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk)
+                            secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk, by_enemy_unit=False)
                             self.delete_interrupt()
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif current_interrupt == "Savage Parasite":

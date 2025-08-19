@@ -608,7 +608,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
                                 if other_player.attachments_at_planet[self.attacker_planet][i]\
                                         .get_ability() == "Repulsor Minefield":
-                                    player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1)
+                                    player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
+                                                                by_enemy_unit=False)
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     in self.units_move_hq_attack:
                                 self.unit_will_move_after_attack = True
