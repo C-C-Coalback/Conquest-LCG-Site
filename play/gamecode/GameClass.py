@@ -6222,7 +6222,8 @@ class Game:
                     player = self.p2
                 if player.magus_harid_waiting_cards:
                     del player.magus_harid_waiting_cards[0]
-            if self.interrupts_waiting_on_resolution[0] == "Magus Harid: Final Form":
+            if self.interrupts_waiting_on_resolution[0] == "Magus Harid: Final Form" or \
+                    self.interrupts_waiting_on_resolution[0] == "Grand Master Belial":
                 player = self.p1
                 if self.player_resolving_interrupts[0] == self.name_2:
                     player = self.p2

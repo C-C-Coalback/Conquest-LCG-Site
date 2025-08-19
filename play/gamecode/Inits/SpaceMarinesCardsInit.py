@@ -399,6 +399,11 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Fierce Purgator", "While this unit has faith, it gains Retaliate (3).\n"
                                                 "Reaction: After this unit resolves its attack, deal 1 damage to a unit"
                                                 " at this planet and each adjacent planet.", "Soldier. Grey Knights.",
-                             3, faction, "Common", 1, 4, 1, False)
+                             3, faction, "Common", 1, 4, 1, False),
+        CardClasses.ArmyCard("Grand Master Belial", "Deep Strike (2).\n"
+                                                    "Interrupt: When your Bloodied warlord is defeated, discard it and"
+                                                    " pay 1 resource and Deep Strike this unit to have it be considered"
+                                                    " a warlord. If it is defeated you lose the game.",
+                             "Soldier. Dark Angels.", -1, faction, "Loyal", 2, 6, 0, True, deepstrike=2)
     ]
     return space_marines_card_array

@@ -452,6 +452,9 @@ class Player:
     def deepstrike_attachment_extras(self, planet_id):
         self.after_any_deepstrike(planet_id)
 
+    def belial_deepstrike(self, planet_id):
+        self.after_any_deepstrike(planet_id)
+
     def deepstrike_unit(self, planet_id, unit_id):
         card = self.cards_in_reserve[planet_id][unit_id]
         self.add_card_to_planet(card, planet_id, triggered_card_effect=False)
@@ -4637,11 +4640,19 @@ class Player:
             if self.headquarters[card_pos].get_name() == "Termagant":
                 self.add_card_in_hq_to_discard(card_pos)
                 self.warlord_just_got_destroyed = True
+            if self.headquarters[card_pos].get_name() == "Grand Master Belial" and \
+                    self.headquarters[card_pos].get_card_type() == "Warlord":
+                self.add_card_in_hq_to_discard(card_pos)
+                self.warlord_just_got_destroyed = True
             elif not self.headquarters[card_pos].get_bloodied():
                 self.headquarters[card_pos].bloody_warlord()
             else:
                 if self.get_ability_given_pos(-2, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
                     self.game.create_interrupt("Magus Harid: Final Form", self.name_player,
+                                               (int(self.number), -1, -1))
+                    self.add_card_in_hq_to_discard(card_pos)
+                elif self.search_all_deepstrikes("Grand Master Belial"):
+                    self.game.create_interrupt("Grand Master Belial", self.name_player,
                                                (int(self.number), -1, -1))
                     self.add_card_in_hq_to_discard(card_pos)
                 else:
@@ -4893,6 +4904,13 @@ class Player:
                             self.cards_in_play[i + 1][j].misc_ability_used = True
                             self.game.create_interrupt("Growing Tide", self.name_player, (int(self.number), i, j))
 
+    def search_all_deepstrikes(self, card_name):
+        for i in range(7):
+            for j in range(len(self.cards_in_reserve[i])):
+                if self.cards_in_reserve[i][j].get_ability() == card_name:
+                    return True
+        return False
+
     def destroy_card_in_play(self, planet_num, card_pos):
         if planet_num == -2:
             self.destroy_card_in_hq(card_pos)
@@ -4901,12 +4919,20 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 self.add_card_in_play_to_discard(planet_num, card_pos)
                 self.warlord_just_got_destroyed = True
+            if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Grand Master Belial" and \
+                    self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
+                self.add_card_in_play_to_discard(planet_num, card_pos)
+                self.warlord_just_got_destroyed = True
             elif not self.cards_in_play[planet_num + 1][card_pos].get_bloodied():
                 self.bloody_warlord_given_pos(planet_num, card_pos)
                 self.warlord_just_got_bloodied = True
             else:
                 if self.get_ability_given_pos(planet_num, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
                     self.game.create_interrupt("Magus Harid: Final Form", self.name_player,
+                                               (int(self.number), -1, -1))
+                    self.add_card_in_play_to_discard(planet_num, card_pos)
+                elif self.search_all_deepstrikes("Grand Master Belial"):
+                    self.game.create_interrupt("Grand Master Belial", self.name_player,
                                                (int(self.number), -1, -1))
                     self.add_card_in_play_to_discard(planet_num, card_pos)
                 else:

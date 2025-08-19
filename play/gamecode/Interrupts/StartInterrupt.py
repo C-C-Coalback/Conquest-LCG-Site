@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import DeployPhase
+from .. import CardClasses
 
 
 async def start_resolving_interrupt(self, name, game_update_string):
@@ -64,6 +65,25 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Dodging Land Speeder":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
+        elif current_interrupt == "Grand Master Belial":
+            planet_belial = -1
+            pos_belial = -1
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_reserve[i])):
+                    if primary_player.cards_in_reserve[i][j].get_ability() == "Grand Master Belial":
+                        planet_belial = i
+                        pos_belial = j
+            if planet_belial != -1:
+                cost = primary_player.get_deepstrike_value_given_pos(planet_belial, pos_belial)
+                if primary_player.spend_resources(cost + 1):  # Grand Master Belial requires 1 more resource than normal
+                    del primary_player.cards_in_reserve[planet_belial][pos_belial]
+                    card = CardClasses.WarlordCard("Grand Master Belial", "", "", "Space Marines", 2, 6, 2, 6,
+                                                   "", 7, 7, [])
+                    primary_player.cards_in_play[planet_belial + 1].append(card)
+                    primary_player.belial_deepstrike(planet_belial)
+            else:
+                primary_player.warlord_just_got_destroyed = True
+            self.delete_interrupt()
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:
                 self.delete_interrupt()
