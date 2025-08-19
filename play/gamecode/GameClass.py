@@ -4891,6 +4891,9 @@ class Game:
         if card.get_faction() == "Astra Militarum":
             self.discounts_applied += player.muster_the_guard_count
         slaanesh_temptation = False
+        if card.get_ability() == "Dutiful Castellan":
+            if player.check_if_control_trait("Ecclesiarchy"):
+                self.discounts_applied += 1
         if card.check_for_a_trait("Elite"):
             self.discounts_applied += player.master_warpsmith_count
         else:
@@ -4943,6 +4946,9 @@ class Game:
             self.available_discounts += num_termagants
         if card.get_faction() == "Astra Militarum":
             self.available_discounts += player.muster_the_guard_count
+        if card.get_ability() == "Dutiful Castellan":
+            if player.check_if_control_trait("Ecclesiarchy"):
+                self.available_discounts += 1
         if card.check_for_a_trait("Elite"):
             self.available_discounts += player.master_warpsmith_count
         else:

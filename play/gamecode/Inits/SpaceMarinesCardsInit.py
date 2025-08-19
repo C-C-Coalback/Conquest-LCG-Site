@@ -389,6 +389,12 @@ def space_marines_cards_init():
                                                      "Interrupt: When this unit is chosen as a defender, exhaust it "
                                                      "and move it to an adjacent planet to cancel the attack.",
                              "Vehicle. Dark Angels.", 2, faction, "Loyal", 3, 1, 1, False,
-                             deepstrike=1, wargear_attachments_permitted=False, flying=True)
+                             deepstrike=1, wargear_attachments_permitted=False, flying=True),
+        CardClasses.ArmyCard("Dutiful Castellan", "While you control an Ecclesiarchy unit, "
+                                                  "reduce the cost of this unit by 1.\n"
+                                                  "Unstoppable - The first time this unit is assigned damage this turn,"
+                                                  " prevent 1 of that damage and deal 1 damage to a target unit"
+                                                  " at this planet.", "Martyr. Black Templars.",
+                             3, faction, "Loyal", 3, 3, 1, False, unstoppable=True)
     ]
     return space_marines_card_array

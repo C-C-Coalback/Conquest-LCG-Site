@@ -4007,6 +4007,9 @@ class Player:
                     damage_on_card_after = damage_on_card_after - 1
                     if self.get_ability_given_pos(planet_id, unit_id) == "Righteous Initiate":
                         self.cards_in_play[planet_id + 1][unit_id].extra_attack_until_end_of_phase += 2
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Dutiful Castellan":
+                        self.game.create_reaction("Dutiful Castellan", self.name_player,
+                                                  (int(self.number), planet_id, unit_id))
                     if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
                         self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
                                                   (int(self.number), planet_id, unit_id))
