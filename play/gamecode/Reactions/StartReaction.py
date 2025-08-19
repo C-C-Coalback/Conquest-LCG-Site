@@ -1815,6 +1815,16 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Fierce Purgator":
+            self.misc_misc = []
+            self.misc_misc_2 = []
+            self.misc_misc.append(planet_pos)
+            if planet_pos != 0:
+                if self.planets_in_play_array[planet_pos - 1]:
+                    self.misc_misc.append(planet_pos - 1)
+            if planet_pos != 6:
+                if self.planets_in_play_array[planet_pos + 1]:
+                    self.misc_misc.append(planet_pos + 1)
         elif current_reaction == "Avenging Squad":
             primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

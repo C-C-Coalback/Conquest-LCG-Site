@@ -1740,6 +1740,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                         context="Dutiful Castellan", by_enemy_unit=True)
                 self.delete_reaction()
+        elif current_reaction == "Fierce Purgator":
+            if planet_pos in self.misc_misc:
+                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                self.misc_misc_2.append((int(player_owning_card.number), planet_pos, unit_pos))
+                self.misc_misc.remove(planet_pos)
+                if not self.misc_misc:
+                    for i in range(len(self.misc_misc_2)):
+                        current_num, current_pla, current_pos = self.misc_misc_2[i]
+                        if current_num == 1:
+                            self.p1.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
+                                                         rickety_warbuggy=True)
+                        else:
+                            self.p2.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
+                                                         rickety_warbuggy=True)
+                    self.misc_misc = None
+                    self.misc_misc_2 = None
+                    self.delete_reaction()
         elif current_reaction == "Sweep Attack":
             if self.chosen_first_card:
                 num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]

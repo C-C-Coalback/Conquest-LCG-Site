@@ -395,6 +395,10 @@ def space_marines_cards_init():
                                                   "Unstoppable - The first time this unit is assigned damage this turn,"
                                                   " prevent 1 of that damage and deal 1 damage to a target unit"
                                                   " at this planet.", "Martyr. Black Templars.",
-                             3, faction, "Loyal", 3, 3, 1, False, unstoppable=True)
+                             3, faction, "Loyal", 3, 3, 1, False, unstoppable=True),
+        CardClasses.ArmyCard("Fierce Purgator", "While this unit has faith, it gains Retaliate (3).\n"
+                                                "Reaction: After this unit resolves its attack, deal 1 damage to a unit"
+                                                " at this planet and each adjacent planet.", "Soldier. Grey Knights.",
+                             3, faction, "Common", 1, 4, 1, False)
     ]
     return space_marines_card_array

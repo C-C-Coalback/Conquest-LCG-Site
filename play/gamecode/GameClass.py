@@ -7228,6 +7228,8 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p1.get_ability_given_pos(planet, i) == "Fierce Purgator":
+                                self.create_reaction("Fierce Purgator", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
@@ -7267,6 +7269,8 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p2.get_ability_given_pos(planet, i) == "Fierce Purgator":
+                                self.create_reaction("Fierce Purgator", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p2.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
