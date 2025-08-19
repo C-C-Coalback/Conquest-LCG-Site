@@ -382,6 +382,13 @@ def space_marines_cards_init():
                                                "Reaction: After another unit you control at this planet is dealt damage"
                                                " by an enemy unit, this unit gains Retaliate (1) until the end"
                                                " of the phase.", "Soldier. Ultramarines.",
-                             1, faction, "Common", 1, 2, 1, False, retaliate=1)
+                             1, faction, "Common", 1, 2, 1, False, retaliate=1),
+        CardClasses.ArmyCard("Dodging Land Speeder", "No Wargear Attachments.\n"
+                                                     "Deep Strike (1). Flying.\n"
+                                                     "Cannot be damaged by Area Effect.\n"
+                                                     "Interrupt: When this unit is chosen as a defender, exhaust it "
+                                                     "and move it to an adjacent planet to cancel the attack.",
+                             "Vehicle. Dark Angels.", 2, faction, "Loyal", 3, 1, 1, False,
+                             deepstrike=1, wargear_attachments_permitted=False, flying=True)
     ]
     return space_marines_card_array

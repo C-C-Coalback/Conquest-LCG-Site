@@ -45,7 +45,7 @@ class Game:
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
-        self.units_immune_to_aoe = ["Undying Saint"]
+        self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder"]
         self.attack_being_resolved = False
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, apoka_errata_cards, self)
@@ -2596,7 +2596,8 @@ class Game:
                                     primary_player.headquarters[unit_pos].misc_ability_used = True
                                 else:
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
-                            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+                            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol" or\
+                                    self.interrupts_waiting_on_resolution[0] == "Dodging Land Speeder":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(),
@@ -2604,6 +2605,7 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
+                            self.delete_reaction()
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Jain Zar?":

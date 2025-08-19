@@ -40,6 +40,19 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
             self.infest_planet(chosen_planet, primary_player)
             self.delete_interrupt()
+    elif current_interrupt == "Dodging Land Speeder":
+        _, og_planet, og_pos = self.positions_of_units_interrupting[0]
+        if abs(chosen_planet - og_planet) == 1:
+            primary_player.reset_aiming_reticle_in_play(og_planet, og_pos)
+            primary_player.move_unit_to_planet(og_planet, og_pos, chosen_planet)
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_combat_positions()
+            self.shining_blade_active = False
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            self.delete_interrupt()
     elif current_interrupt == "Shas'el Lyst":
         card = self.preloaded_find_card("Shas'el Lyst")
         primary_player.add_card_to_planet(card, chosen_planet)

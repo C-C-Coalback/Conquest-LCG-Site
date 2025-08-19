@@ -851,6 +851,25 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.last_defender_position = (secondary_player.number,
                                                                        self.defender_planet,
                                                                        self.defender_position)
+                                elif secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position
+                                ) == "Dodging Land Speeder" and secondary_player.get_ready_given_pos(
+                                        self.defender_planet, self.defender_position
+                                ):
+                                    can_continue = False
+                                    await self.send_update_message(
+                                        "Dodging Land Speeder can be used to cancel the attack"
+                                    )
+                                    secondary_player.set_aiming_reticle_in_play(
+                                        self.defender_planet, self.defender_position, "blue"
+                                    )
+                                    self.create_interrupt(
+                                        "Dodging Land Speeder", secondary_player.name_player,
+                                        (int(secondary_player.number), self.defender_planet, self.defender_position)
+                                    )
+                                    self.last_defender_position = (secondary_player.number,
+                                                                   self.defender_planet,
+                                                                   self.defender_position)
                                 elif "Catachan Devils Patrol" in secondary_player.cards:
                                     card = self.preloaded_find_card("Catachan Devils Patrol")
                                     self.discounts_applied = 0

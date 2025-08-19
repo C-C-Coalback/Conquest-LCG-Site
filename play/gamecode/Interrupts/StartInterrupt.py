@@ -62,6 +62,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.ebon_chalice_value,
                                                   by_enemy_unit=False)
             self.delete_interrupt()
+        elif current_interrupt == "Dodging Land Speeder":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
         elif current_interrupt == "Catachan Devils Patrol":
             if "Catachan Devils Patrol" not in primary_player.cards:
                 self.delete_interrupt()
