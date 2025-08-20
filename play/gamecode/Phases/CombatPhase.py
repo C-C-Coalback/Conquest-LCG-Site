@@ -157,12 +157,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.player_with_combat_turn = self.name_2
                     self.p1.has_passed = True
                     self.reset_combat_positions()
+                    for planet in range(7):
+                        for j in range(len(self.p1.cards_in_play[planet + 1])):
+                            self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
                     await self.send_update_message(self.name_1 + " passes their combat/retreat turn.")
                 else:
                     self.number_with_combat_turn = "1"
                     self.player_with_combat_turn = self.name_1
                     self.p2.has_passed = True
                     self.reset_combat_positions()
+                    for planet in range(7):
+                        for j in range(len(self.p2.cards_in_play[planet + 1])):
+                            self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
                     await self.send_update_message(self.name_2 + " passes their combat/retreat turn.")
                 if self.p1.has_passed and self.p2.has_passed:
                     if self.mode == "Normal":
@@ -543,6 +549,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Army":
                                     if player.get_cost_given_pos(chosen_planet, chosen_unit) < 3:
                                         iron_hands_cent_rel = True
+                            pinning_razorback = False
+                            if player.cards_in_play[chosen_planet + 1][chosen_unit].cannot_be_declared_as_attacker:
+                                pinning_razorback = True
                             can_continue = False
                             print("check enemy cards")
                             print(len(secondary_player.cards_in_play[chosen_planet + 1]))
@@ -555,6 +564,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 can_continue = False
                                 valid_unit = False
                                 await self.send_update_message("Iron Hands Centurion is preventing "
+                                                               "this unit from attacking")
+                            elif pinning_razorback:
+                                can_continue = False
+                                valid_unit = False
+                                await self.send_update_message("Pinning Razorback is preventing "
                                                                "this unit from attacking")
                             elif not secondary_player.cards_in_play[chosen_planet + 1]:
                                 valid_unit = False

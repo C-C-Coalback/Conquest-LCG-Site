@@ -434,6 +434,12 @@ def space_marines_cards_init():
                                                      "Cannot be targeted.\n"
                                                      "Each other unit you control at this"
                                                      " planet gets +1 ATK and +1 HP.", "Questor Imperialis.",
-                             6, faction, "Loyal", 5, 9, 6, False, no_attachments=True, retaliate=5, lumbering=True)
+                             6, faction, "Loyal", 5, 9, 6, True, no_attachments=True, retaliate=5, lumbering=True),
+        CardClasses.ArmyCard("Pinning Razorback", "No Wargear Attachments.\n"
+                                                  "Combat Action: A target enemy non-warlord unit at this planet "
+                                                  "cannot be declared as an attacker during your opponent's next combat"
+                                                  " turn this round. (Limit once per phase.)",
+                             "Vehicle. Tank. Space Wolves.", 4, faction, "Common", 2, 5, 1, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return space_marines_card_array

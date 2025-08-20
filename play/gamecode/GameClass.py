@@ -7250,6 +7250,8 @@ class Game:
                         self.p1.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_1
+                            for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
                             if self.p1.get_card_type_given_pos(planet, i) == "Army":
                                 for j in range(len(self.p2.cards_in_play[planet + 1])):
                                     if self.p2.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":
@@ -7293,6 +7295,8 @@ class Game:
                         self.p2.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_2
+                            for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
                             if self.p2.get_card_type_given_pos(planet, i) == "Army":
                                 for j in range(len(self.p1.cards_in_play[planet + 1])):
                                     if self.p1.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":

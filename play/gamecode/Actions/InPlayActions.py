@@ -259,6 +259,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = False
+                    elif ability == "Pinning Razorback":
+                        if not card_chosen.get_once_per_phase_used():
+                            card_chosen.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                     elif ability == "Alluring Daemonette":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -2036,6 +2041,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         )
                         self.action_cleanup()
                         self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Pinning Razorback":
+        if self.position_of_actioned_card[0] == planet_pos:
+            if secondary_player.number == game_update_string[1]:
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                    secondary_player.cards_in_play[planet_pos + 1][unit_pos].cannot_be_declared_as_attacker = True
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                    self.action_cleanup()
     elif self.action_chosen == "Mycetic Spores":
         if self.unit_to_move_position == [-1, -1]:
             if self.player_with_action == self.name_1:
@@ -2043,8 +2057,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             else:
                 primary_player = self.p2
             if game_update_string[1] == primary_player.get_number():
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].has_hive_mind:
                     self.unit_to_move_position = [planet_pos, unit_pos]
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
