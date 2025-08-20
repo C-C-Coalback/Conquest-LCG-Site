@@ -7500,7 +7500,7 @@ class Game:
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
                     reactions.append("Kabalite Blackguard")
             if winner.search_card_in_hq("Clearing the Path"):
-                if winner.check_for_warlord(planet_id):
+                if winner.check_for_warlord(planet_id, True, self.name_player):
                     reactions.append("Clearing the Path")
             if self.get_blue_icon(planet_id):
                 if winner.resources > 0:

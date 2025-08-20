@@ -410,6 +410,10 @@ def space_marines_cards_init():
                              "Unstoppable - The first time this unit is assigned damage this"
                              " turn, prevent 1 of that damage and this unit gains "
                              "Retaliate (2) until the end of the phase.", "Soldier. Black Templars.",
-                             3, faction, "Loyal", 2, 3, 1, False, sweep=1, unstoppable=True)
+                             3, faction, "Loyal", 2, 3, 1, False, sweep=1, unstoppable=True),
+        CardClasses.ArmyCard("Frenzied Wulfen", "Retaliate (2).\n"
+                                                "Reaction: After this unit enters play, a target army unit at this "
+                                                "planet is considered a warlord for your card effects.",
+                             "Warrior. Mutant. Space Wolves.", 3, faction, "Loyal", 3, 3, 1, False, retaliate=2)
     ]
     return space_marines_card_array

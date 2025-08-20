@@ -1585,6 +1585,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Frenzied Wulfen":
+            self.game.create_reaction("Frenzied Wulfen", self.name_player, (int(self.number), position,
+                                                                            last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id
@@ -2450,6 +2453,9 @@ class Player:
                 if self.get_ability_given_pos(planet_pos, j) == "Tenacious Novice Squad":
                     self.game.create_reaction("Tenacious Novice Squad", self.name_player,
                                               (int(self.number), planet_pos, j))
+                if self.get_ability_given_pos(planet_pos, j, bloodied_relevant=True) == "Ragnar Blackmane":
+                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                              (int(self.number), planet_pos, j))
 
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
@@ -2659,7 +2665,7 @@ class Player:
                 return i
         return -1
 
-    def check_for_warlord(self, planet_id):
+    def check_for_warlord(self, planet_id, card_effect=False, searching_name=""):
         if planet_id == -2:
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_card_type() == "Warlord":
@@ -2671,6 +2677,9 @@ class Player:
             for j in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][j].get_card_type() == "Warlord":
                     return 1
+                if card_effect:
+                    if searching_name in self.cards_in_play[planet_id + 1][j].hit_by_frenzied_wulfen_names:
+                        return 1
         return 0
 
     def check_ready_pos(self, planet_id, unit_id):
@@ -2715,12 +2724,12 @@ class Player:
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eop()
 
-    def check_for_enemy_warlord(self, planet_id):
+    def check_for_enemy_warlord(self, planet_id, card_effect=False, searching_name=""):
         if self.number == "1":
             enemy_player = self.game.p2
         else:
             enemy_player = self.game.p1
-        if enemy_player.check_for_warlord(planet_id):
+        if enemy_player.check_for_warlord(planet_id, card_effect, searching_name):
             return True
         return False
 
@@ -3618,10 +3627,6 @@ class Player:
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":
                     owner = self.cards_in_play[planet_pos + 1][i].get_attachments()[j].name_owner
                     self.game.create_reaction("Blacksun Filter", owner, (int(self.number), planet_pos, i))
-            if self.cards_in_play[planet_pos + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
-                # Need an extra check that the ability has not already fired this phase.
-                self.game.create_reaction("Ragnar Blackmane", self.name_player,
-                                          (int(self.number), planet_pos, i))
             if self.cards_in_play[planet_pos + 1][i].get_ability() == "Blood Claw Pack":
                 if self.get_ready_given_pos(planet_pos, i):
                     self.game.create_reaction("Blood Claw Pack", self.name_player,
@@ -3770,17 +3775,17 @@ class Player:
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
         if card.get_ability() in self.plus_two_atk_if_warlord:
-            if self.check_for_warlord(planet_id):
+            if self.check_for_warlord(planet_id, True, self.name_player):
                 attack_value += 2
             else:
                 if self.number == "1":
-                    if self.game.p2.check_for_warlord(planet_id):
+                    if self.game.p2.check_for_warlord(planet_id, True, self.name_player):
                         attack_value += 2
                 elif self.number == "2":
-                    if self.game.p1.check_for_warlord(planet_id):
+                    if self.game.p1.check_for_warlord(planet_id, True, self.name_player):
                         attack_value += 2
         if card.get_ability() == "Baharroth's Hawks":
-            if self.check_for_warlord(planet_id):
+            if self.check_for_warlord(planet_id, True, self.name_player):
                 attack_value += 3
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
@@ -3822,10 +3827,10 @@ class Player:
                     attack_value += 1
             if attachments[i].get_ability() == "Frostfang":
                 if self.number == "1":
-                    if self.game.p2.check_for_warlord(planet_id):
+                    if self.game.p2.check_for_warlord(planet_id, True, self.name_player):
                         attack_value += 2
                 elif self.number == "2":
-                    if self.game.p1.check_for_warlord(planet_id):
+                    if self.game.p1.check_for_warlord(planet_id, True, self.name_player):
                         attack_value += 2
             if attachments[i].get_ability() == "Imperial Power Fist":
                 if len(self.cards_in_play[planet_id + 1]) > 1:
@@ -4323,7 +4328,8 @@ class Player:
                     if self.game.p1.search_synapse_at_planet(planet_id):
                         health += 2
         if self.get_ability_given_pos(planet_id, unit_id) == "Armored Fist Squad":
-            if self.check_for_warlord(planet_id) or self.check_for_enemy_warlord(planet_id):
+            if self.check_for_warlord(planet_id, True, self.name_player) or \
+                    self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health += 2
         if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
             if self.get_cost_given_pos(planet_id, unit_id) < 3:
@@ -4346,10 +4352,10 @@ class Player:
                     health += 1
             if attachments[i].get_ability() == "Frostfang":
                 if self.number == "1":
-                    if self.game.p2.check_for_warlord(planet_id):
+                    if self.game.p2.check_for_warlord(planet_id, True, self.name_player):
                         health += 2
                 elif self.number == "2":
-                    if self.game.p1.check_for_warlord(planet_id):
+                    if self.game.p1.check_for_warlord(planet_id, True, self.name_player):
                         health += 2
         return health
 

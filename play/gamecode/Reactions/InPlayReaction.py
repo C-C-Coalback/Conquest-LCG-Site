@@ -1740,6 +1740,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                         context="Dutiful Castellan", by_enemy_unit=True)
                 self.delete_reaction()
+        elif current_reaction == "Frenzied Wulfen":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.cards_in_play[planet_pos + 1][unit_pos].\
+                        hit_by_frenzied_wulfen_names.append(primary_player.name_player)
+                    self.delete_reaction()
         elif current_reaction == "Fierce Purgator":
             if planet_pos in self.misc_misc:
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)

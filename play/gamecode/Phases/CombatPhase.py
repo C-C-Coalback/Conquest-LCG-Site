@@ -990,9 +990,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if primary_player.check_for_trait_given_pos(self.attacker_planet,
                                                                             self.attacker_position, "Space Wolves"):
                                     if primary_player.search_card_in_hq("Ragnar's Warcamp"):
-                                        if primary_player.check_for_warlord(self.attacker_planet):
+                                        if primary_player.check_for_warlord(self.attacker_planet, True,
+                                                                            primary_player.name_player):
                                             if secondary_player.get_card_type_given_pos(
                                                     self.defender_planet, self.defender_position) == "Warlord":
+                                                attack_value = attack_value * 2
+                                            elif primary_player.name_player in secondary_player.cards_in_play[
+                                                    self.defender_planet + 1][
+                                                    self.defender_position].hit_by_frenzied_wulfen_names:
                                                 attack_value = attack_value * 2
                                 if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                               self.defender_position, "Vehicle"):

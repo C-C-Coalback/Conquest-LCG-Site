@@ -350,6 +350,7 @@ class UnitCard(Card):
         self.faith = 0
         self.retaliate = retaliate
         self.retaliate_eop = 0
+        self.hit_by_frenzied_wulfen_names = []
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value

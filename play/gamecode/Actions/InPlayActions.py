@@ -89,7 +89,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.misc_counter = 2
-                                if secondary_player.check_for_warlord(planet_pos):
+                                if secondary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
                                     self.misc_counter = 3
                                 await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
                         else:
@@ -791,7 +791,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             player_being_hit = self.p2
         can_continue = True
-        if primary_player.check_for_warlord(planet_pos):
+        if primary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
             if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 if player_being_hit.name_player == secondary_player.name_player:
                     can_continue = True
@@ -1635,7 +1635,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                    if primary_player.check_for_warlord(planet_pos):
+                    if primary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
                         can_continue = True
                         possible_interrupts = []
                         if player_owning_card.name_player == primary_player.name_player:
