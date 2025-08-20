@@ -3687,6 +3687,20 @@ class Player:
                 if self.get_ready_given_pos(planet_pos, i):
                     self.game.create_reaction("Blood Claw Pack", self.name_player,
                                               (int(self.number), planet_pos, i))
+        if len(self.cards_in_play[planet_pos + 1]) == 1:
+            if planet_pos != 0:
+                for i in range(len(self.cards_in_play[planet_pos])):
+                    if self.get_ability_given_pos(planet_pos - 1, i) == "Thunderwolf Cavalry":
+                        if not self.check_if_already_have_reaction("Thunderwolf Cavalry"):
+                            self.game.create_reaction("Thunderwolf Cavalry", self.name_player,
+                                                      (int(self.number), planet_pos, -1))
+            if planet_pos != 6:
+                for i in range(len(self.cards_in_play[planet_pos + 2])):
+                    if self.get_ability_given_pos(planet_pos + 1, i) == "Thunderwolf Cavalry":
+                        if not self.check_if_already_have_reaction("Thunderwolf Cavalry"):
+                            self.game.create_reaction("Thunderwolf Cavalry", self.name_player,
+                                                      (int(self.number), planet_pos, -1))
+
 
     def does_own_interrupt_exist(self, reaction_name):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):

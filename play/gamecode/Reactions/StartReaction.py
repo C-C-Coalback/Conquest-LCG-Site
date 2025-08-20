@@ -779,6 +779,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                                 storm_lib_value)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Thunderwolf Cavalry":
+            if not primary_player.cards_in_play[planet_pos + 1]:
+                self.delete_reaction()
         elif current_reaction == "Deathwing Interceders":
             _, current_planet, current_unit = self.last_defender_position
             i = 0

@@ -469,6 +469,10 @@ def space_marines_cards_init():
                                                    "Reaction: After a combat round begins, deal 4 damage to each enemy"
                                                    " unit at this planet attacked by this unit during the previous"
                                                    " combat round.", "Psyker. Ultramarines.",
-                             3, faction, "Common", 1, 6, 1, False, retaliate=1)
+                             3, faction, "Common", 1, 6, 1, False, retaliate=1),
+        CardClasses.ArmyCard("Thunderwolf Cavalry", "Reaction: After an enemy warlord commits to an adjacent planet "
+                                                    "with a single army unit you control switch the location of that "
+                                                    "single unit with this unit.", "Soldier. Space Wolves.",
+                             3, faction, "Common", 3, 3, 1, False)
     ]
     return space_marines_card_array

@@ -773,6 +773,25 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Thunderwolf Cavalry":
+            og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            if abs(og_pla - planet_pos) == 1:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Thunderwolf Cavalry":
+                        if primary_player.cards_in_play[og_pla + 1]:
+                            primary_player.cards_in_play[planet_pos + 1].append(
+                                primary_player.cards_in_play[og_pla + 1][0]
+                            )
+                            primary_player.cards_in_play[og_pla + 1].append(
+                                primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                            )
+                            del primary_player.cards_in_play[og_pla + 1][0]
+                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                            primary_player.adjust_own_reactions(planet_pos, unit_pos)
+                            primary_player.adjust_own_reactions(og_pla, 0)
+                            self.delete_reaction()
+                        else:
+                            await self.send_update_message("PROBLEM: NO UNIT FOR THUNDERWOLF CAVALRY TO SWITCH WITH!")
         elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
                 _, current_planet, current_unit = self.last_defender_position
