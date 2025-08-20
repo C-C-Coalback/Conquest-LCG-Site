@@ -3760,6 +3760,9 @@ class Player:
                 attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if self.get_ability_given_pos(planet_id, unit_id) != "Knight Paladin Voris":
+            if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
+                attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
@@ -4299,6 +4302,9 @@ class Player:
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
+                health += 1
+        if self.get_ability_given_pos(planet_id, unit_id) != "Knight Paladin Voris":
+            if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):

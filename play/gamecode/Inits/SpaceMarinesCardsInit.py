@@ -429,6 +429,11 @@ def space_marines_cards_init():
                                                   "Reaction: After a unit enters play at an adjacent planet, move this"
                                                   " unit to that planet. Then you may deal 1 damage to that unit."
                                                   " (Limit once per phase.)", "Soldier. Grey Knights.",
-                             3, faction, "Common", 2, 4, 1, False)
+                             3, faction, "Common", 2, 4, 1, False),
+        CardClasses.ArmyCard("Knight Paladin Voris", "No Attachments. Lumbering. Retaliate (5).\n"
+                                                     "Cannot be targeted.\n"
+                                                     "Each other unit you control at this"
+                                                     " planet gets +1 ATK and +1 HP.", "Questor Imperialis.",
+                             6, faction, "Loyal", 5, 9, 6, False, no_attachments=True, retaliate=5, lumbering=True)
     ]
     return space_marines_card_array
