@@ -1746,6 +1746,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].\
                         hit_by_frenzied_wulfen_names.append(primary_player.name_player)
                     self.delete_reaction()
+        elif current_reaction == "Inspiring Sergeant":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                name_card = player_owning_card.get_name_given_pos(planet_pos, unit_pos)
+                await self.send_update_message(name_card + " gained +1 ATK and +1 HP until end of phase.")
+                self.delete_reaction()
         elif current_reaction == "Fierce Purgator":
             if planet_pos in self.misc_misc:
                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)

@@ -420,6 +420,10 @@ def space_marines_cards_init():
                                                    "Interrupt: When your opponent triggers an ability that discards a"
                                                    " card from your hand, put this unit into play at a planet. Then "
                                                    "deal 1 damage to an enemy unit at that planet and draw a card.",
-                             "Soldier. Space Wolves.", 1, faction, "Loyal", 3, 3, 1, True)
+                             "Soldier. Space Wolves.", 1, faction, "Loyal", 3, 3, 1, True),
+        CardClasses.ArmyCard("Inspiring Sergeant", "Retaliate (1).\n"
+                                                   "Reaction: After this unit resolves its attack, a target unit at"
+                                                   " this planet gets +1 ATK and +1 HP until the end of the phase.",
+                             "Soldier. Space Marines.", 2, faction, "Loyal", 2, 2, 1, False, retaliate=1)
     ]
     return space_marines_card_array
