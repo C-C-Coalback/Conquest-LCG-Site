@@ -20,6 +20,23 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "Interceptor Squad":
+        if not self.chosen_first_card:
+            p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+            if abs(origin_planet - chosen_planet) == 1:
+                can_move = False
+                for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                    if primary_player.cards_in_play[chosen_planet + 1][i].just_entered_play:
+                        can_move = True
+                if not can_move:
+                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                        if secondary_player.cards_in_play[chosen_planet + 1][i].just_entered_play:
+                            can_move = True
+                if can_move:
+                    primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                    primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                    self.chosen_first_card = True
+                    self.misc_target_planet = chosen_planet
     elif current_reaction == "Heralding Cherubim":
         p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()

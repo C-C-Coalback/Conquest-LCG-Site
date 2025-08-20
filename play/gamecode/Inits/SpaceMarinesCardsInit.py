@@ -424,6 +424,11 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Inspiring Sergeant", "Retaliate (1).\n"
                                                    "Reaction: After this unit resolves its attack, a target unit at"
                                                    " this planet gets +1 ATK and +1 HP until the end of the phase.",
-                             "Soldier. Space Marines.", 2, faction, "Loyal", 2, 2, 1, False, retaliate=1)
+                             "Soldier. Space Marines.", 2, faction, "Loyal", 2, 2, 1, False, retaliate=1),
+        CardClasses.ArmyCard("Interceptor Squad", "While this unit has faith, it gains Mobile.\n"
+                                                  "Reaction: After a unit enters play at an adjacent planet, move this"
+                                                  " unit to that planet. Then you may deal 1 damage to that unit."
+                                                  " (Limit once per phase.)", "Soldier. Grey Knights.",
+                             3, faction, "Common", 2, 4, 1, False)
     ]
     return space_marines_card_array

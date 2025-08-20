@@ -1560,6 +1560,7 @@ class Player:
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
+        self.cards_in_play[position + 1][last_element_index].just_entered_play = True
         other_player = self.get_other_player()
         if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
             if not other_player.check_if_already_have_reaction("Magus Harid"):
@@ -1569,6 +1570,36 @@ class Player:
             if self.game.phase == "COMBAT":
                 self.game.create_reaction("Eloquent Confessor", other_player.name_player,
                                           (int(self.number), position, last_element_index))
+        if position != 0:
+            for i in range(len(other_player.cards_in_play[position])):
+                if other_player.get_ability_given_pos(position - 1, i) == "Interceptor Squad":
+                    if not other_player.get_once_per_phase_used_given_pos(position - 1, i):
+                        if not other_player.check_if_already_have_reaction_of_position("Interceptor Squad",
+                                                                                       position - 1, i):
+                            self.game.create_reaction("Interceptor Squad", other_player.name_player,
+                                                      (int(other_player.number), position - 1, i))
+            for i in range(len(self.cards_in_play[position])):
+                if self.get_ability_given_pos(position - 1, i) == "Interceptor Squad":
+                    if not self.get_once_per_phase_used_given_pos(position - 1, i):
+                        if not self.check_if_already_have_reaction_of_position("Interceptor Squad",
+                                                                               position - 1, i):
+                            self.game.create_reaction("Interceptor Squad", self.name_player,
+                                                      (int(self.number), position - 1, i))
+        if position != 6:
+            for i in range(len(other_player.cards_in_play[position + 2])):
+                if other_player.get_ability_given_pos(position + 1, i) == "Interceptor Squad":
+                    if not other_player.get_once_per_phase_used_given_pos(position + 1, i):
+                        if not other_player.check_if_already_have_reaction_of_position("Interceptor Squad",
+                                                                                       position + 1, i):
+                            self.game.create_reaction("Interceptor Squad", other_player.name_player,
+                                                      (int(other_player.number), position + 1, i))
+            for i in range(len(self.cards_in_play[position + 2])):
+                if self.get_ability_given_pos(position + 1, i) == "Interceptor Squad":
+                    if not self.get_once_per_phase_used_given_pos(position + 1, i):
+                        if not self.check_if_already_have_reaction_of_position("Interceptor Squad",
+                                                                               position + 1, i):
+                            self.game.create_reaction("Interceptor Squad", self.name_player,
+                                                      (int(self.number), position + 1, i))
         if not is_owner_of_card:
             self.cards_in_play[position + 1][last_element_index].name_owner = self.get_name_enemy_player()
         if self.get_card_type_given_pos(position, last_element_index) == "Army":
@@ -2827,6 +2858,9 @@ class Player:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
             if self.count_supports() > 2:
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Interceptor Squad":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, unit_id, "Herald of the Tau'va"):

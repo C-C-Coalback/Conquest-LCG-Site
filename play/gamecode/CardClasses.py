@@ -81,6 +81,7 @@ class Card:
         self.new_ambush = False
         self.embarked_squads_active = False
         self.from_front_line_rhinos = False
+        self.just_entered_play = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used

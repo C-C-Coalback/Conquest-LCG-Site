@@ -1746,6 +1746,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].\
                         hit_by_frenzied_wulfen_names.append(primary_player.name_player)
                     self.delete_reaction()
+        elif current_reaction == "Interceptor Squad":
+            if planet_pos == self.misc_target_planet:
+                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
+                                                            context="Interceptor Squad")
+                    self.delete_reaction()
         elif current_reaction == "Inspiring Sergeant":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")

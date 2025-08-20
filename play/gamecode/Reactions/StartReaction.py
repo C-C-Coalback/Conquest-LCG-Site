@@ -1815,6 +1815,11 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Interceptor Squad":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+            await self.send_update_message("Choose planet to move to.")
+            self.chosen_first_card = False
         elif current_reaction == "Fierce Purgator":
             self.misc_misc = []
             self.misc_misc_2 = []
