@@ -2465,6 +2465,12 @@ class Game:
                             self.interrupts_discard_enemy_allowed = False
                             await self.complete_enemy_discard(primary_player, secondary_player)
                             self.interrupts_discard_enemy_allowed = True
+                        elif chosen_choice == "Hjorvath Coldstorm":
+                            self.interrupting_discard_effect_active = "Hjorvath Coldstorm"
+                            self.chosen_first_card = False
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.name_player_making_choices = primary_player.name_player
                         elif chosen_choice == "Shas'el Lyst":
                             self.choices_available = []
                             self.choice_context = "Target Planet Shas'el Lyst"
@@ -6960,11 +6966,35 @@ class Game:
                         if game_update_string[0] == "IN_PLAY":
                             if game_update_string[1] == primary_player.get_number():
                                 card = self.preloaded_find_card("Blade of the Crimson Oath")
-                                if primary_player.attach_card(card, int(game_update_string[2]), int(game_update_string[3])):
+                                if primary_player.attach_card(card, int(game_update_string[2]),
+                                                              int(game_update_string[3])):
                                     self.interrupting_discard_effect_active = False
                                     self.interrupts_discard_enemy_allowed = False
                                     await self.complete_enemy_discard(primary_player, secondary_player)
                                     self.interrupts_discard_enemy_allowed = True
+            elif self.interrupting_discard_effect_active == "Hjorvath Coldstorm":
+                if not self.chosen_first_card:
+                    if len(game_update_string) == 2:
+                        if game_update_string[0] == "PLANETS":
+                            card = self.preloaded_find_card("Hjorvath Coldstorm")
+                            primary_player.add_card_to_planet(card, int(game_update_string[1]))
+                            primary_player.remove_card_name_from_hand("Hjorvath Coldstorm")
+                            self.chosen_first_card = True
+                            self.misc_target_planet = int(game_update_string[1])
+                else:
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == secondary_player.get_number():
+                                secondary_player.assign_damage_to_pos(int(game_update_string[2]),
+                                                                      int(game_update_string[3]), 1,
+                                                                      shadow_field_possible=True,
+                                                                      rickety_warbuggy=True,
+                                                                      context="Hjorvath Coldstorm")
+                                primary_player.draw_card()
+                                self.interrupting_discard_effect_active = False
+                                self.interrupts_discard_enemy_allowed = False
+                                await self.complete_enemy_discard(primary_player, secondary_player)
+                                self.interrupts_discard_enemy_allowed = True
 
     async def update_rearranging_deck(self, name, game_update_string):
         if name == self.name_player_rearranging_deck:

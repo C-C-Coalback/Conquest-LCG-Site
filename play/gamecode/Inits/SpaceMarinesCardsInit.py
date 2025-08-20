@@ -414,6 +414,12 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Frenzied Wulfen", "Retaliate (2).\n"
                                                 "Reaction: After this unit enters play, a target army unit at this "
                                                 "planet is considered a warlord for your card effects.",
-                             "Warrior. Mutant. Space Wolves.", 3, faction, "Loyal", 3, 3, 1, False, retaliate=2)
+                             "Warrior. Mutant. Space Wolves.", 3, faction, "Loyal", 3, 3, 1, False, retaliate=2),
+        CardClasses.ArmyCard("Hjorvath Coldstorm", "While this unit is at a planet with an enemy warlord it "
+                                                   "gets -2 ATK and -2 HP.\n"
+                                                   "Interrupt: When your opponent triggers an ability that discards a"
+                                                   " card from your hand, put this unit into play at a planet. Then "
+                                                   "deal 1 damage to an enemy unit at that planet and draw a card.",
+                             "Soldier. Space Wolves.", 1, faction, "Loyal", 3, 3, 1, True)
     ]
     return space_marines_card_array

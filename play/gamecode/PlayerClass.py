@@ -322,6 +322,8 @@ class Player:
                 interrupts.append("Blade of the Crimson Oath")
             if self.search_hand_for_card("Shas'el Lyst"):
                 interrupts.append("Shas'el Lyst")
+            if self.search_hand_for_card("Hjorvath Coldstorm"):
+                interrupts.append("Hjorvath Coldstorm")
         return interrupts
 
     async def send_hq(self, force=False):
@@ -3733,6 +3735,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Eloquent Confessor":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Hjorvath Coldstorm":
+            if self.check_for_enemy_warlord(planet_id, True, self.name_player):
+                attack_value = attack_value - 2
         if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
@@ -4273,6 +4278,9 @@ class Player:
             if self.game.round_number == planet_id:
                 if self.search_card_in_hq("Order of the Crimson Oath"):
                     health += 2
+        if self.get_ability_given_pos(planet_id, unit_id) == "Hjorvath Coldstorm":
+            if self.check_for_enemy_warlord(planet_id, True, self.name_player):
+                health = health - 2
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
             if self.get_faith_given_pos(planet_id, unit_id) > 0:
                 health += 1
