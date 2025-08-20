@@ -2610,6 +2610,9 @@ class Player:
                     command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
+        if self.get_ability_given_pos(planet_id, unit_id) == "Prognosticator":
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Improbable Runt Machine":
             command += min(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments()), 3)
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
@@ -4052,7 +4055,22 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
+        self.cards_in_play[planet_id + 1][unit_id].recently_assigned_damage = True
         if total_damage_that_can_be_blocked > 0:
+            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Prognosticator":
+                        if not self.get_once_per_round_used_given_pos(-2, i):
+                            if not self.check_if_already_have_reaction_of_position("Prognosticator", -2, i):
+                                self.game.create_reaction("Prognosticator", self.name_player,
+                                                          (int(self.number), -2, i))
+                for i in range(7):
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_ability_given_pos(i, j) == "Prognosticator":
+                            if not self.get_once_per_round_used_given_pos(i, j):
+                                if not self.check_if_already_have_reaction_of_position("Prognosticator", i, j):
+                                    self.game.create_reaction("Prognosticator", self.name_player,
+                                                              (int(self.number), i, j))
             if self.cards_in_play[planet_id + 1][unit_id].get_unstoppable():
                 if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
                     self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True

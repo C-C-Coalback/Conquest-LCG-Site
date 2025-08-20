@@ -440,6 +440,10 @@ def space_marines_cards_init():
                                                   "cannot be declared as an attacker during your opponent's next combat"
                                                   " turn this round. (Limit once per phase.)",
                              "Vehicle. Tank. Space Wolves.", 4, faction, "Common", 2, 5, 1, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT")
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Prognosticator", "While this unit has faith it gains 1 command icon.\n"
+                                               "Reaction: After a unit with faith you control is assigned damage, place"
+                                               " 1 faith on an army unit at the same planet. (Limit once per round.)",
+                             "Soldier. Grey Knights.", 2, faction, "Common", 2, 2, 1, False)
     ]
     return space_marines_card_array

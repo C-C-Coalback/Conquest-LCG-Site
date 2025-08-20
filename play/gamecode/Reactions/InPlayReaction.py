@@ -1745,6 +1745,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].\
                         hit_by_frenzied_wulfen_names.append(primary_player.name_player)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
+        elif current_reaction == "Prognosticator":
+            valid_planet = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.cards_in_play[planet_pos + 1][i].recently_assigned_damage:
+                    valid_planet = True
+            if valid_planet:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Interceptor Squad":
             if planet_pos == self.misc_target_planet:
@@ -1758,6 +1769,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
                 name_card = player_owning_card.get_name_given_pos(planet_pos, unit_pos)
                 await self.send_update_message(name_card + " gained +1 ATK and +1 HP until end of phase.")
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Fierce Purgator":
             if planet_pos in self.misc_misc:

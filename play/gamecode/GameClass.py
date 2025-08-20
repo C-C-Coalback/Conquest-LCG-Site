@@ -7226,13 +7226,17 @@ class Game:
             if not self.attack_being_resolved and not self.reactions_needing_resolving:
                 for i in range(len(self.p1.headquarters)):
                     self.p1.headquarters[i].valid_sweep_target = True
+                    self.p1.headquarters[i].recently_assigned_damage = False
                 for i in range(len(self.p2.headquarters)):
                     self.p2.headquarters[i].valid_sweep_target = True
+                    self.p2.headquarters[i].recently_assigned_damage = False
                 for i in range(7):
                     for j in range(len(self.p1.cards_in_play[i + 1])):
                         self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
+                        self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
                     for j in range(len(self.p2.cards_in_play[i + 1])):
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
+                        self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
             if self.attack_being_resolved:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False

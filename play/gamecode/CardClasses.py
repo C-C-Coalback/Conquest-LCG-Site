@@ -353,6 +353,7 @@ class UnitCard(Card):
         self.retaliate_eop = 0
         self.hit_by_frenzied_wulfen_names = []
         self.cannot_be_declared_as_attacker = False
+        self.recently_assigned_damage = False
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
