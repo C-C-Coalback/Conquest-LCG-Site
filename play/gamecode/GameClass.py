@@ -7290,6 +7290,9 @@ class Game:
                                 self.create_reaction("Leman Russ Conqueror", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Inspiring Sergeant":
                                 self.create_reaction("Inspiring Sergeant", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Command Predator":
+                                if not self.p1.get_once_per_phase_used_given_pos(planet, i):
+                                    self.create_reaction("Command Predator", self.name_1, (1, planet, i))
                             for rok in self.p1.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
@@ -7335,6 +7338,9 @@ class Game:
                                 self.create_reaction("Leman Russ Conqueror", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Inspiring Sergeant":
                                 self.create_reaction("Inspiring Sergeant", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Command Predator":
+                                if not self.p2.get_once_per_phase_used_given_pos(planet, i):
+                                    self.create_reaction("Command Predator", self.name_2, (2, planet, i))
                             for rok in self.p2.rok_bombardment_active:
                                 if rok == "Own":
                                     self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)

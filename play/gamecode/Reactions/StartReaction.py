@@ -764,6 +764,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Command Predator":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            self.player_with_combat_turn = primary_player.name_player
+            self.number_with_combat_turn = primary_player.number
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Outflank'em":
             if primary_player.resources > 0:
                 can_continue = True

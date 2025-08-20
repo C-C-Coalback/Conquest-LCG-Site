@@ -453,6 +453,11 @@ def space_marines_cards_init():
                                                          "this round, prevent 1 of that damage and another "
                                                          "Black Templars unit you control gets +2 HP until the"
                                                          " end of the phase.", "Soldier. Black Templars.",
-                             4, faction, "Common", 3, 4, 1, False, unstoppable=True)
+                             4, faction, "Common", 3, 4, 1, False, unstoppable=True),
+        CardClasses.ArmyCard("Command Predator", "No Wargear Attachments.\n"
+                                                 "Reaction: After a combat turn during which this unit was an attacker"
+                                                 " ends, take a combat turn. (Limit once per phase.)",
+                             "Vehicle. Tank. Elite.", 5, faction, "Common", 4, 5, 2, False,
+                             wargear_attachments_permitted=False)
     ]
     return space_marines_card_array
