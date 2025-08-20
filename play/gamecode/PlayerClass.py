@@ -3550,6 +3550,7 @@ class Player:
                 self.headquarters[i].mobile_eop = False
                 self.headquarters[i].flying_eop = False
                 self.headquarters[i].attack_set_eop = -1
+                self.headquarters[i].health_set_eop = -1
                 self.headquarters[i].brutal_eop = False
                 self.headquarters[i].extra_traits_eop = ""
                 self.headquarters[i].lost_keywords_eop = False
@@ -3571,6 +3572,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].attack_set_eop = -1
+                self.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = -1
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
                 self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = False
 
@@ -4119,6 +4121,9 @@ class Player:
                     if self.get_ability_given_pos(planet_id, unit_id) == "Steadfast Sword Brethren":
                         self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
                                                   (int(self.number), planet_id, unit_id))
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Wrathful Dreadnought":
+                        self.game.create_reaction("Wrathful Dreadnought", self.name_player,
+                                                  (int(self.number), planet_id, unit_id))
                     if self.get_ability_given_pos(planet_id, unit_id) == "Fighting Company Daras":
                         self.increase_retaliate_given_pos_eop(planet_id, unit_id, 2)
                     if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
@@ -4265,6 +4270,9 @@ class Player:
                     if self.get_ability_given_pos(-2, unit_id) == "Steadfast Sword Brethren":
                         self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
                                                   (int(self.number), -2, unit_id))
+                    if self.get_ability_given_pos(-2, unit_id) == "Wrathful Dreadnought":
+                        self.game.create_reaction("Wrathful Dreadnought", self.name_player,
+                                                  (int(self.number), -2, unit_id))
                     if self.get_ability_given_pos(-2, unit_id) == "Fighting Company Daras":
                         self.increase_retaliate_given_pos_eop(-2, unit_id, 2)
         if total_that_can_be_blocked > 0:
@@ -4326,6 +4334,8 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            if self.headquarters[unit_id].health_set_eop != -1:
+                return self.headquarters[unit_id].health_set_eop
             if self.get_faction_given_pos(-2, unit_id) == "Orks":
                 if self.get_card_type_given_pos(-2, unit_id) != "Token":
                     if self.search_card_in_hq("Mork's Great Heap"):
@@ -4353,6 +4363,8 @@ class Player:
                         health += len(other_player.victory_display)
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        if self.cards_in_play[planet_id + 1][unit_id].health_set_eop != -1:
+            return self.cards_in_play[planet_id + 1][unit_id].health_set_eop
         card = self.cards_in_play[planet_id + 1][unit_id]
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):

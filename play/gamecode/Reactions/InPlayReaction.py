@@ -773,6 +773,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Wrathful Dreadnought":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Thunderwolf Cavalry":
             og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(og_pla - planet_pos) == 1:

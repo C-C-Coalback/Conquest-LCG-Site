@@ -473,6 +473,12 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Thunderwolf Cavalry", "Reaction: After an enemy warlord commits to an adjacent planet "
                                                     "with a single army unit you control switch the location of that "
                                                     "single unit with this unit.", "Soldier. Space Wolves.",
-                             3, faction, "Common", 3, 3, 1, False)
+                             3, faction, "Common", 3, 3, 1, False),
+        CardClasses.ArmyCard("Wrathful Dreadnought", "No Wargear Attachments.\n"
+                                                     "Unstoppable - The first time this unit is assigned damage this"
+                                                     " turn, prevent 1 of that damage and a target army unit has its"
+                                                     " HP value set to 4 until the end of the phase.",
+                             "Vehicle. Black Templars.", 4, faction, "Loyal", 6, 3, 2, False,
+                             wargear_attachments_permitted=False, unstoppable=True)
     ]
     return space_marines_card_array

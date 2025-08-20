@@ -218,6 +218,12 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     primary_player.headquarters[unit_pos].set_reaction_available(False)
                     primary_player.summon_token_at_hq("Khymera", 1)
                     self.delete_reaction()
+    elif current_reaction == "Wrathful Dreadnought":
+        if player_owning_card.check_is_unit_at_pos(-2, unit_pos):
+            if player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Army":
+                player_owning_card.headquarters[unit_pos].health_set_eop = 4
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
     elif current_reaction == "Steadfast Sword Brethren":
         if game_update_string[1] == primary_player.number:
             if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != \
