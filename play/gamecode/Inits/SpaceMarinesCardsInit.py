@@ -448,6 +448,11 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Sanctified Aggressor", "Cannot be damaged by Area Effect.\n"
                                                      "Reaction: After two or more warlords commit to this planet, gain "
                                                      "1 resource and place 1 faith on an army unit at this planet.",
-                             "Soldier. Space Wolves.", 3, faction, "Common", 3, 4, 1, False)
+                             "Soldier. Space Wolves.", 3, faction, "Common", 3, 4, 1, False),
+        CardClasses.ArmyCard("Steadfast Sword Brethren", "Unstoppable - The first time this unit is assigned damage "
+                                                         "this round, prevent 1 of that damage and another "
+                                                         "Black Templars unit you control gets +2 HP until the"
+                                                         " end of the phase.", "Soldier. Black Templars.",
+                             4, faction, "Common", 3, 4, 1, False, unstoppable=True)
     ]
     return space_marines_card_array

@@ -218,6 +218,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     primary_player.headquarters[unit_pos].set_reaction_available(False)
                     primary_player.summon_token_at_hq("Khymera", 1)
                     self.delete_reaction()
+    elif current_reaction == "Steadfast Sword Brethren":
+        if game_update_string[1] == primary_player.number:
+            if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != \
+                    self.positions_of_unit_triggering_reaction[0][2]:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Black Templars"):
+                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
+                    self.delete_reaction()
     elif current_reaction == "Run Down":
         print('run down')
         if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":

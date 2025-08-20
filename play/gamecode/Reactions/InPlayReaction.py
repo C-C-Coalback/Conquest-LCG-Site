@@ -1763,6 +1763,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Interceptor Squad")
                     self.delete_reaction()
+        elif current_reaction == "Steadfast Sword Brethren":
+            if game_update_string[1] == primary_player.number:
+                if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Black Templars"):
+                        primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
+                        self.delete_reaction()
         elif current_reaction == "Sanctified Aggressor":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
