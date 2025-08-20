@@ -444,6 +444,10 @@ def space_marines_cards_init():
         CardClasses.ArmyCard("Prognosticator", "While this unit has faith it gains 1 command icon.\n"
                                                "Reaction: After a unit with faith you control is assigned damage, place"
                                                " 1 faith on an army unit at the same planet. (Limit once per round.)",
-                             "Soldier. Grey Knights.", 2, faction, "Common", 2, 2, 1, False)
+                             "Soldier. Grey Knights.", 2, faction, "Common", 2, 2, 1, False),
+        CardClasses.ArmyCard("Sanctified Aggressor", "Cannot be damaged by Area Effect.\n"
+                                                     "Reaction: After two or more warlords commit to this planet, gain "
+                                                     "1 resource and place 1 faith on an army unit at this planet.",
+                             "Soldier. Space Wolves.", 3, faction, "Common", 3, 4, 1, False)
     ]
     return space_marines_card_array

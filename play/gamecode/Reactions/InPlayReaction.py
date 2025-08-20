@@ -1763,6 +1763,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Interceptor Squad")
                     self.delete_reaction()
+        elif current_reaction == "Sanctified Aggressor":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    primary_player.add_resources(1)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
         elif current_reaction == "Inspiring Sergeant":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
