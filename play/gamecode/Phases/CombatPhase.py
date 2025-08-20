@@ -810,12 +810,27 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                     and not secondary_player.hit_by_gorgul:
                                                 self.fire_warrior_elite_active = True
                                                 can_continue = False
-                                                self.reactions_needing_resolving.append("Fire Warrior Elite")
-                                                self.positions_of_unit_triggering_reaction.append(
-                                                    [int(secondary_player.number),
-                                                     self.defender_planet,
-                                                     -1])
-                                                self.player_who_resolves_reaction.append(secondary_player.name_player)
+                                                self.create_reaction("Fire Warrior Elite", secondary_player.name_player,
+                                                                     (int(secondary_player.number),
+                                                                      self.defender_planet, -1))
+                                                self.last_defender_position = (secondary_player.number,
+                                                                               self.defender_planet,
+                                                                               self.defender_position)
+                                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                            self.defender_position,
+                                                                                            "red")
+                            if can_continue and self.may_move_defender:
+                                for i in range(len(secondary_player.cards_in_reserve[self.defender_planet])):
+                                    if secondary_player.cards_in_reserve[self.defender_planet][i].get_ability() \
+                                            == "Deathwing Interceders":
+                                        if secondary_player.resources > 1:
+                                            if not secondary_player.hit_by_gorgul:
+                                                self.fire_warrior_elite_active = True
+                                                can_continue = False
+                                                self.create_reaction("Deathwing Interceders",
+                                                                     secondary_player.name_player,
+                                                                     (int(secondary_player.number),
+                                                                      self.defender_planet, -1))
                                                 self.last_defender_position = (secondary_player.number,
                                                                                self.defender_planet,
                                                                                self.defender_position)

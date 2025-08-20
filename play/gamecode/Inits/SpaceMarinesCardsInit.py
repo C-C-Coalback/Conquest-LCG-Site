@@ -458,6 +458,12 @@ def space_marines_cards_init():
                                                  "Reaction: After a combat turn during which this unit was an attacker"
                                                  " ends, take a combat turn. (Limit once per phase.)",
                              "Vehicle. Tank. Elite.", 5, faction, "Common", 4, 5, 2, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Deathwing Interceders", "Deep Strike (2).\n"
+                                                      "Interrupt: When an enemy unit would declare an attack against"
+                                                      " a unit you control at this planet, Deep Strike this unit to"
+                                                      " declare it as the defender instead. If this unit is still in"
+                                                      " play at the end of the phase, return it to your hand.",
+                             "Soldier. Dark Angels.", 3, faction, "Common", 2, 4, 0, False, deepstrike=2)
     ]
     return space_marines_card_array

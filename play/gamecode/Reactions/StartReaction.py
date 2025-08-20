@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import CombatPhase
 import copy
 
 
@@ -763,6 +764,30 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif current_reaction == "Deathwing Interceders":
+            _, current_planet, current_unit = self.last_defender_position
+            i = 0
+            found = False
+            while i < len(primary_player.cards_in_reserve[current_planet]) and not found:
+                if primary_player.cards_in_reserve[current_planet][i].get_ability() == "Deathwing Interceders":
+                    dv_value = primary_player.get_deepstrike_value_given_pos(current_planet, i)
+                    if primary_player.spend_resources(dv_value):
+                        primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
+                        last_el_index = primary_player.deepstrike_unit(current_planet, i)
+                        self.may_move_defender = False
+                        print("Calling defender in the funny way")
+                        new_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                                  str(last_el_index)]
+                        await CombatPhase.update_game_event_combat_section(
+                            self, secondary_player.name_player, new_game_update_string)
+                        found = True
+                i = i + 1
+            if not found:
+                last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                           str(current_unit)]
+                await CombatPhase.update_game_event_combat_section(
+                    self, secondary_player.name_player, last_game_update_string)
             self.delete_reaction()
         elif current_reaction == "Command Predator":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

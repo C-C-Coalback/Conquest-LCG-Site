@@ -5809,7 +5809,8 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                         self.allowed_units_alaitoc_shrine = []
                         self.alaitoc_shrine_activated = False
-                    if self.reactions_needing_resolving[0] == "Fire Warrior Elite":
+                    if self.reactions_needing_resolving[0] == "Fire Warrior Elite" or \
+                            self.reactions_needing_resolving[0] == "Deathwing Interceders":
                         self.may_move_defender = False
                         _, current_planet, current_unit = self.last_defender_position
                         last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),

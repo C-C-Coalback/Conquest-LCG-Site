@@ -776,8 +776,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
                 _, current_planet, current_unit = self.last_defender_position
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     if primary_player.get_ability_given_pos(
                             planet_pos, unit_pos) == "Fire Warrior Elite":
