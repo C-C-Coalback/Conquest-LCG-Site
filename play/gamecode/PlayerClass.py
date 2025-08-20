@@ -1244,6 +1244,9 @@ class Player:
         elif self.headquarters[last_element_index].get_ability() == "Salamander Flamer Squad":
             self.headquarters[last_element_index].salamanders_flamers_id_number = self.game.current_flamers_id
             self.game.current_flamers_id += 1
+        elif self.headquarters[last_element_index].get_ability() == "Storming Librarian":
+            self.headquarters[last_element_index].storming_librarian_id_number = self.game.current_librarian_id
+            self.game.current_librarian_id += 1
         elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
             enemy_name = self.game.name_1
             if self.name_player == self.game.name_1:
@@ -1626,6 +1629,10 @@ class Player:
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id
             self.game.current_flamers_id += 1
+        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Storming Librarian":
+            self.cards_in_play[position + 1][last_element_index].storming_librarian_id_number =\
+                self.game.current_librarian_id
+            self.game.current_librarian_id += 1
         if self.game.last_planet_checked_for_battle == position:
             if other_player.search_hand_for_card("Wrathful Retribution"):
                 if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
@@ -4904,6 +4911,8 @@ class Player:
             self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, i))
+            if self.cards_in_play[planet_num + 1][i].get_ability() == "Storming Librarian":
+                self.game.create_reaction("Storming Librarian", self.name_player, (int(self.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Crush of Sky-Slashers":
                 self.game.create_reaction("Crush of Sky-Slashers", self.name_player, (int(self.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][i].get_ability() == "Shard of the Deceiver":

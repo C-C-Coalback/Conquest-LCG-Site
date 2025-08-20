@@ -950,7 +950,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if secondary_player.get_card_type_given_pos(self.defender_planet,
                                                                                 self.defender_position) == "Warlord":
                                         command = command - 999
-                                    attack_value += 2 * command
+                                    attack_value += 2 * max(command, 0)
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                        == "Storming Librarian":
+                                    value_storming_librarion = primary_player.cards_in_play[self.attacker_planet + 1][
+                                        self.attacker_position].storming_librarian_id_number
+                                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].\
+                                        hit_by_which_storming_librarians.append(value_storming_librarion)
                                 for i in range(
                                         len(primary_player.
                                             cards_in_play[self.attacker_planet + 1][self.attacker_position]

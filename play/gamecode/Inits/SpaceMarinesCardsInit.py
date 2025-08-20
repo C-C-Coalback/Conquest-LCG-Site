@@ -464,6 +464,11 @@ def space_marines_cards_init():
                                                       " a unit you control at this planet, Deep Strike this unit to"
                                                       " declare it as the defender instead. If this unit is still in"
                                                       " play at the end of the phase, return it to your hand.",
-                             "Soldier. Dark Angels.", 3, faction, "Common", 2, 4, 0, False, deepstrike=2)
+                             "Soldier. Dark Angels.", 3, faction, "Common", 2, 4, 0, False, deepstrike=2),
+        CardClasses.ArmyCard("Storming Librarian", "Retaliate (1).\n"
+                                                   "Reaction: After a combat round begins, deal 4 damage to each enemy"
+                                                   " unit at this planet attacked by this unit during the previous"
+                                                   " combat round.", "Psyker. Ultramarines.",
+                             3, faction, "Common", 1, 6, 1, False, retaliate=1)
     ]
     return space_marines_card_array

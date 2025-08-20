@@ -61,6 +61,8 @@ class Card:
         self.immortal_loyalist_ok = True
         self.salamanders_flamers_id_number = 0
         self.hit_by_which_salamanders = []
+        self.storming_librarian_id_number = 0
+        self.hit_by_which_storming_librarians = []
         self.techmarine_aspirant_available = True
         self.lost_keywords_eop = False
         self.cannot_ready_phase = False

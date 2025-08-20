@@ -765,6 +765,20 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Storming Librarian":
+            if planet_pos != -2:
+                storm_lib_value = primary_player.cards_in_play[planet_pos + 1][unit_pos].storming_librarian_id_number
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if storm_lib_value in secondary_player.cards_in_play[planet_pos + 1][i].\
+                            hit_by_which_storming_librarians:
+                        secondary_player.assign_damage_to_pos(planet_pos, i, 4, context="Storming Librarian",
+                                                              rickety_warbuggy=True)
+                        while storm_lib_value in secondary_player.cards_in_play[planet_pos + 1][i].\
+                                hit_by_which_storming_librarians:
+                            secondary_player.cards_in_play[planet_pos + 1][i].hit_by_which_storming_librarians.remove(
+                                storm_lib_value)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Deathwing Interceders":
             _, current_planet, current_unit = self.last_defender_position
             i = 0

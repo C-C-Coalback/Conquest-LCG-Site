@@ -399,6 +399,7 @@ class Game:
         self.player_using_xv805 = ""
         self.og_pos_xv805_target = (-1, -1)
         self.current_flamers_id = 0
+        self.current_librarian_id = 0
         self.flamers_damage_active = False
         self.id_of_the_active_flamer = -1
         self.bloodrain_tempest_active = False
@@ -6197,6 +6198,29 @@ class Game:
                     self.p1.wrathful_retribution_value = 0
                 else:
                     self.p2.wrathful_retribution_value = 0
+            if self.reactions_needing_resolving[0] == "Storming Librarian":
+                player = self.p1
+                if self.player_who_resolves_reaction[0] == self.name_2:
+                    player = self.p2
+                num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                id_storm_lib = -1
+                if pla == -2:
+                    id_storm_lib = player.headquarters[pos].storming_librarian_id_number
+                else:
+                    id_storm_lib = player.cards_in_play[pla + 1][pos].storming_librarian_id_number
+                for i in range(7):
+                    for j in range(len(self.p1.cards_in_play[i + 1])):
+                        while id_storm_lib in self.p1.cards_in_play[i + 1][j].hit_by_which_storming_librarians:
+                            self.p1.cards_in_play[i + 1][j].hit_by_which_storming_librarians.remove(id_storm_lib)
+                    for j in range(len(self.p2.cards_in_play[i + 1])):
+                        while id_storm_lib in self.p2.cards_in_play[i + 1][j].hit_by_which_storming_librarians:
+                            self.p2.cards_in_play[i + 1][j].hit_by_which_storming_librarians.remove(id_storm_lib)
+                for i in range(len(self.p1.headquarters)):
+                    while id_storm_lib in self.p1.headquarters[i].hit_by_which_storming_librarians:
+                        self.p1.headquarters[i].hit_by_which_storming_librarians.remove(id_storm_lib)
+                for i in range(len(self.p2.headquarters)):
+                    while id_storm_lib in self.p2.headquarters[i].hit_by_which_storming_librarians:
+                        self.p2.headquarters[i].hit_by_which_storming_librarians.remove(id_storm_lib)
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
             self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
