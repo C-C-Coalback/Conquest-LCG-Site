@@ -404,6 +404,12 @@ def space_marines_cards_init():
                                                     "Interrupt: When your Bloodied warlord is defeated, discard it and"
                                                     " pay 1 resource and Deep Strike this unit to have it be considered"
                                                     " a warlord. If it is defeated you lose the game.",
-                             "Soldier. Dark Angels.", -1, faction, "Loyal", 2, 6, 0, True, deepstrike=2)
+                             "Soldier. Dark Angels.", -1, faction, "Loyal", 2, 6, 0, True, deepstrike=2),
+        CardClasses.ArmyCard("Fighting Company Daras",
+                             "Sweep (1).\n"
+                             "Unstoppable - The first time this unit is assigned damage this"
+                             " turn, prevent 1 of that damage and this unit gains "
+                             "Retaliate (2) until the end of the phase.", "Soldier. Black Templars.",
+                             3, faction, "Loyal", 2, 3, 1, False, sweep=1, unstoppable=True)
     ]
     return space_marines_card_array

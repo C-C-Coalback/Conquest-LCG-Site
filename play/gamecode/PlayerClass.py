@@ -4020,6 +4020,8 @@ class Player:
                     if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
                         self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
                                                   (int(self.number), planet_id, unit_id))
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Fighting Company Daras":
+                        self.increase_retaliate_given_pos_eop(planet_id, unit_id, 2)
                     if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
                         self.ready_given_pos(planet_id, unit_id)
             for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
@@ -4161,6 +4163,8 @@ class Player:
                     afterwards_damage = afterwards_damage - 1
                     if self.get_ability_given_pos(-2, unit_id) == "Righteous Initiate":
                         self.headquarters[unit_id].extra_attack_until_end_of_phase += 2
+                    if self.get_ability_given_pos(-2, unit_id) == "Fighting Company Daras":
+                        self.increase_retaliate_given_pos_eop(-2, unit_id, 2)
         if total_that_can_be_blocked > 0:
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)
