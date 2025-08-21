@@ -4672,12 +4672,14 @@ class Player:
                         if self.headquarters[i].get_damage() > 0:
                             owner = self.headquarters[i].get_attachments()[j].name_owner
                             self.game.create_reaction("Royal Phylactery", owner, (int(self.number), -2, i))
-
         for i in range(7):
             for j in range(len(self.attachments_at_planet[i])):
                 if self.attachments_at_planet[i][j].get_ability() == "Supreme Strategist":
                     if phase == "DEPLOY":
                         self.game.create_reaction("Supreme Strategist", self.name_player, (int(self.number), i, j))
+                if self.attachments_at_planet[i][j].get_ability() == "Trapped Objective":
+                    if phase == "COMBAT":
+                        self.game.create_reaction("Trapped Objective", self.name_player, (int(self.number), i, -1))
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":

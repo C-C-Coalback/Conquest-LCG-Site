@@ -306,7 +306,7 @@ class Game:
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
-                                 "Mobilize the Chapter Initiation"]
+                                 "Mobilize the Chapter Initiation", "Trapped Objective"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -2816,7 +2816,7 @@ class Game:
                                     i = 0
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
-                                            i].get_ability() == "Supreme Strategist":
+                                                i].get_ability() == "Supreme Strategist":
                                             primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1

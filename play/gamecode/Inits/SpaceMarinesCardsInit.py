@@ -523,6 +523,11 @@ def space_marines_cards_init():
                                                         " you control. (Limit once per game.)", "Wargear.",
                                    2, faction, "Loyal", 2, False, unit_must_match_faction=True, deepstrike=1,
                                    type_of_units_allowed_for_attachment="Army", extra_attack=2, extra_health=2,
-                                   action_in_play=True, allowed_phases_in_play="ALL")
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Trapped Objective", "Attach to a non-first planet.\n"
+                                                        "Forced Reaction: After the combat phase begins, sacrifice"
+                                                        " this attachment and deal 2 damage to a warlord at this"
+                                                        " planet if able. Then draw a card.", "Tactic. Space Wolves.",
+                                   1, faction, "Common", 2, True, planet_attachment=True)
     ]
     return space_marines_card_array

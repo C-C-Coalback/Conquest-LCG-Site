@@ -130,6 +130,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             message += ". Press pass when done."
             self.misc_misc_2 = []
             await self.send_update_message(message)
+        elif current_reaction == "Trapped Objective":
+            i = 0
+            while i < len(primary_player.attachments_at_planet[planet_pos]):
+                if primary_player.attachments_at_planet[planet_pos][i].get_ability() == "Trapped Objective":
+                    primary_player.add_card_to_discard("Trapped Objective")
+                    del primary_player.attachments_at_planet[planet_pos][i]
+                    i = i - 1
+                i = i + 1
+            primary_player.draw_card()
         elif current_reaction == "Supreme Strategist":
             if primary_player.cards_in_play[planet_pos + 1]:
                 primary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")

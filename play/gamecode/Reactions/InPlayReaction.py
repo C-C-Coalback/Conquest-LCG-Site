@@ -778,6 +778,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Trapped Objective":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or\
+                        primary_player.name_player in\
+                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                    self.delete_reaction()
         elif current_reaction == "Thunderwolf Cavalry":
             og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(og_pla - planet_pos) == 1:

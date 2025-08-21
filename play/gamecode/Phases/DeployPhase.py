@@ -246,7 +246,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 await deploy_card_routine(self, name, game_update_string[1],
                                                           discounts=self.discounts_applied)
                     elif card.get_card_type() == "Attachment":
-                        if card.planet_attachment:
+                        if card.planet_attachment and (card.ability != "Trapped Objective" or
+                                                       planet_chosen != self.round_number):
                             can_continue = True
                             if card.get_unique():
                                 if player.search_for_unique_card(card.get_name()):
