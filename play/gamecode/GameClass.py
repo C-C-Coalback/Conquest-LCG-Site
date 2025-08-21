@@ -356,6 +356,7 @@ class Game:
         self.tense_negotiations_active = False
         self.shining_blade_active = False
         self.value_doom_siren = 0
+        self.misc_counter_2 = 0
         self.before_first_combat = False
         self.last_planet_checked_command_struggle = -1
         self.planet_aiming_reticle_active = True
@@ -947,6 +948,9 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
+                        self.action_cleanup()
+                    elif self.action_chosen == "The Wolf Within":
+                        await self.send_update_message("Stopping The Wolf Within early")
                         self.action_cleanup()
                     else:
                         await self.send_update_message("Too far in; action must be concluded now")

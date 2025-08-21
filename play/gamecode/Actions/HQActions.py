@@ -453,6 +453,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.chosen_first_card = False
                             self.misc_counter = -1
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                    elif ability == "The Wolf Within":
+                        if primary_player.sacrifice_card_in_hq(unit_pos):
+                            self.misc_target_unit = (-1, -1)
+                            self.misc_counter = 0
+                            self.misc_counter_2 = 0
+                            self.action_chosen = ability
                     elif ability == "Kraktoof Hall":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -900,6 +906,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
                 self.action_cleanup()
+    elif self.action_chosen == "The Wolf Within":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Space Wolves"):
+                if (planet_pos, unit_pos) != self.misc_target_unit:
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                    await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                                   " gained +1 ATK and +1 HP!")
+                    self.misc_counter = self.misc_counter + 1
+                    if self.misc_counter > 1:
+                        self.action_cleanup()
     elif self.action_chosen == "Overrun":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

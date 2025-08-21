@@ -2041,6 +2041,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         )
                         self.action_cleanup()
                         self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "The Wolf Within":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Space Wolves"):
+                if (planet_pos, unit_pos) != self.misc_target_unit:
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                    await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                                   " gained +1 ATK and +1 HP!")
+                    self.misc_counter = self.misc_counter + 1
+                    warlord_count = 0
+                    for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                        if primary_player.get_card_type_given_pos(planet_pos, i) == "Warlord" or \
+                                primary_player.name_player in \
+                                primary_player.cards_in_play[planet_pos + 1][i].hit_by_frenzied_wulfen_names:
+                            warlord_count += 1
+                    for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        if secondary_player.get_card_type_given_pos(planet_pos, i) == "Warlord" or \
+                                primary_player.name_player in \
+                                secondary_player.cards_in_play[planet_pos + 1][i].hit_by_frenzied_wulfen_names:
+                            warlord_count += 1
+                    if warlord_count > 1:
+                        self.misc_counter_2 += 1
+                    if self.misc_counter > 1:
+                        if self.misc_counter_2 > 1:
+                            primary_player.add_resources(1)
+                        self.action_cleanup()
     elif self.action_chosen == "Pinning Razorback":
         if self.position_of_actioned_card[0] == planet_pos:
             if secondary_player.number == game_update_string[1]:

@@ -498,6 +498,11 @@ def space_marines_cards_init():
                                                         "Reaction: After the combat phase begins, draw a card or gain"
                                                         " a resource. Use this ability only if each unit you control"
                                                         " shares the chosen trait.", "Upgrade.",
-                                0, faction, "Loyal", True)
+                                0, faction, "Loyal", True),
+        CardClasses.SupportCard("The Wolf Within", "Action: Sacrifice this support to have up to 2 target Space Wolves "
+                                                   "units you control get +1 ATK and +1 HP until the end of the phase. "
+                                                   "If both units are at a planet with 2 or more warlords, "
+                                                   "gain 1 resource.", "Tale.", 1, faction, "Loyal", True,
+                                action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return space_marines_card_array

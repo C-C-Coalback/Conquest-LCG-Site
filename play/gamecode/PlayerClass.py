@@ -2420,8 +2420,9 @@ class Player:
                     self.game.create_reaction("Eldorath Starbane", self.name_player,
                                               [int(self.number), dest_planet, -1])
                 if self.cards_in_play[origin_planet + 1][i].get_ability(bloodied_relevant=True) == "Ragnar Blackmane":
-                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
-                                              [int(self.number), dest_planet, -1])
+                    if not self.check_if_already_have_reaction("Ragnar Blackmane"):
+                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                                  [int(self.number), dest_planet, -1])
                 self.move_unit_to_planet(origin_planet, i, dest_planet)
                 for j in range(len(self.headquarters)):
                     if self.get_ability_given_pos(-2, j) == "Heralding Cherubim":
@@ -2497,8 +2498,9 @@ class Player:
                     self.game.create_reaction("Tenacious Novice Squad", self.name_player,
                                               (int(self.number), planet_pos, j))
                 if self.get_ability_given_pos(planet_pos, j, bloodied_relevant=True) == "Ragnar Blackmane":
-                    self.game.create_reaction("Ragnar Blackmane", self.name_player,
-                                              (int(self.number), planet_pos, j))
+                    if not self.check_if_already_have_reaction("Ragnar Blackmane"):
+                        self.game.create_reaction("Ragnar Blackmane", self.name_player,
+                                                  (int(self.number), planet_pos, j))
                 if self.get_ability_given_pos(planet_pos, j) == "Sanctified Aggressor":
                     num_warlords = 0
                     for k in range(len(planets_list)):
