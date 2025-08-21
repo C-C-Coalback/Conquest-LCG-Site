@@ -487,6 +487,11 @@ def space_marines_cards_init():
                                                            "phase, move a non-Elite Space Marines army unit from your"
                                                            " HQ to a target non-first planet to have it gain 1 command"
                                                            " icon until the end of next phase.", "Tactic.",
-                              1, faction, "Common", 1, False)
+                              1, faction, "Common", 1, False),
+        CardClasses.EventCard("Uphold His Honor", "The effects of this event cannot be cancelled.\n"
+                                                  "Reaction: After a unit is chosen as a defender, it can trigger"
+                                                  " its Unstoppable specialization for this attack even if it already"
+                                                  " triggered this round.", "Vow.",
+                              0, faction, "Common", 1, False)
     ]
     return space_marines_card_array

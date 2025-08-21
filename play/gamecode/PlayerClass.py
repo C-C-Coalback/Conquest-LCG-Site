@@ -2618,6 +2618,11 @@ class Player:
                 i += 1
         return None
 
+    def get_unstoppable_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_unstoppable()
+        return self.cards_in_play[planet_id + 1][unit_id].get_unstoppable()
+
     def get_command_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_command()

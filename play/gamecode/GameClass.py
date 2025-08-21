@@ -213,7 +213,7 @@ class Game:
         self.name_attachment_discard_shadowsun = ""
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
-        self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death"]
+        self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death", "Uphold His Honor"]
         self.last_shield_string = ""
         self.pos_shield_card = -1
         self.recently_damaged_units = []
@@ -1016,10 +1016,10 @@ class Game:
                         player_with_attach = self.p2
                     if not self.action_chosen:
                         if player_with_attach.attachments_at_planet[pos_planet][
-                                pos_attachment].get_ability() == "Rain of Mycetic Spores":
+                            pos_attachment].get_ability() == "Rain of Mycetic Spores":
                             if primary_player.number == game_update_string[2]:
                                 if player_with_attach.attachments_at_planet[pos_planet][
-                                        pos_attachment].get_ready():
+                                    pos_attachment].get_ready():
                                     player_with_attach.attachments_at_planet[pos_planet][
                                         pos_attachment].exhaust_card()
                                     if not self.infested_planets[pos_planet]:
@@ -2604,7 +2604,7 @@ class Game:
                                     primary_player.headquarters[unit_pos].misc_ability_used = True
                                 else:
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
-                            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol" or\
+                            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol" or \
                                     self.interrupts_waiting_on_resolution[0] == "Dodging Land Speeder":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
@@ -2730,7 +2730,7 @@ class Game:
                                     i = 0
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
-                                                i].get_ability() == "Supreme Strategist":
+                                            i].get_ability() == "Supreme Strategist":
                                             primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1
@@ -2741,7 +2741,7 @@ class Game:
                             else:
                                 i = 0
                                 while i < len(secondary_player.attachments_at_planet[planet_pos]):
-                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
+                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() == \
                                             "Supreme Strategist":
                                         secondary_player.add_card_to_discard("Supreme Strategist")
                                         del secondary_player.attachments_at_planet[planet_pos][i]
@@ -2769,7 +2769,7 @@ class Game:
                                     i = 0
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
-                                                i].get_ability() == "Supreme Strategist":
+                                            i].get_ability() == "Supreme Strategist":
                                             primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1
@@ -2780,7 +2780,7 @@ class Game:
                             else:
                                 i = 0
                                 while i < len(secondary_player.attachments_at_planet[planet_pos]):
-                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() ==\
+                                    if secondary_player.attachments_at_planet[planet_pos][i].get_ability() == \
                                             "Supreme Strategist":
                                         secondary_player.add_card_to_discard("Supreme Strategist")
                                         del secondary_player.attachments_at_planet[planet_pos][i]
@@ -3323,7 +3323,7 @@ class Game:
                     elif self.choice_context == "Agra's Preachings choices":
                         card_name = primary_player.deck[int(game_update_string[1])]
                         card = self.preloaded_find_card(card_name)
-                        if card.get_card_type() == "Army" and card.get_faction() == "Astra Militarum" and not\
+                        if card.get_card_type() == "Army" and card.get_faction() == "Astra Militarum" and not \
                                 card.check_for_a_trait("Elite"):
                             card_at_planet = CardClasses.AttachmentCard(
                                 card_name, "", "", -1, "", "", -1, False, planet_attachment=True
@@ -4057,6 +4057,40 @@ class Game:
                                     self.nullify_context = "Indomitable"
                                 elif primary_player.spend_resources(1):
                                     await self.resolve_indomitable(primary_player, secondary_player)
+                            elif primary_player.cards[self.pos_shield_card] == "Uphold His Honor":
+                                pos_holder = self.positions_of_units_to_take_damage[0]
+                                player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                                primary_player.discard_card_from_hand(self.pos_shield_card)
+                                self.pos_shield_card = -1
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                self.amount_that_can_be_removed_by_shield[0] = \
+                                    self.amount_that_can_be_removed_by_shield[0] - 1
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Righteous Initiate":
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+                                        extra_attack_until_end_of_phase += 2
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Dutiful Castellan":
+                                    if planet_pos != -2:
+                                        self.create_reaction("Dutiful Castellan", primary_player.name_player,
+                                                             (int(primary_player.number), planet_pos, unit_pos))
+                                if primary_player.get_ability_given_pos(planet_pos,
+                                                                        unit_pos) == "Sword Brethren Dreadnought":
+                                    if planet_pos != -2:
+                                        self.create_reaction("Sword Brethren Dreadnought", primary_player.name_player,
+                                                             (int(primary_player.number), planet_pos, unit_pos))
+                                if primary_player.get_ability_given_pos(planet_pos,
+                                                                        unit_pos) == "Steadfast Sword Brethren":
+                                    self.create_reaction("Steadfast Sword Brethren", primary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Wrathful Dreadnought":
+                                    self.create_reaction("Wrathful Dreadnought", primary_player.name_player,
+                                                         (int(primary_player.number), planet_pos, unit_pos))
+                                if primary_player.get_ability_given_pos(planet_pos,
+                                                                        unit_pos) == "Fighting Company Daras":
+                                    primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reclusiam Templars":
+                                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                                if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
                                 if secondary_player.nullify_check():
                                     await self.send_update_message(
@@ -4192,7 +4226,7 @@ class Game:
                                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                        card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
+                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
                                     if card.get_name() not in self.choices_available:
                                         self.choices_available.append(card.get_name())
                             if not self.choices_available:
@@ -4513,7 +4547,7 @@ class Game:
                             if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
                                     .get_card_type() != "Warlord" and \
                                     player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                                    .get_card_type() != "Support":
+                                            .get_card_type() != "Support":
                                 if self.unit_to_move_position[0] != -1:
                                     player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
                                                                         self.unit_to_move_position[1])
@@ -4587,7 +4621,7 @@ class Game:
 
             if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
                 if (primary_player.check_for_trait_given_pos(planet, pos, "Warrior") or
-                        primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
+                    primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
                         primary_player.get_faction_given_pos(planet, pos) == "Necrons":
                     if primary_player.search_card_at_planet(planet, "Ghost Ark of Orikan"):
                         if primary_player.get_cost_given_pos(planet, pos) > 0:
@@ -4729,13 +4763,13 @@ class Game:
             await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_2 + "; " + self.name_1 + "'s warlord was destroyed."
-                                               "----GAME END----"
+                                                                    "----GAME END----"
             )
         elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_1 + "; " + self.name_2 + "'s warlord was destroyed."
-                                               "----GAME END----"
+                                                                    "----GAME END----"
             )
         elif self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
@@ -5028,7 +5062,7 @@ class Game:
                 self.create_reaction("Solarite Avetys", primary_player.name_player,
                                      (int(secondary_player.number), planet_pos, unit_pos))
         cost_diff = secondary_player.get_cost_given_pos(att_pla, att_pos) - \
-            primary_player.get_cost_given_pos(planet_pos, unit_pos)
+                    primary_player.get_cost_given_pos(planet_pos, unit_pos)
         if cost_diff > 0:
             for k in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments)):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments[k].get_ability() == \
@@ -5213,6 +5247,13 @@ class Game:
                                         self.name_player_making_choices = name
                                         self.choice_context = "Use alternative shield effect?"
                                         self.last_shield_string = game_update_string
+                                elif primary_player.cards[hand_pos] == "Uphold His Honor":
+                                    if primary_player.get_unstoppable_given_pos(planet_pos, unit_pos):
+                                        alt_shield_check = True
+                                        self.choices_available = ["Shield", "Effect"]
+                                        self.name_player_making_choices = name
+                                        self.choice_context = "Use alternative shield effect?"
+                                        self.last_shield_string = game_update_string
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
                             if self.damage_can_be_shielded[0]:
@@ -5271,7 +5312,7 @@ class Game:
                                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                             for j in range(len(secondary_player.cards_in_play[
                                                                    planet_pos + 1][i].attachments)):
-                                                if secondary_player.cards_in_play[planet_pos + 1][i].attachments[j].\
+                                                if secondary_player.cards_in_play[planet_pos + 1][i].attachments[j]. \
                                                         get_ability() == "Revered Heavy Flamer":
                                                     self.create_reaction("Revered Heavy Flamer",
                                                                          secondary_player.name_player,
@@ -5312,7 +5353,7 @@ class Game:
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Reanimating Warriors" \
                                                         and not primary_player.cards_in_play[planet_pos + 1][
-                                                        unit_pos].once_per_phase_used:
+                                                    unit_pos].once_per_phase_used:
                                                     self.create_interrupt("Reanimating Warriors",
                                                                           primary_player.name_player,
                                                                           (int(primary_player.number), planet_pos,
@@ -5485,13 +5526,13 @@ class Game:
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
-                                primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
+                                    primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
                                     self.amount_that_can_be_removed_by_shield[0] > 1:
                                 self.amount_that_can_be_removed_by_shield[0] = \
                                     self.amount_that_can_be_removed_by_shield[0] - 1
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                 self.may_block_with_ols = False
-                            elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and\
+                            elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(hurt_planet, hurt_pos) and not \
                                     primary_player.headquarters[hurt_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
@@ -5539,7 +5580,8 @@ class Game:
                                                 if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
                                                         .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
                                                         primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                                        .check_for_a_trait("Soldier", primary_player.etekh_trait):
+                                                                .check_for_a_trait("Soldier",
+                                                                                   primary_player.etekh_trait):
                                                     primary_player.aiming_reticle_coords_hand = None
                                                     primary_player.discard_card_from_hand(self.pos_shield_card)
                                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -5554,7 +5596,8 @@ class Game:
                                                         self.positions_attackers_of_units_to_take_damage[0]
                                                     secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk,
                                                                                           by_enemy_unit=False)
-                                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                                    await self.shield_cleanup(primary_player, secondary_player,
+                                                                              planet_pos)
                             elif self.alt_shield_name == "Faith Denies Death":
                                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1) > 0:
                                     self.choice_context = "Faith Denies Death: Amount Blocked"
@@ -5590,13 +5633,14 @@ class Game:
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
-                                primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
+                                    primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
                                     self.amount_that_can_be_removed_by_shield[0] > 1:
                                 self.amount_that_can_be_removed_by_shield[0] = \
                                     self.amount_that_can_be_removed_by_shield[0] - 1
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                 self.may_block_with_ols = False
-                            elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blood Angels Veterans" and \
+                            elif primary_player.get_ability_given_pos(planet_pos,
+                                                                      unit_pos) == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(planet_pos, unit_pos) and not \
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
@@ -5666,7 +5710,7 @@ class Game:
                             if planet_pos == hurt_planet:
                                 if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Elite"):
                                     if primary_player.cards_in_play[hurt_planet + 1][
-                                            hurt_pos].follower_of_gork_available:
+                                        hurt_pos].follower_of_gork_available:
                                         primary_player.cards_in_play[hurt_planet + 1][
                                             hurt_pos].follower_of_gork_available = False
                                         damage_to_remove = 2
@@ -6045,8 +6089,8 @@ class Game:
                                                 int(game_update_string[2]), int(game_update_string[3]))) and \
                                             (self.forbidden_traits_indirect == ""
                                              or not player.check_for_trait_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3]),
-                                                self.forbidden_traits_indirect)):
+                                                        int(game_update_string[2]), int(game_update_string[3]),
+                                                        self.forbidden_traits_indirect)):
                                         if player.get_faction_given_pos(
                                                 int(game_update_string[2]), int(game_update_string[3])) == \
                                                 self.faction_of_cards_for_indirect or not \
@@ -7401,7 +7445,7 @@ class Game:
             await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_2 + "; " + self.name_1 + " was unable to draw a card from their deck."
-                                               "----GAME END----"
+                                                                    "----GAME END----"
             )
             self.p1.already_lost_due_to_deck = True
         if self.p2.lost_due_to_deck and not self.p2.already_lost_due_to_deck:
