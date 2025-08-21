@@ -404,7 +404,7 @@ def space_marines_cards_init():
                                                     "Interrupt: When your Bloodied warlord is defeated, discard it and"
                                                     " pay 1 resource and Deep Strike this unit to have it be considered"
                                                     " a warlord. If it is defeated you lose the game.",
-                             "Soldier. Dark Angels.", -1, faction, "Loyal", 2, 6, 0, True, deepstrike=2),
+                             "Soldier. Dark Angels.", 0, faction, "Loyal", 2, 6, 0, True, deepstrike=2),
         CardClasses.ArmyCard("Fighting Company Daras",
                              "Sweep (1).\n"
                              "Unstoppable - The first time this unit is assigned damage this"
@@ -492,6 +492,12 @@ def space_marines_cards_init():
                                                   "Reaction: After a unit is chosen as a defender, it can trigger"
                                                   " its Unstoppable specialization for this attack even if it already"
                                                   " triggered this round.", "Vow.",
-                              0, faction, "Common", 1, False)
+                              0, faction, "Common", 1, False),
+        CardClasses.SupportCard("Mobilize the Chapter", "When deployed choose a trait among: "
+                                                        "Dark Angels, Ultramarines, Space Wolves, Black Templars.\n"
+                                                        "Reaction: After the combat phase begins, draw a card or gain"
+                                                        " a resource. Use this ability only if each unit you control"
+                                                        " shares the chosen trait.", "Upgrade.",
+                                0, faction, "Loyal", True)
     ]
     return space_marines_card_array

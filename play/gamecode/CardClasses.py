@@ -84,6 +84,7 @@ class Card:
         self.embarked_squads_active = False
         self.from_front_line_rhinos = False
         self.just_entered_play = False
+        self.misc_string = ""
 
     def get_once_per_game_used(self):
         return self.once_per_game_used

@@ -158,7 +158,7 @@ class Player:
         self.planet_absorption_played = False
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
-        self.preparation_cards = ["Pulsating Carapace"]
+        self.preparation_cards = ["Pulsating Carapace", "Mobilize the Chapter"]
         self.played_necrodermis = False
         self.necrodermis_allowed = True
         self.etekh_trait = ""
@@ -166,8 +166,6 @@ class Player:
         self.command_struggles_won_this_phase = 0
         self.celestian_amelia_active = False
         self.wrathful_retribution_value = 0
-
-
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if not payment:
@@ -1902,6 +1900,9 @@ class Player:
                             print("Played card to HQ")
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Mobilize the Chapter":
+                                self.game.create_reaction("Mobilize the Chapter Initiation", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
@@ -4573,6 +4574,17 @@ class Player:
         self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += value
         return None
 
+    def check_if_all_units_have_trait(self, trait):
+        for i in range(len(self.headquarters)):
+            if self.check_is_unit_at_pos(-2, i):
+                if not self.check_for_trait_given_pos(-2, i, trait):
+                    return False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if not self.check_for_trait_given_pos(i, j, trait):
+                    return False
+        return True
+
     def perform_own_reactions_on_phase_change(self, phase):
         # Forced reactions first
         zog_wort = False
@@ -4610,6 +4622,9 @@ class Player:
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
                     self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
+                if phase == "COMBAT":
+                    self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Shard of the Deceiver":
                 self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Weight of the Aeons":

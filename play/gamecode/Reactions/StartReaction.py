@@ -779,6 +779,20 @@ async def start_resolving_reaction(self, name, game_update_string):
                                 storm_lib_value)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Mobilize the Chapter Initiation":
+            self.choices_available = ["Dark Angels", "Ultramarines", "Space Wolves", "Black Templars"]
+            self.choice_context = "MtC Choose Trait:"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        elif current_reaction == "Mobilize the Chapter":
+            chosen_trait = primary_player.headquarters[unit_pos].misc_string
+            if primary_player.check_if_all_units_have_trait(chosen_trait):
+                self.choices_available = ["Gain 1 Resource", "Draw 1 Card"]
+                self.choice_context = "Mobilize the Chapter Reward:"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                self.delete_reaction()
         elif current_reaction == "The Emperor's Retribution":
             if "The Emperor's Retribution" in primary_player.cards and primary_player.resources > 0:
                 primary_player.spend_resources(1)

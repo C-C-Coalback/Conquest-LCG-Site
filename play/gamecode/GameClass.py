@@ -305,7 +305,8 @@ class Game:
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
-                                 "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut"]
+                                 "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
+                                 "Mobilize the Chapter Initiation"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -408,7 +409,7 @@ class Game:
         self.paying_shrieking_exarch_cost = False
         self.jungle_trench_count = 0
         self.may_block_with_ols = True
-        self.cards_with_dash_cost = ["Seething Mycetic Spore"]
+        self.cards_with_dash_cost = ["Seething Mycetic Spore", "Grand Master Belial"]
         self.stored_discard_and_target = []  # (effect name, player num)
         self.interrupts_discard_enemy_allowed = True
         self.queued_moves = []  # (player num, planet pos, unit pos, destination)
@@ -2520,6 +2521,23 @@ class Game:
                         self.interrupts_discard_enemy_allowed = False
                         await self.complete_enemy_discard(primary_player, secondary_player)
                         self.interrupts_discard_enemy_allowed = True
+                    elif self.choice_context == "Mobilize the Chapter Reward:":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "Gain 1 Resource":
+                            primary_player.add_resources(1)
+                        else:
+                            primary_player.draw_card()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
+                    elif self.choice_context == "MtC Choose Trait:":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                        primary_player.headquarters[pos].misc_string = chosen_choice
+                        await self.send_update_message("Mobilize the Chapter: Chose " + chosen_choice + " trait.")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Target Planet Vale Tenndrac":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         i = 0
@@ -5248,12 +5266,13 @@ class Game:
                                         self.choice_context = "Use alternative shield effect?"
                                         self.last_shield_string = game_update_string
                                 elif primary_player.cards[hand_pos] == "Uphold His Honor":
-                                    if primary_player.get_unstoppable_given_pos(planet_pos, unit_pos):
-                                        alt_shield_check = True
-                                        self.choices_available = ["Shield", "Effect"]
-                                        self.name_player_making_choices = name
-                                        self.choice_context = "Use alternative shield effect?"
-                                        self.last_shield_string = game_update_string
+                                    if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                        if primary_player.get_unstoppable_given_pos(planet_pos, unit_pos):
+                                            alt_shield_check = True
+                                            self.choices_available = ["Shield", "Effect"]
+                                            self.name_player_making_choices = name
+                                            self.choice_context = "Use alternative shield effect?"
+                                            self.last_shield_string = game_update_string
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
                             if self.damage_can_be_shielded[0]:
