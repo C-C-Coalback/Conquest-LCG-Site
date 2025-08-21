@@ -58,8 +58,18 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                               discounts=self.discounts_applied)
             if self.p1.has_passed and self.p2.has_passed:
-                await self.send_update_message("Both passed, move to warlord movement.")
-                await self.change_phase("COMMAND")
+                continue_to_warlord = True
+                if self.p1.search_hand_for_card("Aerial Deployment"):
+                    continue_to_warlord = False
+                    self.reactions_on_end_deploy_phase = True
+                    self.create_reaction("Aerial Deployment", self.name_1, (1, -1, -1))
+                if self.p2.search_hand_for_card("Aerial Deployment"):
+                    continue_to_warlord = False
+                    self.reactions_on_end_deploy_phase = True
+                    self.create_reaction("Aerial Deployment", self.name_2, (1, -1, -1))
+                if continue_to_warlord:
+                    await self.send_update_message("Both passed, move to warlord movement.")
+                    await self.change_phase("COMMAND")
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
             if self.mode == "Normal":
@@ -103,6 +113,12 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 if not secondary_player.has_passed:
                                     self.player_with_deploy_turn = secondary_player.get_name_player()
                                     self.number_with_deploy_turn = secondary_player.get_number()
+                                if primary_player.extra_deploy_turn_active:
+                                    primary_player.extra_deploy_turn_active = False
+                                    primary_player.has_passed = True
+                                    if self.p1.has_passed and self.p2.has_passed:
+                                        await self.send_update_message("Both passed, move to warlord movement.")
+                                        await self.change_phase("COMMAND")
                             self.card_pos_to_deploy = -1
                         elif card.get_has_deepstrike() and primary_player.resources > 0 and self.deepstrike_allowed:
                             print("deepstrike", card.get_deepstrike_value())
@@ -188,6 +204,12 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.card_pos_to_deploy = -1
                             self.deepstrike_deployment_active = False
                             self.action_cleanup()
+                            if player.extra_deploy_turn_active:
+                                player.extra_deploy_turn_active = False
+                                player.has_passed = True
+                                if self.p1.has_passed and self.p2.has_passed:
+                                    await self.send_update_message("Both passed, move to warlord movement.")
+                                    await self.change_phase("COMMAND")
                     elif card.get_card_type() == "Army":
                         if other_player.search_card_at_planet(planet_chosen, "Raving Cryptek"):
                             await self.send_update_message("Raving Cryptek detected! Please choose two")
@@ -252,6 +274,12 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.planet_pos_to_deploy = -1
                                     player.aiming_reticle_coords_hand = None
                                     self.action_cleanup()
+                                    if player.extra_deploy_turn_active:
+                                        player.extra_deploy_turn_active = False
+                                        player.has_passed = True
+                                        if self.p1.has_passed and self.p2.has_passed:
+                                            await self.send_update_message("Both passed, move to warlord movement.")
+                                            await self.change_phase("COMMAND")
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":
@@ -392,6 +420,12 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.choice_context = "Catachan Devils Patrol: make a choice"
             self.name_player_making_choices = secondary_player.get_name_player()
             self.resolving_search_box = True
+    if primary_player.extra_deploy_turn_active:
+        primary_player.extra_deploy_turn_active = False
+        primary_player.has_passed = True
+        if self.p1.has_passed and self.p2.has_passed:
+            await self.send_update_message("Both passed, move to warlord movement.")
+            await self.change_phase("COMMAND")
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     self.card_to_deploy = None
@@ -486,6 +520,12 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 primary_player.aiming_reticle_coords_hand = -1
                 self.card_pos_to_deploy = -1
                 self.action_cleanup()
+                if primary_player.extra_deploy_turn_active:
+                    primary_player.extra_deploy_turn_active = False
+                    primary_player.has_passed = True
+                    if self.p1.has_passed and self.p2.has_passed:
+                        await self.send_update_message("Both passed, move to warlord movement.")
+                        await self.change_phase("COMMAND")
                 self.card_type_of_selected_card_in_hand = ""
                 self.faction_of_card_to_play = ""
                 self.name_of_card_to_play = ""

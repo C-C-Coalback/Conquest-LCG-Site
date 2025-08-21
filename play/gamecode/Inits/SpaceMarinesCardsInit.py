@@ -479,6 +479,9 @@ def space_marines_cards_init():
                                                      " turn, prevent 1 of that damage and a target army unit has its"
                                                      " HP value set to 4 until the end of the phase.",
                              "Vehicle. Black Templars.", 4, faction, "Loyal", 6, 3, 2, False,
-                             wargear_attachments_permitted=False, unstoppable=True)
+                             wargear_attachments_permitted=False, unstoppable=True),
+        CardClasses.EventCard("Aerial Deployment", "Reaction: After both players passed during the deploy phase, "
+                                                   "take an extra deployment turn.", "Tactic.",
+                              0, faction, "Loyal", 2, False)
     ]
     return space_marines_card_array

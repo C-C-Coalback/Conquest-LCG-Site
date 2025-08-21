@@ -132,6 +132,7 @@ class Player:
         self.illegal_commits_warlord = 0
         self.illegal_commits_synapse = 0
         self.primal_howl_used = False
+        self.extra_deploy_turn_active = False
         self.discard_inquis_caius_wroth = False
         self.enemy_has_wyrdboy_stikk = False
         self.accept_any_challenge_used = False

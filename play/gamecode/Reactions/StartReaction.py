@@ -779,6 +779,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                                 storm_lib_value)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Aerial Deployment":
+            if "Aerial Deployment" in primary_player.cards:
+                primary_player.discard_card_name_from_hand("Aerial Deployment")
+                primary_player.extra_deploy_turn_active = True
+                primary_player.has_passed = False
+                self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Thunderwolf Cavalry":
             if not primary_player.cards_in_play[planet_pos + 1]:
                 self.delete_reaction()

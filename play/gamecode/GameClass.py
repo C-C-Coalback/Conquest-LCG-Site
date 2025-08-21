@@ -314,6 +314,7 @@ class Game:
         self.deploy_exhausted = False
         self.need_to_reset_tomb_blade_squadron = False
         self.resolve_kill_effects = True
+        self.reactions_on_end_deploy_phase = False
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
@@ -7109,7 +7110,7 @@ class Game:
                 await HeadquartersPhase.update_game_event_headquarters_section(self, name, game_update_string)
             resolved_subroutine = True
         if self.phase == "DEPLOY":
-            if self.p1.has_passed and self.p2.has_passed:
+            if self.p1.has_passed and self.p2.has_passed and not self.reactions_needing_resolving:
                 print("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
         if self.resolving_kugath_nurglings:
@@ -7225,6 +7226,11 @@ class Game:
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal" and not self.xv805_enforcer_active and not self.queued_moves:
             if not self.reactions_needing_resolving and not self.resolving_search_box:
+                if self.reactions_on_end_deploy_phase and \
+                        not self.p1.extra_deploy_turn_active and not self.p2.extra_deploy_turn_active:
+                    self.reactions_on_end_deploy_phase = False
+                    await self.send_update_message("Both passed, move to warlord movement.")
+                    await self.change_phase("COMMAND")
                 self.p1.highest_cost_invasion_site = 0
                 self.p2.highest_cost_invasion_site = 0
                 self.p1.stored_targets_the_emperor_protects = []
