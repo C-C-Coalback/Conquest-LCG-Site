@@ -105,6 +105,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                     if not secondary_player.get_ready_given_pos(planet_pos, i):
                                         secondary_player.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
                                 self.action_cleanup()
+                    elif ability == "Terminator Armour":
+                        if not card_chosen.get_once_per_game_used():
+                            if player_owning_card.name_player == primary_player.get_name_player():
+                                card_chosen.set_once_per_game_used(True)
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                                primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.action_chosen = ability
                     elif ability == "Cenobyte Servitor":
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         self.chosen_first_card = False

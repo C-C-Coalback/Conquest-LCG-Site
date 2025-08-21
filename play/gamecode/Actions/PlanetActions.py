@@ -277,6 +277,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     secondary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     self.action_cleanup()
+    elif self.action_chosen == "Terminator Armour":
+        if primary_player.check_for_trait_at_planet(chosen_planet, "Scout"):
+            og_pla, og_pos = self.misc_target_unit
+            if og_pla != chosen_planet:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \

@@ -515,6 +515,14 @@ def space_marines_cards_init():
                                                      "exhaust this attachment to move a target enemy army unit at "
                                                      "this planet to a planet with a Space Wolves unit you control.",
                                    "Power. Space Wolves.", 2, faction, "Common", 1, True, planet_attachment=True,
-                                   action_in_play=True, allowed_phases_in_play="COMBAT")
+                                   action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.AttachmentCard("Terminator Armour", "Deep Strike (1).\n"
+                                                        "Attach to a Space Marines army unit."
+                                                        " Attached unit gets +2 ATK and +2 HP.\n"
+                                                        "Action: Move attached unit to a planet with a Scout unit"
+                                                        " you control. (Limit once per game.)", "Wargear.",
+                                   2, faction, "Loyal", 2, False, unit_must_match_faction=True, deepstrike=1,
+                                   type_of_units_allowed_for_attachment="Army", extra_attack=2, extra_health=2,
+                                   action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return space_marines_card_array

@@ -55,6 +55,13 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         primary_player.headquarters[unit_pos].area_effect_eocr += 2
                         self.action_cleanup()
+                elif ability == "Terminator Armour":
+                    if not card_chosen.get_once_per_game_used():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            card_chosen.set_once_per_game_used(True)
+                            self.misc_target_unit = (-2, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos)
+                            self.action_chosen = ability
                 elif ability == "Ymgarl Factor":
                     if primary_player.spend_resources(1):
                         self.action_chosen = ability
