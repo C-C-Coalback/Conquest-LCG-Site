@@ -269,6 +269,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         self.action_cleanup()
+    elif self.action_chosen == "Call the Storm":
+        if chosen_planet != self.misc_target_planet:
+            if self.chosen_first_card:
+                if primary_player.check_for_trait_at_planet(chosen_planet, "Space Wolves"):
+                    og_pla, og_pos = self.misc_target_unit
+                    secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                    secondary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                    self.action_cleanup()
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \

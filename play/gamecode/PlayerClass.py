@@ -392,6 +392,12 @@ class Player:
             self.last_hq_string = joined_string
             await self.game.send_update_message(joined_string)
 
+    def check_for_trait_at_planet(self, planet_pos, trait):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.check_for_trait_given_pos(planet_pos, i, trait):
+                return True
+        return False
+
     def discard_all_cards_in_reserve(self, planet_id):
         while self.cards_in_reserve[planet_id]:
             self.add_card_to_discard(self.cards_in_reserve[planet_id][0].get_name())

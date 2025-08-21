@@ -509,6 +509,12 @@ def space_marines_cards_init():
                                                             " on this support. Then you may sacrifice it to deploy a "
                                                             "unit from your hand at a non-first planet, reducing its "
                                                             "cost by the number of tokens on this support.",
-                                "Location.", 3, faction, "Common", False, limited=True)
+                                "Location.", 3, faction, "Common", False, limited=True),
+        CardClasses.AttachmentCard("Call the Storm", "Attach to a planet.\n"
+                                                     "Combat Action: If there is no enemy warlord at this planet, "
+                                                     "exhaust this attachment to move a target enemy army unit at "
+                                                     "this planet to a planet with a Space Wolves unit you control.",
+                                   "Power. Space Wolves.", 2, faction, "Common", 1, True, planet_attachment=True,
+                                   action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return space_marines_card_array
