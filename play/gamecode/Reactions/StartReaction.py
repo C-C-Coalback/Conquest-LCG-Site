@@ -779,6 +779,13 @@ async def start_resolving_reaction(self, name, game_update_string):
                                 storm_lib_value)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Vamii Industrial Complex":
+            self.chosen_first_card = False
+            primary_player.headquarters[unit_pos].counter += 2
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Sacrifice Vamii Industrial Complex?"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Mobilize the Chapter Initiation":
             self.choices_available = ["Dark Angels", "Ultramarines", "Space Wolves", "Black Templars"]
             self.choice_context = "MtC Choose Trait:"

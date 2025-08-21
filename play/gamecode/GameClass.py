@@ -315,6 +315,7 @@ class Game:
         self.deploy_exhausted = False
         self.need_to_reset_tomb_blade_squadron = False
         self.resolve_kill_effects = True
+        self.vamii_complex_discount = 0
         self.reactions_on_end_deploy_phase = False
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
@@ -2397,6 +2398,18 @@ class Game:
                                                        ". Please choose one to give +2 cost.")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Raving Cryptek: Increase cost"
+                    elif self.choice_context == "Sacrifice Vamii Industrial Complex?":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "No":
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.delete_reaction()
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                            self.vamii_complex_discount = primary_player.headquarters[pos].counter
+                            primary_player.sacrifice_card_in_hq(pos)
                     elif self.choice_context == "Raving Cryptek: Increase cost":
                         self.misc_target_choice = game_update_string[1]
                         if game_update_string[1] == "0":
@@ -4978,6 +4991,7 @@ class Game:
                             slaanesh_temptation = True
         if slaanesh_temptation:
             self.discounts_applied -= 1
+        self.discounts_applied += self.vamii_complex_discount
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
         other_player = self.p1

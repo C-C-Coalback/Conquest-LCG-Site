@@ -87,6 +87,17 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
+        elif current_reaction == "Vamii Industrial Complex":
+            if not self.chosen_first_card:
+                card = primary_player.get_card_in_hand(hand_pos)
+                if card.get_is_unit():
+                    self.card_pos_to_deploy = hand_pos
+                    self.card_to_deploy = card
+                    print("card name: ", self.card_to_deploy.get_name())
+                    self.card_type_of_selected_card_in_hand = card.get_card_type()
+                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                    primary_player.aiming_reticle_color = "blue"
+                    self.chosen_first_card = True
         elif current_reaction == "Shard of the Deceiver":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             if not primary_player.cards:

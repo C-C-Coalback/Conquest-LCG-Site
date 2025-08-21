@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import CommandPhase
+from ..Phases import DeployPhase
 
 
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -29,6 +30,23 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 last_el_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
                 primary_player.cards_in_play[chosen_planet][last_el_index].command_until_combat += 1
                 self.delete_reaction()
+    elif current_reaction == "Vamii Industrial Complex":
+        if self.chosen_first_card:
+            if chosen_planet != self.round_number:
+                self.discounts_applied = 0
+                card = self.card_to_deploy
+                await self.calculate_available_discounts_unit(chosen_planet, card, primary_player)
+                await self.calculate_automatic_discounts_unit(chosen_planet, card, primary_player)
+                if card.check_for_a_trait("Elite"):
+                    primary_player.master_warpsmith_count = 0
+                self.card_to_deploy = card
+                if self.available_discounts > self.discounts_applied:
+                    self.stored_mode = self.mode
+                    self.mode = "DISCOUNT"
+                    self.planet_aiming_reticle_position = chosen_planet
+                    self.planet_aiming_reticle_active = True
+                else:
+                    await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=self.discounts_applied)
     elif current_reaction == "Interceptor Squad":
         if not self.chosen_first_card:
             p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]

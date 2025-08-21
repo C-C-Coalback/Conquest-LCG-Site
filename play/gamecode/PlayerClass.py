@@ -342,17 +342,19 @@ class Player:
                 card_type = current_card.get_card_type()
                 if current_card.is_unit:
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                else:
+                    single_card_string += "0"
+                single_card_string += "|"
+                if current_card.is_unit:
+                    single_card_string += str(current_card.get_faith())
                 elif current_card.get_name() == "Hive Ship Tendrils":
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Promethium Mine":
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "World Engine Beam":
                     single_card_string += str(current_card.counter)
-                else:
-                    single_card_string += "0"
-                single_card_string += "|"
-                if current_card.is_unit:
-                    single_card_string += str(current_card.get_faith())
+                elif current_card.get_name() == "Vamii Industrial Complex":
+                    single_card_string += str(current_card.counter)
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -4627,6 +4629,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Vamii Industrial Complex":
+                if phase == "COMBAT":
+                    self.game.create_reaction("Vamii Industrial Complex", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Shard of the Deceiver":
                 self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Weight of the Aeons":

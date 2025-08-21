@@ -503,6 +503,12 @@ def space_marines_cards_init():
                                                    "units you control get +1 ATK and +1 HP until the end of the phase. "
                                                    "If both units are at a planet with 2 or more warlords, "
                                                    "gain 1 resource.", "Tale.", 1, faction, "Loyal", True,
-                                action_in_play=True, allowed_phases_in_play="ALL")
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Vamii Industrial Complex", "Limited.\n"
+                                                            "Reaction: After the combat phase begins, place 2 resources"
+                                                            " on this support. Then you may sacrifice it to deploy a "
+                                                            "unit from your hand at a non-first planet, reducing its "
+                                                            "cost by the number of tokens on this support.",
+                                "Location.", 3, faction, "Common", False, limited=True)
     ]
     return space_marines_card_array

@@ -314,16 +314,11 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     secondary_player = self.p2
     if self.phase != "DEPLOY":
         is_an_interrupt = False
-        if self.interrupts_waiting_on_resolution:
+        is_a_reaction = False
+        if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
             if self.interrupts_waiting_on_resolution[0] == "Magus Harid" or \
-                    self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
-                is_an_interrupt = True
-                primary_player = self.p1
-                secondary_player = self.p2
-                if self.player_resolving_interrupts[0] == self.name_2:
-                    primary_player = self.p2
-                    secondary_player = self.p1
-            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+                    self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors" or \
+                    self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
                 is_an_interrupt = True
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -331,6 +326,15 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                     primary_player = self.p2
                     secondary_player = self.p1
         if not is_an_interrupt:
+            if self.reactions_needing_resolving and self.already_resolving_reaction:
+                if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
+                    is_a_reaction = True
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                    if self.player_who_resolves_reaction[0] == self.name_2:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+        if not is_an_interrupt and not is_a_reaction:
             if self.player_with_action == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -410,7 +414,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.damage_is_taken_one_at_a_time = True
             primary_player.set_aiming_reticle_in_play(planet_pos, position_of_unit, "red")
     self.action_cleanup()
-    if self.interrupts_waiting_on_resolution:
+    if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
         if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
             self.delete_interrupt()
         if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
@@ -424,6 +428,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.choice_context = "Catachan Devils Patrol: make a choice"
             self.name_player_making_choices = secondary_player.get_name_player()
             self.resolving_search_box = True
+    if self.reactions_needing_resolving and self.already_resolving_reaction:
+        if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
+            self.delete_reaction()
     if primary_player.extra_deploy_turn_active:
         primary_player.extra_deploy_turn_active = False
         primary_player.has_passed = True
