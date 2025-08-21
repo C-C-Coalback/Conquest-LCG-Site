@@ -353,7 +353,9 @@ class Game:
         self.guardian_mesh_armor_enabled = True
         self.guardian_mesh_armor_active = False
         self.maksim_squadron_enabled = True
+        self.woken_machine_spirit_enabled = False
         self.maksim_squadron_active = False
+        self.woken_machine_spirit_active = False
         self.tense_negotiations_active = False
         self.shining_blade_active = False
         self.value_doom_siren = 0
@@ -3558,6 +3560,20 @@ class Game:
                             self.reset_choices_available()
                             self.resolving_search_box = False
                             self.delete_reaction()
+                    elif self.choice_context == "Use Woken Machine Spirit?":
+                        self.woken_machine_spirit_enabled = False
+                        if game_update_string[1] == "0":
+                            self.woken_machine_spirit_active = True
+                            pos_holder = self.positions_of_units_to_take_damage[0]
+                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
+                        else:
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Use Maksim's Squadron?":
                         self.maksim_squadron_enabled = False
                         if game_update_string[1] == "0":
@@ -5329,6 +5345,15 @@ class Game:
                                                 self.name_player_making_choices = primary_player.name_player
                                                 can_continue = False
                                 if can_continue:
+                                    if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
+                                                                                "Woken Machine Spirit"):
+                                        if self.woken_machine_spirit_enabled and not primary_player.hit_by_gorgul:
+                                            self.last_shield_string = game_update_string
+                                            self.choice_context = "Use Woken Machine Spirit?"
+                                            self.choices_available = ["Yes", "No"]
+                                            self.name_player_making_choices = primary_player.name_player
+                                            can_continue = False
+                                if can_continue:
                                     no_mercy_possible = False
                                     if can_no_mercy:
                                         for i in range(len(secondary_player.cards)):
@@ -5349,7 +5374,10 @@ class Game:
                                             shields = shields * 2
                                         if self.maksim_squadron_active:
                                             shields += 1
+                                        if self.woken_machine_spirit_active:
+                                            shields += 1
                                         self.maksim_squadron_enabled = True
+                                        self.woken_machine_spirit_enabled = True
                                         self.guardian_mesh_armor_enabled = True
                                         shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                         self.amount_that_can_be_removed_by_shield[0] = \
@@ -6387,6 +6415,7 @@ class Game:
         self.guardian_mesh_armor_active = False
         self.maksim_squadron_active = False
         self.maksim_squadron_enabled = True
+        self.woken_machine_spirit_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.alt_shield_mode_active = False
         self.may_block_with_ols = True

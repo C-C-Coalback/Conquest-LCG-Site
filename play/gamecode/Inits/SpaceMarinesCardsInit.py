@@ -528,6 +528,14 @@ def space_marines_cards_init():
                                                         "Forced Reaction: After the combat phase begins, sacrifice"
                                                         " this attachment and deal 2 damage to a warlord at this"
                                                         " planet if able. Then draw a card.", "Tactic. Space Wolves.",
-                                   1, faction, "Common", 2, True, planet_attachment=True)
+                                   1, faction, "Common", 2, True, planet_attachment=True),
+        CardClasses.AttachmentCard("Woken Machine Spirit", "Attach to a Vehicle unit. Limit 1 per unit.\n"
+                                                           "Attached unit gets +1 HP.\n"
+                                                           "Interrupt: When you use a shield card to prevent damage to"
+                                                           " attached unit, that card gains 1 shield icon. Then the "
+                                                           "shielded unit gets +1 ATK until the end of the phase.",
+                                   "Hardpoint.", 0, faction, "Common", 1, False, extra_health=1,
+                                   limit_one_per_unit=True,
+                                   type_of_units_allowed_for_attachment="Army/Token/Synapse/Warlord")
     ]
     return space_marines_card_array
