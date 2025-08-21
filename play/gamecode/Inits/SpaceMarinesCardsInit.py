@@ -482,6 +482,11 @@ def space_marines_cards_init():
                              wargear_attachments_permitted=False, unstoppable=True),
         CardClasses.EventCard("Aerial Deployment", "Reaction: After both players passed during the deploy phase, "
                                                    "take an extra deployment turn.", "Tactic.",
-                              0, faction, "Loyal", 2, False)
+                              0, faction, "Loyal", 2, False),
+        CardClasses.EventCard("The Emperor's Retribution", "Reaction: After your opponent passes during the deploy "
+                                                           "phase, move a non-Elite Space Marines army unit from your"
+                                                           " HQ to a target non-first planet to have it gain 1 command"
+                                                           " icon until the end of next phase.", "Tactic.",
+                              1, faction, "Common", 1, False)
     ]
     return space_marines_card_array

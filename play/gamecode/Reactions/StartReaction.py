@@ -779,6 +779,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                                 storm_lib_value)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "The Emperor's Retribution":
+            if "The Emperor's Retribution" in primary_player.cards and primary_player.resources > 0:
+                primary_player.spend_resources(1)
+                primary_player.discard_card_name_from_hand("The Emperor's Retribution")
+                self.chosen_first_card = False
+                self.misc_target_unit = (-1, -1)
+            else:
+                self.delete_reaction()
         elif current_reaction == "Aerial Deployment":
             if "Aerial Deployment" in primary_player.cards:
                 primary_player.discard_card_name_from_hand("Aerial Deployment")

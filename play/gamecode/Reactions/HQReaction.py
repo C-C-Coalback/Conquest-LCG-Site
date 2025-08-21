@@ -224,6 +224,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 player_owning_card.headquarters[unit_pos].health_set_eop = 4
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+    elif current_reaction == "The Emperor's Retribution":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                    if primary_player.get_faction_given_pos(-2, unit_pos) == "Space Marines":
+                        if not primary_player.check_for_trait_given_pos(-2, unit_pos, "Elite"):
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (-2, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(-2, unit_pos)
     elif current_reaction == "Steadfast Sword Brethren":
         if game_update_string[1] == primary_player.number:
             if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != \

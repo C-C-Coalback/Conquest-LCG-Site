@@ -20,6 +20,15 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
+    elif current_reaction == "The Emperor's Retribution":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.misc_target_unit
+            if chosen_planet != self.round_number:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                last_el_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+                primary_player.cards_in_play[chosen_planet][last_el_index].command_until_combat += 1
+                self.delete_reaction()
     elif current_reaction == "Interceptor Squad":
         if not self.chosen_first_card:
             p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]

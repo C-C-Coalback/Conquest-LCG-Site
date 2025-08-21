@@ -27,6 +27,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.name_player_making_choices = self.player_with_action
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             print("Need to pass")
+            continue_to_warlord = True
             if name == self.player_with_deploy_turn:
                 if self.mode == "ACTION":
                     self.mode = self.stored_mode
@@ -45,6 +46,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p1.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        if self.p2.search_hand_for_card("The Emperor's Retribution"):
+                            self.create_reaction("The Emperor's Retribution", self.name_2, (2, -1, -1))
                         await self.send_update_message(self.name_1 + " passes their deploy turn.")
                     else:
                         self.number_with_deploy_turn = "1"
@@ -52,13 +55,14 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p2.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        if self.p1.search_hand_for_card("The Emperor's Retribution"):
+                            self.create_reaction("The Emperor's Retribution", self.name_1, (1, -1, -1))
                         await self.send_update_message(self.name_2 + " passes their deploy turn.")
                 elif self.mode == "DISCOUNT":
                     print("Play card with not all discounts")
                     await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                               discounts=self.discounts_applied)
             if self.p1.has_passed and self.p2.has_passed:
-                continue_to_warlord = True
                 if self.p1.search_hand_for_card("Aerial Deployment"):
                     continue_to_warlord = False
                     self.reactions_on_end_deploy_phase = True

@@ -3556,6 +3556,8 @@ class Player:
                 self.headquarters[i].extra_traits_eop = ""
                 self.headquarters[i].lost_keywords_eop = False
                 self.headquarters[i].cannot_ready_phase = False
+                if self.game.phase == "COMBAT":
+                    self.headquarters[i].command_until_combat = 0
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].lost_keywords_eop = False
@@ -3576,6 +3578,8 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = -1
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
                 self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = False
+                if self.game.phase == "COMBAT":
+                    self.cards_in_play[planet_pos + 1][unit_pos].command_until_combat = 0
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):

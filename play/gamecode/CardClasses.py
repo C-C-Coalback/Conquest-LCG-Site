@@ -350,6 +350,7 @@ class UnitCard(Card):
         self.new_additional_resources_command_struggle = 0
         self.new_additional_cards_command_struggle = 0
         self.new_brutal = False
+        self.command_until_combat = 0
         self.faith = 0
         self.retaliate = retaliate
         self.retaliate_eop = 0
@@ -745,6 +746,7 @@ class UnitCard(Card):
     def get_command(self):
         command = self.command
         command += self.extra_command_eop
+        command += self.command_until_combat
         if self.hit_by_superiority:
             return 0
         for i in range(len(self.attachments)):
