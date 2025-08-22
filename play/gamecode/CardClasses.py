@@ -321,6 +321,7 @@ class UnitCard(Card):
         self.hit_by_superiority = False
         self.has_hive_mind = hive_mind
         self.brutal_eocr = False
+        self.health_eocr = 0
         self.armorbane_eop = False
         self.area_effect_eop = 0
         self.brutal_eop = False
@@ -370,6 +371,9 @@ class UnitCard(Card):
         retaliate_value = self.retaliate
         if self.blanked_eop:
             retaliate_value = 0
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Vitarus, the Sanguine Sword":
+                retaliate_value += 3
         retaliate_value = retaliate_value + self.retaliate_eop
         return retaliate_value
 
@@ -667,6 +671,7 @@ class UnitCard(Card):
             self.damage = 0
 
     def reset_own_eocr_values(self):
+        self.health_eocr = 0
         self.brutal_eocr = False
         self.area_effect_eocr = 0
 
@@ -723,6 +728,7 @@ class UnitCard(Card):
 
     def get_health(self):
         health = self.health
+        health += self.health_eocr
         health -= self.negative_hp_until_eop
         health += self.positive_hp_until_eop
         health += self.positive_hp_until_eob

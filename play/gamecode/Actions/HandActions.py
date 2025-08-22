@@ -18,16 +18,26 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     print(card.get_has_action_while_in_hand())
     if not self.action_chosen:
         self.card_pos_to_deploy = int(game_update_string[2])
-        if primary_player.subject_omega_relevant:
+        if primary_player.subject_omega_relevant and self.phase == "COMBAT":
             if primary_player.get_ambush_of_card(card):
+                if not primary_player.enemy_holding_cell_check(card.get_name()):
+                    self.card_pos_to_deploy = int(game_update_string[2])
+                    self.action_chosen = "Ambush"
+                    self.card_to_deploy = card
+                    self.card_type_of_selected_card_in_hand = card.get_card_type()
+                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                    primary_player.aiming_reticle_color = "blue"
+                    self.omega_ambush_active = True
+        elif card.get_ability() == "Sanguinary Guard" and self.phase == "COMBAT":
+            if not primary_player.enemy_holding_cell_check(card.get_name()):
                 self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
                 self.card_to_deploy = card
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 primary_player.aiming_reticle_color = "blue"
-                self.omega_ambush_active = True
-        elif primary_player.get_ambush_of_card(card):
+                self.sanguinary_ambush_active = True
+        elif primary_player.get_ambush_of_card(card) and self.phase == "COMBAT":
             if not primary_player.enemy_holding_cell_check(card.get_name()):
                 self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
@@ -84,6 +94,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Keep Firing!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "The Bloodied Host":
+                        if not primary_player.bloodied_host_used and self.last_planet_checked_for_battle != -1:
+                            primary_player.bloodied_host_used = True
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.check_is_unit_at_pos(-2, i):
+                                    primary_player.headquarters[unit_id].health_eocr += 2
+                            for i in range(7):
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    primary_player.cards_in_play[i + 1][j].health_eocr += 2
+                        else:
+                            primary_player.add_resources(1, refund=True)
                     elif ability == "Brutal Cunning":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

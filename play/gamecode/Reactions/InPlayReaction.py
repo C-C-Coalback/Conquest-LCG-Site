@@ -1786,6 +1786,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Sanguinary Guard":
+            if planet_pos == self.last_planet_checked_for_battle:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Sanguinary Guard":
+                        primary_player.return_card_to_hand(planet_pos, unit_pos)
+                        self.delete_reaction()
         elif current_reaction == "Brotherhood Justicar":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == primary_player.get_number():

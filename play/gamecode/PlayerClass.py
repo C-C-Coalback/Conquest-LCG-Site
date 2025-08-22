@@ -140,6 +140,7 @@ class Player:
         self.enemy_has_wyrdboy_stikk = False
         self.accept_any_challenge_used = False
         self.rok_bombardment_active = []
+        self.bloodied_host_used = False
         self.master_warpsmith_count = 0
         self.gut_and_pillage_used = False
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
@@ -652,6 +653,12 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Fierce Purgator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 retaliate += 3
+        warlord_pla, warlord_pos = self.get_location_of_warlord()
+        if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Mephiston":
+            retaliate += 1
+        elif self.get_ability_given_pos(warlord_pla, warlord_pos) == "Mephiston BLOODIED":
+            if warlord_pla == planet_id:
+                retaliate += 1
         return retaliate
 
     async def send_victory_display(self):
@@ -5364,8 +5371,6 @@ class Player:
                     self.add_to_hq(card)
 
     def remove_card_from_play(self, planet_num, card_pos):
-        # card_object = self.cards_in_play[planet_num + 1][card_pos]
-        # self.discard_object(card_object)
         del self.cards_in_play[planet_num + 1][card_pos]
         self.adjust_own_reactions(planet_num, card_pos)
         self.adjust_own_interrupts(planet_num, card_pos)

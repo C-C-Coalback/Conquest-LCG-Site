@@ -380,6 +380,7 @@ class Game:
         self.name_player_who_won_combat = ""
         self.damage_amounts_baarzul = []
         self.omega_ambush_active = False
+        self.sanguinary_ambush_active = False
         self.shadow_thorns_body_allowed = True
         self.sacaellums_finest_active = False
         self.eldritch_council_value = 0
@@ -2157,6 +2158,7 @@ class Game:
         self.mode = "Normal"
         self.position_of_actioned_card = (-1, -1)
         self.omega_ambush_active = False
+        self.sanguinary_ambush_active = False
         self.p1.harbinger_of_eternity_active = False
         self.p2.harbinger_of_eternity_active = False
         if self.phase == "DEPLOY":
@@ -2511,6 +2513,16 @@ class Game:
                         else:
                             await DeployPhase.deploy_card_routine(self, name, self.misc_target_planet,
                                                                   discounts=self.discounts_applied)
+                    elif self.choice_context == "Mephiston Gains":
+                        chosen_choice = self.choices_available[int(game_update_string[1])]
+                        if chosen_choice == "Draw Card":
+                            primary_player.draw_card()
+                        else:
+                            primary_player.add_resources(1)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
+                        self.delete_interrupt()
                     elif self.choice_context == "Ready Vengeful Seraphim?":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Yes":
@@ -4972,6 +4984,14 @@ class Game:
                 i += 1
 
     async def change_phase(self, new_val, refresh_abilities=True):
+        if self.p1.command_struggles_won_this_phase < self.p2.command_struggles_won_this_phase:
+            pla, pos = self.p1.get_location_of_warlord()
+            if self.p1.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston":
+                self.create_interrupt("Mephiston", self.name_1, (1, pla, pos))
+        elif self.p2.command_struggles_won_this_phase < self.p1.command_struggles_won_this_phase:
+            pla, pos = self.p2.get_location_of_warlord()
+            if self.p2.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston":
+                self.create_interrupt("Mephiston", self.name_2, (2, pla, pos))
         self.p1.has_passed = False
         self.p2.has_passed = False
         self.last_planet_checked_for_battle = -1
@@ -7779,6 +7799,8 @@ class Game:
             for i in range(len(winner.cards_in_play[planet_id + 1])):
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
                     reactions.append("Kabalite Blackguard")
+                if winner.get_ability_given_pos(planet_id, i) == "Sanguinary Guard":
+                    reactions.append("Sanguinary Guard")
             if winner.search_card_in_hq("Clearing the Path"):
                 if winner.check_for_warlord(planet_id, True, self.name_player):
                     reactions.append("Clearing the Path")

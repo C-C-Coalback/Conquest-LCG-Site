@@ -65,6 +65,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Dodging Land Speeder":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
+        elif current_interrupt == "Mephiston":
+            self.choices_available = ["Draw Card", "Gain Resource"]
+            self.choice_context = "Mephiston Gains"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_interrupt == "Grand Master Belial":
             planet_belial = -1
             pos_belial = -1

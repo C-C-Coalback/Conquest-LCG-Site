@@ -375,6 +375,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.action_chosen = ability
+                    elif ability == "The Black Rage":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif ability == "Urien's Oubliette":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
@@ -613,6 +618,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.choice_context = "Amount of damage (WEB)"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+    elif self.action_chosen == "The Black Rage":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+                    primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 1)
+                    primary_player.headquarters[unit_pos].sacrifice_end_of_phase = True
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_cleanup()
     elif self.action_chosen == "Imotekh the Stormlord":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

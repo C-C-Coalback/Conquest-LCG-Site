@@ -566,6 +566,34 @@ def space_marines_cards_init():
         CardClasses.EventCard("Psychic Ward", "Interrupt: When your opponent plays an event card, cancel its effects. "
                                               "Your opponent may place 1 faith on your warlord and exhaust "
                                               "their warlord to cancel this effect.", "Power. Grey Knights.",
-                              0, faction, "Signature", 1, False)
+                              0, faction, "Signature", 1, False),
+        CardClasses.WarlordCard("Mephiston", "Each unit you control gains Retaliate (1).\n"
+                                             "Interrupt: When the command phase ends, if your opponent won more command"
+                                             " struggles than you this phase, draw a card or gain 1 resource.",
+                                "Myth. Blood Angels.", faction, 2, 7, 2, 6,
+                                "Bloodied.\n"
+                                "Each unit you control at this planet gains Retaliate (1).", 7, 7,
+                                ["4x Sanguinary Guard", "1x The Black Rage",
+                                 "2x The Bloodied Host", "1x Vitarus, the Sanguine Sword"]),
+        CardClasses.ArmyCard("Sanguinary Guard", "You may deploy this unit from your hand at a "
+                                                 "planet with your warlord as though it had Ambush.\n"
+                                                 "Interrupt: When you win a battle at this planet,"
+                                                 " return this unit to your hand.", "Blood Angels. Elite.",
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("The Black Rage", "Action: Exhaust this support to give a target Space Marines army"
+                                                  " unit you control +1 ATK, +1 HP and Retaliate (1). If that unit "
+                                                  "is still in play at the end of the phase, sacrifice it.",
+                                "Flaw. Blood Angels.", 1, faction, "Signature", False,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("The Bloodied Host", "Play only during a battle.\n"
+                                                   "Action: Each unit you control gets +2 HP until the end of the "
+                                                   "combat round. (Max 1 per round.)", "Tale.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Vitarus, the Sanguine Sword", "Deep Strike (0).\n"
+                                                                  "Attach to a unit.\n"
+                                                                  "Attached unit gets +1 ATK, +1 HP, and"
+                                                                  " Retaliate (3).", "Wargear.",
+                                   1, faction, "Signature", 3, True, deepstrike=0, extra_health=1, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Warlord/Synapse/Army/Token")
     ]
     return space_marines_card_array
