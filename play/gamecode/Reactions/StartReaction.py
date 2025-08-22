@@ -116,6 +116,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
         elif current_reaction == "Castellan Crowe":
             self.misc_counter = 0
+        elif current_reaction == "Brotherhood Justicar":
+            if not self.apoka:
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    primary_player.increase_faith_given_pos(planet_pos, i, 1)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+            else:
+                self.misc_counter = 0
         elif current_reaction == "Sautekh Royal Crypt Damage":
             self.misc_misc = [False, False, False, False, False, False, False]
             self.misc_misc[planet_pos] = True

@@ -1786,6 +1786,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Brotherhood Justicar":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == primary_player.get_number():
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter += 1
+                    if self.misc_counter > 1:
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Castellan Crowe":
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
                 self.misc_counter += 1

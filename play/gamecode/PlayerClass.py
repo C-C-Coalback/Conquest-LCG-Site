@@ -2006,6 +2006,9 @@ class Player:
                             if card.get_ability() == "Triarch Stalkers Procession":
                                 other_player.draw_card()
                                 other_player.draw_card()
+                            if card.get_ability() == "Brotherhood Justicar":
+                                self.game.create_reaction("Brotherhood Justicar", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -4138,7 +4141,7 @@ class Player:
                                 if not self.check_if_already_have_reaction_of_position("Prognosticator", i, j):
                                     self.game.create_reaction("Prognosticator", self.name_player,
                                                               (int(self.number), i, j))
-            if self.cards_in_play[planet_id + 1][unit_id].get_unstoppable():
+            if self.get_unstoppable_given_pos(planet_id, unit_id):
                 if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
                     self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True
                     self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
@@ -4146,6 +4149,8 @@ class Player:
                     damage_on_card_after = damage_on_card_after - 1
                     if self.get_ability_given_pos(planet_id, unit_id) == "Righteous Initiate":
                         self.cards_in_play[planet_id + 1][unit_id].extra_attack_until_end_of_phase += 2
+                    if self.get_ability_given_pos(planet_id, unit_id) == "Brotherhood Justicar":
+                        self.increase_faith_given_pos(planet_id, unit_id, 1)
                     if self.get_ability_given_pos(planet_id, unit_id) == "Dutiful Castellan":
                         self.game.create_reaction("Dutiful Castellan", self.name_player,
                                                   (int(self.number), planet_id, unit_id))
@@ -4293,7 +4298,7 @@ class Player:
         afterwards_damage = self.headquarters[unit_id].get_damage()
         total_that_can_be_blocked = afterwards_damage - prior_damage
         if total_that_can_be_blocked > 0:
-            if self.headquarters[unit_id].get_unstoppable():
+            if self.get_unstoppable_given_pos(-2, unit_id):
                 if not self.headquarters[unit_id].once_per_round_used:
                     self.headquarters[unit_id].once_per_round_used = True
                     self.headquarters[unit_id].set_damage(afterwards_damage - 1)
@@ -4304,6 +4309,8 @@ class Player:
                     if self.get_ability_given_pos(-2, unit_id) == "Steadfast Sword Brethren":
                         self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
                                                   (int(self.number), -2, unit_id))
+                    if self.get_ability_given_pos(-2, unit_id) == "Brotherhood Justicar":
+                        self.increase_faith_given_pos(-2, unit_id, 1)
                     if self.get_ability_given_pos(-2, unit_id) == "Wrathful Dreadnought":
                         self.game.create_reaction("Wrathful Dreadnought", self.name_player,
                                                   (int(self.number), -2, unit_id))
