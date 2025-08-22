@@ -952,6 +952,8 @@ class Player:
                 shields = 1
                 if tank:
                     shields = 2
+        if card_object.get_name() == "Humanity's Shield":
+            shields = 2
         if shields > 0:
             if card_object.get_faction() == "Tau":
                 if planet_pos is not None:

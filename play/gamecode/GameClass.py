@@ -5548,6 +5548,10 @@ class Game:
                                 if self.amount_that_can_be_removed_by_shield[0] == 0:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Humanity's Shield":
+                            if self.damage_can_be_shielded[0]:
+                                primary_player.cards.append("Humanity's Shield")
+                                del primary_player.headquarters[hq_pos]
                         elif primary_player.get_ability_given_pos(-2, hq_pos) == "Praetorian Shadow":
                             if primary_player.get_ready_given_pos(-2, hq_pos):
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":

@@ -1794,6 +1794,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter > 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Humanity's Shield":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.delete_reaction()
         elif current_reaction == "The Blade of Antwyr":
             if game_update_string[1] == primary_player.number:
                 if planet_pos in self.misc_misc:

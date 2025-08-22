@@ -591,6 +591,8 @@ def resolve_winnings(self, winner, loser, planet_id):
     already_noxious = False
     if winner.search_card_in_hq("Omega Zero Command"):
         self.create_reaction("Omega Zero Command", winner.name_player, (int(winner.get_number()), planet_id, -1))
+    if loser.search_card_in_hq("Humanity's Shield"):
+        self.create_reaction("Humanity's Shield", loser.name_player, (int(loser.get_number()), planet_id, -1))
     for i in range(len(winner.cards_in_play[planet_id + 1])):
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
