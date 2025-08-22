@@ -8133,6 +8133,12 @@ class Game:
             self.player_with_combat_turn = self.name_2
             self.number_reset_combat_turn = self.number_with_combat_turn
             self.player_reset_combat_turn = self.player_with_combat_turn
+        if self.number_with_combat_turn == "1":
+            self.p1.has_initiative_for_battle = True
+            self.p2.has_initiative_for_battle = False
+        else:
+            self.p2.has_initiative_for_battle = True
+            self.p1.has_initiative_for_battle = False
 
     def check_battle(self, planet_id):
         if planet_id == self.round_number:

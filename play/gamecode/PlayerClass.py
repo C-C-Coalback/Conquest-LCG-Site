@@ -45,6 +45,7 @@ class Player:
         self.name_player = name
         self.position_activated = []
         self.has_initiative = True
+        self.has_initiative_for_battle = False
         self.has_turn = True
         self.retreating = False
         self.has_passed = False
@@ -279,7 +280,10 @@ class Player:
             enemy_player = self.game.p2
         else:
             enemy_player = self.game.p1
-        if enemy_player.has_initiative:
+        if self.game.last_planet_checked_for_battle != -1:
+            if enemy_player.has_initiative_for_battle:
+                return True
+        elif self.game.player_with_initiative == enemy_player.name_player:
             return True
         if planet_pos == self.game.last_planet_checked_for_battle:
             if self.search_card_at_planet(planet_pos, "Corpulent Ork"):
