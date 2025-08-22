@@ -124,6 +124,16 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
             else:
                 self.misc_counter = 0
+        elif current_reaction == "The Blade of Antwyr":
+            self.misc_misc = []
+            if planet_pos != 0:
+                if self.planets_in_play_array[planet_pos - 1]:
+                    self.misc_misc.append(planet_pos - 1)
+            if planet_pos != 6:
+                if self.planets_in_play_array[planet_pos + 1]:
+                    self.misc_misc.append(planet_pos + 1)
+            if not self.misc_misc:
+                self.delete_reaction()
         elif current_reaction == "Sautekh Royal Crypt Damage":
             self.misc_misc = [False, False, False, False, False, False, False]
             self.misc_misc[planet_pos] = True

@@ -1794,6 +1794,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter > 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "The Blade of Antwyr":
+            if game_update_string[1] == primary_player.number:
+                if planet_pos in self.misc_misc:
+                    self.misc_misc.remove(planet_pos)
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    if not self.misc_misc:
+                        self.delete_reaction()
         elif current_reaction == "Castellan Crowe":
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
                 self.misc_counter += 1

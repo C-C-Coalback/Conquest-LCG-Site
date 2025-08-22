@@ -2619,6 +2619,9 @@ class Player:
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
                         self.game.create_reaction("Old Zogwort", self.name_player,
                                                   (int(self.number), planet_pos - 1, i))
+                    if self.search_attachments_at_pos(-2, i, "The Blade of Antwyr"):
+                        self.game.create_reaction("The Blade of Antwyr", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Starblaze":
                         self.game.create_reaction("Commander Starblaze", self.name_player,
                                                   (int(self.number), planet_pos - 1, i))
