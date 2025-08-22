@@ -124,6 +124,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
             else:
                 self.misc_counter = 0
+        elif current_reaction == "Citadel of Vamii":
+            if num == 1:
+                self.p1.set_blanked_given_pos(planet_pos, unit_pos, exp="EOR")
+            else:
+                self.p2.set_blanked_given_pos(planet_pos, unit_pos, exp="EOR")
+        elif current_reaction == "Fortress of Mangeras":
+            primary_player.draw_card()
+            self.delete_reaction()
         elif current_reaction == "The Blade of Antwyr":
             self.misc_misc = []
             if planet_pos != 0:

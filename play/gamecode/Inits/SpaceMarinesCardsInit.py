@@ -594,6 +594,45 @@ def space_marines_cards_init():
                                                                   "Attached unit gets +1 ATK, +1 HP, and"
                                                                   " Retaliate (3).", "Wargear.",
                                    1, faction, "Signature", 3, True, deepstrike=0, extra_health=1, extra_attack=1,
-                                   type_of_units_allowed_for_attachment="Warlord/Synapse/Army/Token")
+                                   type_of_units_allowed_for_attachment="Warlord/Synapse/Army/Token"),
+        CardClasses.WarlordCard("Chapter Champion Varn",
+                                "Reduce by 1 the cost of the first support you deploy each round.\n"
+                                "If a support has more damage on it than its cost, sacrifice it.\n"
+                                "Forced Interrupt: When an army unit you control takes damage equal or lower than"
+                                " its remaining HP, move 1 of that damage to a support card you control.",
+                                "Soldier. Imperial Fists.", faction, 2, 7, 2, 6,
+                                "Bloodied.\n"
+                                "Reduce by 1 the cost of the first support you deploy each round.", 7, 7,
+                                ["1x Citadel of Vamii", "1x Fortress of Mangeras", "1x Memories of Fallen Comrades",
+                                 "2x The Siege Masters", "3x 3rd Company Tactical Squad"]),
+        CardClasses.ArmyCard("3rd Company Tactical Squad", "While you control no support cards this unit "
+                                                           "gains 1 command icon.\n"
+                                                           "Interrupt: When this unit leaves play, Rally 6 a support "
+                                                           "card, add it to your hand.", "Soldier. Imperial Fists.",
+                             2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.EventCard("The Siege Masters", "The effects of this event cannot be cancelled.\n"
+                                                   "Action: Exhaust a target enemy support card and Rally 8"
+                                                   " a support card, add it to your hand.", "Tactic. Imperial Fists.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Memories of Fallen Comrades", "Attach to your warlord.\n"
+                                                                  "Attached unit gets +1 HP.\n"
+                                                                  "Combat Action: Exhaust this attachment to remove "
+                                                                  "1 damage from up to 2 support cards you control.",
+                                   "Wargear.", 1, faction, "Signature", 3, False, extra_health=1,
+                                   action_in_play=True, allowed_phases_in_play="COMBAT",
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
+        CardClasses.SupportCard("Fortress of Mangeras", "Cannot be targeted by enemy card abilities.\n"
+                                                        "For the purposes of card effects, this card is considered "
+                                                        "to have a cost of 4.\n"
+                                                        "Reaction: After a support card you control leaves play,"
+                                                        " draw a card.", "Location.",
+                                3, faction, "Signature", False),
+        CardClasses.SupportCard("Citadel of Vamii", "Cannot be targeted by enemy card abilities.\n"
+                                                    "For the purposes of card effects, this card is considered "
+                                                    "to have a cost of 4.\n"
+                                                    "Reaction: After a support card enters play, treat its printed"
+                                                    " text box as blank until the end of the round and remove "
+                                                    "1 damage from a support card.", "Location.",
+                                2, faction, "Signature", False)
     ]
     return space_marines_card_array

@@ -17,6 +17,23 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_interrupt()
+        elif current_interrupt == "3rd Company Tactical Squad":
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "DRAW"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Support"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 999
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            primary_player.number_cards_to_search = 6
+            if len(primary_player.deck) > 5:
+                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+            else:
+                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
+            self.delete_interrupt()
         elif self.interrupts_waiting_on_resolution[0] == "M35 Galaxy Lasgun":
             if "M35 Galaxy Lasgun" in primary_player.discard:
                 primary_player.discard.remove("M35 Galaxy Lasgun")

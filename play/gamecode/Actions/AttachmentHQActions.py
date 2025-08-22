@@ -62,6 +62,13 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.misc_target_unit = (-2, unit_pos)
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos)
                             self.action_chosen = ability
+                elif ability == "Memories of Fallen Comrades":
+                    if player_owning_card.name_player == primary_player.get_name_player():
+                        if card_chosen.get_ready():
+                            card_chosen.exhaust_card()
+                            self.action_chosen = ability
+                            self.misc_counter = 0
+                            self.misc_target_unit = (-1, -1)
                 elif ability == "Ymgarl Factor":
                     if primary_player.spend_resources(1):
                         self.action_chosen = ability

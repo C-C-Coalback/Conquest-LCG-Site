@@ -14,6 +14,7 @@ class Card:
         self.ability = name
         self.text = text
         self.blanked_eop = False
+        self.blanked_eor = False
         self.traits = traits
         self.cost = cost
         self.faction = faction
@@ -85,6 +86,7 @@ class Card:
         self.from_front_line_rhinos = False
         self.just_entered_play = False
         self.misc_string = ""
+        self.damage = 0
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
@@ -112,7 +114,13 @@ class Card:
         self.attachments[-1].from_magus_harid = is_magus
 
     def get_damage(self):
-        return 0
+        return self.damage
+
+    def increase_damage(self, amount):
+        self.damage += amount
+
+    def decrease_damage(self, amount):
+        self.damage = self.damage - amount
 
     def get_indirect_damage(self):
         return 0
@@ -166,6 +174,8 @@ class Card:
     def get_ability(self, bloodied_relevant=False):
         if self.blanked_eop:
             return "BLANKED"
+        if self.blanked_eor:
+            return "BLANKED"
         if self.new_ability:
             return self.new_ability
         if bloodied_relevant:
@@ -176,9 +186,14 @@ class Card:
     def set_blanked(self, new_val, exp="EOP"):
         if exp == "EOP":
             self.blanked_eop = new_val
+        if exp == "EOR":
+            self.blanked_eor = new_val
 
     def reset_blanked_eop(self):
         self.blanked_eop = False
+
+    def reset_blanked_eor(self):
+        self.blanked_eor = False
 
     def get_blanked(self):
         return self.blanked_eop
@@ -205,6 +220,10 @@ class Card:
         return self.allowed_phases_while_in_hand
 
     def get_applies_discounts(self):
+        if self.blanked_eop:
+            return False
+        if self.blanked_eor:
+            return False
         return self.applies_discounts
 
     def get_discount_amount(self):

@@ -618,6 +618,46 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.choice_context = "Amount of damage (WEB)"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+    elif self.action_chosen == "The Siege Masters":
+        if game_update_string[1] == secondary_player.get_number():
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+                if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    can_continue = True
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        -2, unit_pos, targeting_support=True)
+                    if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                    elif possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Event Action"
+                    if can_continue:
+                        secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.resolving_search_box = True
+                        self.what_to_do_with_searched_card = "DRAW"
+                        self.traits_of_searched_card = None
+                        self.card_type_of_searched_card = "Support"
+                        self.faction_of_searched_card = None
+                        self.max_cost_of_searched_card = 999
+                        self.all_conditions_searched_card_required = True
+                        self.no_restrictions_on_chosen_card = False
+                        primary_player.number_cards_to_search = 8
+                        if len(primary_player.deck) > 7:
+                            self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                        else:
+                            self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                        self.name_player_who_is_searching = primary_player.name_player
+                        self.number_who_is_searching = primary_player.number
+                        self.action_cleanup()
     elif self.action_chosen == "The Black Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1051,6 +1091,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if magus_card:
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.action_cleanup()
+    elif self.action_chosen == "Memories of Fallen Comrades":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+                if (planet_pos, unit_pos) != self.misc_target_unit:
+                    if primary_player.headquarters[unit_pos].get_damage() > 0:
+                        primary_player.headquarters[unit_pos].decrease_damage(1)
+                        self.misc_counter += 1
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        if self.misc_counter > 1:
+                            self.action_cleanup()
     elif self.action_chosen == "Twisted Laboratory":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

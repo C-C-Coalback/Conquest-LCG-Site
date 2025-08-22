@@ -345,7 +345,7 @@ class Game:
         self.auto_card_destruction = True
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
-        self.forced_interrupts = ["Flayed Ones Revenants"]
+        self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.ebon_chalice_value = 0
@@ -955,6 +955,9 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
+                        self.action_cleanup()
+                    elif self.action_chosen == "Memories of Fallen Comrades":
+                        await self.send_update_message("Stopping Memories of Fallen Comrades early")
                         self.action_cleanup()
                     else:
                         await self.send_update_message("Too far in; action must be concluded now")
@@ -6525,6 +6528,18 @@ class Game:
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
                         damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
+            if self.amount_that_can_be_removed_by_shield[0] > 0:
+                num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
+                if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
+                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                    if primary_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn":
+                        if primary_player.check_if_support_exists():
+                            health = primary_player.get_health_given_pos(def_pla, def_pos)
+                            damage = primary_player.get_damage_given_pos(def_pla, def_pos)
+                            if health >= damage:
+                                primary_player.remove_damage_from_pos(def_pla, def_pos, 1)
+                                self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
+                                                      (int(primary_player.number), -1, -1))
             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                 player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
                 secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

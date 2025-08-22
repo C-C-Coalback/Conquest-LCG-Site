@@ -224,6 +224,11 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 player_owning_card.headquarters[unit_pos].health_set_eop = 4
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+    elif current_reaction == "Citadel of Vamii":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+            if player_owning_card.headquarters[unit_pos].get_damage() > 0:
+                player_owning_card.headquarters[unit_pos].decrease_damage(1)
+                self.delete_reaction()
     elif current_reaction == "Castellan Crowe":
         if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
             self.misc_counter += 1

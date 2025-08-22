@@ -335,6 +335,12 @@ class Player:
                 interrupts.append("Hjorvath Coldstorm")
         return interrupts
 
+    def check_if_support_exists(self):
+        for i in range(len(self.headquarters)):
+            if self.get_card_type_given_pos(-2, i) == "Support":
+                return True
+        return False
+
     async def send_hq(self, force=False):
         joined_string = ""
         if self.headquarters:
@@ -352,6 +358,8 @@ class Player:
                 card_type = current_card.get_card_type()
                 if current_card.is_unit:
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                elif current_card.get_card_type() == "Support":
+                    single_card_string += str(current_card.get_damage())
                 else:
                     single_card_string += "0"
                 single_card_string += "|"
@@ -1261,6 +1269,13 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
             self.game.create_reaction("Devoted Hospitaller", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.get_card_type_given_pos(-2, last_element_index) == "Support":
+            if self.search_card_in_hq("Citadel of Vamii"):
+                self.game.create_reaction("Citadel of Vamii", self.name_player,
+                                          (int(self.number), -2, last_element_index))
+            if other_player.search_card_in_hq("Citadel of Vamii"):
+                self.game.create_reaction("Citadel of Vamii", other_player.name_player,
+                                          (int(self.number), -2, last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Court of the Stormlord":
             self.game.create_reaction("Court of the Stormlord", self.name_player,
                                       (int(self.number), -2, last_element_index))
@@ -1778,6 +1793,9 @@ class Player:
 
     def get_cost_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Citadel of Vamii" or \
+                    self.get_ability_given_pos(planet_id, unit_id) == "Citadel of Vamii":
+                return 4
             return self.headquarters[unit_id].get_cost()
         return self.cards_in_play[planet_id + 1][unit_id].get_cost()
 
@@ -1907,6 +1925,13 @@ class Player:
         if card is None:
             return "ERROR/play_card function called incorrectly", -1
         if card is not None:
+            if card.get_card_type() == "Support":
+                warlord_pla, warlord_pos = self.get_location_of_warlord()
+                if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn" or \
+                        self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn BLOODIED":
+                    if not self.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                        discounts += 1
+                        self.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
             cost = card.get_cost() - discounts
             if position == -2:
                 print("Play card to HQ")
@@ -2679,6 +2704,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Prognosticator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 command += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "3rd Company Tactical Squad":
+            if not self.check_if_support_exists():
+                command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Improbable Runt Machine":
             command += min(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments()), 3)
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
@@ -2818,6 +2846,13 @@ class Player:
             return None
         self.cards_in_play[planet_id + 1][unit_id].set_blanked(True, exp=exp)
         return None
+
+    def reset_all_blanked_eor(self):
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].reset_blanked_eor()
+        for planet_pos in range(7):
+            for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eor()
 
     def reset_all_blanked_eop(self):
         for i in range(len(self.headquarters)):
@@ -3434,6 +3469,7 @@ class Player:
         return None
 
     def round_ends_reset_values(self):
+        self.reset_all_blanked_eor()
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].set_once_per_round_used(False)
@@ -5502,6 +5538,8 @@ class Player:
             self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
+        if card.get_ability() == "3rd Company Tactical Squad":
+            self.game.create_interrupt("3rd Company Tactical Squad", self.name_player, (int(self.number), -1, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.add_card_to_discard(card_name)
@@ -5583,6 +5621,8 @@ class Player:
                             self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), i, j))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
+        if card.get_ability() == "3rd Company Tactical Squad":
+            self.game.create_interrupt("3rd Company Tactical Squad", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Kabalite Halfborn":
             self.game.create_reaction("Kabalite Halfborn", self.name_player, (int(self.number), -1, -1))
         if self.get_ability_given_pos(-2, card_pos) == "Coteaz's Henchmen":
@@ -5595,6 +5635,11 @@ class Player:
             if self.search_card_in_hq("Endless Legions", ready_relevant=True):
                 self.game.create_reaction("Endless Legions", self.name_player,
                                           (int(self.number), -1, -1))
+        if card.get_card_type() == "Support":
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Fortress of Mangeras":
+                    self.game.create_reaction("Fortress of Mangeras", self.name_player,
+                                              (int(self.number), -2, i))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.add_card_to_discard(card_name)
