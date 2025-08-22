@@ -536,6 +536,36 @@ def space_marines_cards_init():
                                                            "shielded unit gets +1 ATK until the end of the phase.",
                                    "Hardpoint.", 0, faction, "Common", 1, False, extra_health=1,
                                    limit_one_per_unit=True,
-                                   type_of_units_allowed_for_attachment="Army/Token/Synapse/Warlord")
+                                   type_of_units_allowed_for_attachment="Army/Token/Synapse/Warlord"),
+        CardClasses.WarlordCard("Castellan Crowe", "Each unit you control is considered to have faith.\n"
+                                                   "Reaction: After an army unit damages an enemy army unit by an "
+                                                   "attack, pay X faith to deal X damage to that enemy unit.",
+                                "Soldier. Grey Knights.", faction, 2, 7, 2, 6,
+                                "Bloodied.\n"
+                                "Each unit you control is considered to have faith.\n"
+                                "Action: Pay 1 faith to give this unit +3 ATK for its next attack this phase."
+                                " (Limit once per game.)", 7, 7,
+                                ["4x Brotherhood Justicar", "1x Humanity's Shield",
+                                 "2x Psychic Ward", "1x The Blade of Antwyr"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Brotherhood Justicar", "Unstoppable - The first time this unit is assigned damage this"
+                                                     " turn, prevent 1 of that damage and place 1 faith on it.\n"
+                                                     "Reaction: After you deploy this unit place 1 faith on each unit"
+                                                     " you control at this planet.", "Soldier. Grey Knights.",
+                             3, faction, "Signature", 3, 3, 1, False, unstoppable=True),
+        CardClasses.SupportCard("Humanity's Shield", "This card (in your hand or in play) may be used as a "
+                                                     "shield card with 2 shield icons.", "Creed. Grey Knights.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("The Blade of Antwyr", "Attach to a Grey Knights unit.\n"
+                                                          "Attached unit gets +1 HP.\n"
+                                                          "Reaction: After attached unit commits to a planet, place "
+                                                          "1 faith on a unit you control at each adjacent planet.",
+                                   "Wargear. Daemon.", 1, faction, "Signature", 3, True, extra_health=1,
+                                   required_traits="Grey Knights",
+                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token"),
+        CardClasses.EventCard("Psychic Ward", "Interrupt: When your opponent plays an event card, cancel its effects. "
+                                              "Your opponent may place 1 faith on your warlord and exhaust "
+                                              "their warlord to cancel this effect.", "Power. Grey Knights.",
+                              0, faction, "Signature", 1, False)
     ]
     return space_marines_card_array

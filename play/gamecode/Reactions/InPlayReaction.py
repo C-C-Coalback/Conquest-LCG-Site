@@ -1205,7 +1205,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.chosen_first_card = True
                             await self.send_update_message("Now ready unit with faith.")
             else:
-                if player_owning_card.get_faith_given_pos(planet_pos, unit_pos) > 0:
+                if player_owning_card.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
                     if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         player_owning_card.ready_given_pos(planet_pos, unit_pos)
                         self.delete_reaction()
@@ -1786,6 +1786,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Castellan Crowe":
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                self.misc_counter += 1
+                await self.send_update_message("Total faith spent: " + str(self.misc_counter))
         elif current_reaction == "Interceptor Squad":
             if planet_pos == self.misc_target_planet:
                 if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:

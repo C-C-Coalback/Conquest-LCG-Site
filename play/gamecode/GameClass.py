@@ -5100,6 +5100,11 @@ class Game:
 
     def checks_on_damage_from_attack(self, primary_player, secondary_player, planet_pos, unit_pos):
         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and\
+                secondary_player.get_card_type_given_pos(att_pla, att_pos) == "Army":
+            if secondary_player.castellan_crowe_relevant:
+                self.create_reaction("Castellan Crowe", secondary_player.name_player,
+                                     (int(primary_player.number), planet_pos, unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Neophyte Apprentice":
             secondary_player.sacrifice_card_in_play(att_pla, att_pos)
             self.create_reaction("Neophyte Apprentice", secondary_player.name_player,
@@ -5305,7 +5310,7 @@ class Game:
                                             self.choice_context = "Use alternative shield effect?"
                                             self.last_shield_string = game_update_string
                                 elif primary_player.cards[hand_pos] == "Faith Denies Death":
-                                    if primary_player.get_faith_given_pos(planet_pos, unit_pos) > 0:
+                                    if primary_player.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
                                         alt_shield_check = True
                                         self.choices_available = ["Shield", "Effect"]
                                         self.name_player_making_choices = name
@@ -5932,6 +5937,10 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                         self.allowed_units_alaitoc_shrine = []
                         self.alaitoc_shrine_activated = False
+                    if self.reactions_needing_resolving[0] == "Castellan Crowe":
+                        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                        if self.misc_counter > 0:
+                            secondary_player.assign_damage_to_pos(pla, pos, self.misc_counter)
                     if self.reactions_needing_resolving[0] == "Fire Warrior Elite" or \
                             self.reactions_needing_resolving[0] == "Deathwing Interceders":
                         self.may_move_defender = False

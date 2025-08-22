@@ -114,6 +114,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                                            "/rearrange-deck/{player_number}/{cards_amount} command now.")
         elif current_reaction == "Sautekh Royal Crypt":
             primary_player.exhaust_card_in_hq_given_name("Sautekh Royal Crypt")
+        elif current_reaction == "Castellan Crowe":
+            self.misc_counter = 0
         elif current_reaction == "Sautekh Royal Crypt Damage":
             self.misc_misc = [False, False, False, False, False, False, False]
             self.misc_misc[planet_pos] = True

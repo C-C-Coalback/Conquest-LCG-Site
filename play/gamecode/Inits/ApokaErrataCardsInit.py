@@ -74,6 +74,11 @@ def apoka_errata_cards_init():
                                                    "the bottom of your deck to Rally 6 a Necrons unit with a printed "
                                                    "cost of 3 or lower, put it into play exhausted at a planet "
                                                    "where no battle is taking place.",
-                                "Upgrade.", 1, "Necrons", "Common", False)
+                                "Upgrade.", 1, "Necrons", "Common", False),
+        CardClasses.ArmyCard("Brotherhood Justicar", "Unstoppable - The first time this unit is assigned damage this "
+                                                     "turn, prevent 1 of that damage and place 1 faith on it.\n"
+                                                     "Reaction: After you deploy this unit, place 2 faith among units "
+                                                     "you control at this planet.", "Soldier. Grey Knights.",
+                             3, "Space Marines", "Signature", 3, 3, 1, False, unstoppable=True)
     ]
     return apoka_errata_cards_array

@@ -210,6 +210,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             card.exhaust_card()
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                    elif ability == "Castellan Crowe BLOODIED":
+                        if not card.get_once_per_game_used():
+                            card.set_once_per_game_used(True)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Supreme Appearance":
                         if card.get_ready():
                             if primary_player.controls_no_ranged_units():
@@ -905,6 +910,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
+                self.action_cleanup()
+    elif self.action_chosen == "Castellan Crowe BLOODIED":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                og_pla, og_pos = self.position_of_actioned_card
+                primary_player.increase_attack_of_unit_at_pos(og_pla, og_pos, 3, expiration="NEXT")
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 self.action_cleanup()
     elif self.action_chosen == "The Wolf Within":
         if game_update_string[1] == primary_player.get_number():

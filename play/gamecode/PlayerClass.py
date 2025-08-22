@@ -127,6 +127,8 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.castellan_crowe_relevant = False
+        self.castellan_crowe_2_relevant = False
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -195,6 +197,9 @@ class Player:
             self.grigory_maksim_relevant = True
         if self.headquarters[0].get_name() == "Illuminor Szeras":
             self.illuminor_szeras_relevant = True
+        if self.headquarters[0].get_name() == "Castellan Crowe":
+            self.castellan_crowe_relevant = True
+            self.castellan_crowe_2_relevant = True
         self.deck = deck_list[1:]
         if self.warlord_faction == "Tyranids":
             i = 0
@@ -641,7 +646,7 @@ class Player:
             return self.headquarters[unit_id].get_retaliate()
         retaliate = self.cards_in_play[planet_id + 1][unit_id].get_retaliate()
         if self.get_ability_given_pos(planet_id, unit_id) == "Fierce Purgator":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 retaliate += 3
         return retaliate
 
@@ -1015,6 +1020,7 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.castellan_crowe_2_relevant = False
         self.retreat_warlord()
 
     def shuffle_deck(self):
@@ -1309,6 +1315,13 @@ class Player:
         if planet_pos == -2:
             return self.headquarters[unit_pos].get_unique()
         return self.cards_in_play[planet_pos + 1][unit_pos].get_unique()
+
+    def get_has_faith_given_pos(self, planet_pos, unit_pos):
+        if self.castellan_crowe_relevant:
+            return True
+        elif self.get_faith_given_pos(planet_pos, unit_pos) > 0:
+            return True
+        return False
 
     def get_faith_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
@@ -2645,7 +2658,7 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         if self.get_ability_given_pos(planet_id, unit_id) == "Prognosticator":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Improbable Runt Machine":
             command += min(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments()), 3)
@@ -2763,7 +2776,7 @@ class Player:
             if self.warlord_faction != "Tau":
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Vengeful Seraphim":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
             if self.search_card_at_planet(planet_id, "Soaring Gargoyles"):
@@ -2811,7 +2824,7 @@ class Player:
             if self.warlord_faction != "Dark Eldar":
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Dominion Eugenia":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
             if self.game.bloodthirst_active[planet_id]:
@@ -2897,7 +2910,7 @@ class Player:
             if self.count_supports() > 2:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Interceptor Squad":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, unit_id, "Herald of the Tau'va"):
@@ -3776,12 +3789,12 @@ class Player:
                 if self.count_units_in_discard() > 5:
                     attack_value += 2
             if card.get_ability() == "Eloquent Confessor":
-                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     attack_value += 1
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
-                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     attack_value += 1
             if card.get_ability() == "Shard of the Deceiver":
                 attack_value += len(self.discard)
@@ -3824,10 +3837,10 @@ class Player:
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Eloquent Confessor":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
@@ -4034,7 +4047,7 @@ class Player:
                     return False, 0
         if att_pos is None:
             if self.get_ability_given_pos(planet_id, unit_id) == "Exalted Celestians":
-                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     return False, 0
         if rickety_warbuggy:
             if self.get_ability_given_pos(planet_id, unit_id) == "Rickety Warbuggy":
@@ -4111,7 +4124,7 @@ class Player:
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
         self.cards_in_play[planet_id + 1][unit_id].recently_assigned_damage = True
         if total_damage_that_can_be_blocked > 0:
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 for i in range(len(self.headquarters)):
                     if self.get_ability_given_pos(-2, i) == "Prognosticator":
                         if not self.get_once_per_round_used_given_pos(-2, i):
@@ -4273,7 +4286,7 @@ class Player:
 
     def assign_damage_to_pos_hq(self, unit_id, damage, can_shield=True, context="", preventable=True):
         if self.get_ability_given_pos(-2, unit_id) == "Exalted Celestians":
-            if self.get_faith_given_pos(-2, unit_id) > 0:
+            if self.get_has_faith_given_pos(-2, unit_id) > 0:
                 return False
         prior_damage = self.headquarters[unit_id].get_damage()
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
@@ -4370,7 +4383,7 @@ class Player:
             if self.headquarters[unit_id].get_ability() == "Improbable Runt Machine":
                 health += min(len(self.headquarters[unit_id].get_attachments()), 3)
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
-                if self.get_faith_given_pos(planet_id, unit_id) > 0:
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     health += 1
             if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
                 health += len(self.discard)
@@ -4410,7 +4423,7 @@ class Player:
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health = health - 2
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 health += 1
         if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
@@ -5668,7 +5681,7 @@ class Player:
         if planet_id == -2:
             return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":
-            if self.get_faith_given_pos(planet_id, unit_id) > 0:
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return False
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, "Disciple of Excess"):

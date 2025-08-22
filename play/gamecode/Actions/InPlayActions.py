@@ -121,6 +121,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    elif ability == "Castellan Crowe BLOODIED":
+                        if not card_chosen.get_once_per_game_used():
+                            card_chosen.set_once_per_game_used(True)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Torquemada Coteaz":
                         if not card_chosen.misc_ability_used:
                             card_chosen.misc_ability_used = True
@@ -1503,6 +1508,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = None
                         self.action_cleanup()
                         self.misc_target_planet = -1
+    elif self.action_chosen == "Castellan Crowe BLOODIED":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                og_pla, og_pos = self.position_of_actioned_card
+                primary_player.increase_attack_of_unit_at_pos(og_pla, og_pos, 3, expiration="NEXT")
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                self.action_cleanup()
     elif self.action_chosen == "Call the Storm":
         if not self.chosen_first_card:
             if planet_pos == self.misc_target_planet:

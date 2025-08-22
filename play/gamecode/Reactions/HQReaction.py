@@ -131,7 +131,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
     elif current_reaction == "Wrathful Retribution":
-        if player_owning_card.get_faith_given_pos(planet_pos, unit_pos) > 0:
+        if player_owning_card.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
             if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                 player_owning_card.ready_given_pos(planet_pos, unit_pos)
                 self.delete_reaction()
@@ -224,6 +224,10 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 player_owning_card.headquarters[unit_pos].health_set_eop = 4
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+    elif current_reaction == "Castellan Crowe":
+        if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+            self.misc_counter += 1
+            await self.send_update_message("Total faith spent: " + str(self.misc_counter))
     elif current_reaction == "The Emperor's Retribution":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
