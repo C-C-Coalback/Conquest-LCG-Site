@@ -3161,6 +3161,10 @@ class Player:
         if self.hit_by_gorgul:
             return False
         num_nullifies = 0
+        if self.castellan_crowe_relevant:
+            if "Psychic Ward" in self.cards:
+                return True
+            return False
         if self.urien_relevant:
             if self.resources < 1:
                 return False

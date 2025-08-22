@@ -1591,26 +1591,32 @@ class Game:
                 resolve_nullify_discard = False
                 await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
                 while self.nullify_count > 0:
+                    card_name_p1 = "Nullify"
+                    if self.p1.castellan_crowe_relevant:
+                        card_name_p1 = "Psychic Ward"
+                    card_name_p2 = "Nullify"
+                    if self.p2.castellan_crowe_relevant:
+                        card_name_p2 = "Psychic Ward"
                     if self.name_player_using_backlash == self.name_1:
-                        card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                         if self.p2.aiming_reticle_coords_hand is not None:
                             if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p2.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
                         if self.nullify_count > 0:
-                            card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                            card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                             if self.p1.aiming_reticle_coords_hand is not None:
                                 if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                                     self.p1.aiming_reticle_coords_hand -= 1
                             self.nullify_count -= 1
                     else:
-                        card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                         if self.p1.aiming_reticle_coords_hand is not None:
                             if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p1.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
                         if self.nullify_count > 0:
-                            card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                            card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                             if self.p2.aiming_reticle_coords_hand is not None:
                                 if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                     self.p2.aiming_reticle_coords_hand -= 1
@@ -1627,26 +1633,32 @@ class Game:
                 resolve_nullify_discard = False
                 await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
                 while self.nullify_count > 0:
+                    card_name_p1 = "Nullify"
+                    if self.p1.castellan_crowe_relevant:
+                        card_name_p1 = "Psychic Ward"
+                    card_name_p2 = "Nullify"
+                    if self.p2.castellan_crowe_relevant:
+                        card_name_p2 = "Psychic Ward"
                     if self.name_player_using_backlash == self.name_1:
-                        card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                         if self.p2.aiming_reticle_coords_hand is not None:
                             if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p2.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
                         if self.nullify_count > 0:
-                            card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                            card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                             if self.p1.aiming_reticle_coords_hand is not None:
                                 if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                                     self.p1.aiming_reticle_coords_hand -= 1
                             self.nullify_count -= 1
                     else:
-                        card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                         if self.p1.aiming_reticle_coords_hand is not None:
                             if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p1.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
                         if self.nullify_count > 0:
-                            card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                            card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                             if self.p2.aiming_reticle_coords_hand is not None:
                                 if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                     self.p2.aiming_reticle_coords_hand -= 1
@@ -1716,26 +1728,32 @@ class Game:
                 primary_player.aiming_reticle_coords_hand_2 = None
         if resolve_nullify_discard:
             while self.nullify_count > 0:
+                card_name_p1 = "Nullify"
+                if self.p1.castellan_crowe_relevant:
+                    card_name_p1 = "Psychic Ward"
+                card_name_p2 = "Nullify"
+                if self.p2.castellan_crowe_relevant:
+                    card_name_p2 = "Psychic Ward"
                 if self.first_player_nullified == self.name_1:
-                    card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                    card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                     if self.p2.aiming_reticle_coords_hand is not None:
                         if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                             self.p2.aiming_reticle_coords_hand -= 1
                     self.nullify_count -= 1
                     if self.nullify_count > 0:
-                        card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                         if self.p1.aiming_reticle_coords_hand is not None:
                             if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p1.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
                 else:
-                    card_pos_discard = self.p1.discard_card_name_from_hand("Nullify")
+                    card_pos_discard = self.p1.discard_card_name_from_hand(card_name_p1)
                     if self.p1.aiming_reticle_coords_hand is not None:
                         if self.p1.aiming_reticle_coords_hand > card_pos_discard:
                             self.p1.aiming_reticle_coords_hand -= 1
                     self.nullify_count -= 1
                     if self.nullify_count > 0:
-                        card_pos_discard = self.p2.discard_card_name_from_hand("Nullify")
+                        card_pos_discard = self.p2.discard_card_name_from_hand(card_name_p2)
                         if self.p2.aiming_reticle_coords_hand is not None:
                             if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p2.aiming_reticle_coords_hand -= 1
@@ -2359,6 +2377,41 @@ class Game:
                         self.reset_choices_available()
                         if not self.scan_planet_for_nurgling_bomb(primary_player, secondary_player, planet):
                             self.complete_nurgling_bomb(planet)
+                    elif self.choice_context == "Prevent Psychic Ward?":
+                        if game_update_string[1] == "0":
+                            self.reset_choices_available()
+                            pla, pos = primary_player.get_location_of_warlord()
+                            primary_player.exhaust_given_pos(pla, pos)
+                            pla, pos = secondary_player.get_location_of_warlord()
+                            secondary_player.increase_faith_given_pos(pla, pos, 1)
+                            secondary_player.discard_card_name_from_hand("Psychic Ward")
+                            await self.complete_nullify()
+                            self.nullify_count = 0
+                        elif game_update_string[1] == "1":
+                            self.reset_choices_available()
+                            secondary_player.num_nullify_played += 1
+                            self.nullify_count += 1
+                            await self.complete_nullify()
+                            self.nullify_count = 0
+                    elif self.choice_context == "Use Psychic Ward?":
+                        if game_update_string[1] == "0":
+                            self.reset_choices_available()
+                            pla, pos = secondary_player.get_location_of_warlord()
+                            if secondary_player.get_ready_given_pos(pla, pos):
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Prevent Psychic Ward?"
+                                self.choices_available = ["Yes", "No"]
+                            else:
+                                primary_player.num_nullify_played += 1
+                                self.nullify_count += 1
+                                await self.complete_nullify()
+                                self.nullify_count = 0
+                        elif game_update_string[1] == "1":
+                            self.choices_available = []
+                            self.choice_context = ""
+                            self.name_player_making_choices = ""
+                            await self.complete_nullify()
+                            self.nullify_count = 0
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -7248,6 +7301,15 @@ class Game:
             if self.p1.has_passed and self.p2.has_passed and not self.reactions_needing_resolving:
                 print("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
+        if self.choice_context == "Use Nullify?":
+            if self.name_player_making_choices == self.name_1:
+                if self.p1.castellan_crowe_relevant:
+                    self.choice_context = "Use Psychic Ward?"
+                    await self.send_update_message("Switched to offering Psychic Ward")
+            elif self.name_player_making_choices == self.name_2:
+                if self.p2.castellan_crowe_relevant:
+                    self.choice_context = "Use Psychic Ward?"
+                    await self.send_update_message("Switched to offering Psychic Ward")
         if self.resolving_kugath_nurglings:
             if self.check_end_kugath_nurglings():
                 await self.send_update_message("Leaving Ku'gath Nurglings")
