@@ -1269,6 +1269,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
             self.game.create_reaction("Devoted Hospitaller", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Advocator of Blood":
+            self.game.create_reaction("Advocator of Blood", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         if self.get_card_type_given_pos(-2, last_element_index) == "Support":
             if self.search_card_in_hq("Citadel of Vamii"):
                 self.game.create_reaction("Citadel of Vamii", self.name_player,
@@ -1702,6 +1705,9 @@ class Player:
                                       (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Devoted Hospitaller":
             self.game.create_reaction("Devoted Hospitaller", self.name_player,
+                                      (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Advocator of Blood":
+            self.game.create_reaction("Advocator of Blood", self.name_player,
                                       (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Court of the Stormlord":
             self.game.create_reaction("Court of the Stormlord", self.name_player,
@@ -2703,6 +2709,26 @@ class Player:
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
         if self.get_ability_given_pos(planet_id, unit_id) == "Prognosticator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                command += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Advocator of Blood":
+            warlord_bloodied = False
+            warlord_pla, warlord_pos = self.get_location_of_warlord()
+            if warlord_pla == -2:
+                if self.headquarters[warlord_pos].get_bloodied():
+                    warlord_bloodied = True
+            elif warlord_pla != -1:
+                if self.cards_in_play[warlord_pla + 1][warlord_pos].get_bloodied():
+                    warlord_bloodied = True
+            if not warlord_bloodied:
+                other_player = self.get_other_player()
+                warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                if warlord_pla == -2:
+                    if other_player.headquarters[warlord_pos].get_bloodied():
+                        warlord_bloodied = True
+                elif warlord_pla != -1:
+                    if other_player.cards_in_play[warlord_pla + 1][warlord_pos].get_bloodied():
+                        warlord_bloodied = True
+            if warlord_bloodied:
                 command += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "3rd Company Tactical Squad":
             if not self.check_if_support_exists():

@@ -356,6 +356,11 @@ def chaos_cards_init():
                                                     "Forced Reaction: After the deploy phase begins, move this unit to"
                                                     " the first planet. Then deal 2 damage to an enemy unit"
                                                     " at that planet.", "Daemon. Khorne.",
-                             3, faction, "Loyal", 4, 2, 1, False)
+                             3, faction, "Loyal", 4, 2, 1, False),
+        CardClasses.ArmyCard("Advocator of Blood", "Brutal.\n"
+                                                   "While any warlord is bloodied, this unit gains 1 command icon.\n"
+                                                   "Reaction: After this unit enters play, move up to 2 damage from "
+                                                   "Chaos army units and Khorne units to this unit.",
+                             "Daemon. Khorne.", 3, faction, "Common", 1, 5, 1, False, brutal=True)
     ]
     return chaos_card_array

@@ -132,6 +132,8 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Fortress of Mangeras":
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Advocator of Blood":
+            self.misc_counter = 0
         elif current_reaction == "The Blade of Antwyr":
             self.misc_misc = []
             if planet_pos != 0:
