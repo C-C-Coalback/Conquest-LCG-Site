@@ -7579,6 +7579,8 @@ class Game:
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Heavy Flamer Retributor":
                                 self.create_reaction("Heavy Flamer Retributor", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "The Masque":
+                                self.create_reaction("The Masque", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":
@@ -7627,6 +7629,8 @@ class Game:
                                 self.create_reaction("Ravening Psychopath", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Heavy Flamer Retributor":
                                 self.create_reaction("Heavy Flamer Retributor", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "The Masque":
+                                self.create_reaction("The Masque", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":

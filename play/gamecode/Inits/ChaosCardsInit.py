@@ -361,6 +361,10 @@ def chaos_cards_init():
                                                    "While any warlord is bloodied, this unit gains 1 command icon.\n"
                                                    "Reaction: After this unit enters play, move up to 2 damage from "
                                                    "Chaos army units and Khorne units to this unit.",
-                             "Daemon. Khorne.", 3, faction, "Common", 1, 5, 1, False, brutal=True)
+                             "Daemon. Khorne.", 3, faction, "Common", 1, 5, 1, False, brutal=True),
+        CardClasses.ArmyCard("The Masque", "Sweep (1). Retaliate (4).\n"
+                                           "Reaction: After this unit resolves an attack, put a Cultist token into "
+                                           "play at this planet.", "Daemon. Slaanesh. Elite.",
+                             6, faction, "Common", 3, 6, 2, True, sweep=1, retaliate=4)
     ]
     return chaos_card_array
