@@ -88,6 +88,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.unit_to_move_position = [-1, -1]
+                    elif ability == "Big Mek Kagdrak":
+                        if not card.get_once_per_round_used():
+                            card.set_once_per_round_used(True)
+                            await self.send_update_message("Choose target for Big Mek Kagrak.")
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Evangelizing Ships":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -416,6 +423,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
                     elif ability == "Dark Angels Cruiser":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.action_chosen = ability
+                    elif ability == "Da Workship":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
@@ -838,6 +849,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
+    elif self.action_chosen == "Big Mek Kagdrak":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                self.misc_target_unit = (planet_pos, unit_pos)
+                self.misc_target_player = player_owning_card.name_player
+                self.choices_available = ["Flying", "Armorbane", "Brutal",
+                                          "Area Effect (1)", "Sweep (2)", "Retaliate (3)"]
+                if primary_player.last_kagrak_trait in self.choices_available:
+                    self.choices_available.remove(primary_player.last_kagrak_trait)
+                self.choice_context = "Big Mek Kagdrak Keyword"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
     elif self.action_chosen == "A Thousand Cuts":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

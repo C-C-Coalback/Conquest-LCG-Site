@@ -270,6 +270,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         self.action_cleanup()
+    elif self.action_chosen == "Da Workship":
+        num_snotlings = len(secondary_player.victory_display)
+        for _ in range(num_snotlings):
+            primary_player.summon_token_at_planet("Snotlings", chosen_planet)
+        self.action_cleanup()
     elif self.action_chosen == "Call the Storm":
         if chosen_planet != self.misc_target_planet:
             if self.chosen_first_card:

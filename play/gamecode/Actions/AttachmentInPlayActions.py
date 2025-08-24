@@ -104,6 +104,12 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.action_chosen = ability
                                 self.misc_counter = 0
                                 self.misc_target_unit = (-1, -1)
+                    elif ability == "Drivin' Ambishun'":
+                        if player_owning_card.name_player == primary_player.get_name_player():
+                            if card_chosen.get_ready():
+                                card_chosen.exhaust_card()
+                                self.action_chosen = ability
+                                self.misc_target_planet = planet_pos
                     elif ability == "Drone Defense System":
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):

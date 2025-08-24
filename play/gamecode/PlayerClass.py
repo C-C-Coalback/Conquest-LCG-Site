@@ -173,6 +173,10 @@ class Player:
         self.command_struggles_won_this_phase = 0
         self.celestian_amelia_active = False
         self.wrathful_retribution_value = 0
+        self.last_kagrak_trait = ""
+        self.looted_skrap_active = False
+        self.looted_skrap_count = 0
+        self.looted_skrap_planet = -1
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -3650,7 +3654,12 @@ class Player:
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
                 self.headquarters[i].area_effect_eor = 0
+                self.headquarters[i].brutal_eor = False
+                self.headquarters[i].flying_eor = False
                 self.headquarters[i].armorbane_eor = False
+                self.headquarters[i].positive_hp_until_eor = 0
+                self.headquarters[i].sweep_eor = 0
+                self.headquarters[i].retaliate_eor = 0
                 self.headquarters[i].mobile_eor = False
                 self.headquarters[i].extra_traits_eor = ""
                 self.headquarters[i].embarked_squads_active = False
@@ -3663,7 +3672,12 @@ class Player:
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     self.cards_in_play[i + 1][j].get_attachments()[k].set_once_per_round_used(False)
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
+                self.cards_in_play[i + 1][j].brutal_eor = False
+                self.cards_in_play[i + 1][j].flying_eor = False
                 self.cards_in_play[i + 1][j].armorbane_eor = False
+                self.cards_in_play[i + 1][j].positive_hp_until_eor = 0
+                self.cards_in_play[i + 1][j].sweep_eor = 0
+                self.cards_in_play[i + 1][j].retaliate_eor = 0
                 self.cards_in_play[i + 1][j].mobile_eor = False
                 self.cards_in_play[i + 1][j].extra_traits_eor = ""
                 self.cards_in_play[i + 1][j].embarked_squads_active = False
@@ -3683,11 +3697,15 @@ class Player:
         if planet_pos == -2:
             if expiration == "EOP":
                 self.headquarters[unit_pos].increase_extra_health_until_end_of_phase(amount)
+            elif expiration == "EOR":
+                self.headquarters[unit_pos].increase_extra_health_until_end_of_round(amount)
             elif expiration == "EOG":
                 self.headquarters[unit_pos].increase_extra_health_until_end_of_game(amount)
             return None
         if expiration == "EOP":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_phase(amount)
+        elif expiration == "EOR":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_round(amount)
         elif expiration == "EOG":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_health_until_end_of_game(amount)
         return None
@@ -5196,6 +5214,7 @@ class Player:
         return -1, -1
 
     def resolve_battle_begins(self, planet_num):
+        self.looted_skrap_active = False
         for i in range(len(self.cards_in_play[planet_num + 1])):
             if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf", must_match_name=True):
                 if self.get_ready_given_pos(planet_num, i):
@@ -5204,6 +5223,8 @@ class Player:
                 self.game.create_reaction("Kroot Guerrilla", self.name_player, (int(self.number), planet_num, i))
             if self.get_lumbering_given_pos(planet_num, i):
                 self.exhaust_given_pos(planet_num, i, card_effect=True)
+            if self.get_ability_given_pos(planet_num, i) == "Da Swoopy":
+                self.game.create_reaction("Da Swoopy", self.name_player, (int(self.number), planet_num, i))
 
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
@@ -5363,9 +5384,12 @@ class Player:
                     self.add_card_in_play_to_discard(planet_num, card_pos)
                     self.warlord_just_got_destroyed = True
         else:
-            other_player = self.game.p1
-            if other_player.name_player == self.name_player:
-                other_player = self.game.p2
+            other_player = self.get_other_player()
+            if other_player.looted_skrap_active:
+                if planet_num == other_player.looted_skrap_planet:
+                    if other_player.looted_skrap_count > 0:
+                        other_player.add_resources(1)
+                        other_player.looted_skrap_count = other_player.looted_skrap_count - 1
             if other_player.search_hand_for_card("Berzerker Warriors"):
                 if not other_player.check_if_already_have_reaction("Berzerker Warriors"):
                     self.game.create_interrupt("Berzerker Warriors", other_player.name_player,
@@ -5972,23 +5996,45 @@ class Player:
             self.game.create_interrupt("Shas'el Lyst", self.name_player, (int(self.number), -1, -1))
         return True
 
-    def get_keywords_given_pos(self, planet_pos, unit_pos):
+    def get_keywords_given_pos(self, planet_pos, unit_pos, printed=True):
         keywords = []
         if planet_pos == -2:
             return keywords
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_brutal:
-            keywords.append("Brutal")
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_flying:
-            keywords.append("Flying")
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_armorbane:
-            keywords.append("Armorbane")
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_mobile:
-            keywords.append("Mobile")
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect > 0:
-            keywords.append("Area Effect")
-            self.game.stored_area_effect_value = self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect
-        if self.cards_in_play[planet_pos + 1][unit_pos].by_base_ranged:
-            keywords.append("Ranged")
+        if printed:
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_brutal:
+                keywords.append("Brutal")
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_flying:
+                keywords.append("Flying")
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_armorbane:
+                keywords.append("Armorbane")
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_mobile:
+                keywords.append("Mobile")
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect > 0:
+                keywords.append("Area Effect")
+                self.game.stored_area_effect_value = self.cards_in_play[planet_pos + 1][unit_pos].by_base_area_effect
+            if self.cards_in_play[planet_pos + 1][unit_pos].by_base_ranged:
+                keywords.append("Ranged")
+        else:
+            if self.get_brutal_given_pos(planet_pos, unit_pos):
+                keywords.append("Brutal")
+            if self.get_flying_given_pos(planet_pos, unit_pos):
+                keywords.append("Flying")
+            if self.get_armorbane_given_pos(planet_pos, unit_pos):
+                keywords.append("Armorbane")
+            if self.get_retaliate_given_pos(planet_pos, unit_pos) > 0:
+                keywords.append("Retaliate")
+            if self.get_area_effect_given_pos(planet_pos, unit_pos) > 0:
+                keywords.append("Area Effect")
+            if self.get_sweep_given_pos(planet_pos, unit_pos) > 0:
+                kewords.append("Sweep")
+            if self.get_ranged_given_pos(planet_pos, unit_pos):
+                keywords.append("Ranged")
+            if self.get_lumbering_given_pos(planet_pos, unit_pos):
+                keywords.append("Lumbering")
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ambush():
+                keywords.append("Ambush")
+            if self.get_mobile_given_pos(planet_pos, unit_pos):
+                keywords.append("Mobile")
         return keywords
 
     def reset_can_retreat_values(self):

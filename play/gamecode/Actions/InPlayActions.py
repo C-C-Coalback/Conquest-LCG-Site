@@ -19,6 +19,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     else:
         card_chosen = self.p2.cards_in_play[planet_pos + 1][unit_pos]
         player_owning_card = self.p2
+    card = card_chosen
     if not self.action_chosen:
         print("action not chosen")
         if card_chosen.get_has_action_while_in_play():
@@ -75,6 +76,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_second_card = False
+                    elif ability == "Big Mek Kagdrak":
+                        if not card.get_once_per_round_used():
+                            card.set_once_per_round_used(True)
+                            await self.send_update_message("Choose target for Big Mek Kagrak.")
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Big Mek Kagdrak BLOODIED":
+                        if not card.get_once_per_game_used():
+                            card.set_once_per_game_used(True)
+                            await self.send_update_message("Choose target for Big Mek Kagrak.")
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Wildrider Squadron":
                         if not card_chosen.get_once_per_phase_used():
                             if player_owning_card.name_player == name:
@@ -275,6 +290,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.chosen_first_card = False
+                    elif ability == "Da 'Eavy":
+                        primary_player.retreat_unit(planet_pos, unit_pos)
+                        self.action_cleanup()
                     elif ability == "Mekaniak Repair Krew":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -2325,6 +2343,39 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
+    elif self.action_chosen == "Big Mek Kagdrak":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                self.misc_target_unit = (planet_pos, unit_pos)
+                self.misc_target_player = player_owning_card.name_player
+                self.choices_available = ["Flying", "Armorbane", "Brutal",
+                                          "Area Effect (1)", "Sweep (2)", "Retaliate (3)"]
+                if primary_player.last_kagrak_trait in self.choices_available:
+                    self.choices_available.remove(primary_player.last_kagrak_trait)
+                self.choice_context = "Big Mek Kagdrak Keyword"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+    elif self.action_chosen == "Big Mek Kagdrak BLOODIED":
+        if self.position_of_actioned_card[0] == planet_pos:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    self.misc_target_player = player_owning_card.name_player
+                    self.choices_available = ["Flying", "Armorbane", "Brutal",
+                                              "Area Effect (1)", "Sweep (2)", "Retaliate (3)"]
+                    if primary_player.last_kagrak_trait in self.choices_available:
+                        self.choices_available.remove(primary_player.last_kagrak_trait)
+                    self.choice_context = "Big Mek Kagdrak Keyword"
+                    self.name_player_making_choices = primary_player.name_player
+                    self.resolving_search_box = True
+    elif self.action_chosen == "Drivin' Ambishun'":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if self.misc_target_planet == planet_pos:
+                health_gained = len(primary_player.get_keywords_given_pos(planet_pos, unit_pos, False))
+                primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, health_gained, expiration="EOR")
+                await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                               " gained +" + str(health_gained) + " HP!")
+                self.action_cleanup()
     elif self.action_chosen == "The Emperor's Champion":
         if game_update_string[1] == secondary_player.get_number() and planet_pos == self.position_of_actioned_card[0]:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

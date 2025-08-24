@@ -97,6 +97,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "The Siege Masters":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Looted Skrap":
+                        if primary_player.can_play_limited:
+                            if self.last_planet_checked_for_battle != -1:
+                                primary_player.can_play_limited = False
+                                primary_player.looted_skrap_active = True
+                                primary_player.looted_skrap_count = 3
+                                primary_player.looted_skrap_planet = self.last_planet_checked_for_battle
+                                primary_player.discard_card_from_hand(hand_pos)
+                                self.action_cleanup()
                     elif ability == "The Bloodied Host":
                         if not primary_player.bloodied_host_used and self.last_planet_checked_for_battle != -1:
                             primary_player.bloodied_host_used = True
@@ -107,6 +116,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             for i in range(7):
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     primary_player.cards_in_play[i + 1][j].health_eocr += 2
+                            self.action_cleanup()
                         else:
                             primary_player.add_resources(1, refund=True)
                     elif ability == "Brutal Cunning":

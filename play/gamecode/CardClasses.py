@@ -381,6 +381,12 @@ class UnitCard(Card):
         self.cannot_be_declared_as_attacker = False
         self.recently_assigned_damage = False
         self.health_set_eop = -1
+        self.brutal_eor = False
+        self.flying_eor = False
+        self.sweep_eor = 0
+        self.retaliate_eor = 0
+        self.positive_hp_until_eor = 0
+        self.flying_eocr = False
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
@@ -396,6 +402,7 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "Vitarus, the Sanguine Sword":
                 retaliate_value += 3
         retaliate_value = retaliate_value + self.retaliate_eop
+        retaliate_value += self.retaliate_eor
         return retaliate_value
 
     def set_retaliate(self, retaliate):
@@ -424,10 +431,11 @@ class UnitCard(Card):
         if self.new_ability:
             sweep = self.new_sweep
         if self.blanked_eop:
-            return 0
+            sweep = 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Crown of Control":
                 sweep += 1
+        sweep += self.sweep_eor
         return sweep
 
     def get_lumbering(self):
@@ -506,6 +514,9 @@ class UnitCard(Card):
 
     def increase_extra_health_until_end_of_phase(self, amount):
         self.positive_hp_until_eop += amount
+
+    def increase_extra_health_until_end_of_round(self, amount):
+        self.positive_hp_until_eor += amount
 
     def reset_extra_attack_until_next_attack(self):
         self.extra_attack_until_next_attack = 0
@@ -661,6 +672,10 @@ class UnitCard(Card):
             return False
         if self.flying_eop:
             return True
+        if self.flying_eor:
+            return True
+        if self.flying_eocr:
+            return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Valkyris Pattern Jump Pack":
                 return True
@@ -695,6 +710,7 @@ class UnitCard(Card):
         self.health_eocr = 0
         self.brutal_eocr = False
         self.area_effect_eocr = 0
+        self.flying_eocr = False
 
     def get_brutal(self):
         if self.blanked_eop:
@@ -704,6 +720,8 @@ class UnitCard(Card):
         if self.brutal_eocr:
             return True
         if self.brutal_eop:
+            return True
+        if self.brutal_eor:
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "The Butcher's Nails":
@@ -754,6 +772,7 @@ class UnitCard(Card):
         health += self.positive_hp_until_eop
         health += self.positive_hp_until_eob
         health += self.positive_hp_until_eog
+        health += self.positive_hp_until_eor
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 if not self.attachments[i].from_magus_harid:

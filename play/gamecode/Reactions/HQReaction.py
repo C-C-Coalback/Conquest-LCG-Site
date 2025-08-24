@@ -229,6 +229,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if player_owning_card.headquarters[unit_pos].get_damage() > 0:
                 player_owning_card.headquarters[unit_pos].decrease_damage(1)
                 self.delete_reaction()
+    elif current_reaction == "Da Swoopy":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
+                    player_owning_card.headquarters[unit_pos].flying_eocr = True
+                    await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                                   " gained the Flying keyword until the end of the combat round.")
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
     elif current_reaction == "Advocator of Blood":
         if (player_owning_card.get_card_type_given_pos(planet_pos,
                                                        unit_pos) == "Army" and player_owning_card.get_faction_given_pos(

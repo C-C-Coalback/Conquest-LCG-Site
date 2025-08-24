@@ -2326,6 +2326,7 @@ class Game:
                         primary_player.bottom_remaining_cards()
             if len(game_update_string) == 2:
                 if game_update_string[0] == "CHOICE":
+                    chosen_choice = self.choices_available[int(game_update_string[1])]
                     if self.choice_context == "Choose Which Interrupt":
                         print("\nGot to asking which interrupt\n")
                         self.asking_which_interrupt = False
@@ -2638,6 +2639,44 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
+                    elif self.choice_context == "Big Mek Kagdrak Keyword":
+                        primary_player.last_kagrak_trait = chosen_choice
+                        target_player = primary_player
+                        if self.misc_target_player != target_player.name_player:
+                            target_player = secondary_player
+                        planet_pos, unit_pos = self.misc_target_unit
+                        if planet_pos == -2:
+                            if chosen_choice == "Area Effect (1)":
+                                target_player.headquarters[unit_pos].area_effect_eor += 1
+                            elif chosen_choice == "Armorbane":
+                                target_player.headquarters[unit_pos].armorbane_eor = True
+                            elif chosen_choice == "Brutal":
+                                target_player.headquarters[unit_pos].brutal_eor = True
+                            elif chosen_choice == "Flying":
+                                target_player.headquarters[unit_pos].flying_eor = True
+                            elif chosen_choice == "Sweep (2)":
+                                target_player.headquarters[unit_pos].sweep_eor += 2
+                            elif chosen_choice == "Retaliate (3)":
+                                target_player.headquarters[unit_pos].retaliate_eor += 3
+                        else:
+                            if chosen_choice == "Area Effect (1)":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eor += 1
+                            elif chosen_choice == "Armorbane":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eor = True
+                            elif chosen_choice == "Brutal":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eor = True
+                            elif chosen_choice == "Flying":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].flying_eor = True
+                            elif chosen_choice == "Sweep (2)":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].sweep_eor += 2
+                            elif chosen_choice == "Retaliate (3)":
+                                target_player.cards_in_play[planet_pos + 1][unit_pos].retaliate_eor += 3
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        og_pla, og_pos = self.position_of_actioned_card
+                        primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                        self.action_cleanup()
                     elif self.choice_context == "Target Planet Vale Tenndrac":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         i = 0

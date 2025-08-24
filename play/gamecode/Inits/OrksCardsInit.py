@@ -325,6 +325,48 @@ def orks_cards_init():
                                                      "Reaction: After this unit resolves an attack, move an attachment "
                                                      "from this unit to a target eligible unit at this planet to deal "
                                                      "2 damage to it. (Limit once per attack.)", "Soldier.",
-                             3, faction, "Common", 2, 2, 1, False)
+                             3, faction, "Common", 2, 2, 1, False),
+        CardClasses.WarlordCard("Big Mek Kagdrak", "Action: Give a non-Elite army unit a keyword, different from "
+                                                   "previous round, from among: Flying, Armorbane, Brutal, "
+                                                   "Area Effect (1), Sweep (2) or Retaliate (3), until the end "
+                                                   "of the round. (Limit once per round.)", "Soldier. Big Mek.",
+                                faction, 2, 7, 2, 5,
+                                "Bloodied.\n"
+                                "Action: Give a non-Elite army unit at this planet a keyword, from among: Flying,"
+                                " Armorbane, Brutal, Area Effect (1), Sweep (2) or Retaliate (3), until the"
+                                " end of the round. (Limit once per game.)", 7, 7,
+                                ["1x Da Workship", "1x Drivin' Ambishun'", "2x Looted Skrap",
+                                 "1x Da 'Eavy", "1x Da Boomy", "1x Da Sharpy", "1x Da Swoopy"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Da Workship", "Deploy Action: Exhaust this support to place X Snotling tokens into"
+                                               " play at a target planet. X equals the number of planets in your"
+                                               " opponent's victory display.", "Location.",
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.AttachmentCard("Drivin' Ambishun'", "Attach to your warlord.\n"
+                                                        "Action: Exhaust this attachment to have a target army unit "
+                                                        "at this planet gain +1 HP per keyword it has, "
+                                                        "until the end of the round.", "Wargear.",
+                                   0, faction, "Signature", 3, False,
+                                   action_in_play=True, allowed_phases_in_play="ALL",
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
+        CardClasses.EventCard("Looted Skrap", "Limited.\n"
+                                              "Action: Target a planet where a battle is taking place. Until the end"
+                                              " of the battle, each time an enemy unit is destroyed at that"
+                                              " planet, gain 1 resource (max 3).", "Tactic.",
+                              0, faction, "Signature", 1, False, limited=True,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Da 'Eavy", "Lumbering.\n"
+                                         "Combat Action: Retreat this unit.", "Vehicle. Experimental.",
+                             0, faction, "Signature", 2, 3, 1, False, lumbering=True,
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Da Boomy", "Retaliate (3).", "Vehicle. Experimental.",
+                             1, faction, "Signature", 1, 2, 1, False, retaliate=3),
+        CardClasses.ArmyCard("Da Sharpy", "Sweep (2).", "Vehicle. Experimental.",
+                             2, faction, "Signature", 2, 2, 1, False, sweep=2),
+        CardClasses.ArmyCard("Da Swoopy", "Flying.\n"
+                                          "Reaction: After a battle starts at this planet, have a Warrior Orks army "
+                                          "unit gain flying until the end of the combat round.",
+                             "Vehicle. Experimental.", 2, faction, "Signature", 2, 4, 1, False, flying=False)
+
     ]
     return orks_card_array

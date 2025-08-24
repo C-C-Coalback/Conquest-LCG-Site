@@ -141,6 +141,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Da Swoopy":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                    if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
+                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].flying_eocr = True
+                        await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                                       " gained the Flying keyword until the end of the combat round.")
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Junk Chucka Kommando":
             if self.chosen_first_card:
                 if self.misc_target_attachment[1] == planet_pos:
