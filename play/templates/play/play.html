@@ -485,7 +485,7 @@
                             var rotation = "";
                             var full_string = `<div class="Card-div">`;
                             if (is_ready === "E") {
-                                rotation = " style='rotate: 90deg;'";
+                                rotation = "rotate: 90deg;";
                                 card_class = "Exhausted-Card";
                                 route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             }
@@ -517,22 +517,28 @@
                                     attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                                 }
                                 var attachment_style_string = "";
-                                if (rotation === "") {
+                                if (attachment_rotation === "") {
                                     attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
                                 } else {
-                                    attachment_style_string = ` "margin-left: ` + (j - 6).toString() + `vw"`;
+                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 6).toString() + `vw"`;
                                 }
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             }
                             var style_string = "";
                             if (card_data_split.length > 6) {
                                 if (rotation === "") {
                                     style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                                 } else {
-                                    style_string = ` "margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 6).toString() + `vw;"`;
+                                }
+                            } else {
+                                if (rotation === "") {
+                                    style_string = ``;
+                                } else {
+                                    style_string = ` style="rotate: 90deg;"`;
                                 }
                             }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             if (card_data_split[5] !== "") {
                                 full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[5] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                             }
@@ -615,19 +621,25 @@
                             if (attachment_rotation === "") {
                                 attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
                             } else {
-                                attachment_style_string = ` "margin-left: ` + (j - 6).toString() + `vw"`;
+                                attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 6).toString() + `vw"`;
                             }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
                         var style_string = "";
                         if (card_data_split.length > 6) {
                             if (rotation === "") {
                                 style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                             } else {
-                                style_string = ` "margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                                style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                            }
+                        } else {
+                            if (rotation === "") {
+                                style_string = ``;
+                            } else {
+                                style_string = ` style="rotate: 90deg;"`;
                             }
                         }
-                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + rotation + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         if (card_data_split[5] !== "") {
                             full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[5] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                         }
