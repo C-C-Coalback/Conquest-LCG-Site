@@ -141,6 +141,20 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Junk Chucka Kommando":
+            if self.chosen_first_card:
+                if self.misc_target_attachment[1] == planet_pos:
+                    og_pla, og_pos, og_attachment = self.misc_target_attachment
+                    attachment = primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+                    owner_attachment = attachment.name_owner
+                    not_own_attachment = False
+                    if owner_attachment != player_owning_card.name_player:
+                        not_own_attachment = True
+                    if player_owning_card.attach_card(attachment, og_pla, og_pos,
+                                                      not_own_attachment=not_own_attachment):
+                        del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+                        player_owning_card.assign_damage_to_pos(og_pla, og_pos, 2, rickety_warbuggy=True)
+                        self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

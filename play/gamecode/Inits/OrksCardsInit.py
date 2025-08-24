@@ -320,6 +320,11 @@ def orks_cards_init():
                                                         "Action: Attach a Runt unit you control to this unit as a "
                                                         "Copilot attachment. (Limit once per round.)",
                              "Machine. Marvel.", 2, faction, "Loyal", 1, 1, 1, False, flying=True,
-                             action_in_play=True, allowed_phases_in_play="ALL")
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Junk Chucka Kommando", "Reduce the cost of attachments you attach to this unit by 1.\n"
+                                                     "Reaction: After this unit resolves an attack, move an attachment "
+                                                     "from this unit to a target eligible unit at this planet to deal "
+                                                     "2 damage to it. (Limit once per attack.)", "Soldier.",
+                             3, faction, "Common", 2, 2, 1, False)
     ]
     return orks_card_array

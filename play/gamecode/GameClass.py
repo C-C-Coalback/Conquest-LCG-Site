@@ -6,7 +6,8 @@ from . import FindCard
 import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
-from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction
+from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction, \
+    AttachmentInPlayReaction
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
     AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
@@ -6174,6 +6175,11 @@ class Game:
                                                 self.chosen_first_card = True
                                                 primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     defense_battery_activated = False
+            elif len(game_update_string) == 6:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "IN_PLAY":
+                        await AttachmentInPlayReaction.resolve_attachment_in_play_reaction(
+                            self, name, game_update_string, primary_player, secondary_player)
 
     async def resolve_mobile(self, name, game_update_string):
         if self.player_with_initiative == self.name_1:
@@ -7594,6 +7600,8 @@ class Game:
                                 self.create_reaction("Heavy Flamer Retributor", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "The Masque":
                                 self.create_reaction("The Masque", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Junk Chucka Kommando":
+                                self.create_reaction("Junk Chucka Kommando", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":
@@ -7644,6 +7652,8 @@ class Game:
                                 self.create_reaction("Heavy Flamer Retributor", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "The Masque":
                                 self.create_reaction("The Masque", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Junk Chucka Kommando":
+                                self.create_reaction("Junk Chucka Kommando", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":

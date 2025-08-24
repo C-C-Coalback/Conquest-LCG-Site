@@ -120,6 +120,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Cultist", planet_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Junk Chucka Kommando":
+            self.chosen_first_card = False
         elif current_reaction == "Brotherhood Justicar":
             if not self.apoka:
                 for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
@@ -2030,17 +2032,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.indirect_damage_applied = 0
             secondary_player.total_indirect_damage = 2
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Mark of Chaos":
-            if self.positions_of_unit_triggering_reaction[0][0] == 1:
-                secondary_player = self.p2
-            else:
-                secondary_player = self.p1
-            loc_of_mark = self.positions_of_unit_triggering_reaction[0][1]
-            secondary_player.suffer_area_effect(loc_of_mark, 1)
-            self.number_of_units_left_to_suffer_damage = \
-                secondary_player.get_number_of_units_at_planet(loc_of_mark)
-            if self.number_of_units_left_to_suffer_damage > 0:
-                secondary_player.set_aiming_reticle_in_play(loc_of_mark, 0, "red")
-                for j in range(1, self.number_of_units_left_to_suffer_damage):
-                    secondary_player.set_aiming_reticle_in_play(loc_of_mark, j, "blue")
+        elif current_reaction == "Mark of Chaos":
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                secondary_player.assign_damage_to_pos(planet_pos, i, 1)
             self.delete_reaction()

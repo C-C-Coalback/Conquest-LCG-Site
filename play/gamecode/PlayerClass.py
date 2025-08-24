@@ -1700,7 +1700,11 @@ class Player:
                                     army_unit_as_attachment=army_unit_as_attachment):
                     return True
                 return False
+            if self.get_ability_given_pos(planet, position) == "Junk Chucka Kommando":
+                discounts += 1
             cost = card.get_cost() - discounts
+            if cost < 0:
+                cost = 0
             if self.spend_resources(cost):
                 if self.attach_card(card, planet, position, not_own_attachment,
                                     army_unit_as_attachment=army_unit_as_attachment):
@@ -1717,7 +1721,11 @@ class Player:
                 if self.attach_card(card, planet, position, not_own_attachment):
                     return True
                 return False
+            if self.get_ability_given_pos(planet, position) == "Junk Chucka Kommando":
+                discounts += 1
             cost = card.get_cost() - discounts
+            if cost < 0:
+                cost = 0
             if self.spend_resources(cost):
                 if self.attach_card(card, planet, position, not_own_attachment):
                     return True
