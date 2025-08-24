@@ -5798,6 +5798,19 @@ class Game:
                                     self.misc_target_planet = hurt_planet
                                     self.misc_target_unit = hurt_pos
                                     self.old_one_eye_pos = (planet_pos, unit_pos)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Expendable Pawn":
+                            if planet_pos != hurt_planet or unit_pos != hurt_pos:
+                                if planet_pos == hurt_planet or abs(planet_pos - hurt_planet) == 1:
+                                    damage_to_remove = 2
+                                    if self.amount_that_can_be_removed_by_shield[0] < 2:
+                                        damage_to_remove = self.amount_that_can_be_removed_by_shield[0]
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - damage_to_remove
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
+                                    primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                    if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Praetorian Shadow":
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                 if primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord":
@@ -5806,7 +5819,7 @@ class Game:
                                     self.amount_that_can_be_removed_by_shield[0] = \
                                         self.amount_that_can_be_removed_by_shield[0] - 1
                                     if self.amount_that_can_be_removed_by_shield[0] == 0:
-                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \

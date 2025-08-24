@@ -365,6 +365,9 @@ def chaos_cards_init():
         CardClasses.ArmyCard("The Masque", "Sweep (1). Retaliate (4).\n"
                                            "Reaction: After this unit resolves an attack, put a Cultist token into "
                                            "play at this planet.", "Daemon. Slaanesh. Elite.",
-                             6, faction, "Common", 3, 6, 2, True, sweep=1, retaliate=4)
+                             6, faction, "Common", 3, 6, 2, True, sweep=1, retaliate=4),
+        CardClasses.ArmyCard("Expendable Pawn", "Reaction: After a unit is assigned damage at this planet or an "
+                                                "adjacent planet, sacrifice this unit to prevent 2 of that damage.",
+                             "Cultist. Khorne.", 1, faction, "Common", 1, 1, 1, False)
     ]
     return chaos_card_array
