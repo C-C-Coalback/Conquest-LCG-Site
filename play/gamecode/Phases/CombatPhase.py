@@ -342,7 +342,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         player.deepstrike_unit(chosen_planet, chosen_unit)
                                     elif player.get_card_type_in_reserve(chosen_planet, chosen_unit) == "Event":
                                         player.deepstrike_event(chosen_planet, chosen_unit)
-                                    if not player.cards_in_reserve[chosen_planet]:
+                                    if not player.check_for_cards_in_reserve(chosen_planet):
                                         player.has_passed = True
                                         if not other_player.has_passed:
                                             self.name_player_making_choices = other_player.name_player
@@ -365,7 +365,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             chosen_planet, player.cards_in_reserve[chosen_planet][chosen_unit])
                                         del player.cards_in_reserve[chosen_planet][chosen_unit]
                                         player.deepstrike_attachment_extras(chosen_planet)
-                                        if not player.cards_in_reserve[chosen_planet]:
+                                        if not player.check_for_cards_in_reserve(chosen_planet):
                                             player.has_passed = True
                                             if not other_player.has_passed:
                                                 self.name_player_making_choices = other_player.name_player
@@ -395,13 +395,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
             chosen_unit = int(game_update_string[3])
             if self.start_battle_deepstrike:
                 if name == self.name_player_deepstriking:
+                    if self.num_player_deepstriking == "1":
+                        player = self.p1
+                        other_player = self.p2
+                    else:
+                        player = self.p2
+                        other_player = self.p1
                     if self.choosing_target_for_deepstruck_attachment:
-                        if self.num_player_deepstriking == "1":
-                            player = self.p1
-                            other_player = self.p2
-                        else:
-                            player = self.p2
-                            other_player = self.p1
                         if game_update_string[1] == player.number:
                             player_receiving_attachment = player
                             not_own_att = False
@@ -409,30 +409,108 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player_receiving_attachment = other_player
                             not_own_att = True
                         og_pla, og_pos = self.deepstruck_attachment_pos
-                        card = player.cards_in_reserve[og_pla][og_pos]
-                        if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
-                                                                   not_own_attachment=not_own_att):
-                            del player.cards_in_reserve[og_pla][og_pos]
-                            player.deepstrike_attachment_extras(chosen_planet)
-                            self.choosing_target_for_deepstruck_attachment = False
-                            self.deepstruck_attachment_pos = (-1, -1)
-                            player.has_passed = True
-                            if not other_player.has_passed:
-                                self.name_player_making_choices = other_player.name_player
-                                self.choice_context = "Deepstrike cards?"
-                                self.choices_available = ["Yes", "No"]
-                                self.resolving_search_box = True
-                                await self.send_update_message(
-                                    other_player.name_player + " can deepstrike")
-                            if player.has_passed and other_player.has_passed:
-                                self.start_battle_deepstrike = False
-                                self.resolving_search_box = False
-                                self.reset_choices_available()
-                                player.has_passed = False
-                                other_player.has_passed = False
-                                await self.send_update_message("Deepstrike is complete")
-                                self.start_ranged_skirmish(self.last_planet_checked_for_battle)
-            if name == self.player_with_combat_turn:
+                        if not player.idden_base_active:
+                            card = player.cards_in_reserve[og_pla][og_pos]
+                        else:
+                            card = self.preloaded_find_card(
+                                player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
+                        if (not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or\
+                                player_receiving_attachment.name_player != player.name_player:
+                            if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
+                                                                       not_own_attachment=not_own_att):
+                                if not player.idden_base_active:
+                                    del player.cards_in_reserve[og_pla][og_pos]
+                                else:
+                                    player.discard_attachments_from_card(og_pla, og_pos)
+                                    del player.cards_in_play[og_pla + 1][og_pos]
+                                player.deepstrike_attachment_extras(chosen_planet)
+                                self.choosing_target_for_deepstruck_attachment = False
+                                self.deepstruck_attachment_pos = (-1, -1)
+                                if not other_player.has_passed:
+                                    self.name_player_making_choices = other_player.name_player
+                                    self.choice_context = "Deepstrike cards?"
+                                    self.choices_available = ["Yes", "No"]
+                                    self.resolving_search_box = True
+                                    await self.send_update_message(
+                                        other_player.name_player + " can deepstrike")
+                                if player.has_passed and other_player.has_passed:
+                                    self.start_battle_deepstrike = False
+                                    self.resolving_search_box = False
+                                    self.reset_choices_available()
+                                    player.has_passed = False
+                                    other_player.has_passed = False
+                                    await self.send_update_message("Deepstrike is complete")
+                                    self.start_ranged_skirmish(self.last_planet_checked_for_battle)
+                    else:
+                        if game_update_string[1] == self.num_player_deepstriking:
+                            chosen_planet = int(game_update_string[2])
+                            chosen_unit = int(game_update_string[3])
+                            if chosen_planet == self.last_planet_checked_for_battle:
+                                if self.num_player_deepstriking == "1":
+                                    player = self.p1
+                                    other_player = self.p2
+                                else:
+                                    player = self.p2
+                                    other_player = self.p1
+                                cost = player.get_deepstrike_value_given_pos(chosen_planet, chosen_unit)
+                                if cost != -1:
+                                    if player.spend_resources(cost):
+                                        if player.get_card_type_in_reserve(chosen_planet, chosen_unit) != "Attachment":
+                                            if player.get_card_type_in_reserve(chosen_planet, chosen_unit) == "Army":
+                                                player.deepstrike_unit(chosen_planet, chosen_unit)
+                                            elif player.get_card_type_in_reserve(chosen_planet, chosen_unit) == "Event":
+                                                player.deepstrike_event(chosen_planet, chosen_unit)
+                                            if not player.check_for_cards_in_reserve(chosen_planet):
+                                                player.has_passed = True
+                                                if not other_player.has_passed:
+                                                    self.name_player_making_choices = other_player.name_player
+                                                    self.choice_context = "Deepstrike cards?"
+                                                    self.choices_available = ["Yes", "No"]
+                                                    self.resolving_search_box = True
+                                                    await self.send_update_message(
+                                                        other_player.name_player + " can deepstrike")
+                                                if player.has_passed and other_player.has_passed:
+                                                    self.start_battle_deepstrike = False
+                                                    self.resolving_search_box = False
+                                                    self.reset_choices_available()
+                                                    player.has_passed = False
+                                                    other_player.has_passed = False
+                                                    await self.send_update_message("Deepstrike is complete")
+                                                    self.start_ranged_skirmish(self.last_planet_checked_for_battle)
+                                        else:
+                                            card_name = player.cards_in_play[
+                                                chosen_planet + 1][chosen_unit].deepstrike_card_name
+                                            card = self.preloaded_find_card(card_name)
+                                            if card.planet_attachment:
+                                                player.add_attachment_to_planet(
+                                                    chosen_planet, card)
+                                                player.discard_attachments_from_card(chosen_planet, chosen_unit)
+                                                del player.cards_in_play[chosen_planet + 1][chosen_unit]
+                                                player.deepstrike_attachment_extras(chosen_planet)
+                                                if not player.check_for_cards_in_reserve(chosen_planet):
+                                                    player.has_passed = True
+                                                    if not other_player.has_passed:
+                                                        self.name_player_making_choices = other_player.name_player
+                                                        self.choice_context = "Deepstrike cards?"
+                                                        self.choices_available = ["Yes", "No"]
+                                                        self.resolving_search_box = True
+                                                        await self.send_update_message(
+                                                            other_player.name_player + " can deepstrike")
+                                                    if player.has_passed and other_player.has_passed:
+                                                        self.start_battle_deepstrike = False
+                                                        self.resolving_search_box = False
+                                                        self.reset_choices_available()
+                                                        player.has_passed = False
+                                                        other_player.has_passed = False
+                                                        await self.send_update_message("Deepstrike is complete")
+                                                        self.start_ranged_skirmish(self.last_planet_checked_for_battle)
+                                            else:
+                                                self.choosing_target_for_deepstruck_attachment = True
+                                                player.cards_in_play[chosen_planet + 1][chosen_unit]. \
+                                                    aiming_reticle_color = "blue"
+                                                self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
+                                                await self.send_update_message("deepstriking attachment")
+            elif name == self.player_with_combat_turn:
                 print(self.number_with_combat_turn)
                 print(self.player_with_combat_turn)
                 print(self.attacker_position)

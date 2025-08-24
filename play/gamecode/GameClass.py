@@ -5009,6 +5009,18 @@ class Game:
         self.phase = new_val
         if self.phase == "COMMAND":
             self.committing_warlords = True
+        if self.phase == "COMBAT":
+            if self.p1.search_card_in_hq("'idden Base"):
+                self.p1.idden_base_transform()
+                self.p1.idden_base_active = True
+            if self.p2.search_card_in_hq("idden Base"):
+                self.p2.idden_base_transform()
+                self.p2.idden_base_active = True
+        if self.phase == "HEADQUARTERS":
+            self.p1.idden_base_detransform()
+            self.p1.idden_base_active = False
+            self.p2.idden_base_detransform()
+            self.p2.idden_base_active = False
         sacrifice_locations = self.p1.sacrifice_check_eop()
         sacrifice_locations = self.p2.sacrifice_check_eop()
         self.conclude_mind_shackle_scarab()
@@ -7339,6 +7351,23 @@ class Game:
             if self.p1.has_passed and self.p2.has_passed and not self.reactions_needing_resolving:
                 print("Both passed, move to warlord movement.")
                 await self.change_phase("COMMAND")
+        elif self.phase == "COMBAT":
+            if not self.p1.idden_base_active:
+                if self.p1.search_card_in_hq("'idden Base"):
+                    self.p1.idden_base_transform()
+                    self.p1.idden_base_active = True
+            else:
+                if not self.p1.search_card_in_hq("'idden Base"):
+                    self.p1.idden_base_detransform()
+                    self.p1.idden_base_active = False
+            if not self.p2.idden_base_active:
+                if self.p2.search_card_in_hq("idden Base"):
+                    self.p2.idden_base_transform()
+                    self.p2.idden_base_active = True
+            else:
+                if not self.p2.search_card_in_hq("'idden Base"):
+                    self.p2.idden_base_detransform()
+                    self.p2.idden_base_active = False
         if self.choice_context == "Use Nullify?":
             if self.name_player_making_choices == self.name_1:
                 if self.p1.castellan_crowe_relevant:
@@ -8084,25 +8113,25 @@ class Game:
         self.last_planet_checked_for_battle = planet_pos
         self.p1.resolve_battle_begins(planet_pos)
         self.p2.resolve_battle_begins(planet_pos)
-        if self.p1.cards_in_reserve[planet_pos] or self.p2.cards_in_reserve[planet_pos]:
+        if self.p1.check_for_cards_in_reserve(planet_pos) or self.p2.check_for_cards_in_reserve(planet_pos):
             self.start_battle_deepstrike = True
-            if self.p1.cards_in_reserve[planet_pos]:
+            if self.p1.check_for_cards_in_reserve(planet_pos):
                 self.p1.has_passed = False
             else:
                 self.p1.has_passed = True
-            if self.p2.cards_in_reserve[planet_pos]:
+            if self.p2.check_for_cards_in_reserve(planet_pos):
                 self.p2.has_passed = False
             else:
                 self.p2.has_passed = True
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Deepstrike cards?"
             self.resolving_search_box = True
-            if self.p1.cards_in_reserve[planet_pos] and self.p2.cards_in_reserve[planet_pos]:
-                if self.p1.has_initiative:
+            if self.p1.check_for_cards_in_reserve(planet_pos) and self.p2.check_for_cards_in_reserve(planet_pos):
+                if self.game.player_with_initiative == self.name_1:
                     self.name_player_making_choices = self.name_1
                 else:
                     self.name_player_making_choices = self.name_2
-            elif self.p1.cards_in_reserve[planet_pos]:
+            elif self.p1.check_for_cards_in_reserve(planet_pos):
                 self.name_player_making_choices = self.name_1
             else:
                 self.name_player_making_choices = self.name_2

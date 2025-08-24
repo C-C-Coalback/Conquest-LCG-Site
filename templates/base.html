@@ -4,7 +4,6 @@
 <link rel="stylesheet" href="{% static 'navi_bar.css' %}">
 <link rel ="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/png">
 <head>
-  {% include 'header.html'%}
   <meta charset="utf-8">
   <meta name="application-name" content="Iridial.net">
   <meta name="description" content="A browser implementation of the Warhammer 40,000: Conquest Living Card Game.">
@@ -14,6 +13,7 @@
 </head>
 
 <body>
+  {% include 'header.html'%}
   <main>
     {% block content %}
     {% endblock %}

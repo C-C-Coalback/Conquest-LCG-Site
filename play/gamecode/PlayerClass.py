@@ -3,6 +3,7 @@ import random
 from random import shuffle
 import copy
 import threading
+from . import CardClasses
 
 
 def clean_received_deck(raw_deck):
@@ -67,6 +68,7 @@ class Player:
         self.committed_synapse = True
         self.warlord_commit_location = -1
         self.synapse_commit_location = -1
+        self.idden_base_active = False
         self.warlord_just_got_bloodied = False
         self.condition_player_main = threading.Condition()
         self.condition_player_sub = threading.Condition()
@@ -146,6 +148,7 @@ class Player:
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
         self.war_of_ideas_active = False
         self.cards_in_reserve = [[], [], [], [], [], [], []]
+        self.cards_in_reserve_hq = []
         self.the_princes_might_active = [False, False, False, False, False, False, False]
         self.hit_by_gorgul = False
         self.concealing_darkness_active = False
@@ -172,6 +175,9 @@ class Player:
         self.wrathful_retribution_value = 0
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
+        if planet_pos == -2:
+            self.cards_in_reserve_hq.append(copy.deepcopy(card))
+            return True
         if not payment:
             self.cards_in_reserve[planet_pos].append(copy.deepcopy(card))
             return True
@@ -348,6 +354,8 @@ class Player:
             for i in range(len(self.headquarters)):
                 current_card = self.headquarters[i]
                 single_card_string = current_card.get_name()
+                if current_card.actually_a_deepstrike:
+                    single_card_string = current_card.deepstrike_card_name
                 if single_card_string in self.cards_that_have_errata:
                     single_card_string += "_apoka"
                 single_card_string = single_card_string + "|"
@@ -381,6 +389,8 @@ class Player:
                         single_card_string += "B|"
                     else:
                         single_card_string += "H|"
+                elif current_card.actually_a_deepstrike:
+                    single_card_string += "D|"
                 else:
                     single_card_string += "H|"
                 if current_card.aiming_reticle_color is not None:
@@ -402,10 +412,52 @@ class Player:
                     else:
                         single_card_string += "R+"
                 card_strings.append(single_card_string)
+            for i in range(len(self.cards_in_reserve_hq)):
+                current_card = self.cards_in_reserve_hq[i]
+                single_card_string = current_card.get_name()
+                if single_card_string in self.cards_that_have_errata:
+                    single_card_string += "_apoka"
+                single_card_string = single_card_string + "|"
+                if current_card.ready:
+                    single_card_string += "R|"
+                else:
+                    single_card_string += "E|"
+                if current_card.is_unit:
+                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                elif current_card.get_card_type() == "Support":
+                    single_card_string += str(current_card.get_damage())
+                else:
+                    single_card_string += "0"
+                single_card_string += "|"
+                if current_card.is_unit:
+                    single_card_string += str(current_card.get_faith())
+                else:
+                    single_card_string += "0"
+                single_card_string += "|D|"
+                if current_card.aiming_reticle_color is not None:
+                    single_card_string += current_card.aiming_reticle_color
+                attachments_list = current_card.get_attachments()
+                for a in range(len(attachments_list)):
+                    single_card_string += "|"
+                    single_card_string += attachments_list[a].get_name()
+                    if attachments_list[a].get_name() in self.cards_that_have_errata:
+                        single_card_string += "_apoka"
+                    single_card_string += "+"
+                    if attachments_list[a].get_ready():
+                        single_card_string += "R"
+                    else:
+                        single_card_string += "E"
+                    single_card_string += "+"
+                    if attachments_list[a].from_magus_harid:
+                        single_card_string += "M+" + attachments_list[a].name_owner
+                    else:
+                        single_card_string += "R+"
+                card_strings.append(single_card_string)
             joined_string = "/".join(card_strings)
-            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + joined_string
+            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" \
+                            + self.name_player + "/" + joined_string
         else:
-            joined_string = "GAME_INFO/HQ/" + str(self.number)
+            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + self.name_player
         if self.last_hq_string != joined_string or force:
             self.last_hq_string = joined_string
             await self.game.send_update_message(joined_string)
@@ -422,9 +474,33 @@ class Player:
             del self.cards_in_reserve[planet_id][0]
 
     def get_card_type_in_reserve(self, planet_id, unit_id):
+        if self.idden_base_active:
+            card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
+            card = self.game.preloaded_find_card(card_name)
+            return card.get_card_type()
         return self.cards_in_reserve[planet_id][unit_id].get_card_type()
 
     def get_deepstrike_value_given_pos(self, planet_id, unit_id):
+        if self.idden_base_active:
+            card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
+            card = self.game.preloaded_find_card(card_name)
+            ds_value = card.get_deepstrike_value()
+            if ds_value == -1:
+                return -1
+            other_player = self.get_other_player()
+            for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                if other_player.get_ability_given_pos(planet_id, i) == "Catachan Tracker":
+                    ds_value += 2
+            vanguarding_horror = False
+            if planet_id != 0:
+                if self.search_card_at_planet(planet_id - 1, "Vanguarding Horror"):
+                    vanguarding_horror = True
+            if not vanguarding_horror and planet_id != 6:
+                if self.search_card_at_planet(planet_id + 1, "Vanguarding Horror"):
+                    vanguarding_horror = True
+            if vanguarding_horror:
+                ds_value = ds_value - 1
+            return ds_value
         ds_value = self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
         other_player = self.game.p1
         if other_player.name_player == self.name_player:
@@ -444,7 +520,10 @@ class Player:
         return ds_value
 
     def deepstrike_event(self, planet_id, unit_id):
-        ability = self.cards_in_reserve[planet_id][unit_id].get_name()
+        if not self.idden_base_active:
+            ability = self.cards_in_reserve[planet_id][unit_id].get_name()
+        else:
+            ability = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
         if ability == "The Prince's Might":
             self.the_princes_might_active[planet_id] = True
         if ability == "Unseen Strike":
@@ -461,7 +540,11 @@ class Player:
             self.game.create_reaction("Burst Forth", self.name_player, (int(self.number), planet_id, -1))
         self.add_card_to_discard(ability)
         self.after_any_deepstrike(planet_id)
-        del self.cards_in_reserve[planet_id][unit_id]
+        if not self.idden_base_active:
+            del self.cards_in_reserve[planet_id][unit_id]
+        else:
+            self.discard_attachments_from_card(planet_id, unit_id)
+            del self.cards_in_play[planet_id + 1][unit_id]
 
     def after_any_deepstrike(self, planet_id):
         warlord_pla, warlord_pos = self.get_location_of_warlord()
@@ -483,11 +566,23 @@ class Player:
         self.after_any_deepstrike(planet_id)
 
     def deepstrike_unit(self, planet_id, unit_id):
-        card = self.cards_in_reserve[planet_id][unit_id]
+        if not self.idden_base_active:
+            card = self.cards_in_reserve[planet_id][unit_id]
+        else:
+            card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
+            card = self.game.preloaded_find_card(card_name)
         self.add_card_to_planet(card, planet_id, triggered_card_effect=False)
         self.after_any_deepstrike(planet_id)
-        del self.cards_in_reserve[planet_id][unit_id]
+        attachments = []
+        if not self.idden_base_active:
+            del self.cards_in_reserve[planet_id][unit_id]
+        else:
+            attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
+            del self.cards_in_play[planet_id + 1][unit_id]
         last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
+        for i in range(len(attachments)):
+            if not self.attach_card(attachments[i], planet_id, last_element_index):
+                self.add_card_to_discard(attachments[i].get_name())
         ability = self.get_ability_given_pos(planet_id, last_element_index)
         if ability == "8th Company Assault Squad":
             self.game.create_reaction("8th Company Assault Squad", self.name_player,
@@ -537,6 +632,8 @@ class Player:
                     for i in range(len(self.cards_in_play[planet_id + 1])):
                         current_card = self.cards_in_play[planet_id + 1][i]
                         single_card_string = current_card.get_name()
+                        if current_card.actually_a_deepstrike:
+                            single_card_string = current_card.deepstrike_card_name
                         if single_card_string in self.cards_that_have_errata:
                             single_card_string += "_apoka"
                         single_card_string = single_card_string + "|"
@@ -548,7 +645,9 @@ class Player:
                         single_card_string += "|"
                         single_card_string += str(current_card.get_faith())
                         single_card_string += "|"
-                        if current_card.get_card_type() == "Warlord":
+                        if current_card.actually_a_deepstrike:
+                            single_card_string += "D"
+                        elif current_card.get_card_type() == "Warlord":
                             if current_card.get_bloodied():
                                 single_card_string += "B"
                             else:
@@ -1238,6 +1337,46 @@ class Player:
                             del self.game.extra_interrupt_info[i]
                             i = i - 1
             i += 1
+
+    def idden_base_detransform(self):
+        for i in range(7):
+            j = 0
+            while j < len(self.cards_in_play[i + 1]):
+                if self.cards_in_play[i + 1][j].actually_a_deepstrike:
+                    self.discard_attachments_from_card(i, j)
+                    card = self.game.preloaded_find_card(self.cards_in_play[i + 1][j].deepstrike_card_name)
+                    self.put_card_into_reserve(card, i, payment=False)
+                    del self.cards_in_play[i + 1][j]
+                    j = j - 1
+                j = j + 1
+        j = 0
+        while j < len(self.headquarters):
+            if self.headquarters[j].actually_a_deepstrike:
+                self.discard_attachments_from_card(-2, j)
+                card = self.game.preloaded_find_card(self.headquarters[j].deepstrike_card_name)
+                self.put_card_into_reserve(card, -2, payment=False)
+                del self.headquarters[j]
+                j = j - 1
+            j = j + 1
+
+    def idden_base_transform(self):
+        for i in range(7):
+            while self.cards_in_reserve[i]:
+                card = CardClasses.ArmyCard("Cardback", "I am a Deepstriked Card.", "",
+                                            0, "Orks", "Common", 2, 2, 0, False)
+                card.actually_a_deepstrike = True
+                card.deepstrike_card_name = self.cards_in_reserve[i][0].get_name()
+                card.name_owner = self.name_player
+                self.cards_in_play[i + 1].append(card)
+                del self.cards_in_reserve[i][0]
+        while self.cards_in_reserve_hq:
+            card = CardClasses.ArmyCard("Cardback", "I am a Deepstriked Card.", "",
+                                        0, "Orks", "Common", 2, 2, 0, False)
+            card.actually_a_deepstrike = True
+            card.deepstrike_card_name = self.cards_in_reserve_hq[0].get_name()
+            card.name_owner = self.name_player
+            self.headquarters.append(card)
+            del self.cards_in_reserve_hq[0]
 
     def add_to_hq(self, card_object):
         if card_object.get_unique():
@@ -5173,6 +5312,14 @@ class Player:
                             self.cards_in_play[i + 1][j].misc_ability_used = True
                             self.game.create_interrupt("Growing Tide", self.name_player, (int(self.number), i, j))
 
+    def check_for_cards_in_reserve(self, planet_pos):
+        if self.cards_in_reserve[planet_pos]:
+            return True
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.cards_in_play[planet_pos + 1][i].actually_a_deepstrike:
+                return True
+        return False
+
     def search_all_deepstrikes(self, card_name):
         for i in range(7):
             for j in range(len(self.cards_in_reserve[i])):
@@ -5454,6 +5601,8 @@ class Player:
             other_player = self.game.p2
         card = self.cards_in_play[planet_num + 1][card_pos]
         card_name = card.get_name()
+        if card.actually_a_deepstrike:
+            card_name = card.deepstrike_card_name
         if card.get_card_type() == "Army":
             for i in range(len(self.cards_in_play[planet_num + 1])):
                 if self.cards_in_play[planet_num + 1][i].get_ability() == "Cadian Mortar Squad":
@@ -5608,6 +5757,8 @@ class Player:
     def add_card_in_hq_to_discard(self, card_pos):
         card = self.headquarters[card_pos]
         card_name = card.get_name()
+        if card.actually_a_deepstrike:
+            card_name = card.deepstrike_card_name
         planet_num = -2
         if card.get_is_unit():
             if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):

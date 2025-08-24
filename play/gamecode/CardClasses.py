@@ -87,6 +87,8 @@ class Card:
         self.just_entered_play = False
         self.misc_string = ""
         self.damage = 0
+        self.actually_a_deepstrike = False
+        self.deepstrike_card_name = ""
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
