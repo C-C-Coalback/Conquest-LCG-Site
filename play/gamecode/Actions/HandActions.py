@@ -94,6 +94,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Keep Firing!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                    elif ability == "Consumed by the Kindred":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        self.misc_target_unit = (-1, -1)
+                        self.chosen_first_card = False
                     elif ability == "Supply Line Incursion":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

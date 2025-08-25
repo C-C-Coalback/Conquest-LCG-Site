@@ -310,6 +310,10 @@ def tau_cards_init():
                                              "Interrupt: When your opponent triggers an ability that discards a card "
                                              "from your hand or routs a unit you control, put this unit from your "
                                              "hand into play at a planet.", "Soldier. Hero.",
-                             2, faction, "Loyal", 2, 3, 1, True)
+                             2, faction, "Loyal", 2, 3, 1, True),
+        CardClasses.EventCard("Consumed by the Kindred", "Action: Exhaust a Kroot unit and sacrifice another "
+                                                         "non-Vehicle unit to gain resources equal to the "
+                                                         "sacrificed unit's printed cost.", "Tactic. Kroot.",
+                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tau_cards_array

@@ -2192,6 +2192,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.misc_target_unit = (planet_pos, unit_pos)
                         self.chosen_first_card = True
+    elif self.action_chosen == "Consumed by the Kindred":
+        if game_update_string[1] == primary_player.get_number():
+            if not self.chosen_first_card:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.chosen_first_card = True
+                        self.misc_target_unit = (planet_pos, unit_pos)
+            else:
+                if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle"):
+                    if (planet_pos, unit_pos) != self.misc_target_unit:
+                        cost = primary_player.get_cost_given_pos(planet_pos, unit_pos)
+                        if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                            primary_player.add_resources(cost)
+                            self.action_cleanup()
     elif self.action_chosen == "+1 ATK Warrior":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
