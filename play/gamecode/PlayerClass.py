@@ -4102,6 +4102,9 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
+        if self.get_ability_given_pos(planet_id, unit_id) == "Kabal of the Ebon Law":
+            if planet_id != self.game.round_number:
+                attack_value += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
@@ -5241,6 +5244,8 @@ class Player:
                 self.exhaust_given_pos(planet_num, i, card_effect=True)
             if self.get_ability_given_pos(planet_num, i) == "Da Swoopy":
                 self.game.create_reaction("Da Swoopy", self.name_player, (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Kabal of the Ebon Law":
+                self.game.create_reaction("Kabal of the Ebon Law", self.name_player, (int(self.number), planet_num, i))
 
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if planet_id == -2:

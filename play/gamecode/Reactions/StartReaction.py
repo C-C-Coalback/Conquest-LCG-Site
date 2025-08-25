@@ -2029,6 +2029,21 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Patient Infiltrator":
             primary_player.ready_given_pos(planet_pos, unit_pos)
+        elif current_reaction == "Kabal of the Ebon Law":
+            will_draw = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_attack_given_pos(planet_pos, i) > 1:
+                    will_draw = True
+            if will_draw:
+                primary_player.draw_card()
+            will_draw = False
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_attack_given_pos(planet_pos, i) > 1:
+                    will_draw = True
+            if will_draw:
+                secondary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Sootblade Assashun":
             self.location_of_indirect = "PLANET"
             self.indirect_exhaust_only = True

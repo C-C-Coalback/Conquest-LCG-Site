@@ -348,6 +348,10 @@ def dark_eldar_cards_init():
                              2, faction, "Loyal", 1, 2, 1, False),
         CardClasses.EventCard("Supply Line Incursion", "Action: Exhaust target support. Then, if that support is a"
                                                        " Limited card, draw one card and gain 1 resource.", "Tactic.",
-                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Kabal of the Ebon Law", "This unit gets +1 ATK while it is not at the first planet.\n"
+                                                      "Forced Reaction: After a battle starts at this planet, each "
+                                                      "player controlling a unit with 2 ATK or more, draws a card.",
+                             "Kabalite.", 2, faction, "Loyal", 2, 2, 1, False)
     ]
     return dark_eldar_cards_array
