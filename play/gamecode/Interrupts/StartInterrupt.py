@@ -49,6 +49,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.aiming_reticle_color = "blue"
         elif current_interrupt == "Mucolid Spores":
             self.misc_counter = 0
+        elif current_interrupt == "Fairly 'Quipped Kommando":
+            attachment_name = self.extra_interrupt_info[0]
+            if attachment_name in primary_player.discard:
+                primary_player.cards.append(attachment_name)
+                primary_player.discard.remove(attachment_name)
+            self.delete_interrupt()
         elif current_interrupt == "Blood of Martyrs":
             self.misc_counter = 3
             self.misc_misc = []

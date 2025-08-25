@@ -4512,8 +4512,14 @@ class Player:
         name_attachment = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_name()
         name_owner = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner
         if name_owner == self.game.name_1:
+            if self.game.p1.search_card_at_planet(planet_pos, "Fairly 'Quipped Kommando"):
+                self.game.create_interrupt("Fairly 'Quipped Kommando", self.game.p1.name_player,
+                                           (1, -1, -1), extra_info=name_attachment)
             self.game.p1.add_card_to_discard(name_attachment)
         else:
+            if self.game.p2.search_card_at_planet(planet_pos, "Fairly 'Quipped Kommando"):
+                self.game.create_interrupt("Fairly 'Quipped Kommando", self.game.p2.name_player,
+                                           (2, -1, -1), extra_info=name_attachment)
             self.game.p2.add_card_to_discard(name_attachment)
         if name_attachment == "Savage Parasite":
             self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
@@ -4658,6 +4664,8 @@ class Player:
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     health += 1
+            if self.get_ability_given_pos(planet_id, unit_id) == "Fairly 'Quipped Kommando":
+                health += len(self.headquarters[unit_id].get_attachments())
             if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
                 health += len(self.discard)
             for i in range(len(self.headquarters[unit_id].get_attachments())):
@@ -4670,6 +4678,7 @@ class Player:
                         health += len(other_player.victory_display)
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        ability = self.get_ability_given_pos(planet_id, unit_id)
         if self.cards_in_play[planet_id + 1][unit_id].health_set_eop != -1:
             return self.cards_in_play[planet_id + 1][unit_id].health_set_eop
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -4677,34 +4686,36 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 health += 1
-        if self.get_ability_given_pos(planet_id, unit_id) != "Knight Paladin Voris":
+        if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
+        if ability == "Fairly 'Quipped Kommando":
+            health += len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
             if self.search_card_in_hq("Mork's Great Heap"):
                 health += 1
-        if card.get_ability() == "Improbable Runt Machine":
+        if ability == "Improbable Runt Machine":
             health += min(len(card.get_attachments()), 3)
-        if card.get_ability() == "Charging Juggernaut":
+        if ability == "Charging Juggernaut":
             if card.get_attachments():
                 health += 1
         if card.get_card_type() == "Warlord":
             if self.game.round_number == planet_id:
                 if self.search_card_in_hq("Order of the Crimson Oath"):
                     health += 2
-        if self.get_ability_given_pos(planet_id, unit_id) == "Hjorvath Coldstorm":
+        if ability == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health = health - 2
-        if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+        if ability == "Tenacious Novice Squad":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 health += 1
-        if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
+        if ability == "Sacaellum Shrine Guard" or ability == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
                 health += 1
         if self.game.infested_planets[planet_id]:
-            if self.get_ability_given_pos(planet_id, unit_id) == "Emergent Cultists":
+            if ability == "Emergent Cultists":
                 health += 1
-        if card.get_ability() == "Shard of the Deceiver":
+        if ability == "Shard of the Deceiver":
             health += len(self.discard)
         if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
             if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
@@ -4720,10 +4731,10 @@ class Player:
             if self.game.infested_planets[planet_id]:
                 if self.search_for_card_everywhere("Aberrant Alpha"):
                     health += 1
-        if card.get_ability() == "Ramshackle Trukk":
+        if ability== "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 health += 4
-        if card.get_ability() == "Goliath Rockgrinder":
+        if ability == "Goliath Rockgrinder":
             if self.game.infested_planets[planet_id]:
                 health += 2
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
@@ -4734,12 +4745,12 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
                     health += 2
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Pyrrhian Eternals":
+        if ability == "Pyrrhian Eternals":
             health += self.discard.count("Pyrrhian Eternals")
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Lychguard Sentinel":
+        if ability == "Lychguard Sentinel":
             if self.count_units_in_discard() > 5:
                 health += 4
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Ymgarl Genestealer":
+        if ability == "Ymgarl Genestealer":
             if self.search_synapse_at_planet(planet_id):
                 health += 2
             else:
@@ -4749,7 +4760,7 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.search_synapse_at_planet(planet_id):
                         health += 2
-        if self.get_ability_given_pos(planet_id, unit_id) == "Armored Fist Squad":
+        if ability == "Armored Fist Squad":
             if self.check_for_warlord(planet_id, True, self.name_player) or \
                     self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health += 2

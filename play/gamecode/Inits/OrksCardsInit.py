@@ -379,7 +379,12 @@ def orks_cards_init():
                                                      " the end of the phase. (Limit once per round.)", "Vehicle.",
                              2, faction, "Common", 2, 3, 1, False, deepstrike=1,
                              wargear_attachments_permitted=False,
-                             action_in_play=True, allowed_phases_in_play="ALL")
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Fairly 'Quipped Kommando", "Deep Strike (0).\n"
+                                                         "This unit gets +1 HP per attachment on it.\n"
+                                                         "Interrupt: When an attachment you control leaves play from "
+                                                         "this planet, return it to your hand instead.",
+                             "Soldier.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=0)
 
     ]
     return orks_card_array
