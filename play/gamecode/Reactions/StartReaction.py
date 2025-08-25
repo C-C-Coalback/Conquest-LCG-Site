@@ -2027,6 +2027,8 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Raiding Kabal":
             primary_player.summon_token_at_planet("Khymera", self.last_planet_checked_for_battle)
             self.delete_reaction()
+        elif current_reaction == "Patient Infiltrator":
+            primary_player.ready_given_pos(planet_pos, unit_pos)
         elif current_reaction == "Sootblade Assashun":
             self.location_of_indirect = "PLANET"
             self.indirect_exhaust_only = True

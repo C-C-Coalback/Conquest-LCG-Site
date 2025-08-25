@@ -366,7 +366,12 @@ def orks_cards_init():
         CardClasses.ArmyCard("Da Swoopy", "Flying.\n"
                                           "Reaction: After a battle starts at this planet, have a Warrior Orks army "
                                           "unit gain flying until the end of the combat round.",
-                             "Vehicle. Experimental.", 2, faction, "Signature", 2, 4, 1, False, flying=False)
+                             "Vehicle. Experimental.", 2, faction, "Signature", 2, 4, 1, False, flying=True),
+        CardClasses.ArmyCard("Patient Infiltrator", "Deep Strike (1). You may Deep Strike this card as an "
+                                                    "action during the combat phase.\n"
+                                                    "Reaction: After you Deep Strike this unit, ready it and move up to"
+                                                    " 1 damage from this unit to a target unit at the same planet.",
+                             "Soldier.", 2, faction, "Signature", 3, 2, 1, False, deepstrike=1)
 
     ]
     return orks_card_array

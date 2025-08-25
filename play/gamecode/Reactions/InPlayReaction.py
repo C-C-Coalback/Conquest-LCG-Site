@@ -141,6 +141,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Patient Infiltrator":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                damage = player_owning_card.get_damage_given_pos(planet_pos, unit_pos)
+                player_owning_card.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Da Swoopy":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Orks":

@@ -989,6 +989,12 @@ class Game:
                                 if primary_player.spend_resources(cost):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos)
                                     self.action_cleanup()
+                            elif primary_player.cards_in_reserve[planet_pos][unit_pos].get_ability() \
+                                    == "Patient Infiltrator" and self.phase == "COMBAT":
+                                cost = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                if primary_player.spend_resources(cost):
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    self.action_cleanup()
                     elif self.action_chosen == "Vanguarding Horror":
                         if not self.chosen_first_card:
                             if primary_player.get_number() == game_update_string[1]:

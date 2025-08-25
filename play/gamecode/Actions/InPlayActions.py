@@ -24,7 +24,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         print("action not chosen")
         if card_chosen.get_has_action_while_in_play():
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
-                    card_chosen.get_allowed_phases_while_in_play() == "ALL":
+                    card_chosen.get_allowed_phases_while_in_play() == "ALL" or card_chosen.get_ability() == "Cardback":
                 print("reached new in play unit action")
                 ability = card_chosen.get_ability(bloodied_relevant=True)
                 self.position_of_actioned_card = (planet_pos, unit_pos)
@@ -357,6 +357,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Cardback":
+                        if card_chosen.actually_a_deepstrike:
+                            actual_ability = card_chosen.deepstrike_card_name
+                            if actual_ability == "Patient Infiltrator":
+                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                if primary_player.spend_resources(ds_value):
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    self.action_cleanup()
+                            elif actual_ability == "XV25 Stealth Squad":
+                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                if primary_player.spend_resources(ds_value):
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    self.action_cleanup()
                     elif ability == "Evangelizing Ships":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)

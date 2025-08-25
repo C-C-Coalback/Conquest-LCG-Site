@@ -570,61 +570,73 @@ class Player:
         self.after_any_deepstrike(planet_id)
 
     def deepstrike_unit(self, planet_id, unit_id):
+        damage = 0
+        ready = True
         if not self.idden_base_active:
             card = self.cards_in_reserve[planet_id][unit_id]
         else:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
             card = self.game.preloaded_find_card(card_name)
-        self.add_card_to_planet(card, planet_id, triggered_card_effect=False)
-        self.after_any_deepstrike(planet_id)
-        attachments = []
-        if not self.idden_base_active:
-            del self.cards_in_reserve[planet_id][unit_id]
-        else:
-            attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
-            del self.cards_in_play[planet_id + 1][unit_id]
-        last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
-        for i in range(len(attachments)):
-            if not self.attach_card(attachments[i], planet_id, last_element_index):
-                self.add_card_to_discard(attachments[i].get_name())
-        ability = self.get_ability_given_pos(planet_id, last_element_index)
-        if ability == "8th Company Assault Squad":
-            self.game.create_reaction("8th Company Assault Squad", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Tunneling Mawloc":
-            self.game.create_reaction("Tunneling Mawloc", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Patron Saint":
-            self.game.create_reaction("Patron Saint", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Seething Mycetic Spore":
-            self.game.create_reaction("Seething Mycetic Spore", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Slavering Mawloc":
-            self.game.create_reaction("Slavering Mawloc", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Scorpion Striker":
-            self.game.create_reaction("Scorpion Striker", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Beastmaster Harvester":
-            self.game.create_reaction("Beastmaster Harvester", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Deathwing Terminators":
-            self.game.create_reaction("Deathwing Terminators", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Lictor Vine Lurker":
-            self.game.create_reaction("Lictor Vine Lurker", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Mandrake Cutthroat":
-            self.game.create_reaction("Mandrake Cutthroat", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Vezuel's Hunters":
-            self.game.create_reaction("Vezuel's Hunters", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        if ability == "Sootblade Assashun":
-            self.game.create_reaction("Sootblade Assashun", self.name_player,
-                                      (int(self.number), planet_id, last_element_index))
-        return last_element_index
+            damage = self.get_damage_given_pos(planet_id, unit_id)
+            ready = self.get_ready_given_pos(planet_id, unit_id)
+        if self.add_card_to_planet(card, planet_id, triggered_card_effect=False) != -1:
+            self.after_any_deepstrike(planet_id)
+            attachments = []
+            if not self.idden_base_active:
+                del self.cards_in_reserve[planet_id][unit_id]
+            else:
+                attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()
+                del self.cards_in_play[planet_id + 1][unit_id]
+            last_element_index = len(self.cards_in_play[planet_id + 1]) - 1
+            self.cards_in_play[planet_id + 1][last_element_index].damage = damage
+            self.cards_in_play[planet_id + 1][last_element_index].ready = ready
+            for i in range(len(attachments)):
+                if not self.attach_card(attachments[i], planet_id, last_element_index):
+                    self.add_card_to_discard(attachments[i].get_name())
+            ability = self.get_ability_given_pos(planet_id, last_element_index)
+            if ability == "8th Company Assault Squad":
+                self.game.create_reaction("8th Company Assault Squad", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Patient Infiltrator":
+                if self.get_damage_given_pos(planet_id, last_element_index) > 0:
+                    if not self.get_ready_given_pos(planet_id, last_element_index):
+                        self.game.create_reaction("Patient Infiltrator", self.name_player,
+                                                  (int(self.number), planet_id, last_element_index))
+            if ability == "Tunneling Mawloc":
+                self.game.create_reaction("Tunneling Mawloc", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Patron Saint":
+                self.game.create_reaction("Patron Saint", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Seething Mycetic Spore":
+                self.game.create_reaction("Seething Mycetic Spore", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Slavering Mawloc":
+                self.game.create_reaction("Slavering Mawloc", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Scorpion Striker":
+                self.game.create_reaction("Scorpion Striker", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Beastmaster Harvester":
+                self.game.create_reaction("Beastmaster Harvester", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Deathwing Terminators":
+                self.game.create_reaction("Deathwing Terminators", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Lictor Vine Lurker":
+                self.game.create_reaction("Lictor Vine Lurker", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Mandrake Cutthroat":
+                self.game.create_reaction("Mandrake Cutthroat", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Vezuel's Hunters":
+                self.game.create_reaction("Vezuel's Hunters", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            if ability == "Sootblade Assashun":
+                self.game.create_reaction("Sootblade Assashun", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
+            return last_element_index
+        return -1
 
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
