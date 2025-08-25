@@ -341,6 +341,10 @@ def dark_eldar_cards_init():
                                                       "reserve at a planet. Your opponent may exhaust a unit at that"
                                                       " planet to cancel this effect.", "Wargear. Weapon.",
                                    2, faction, "Loyal", 2, True, deepstrike=0, extra_health=1, extra_attack=2,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Raiding Kabal", "This unit gets Sweep (1) while it is not at the first planet.\n"
+                                              "Reaction: After you win a battle at this planet, put a Khymera "
+                                              "token into play at this planet.", "Kabalite.",
+                             2, faction, "Loyal", 1, 2, 1, False)
     ]
     return dark_eldar_cards_array

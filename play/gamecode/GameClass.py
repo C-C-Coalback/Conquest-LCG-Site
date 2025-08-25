@@ -7914,6 +7914,8 @@ class Game:
                     reactions.append("Kabalite Blackguard")
                 if winner.get_ability_given_pos(planet_id, i) == "Sanguinary Guard":
                     reactions.append("Sanguinary Guard")
+                if winner.get_ability_given_pos(planet_id, i) == "Raiding Kabal":
+                    reactions.append("Raiding Kabal")
             if winner.search_card_in_hq("Clearing the Path"):
                 if winner.check_for_warlord(planet_id, True, self.name_player):
                     reactions.append("Clearing the Path")

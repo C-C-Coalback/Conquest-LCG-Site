@@ -1535,7 +1535,11 @@ class Player:
     def get_sweep_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             return self.headquarters[unit_pos].get_sweep()
-        return self.cards_in_play[planet_pos + 1][unit_pos].get_sweep()
+        sweep_value = self.cards_in_play[planet_pos + 1][unit_pos].get_sweep()
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Raiding Kabal":
+            if planet_pos != self.game.round_number:
+                sweep_value += 1
+        return sweep_value
 
     def get_card_in_hand(self, position_hand):
         card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
