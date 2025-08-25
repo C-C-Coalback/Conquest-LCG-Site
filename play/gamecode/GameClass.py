@@ -5139,6 +5139,10 @@ class Game:
             for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
                     self.discounts_applied = self.discounts_applied - 2
+        for i in range(7):
+            for j in range(len(player.cards_in_play[i + 1])):
+                if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
+                    self.discounts_applied = self.discounts_applied - 1
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
                 if i != planet_chosen:
@@ -5189,6 +5193,10 @@ class Game:
         if card.get_ability() == "Dutiful Castellan":
             if player.check_if_control_trait("Ecclesiarchy"):
                 self.available_discounts += 1
+        for i in range(7):
+            for j in range(len(player.cards_in_play[i + 1])):
+                if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
+                    self.available_discounts = self.available_discounts - 1
         if card.check_for_a_trait("Elite"):
             self.available_discounts += player.master_warpsmith_count
         else:

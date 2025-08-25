@@ -368,6 +368,11 @@ def chaos_cards_init():
                              6, faction, "Common", 3, 6, 2, True, sweep=1, retaliate=4),
         CardClasses.ArmyCard("Expendable Pawn", "Reaction: After a unit is assigned damage at this planet or an "
                                                 "adjacent planet, sacrifice this unit to prevent 2 of that damage.",
-                             "Cultist. Khorne.", 1, faction, "Common", 1, 1, 1, False)
+                             "Cultist. Khorne.", 1, faction, "Common", 1, 1, 1, False),
+        CardClasses.ArmyCard("Uncontrollable Rioters", "Cost of units you deploy is increased by 1.\n"
+                                                       "This unit cannot change control more than once per round.\n"
+                                                       "Action: Give control of this unit to your opponent.",
+                             "Cultist. Mob.", 0, faction, "Loyal", 2, 1, 0, False,
+                             action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return chaos_card_array

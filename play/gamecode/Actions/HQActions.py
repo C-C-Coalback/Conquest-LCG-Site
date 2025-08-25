@@ -387,6 +387,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    elif ability == "Uncontrollable Rioters":
+                        if not card_chosen.get_once_per_round_used():
+                            card_chosen.set_once_per_round_used(True)
+                            self.take_control_of_card(secondary_player, primary_player, planet_pos, unit_pos)
+                            self.action_cleanup()
                     elif ability == "Urien's Oubliette":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
