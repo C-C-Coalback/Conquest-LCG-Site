@@ -1753,6 +1753,34 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_chosen == "Supply Line Incursion":
+        if player_owning_card.headquarters[unit_pos].get_card_type() == "Support":
+            can_continue = True
+            is_support = True
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    -2, unit_pos, targeting_support=is_support)
+                if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy events.")
+                elif possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            if can_continue:
+                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                if player_owning_card.headquarters[unit_pos].get_limited():
+                    primary_player.draw_card()
+                    primary_player.add_resources(1)
+                self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
         if game_update_string[1] == "1":
             player_receiving_attachment = self.p1

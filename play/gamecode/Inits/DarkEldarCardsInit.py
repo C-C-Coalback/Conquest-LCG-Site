@@ -345,6 +345,9 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Raiding Kabal", "This unit gets Sweep (1) while it is not at the first planet.\n"
                                               "Reaction: After you win a battle at this planet, put a Khymera "
                                               "token into play at this planet.", "Kabalite.",
-                             2, faction, "Loyal", 1, 2, 1, False)
+                             2, faction, "Loyal", 1, 2, 1, False),
+        CardClasses.EventCard("Supply Line Incursion", "Action: Exhaust target support. Then, if that support is a"
+                                                       " Limited card, draw one card and gain 1 resource.", "Tactic.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return dark_eldar_cards_array
