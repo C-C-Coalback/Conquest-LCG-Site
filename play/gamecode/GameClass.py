@@ -6033,6 +6033,18 @@ class Game:
                                             primary_player.set_damage_given_pos(
                                                 planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                    elif attachment.get_ability() == "Warhost Helmet" and attachment.get_ready() and \
+                                            attachment.name_owner == primary_player.name_player and \
+                                            primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                        attachment.exhaust_card()
+                                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        damage = self.amount_that_can_be_removed_by_shield[0]
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                                        self.amount_that_can_be_removed_by_shield[0] = 0
+                                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1,
+                                                                                      expiration="NEXT")
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 6:
                 if game_update_string[0] == "ATTACHMENT":
                     if game_update_string[1] == "IN_PLAY":
@@ -6052,6 +6064,18 @@ class Game:
                                                 self.damage_on_units_list_before_new_damage[0]:
                                             primary_player.set_damage_given_pos(
                                                 planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                    elif attachment.get_ability() == "Warhost Helmet" and attachment.get_ready() and \
+                                            attachment.name_owner == primary_player.name_player and \
+                                            primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                        attachment.exhaust_card()
+                                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        damage = self.amount_that_can_be_removed_by_shield[0]
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                                        self.amount_that_can_be_removed_by_shield[0] = 0
+                                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1,
+                                                                                      expiration="NEXT")
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                                     elif attachment.get_ability() == "Armored Shell" and \
                                             attachment.name_owner == primary_player.name_player and \

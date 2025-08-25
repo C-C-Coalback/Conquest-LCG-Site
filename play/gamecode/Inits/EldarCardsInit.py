@@ -352,6 +352,14 @@ def eldar_cards_init():
                                                    "Interrupt: When this unit is assigned damage by an enemy army unit,"
                                                    " prevent all but 2 of that damage. Then deal damage to that unit"
                                                    " damage equal to the damage prevented. (Limit once per phase.)",
-                             "Psyker. Harlequin.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=1)
+                             "Psyker. Harlequin.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=1),
+        CardClasses.AttachmentCard("Warhost Helmet", "Attach to a Saim-Hann unit. Limit 1 per unit.\n"
+                                                     "Attached unit gets +2 HP.\n"
+                                                     "Reaction: After attached unit is assigned damage, exhaust it"
+                                                     " and this attachment to prevent all of that damage. "
+                                                     "Then attached unit gets +1 ATK for its next attack this phase.",
+                                   "Wargear.", 0, faction, "Loyal", 2, False, limit_one_per_unit=True,
+                                   required_traits="Saim-Hann", extra_health=2,
+                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token")
     ]
     return eldar_cards_array
