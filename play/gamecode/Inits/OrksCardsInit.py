@@ -371,7 +371,15 @@ def orks_cards_init():
                                                     "action during the combat phase.\n"
                                                     "Reaction: After you Deep Strike this unit, ready it and move up to"
                                                     " 1 damage from this unit to a target unit at the same planet.",
-                             "Soldier.", 2, faction, "Signature", 3, 2, 1, False, deepstrike=1)
+                             "Soldier.", 2, faction, "Common", 3, 2, 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Slave-powered Wagons", "No Wargear Attachments.\n"
+                                                     "Deep Strike (1).\n"
+                                                     "Action: Destroy a target token unit at this planet or an"
+                                                     " adjacent planet. Then this unit gets +1 ATK and +1 HP until"
+                                                     " the end of the phase. (Limit once per round.)", "Vehicle.",
+                             2, faction, "Common", 2, 3, 1, False, deepstrike=1,
+                             wargear_attachments_permitted=False,
+                             action_in_play=True, allowed_phases_in_play="ALL")
 
     ]
     return orks_card_array

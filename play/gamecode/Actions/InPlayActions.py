@@ -370,6 +370,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 if primary_player.spend_resources(ds_value):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos)
                                     self.action_cleanup()
+                    elif ability == "Slave-powered Wagons":
+                        if not card_chosen.get_once_per_round_used():
+                            card_chosen.set_once_per_round_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Evangelizing Ships":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -1266,6 +1272,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if not primary_player.harbinger_of_eternity_active:
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
+    elif self.action_chosen == "Slave-powered Wagons":
+        og_pla, og_pos = self.position_of_actioned_card
+        if og_pla == planet_pos or abs(og_pla - planet_pos) == 1:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
+                player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
+                if planet_pos == og_pla and game_update_string[1] == primary_player.get_number():
+                    if og_pos > unit_pos:
+                        og_pos = og_pos - 1
+                primary_player.increase_attack_of_unit_at_pos(og_pla, og_pos, 1, expiration="EOP")
+                primary_player.increase_health_of_unit_at_pos(og_pla, og_pos, 1, expiration="EOP")
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
     elif self.action_chosen == "Preemptive Barrage":
         if game_update_string[1] == primary_player.get_number():
