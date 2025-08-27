@@ -397,7 +397,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.misc_target_planet = planet_pos
                     elif ability == "Keening Maleceptor":
                         if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
-                            if self.infested_planets[planet_pos]:
+                            if self.infested_planets[planet_pos] and self.planet_array[planet_pos] != "Jaricho":
                                 self.infested_planets[planet_pos] = False
                                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
                                 self.mask_jain_zar_check_actions(primary_player, secondary_player)

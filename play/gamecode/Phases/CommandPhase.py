@@ -5,7 +5,7 @@ async def update_game_event_command_section(self, name, game_update_string):
     print("Run command code.")
     if self.mode == "ACTION":
         await self.update_game_event_action(name, game_update_string)
-    elif self.committing_warlords:
+    elif self.committing_warlords and not self.nectavus_active:
         print("Warlord assignment")
         if len(game_update_string) == 2:
             if game_update_string[0] == "PLANETS":
@@ -469,18 +469,25 @@ async def update_game_event_command_section(self, name, game_update_string):
             if self.p1.mobile_resolved and self.p2.mobile_resolved:
                 await self.send_update_message("Window granted for players to use "
                                                "reactions/actions before the battle begins.")
+        elif self.nectavus_active:
+            ret_val = try_entire_command(self, self.nectavus_target)
+            await interpret_command_state(self, ret_val)
 
 
 async def interpret_command_state(self, ret_val):
     if ret_val == "COMPLETE":
         receive_winnings(self)
         self.planet_aiming_reticle_position = -1
-        self.after_command_struggle = True
+        if not self.nectavus_active:
+            self.after_command_struggle = True
         self.during_command_struggle = False
         self.p1.has_passed = False
         self.p2.has_passed = False
         self.resolve_remaining_cs_after_reactions = False
-        await self.send_update_message("Window given for actions after command struggle.")
+        if not self.nectavus_active:
+            await self.send_update_message("Window given for actions after command struggle.")
+        if self.nectavus_active:
+            self.nectavus_active = False
     elif ret_val == "INTERRUPT PRE STRUGGLE":
         message = "Window given for effects pre-command struggle at " + \
                   self.planet_array[self.last_planet_checked_command_struggle] + "."
@@ -498,6 +505,9 @@ def try_entire_command(self, planet_pos):
     self.planet_aiming_reticle_position = planet_pos
     if planet_pos > 6:
         return "COMPLETE"
+    if self.nectavus_active:
+        if planet_pos > self.nectavus_target:
+            return "COMPLETE"
     if not self.planets_in_play_array[planet_pos]:
         return try_entire_command(self, planet_pos + 1)
     if self.interrupts_before_cs_allowed:
@@ -562,12 +572,14 @@ def try_entire_command(self, planet_pos):
 def receive_winnings(self):
     for i in range(len(self.total_gains_command_struggle)):
         if self.total_gains_command_struggle[i] is not None:
-            if self.total_gains_command_struggle[i][0] == "1":
+            if (self.total_gains_command_struggle[i][0] == "1" and not self.nectavus_active) or\
+                    (self.total_gains_command_struggle[i][0] == "2" and self.nectavus_active):
                 self.p1.command_struggles_won_this_phase += 1
                 self.p1.add_resources(self.total_gains_command_struggle[i][1])
                 for _ in range(self.total_gains_command_struggle[i][2]):
                     self.p1.draw_card()
-            elif self.total_gains_command_struggle[i][0] == "2":
+            elif (self.total_gains_command_struggle[i][0] == "2" and not self.nectavus_active) or\
+                    (self.total_gains_command_struggle[i][0] == "1" and self.nectavus_active):
                 self.p2.command_struggles_won_this_phase += 1
                 self.p2.add_resources(self.total_gains_command_struggle[i][1])
                 for _ in range(self.total_gains_command_struggle[i][2]):

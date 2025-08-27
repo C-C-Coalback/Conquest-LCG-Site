@@ -1061,7 +1061,7 @@ class TokenCard(UnitCard):
 
 
 class PlanetCard:
-    def __init__(self, name, text, cards, resources, red, blue, green, image_name):
+    def __init__(self, name, text, cards, resources, red, blue, green, image_name=""):
         self.name = name
         self.text = text
         self.cards = cards
@@ -1069,6 +1069,7 @@ class PlanetCard:
         self.red = red
         self.blue = blue
         self.green = green
+        self.image_name = name.replace(" ", "_")
         self.image_name = image_name
 
     def get_name(self):

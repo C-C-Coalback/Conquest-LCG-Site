@@ -30,6 +30,11 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 last_el_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
                 primary_player.cards_in_play[chosen_planet][last_el_index].command_until_combat += 1
                 self.delete_reaction()
+    elif current_reaction == "Navida Prime Commit":
+        if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+            self.create_reaction(self.planet_array[chosen_planet] + " Commit", primary_player.name_player,
+                                 (int(primary_player.number), self.positions_of_unit_triggering_reaction[0][1], -1))
+            self.delete_reaction()
     elif current_reaction == "Vamii Industrial Complex":
         if self.chosen_first_card:
             if chosen_planet != self.round_number:

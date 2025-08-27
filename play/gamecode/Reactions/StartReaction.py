@@ -268,6 +268,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.card_type_of_searched_card = None
             self.faction_of_searched_card = None
             self.no_restrictions_on_chosen_card = True
+            self.all_conditions_searched_card_required = False
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Experimental Devilfish":
@@ -951,17 +952,21 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
         elif current_reaction == "Sword Brethren Dreadnought":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            self.delete_reaction()
-            self.need_to_resolve_battle_ability = True
-            self.resolving_search_box = True
-            self.battle_ability_to_resolve = self.planet_array[planet_pos]
-            self.player_resolving_battle_ability = primary_player.name_player
-            self.number_resolving_battle_ability = primary_player.number
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Resolve Battle Ability?"
-            self.name_player_making_choices = primary_player.name_player
-            self.tense_negotiations_active = True
+            if self.planet_array[planet_pos] != "Jaricho" and \
+                    (self.planet_array[planet_pos] != "Nectavus XI" and self.resolve_remaining_cs_after_reactions):
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                self.delete_reaction()
+                self.need_to_resolve_battle_ability = True
+                self.resolving_search_box = True
+                self.battle_ability_to_resolve = self.planet_array[planet_pos]
+                self.player_resolving_battle_ability = primary_player.name_player
+                self.number_resolving_battle_ability = primary_player.number
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Resolve Battle Ability?"
+                self.name_player_making_choices = primary_player.name_player
+                self.tense_negotiations_active = True
+            else:
+                self.delete_reaction()
         elif current_reaction == "Gene Implantation":
             if primary_player.resources > 0:
                 can_continue = True
@@ -1748,6 +1753,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.card_type_of_searched_card = "Attachment"
             self.faction_of_searched_card = None
             self.no_restrictions_on_chosen_card = False
+            self.all_conditions_searched_card_required = False
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Shrine of Warpflame":
@@ -2024,9 +2030,37 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.total_indirect_damage = 2
             self.forbidden_traits_indirect = "Nurgle"
             self.delete_reaction()
+        elif current_reaction == "Vargus Commit":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            bloodied = False
+            if warlord_pla == -2:
+                bloodied = primary_player.headquarters[warlord_pos].get_bloodied()
+            elif warlord_pla != -1:
+                bloodied = primary_player.cards_in_play[warlord_pla + 1][warlord_pos].get_bloodied()
+            if bloodied:
+                primary_player.add_resources(2)
+            else:
+                primary_player.add_resources(1)
+            self.delete_reaction()
         elif current_reaction == "Raiding Kabal":
             primary_player.summon_token_at_planet("Khymera", self.last_planet_checked_for_battle)
             self.delete_reaction()
+        elif current_reaction == "Erida Commit":
+            await self.send_update_message("Please handle the hand size limit yourself.")
+            self.delete_reaction()
+        elif current_reaction == "Munos Commit":
+            if not primary_player.deck:
+                self.delete_reaction()
+            else:
+                self.choices_available = [primary_player.deck[0], "Do Nothing"]
+                self.choice_context = "Munos Topdeck"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+        elif current_reaction == "Anshan Commit":
+            self.choices_available = ["Draw 1 card", "Gain 1 resource"]
+            self.choice_context = "Anshan own gains"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Patient Infiltrator":
             primary_player.ready_given_pos(planet_pos, unit_pos)
         elif current_reaction == "Kabal of the Ebon Law":

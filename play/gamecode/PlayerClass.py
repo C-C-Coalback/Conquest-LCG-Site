@@ -267,6 +267,7 @@ class Player:
                 await self.game.send_update_message("Apoka Errata is active")
             else:
                 await self.game.send_update_message("No Errata is active")
+            await self.game.send_update_message("The " + self.game.sector + " sector is active")
             await self.game.send_update_message(
                 self.game.name_1 + " may mulligan their opening hand.")
         self.condition_player_main.notify_all()
@@ -2399,7 +2400,36 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == card_name:
                     self.cards_in_play[i + 1][j].misc_ability_used = False
 
-    def return_card_to_hand(self, planet_pos, unit_pos):
+    def return_attachment_to_hand(self, planet_pos, unit_pos, attachment_pos):
+        other_player = self.get_other_player()
+        if planet_pos == -2:
+            card_name = self.headquarters[unit_pos].get_attachments()[attachment_pos].get_name()
+            name_owner = self.headquarters[unit_pos].get_attachments()[attachment_pos].name_owner
+            if name_owner == self.name_player:
+                self.cards.append(card_name)
+            else:
+                other_player.cards.append(card_name)
+            del self.headquarters[unit_pos].get_attachments()[attachment_pos]
+            return None
+        card_name = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_name()
+        name_owner = self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner
+        if name_owner == self.name_player:
+            self.cards.append(card_name)
+        else:
+            other_player.cards.append(card_name)
+        del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+        return None
+
+    def return_attachments_on_card_to_hand(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            while len(self.headquarters[unit_pos].get_attachments()):
+                self.return_attachment_to_hand(planet_pos, unit_pos, 0)
+            return None
+        while len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()):
+            self.return_attachment_to_hand(planet_pos, unit_pos, 0)
+        return None
+
+    def return_card_to_hand(self, planet_pos, unit_pos, return_attachments=False):
         if planet_pos == -2:
             if self.headquarters[unit_pos].name_owner == self.name_player:
                 self.cards.append(self.headquarters[unit_pos].get_name())
@@ -2408,7 +2438,10 @@ class Player:
                 if self.game.name_1 == self.name_player:
                     ret_player = self.game.p2
                 ret_player.cards.append(self.headquarters[unit_pos].get_name())
-            self.discard_attachments_from_card(planet_pos, unit_pos)
+            if not return_attachments:
+                self.discard_attachments_from_card(planet_pos, unit_pos)
+            else:
+                self.return_attachments_on_card_to_hand(planet_pos, unit_pos)
             self.remove_card_from_hq(unit_pos)
             return None
         if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == self.name_player:
@@ -2418,7 +2451,10 @@ class Player:
             if self.game.name_1 == self.name_player:
                 ret_player = self.game.p2
             ret_player.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
-        self.discard_attachments_from_card(planet_pos, unit_pos)
+        if not return_attachments:
+            self.discard_attachments_from_card(planet_pos, unit_pos)
+        else:
+            self.return_attachments_on_card_to_hand(planet_pos, unit_pos)
         self.remove_card_from_play(planet_pos, unit_pos)
         return None
 
@@ -2813,6 +2849,11 @@ class Player:
                     return True
             return False
         else:
+            gardis_planets = ["Anshan", "Beckel", "Erida", "Excellor", "Jalayerid",
+                              "Jaricho", "Munos", "Navida Prime", "Nectavus XI", "Vargus"]
+            if self.game.planet_array[planet_pos - 1] in gardis_planets:
+                self.game.create_reaction(self.game.planet_array[planet_pos - 1] + " Commit",
+                                          self.name_player, (int(self.number), planet_pos - 1, -1))
             i = 0
             while i < len(headquarters_list):
                 card_type = headquarters_list[i].get_card_type()
@@ -5108,6 +5149,12 @@ class Player:
                 self.warlord_just_got_destroyed = True
             elif not self.headquarters[card_pos].get_bloodied():
                 self.headquarters[card_pos].bloody_warlord()
+                self.urien_relevant = False
+                self.gorzod_relevant = False
+                self.subject_omega_relevant = False
+                self.grigory_maksim_relevant = False
+                self.illuminor_szeras_relevant = False
+                self.castellan_crowe_2_relevant = False
             else:
                 if self.get_ability_given_pos(-2, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
                     self.game.create_interrupt("Magus Harid: Final Form", self.name_player,

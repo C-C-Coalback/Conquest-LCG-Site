@@ -72,12 +72,24 @@
 </div>
 <div id="game-settings-container">
     <h2>Game Settings</h2>
-    <input id="cb" type="checkbox" style="float: left; margin-top: 5px;>">
+    <input id="cb" type="checkbox" style="float: left; margin-top: 5px;">
     <div style="margin-left: 25px;">
      Private
     </div>
     <br>
-    <input id="apokacb" type="checkbox" style="float: left; margin-top: 5px;>">
+    <select id="sector" style="float: left; margin-top: 0px;">
+        <option value="Traxis" selected="selected">Traxis</option>
+        <option value="Gardis">Gardis</option>
+        <option value="Veros">Veros</option>
+        <option value="The Breach">The Breach</option>
+        <option value="Nepthis">Nepthis</option>
+        <option value="Sargos">Sargos</option>
+    </select>
+    <div style="margin-left: 25px;">
+     Sector
+    </div>
+    <br>
+    <input id="apokacb" type="checkbox" style="float: left; margin-top: 5px;">
     <div style="margin-left: 25px;">
      Apoka Errata
     </div>
@@ -110,15 +122,16 @@
             } else if (split_string[0] == "Create spec") {
                 addSpec(split_string[1], split_string[2], split_string[3]);
             } else {
-                addLobby(split_string[1], split_string[2], split_string[3], split_string[4])
+                addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5])
             }
         };
 
         document.querySelector('#create-lobby-submit').onclick = function(e) {
-            const private = document.getElementById("cb").checked
-            const apoka = document.getElementById("apokacb").checked
+            const private = document.getElementById("cb").checked;
+            const apoka = document.getElementById("apokacb").checked;
+            const sector = document.getElementById("sector").value;
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString()
+                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString() + "/" + sector
             }));
         };
 
@@ -178,7 +191,7 @@
             document.body.appendChild(ourAudio);
         }
 
-        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka) {
+        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka, sector) {
             var stringToAdd = "";
             stringToAdd = `<div class="box">` + nameOfPlayerOne + `<br>VS<br>`+ nameOfPlayerTwo + `
                 </div><details><summary>Settings</summary>`;
@@ -193,6 +206,8 @@
             } else {
                 stringToAdd += "No Errata";
             }
+            stringToAdd += "<br>";
+            stringToAdd += sector + " Sector";
             stringToAdd += "</details>";
             document.getElementById("add_to_me").innerHTML += stringToAdd;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {

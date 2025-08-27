@@ -141,6 +141,24 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         elif self.misc_target_unit_2 == (-1, -1):
                             self.misc_target_unit_2 = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+        elif current_reaction == "Beckel Commit":
+            if game_update_string[1] == primary_player.number:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                    self.delete_reaction()
+        elif current_reaction == "Excellor Commit":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.delete_reaction()
+        elif current_reaction == "Jalayerid Commit":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.delete_reaction()
+        elif current_reaction == "Nectavus XI Commit":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                    self.delete_reaction()
         elif current_reaction == "Patient Infiltrator":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 damage = player_owning_card.get_damage_given_pos(planet_pos, unit_pos)

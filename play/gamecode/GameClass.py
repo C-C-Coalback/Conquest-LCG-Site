@@ -28,7 +28,7 @@ def create_planets(planet_array_objects):
 
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka,
-                 apoka_errata_cards):
+                 apoka_errata_cards, sector="Traxis"):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
@@ -55,8 +55,16 @@ class Game:
         self.current_board_state = ""
         self.running = True
         self.planet_array = []
-        for i in range(10):
-            self.planet_array.append(self.planet_cards_array[i].get_name())
+        self.sector = sector
+        if sector == "Traxis":
+            for i in range(10):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
+        elif sector == "Gardis":
+            for i in range(10, 20):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
+        else:
+            for i in range(10):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
         random.shuffle(self.planet_array)
         self.planets_removed_from_game = copy.deepcopy(self.planet_array[-3:])
         self.planet_array = self.planet_array[:7]
@@ -307,7 +315,8 @@ class Game:
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
-                                 "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law"]
+                                 "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
+                                 "Erida Commit", "Jaricho Commit", "Beckel Commit"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -421,6 +430,12 @@ class Game:
         self.queued_moves = []  # (player num, planet pos, unit pos, destination)
         self.sororitas_command_squad_value = 0
         self.retaliate_used = False
+        self.jaricho_target = -1
+        self.active_jaricho_battle = False
+        self.jaricho_actual_triggered_planet = -1
+        self.nectavus_active = False
+        self.nectavus_target = -1
+        self.nectavus_actual_current_planet = -1
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -1333,7 +1348,8 @@ class Game:
                             self.reset_search_values()
                             if self.resolving_search_box:
                                 self.resolving_search_box = False
-                            if self.battle_ability_to_resolve == "Elouith":
+                            if self.battle_ability_to_resolve == "Elouith" or \
+                                    self.battle_ability_to_resolve == "Anshan":
                                 await self.resolve_battle_conclusion(name, game_update_string)
                                 self.reset_battle_resolve_attributes()
                     else:
@@ -1393,6 +1409,11 @@ class Game:
         self.p2.foretell_permitted = True
         self.p1.rok_bombardment_active = []
         self.p2.rok_bombardment_active = []
+        self.nectavus_active = False
+        self.nectavus_target = -1
+        if self.nectavus_actual_current_planet != -1:
+            self.last_planet_checked_command_struggle = self.nectavus_actual_current_planet
+        self.nectavus_actual_current_planet = -1
         if not self.tense_negotiations_active:
             winner = None
             if self.player_resolving_battle_ability == self.name_2:
@@ -1437,6 +1458,10 @@ class Game:
             self.p1.reset_extra_health_eob()
             self.p2.reset_extra_health_eob()
             self.additional_icons_planets_eob = [[], [], [], [], [], [], []]
+            if self.active_jaricho_battle:
+                self.last_planet_checked_for_battle = self.jaricho_actual_triggered_planet
+                self.active_jaricho_battle = False
+                self.jaricho_actual_triggered_planet = -1
             self.mode = "Normal"
             if self.kaerux_erameas_active:
                 self.kaerux_erameas_active = False
@@ -2265,7 +2290,37 @@ class Game:
                 self.card_type_of_searched_card = None
                 self.faction_of_searched_card = None
                 self.max_cost_of_searched_card = None
+                self.all_conditions_searched_card_required = False
                 self.no_restrictions_on_chosen_card = True
+            else:
+                await self.send_update_message("Too few cards in deck for search")
+                await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Navida Prime":
+            self.choices_available = []
+            for i in range(len(self.p1.victory_display)):
+                self.choices_available.append(self.p1.victory_display[i].get_name())
+            for i in range(len(self.p2.victory_display)):
+                self.choices_available.append(self.p2.victory_display[i].get_name())
+            if not self.choices_available:
+                await self.resolve_battle_conclusion(name, game_update_string)
+            else:
+                self.choice_context = "Navida Prime Target"
+                self.name_player_making_choices = winner.name_player
+        elif self.battle_ability_to_resolve == "Anshan":
+            winner.number_cards_to_search = len(winner.deck)
+            if len(winner.deck) > 5:
+                winner.number_cards_to_search = 6
+            if winner.number_cards_to_search:
+                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                self.name_player_who_is_searching = winner.name_player
+                self.number_who_is_searching = str(winner.number)
+                self.what_to_do_with_searched_card = "PLAY TO BATTLE"
+                self.traits_of_searched_card = None
+                self.card_type_of_searched_card = "Army"
+                self.faction_of_searched_card = None
+                self.max_cost_of_searched_card = 3
+                self.no_restrictions_on_chosen_card = False
+                self.all_conditions_searched_card_required = True
             else:
                 await self.send_update_message("Too few cards in deck for search")
                 await self.resolve_battle_conclusion(name, game_update_string)
@@ -2278,11 +2333,32 @@ class Game:
                 self.name_player_making_choices = winner.name_player
             else:
                 await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Beckel":
+            await self.send_update_message("Please say your card name in the chat.")
+            self.choices_available = ["Look At Hand."]
+            self.choice_context = "Beckel Pause"
+            self.name_player_making_choices = winner.name_player
         elif self.battle_ability_to_resolve == "Y'varn":
             self.yvarn_active = True
             self.p1_triggered_yvarn = False
             self.p2_triggered_yvarn = False
             self.reset_choices_available()
+        elif self.battle_ability_to_resolve == "Excellor":
+            self.misc_target_unit = (-1, -1)
+            self.misc_target_player = ""
+        elif self.battle_ability_to_resolve == "Vargus":
+            self.misc_target_unit = (-1, -1)
+            self.misc_target_player = ""
+        elif self.battle_ability_to_resolve == "Jalayerid":
+            self.misc_misc = []
+            if self.last_planet_checked_for_battle != 0:
+                if self.planets_in_play_array[self.last_planet_checked_for_battle - 1]:
+                    self.misc_misc.append(self.last_planet_checked_for_battle - 1)
+            if self.last_planet_checked_for_battle != 6:
+                if self.planets_in_play_array[self.last_planet_checked_for_battle + 1]:
+                    self.misc_misc.append(self.last_planet_checked_for_battle + 1)
+            self.misc_misc.append(-2)
+            self.misc_misc_2 = []
 
     async def resolve_choice(self, name, game_update_string):
         if name == self.name_1:
@@ -2372,6 +2448,22 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Beckel Gain":
+                        if chosen_choice == "Yes":
+                            primary_player.add_resources(1)
+                        self.reset_choices_available()
+                        await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Beckel Pause":
+                        message_to_send = "Cards in " + secondary_player.name_player + "'s hand: "
+                        for i in range(len(secondary_player.cards)):
+                            message_to_send += secondary_player.cards[i]
+                            if i != len(secondary_player.cards) - 1:
+                                message_to_send += ", "
+                        message_to_send += ". Was the card you named in the hand?"
+                        await self.send_update_message(message_to_send)
+                        self.choice_context = "Beckel Gain"
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = primary_player.name_player
                     elif self.choice_context == "Nurgling Bomb Choice:":
                         planet, unit = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet, unit)
@@ -2834,6 +2926,29 @@ class Game:
                                     self.choices_available.append(card.get_name())
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Suffer Rakarth's Experimentations"
+                    elif self.choice_context == "Anshan own gains":
+                        if chosen_choice == "Draw 1 card":
+                            primary_player.draw_card()
+                        else:
+                            primary_player.add_resources(1)
+                        self.choice_context = "Anshan opponent gains"
+                    elif self.choice_context == "Munos Topdeck":
+                        if chosen_choice == "Do Nothing":
+                            pass
+                        else:
+                            primary_player.deck.append(primary_player.deck[0])
+                            del primary_player.deck[0]
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
+                        self.delete_reaction()
+                    elif self.choice_context == "Anshan opponent gains":
+                        if chosen_choice == "Draw 1 card":
+                            secondary_player.draw_card()
+                        else:
+                            secondary_player.add_resources(1)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Catachan Devils Patrol: make a choice":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Take Damage":
@@ -3066,6 +3181,7 @@ class Game:
                             self.card_type_of_searched_card = "Support"
                             self.faction_of_searched_card = None
                             self.no_restrictions_on_chosen_card = False
+                            self.all_conditions_searched_card_required = True
                         else:
                             self.delete_reaction()
                             self.resolving_search_box = False
@@ -3204,6 +3320,11 @@ class Game:
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.searing_brand_cancel_enabled = True
+                    elif self.choice_context == "Navida Prime Target":
+                        self.battle_ability_to_resolve = chosen_choice
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "Resolve Battle Ability?"
+                        self.name_player_making_choices = name
                     elif self.choice_context == "Which Player? (Slake the Thirst):":
                         self.misc_target_choice = game_update_string[1]
                         self.choices_available = []
@@ -3298,7 +3419,6 @@ class Game:
                             else:
                                 winner = self.p1
                                 loser = self.p2
-                                "No Mercy"
                             self.unit_to_move_position = (-1, -1)
                             self.player_using_battle_ability = winner.name_player
                             if winner.foretell_check():
@@ -4442,6 +4562,7 @@ class Game:
                             self.faction_of_searched_card = None
                             self.max_cost_of_searched_card = None
                             self.no_restrictions_on_chosen_card = True
+                            self.all_conditions_searched_card_required = False
                         else:
                             await self.send_update_message("Too few cards in deck")
                     elif self.choice_context == "Which deck to use Biel-Tan Warp Spiders:":
@@ -4464,6 +4585,7 @@ class Game:
                             self.faction_of_searched_card = None
                             self.max_cost_of_searched_card = None
                             self.no_restrictions_on_chosen_card = True
+                            self.all_conditions_searched_card_required = False
                         else:
                             await self.send_update_message("Too few cards in deck")
 
@@ -4520,11 +4642,27 @@ class Game:
                 self.yvarn_active = False
                 self.reset_choices_available()
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+        elif self.nectavus_active:
+            await CommandPhase.update_game_event_command_section(self, name, game_update_string)
+            if not self.nectavus_active:
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
         elif name == self.player_resolving_battle_ability:
-            print("Name match")
+            primary_player = self.p1
+            secondary_player = self.p2
+            if name == secondary_player.name_player:
+                secondary_player = self.p1
+                primary_player = self.p2
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+                    if self.battle_ability_to_resolve == "Jalayerid" and self.misc_misc_2 is not None:
+                        for i in range(len(self.misc_misc_2)):
+                            og_pla, og_pos = self.misc_misc_2[i]
+                            secondary_player.assign_damage_to_pos(og_pla, og_pos, 1)
+                        self.misc_misc = None
+                        self.misc_misc_2 = None
+                        self.damage_from_atrox = True
+                    else:
+                        await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             if self.battle_ability_to_resolve == "Ferrin":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -4587,6 +4725,168 @@ class Game:
                         self.choices_available = ["Yes", "No"]
                         self.choice_context = "Resolve Battle Ability?"
                         self.name_player_making_choices = name
+            elif self.battle_ability_to_resolve == "Nectavus XI":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        self.nectavus_target = int(game_update_string[1])
+                        self.nectavus_active = True
+                        self.nectavus_actual_current_planet = self.last_planet_checked_command_struggle
+                        self.last_planet_checked_command_struggle = int(game_update_string[1])
+                        if not self.resolve_remaining_cs_after_reactions:
+                            self.total_gains_command_struggle = [None, None, None, None, None, None, None]
+                        self.resolve_remaining_cs_after_reactions = False
+                        self.before_command_struggle = False
+                        self.p1.has_passed = True
+                        self.p2.has_passed = True
+                        self.interrupts_during_cs_allowed = True
+                        self.reactions_after_cs_allowed = True
+                        await self.resolve_battle_ability_routine(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Jaricho":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if int(game_update_string[1]) != self.last_planet_checked_for_battle and \
+                                int(game_update_string[1]) != self.round_number:
+                            self.jaricho_target = int(game_update_string[1])
+                            self.jaricho_actual_triggered_planet = self.last_planet_checked_for_battle
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                            self.active_jaricho_battle = True
+            elif self.battle_ability_to_resolve == "Munos":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            cost = player_owning_card.get_cost_given_pos(planet_pos, unit_pos)
+                            player_owning_card.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
+                            player_owning_card.add_resources(cost)
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            cost = player_owning_card.get_cost_given_pos(planet_pos, unit_pos)
+                            player_owning_card.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
+                            player_owning_card.add_resources(cost)
+                            await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Erida":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == primary_player.number:
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                                    primary_player.draw_card()
+                                    primary_player.draw_card()
+                                    primary_player.add_resources(2)
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == primary_player.number:
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                if primary_player.sacrifice_card_in_hq(unit_pos):
+                                    primary_player.draw_card()
+                                    primary_player.draw_card()
+                                    primary_player.add_resources(2)
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Jalayerid":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == secondary_player.get_number():
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos in self.misc_misc:
+                                secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.misc_misc_2.append((planet_pos, unit_pos))
+                                self.misc_misc.remove(planet_pos)
+                            if not self.misc_misc:
+                                for i in range(len(self.misc_misc_2)):
+                                    og_pla, og_pos = self.misc_misc_2[i]
+                                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1)
+                                self.misc_misc = None
+                                self.misc_misc_2 = None
+                                self.damage_from_atrox = True
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == secondary_player.get_number():
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if secondary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                                if planet_pos in self.misc_misc:
+                                    secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    self.misc_misc_2.append((planet_pos, unit_pos))
+                                    self.misc_misc.remove(planet_pos)
+                                if not self.misc_misc:
+                                    for i in range(len(self.misc_misc_2)):
+                                        og_pla, og_pos = self.misc_misc_2[i]
+                                        secondary_player.assign_damage_to_pos(og_pla, og_pos, 1)
+                                    self.misc_misc = None
+                                    self.misc_misc_2 = None
+                                    self.damage_from_atrox = True
+            elif self.battle_ability_to_resolve == "Vargus":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+                            if (planet_pos, unit_pos) != self.misc_target_unit:
+                                if not self.misc_target_player:
+                                    if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                        self.misc_target_player = player_owning_card.name_player
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                else:
+                                    og_pla, og_pos = self.misc_target_unit
+                                    player_owning_first_card = self.p1
+                                    if self.misc_target_player != player_owning_first_card.name_player:
+                                        player_owning_first_card = self.p2
+                                    player_owning_first_card.remove_damage_from_pos(og_pla, og_pos, 1)
+                                    damage = player_owning_card.get_damage_given_pos(planet_pos, unit_pos)
+                                    player_owning_card.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+                                    if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                        primary_player.add_resources(1)
+                                    player_owning_first_card.reset_all_aiming_reticles_play_hq()
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Excellor":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            if planet_pos != self.misc_target_unit[0]:
+                                if not self.misc_target_player:
+                                    self.misc_target_player = player_owning_card.name_player
+                                    self.misc_target_unit = (planet_pos, unit_pos)
+                                    player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                elif self.misc_target_player == player_owning_card.name_player:
+                                    og_pla, og_pos = self.misc_target_unit
+                                    player_owning_card.cards_in_play[og_pla + 1].append(
+                                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos])
+                                    player_owning_card.cards_in_play[planet_pos + 1].append(
+                                        player_owning_card.cards_in_play[og_pla + 1][og_pos])
+                                    del player_owning_card.cards_in_play[og_pla + 1][og_pos]
+                                    del player_owning_card.cards_in_play[planet_pos + 1][unit_pos]
+                                    player_owning_card.reset_all_aiming_reticles_play_hq()
+                                    await self.resolve_battle_conclusion(name, game_update_string)
             elif self.battle_ability_to_resolve == "Iridial":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -8243,7 +8543,15 @@ class Game:
                 self.name_player_making_choices = self.name_2
 
     def find_next_planet_for_combat(self):
-        if not self.bloodrain_tempest_active:
+        if self.jaricho_target != -1:
+            i = self.jaricho_target
+            self.jaricho_target = -1
+            self.begin_battle(i)
+            self.begin_combat_round()
+            if not self.start_battle_deepstrike:
+                self.start_ranged_skirmish(i)
+            return True
+        elif not self.bloodrain_tempest_active:
             i = self.last_planet_checked_for_battle + 1
             while i < len(self.planet_array):
                 if self.planets_in_play_array[i]:

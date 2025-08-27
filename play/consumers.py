@@ -17,7 +17,7 @@ for key in range(len(card_array)):
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
-active_lobbies = [[], [], [], []]
+active_lobbies = [[], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
 
@@ -45,7 +45,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.accept()
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                      + active_lobbies[2][i] + "/" + active_lobbies[3][i]
+                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + active_lobbies[4][i]
             await self.chat_message({"type": "chat.message", "message": message})
         i = 0
         print("CURRENT SPEC")
@@ -98,10 +98,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 active_lobbies[3].append("No Errata")
             else:
                 active_lobbies[3].append("Apoka")
+            active_lobbies[4].append(split_message[3])
             print(active_lobbies)
             le = len(active_lobbies[0]) - 1
             split_message[0] += "/" + active_lobbies[0][le] + "/" + active_lobbies[1][le] + \
-                                "/" + active_lobbies[2][le] + "/" + active_lobbies[3][le]
+                                "/" + active_lobbies[2][le] + "/" + active_lobbies[3][le] + \
+                                "/" + active_lobbies[4][le]
             print(split_message[0])
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "chat.message", "message": split_message[0]}
@@ -114,6 +116,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     del active_lobbies[1][i]
                     del active_lobbies[2][i]
                     del active_lobbies[3][i]
+                    del active_lobbies[4][i]
                     i += -1
                 i += 1
             print(active_lobbies)
@@ -123,7 +126,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             )
             for i in range(len(active_lobbies[0])):
                 message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/"\
-                          + active_lobbies[2][i] + "/" + active_lobbies[3][i]
+                          + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
@@ -139,7 +142,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 )
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i]
+                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
@@ -172,7 +175,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 apoka = False
                 if active_lobbies[3][game_num] == "Apoka":
                     apoka = True
-                game_id = self.create_game(first_name, second_name, game_id, apoka)
+                sector = active_lobbies[4][game_num]
+                game_id = self.create_game(first_name, second_name, game_id, apoka, sector=sector)
                 if active_lobbies[2][game_num] == "Public":
                     current_time = datetime.datetime.now()
                     time_change = datetime.timedelta(minutes=1440)
@@ -191,11 +195,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         del active_lobbies[1][i]
                         del active_lobbies[2][i]
                         del active_lobbies[3][i]
+                        del active_lobbies[4][i]
                         i += -1
                     i += 1
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i]
+                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
@@ -220,7 +225,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    def create_game(self, name_1, name_2, game_id, apoka):
+    def create_game(self, name_1, name_2, game_id, apoka, sector="Traxis"):
         global active_games
         global card_array
         global planet_array
@@ -229,12 +234,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         for i in range(len(active_games)):
             if active_games[i].game_id == game_id:
                 new_game_id = game_id + random.choice('0123456789ABCDEF')
-                return self.create_game(name_1, name_2, new_game_id, apoka)
+                return self.create_game(name_1, name_2, new_game_id, apoka, sector=sector)
         card_errata = []
         if apoka:
             card_errata = apoka_errata_cards_array
         active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict,
-                                           apoka, card_errata))
+                                           apoka, card_errata, sector=sector))
         return game_id
 
 

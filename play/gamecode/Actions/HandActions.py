@@ -425,7 +425,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Tense Negotiations":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
-                            if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            if primary_player.get_ready_given_pos(warlord_planet, warlord_pos) and \
+                                    self.planet_array[warlord_planet] != "Jaricho":
                                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                                 primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
                                 self.action_cleanup()
