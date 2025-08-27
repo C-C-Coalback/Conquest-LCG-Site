@@ -3776,7 +3776,7 @@ class Player:
             elif expiration == "EOP":
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_phase(amount)
             elif expiration == "EOG":
-                self.headquarters[unit].increase_extra_attack_until_end_of_game(amount)
+                self.headquarters[unit_pos].increase_extra_attack_until_end_of_game(amount)
             return None
         if expiration == "EOB":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
@@ -3874,6 +3874,8 @@ class Player:
         self.concealing_darkness_active = False
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
+                if self.game.phase == "DEPLOY":
+                    self.headquarters[i].cannot_ready_hq_phase = False
                 self.headquarters[i].negative_hp_until_eop = 0
                 self.headquarters[i].hit_by_which_salamanders = []
                 self.headquarters[i].new_ability = ""
@@ -3896,6 +3898,8 @@ class Player:
                     self.headquarters[i].command_until_combat = 0
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                if self.game.phase == "DEPLOY":
+                    self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_hq_phase = False
                 self.cards_in_play[planet_pos + 1][unit_pos].lost_keywords_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop = 0
@@ -5675,12 +5679,12 @@ class Player:
             else:
                 self.destroy_card_in_play(planet_num, i)
 
-    def summon_token_at_planet(self, token_name, planet_num):
+    def summon_token_at_planet(self, token_name, planet_num, already_exhausted=False):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if card.get_name() != "FINAL CARD":
             if self.count_copies_in_play(card.get_name()) < 10:
-                self.add_card_to_planet(card, planet_num)
+                self.add_card_to_planet(card, planet_num, already_exhausted=already_exhausted)
 
     def summon_token_at_hq(self, token_name, amount=1):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
@@ -6229,6 +6233,8 @@ class Player:
 
     def ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
+            if self.headquarters[unit_id].cannot_ready_hq_phase and self.game.phase == "HEADQUARTERS":
+                return None
             if self.headquarters[unit_id].cannot_ready_phase:
                 return None
             was_ready = self.headquarters[unit_id].get_ready()
@@ -6246,6 +6252,8 @@ class Player:
                 if self.get_ability_given_pos(planet_id, unit_id) == "Salamander Flamer Squad":
                     self.game.create_reaction("Salamander Flamer Squad", self.name_player,
                                               (int(self.number), planet_id, unit_id))
+            return None
+        if self.cards_in_play[planet_id + 1][unit_id].cannot_ready_hq_phase and self.game.phase == "HEADQUARTERS":
             return None
         if self.cards_in_play[planet_id + 1][unit_id].cannot_ready_phase:
             return None

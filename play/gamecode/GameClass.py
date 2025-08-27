@@ -62,6 +62,9 @@ class Game:
         elif sector == "Gardis":
             for i in range(10, 20):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
+        elif sector == "Veros":
+            for i in range(20, 30):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
         else:
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -2279,6 +2282,48 @@ class Game:
             else:
                 loser.discard_card_at_random()
                 await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Mangeras":
+            self.misc_counter = 4
+        elif self.battle_ability_to_resolve == "Contaminated World Adracan":
+            self.misc_counter = 5
+            self.misc_misc = []
+            self.misc_target_planet = -1
+            self.chosen_first_card = False
+        elif self.battle_ability_to_resolve == "Craftworld Lugath":
+            self.choices_available = ["Copy Adjacent", "Switch"]
+            if self.last_planet_checked_for_battle == self.round_number:
+                self.choices_available.remove("Switch")
+            self.choice_context = "Craftworld Lugath Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Ironforge":
+            self.chosen_first_card = False
+            await self.send_update_message("You may move a unit to your HQ.")
+        elif self.battle_ability_to_resolve == "Kunarog The Slave Market":
+            self.choices_available = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
+            self.choice_context = "Kunarog The Slave Market Token"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Xenos World Tallin":
+            self.chosen_first_card = False
+            self.chosen_second_card = False
+            self.misc_target_planet = -1
+        elif self.battle_ability_to_resolve == "Frontier World Jaris":
+            if len(winner.cards) < len(loser.cards):
+                for _ in range(3):
+                    winner.draw_card()
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Zarvoss Foundry":
+            winner.number_cards_to_search = 8
+            if len(winner.deck) < 8:
+                winner.number_cards_to_search = len(winner.deck)
+            self.choices_available = winner.deck[:winner.number_cards_to_search]
+            if self.choices_available:
+                self.choice_context = "Zarvoss Foundry Rally"
+                self.name_player_making_choices = winner.name_player
+                self.resolving_search_box = True
+            else:
+                await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Elouith":
             if len(winner.deck) > 2:
                 winner.number_cards_to_search = 3
@@ -2915,6 +2960,10 @@ class Game:
                             primary_player.retreat_unit(planet_pos, unit_pos)
                             self.reset_choices_available()
                             self.delete_reaction()
+                    elif self.choice_context == "Kunarog The Slave Market Token":
+                        self.misc_target_choice = chosen_choice
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Rakarth's Experimentations card type":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = ["Damage Warlord"]
@@ -2932,6 +2981,38 @@ class Game:
                         else:
                             primary_player.add_resources(1)
                         self.choice_context = "Anshan opponent gains"
+                    elif self.choice_context == "BTD: Last Planet or HQ?":
+                        if primary_player.aiming_reticle_coords_hand is not None:
+                            card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                            if chosen_choice == "HQ":
+                                if primary_player.add_to_hq(card):
+                                    del primary_player.cards[primary_player.aiming_reticle_coords_hand]
+                            else:
+                                last_planet = -1
+                                for i in range(7):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                if last_planet != -1:
+                                    if primary_player.add_card_to_planet(card, last_planet):
+                                        del primary_player.cards[primary_player.aiming_reticle_coords_hand]
+                        elif primary_player.aiming_reticle_coords_discard is not None:
+                            card = primary_player.get_card_in_discard(primary_player.aiming_reticle_coords_discard)
+                            if chosen_choice == "HQ":
+                                if primary_player.add_to_hq(card):
+                                    del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+                            else:
+                                last_planet = -1
+                                for i in range(7):
+                                    if self.planets_in_play_array[i]:
+                                        last_planet = i
+                                if last_planet != -1:
+                                    if primary_player.add_card_to_planet(card, last_planet) != -1:
+                                        del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+                        self.reset_choices_available()
+                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.aiming_reticle_coords_discard = None
+                        self.resolving_search_box = False
+                        await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Munos Topdeck":
                         if chosen_choice == "Do Nothing":
                             pass
@@ -2969,6 +3050,20 @@ class Game:
                                 self.p2.has_passed = True
                                 self.reset_combat_positions()
                         self.reset_choices_available()
+                    elif self.choice_context == "CWA: Infest Planet?":
+                        if chosen_choice == "Yes":
+                            self.infest_planet(self.misc_target_planet, primary_player)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        for i in range(len(self.misc_misc)):
+                            num, pla, pos = self.misc_misc[i]
+                            if num == 1:
+                                self.p1.assign_damage_to_pos(pla, pos, 1)
+                            else:
+                                self.p2.assign_damage_to_pos(pla, pos, 1)
+                            self.damage_from_atrox = True
+                        if not self.damage_from_atrox:
+                            await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Pulsating Carapace choice":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Infest planet":
@@ -3151,6 +3246,21 @@ class Game:
                                     primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
                                     primary_player.bottom_remaining_cards()
                                     self.delete_reaction()
+                    elif self.choice_context == "Zarvoss Foundry Rally":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Support":
+                            primary_player.add_to_hq(card)
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.bottom_remaining_cards()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            await self.resolve_battle_conclusion(name, game_update_string)
+                        elif card.get_card_type() == "Attachment":
+                            self.misc_player_storage = chosen_choice
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.bottom_remaining_cards()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Sacrifice Convent Prioris Advisor?":
                         if self.choices_available[int(game_update_string[1])] == "Yes":
                             i = 0
@@ -3233,6 +3343,10 @@ class Game:
                             primary_player.sacrifice_card_in_hq(unit_pos)
                         else:
                             self.delete_reaction()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Craftworld Lugath Choice":
+                        self.misc_target_choice = chosen_choice
+                        self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Sweep Attack: Search which area?":
                         if game_update_string[1] == "0":
@@ -4646,6 +4760,41 @@ class Game:
             await CommandPhase.update_game_event_command_section(self, name, game_update_string)
             if not self.nectavus_active:
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
+        elif name != self.player_resolving_battle_ability:
+            primary_player = self.p1
+            secondary_player = self.p2
+            if name == secondary_player.name_player:
+                secondary_player = self.p1
+                primary_player = self.p2
+            if name == self.name_1 or name == self.name_2:
+                if self.battle_ability_to_resolve == "Xenos World Tallin":
+                    if self.chosen_first_card and not self.chosen_second_card:
+                        if len(game_update_string) == 1:
+                            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                                self.chosen_second_card = True
+                                await self.send_update_message("The mandatory move was not performed.")
+                        if len(game_update_string) == 3:
+                            if game_update_string[0] == "HQ":
+                                if game_update_string[1] == primary_player.get_number():
+                                    if primary_player.get_card_type_given_pos(-2, int(game_update_string[2])) == "Army":
+                                        primary_player.move_unit_to_planet(
+                                            -2, int(game_update_string[2]),
+                                            self.misc_target_planet)
+                                        self.chosen_second_card = True
+                                        await self.send_update_message(secondary_player.name_player +
+                                                                       " may move an army unit to the same planet.")
+                        if len(game_update_string) == 4:
+                            if game_update_string[0] == "IN_PLAY":
+                                if game_update_string[1] == primary_player.get_number():
+                                    if primary_player.get_card_type_given_pos(int(game_update_string[2]),
+                                                                              int(game_update_string[3])) == "Army":
+                                        if int(game_update_string[2]) != self.misc_target_planet:
+                                            primary_player.move_unit_to_planet(
+                                                int(game_update_string[2]),
+                                                int(game_update_string[3]), self.misc_target_planet)
+                                            self.chosen_second_card = True
+                                            await self.send_update_message(secondary_player.name_player +
+                                                                           " may move an army unit to the same planet.")
         elif name == self.player_resolving_battle_ability:
             primary_player = self.p1
             secondary_player = self.p2
@@ -4661,6 +4810,17 @@ class Game:
                         self.misc_misc = None
                         self.misc_misc_2 = None
                         self.damage_from_atrox = True
+                    elif self.battle_ability_to_resolve == "Ironforge" and not self.chosen_first_card:
+                        self.chosen_first_card = True
+                        await self.send_update_message("Passed on moving a unit to the HQ. "
+                                                       "You may still increase the stats of a unit.")
+                    elif self.battle_ability_to_resolve == "Contaminated World Adracan" and not self.chosen_first_card:
+                        self.chosen_first_card = True
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "CWA: Infest Planet?"
+                        self.name_player_making_choices = primary_player.name_player
+                        self.resolving_search_box = True
+                        await self.send_update_message("Infest the planet?")
                     else:
                         await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             if self.battle_ability_to_resolve == "Ferrin":
@@ -4725,6 +4885,217 @@ class Game:
                         self.choices_available = ["Yes", "No"]
                         self.choice_context = "Resolve Battle Ability?"
                         self.name_player_making_choices = name
+            elif self.battle_ability_to_resolve == "Kunarog The Slave Market":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if self.misc_target_choice:
+                            for i in range(2):
+                                primary_player.summon_token_at_planet(self.misc_target_choice,
+                                                                      int(game_update_string[1]),
+                                                                      already_exhausted=True)
+                            await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Craftworld Lugath":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if self.misc_target_choice == "Copy Adjacent":
+
+                            if abs(self.last_planet_checked_for_battle - int(game_update_string[1])):
+                                self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Resolve Battle Ability?"
+                                self.name_player_making_choices = name
+                        else:
+                            if self.last_planet_checked_for_battle != int(game_update_string[1]):
+                                temp = self.planet_array[int(game_update_string[1])]
+                                self.planet_array[int(game_update_string[1])] = \
+                                    self.planet_array[self.last_planet_checked_for_battle]
+                                self.planet_array[self.last_planet_checked_for_battle] = temp
+                                await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Ironforge":
+                if self.chosen_first_card:
+                    if len(game_update_string) == 3:
+                        if game_update_string[0] == "HQ":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.increase_attack_of_unit_at_pos(
+                                        planet_pos, unit_pos, 2, expiration="EOG")
+                                    primary_player.increase_health_of_unit_at_pos(
+                                        planet_pos, unit_pos, 2, expiration="EOG")
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                else:
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+                                    self.chosen_first_card = True
+                                    await self.send_update_message("You may increase the stats of a unit in the HQ.")
+            elif self.battle_ability_to_resolve == "Daprian's Gate":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            if player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
+                                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                                player_owning_card.headquarters[unit_pos].cannot_ready_hq_phase = True
+                                await self.resolve_battle_conclusion(planet_pos, unit_pos)
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            if player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
+                                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_hq_phase = True
+                                await self.resolve_battle_conclusion(planet_pos, unit_pos)
+            elif self.battle_ability_to_resolve == "Bhorsapolis The Decadent":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HAND":
+                        if game_update_string[1] == primary_player.get_number():
+                            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+                            if not card.check_for_a_trait("Elite"):
+                                if card.get_card_type() == "Army":
+                                    primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                                    primary_player.aiming_reticle_coords_discard = None
+                                    self.misc_target_choice = card.get_name()
+                                    self.choices_available = ["HQ", "Last Planet"]
+                                    self.choice_context = "BTD: Last Planet or HQ?"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                    if game_update_string[0] == "IN_DISCARD":
+                        if game_update_string[1] == primary_player.get_number():
+                            card = primary_player.get_card_in_discard(int(game_update_string[2]))
+                            if not card.check_for_a_trait("Elite"):
+                                if card.get_card_type() == "Army":
+                                    primary_player.aiming_reticle_coords_discard = int(game_update_string[2])
+                                    primary_player.aiming_reticle_coords_hand = None
+                                    self.misc_target_choice = card.get_name()
+                                    self.choices_available = ["HQ", "Last Planet"]
+                                    self.choice_context = "BTD: Last Planet or HQ?"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+            elif self.battle_ability_to_resolve == "Contaminated World Adracan":
+                if not self.chosen_first_card:
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == "1":
+                                player_owning_card = self.p1
+                            else:
+                                player_owning_card = self.p2
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if planet_pos == self.misc_target_planet or self.misc_target_planet == -1:
+                                if (int(player_owning_card.number), planet_pos, unit_pos) not in self.misc_misc:
+                                    self.misc_misc.append((int(player_owning_card.number), planet_pos, unit_pos))
+                                    self.misc_counter = self.misc_counter - 1
+                                    self.misc_target_planet = planet_pos
+                                    player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    if self.misc_counter < 1:
+                                        self.chosen_first_card = True
+                                        self.choices_available = ["Yes", "No"]
+                                        self.choice_context = "CWA: Infest Planet?"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                        await self.send_update_message("Infest the planet?")
+            elif self.battle_ability_to_resolve == "Mangeras":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == primary_player.get_number():
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == primary_player.get_number():
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Xenos World Tallin":
+                if len(game_update_string) == 2:
+                    if not self.chosen_first_card:
+                        if game_update_string[0] == "PLANETS":
+                            self.misc_target_planet = int(game_update_string[1])
+                            self.chosen_first_card = True
+                            await self.send_update_message(self.planet_array[int(game_update_string[1])] +
+                                                           " targeted for the Xenos World Tallin ability. " +
+                                                           secondary_player.name_player + " must move a unit.")
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == primary_player.get_number():
+                            if primary_player.get_card_type_given_pos(-2, int(game_update_string[2])) == "Army":
+                                primary_player.move_unit_to_planet(
+                                    -2, int(game_update_string[2]),
+                                    self.misc_target_planet)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                if len(game_update_string) == 4:
+                    if self.chosen_first_card and self.chosen_second_card:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == primary_player.get_number():
+                                if primary_player.get_card_type_given_pos(int(game_update_string[2]),
+                                                                          int(game_update_string[3])) == "Army":
+                                    if int(game_update_string[2]) != self.misc_target_planet:
+                                        primary_player.move_unit_to_planet(
+                                            int(game_update_string[2]), int(game_update_string[3]),
+                                            self.misc_target_planet)
+                                        await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Zarvoss Foundry":
+                if self.misc_player_storage:
+                    card = self.preloaded_find_card(self.misc_player_storage)
+                    if card.get_card_type() == "Attachment":
+                        if len(game_update_string) == 2:
+                            if game_update_string[0] == "PLANETS":
+                                if card.planet_attachment:
+                                    primary_player.add_attachment_to_planet(int(game_update_string[1]), card)
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                        elif len(game_update_string) == 3:
+                            if game_update_string[0] == "HQ":
+                                if game_update_string[1] == "1":
+                                    player_owning_card = self.p1
+                                else:
+                                    player_owning_card = self.p2
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                not_own_attachment = False
+                                if player_owning_card.get_number() != primary_player.get_number():
+                                    not_own_attachment = True
+                                if player_owning_card.attach_card(card, planet_pos, unit_pos,
+                                                                  not_own_attachment=not_own_attachment):
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                        elif len(game_update_string) == 4:
+                            if game_update_string[0] == "IN_PLAY":
+                                if game_update_string[1] == "1":
+                                    player_owning_card = self.p1
+                                else:
+                                    player_owning_card = self.p2
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                not_own_attachment = False
+                                if player_owning_card.get_number() != primary_player.get_number():
+                                    not_own_attachment = True
+                                if player_owning_card.attach_card(card, planet_pos, unit_pos,
+                                                                  not_own_attachment=not_own_attachment):
+                                    await self.resolve_battle_conclusion(name, game_update_string)
             elif self.battle_ability_to_resolve == "Nectavus XI":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":

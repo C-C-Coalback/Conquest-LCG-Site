@@ -40,5 +40,15 @@ def planet_cards_init():
                     CardClasses.PlanetCard("Navida Prime", "", 2, 0, False, False, True),
                     CardClasses.PlanetCard("Nectavus XI", "", 1, 1, True, True, False),
                     CardClasses.PlanetCard("Vargus", "", 2, 0, False, True, False),
+                    CardClasses.PlanetCard("Zarvoss Foundry", "", 1, 0, True, True, True),
+                    CardClasses.PlanetCard("Xenos World Tallin", "", 1, 1, False, True, True),
+                    CardClasses.PlanetCard("Mangeras", "", 1, 1, True, True, False),
+                    CardClasses.PlanetCard("Kunarog The Slave Market", "", 0, 2, True, False, False),
+                    CardClasses.PlanetCard("Ironforge", "", 2, 0, False, False, True),
+                    CardClasses.PlanetCard("Frontier World Jaris", "", 0, 1, True, True, True),
+                    CardClasses.PlanetCard("Daprian's Gate", "", 0, 2, False, False, True),
+                    CardClasses.PlanetCard("Craftworld Lugath", "", 2, 0, False, True, False),
+                    CardClasses.PlanetCard("Contaminated World Adracan", "", 1, 1, True, True, False),
+                    CardClasses.PlanetCard("Bhorsapolis The Decadent", "", 1, 1, True, False, True),
                     CardClasses.PlanetCard("FINAL CARD", "", -1, -1, False, False, False, "NO IMAGE")]
     return planet_array
