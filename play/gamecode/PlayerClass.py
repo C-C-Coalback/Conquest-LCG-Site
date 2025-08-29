@@ -3203,6 +3203,9 @@ class Player:
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, unit_id, "Herald of the Tau'va"):
                 return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Conjuring Warmaster":
+            if self.check_for_warlord(planet_id, card_effect=True, searching_name=self.name_player):
+                return True
         if planet_id == -2:
             return self.headquarters[unit_id].get_mobile()
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()

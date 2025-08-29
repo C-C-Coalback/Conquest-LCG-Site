@@ -328,19 +328,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Zarathur's Flamers":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Saint Celestine":
                         if not card_chosen.get_once_per_phase_used():
                             if not card_chosen.bloodied:
                                 card_chosen.set_once_per_phase_used(True)
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                                self.position_of_actioned_card = (planet_pos, unit_pos)
                                 self.chosen_first_card = False
                     elif ability == "Ravenous Flesh Hounds":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Conjuring Warmaster":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif ability == "Uncontrollable Rioters":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
@@ -1409,6 +1411,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.position_of_actioned_card = (-1, -1)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+    elif self.action_chosen == "Conjuring Warmaster":
+        if game_update_string[1] == primary_player.number:
+            if planet_pos != self.position_of_actioned_card[0]:
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                            if primary_player.move_unit_to_planet(
+                                    planet_pos, unit_pos, self.position_of_actioned_card[0]):
+                                last_element_index = len(
+                                    primary_player.cards_in_play[self.position_of_actioned_card[0] + 1]) - 1
+                                primary_player.exhaust_given_pos(self.position_of_actioned_card[0],
+                                                                 last_element_index)
+                                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                            self.position_of_actioned_card[1])
+                                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                                self.action_cleanup()
     elif self.action_chosen == "Imperial Bastion":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

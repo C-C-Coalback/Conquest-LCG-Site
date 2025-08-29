@@ -373,6 +373,11 @@ def chaos_cards_init():
                                                        "This unit cannot change control more than once per round.\n"
                                                        "Action: Give control of this unit to your opponent.",
                              "Cultist. Mob.", 0, faction, "Loyal", 2, 1, 0, False,
-                             action_in_play=True, allowed_phases_in_play="ALL")
+                             action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Conjuring Warmaster", "While at a planet with your warlord, this unit gains Mobile.\n"
+                                                    "Combat Action: Exhaust an Elite unit you control at a planet to "
+                                                    "move it to this planet. (Limit once per phase.)",
+                             "Warrior. Slaanesh.", 3, faction, "Loyal", 2, 3, 1, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return chaos_card_array
