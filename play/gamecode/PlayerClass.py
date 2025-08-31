@@ -181,6 +181,7 @@ class Player:
         self.cards_removed_from_game = []
         self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
         self.last_removed_string = ""
+        self.played_grand_plan = False
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -1826,6 +1827,26 @@ class Player:
             if self.game.phase == "COMBAT":
                 self.game.create_reaction("Eloquent Confessor", other_player.name_player,
                                           (int(self.number), position, last_element_index))
+        if card.get_card_type() == "Army":
+            for i in range(len(other_player.cards_in_play[position + 1])):
+                if other_player.resources > 0:
+                    if other_player.get_unique_given_pos(position, i):
+                        if not other_player.check_if_already_have_reaction("The Inevitable Decay"):
+                            if "The Inevitable Decay" in other_player.cards:
+                                self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                          (int(self.number), -1, -1))
+                            elif "The Inevitable Decay" in other_player.cards_removed_from_game:
+                                warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                                vael_relevant = False
+                                if other_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                        other_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                                    vael_relevant = True
+                                elif other_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                                        and not other_player.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                                    vael_relevant = True
+                                if vael_relevant:
+                                    self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                              (int(self.number), -1, -1))
         if position != 0:
             for i in range(len(other_player.cards_in_play[position])):
                 if other_player.get_ability_given_pos(position - 1, i) == "Interceptor Squad":
@@ -1966,6 +1987,21 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_once_per_game_used()
         return self.cards_in_play[planet_id + 1][unit_id].get_once_per_game_used()
+
+    def return_cards_to_hand_eor(self):
+        i = 0
+        while i < len(self.headquarters):
+            if self.headquarters[i].return_to_hand_eor:
+                self.return_card_to_hand(-2, i, return_attachments=False)
+                i = i - 1
+            i = i + 1
+        for i in range(7):
+            j = 0
+            while j < len(self.cards_in_play[i + 1]):
+                if self.cards_in_play[i + 1][j].return_to_hand_eor:
+                    self.return_card_to_hand(i, j, return_attachments=False)
+                    i = i - 1
+                i = i + 1
 
     def get_once_per_phase_used_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
@@ -2521,6 +2557,26 @@ class Player:
             if self.headquarters[origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(destination):
                     self.headquarters[origin_position].valid_defense_battery_target = True
+            if self.headquarters[origin_position].get_card_type() == "Army":
+                for i in range(len(other_player.cards_in_play[destination + 1])):
+                    if other_player.resources > 0:
+                        if other_player.get_unique_given_pos(destination, i):
+                            if not other_player.check_if_already_have_reaction("The Inevitable Decay"):
+                                if "The Inevitable Decay" in other_player.cards:
+                                    self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                              (int(self.number), -1, -1))
+                                elif "The Inevitable Decay" in other_player.cards_removed_from_game:
+                                    warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                                    vael_relevant = False
+                                    if other_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                            other_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                    elif other_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                                            and not other_player.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                    if vael_relevant:
+                                        self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                                  (int(self.number), -1, -1))
             for i in range(len(other_player.cards_in_play[destination + 1])):
                 if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(destination, i):
@@ -2697,13 +2753,33 @@ class Player:
                 if self.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
                     self.game.create_reaction("Wildrider Vyper", self.name_player,
                                               (int(self.number), origin_planet, i))
-            other_player = self.game.p1
-            if other_player.name_player == self.name_player:
-                other_player = self.game.p2
+            other_player = self.get_other_player()
             for i in range(len(other_player.cards_in_play[origin_planet + 1])):
                 if other_player.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
                     self.game.create_reaction("Wildrider Vyper", other_player.name_player,
                                               (int(other_player.number), origin_planet, i))
+            if self.get_card_type_given_pos(destination, new_pos) == "Army":
+                for i in range(len(other_player.cards_in_play[destination + 1])):
+                    if other_player.resources > 0:
+                        if other_player.get_unique_given_pos(destination, i):
+                            if not other_player.check_if_already_have_reaction("The Inevitable Decay"):
+                                if "The Inevitable Decay" in other_player.cards:
+                                    self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                              (int(self.number), -1, -1))
+                                elif "The Inevitable Decay" in other_player.cards_removed_from_game:
+                                    warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                                    vael_relevant = False
+                                    if other_player.get_ability_given_pos(warlord_pla,
+                                                                          warlord_pos) == "Vael the Gifted" and not \
+                                            other_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                    elif other_player.get_ability_given_pos(warlord_pla,
+                                                                            warlord_pos) == "Vael the Gifted BLOODIED" \
+                                            and not other_player.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                    if vael_relevant:
+                                        self.game.create_reaction("The Inevitable Decay", other_player.name_player,
+                                                                  (int(self.number), -1, -1))
         if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":
             self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
         return True
@@ -6341,6 +6417,15 @@ class Player:
         for letter in planet_name:
             if letter == "_":
                 planet_name = planet_name.replace(letter, " ")
+        if self.game.grand_plan_active:
+            self.game.grand_plan_active = False
+            self.game.grand_plan_queued.append(
+                (planet_name, self.game.round_number + 2, int(self.number),
+                 self.game.p1.played_grand_plan, self.game.p2.played_grand_plan)
+            )
+            self.game.p1.played_grand_plan = False
+            self.game.p2.played_grand_plan = False
+            return 0
         while planet_cards[i].get_name() != "FINAL CARD":
             print(planet_cards[i].get_name(), planet_name)
             if planet_cards[i].get_name() == planet_name:

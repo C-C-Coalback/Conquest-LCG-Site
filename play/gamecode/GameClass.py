@@ -439,6 +439,8 @@ class Game:
         self.nectavus_active = False
         self.nectavus_target = -1
         self.nectavus_actual_current_planet = -1
+        self.grand_plan_queued = []  # (planet name, target round, num getting planet, p1 planned, p2 planned)
+        self.grand_plan_active = False
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -995,6 +997,51 @@ class Game:
                     await HQActions.update_game_event_action_hq(self, name, game_update_string)
                 elif game_update_string[0] == "IN_DISCARD":
                     await DiscardActions.update_game_event_action_discard(self, name, game_update_string)
+                elif game_update_string[0] == "REMOVED":
+                    chosen_removed = int(game_update_string[1])
+                    pos_removed = int(game_update_string[2])
+                    if self.player_with_action == self.name_1:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    if not self.action_chosen:
+                        if chosen_removed == int(primary_player.number):
+                            ability = primary_player.cards_removed_from_game[pos_removed]
+                            if ability == "The Orgiastic Feast":
+                                if self.phase == "COMMAND":
+                                    vael_relevant = False
+                                    vael_bloodied = False
+                                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                                    if primary_player.get_ability_given_pos(
+                                            warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                            primary_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                    elif primary_player.get_ability_given_pos(
+                                            warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                                            and not primary_player.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                                        vael_relevant = True
+                                        vael_bloodied = True
+                                    if vael_relevant:
+                                        if primary_player.spend_resources(4):
+                                            primary_player.add_card_to_discard(ability)
+                                            primary_player.cards_removed_from_game.remove(ability)
+                                            if vael_bloodied:
+                                                primary_player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
+                                            else:
+                                                primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
+                                            primary_player.number_cards_to_search = 12
+                                            if primary_player.number_cards_to_search > len(primary_player.deck):
+                                                primary_player.number_cards_to_search = len(primary_player.deck)
+                                            self.choices_available = \
+                                                primary_player.deck[:primary_player.number_cards_to_search]
+                                            if self.choices_available:
+                                                self.choice_context = "The Orgiastic Feast Rally 1"
+                                                self.misc_target_choice = ""
+                                                self.name_player_making_choices = primary_player.name_player
+                                                self.resolving_search_box = True
+                                                self.action_chosen = ability
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayActions.update_game_event_action_in_play(self, name, game_update_string)
@@ -1160,6 +1207,13 @@ class Game:
                         return True
                 elif game_update_string[1] == "2":
                     if len(self.p2.discard) > int(game_update_string[2]):
+                        return True
+            elif game_update_string[0] == "REMOVED":
+                if game_update_string[1] == "1":
+                    if len(self.p1.cards_removed_from_game) > int(game_update_string[2]):
+                        return True
+                elif game_update_string[1] == "2":
+                    if len(self.p2.cards_removed_from_game) > int(game_update_string[2]):
                         return True
             elif game_update_string[0] == "HAND":
                 if game_update_string[1] == "1":
@@ -2577,6 +2631,28 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "The Orgiastic Feast Rally 2":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Army":
+                            if card.get_cost() < 5:
+                                self.misc_target_choice += "/" + card.get_name()
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                del primary_player.deck[int(game_update_string[1])]
+                                primary_player.bottom_remaining_cards()
+                    elif self.choice_context == "The Orgiastic Feast Rally 1":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Army":
+                            if card.get_cost() < 5:
+                                self.choice_context = "The Orgiastic Feast Rally 2"
+                                self.misc_target_choice = card.get_name()
+                                primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                del primary_player.deck[int(game_update_string[1])]
+                                self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                                if not self.choices_available:
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
                     elif self.choice_context == "Eldritch Council: Choose Card":
                         choice_pos = int(game_update_string[1])
                         if choice_pos == 0:
@@ -8623,6 +8699,20 @@ class Game:
                 reactions.append("Agra's Preachings")
             if loser.search_card_in_hq("Order of the Crimson Oath"):
                 reactions.append("Order of the Crimson Oath")
+            if loser.resources > 0 and self.round_number == planet_id:
+                if loser.search_hand_for_card("The Grand Plan"):
+                    reactions.append("The Grand Plan")
+                elif "The Grand Plan" in loser.cards_removed_from_game:
+                    warlord_pla, warlord_pos = loser.get_location_of_warlord()
+                    vael_relevant = False
+                    if loser.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                            loser.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                    elif loser.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                            and not loser.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                    if vael_relevant:
+                        reactions.append("The Grand Plan")
         return reactions
 
     def check_reactions_from_winning_combat(self, winner, planet_id):
@@ -8661,6 +8751,20 @@ class Game:
                     if not winner.gut_and_pillage_used:
                         if winner.search_hand_for_card("Gut and Pillage"):
                             reactions.append("Gut and Pillage")
+            if winner.resources > 0 and planet_id == self.round_number:
+                if winner.search_hand_for_card("The Grand Plan"):
+                    reactions.append("The Grand Plan")
+                elif "The Grand Plan" in winner.cards_removed_from_game:
+                    warlord_pla, warlord_pos = winner.get_location_of_warlord()
+                    vael_relevant = False
+                    if winner.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                            winner.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                    elif winner.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                            and not winner.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                    if vael_relevant:
+                        reactions.append("The Grand Plan")
         return reactions
 
     def infest_planet(self, planet, player_doing_infesting):
@@ -8840,7 +8944,7 @@ class Game:
             self.player_with_combat_turn = self.name_2
             self.number_with_combat_turn = "2"
 
-    def automated_headquarters_phase(self):
+    async def automated_headquarters_phase(self):
         self.actions_allowed = True
         self.p1.add_resources(4)
         self.p2.add_resources(4)
@@ -8856,6 +8960,8 @@ class Game:
         self.p2.move_synapse_to_hq()
         self.p1.ready_all_in_play()
         self.p2.ready_all_in_play()
+        self.p1.return_cards_to_hand_eor()
+        self.p2.return_cards_to_hand_eor()
         i = 0
         while i < len(self.p1.headquarters):
             if self.p1.headquarters[i].get_ability() == "Promethium Mine":
@@ -8883,6 +8989,29 @@ class Game:
         elif self.round_number == 1:
             self.planets_in_play_array[6] = True
         self.round_number += 1
+        i = 0
+        while i < len(self.grand_plan_queued):
+            planet_name, target_round, num_getting_planet, p1_planned, p2_planned = self.grand_plan_queued[i]
+            if target_round == self.round_number:
+                planet_card = FindCard.find_planet_card(planet_name, self.planet_cards_array)
+                if planet_card.get_name() != "FINAL CARD":
+                    if num_getting_planet == 1:
+                        self.p1.victory_display.append(planet_card)
+                        await self.send_update_message("The Grand Plan bears fruit.")
+                        await self.p1.send_victory_display()
+                    else:
+                        self.p2.victory_display.append(planet_card)
+                        await self.send_update_message("The Gran Plan bears fruit.")
+                        await self.p2.send_victory_display()
+                    if p1_planned:
+                        for _ in range(4):
+                            self.p1.draw_card()
+                    if p2_planned:
+                        for _ in range(4):
+                            self.p2.draw_card()
+                del self.grand_plan_queued[i]
+                i = i - 1
+            i = i + 1
         if self.round_number > 6:
             self.phase = "FIN/IF WINNER UNDECIDED,/PLAYER WHO WON LAST/BATTLE IS THE WINNER/GO HOME."
         self.swap_initiative()

@@ -78,6 +78,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
+                    elif ability == "The Orgiastic Feast":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        primary_player.number_cards_to_search = 12
+                        if primary_player.number_cards_to_search > len(primary_player.deck):
+                            primary_player.number_cards_to_search = len(primary_player.deck)
+                        self.choices_available = \
+                            primary_player.deck[:primary_player.number_cards_to_search]
+                        if self.choices_available:
+                            self.choice_context = "The Orgiastic Feast Rally 1"
+                            self.misc_target_choice = ""
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                            self.action_chosen = ability
                     elif ability == "Rakarth's Experimentations":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

@@ -492,6 +492,46 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.delete_reaction()
+        elif current_reaction == "The Inevitable Decay":
+            if not self.chosen_first_card:
+                if game_update_string[1] == secondary_player.get_number():
+                    unique_present = False
+                    for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                        if primary_player.get_unique_given_pos(planet_pos, i):
+                            unique_present = True
+                    if unique_present:
+                        if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target or \
+                                secondary_player.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.misc_target_planet = planet_pos
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.misc_counter = 2
+                            self.chosen_first_card = True
+            else:
+                if planet_pos == self.misc_target_planet:
+                    if game_update_string[1] != secondary_player.get_number() or \
+                            (planet_pos, unit_pos) != self.misc_target_unit:
+                        if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                            player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                            og_pla, og_pos = self.misc_target_unit
+                            damage = secondary_player.get_damage_given_pos(og_pla, og_pos)
+                            secondary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
+                            self.misc_counter = self.misc_counter - 1
+                            if self.misc_counter < 1:
+                                self.delete_reaction()
+        elif current_reaction == "The Grand Plan":
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    enemy_army = False
+                    for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                            enemy_army = True
+                    if not enemy_army:
+                        if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                            self.grand_plan_active = True
+                            primary_player.played_grand_plan = True
+                            await self.send_update_message("The Grand Plan is active!")
+                            self.delete_reaction()
         elif current_reaction == "Wildrider Vyper":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1

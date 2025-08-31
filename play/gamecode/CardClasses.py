@@ -90,6 +90,7 @@ class Card:
         self.actually_a_deepstrike = False
         self.deepstrike_card_name = ""
         self.cannot_ready_hq_phase = False
+        self.return_to_hand_eor = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used

@@ -270,6 +270,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         self.action_cleanup()
+    elif self.action_chosen == "The Orgiastic Feast":
+        card_names = self.misc_target_choice.split(sep="/")
+        for i in range(len(card_names)):
+            if card_names[i]:
+                card = self.preloaded_find_card(card_names[i])
+                if primary_player.add_card_to_planet(card, chosen_planet, triggered_card_effect=True) != -1:
+                    last_el = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+                    primary_player.cards_in_play[chosen_planet + 1][last_el].return_to_hand_eor = True
+                else:
+                    primary_player.add_card_to_discard(card_names[i])
+        self.action_cleanup()
     elif self.action_chosen == "Da Workship":
         num_snotlings = len(secondary_player.victory_display)
         for _ in range(num_snotlings):
