@@ -575,8 +575,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if player_owning_card.name_player == primary_player.name_player:
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                     intercept_possible=True)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -807,14 +807,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
-                can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:
                     possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, move_from_planet=True)
+                        planet_pos, unit_pos, move_from_planet=True, event=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
@@ -854,7 +852,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         possible_interrupts = secondary_player.intercept_check()
                     if player_owning_card.name_player == secondary_player.name_player:
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                            planet_pos, unit_pos, intercept_possible=True, context="Searing Brand")
+                            planet_pos, unit_pos, intercept_possible=True, context="Searing Brand", event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -904,7 +902,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, intercept_possible=True)
+                        planet_pos, unit_pos, intercept_possible=True, event=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
@@ -944,7 +942,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -1004,7 +1002,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         possible_interrupts = secondary_player.intercept_check()
                     if player_owning_card.name_player == secondary_player.name_player:
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                            planet_pos, unit_pos, intercept_possible=True)
+                            planet_pos, unit_pos, intercept_possible=True, event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -1038,7 +1036,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -1122,7 +1120,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                planet_pos, unit_pos, intercept_possible=True)
+                planet_pos, unit_pos, intercept_possible=True, event=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
@@ -1554,7 +1552,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, intercept_possible=True)
+                        planet_pos, unit_pos, intercept_possible=True, event=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
@@ -1611,7 +1609,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             possible_interrupts = secondary_player.intercept_check()
                         if player_owning_card.name_player == secondary_player.name_player:
                             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                                planet_pos, unit_pos, intercept_possible=True)
+                                planet_pos, unit_pos, intercept_possible=True, event=True)
                             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                 can_continue = False
                                 await self.send_update_message("Immune to enemy card abilities.")
@@ -1718,7 +1716,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = secondary_player.intercept_check()
                 if player_owning_card.name_player == secondary_player.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, intercept_possible=True)
+                        planet_pos, unit_pos, intercept_possible=True, event=True)
                     if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy card abilities.")
@@ -1775,7 +1773,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             possible_interrupts = secondary_player.intercept_check()
                         if player_owning_card.name_player == secondary_player.name_player:
                             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                                planet_pos, unit_pos, intercept_possible=True)
+                                planet_pos, unit_pos, intercept_possible=True, event=True)
                             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                 can_continue = False
                                 await self.send_update_message("Immune to enemy card abilities.")
@@ -1815,7 +1813,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         possible_interrupts = secondary_player.intercept_check()
                     if player_owning_card.name_player == secondary_player.name_player:
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                            planet_pos, unit_pos, intercept_possible=True)
+                            planet_pos, unit_pos, intercept_possible=True, event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -1940,7 +1938,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     possible_interrupts = []
                     if player_owning_card.name_player == secondary_player.name_player:
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                            planet_pos, unit_pos)
+                            planet_pos, unit_pos, event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -2284,7 +2282,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                planet_pos, unit_pos, intercept_possible=True)
+                planet_pos, unit_pos, intercept_possible=True, event=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
@@ -2317,7 +2315,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if game_update_string[1] == secondary_player.number:
                     if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -2349,7 +2348,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_being_hit = self.p2
             can_continue = True
             if secondary_player.get_number() == game_update_string[1]:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos, event=True)
                 if planet_pos == self.misc_target_unit[0] and unit_pos == self.misc_target_unit[1]:
                     can_continue = False
                     await self.send_update_message("Can't hit itself.")
@@ -2387,7 +2386,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -2587,7 +2586,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -2625,7 +2624,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                planet_pos, unit_pos, intercept_possible=True)
+                planet_pos, unit_pos, intercept_possible=True, event=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")
@@ -2673,7 +2672,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             possible_interrupts = secondary_player.intercept_check()
                         if player_owning_card.name_player == secondary_player.name_player:
                             possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                                planet_pos, unit_pos, intercept_possible=True)
+                                planet_pos, unit_pos, intercept_possible=True, event=True)
                             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                                 can_continue = False
                                 await self.send_update_message("Immune to enemy card abilities.")
@@ -2824,7 +2823,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if secondary_player.get_card_type_given_pos(planet_pos, unit_pos):
                     if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         can_continue = True
-                        possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, event=True)
                         if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                             can_continue = False
                             await self.send_update_message("Immune to enemy card abilities.")
@@ -2952,7 +2952,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -2992,8 +2992,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if player_owning_card.name_player == primary_player.name_player:
             possible_interrupts = secondary_player.intercept_check()
         if player_owning_card.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos,
-                                                                                 intercept_possible=True)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
             if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy card abilities.")

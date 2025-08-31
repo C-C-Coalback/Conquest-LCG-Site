@@ -644,7 +644,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
                     can_continue = True
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        -2, unit_pos, targeting_support=True)
+                        -2, unit_pos, targeting_support=True, event=True)
                     if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")
@@ -836,7 +836,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                 can_continue = True
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
@@ -880,7 +880,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
             if not player_being_hit.check_for_trait_given_pos(-2, unit_pos, "Elite"):
                 if player_being_hit.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
                     if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")
@@ -975,7 +975,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         can_continue = True
         if player_being_hit.headquarters[unit_pos].get_card_type() != "Warlord":
             if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
@@ -1031,7 +1031,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 possible_interrupts = secondary_player.intercept_check()
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True)
+                    planet_pos, unit_pos, intercept_possible=True, event=True)
                 if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy card abilities.")
@@ -1085,7 +1085,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.enslaved_faction == player_being_hit.get_faction_given_pos(-2, unit_pos):
             can_continue = True
             if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
                 if possible_interrupts:
                     can_continue = False
                     await self.send_update_message("Some sort of interrupt may be used.")
@@ -1174,7 +1174,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if not player_being_hit.headquarters[unit_pos].check_for_a_trait("Vehicle", player_being_hit.etekh_trait) and \
                 player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Army":
             if player_being_hit.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos, power=True):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
@@ -1223,8 +1223,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
             is_support = False
             if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                 is_support = True
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos,
-                                                                                 targeting_support=is_support)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                -2, unit_pos, targeting_support=is_support, event=True)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
@@ -1346,8 +1346,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
             can_continue = True
             if target_player.name_player == secondary_player.name_player:
                 is_support = True
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos,
-                                                                                     targeting_support=is_support)
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    -2, unit_pos, targeting_support=is_support, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
@@ -1436,7 +1436,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     can_continue = True
                     is_support = True
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        -2, unit_pos, targeting_support=is_support)
+                        -2, unit_pos, targeting_support=is_support, event=True)
                     if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")
@@ -1681,7 +1681,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             player_returning = self.p2
         can_continue = True
         if player_returning.name_player == secondary_player.name_player:
-            possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
                 await self.send_update_message("Immune to enemy events.")
@@ -1741,7 +1741,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             is_support = True
             if player_destroying_support.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    -2, unit_pos, targeting_support=is_support)
+                    -2, unit_pos, targeting_support=is_support, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")
@@ -1768,7 +1768,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             is_support = True
             if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    -2, unit_pos, targeting_support=is_support)
+                    -2, unit_pos, targeting_support=is_support, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                     can_continue = False
                     await self.send_update_message("Immune to enemy events.")

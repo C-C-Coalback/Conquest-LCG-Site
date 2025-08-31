@@ -3560,6 +3560,9 @@ class Player:
         print("---\nNullify Check!\n---")
         if self.hit_by_gorgul:
             return False
+        other_player = self.get_other_player()
+        if other_player.vael_relevent:
+            return False
         num_nullifies = 0
         if self.castellan_crowe_relevant:
             if "Psychic Ward" in self.cards:
@@ -3595,19 +3598,23 @@ class Player:
         return False
 
     def interrupt_cancel_target_check(self, planet_pos, unit_pos, context="", move_from_planet=False,
-                                      targeting_support=False, intercept_possible=False):
+                                      targeting_support=False, intercept_possible=False, event=False):
         possible_interrupts = []
+        vael = False
+        if event:
+            other_player = self.get_other_player()
+            vael = other_player.vael_relevent
         if targeting_support:
             if self.game.colony_shield_generator_enabled:
                 if self.get_ability_given_pos(planet_pos, unit_pos) != "Colony Shield Generator":
                     if self.search_card_in_hq("Colony Shield Generator", ready_relevant=True):
                         possible_interrupts.append("Colony Shield Generator")
         else:
-            if context == "Searing Brand":
+            if context == "Searing Brand" and not vael:
                 if self.game.searing_brand_cancel_enabled:
                     if len(self.cards) > 1:
                         possible_interrupts.append("Searing Brand")
-            if move_from_planet:
+            if move_from_planet and not vael:
                 if self.game.slumbering_gardens_enabled:
                     if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
                         possible_interrupts.append("Slumbering Gardens")
@@ -3615,17 +3622,17 @@ class Player:
                 if self.game.intercept_enabled:
                     if self.search_card_in_hq("Intercept", ready_relevant=True):
                         possible_interrupts.append("Intercept")
-            if self.game.storm_of_silence_enabled:
+            if self.game.storm_of_silence_enabled and not vael:
                 if self.storm_of_silence_check():
                     possible_interrupts.append("Storm of Silence")
-            if self.game.communications_relay_enabled:
+            if self.game.communications_relay_enabled and not vael:
                 if self.communications_relay_check(planet_pos, unit_pos):
                     possible_interrupts.append("Communications Relay")
-            if self.game.backlash_enabled:
+            if self.game.backlash_enabled and not vael:
                 if self.backlash_check(planet_pos, unit_pos):
                     possible_interrupts.append("Backlash")
             if planet_pos != -2:
-                if self.game.communications_relay_enabled:
+                if self.game.communications_relay_enabled and not vael:
                     if self.cards_in_play[planet_pos + 1][unit_pos].immortal_loyalist_ok:
                         self.cards_in_play[planet_pos + 1][unit_pos].immortal_loyalist_ok = False
                         if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
