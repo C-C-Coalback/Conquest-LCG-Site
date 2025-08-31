@@ -6796,6 +6796,12 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                         self.allowed_units_alaitoc_shrine = []
                         self.alaitoc_shrine_activated = False
+                    if self.reactions_needing_resolving[0] == "The Blood Pits":
+                        if self.misc_misc:
+                            for i in range(len(self.misc_misc)):
+                                pla, pos = self.misc_misc[i]
+                                secondary_player.assign_damage_to_pos(pla, pos, 2)
+                        self.misc_misc = None
                     if self.reactions_needing_resolving[0] == "Castellan Crowe":
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]
                         if self.misc_counter > 0:

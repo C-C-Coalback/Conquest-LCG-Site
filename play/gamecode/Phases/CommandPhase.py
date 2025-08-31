@@ -195,6 +195,31 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.resolve_enemy_warlord_committed_to_planet(self.p1.warlord_commit_location)
                     self.p1.commit_synapse_to_planet()
                     self.p2.commit_synapse_to_planet()
+                    if self.p1.warlord_commit_location == self.p2.warlord_commit_location:
+                        warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
+                        vael_relevant = False
+                        if self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                self.p1.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                            vael_relevant = True
+                        elif self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" and \
+                                not self.p1.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                            vael_relevant = True
+                        if "The Blood Pits" in self.p1.cards or \
+                                ("The Blood Pits" in self.p1.cards_removed_from_game and vael_relevant):
+                            if self.p1.resources > 0:
+                                self.create_reaction("The Blood Pits", self.name_1, (1, -1, -1))
+                        warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
+                        vael_relevant = False
+                        if self.p2.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                self.p2.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                            vael_relevant = True
+                        elif self.p2.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" and \
+                                not self.p2.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                            vael_relevant = True
+                        if "The Blood Pits" in self.p2.cards or \
+                                ("The Blood Pits" in self.p2.cards_removed_from_game and vael_relevant):
+                            if self.p2.resources > 0:
+                                self.create_reaction("The Blood Pits", self.name_2, (2, -1, -1))
                     for i in range(len(self.p1.headquarters)):
                         if self.p1.get_card_type_given_pos(-2, i) == "Synapse":
                             self.create_reaction("Reinforced Synaptic Network", self.name_1, (1, -2, i))

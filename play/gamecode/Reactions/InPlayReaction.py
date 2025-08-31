@@ -146,6 +146,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
+        elif current_reaction == "The Blood Pits":
+            if game_update_string[1] == secondary_player.number:
+                if not secondary_player.check_for_warlord(planet_pos):
+                    already_present = False
+                    for i in range(len(self.misc_misc)):
+                        if self.misc_misc[i][0] == planet_pos:
+                            already_present = True
+                    if not already_present:
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.misc_misc.append((planet_pos, unit_pos))
         elif current_reaction == "Excellor Commit":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)

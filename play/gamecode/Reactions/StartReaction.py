@@ -2030,6 +2030,38 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.total_indirect_damage = 2
             self.forbidden_traits_indirect = "Nurgle"
             self.delete_reaction()
+        elif current_reaction == "The Blood Pits":
+            if primary_player.resources > 0:
+                if "The Blood Pits" in primary_player.cards:
+                    primary_player.spend_resources(1)
+                    primary_player.discard_card_name_from_hand("The Blood Pits")
+                    self.misc_misc = []
+                    await self.send_update_message("Press pass button to deal the damage after choosing units.")
+                elif "The Blood Pits" in primary_player.cards_removed_from_game:
+                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                    vael_relevant = False
+                    vael_bloodied = False
+                    if primary_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                            primary_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                    elif primary_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                            and not primary_player.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
+                        vael_relevant = True
+                        vael_bloodied = True
+                    if vael_relevant:
+                        primary_player.spend_resources(1)
+                        primary_player.cards_removed_from_game.remove("The Blood Pits")
+                        primary_player.add_card_to_discard("The Blood Pits")
+                        self.misc_misc = []
+                        await self.send_update_message("Press pass button to deal the damage after choosing units.")
+                        if vael_bloodied:
+                            primary_player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
+                        else:
+                            primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
+                    else:
+                        self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Vargus Commit":
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             bloodied = False
