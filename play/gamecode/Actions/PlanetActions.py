@@ -270,6 +270,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         self.action_cleanup()
+    elif self.action_chosen == "Sacrificial Altar":
+        if chosen_planet != self.round_number:
+            secondary_player.sac_altar_rewards[chosen_planet] += 1
+            primary_player.draw_card()
+            primary_player.add_resources(1)
+            self.action_cleanup()
+            planet_name = self.get_planet_name(chosen_planet)
+            await self.send_update_message(planet_name + " was targeted for Sacrificial Altar.")
     elif self.action_chosen == "The Orgiastic Feast":
         card_names = self.misc_target_choice.split(sep="/")
         for i in range(len(card_names)):

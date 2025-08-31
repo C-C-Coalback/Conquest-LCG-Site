@@ -91,6 +91,7 @@ class Player:
         self.warlord_just_got_destroyed = False
         self.lost_due_to_deck = False
         self.already_lost_due_to_deck = False
+        self.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]
         self.mulligan_done = False
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
                              "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor",

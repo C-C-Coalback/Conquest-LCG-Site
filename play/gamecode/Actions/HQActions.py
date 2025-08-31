@@ -339,6 +339,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.misc_target_unit = (-1, -1)
+                    elif ability == "Sacrificial Altar":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
                     elif ability == "Immortal Legion":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])

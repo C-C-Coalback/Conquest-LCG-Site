@@ -110,6 +110,26 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 card_chosen.exhaust_card()
                                 self.action_chosen = ability
                                 self.misc_target_planet = planet_pos
+                    elif ability == "Talisman of Denial":
+                        if player_owning_card.name_player == primary_player.get_name_player():
+                            hale_warlord = False
+                            enemy_warlord_pla = -1
+                            enemy_warlord_pos = -1
+                            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                                if secondary_player.get_card_type_given_pos(planet_pos, i) == "Warlord":
+                                    if not secondary_player.cards_in_play[planet_pos + 1][i].get_bloodied():
+                                        hale_warlord = True
+                                        enemy_warlord_pla = planet_pos
+                                        enemy_warlord_pos = i
+                            if hale_warlord:
+                                primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos,
+                                                                             attachment_pos)
+                                own_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                                enemy_damage = secondary_player.get_damage_given_pos(enemy_warlord_pla,
+                                                                                     enemy_warlord_pos)
+                                primary_player.set_damage_given_pos(planet_pos, unit_pos, enemy_damage)
+                                secondary_player.set_damage_given_pos(planet_pos, unit_pos, own_damage)
+                                self.action_cleanup()
                     elif ability == "Drone Defense System":
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):

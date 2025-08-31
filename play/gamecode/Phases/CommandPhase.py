@@ -613,6 +613,10 @@ def receive_winnings(self):
 
 def resolve_winnings(self, winner, loser, planet_id):
     chosen_planet = FindCard.find_planet_card(self.planet_array[planet_id], self.planet_cards_array)
+    while winner.sac_altar_rewards[planet_id] > 0:
+        winner.sac_altar_rewards[planet_id] = winner.sac_altar_rewards[planet_id] - 1
+        winner.draw_card()
+        winner.add_resources(1)
     if self.canceled_resource_bonuses[planet_id]:
         resources_won = 0
     else:

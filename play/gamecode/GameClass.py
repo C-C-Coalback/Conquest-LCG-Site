@@ -8881,6 +8881,8 @@ class Game:
         self.p2.has_passed = False
         self.p1.command_struggles_won_this_phase = 0
         self.p2.command_struggles_won_this_phase = 0
+        self.p1.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]
+        self.p2.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]
         if self.p1.planet_absorption_played:
             await self.game.send_update_message(
                 "----GAME END----"
