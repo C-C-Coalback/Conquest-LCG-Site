@@ -6878,6 +6878,11 @@ class Game:
                                 pla, pos = self.misc_misc[i]
                                 secondary_player.assign_damage_to_pos(pla, pos, 2)
                         self.misc_misc = None
+                        primary_player.drammask_nane_check()
+                    if self.reactions_needing_resolving[0] == "The Inevitable Decay":
+                        primary_player.drammask_nane_check()
+                    if self.reactions_needing_resolving[0] == "Drammask Nane":
+                        primary_player.reset_all_aiming_reticles_play_hq()
                     if self.reactions_needing_resolving[0] == "Castellan Crowe":
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]
                         if self.misc_counter > 0:

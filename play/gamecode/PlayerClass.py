@@ -1988,6 +1988,13 @@ class Player:
             return self.headquarters[unit_id].get_once_per_game_used()
         return self.cards_in_play[planet_id + 1][unit_id].get_once_per_game_used()
 
+    def drammask_nane_check(self):
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ability_given_pos(i, j) == "Drammask Nane":
+                    self.game.create_reaction("Drammask Nane", self.name_player,
+                                              (int(self.number), i, j))
+
     def return_cards_to_hand_eor(self):
         i = 0
         while i < len(self.headquarters):

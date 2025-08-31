@@ -518,6 +518,26 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
                             self.misc_counter = self.misc_counter - 1
                             if self.misc_counter < 1:
+                                primary_player.drammask_nane_check()
+                                self.delete_reaction()
+        elif current_reaction == "Drammask Nane":
+            if game_update_string[1] == primary_player.get_number():
+                if planet_pos == self.misc_target_planet:
+                    if not self.chosen_first_card:
+                        if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                            self.chosen_first_card = True
+                            self.misc_counter = 4
+                            self.misc_misc = []
+                    else:
+                        if self.misc_misc is None:
+                            self.misc_misc = []
+                        if (planet_pos, unit_pos) not in self.misc_misc:
+                            self.misc_misc.append((planet_pos, unit_pos))
+                            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                            self.misc_counter = self.misc_counter - 1
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            if self.misc_counter < 1:
+                                primary_player.reset_all_aiming_reticles_play_hq()
                                 self.delete_reaction()
         elif current_reaction == "The Grand Plan":
             if game_update_string[1] == primary_player.get_number():
@@ -531,6 +551,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.grand_plan_active = True
                             primary_player.played_grand_plan = True
                             await self.send_update_message("The Grand Plan is active!")
+                            primary_player.drammask_nane_check()
                             self.delete_reaction()
         elif current_reaction == "Wildrider Vyper":
             if game_update_string[1] == "1":

@@ -280,6 +280,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     primary_player.cards_in_play[chosen_planet + 1][last_el].return_to_hand_eor = True
                 else:
                     primary_player.add_card_to_discard(card_names[i])
+        primary_player.drammask_nane_check()
         self.action_cleanup()
     elif self.action_chosen == "Da Workship":
         num_snotlings = len(secondary_player.victory_display)

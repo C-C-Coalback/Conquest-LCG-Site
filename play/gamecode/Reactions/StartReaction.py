@@ -2030,6 +2030,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.total_indirect_damage = 2
             self.forbidden_traits_indirect = "Nurgle"
             self.delete_reaction()
+        elif current_reaction == "Drammask Nane":
+            self.chosen_first_card = False
+            self.misc_target_planet = planet_pos
         elif current_reaction == "The Inevitable Decay":
             if primary_player.resources > 0:
                 if "The Inevitable Decay" in primary_player.cards:
