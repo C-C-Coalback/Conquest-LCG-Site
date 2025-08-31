@@ -31,6 +31,8 @@ async def update_game_event_action_discard(self, name, game_update_string):
                     self.action_chosen = ability
                     self.position_discard_of_card = pos_discard
                     primary_player.harbinger_of_eternity_active = True
+                    del primary_player.discard[pos_discard]
+                    primary_player.remove_card_from_game(ability)
             elif ability == "Awake the Sleepers":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):
@@ -39,6 +41,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         )
                         primary_player.discard.remove("Awake the Sleepers")
                         self.action_chosen = ability
+                        primary_player.remove_card_from_game(ability)
                         primary_player.harbinger_of_eternity_active = True
                         self.name_player_making_choices = primary_player.name_player
                         self.choices_available = []
@@ -83,6 +86,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             del primary_player.discard[pos_discard]
                             self.action_chosen = ability
                             primary_player.harbinger_of_eternity_active = True
+                            primary_player.remove_card_from_game(ability)
                             self.name_player_making_choices = primary_player.name_player
                             self.choices_available = []
                             self.choice_context = ability
@@ -108,6 +112,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         )
                         self.action_chosen = ability
                         primary_player.harbinger_of_eternity_active = True
+                        primary_player.remove_card_from_game(ability)
                         del primary_player.discard[pos_discard]
                         self.misc_counter = 0
             elif ability == "Extermination":
@@ -118,6 +123,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         )
                         self.action_chosen = ability
                         primary_player.harbinger_of_eternity_active = True
+                        primary_player.remove_card_from_game(ability)
                         del primary_player.discard[pos_discard]
             elif ability == "Mechanical Enhancement":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
@@ -128,6 +134,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.action_chosen = ability
                         primary_player.harbinger_of_eternity_active = True
                         del primary_player.discard[pos_discard]
+                        primary_player.remove_card_from_game(ability)
             elif ability == "The Strength of the Enemy":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(2):
@@ -145,6 +152,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         primary_player.harbinger_of_eternity_active = True
                         del primary_player.discard[pos_discard]
                         primary_player.used_reanimation_protocol = True
+                        primary_player.remove_card_from_game(ability)
     elif self.action_chosen == "Eternity Gate":
         if chosen_discard == int(primary_player.number):
             primary_player.move_to_top_of_discard(pos_discard)

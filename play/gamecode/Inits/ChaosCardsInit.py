@@ -378,6 +378,53 @@ def chaos_cards_init():
                                                     "Combat Action: Exhaust an Elite unit you control at a planet to "
                                                     "move it to this planet. (Limit once per phase.)",
                              "Warrior. Slaanesh.", 3, faction, "Loyal", 2, 3, 1, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT")
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.WarlordCard("Vael the Gifted", "Effects of events you play cannot be cancelled.\n"
+                                                   "When the game starts, remove each Ritual card"
+                                                   " in your deck from the game.\n"
+                                                   "You may play Ritual events you removed from the "
+                                                   "game as if they were in your hand. (Limit once per round.)",
+                                "Ritualist. Chaos Undivided.", faction, 2, 6, 2, 6,
+                                "Bloodied.\n"
+                                "You may play Ritual events you removed from the game as if they were "
+                                "in your hand. (Limit once per game.)", 7, 7,
+                                ["2x Drammask Nane", "1x Sacrificial Altar", "1x Talisman of Denial",
+                                 "1x The Blood Pits", "1x The Grand Plan",
+                                 "1x The Inevitable Decay", "1x The Orgiastic Feast"]),
+        CardClasses.ArmyCard("Drammask Nane", "Reaction: After you play a Ritual event, sacrifice a unit at this planet"
+                                              " to have up to 4 units you control at this planet get +1 ATK until"
+                                              " the end of the phase.", "Sorcerer.",
+                             3, faction, "Signature", 2, 4, 2, True),
+        CardClasses.SupportCard("Sacrificial Altar", "Deploy Action: Exhaust this support and target a non first-planet"
+                                                     " to draw 1 card an gain 1 resource. If your opponent wins a "
+                                                     "command struggle at the targeted planet this round, they draw"
+                                                     " 1 card and gain 1 resource.", "Location.",
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.AttachmentCard("Talisman of Denial", "Attach to your warlord.\n"
+                                                         "Attached unit gains 3 command icons.\n"
+                                                         "Combat Action: Sacrifice this attachment to switch the"
+                                                         " damage on your warlord with the damage on a "
+                                                         "hale warlord at this planet.", "Wargear.",
+                                   0, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   action_in_play=True, allowed_phases_in_play="COMBAT", must_be_own_unit=True,
+                                   extra_command=3),
+        CardClasses.EventCard("The Blood Pits", "Reaction: After your warlord commits to a planet with an enemy"
+                                                " warlord, choose up to 1 enemy unit at each planet without a warlord."
+                                                " Deal 2 damage to each chosen unit.", "Ritual. Khorne.",
+                              1, faction, "Signature", 1, False),
+        CardClasses.EventCard("The Grand Plan", "Interrupt: When a player places a planet in their victory display, "
+                                                "sacrifice an army unit at a planet with no enemy army unit to remove"
+                                                " that planet from the game instead. At the end of the next round, "
+                                                "place the planet in that player's victory display and draw 4 cards.",
+                              "Ritual. Tzeentch.", 1, faction, "Signature", 1, False),
+        CardClasses.EventCard("The Inevitable Decay", "Reaction: After an enemy army unit enters play or moves to a "
+                                                      "planet with a unique unit you control, exhaust it and move up "
+                                                      "to 2 damage from units at the same planet to that enemy unit.",
+                              "Ritual. Nurgle.", 1, faction, "Signature", 1, False),
+        CardClasses.EventCard("The Orgiastic Feast", "Command Action: Rally 12 up to two units with cost 4 or lower, "
+                                                     "put them into play at a target planet and shuffle your deck. "
+                                                     "If those units are still in play at the end of the round, "
+                                                     "return them to your hand.", "Ritual. Slaanesh.",
+                              4, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
     ]
     return chaos_card_array

@@ -130,6 +130,7 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.vael_relevent = False
         self.castellan_crowe_relevant = False
         self.castellan_crowe_2_relevant = False
         self.ichor_gauntlet_target = ""
@@ -177,6 +178,9 @@ class Player:
         self.looted_skrap_active = False
         self.looted_skrap_count = 0
         self.looted_skrap_planet = -1
+        self.cards_removed_from_game = []
+        self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
+        self.last_removed_string = ""
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -213,6 +217,16 @@ class Player:
             self.castellan_crowe_relevant = True
             self.castellan_crowe_2_relevant = True
         self.deck = deck_list[1:]
+        if self.headquarters[0].get_name() == "Vael the Gifted":
+            self.vael_relevent = True
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.ritual_cards:
+                    self.remove_card_from_game(self.deck[i])
+                    del self.deck[i]
+                    i = i - 1
+                i = i + 1
+            await self.send_removed_cards()
         if self.warlord_faction == "Tyranids":
             i = 0
             while i < len(self.deck):
@@ -224,6 +238,7 @@ class Player:
                                                                               self.cards_that_have_errata)))
                     self.headquarters[1].name_owner = self.name_player
                     del self.deck[i]
+                    i = i - 1
                 i = i + 1
         self.shuffle_deck()
         self.deck_loaded = True
@@ -279,6 +294,9 @@ class Player:
             return None
         self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = True
         return None
+
+    def remove_card_from_game(self, card_name):
+        self.cards_removed_from_game.append(card_name)
 
     def search_synapse_in_hq(self):
         for i in range(len(self.headquarters)):
@@ -804,9 +822,17 @@ class Player:
                                                     "----GAME END----"
             )
 
+    async def send_removed_cards(self, force=False):
+        joined_string = "GAME_INFO/REMOVED/" + str(self.number)
+        if self.cards_removed_from_game:
+            for i in range(len(self.cards_removed_from_game)):
+                joined_string += "/" + self.cards_removed_from_game[i] + "|"
+        if joined_string != self.last_removed_string or force:
+            self.last_removed_string = joined_string
+            await self.game.send_update_message(joined_string)
+
     async def send_discard(self, force=False):
         joined_string = "GAME_INFO/DISCARD/" + str(self.number)
-        top_card = self.get_top_card_discard()
         if self.discard:
             for i in range(len(self.discard)):
                 joined_string += "/" + self.discard[i] + "|"
@@ -921,6 +947,12 @@ class Player:
 
     def set_phase(self, new_phase):
         self.phase = new_phase
+
+    def get_top_card_removed(self):
+        if not self.cards_removed_from_game:
+            return None
+        else:
+            return self.cards_removed_from_game[-1]
 
     def get_top_card_discard(self):
         if not self.discard:
@@ -1157,6 +1189,7 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.vael_relevent = False
         self.castellan_crowe_2_relevant = False
         self.retreat_warlord()
 
@@ -5161,6 +5194,7 @@ class Player:
                 self.subject_omega_relevant = False
                 self.grigory_maksim_relevant = False
                 self.illuminor_szeras_relevant = False
+                self.vael_relevent = False
                 self.castellan_crowe_2_relevant = False
             else:
                 if self.get_ability_given_pos(-2, card_pos) == "Magus Harid" and not self.hit_by_gorgul:

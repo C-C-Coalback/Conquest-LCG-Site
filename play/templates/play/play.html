@@ -117,20 +117,36 @@
     <div id="victory-display-player-2">
         <p></p>
     </div>
-        <div id="current-discard-player-1">
+    <div id="current-discard-player-1">
         <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
+    </div>
+    <div id="current-removed-player-1">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p1" class="Card" onclick="showRemoved(this.id);">
     </div>
     <div id="current-discard-player-2">
         <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
+    </div>
+    <div id="current-removed-player-2">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p2" class="Card" onclick="showRemoved(this.id);">
     </div>
     <div id="expanded-DISCARD_PILE-1">
         <div id="expanded-discard-1-settings">
             <input type="image" id="IN_DISCARD/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
         </div>
     </div>
+    <div id="expanded-REMOVED_PILE-1">
+        <div id="expanded-removed-1-settings">
+            <input type="image" id="REMOVED/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+        </div>
+    </div>
     <div id="expanded-DISCARD_PILE-2">
         <div id="expanded-discard-2-settings">
             <input type="image" id="IN_DISCARD/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+        </div>
+    </div>
+    <div id="expanded-REMOVED_PILE-2">
+        <div id="expanded-removed-2-settings">
+            <input type="image" id="REMOVED/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
         </div>
     </div>
     <div id="search-collapse" draggable="true" class="draggable">
@@ -442,6 +458,34 @@
                         var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                         var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
                         document.getElementById(target_discard_pile_id).innerHTML += full_string;
+                    }
+                } else if (split_data[1] === "REMOVED") {
+                    var target_removed_pile_id = "current-removed-player-" + split_data[2];
+                    document.getElementById(target_removed_pile_id).innerHTML = ``;
+                    var target_expanded_removed = "expanded-removed-" + split_data[2] + "-settings";
+                    document.getElementById(target_expanded_removed).innerHTML = ``;
+                    if (split_data.length >= 4) {
+                        for (var i = 3; i < split_data.length; i++) {
+                            var card_data_split = split_data[i].split("|");
+                            var card_name = card_data_split[0];
+                            var string_id = (i-3).toString();
+                            string_id = "REMOVED/" + split_data[2] + "/" + string_id;
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                            var full_string = `<div class="Card-div">`;
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
+                            if (card_data_split[1] !== "") {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            }
+                            full_string += `</div>`;
+                            document.getElementById(target_expanded_removed).innerHTML += full_string;
+                        }
+                        var card_name = split_data[split_data.length - 1].split("|")[0];
+                        var string_id = "REMOVED_PILE/" + split_data[2];
+                        card_name = card_name.split(' ').join('_');
+                        var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
+                        document.getElementById(target_removed_pile_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "RESOURCES") {
                     if (split_data[2] === "1") {
@@ -826,14 +870,25 @@
         }
 
         function showDiscard(discard_id) {
-        var target_discard_display = "expanded/" + discard_id;
-        target_discard_display = target_discard_display.split('/').join('-');
-        var x = document.getElementById(target_discard_display);
-        if (x.style.display !== "block") {
-            x.style.display = "block";
-        } else {
-            x.style.display = "none";
+            var target_discard_display = "expanded/" + discard_id;
+            target_discard_display = target_discard_display.split('/').join('-');
+            var x = document.getElementById(target_discard_display);
+            if (x.style.display !== "block") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
         }
+
+        function showRemoved(removed_id) {
+            var target_removed_display = "expanded/" + removed_id;
+            target_removed_display = target_removed_display.split('/').join('-');
+            var x = document.getElementById(target_removed_display);
+            if (x.style.display !== "block") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
         }
     </script>
 {% endblock %}

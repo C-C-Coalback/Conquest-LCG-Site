@@ -1089,8 +1089,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
-            if primary_player.aiming_reticle_coords_hand > int(game_update_string[2]):
-                primary_player.aiming_reticle_coords_hand -= 1
+            if primary_player.aiming_reticle_coords_hand is not None:
+                if primary_player.aiming_reticle_coords_hand > int(game_update_string[2]):
+                    primary_player.aiming_reticle_coords_hand -= 1
             self.misc_counter += 1
             if self.misc_counter > 1:
                 if not primary_player.harbinger_of_eternity_active:
