@@ -183,6 +183,7 @@ class Player:
         self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
         self.last_removed_string = ""
         self.played_grand_plan = False
+        self.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -4272,6 +4273,15 @@ class Player:
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 attack_value += 1
+        if ability == "Ireful Vanguard":
+            warlord_pla, warlord_pos = self.get_location_of_warlord()
+            if self.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                attack_value += 1
+            else:
+                other_player = self.get_other_player()
+                warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                if other_player.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                    attack_value += 1
         if ability == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
@@ -4821,29 +4831,46 @@ class Player:
             other_player = self.game.p2
         return other_player
 
+    def get_bloodied_given_pos(self, planet_id, unit_id):
+        if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+            return False
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_bloodied()
+        return self.cards_in_play[planet_id + 1][unit_id]
+
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            ability = self.get_ability_given_pos(planet_id, unit_id)
             if self.headquarters[unit_id].health_set_eop != -1:
                 return self.headquarters[unit_id].health_set_eop
             if self.get_faction_given_pos(-2, unit_id) == "Orks":
                 if self.get_card_type_given_pos(-2, unit_id) != "Token":
                     if self.search_card_in_hq("Mork's Great Heap"):
                         health += 1
-            if self.headquarters[unit_id].get_ability() == "Charging Juggernaut":
+            if ability == "Charging Juggernaut":
                 if self.headquarters[unit_id].get_attachments():
                     health += 1
-            if self.headquarters[unit_id].get_ability() == "Lychguard Sentinel":
+            if ability == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
-            if self.headquarters[unit_id].get_ability() == "Improbable Runt Machine":
+            if ability == "Improbable Runt Machine":
                 health += min(len(self.headquarters[unit_id].get_attachments()), 3)
-            if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+            if ability == "Tenacious Novice Squad":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     health += 1
-            if self.get_ability_given_pos(planet_id, unit_id) == "Fairly 'Quipped Kommando":
+            if ability == "Ireful Vanguard":
+                warlord_pla, warlord_pos = self.get_location_of_warlord()
+                if self.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                    health += 1
+                else:
+                    other_player = self.get_other_player()
+                    warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                    if other_player.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                        health += 1
+            if ability == "Fairly 'Quipped Kommando":
                 health += len(self.headquarters[unit_id].get_attachments())
-            if self.headquarters[unit_id].get_ability() == "Shard of the Deceiver":
+            if ability == "Shard of the Deceiver":
                 health += len(self.discard)
             for i in range(len(self.headquarters[unit_id].get_attachments())):
                 attachment = self.headquarters[unit_id].get_attachments()[i]
@@ -4863,6 +4890,15 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 health += 1
+        if ability == "Ireful Vanguard":
+            warlord_pla, warlord_pos = self.get_location_of_warlord()
+            if self.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                health += 1
+            else:
+                other_player = self.get_other_player()
+                warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+                if other_player.get_bloodied_given_pos(warlord_pla, warlord_pos):
+                    health += 1
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1

@@ -8883,6 +8883,8 @@ class Game:
         self.p2.command_struggles_won_this_phase = 0
         self.p1.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]
         self.p2.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]
+        self.p1.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
+        self.p2.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
         if self.p1.planet_absorption_played:
             await self.game.send_update_message(
                 "----GAME END----"

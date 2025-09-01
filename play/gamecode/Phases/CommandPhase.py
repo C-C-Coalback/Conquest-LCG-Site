@@ -617,6 +617,7 @@ def resolve_winnings(self, winner, loser, planet_id):
         winner.sac_altar_rewards[planet_id] = winner.sac_altar_rewards[planet_id] - 1
         winner.draw_card()
         winner.add_resources(1)
+    winner.won_command_struggles_planets_round[planet_id] = True
     if self.canceled_resource_bonuses[planet_id]:
         resources_won = 0
     else:
