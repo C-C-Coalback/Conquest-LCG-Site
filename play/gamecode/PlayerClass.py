@@ -5168,6 +5168,9 @@ class Player:
             if self.headquarters[i].get_ability() == "Obedience":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Willing Submission":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Willing Submission", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Deathmark Assassins":
                 if phase == "COMBAT":
                     self.game.create_reaction("Deathmark Assassins", self.name_player, (int(self.number), -2, i))

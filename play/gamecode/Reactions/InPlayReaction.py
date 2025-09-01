@@ -2053,6 +2053,26 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+        elif current_reaction == "Willing Submission":
+            if not self.chosen_first_card or not self.chosen_second_card:
+                if primary_player.get_number() == game_update_string[1]:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or primary_player.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color != "blue":
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        if not self.chosen_first_card:
+                            self.chosen_first_card = True
+                            self.chosen_second_card = False
+                        else:
+                            self.chosen_second_card = True
+                            self.player_who_resolves_reaction[0] = secondary_player.name_player
+                            primary_player.draw_card()
+                            await self.send_update_message(secondary_player.name_player +
+                                                           " may now choose a unit to damage.")
+            else:
+                if secondary_player.get_number() == game_update_string[1]:
+                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "blue":
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                        secondary_player.reset_all_aiming_reticles_play_hq()
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]

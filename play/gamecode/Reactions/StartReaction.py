@@ -2037,6 +2037,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Willing Submission":
+            primary_player.draw_card()
+            self.chosen_first_card = False
+            self.choice_context = "WillSub: Draw Card for Damage?"
+            self.choices_available = ["Yes", "No"]
+            self.name_player_making_choices = secondary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Tides of Chaos":
             resources_to_spend = 1
             if primary_player.urien_relevant:

@@ -319,7 +319,7 @@ class Game:
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
-                                 "Erida Commit", "Jaricho Commit", "Beckel Commit"]
+                                 "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -3309,6 +3309,14 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "WillSub: Draw Card for Damage?":
+                        if chosen_choice == "Yes":
+                            self.chosen_first_card = False
+                            self.player_who_resolves_reaction[0] = primary_player.name_player
+                        else:
+                            self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Krieg Armoured Regiment result:":
                         card_name = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(card_name)
@@ -6924,6 +6932,9 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    if self.reactions_needing_resolving[0] == "Willing Submission":
+                        primary_player.reset_all_aiming_reticles_play_hq()
+                        secondary_player.reset_all_aiming_reticles_play_hq()
                     if self.reactions_needing_resolving[0] == "Soul Grinder":
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]

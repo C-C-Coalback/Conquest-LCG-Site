@@ -355,6 +355,11 @@ def dark_eldar_cards_init():
                              "Kabalite.", 2, faction, "Loyal", 2, 2, 1, False),
         CardClasses.ArmyCard("Connoisseur of Terror", "Deep Strike (2).\n"
                                                       "Reaction: After this unit is turned face-up, draw 2 cards.",
-                             "Scholar. Haemonculus.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=2)
+                             "Scholar. Haemonculus.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=2),
+        CardClasses.SupportCard("Willing Submission", "Forced Reaction: After the deploy phase begins, draw 1 card. "
+                                                      "Then your opponent may choose 2 units he controls"
+                                                      " (or his warlord if he controls no other unit) to draw 1 card."
+                                                      " You may deal 1 damage to one of the chosen units.", "Torture.",
+                                1, faction, "Loyal", False)
     ]
     return dark_eldar_cards_array
