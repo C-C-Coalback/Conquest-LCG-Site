@@ -2048,6 +2048,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
+        elif current_reaction == "Galvax the Bloated":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]

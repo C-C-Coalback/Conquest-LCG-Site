@@ -425,6 +425,11 @@ def chaos_cards_init():
                                                      "put them into play at a target planet and shuffle your deck. "
                                                      "If those units are still in play at the end of the round, "
                                                      "return them to your hand.", "Ritual. Slaanesh.",
-                              4, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
+                              4, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND"),
+        CardClasses.ArmyCard("Galvax the Bloated", "This unit gets +1 ATK and +1 HP for each cultist"
+                                                   " unit you control at this planet.\n"
+                                                   "Reaction: After a Cultist unit you control leaves play from this "
+                                                   "planet, deal 1 damage to a unit at this planet.",
+                             "Touched. Nurgle.", 3, faction, "Loyal", 2, 4, 1, True)
     ]
     return chaos_card_array

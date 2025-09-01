@@ -4250,6 +4250,7 @@ class Player:
         if other_player.name_player == self.name_player:
             other_player = self.game.p2
         attack_value = card.get_attack()
+        ability = self.get_ability_given_pos(planet_id, unit_id)
         if card.get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
@@ -4268,24 +4269,28 @@ class Player:
                 attack_value += 1
         if card.get_ability() == "Shard of the Deceiver":
             attack_value += len(self.discard)
-        if self.get_ability_given_pos(planet_id, unit_id) != "Knight Paladin Voris":
+        if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 attack_value += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Holy Battery":
+        if ability == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Kabal of the Ebon Law":
+        if ability == "Kabal of the Ebon Law":
             if planet_id != self.game.round_number:
                 attack_value += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
+        if ability == "Tenacious Novice Squad":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Eloquent Confessor":
+        if ability == "Eloquent Confessor":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Hjorvath Coldstorm":
+        if ability == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 attack_value = attack_value - 2
+        if ability == "Galvax the Bloated":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.check_for_trait_given_pos(planet_id, i, "Cultist"):
+                    attack_value += 1
         if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
@@ -4298,16 +4303,16 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
                     attack_value += 1
-        if card.get_ability() == "Improbable Runt Machine":
+        if ability == "Improbable Runt Machine":
             attack_value += min(len(card.get_attachments()), 3)
-        if card.get_ability() == "Praetorian Ancient":
+        if ability == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 attack_value += 2
-        if card.get_ability() == "Pyrrhian Eternals":
+        if ability == "Pyrrhian Eternals":
             attack_value += self.discard.count("Pyrrhian Eternals")
-        if card.get_ability() == "Destroyer Cultist":
+        if ability == "Destroyer Cultist":
             attack_value += self.count_non_necron_factions()
-        if card.get_ability() != "Colonel Straken":
+        if ability != "Colonel Straken":
             straken_check = self.search_card_at_planet(planet_id, "Colonel Straken", bloodied_relevant=True)
             if straken_check:
                 if card.check_for_a_trait("Soldier") or card.check_for_a_trait("Warrior"):
@@ -4320,14 +4325,14 @@ class Player:
             if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
                 if self.check_if_trait_at_planet(planet_id, "Warrior"):
                     attack_value += 1
-        if card.get_ability() == "Auxiliary Overseer":
+        if ability == "Auxiliary Overseer":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_faction_given_pos(planet_id, i) != "Tau":
                     attack_value += 1
-        if card.get_ability() == "Goff Boyz":
+        if ability == "Goff Boyz":
             if self.game.round_number == planet_id:
                 attack_value = attack_value + 3
-        if card.get_ability() in self.plus_two_atk_if_warlord:
+        if ability in self.plus_two_atk_if_warlord:
             if self.check_for_warlord(planet_id, True, self.name_player):
                 attack_value += 2
             else:
@@ -4337,26 +4342,26 @@ class Player:
                 elif self.number == "2":
                     if self.game.p1.check_for_warlord(planet_id, True, self.name_player):
                         attack_value += 2
-        if card.get_ability() == "Baharroth's Hawks":
+        if ability == "Baharroth's Hawks":
             if self.check_for_warlord(planet_id, True, self.name_player):
                 attack_value += 3
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 attack_value += 1
-        if card.get_ability() == "Gorzod's Wagons":
+        if ability == "Gorzod's Wagons":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 attack_value += 2
-        if card.get_ability() == "Fire Warrior Grenadiers":
+        if ability == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
                     attack_value += 2
-        if card.get_ability() == "Sacaellum Shrine Guard" or card.get_ability() == "Saim-Hann Kinsman":
+        if ability == "Sacaellum Shrine Guard" or ability == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
                 attack_value += 1
-        if card.get_ability() == "Virulent Plague Squad":
+        if ability == "Virulent Plague Squad":
             attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
-        if card.get_ability() == "Infantry Conscripts":
+        if ability == "Infantry Conscripts":
             support_count = 0
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_card_type() == "Support":
@@ -4861,6 +4866,10 @@ class Player:
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
+        if ability == "Galvax the Bloated":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.check_for_trait_given_pos(planet_id, i, "Cultist"):
+                    health += 1
         if ability == "Fairly 'Quipped Kommando":
             health += len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())
         if card.get_faction() == "Orks" and card.get_card_type() != "Token":
@@ -5941,6 +5950,10 @@ class Player:
         if self.get_ability_given_pos(planet_num, card_pos) == "Coteaz's Henchmen":
             self.game.create_reaction("Coteaz's Henchmen", self.name_player,
                                       (int(self.number), -1, -1))
+        if card.check_for_a_trait("Cultist"):
+            for i in range(len(self.cards_in_play[planet_num + 1])):
+                if self.get_ability_given_pos(planet_num, i) == "Galvax the Bloated":
+                    self.game.create_reaction("Galvax the Bloated", self.name_player, (int(self.number), planet_num, i))
         if card.check_for_a_trait("Cultist") or card.check_for_a_trait("Daemon"):
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Murder Cogitator":
