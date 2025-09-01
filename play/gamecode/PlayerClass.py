@@ -3008,12 +3008,17 @@ class Player:
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
                     self.move_unit_to_planet(-2, i, planet_pos - 1, card_effect=False)
-                    for j in range(7):
-                        if j != planet_pos - 1:
-                            for k in range(len(self.cards_in_play[j + 1])):
-                                if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
-                                    self.game.create_reaction("Blackmane Sentinel", self.name_player,
-                                                              (int(self.number), j, k))
+                    if card_type == "Warlord":
+                        if self.search_hand_for_card("Tides of Chaos"):
+                            if self.resources > 0:
+                                self.game.create_reaction("Tides of Chaos", self.name_player,
+                                                          (int(self.number), -1, -1))
+                        for j in range(7):
+                            if j != planet_pos - 1:
+                                for k in range(len(self.cards_in_play[j + 1])):
+                                    if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
+                                        self.game.create_reaction("Blackmane Sentinel", self.name_player,
+                                                                  (int(self.number), j, k))
                     i -= 1
                 i += 1
         return None

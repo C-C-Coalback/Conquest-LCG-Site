@@ -2033,6 +2033,28 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Drammask Nane":
             self.chosen_first_card = False
             self.misc_target_planet = planet_pos
+        elif current_reaction == "Tides of Chaos":
+            resources_to_spend = 1
+            if primary_player.urien_relevant:
+                resources_to_spend = 2
+            if primary_player.spend_resources(resources_to_spend):
+                primary_player.discard_card_name_from_hand("Tides of Chaos")
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.get_card_type_given_pos(-2, i) == "Army":
+                        primary_player.headquarters[i].extra_command_eop += primary_player.get_attack_given_pos(-2, i)
+                for i in range(len(secondary_player.headquarters)):
+                    if secondary_player.get_card_type_given_pos(-2, i) == "Army":
+                        secondary_player.headquarters[i].extra_command_eop += secondary_player.get_attack_given_pos(-2, i)
+                for i in range(7):
+                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                        if primary_player.get_card_type_given_pos(i, j) == "Army":
+                            primary_player.cards_in_play[i + 1][j].extra_command_eop += \
+                                primary_player.get_attack_given_pos(i, j)
+                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        if secondary_player.get_card_type_given_pos(i, j) == "Army":
+                            secondary_player.cards_in_play[i + 1][j].extra_command_eop +=\
+                                secondary_player.get_attack_given_pos(i, j)
+            self.delete_reaction()
         elif current_reaction == "The Inevitable Decay":
             if primary_player.resources > 0:
                 if "The Inevitable Decay" in primary_player.cards:

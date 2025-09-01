@@ -435,6 +435,10 @@ def chaos_cards_init():
                                                 "Action: Deal 3 damage to an army unit at this planet."
                                                 " Use this ability only if your opponent won a command struggle at"
                                                 " this planet this round (Limit once per round.)", "Warrior. Khorne.",
-                             3, faction, "Loyal", 3, 4, 1, False, action_in_play=True, allowed_phases_in_play="ALL")
+                             3, faction, "Loyal", 3, 4, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Tides of Chaos", "Reaction: After your warlord commits to a planet, each army unit "
+                                                "gains an amount of command icons equal to their ATK value "
+                                                "until the end of the phase.", "Tactic.",
+                              1, faction, "Loyal", 2, False)
     ]
     return chaos_card_array
