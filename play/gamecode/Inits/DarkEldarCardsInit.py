@@ -352,6 +352,9 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Kabal of the Ebon Law", "This unit gets +1 ATK while it is not at the first planet.\n"
                                                       "Forced Reaction: After a battle starts at this planet, each "
                                                       "player controlling a unit with 2 ATK or more, draws a card.",
-                             "Kabalite.", 2, faction, "Loyal", 2, 2, 1, False)
+                             "Kabalite.", 2, faction, "Loyal", 2, 2, 1, False),
+        CardClasses.ArmyCard("Connoisseur of Terror", "Deep Strike (2).\n"
+                                                      "Reaction: After this unit is turned face-up, draw 2 cards.",
+                             "Scholar. Haemonculus.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=2)
     ]
     return dark_eldar_cards_array

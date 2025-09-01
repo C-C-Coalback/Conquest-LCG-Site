@@ -630,6 +630,9 @@ class Player:
             if ability == "Patron Saint":
                 self.game.create_reaction("Patron Saint", self.name_player,
                                           (int(self.number), planet_id, last_element_index))
+            if ability == "Connoisseur of Terror":
+                self.game.create_reaction("Connoisseur of Terror", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
             if ability == "Seething Mycetic Spore":
                 self.game.create_reaction("Seething Mycetic Spore", self.name_player,
                                           (int(self.number), planet_id, last_element_index))

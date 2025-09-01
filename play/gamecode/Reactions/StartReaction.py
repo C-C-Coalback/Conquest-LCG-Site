@@ -2033,6 +2033,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Drammask Nane":
             self.chosen_first_card = False
             self.misc_target_planet = planet_pos
+        elif current_reaction == "Connoisseur of Terror":
+            primary_player.draw_card()
+            primary_player.draw_card()
+            self.delete_reaction()
         elif current_reaction == "Tides of Chaos":
             resources_to_spend = 1
             if primary_player.urien_relevant:
