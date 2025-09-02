@@ -384,7 +384,12 @@ def orks_cards_init():
                                                          "This unit gets +1 HP per attachment on it.\n"
                                                          "Interrupt: When an attachment you control leaves play from "
                                                          "this planet, return it to your hand instead.",
-                             "Soldier.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=0)
+                             "Soldier.", 2, faction, "Loyal", 2, 2, 1, False, deepstrike=0),
+        CardClasses.ArmyCard("Impulsive Loota", "Deep Strike (1).\n"
+                                                "Reaction: After an attachment card is discarded, Deep Strike this"
+                                                " unit to deploy that attachment from your discard pile "
+                                                "attached to this unit.", "Soldier.",
+                             3, faction, "Common", 1, 3, 1, False, deepstrike=1)
 
     ]
     return orks_card_array

@@ -1066,6 +1066,26 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Impulsive Loota In Play":
+            if not self.chosen_first_card:
+                if game_update_string[1] == primary_player.number:
+                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].actually_a_deepstrike:
+                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].deepstrike_card_name \
+                                == "Impulsive Loota":
+                            cost = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                            if primary_player.spend_resources(cost):
+                                last_el_index = primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                if last_el_index == -1:
+                                    await self.send_update_message(
+                                        "Could not Deep Strike the Impulsive Loota! Cancelling...")
+                                    self.delete_reaction()
+                                else:
+                                    self.chosen_first_card = True
+                                    self.misc_target_unit = (planet_pos, last_el_index)
+                                    await self.send_update_message("Please choose the card to attach.")
+                            else:
+                                await self.send_update_message(
+                                    "Could not pay the cost for the Impulsive Loota! Cancelling...")
         elif self.reactions_needing_resolving[0] == "Blackmane Sentinel":
             if game_update_string[1] == primary_player.get_number():
                 warlord_pla = primary_player.find_warlord_planet()

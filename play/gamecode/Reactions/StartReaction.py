@@ -2037,6 +2037,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Impulsive Loota Reserve" or current_reaction == "Impulsive Loota In Play":
+            self.chosen_first_card = False
+            await self.send_update_message("Please choose the card to deepstrike.")
         elif current_reaction == "Willing Submission":
             primary_player.draw_card()
             self.chosen_first_card = False

@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def resolve_discard_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -81,6 +82,18 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                                 self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
                             self.name_player_who_is_searching = primary_player.name_player
                             self.number_who_is_searching = primary_player.number
+        elif current_reaction == "Impulsive Loota Reserve" or current_reaction == "Impulsive Loota In Play":
+            if chosen_discard == int(primary_player.number):
+                if self.chosen_first_card:
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.get_card_type() == "Attachment" and \
+                            (card.get_name() in primary_player.stored_cards_recently_discarded or
+                             card.get_name() in primary_player.cards_recently_discarded):
+                        if not card.planet_attachment:
+                            planet_pos, unit_pos = self.misc_target_unit
+                            self.card_to_deploy = card
+                            new_game_update_string = ["IN_PLAY", primary_player.number, str(planet_pos), str(unit_pos)]
+                            await DeployPhase.deploy_card_routine_attachment(self, name, new_game_update_string)
         elif current_reaction == "Optimized Protocol":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

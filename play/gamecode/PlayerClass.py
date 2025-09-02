@@ -5538,8 +5538,24 @@ class Player:
     def add_card_to_discard(self, card_name):
         if card_name not in ["Snotlings", "Guardsman", "Cultist", "Khymera", "Termagant"]:
             self.discard.append(card_name)
-        if card_name == "Cardinal Agra Decree":
-            self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
+            card = self.game.preloaded_find_card(card_name)
+            self.cards_recently_discarded.append(card_name)
+            if card.get_card_type() == "Attachment":
+                if not card.planet_attachment:
+                    for i in range(7):
+                        for j in range(len(self.cards_in_reserve[i])):
+                            if not self.check_if_already_have_reaction("Impulsive Loota"):
+                                if self.cards_in_reserve[i][j].get_ability() == "Impulsive Loota":
+                                    self.game.create_reaction("Impulsive Loota Reserve", self.name_player,
+                                                              (int(self.number), -1, -1))
+                        for j in range(len(self.cards_in_play[i + 1])):
+                            if not self.check_if_already_have_reaction("Impulsive Loota"):
+                                if self.cards_in_play[i + 1][j].actually_a_deepstrike:
+                                    if self.cards_in_play[i + 1][j].deepstrike_card_name == "Impulsive Loota":
+                                        self.game.create_reaction("Impulsive Loota In Play", self.name_player,
+                                                                  (int(self.number), -1, -1))
+            if card_name == "Cardinal Agra Decree":
+                self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
 
     def search_for_preemptive_destroy_interrupts(self):
         for i in range(len(self.headquarters)):

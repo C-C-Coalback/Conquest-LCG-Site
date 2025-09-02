@@ -480,6 +480,17 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         player_gaining_attachment = self.p2
     card = None
     magus_harid = False
+    impulsive_loota = False
+    if self.reactions_needing_resolving:
+        if self.reactions_needing_resolving[0] == "Impulsive Loota Reserve"\
+                or self.reactions_needing_resolving[0] == "Impulsive Loota In Play":
+            card = self.card_to_deploy
+            impulsive_loota = True
+            primary_player = self.p1
+            secondary_player = self.p2
+            if self.player_who_resolves_reaction[0] == self.name_2:
+                primary_player = self.p2
+                secondary_player = self.p1
     if self.interrupts_waiting_on_resolution:
         if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
             card = self.card_to_deploy
@@ -546,3 +557,6 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                     self.misc_player_storage = ""
                     self.delete_interrupt()
                     self.action_cleanup()
+                if impulsive_loota:
+                    primary_player.discard.remove(card.get_name())
+                    self.delete_reaction()

@@ -7003,6 +7003,28 @@ class Game:
                             await self.send_update_message(secondary_player.name_player + " has a " + name_card +
                                                            " at that position")
                             self.delete_reaction()
+                    elif self.reactions_needing_resolving[0] == "Impulsive Loota Reserve":
+                        if not self.chosen_first_card:
+                            if game_update_string[1] == primary_player.number:
+                                if primary_player.cards_in_reserve[int(game_update_string[2])][
+                                        int(game_update_string[3])].get_ability() == "Impulsive Loota":
+                                    cost = primary_player.get_deepstrike_value_given_pos(int(game_update_string[2]),
+                                                                                         int(game_update_string[3]))
+                                    if primary_player.spend_resources(cost):
+                                        last_el_index = primary_player.deepstrike_unit(int(game_update_string[2]),
+                                                                                       int(game_update_string[3]))
+                                        if last_el_index == -1:
+                                            await self.send_update_message(
+                                                "Could not Deep Strike the Impulsive Loota! Cancelling...")
+                                            self.delete_reaction()
+                                        else:
+                                            self.chosen_first_card = True
+                                            self.misc_target_unit = (int(game_update_string[2]), last_el_index)
+                                            await self.send_update_message("Please choose the card to attach.")
+                                    else:
+                                        await self.send_update_message(
+                                            "Could not pay the cost for the Impulsive Loota! Cancelling...")
+                                        self.delete_reaction()
             elif len(game_update_string) == 5:
                 if game_update_string[0] == "ATTACHMENT":
                     if game_update_string[1] == "PLANETS":
