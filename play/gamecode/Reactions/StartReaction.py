@@ -2044,8 +2044,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.sacrifice_card_in_hq(unit_pos)
             self.masters_of_the_webway = True
             self.delete_reaction()
+        elif current_reaction == "The Dawnsinger":
+            self.choices_available = ["Lose 2 cards", "Opponent draws 2 cards"]
+            self.choice_context = "The Dawnsinger Choice"
+            self.name_player_making_choices = secondary_player.name_player
+            self.misc_counter = 0
+            self.resolving_search_box = True
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
         elif current_reaction == "The Blinded Princess":
             self.player_who_resolves_reaction[0] = secondary_player.name_player
+        elif current_reaction == "The Webway Witch":
+            secondary_player.webway_witch = planet_pos
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "The Dance Without End":
             if primary_player.resources > 0:
                 can_continue = True

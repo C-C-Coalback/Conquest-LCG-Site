@@ -356,6 +356,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         else:
             primary_player = self.p2
             secondary_player = self.p1
+    if primary_player.webway_witch > -1:
+        if self.planets_in_play_array[primary_player.webway_witch]:
+            planet_pos = primary_player.webway_witch
     primary_player.reset_all_aiming_reticles_play_hq()
     damage_to_take = sum(self.damage_for_unit_to_take_on_play)
     print("position hand of unit: ", self.card_pos_to_deploy)
@@ -371,6 +374,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                              damage_to_take=damage_to_take,
                                                              is_owner_of_card=own_card)
     if played_card == "SUCCESS":
+        primary_player.webway_witch = -1
         self.queued_sound = "onplay"
         if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID":

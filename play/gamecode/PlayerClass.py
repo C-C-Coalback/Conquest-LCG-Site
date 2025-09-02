@@ -184,6 +184,7 @@ class Player:
         self.last_removed_string = ""
         self.played_grand_plan = False
         self.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
+        self.webway_witch = -1
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -2305,6 +2306,9 @@ class Player:
                             if card.get_ability() == "Brotherhood Justicar":
                                 self.game.create_reaction("Brotherhood Justicar", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "The Webway Witch":
+                                self.game.create_reaction("The Webway Witch", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Scything Hormagaunts":
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -4083,6 +4087,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
 
     def refresh_once_per_phase_abilities(self):
+        self.webway_witch = -1
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].set_once_per_phase_used(False)
@@ -5866,6 +5871,9 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
                 self.game.create_reaction("Shrouded Harlequin", self.name_player,
                                           (int(self.number), -1, -1))
+            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "The Dawnsinger":
+                self.game.create_reaction("The Dawnsinger", self.name_player,
+                                          (int(self.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
                 self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
                                           (int(self.number), -1, -1))
@@ -6031,6 +6039,8 @@ class Player:
                                           (int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "The Sun Prince":
+            self.game.create_interrupt("The Sun Prince", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
             self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Growing Tide":

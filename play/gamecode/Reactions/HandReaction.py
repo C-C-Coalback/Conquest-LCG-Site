@@ -111,6 +111,12 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                                                               discounts=self.discounts_applied)
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
+        elif current_reaction == "The Dawnsinger":
+            primary_player.deck.insert(0, primary_player.cards[hand_pos])
+            del primary_player.cards[hand_pos]
+            self.misc_counter += 1
+            if self.misc_counter > 1:
+                self.delete_reaction()
         elif current_reaction == "Jaricho Commit":
             await self.send_update_message(primary_player.name_player + " reveals a " +
                                            primary_player.cards[hand_pos] + " from their hand.")

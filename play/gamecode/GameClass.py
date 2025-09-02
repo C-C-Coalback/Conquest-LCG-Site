@@ -3272,15 +3272,22 @@ class Game:
                                 self.resolving_search_box = False
                                 self.delete_reaction()
                     elif self.choice_context == "Bottom card (CotS)":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.append(chosen_choice)
                         del primary_player.deck[int(game_update_string[1])]
                         self.reset_choices_available()
                         self.resolving_search_box = True
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    elif self.choice_context == "The Dawnsinger Choice":
+                        if chosen_choice == "Lose 2 cards":
+                            pass
+                        else:
+                            secondary_player.draw_card()
+                            secondary_player.draw_card()
+                            self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Select new synapse (RSN):":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(chosen_choice)
                         primary_player.add_to_hq(card)
                         last_element_index = len(primary_player.headquarters) - 1
