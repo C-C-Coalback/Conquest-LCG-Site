@@ -360,6 +360,11 @@ def eldar_cards_init():
                                                      "Then attached unit gets +1 ATK for its next attack this phase.",
                                    "Wargear.", 0, faction, "Loyal", 2, False, limit_one_per_unit=True,
                                    required_traits="Saim-Hann", extra_health=2,
-                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token")
+                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token"),
+        CardClasses.ArmyCard("Phantasmatic Masque", "This unit gets +1 ATK for each remaining HP.\n"
+                                                    "Reaction: After an attack against this unit resolves, exhaust "
+                                                    "this unit to deal 2 damage to the attacker."
+                                                    " (Limit once per phase.)", "Warrior. Harlequin.",
+                             2, faction, "Loyal", 0, 3, 1, False)
     ]
     return eldar_cards_array

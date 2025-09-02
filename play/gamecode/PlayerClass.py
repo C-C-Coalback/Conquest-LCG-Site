@@ -4259,6 +4259,9 @@ class Player:
                 attack_value += min(len(card.get_attachments()), 3)
             if card.get_ability() == "Destroyer Cultist":
                 attack_value += self.count_non_necron_factions()
+            if card.get_ability() == "Phantasmatic Masque":
+                attack_value += self.get_health_given_pos(planet_id, unit_id) - \
+                                self.get_damage_given_pos(planet_id, unit_id)
             if card.get_ability() == "Virulent Plague Squad":
                 attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
             return attack_value
@@ -4319,6 +4322,9 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.check_for_trait_given_pos(planet_id, i, "Cultist"):
                     attack_value += 1
+        if ability == "Phantasmatic Masque":
+            attack_value += self.get_health_given_pos(planet_id, unit_id) - \
+                            self.get_damage_given_pos(planet_id, unit_id)
         if self.check_for_trait_given_pos(planet_id, unit_id, "Sautekh"):
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":

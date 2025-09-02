@@ -2040,6 +2040,16 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Yvraine's Entourage":
             self.misc_misc = None
             self.chosen_first_card = False
+        elif current_reaction == "Phantasmatic Masque":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            for planet in range(7):
+                for i in range(len(secondary_player.cards_in_play[planet + 1])):
+                    if secondary_player.cards_in_play[planet + 1][i].resolving_attack:
+                        secondary_player.assign_damage_to_pos(planet, i, 2,
+                                                              rickety_warbuggy=True, shadow_field_possible=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Host of the Emissary":
             primary_player.exhaust_card_in_hq_given_name("Host of the Emissary")
             self.player_who_resolves_reaction[0] = secondary_player.name_player
