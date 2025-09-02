@@ -2044,6 +2044,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.sacrifice_card_in_hq(unit_pos)
             self.masters_of_the_webway = True
             self.delete_reaction()
+        elif current_reaction == "The Blinded Princess":
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
         elif current_reaction == "The Dance Without End":
             if primary_player.resources > 0:
                 can_continue = True

@@ -1903,6 +1903,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Frenzied Wulfen":
             self.game.create_reaction("Frenzied Wulfen", self.name_player, (int(self.number), position,
                                                                             last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "The Blinded Princess":
+            self.game.create_reaction("The Blinded Princess", self.name_player, (int(self.number), position,
+                                                                                 last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id
@@ -4159,7 +4162,7 @@ class Player:
             return 0
         else:
             other_player = self.get_other_player()
-            if other_player.search_card_at_planet("Zen Xi Aonia"):
+            if other_player.search_card_at_planet(planet_id, "Zen Xi Aonia"):
                 return 0
         area_effect = self.cards_in_play[planet_id + 1][unit_id].get_area_effect()
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":

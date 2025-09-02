@@ -1066,6 +1066,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "The Blinded Princess":
+            if primary_player.get_number() == game_update_string[1]:
+                if planet_pos != self.positions_of_unit_triggering_reaction[0][1]:
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                        secondary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
+                        self.delete_reaction()
         elif current_reaction == "Yvraine's Entourage":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
