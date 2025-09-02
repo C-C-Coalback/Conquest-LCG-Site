@@ -1,7 +1,7 @@
 import copy
 
 from .. import FindCard
-from ..Phases import DeployPhase
+from ..Phases import DeployPhase, CombatPhase
 
 
 async def resolve_in_play_interrupt(self, name, game_update_string, primary_player, secondary_player):
@@ -132,6 +132,17 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                             primary_player.draw_card()
                         primary_player.reset_all_aiming_reticles_play_hq()
                         self.delete_interrupt()
+    elif current_interrupt == "Zen Xi Aonia":
+        if game_update_string[1] == primary_player.get_number():
+            _, current_planet, current_unit = self.last_defender_position
+            if planet_pos == self.positions_of_units_interrupting[0][1]:
+                if current_unit != unit_pos:
+                    primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
+                    self.may_move_defender = False
+                    print("Calling defender in the funny way")
+                    await CombatPhase.update_game_event_combat_section(
+                        self, secondary_player.name_player, game_update_string)
+                    self.delete_interrupt()
     elif current_interrupt == "Banner of the Cult":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

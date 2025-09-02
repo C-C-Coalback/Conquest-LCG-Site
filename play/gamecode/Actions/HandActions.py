@@ -103,6 +103,21 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["Army", "Support", "Attachment", "Event"]
                         self.choice_context = "Rakarth's Experimentations card type"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Access to the Black Library":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.choices_available = []
+                        for i in range(len(primary_player.deck)):
+                            if primary_player.deck[i] not in self.choices_available:
+                                self.choices_available.append(primary_player.deck[i])
+                        if not self.choices_available or len(self.choices_available) == 1:
+                            self.reset_choices_available()
+                            self.action_cleanup()
+                        else:
+                            self.choice_context = "Access to the Black Library"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.chosen_first_card = False
+                            self.misc_target_choice = ""
                     elif ability == "Muster the Guard":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):

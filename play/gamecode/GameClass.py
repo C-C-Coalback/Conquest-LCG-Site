@@ -358,7 +358,7 @@ class Game:
         self.auto_card_destruction = True
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
-        self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn"]
+        self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.ebon_chalice_value = 0
@@ -3069,6 +3069,24 @@ class Game:
                         else:
                             primary_player.add_resources(1)
                         self.choice_context = "Anshan opponent gains"
+                    elif self.choice_context == "Access to the Black Library":
+                        if not self.chosen_first_card:
+                            self.misc_target_choice = chosen_choice
+                            self.chosen_first_card = True
+                            self.chosen_second_card = False
+                            self.choices_available.remove(chosen_choice)
+                        elif not self.chosen_second_card:
+                            await self.send_update_message("Please decide which card to give your opponent.")
+                            self.choices_available = [chosen_choice, self.misc_target_choice]
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.chosen_second_card = True
+                        else:
+                            secondary_player.cards.append(chosen_choice)
+                            secondary_player.deck.remove(chosen_choice)
+                            secondary_player.shuffle_deck()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.action_cleanup()
                     elif self.choice_context == "BTD: Last Planet or HQ?":
                         if primary_player.aiming_reticle_coords_hand is not None:
                             card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
@@ -7275,6 +7293,8 @@ class Game:
                                 primary_player.draw_card()
                             self.delete_interrupt()
                             primary_player.reset_all_aiming_reticles_play_hq()
+                    elif current_interrupt == "Zen Xi Aonia":
+                        await self.send_update_message("You cannot stop Zen Xi Aonia.")
                     else:
                         self.delete_interrupt()
             if len(game_update_string) == 2:

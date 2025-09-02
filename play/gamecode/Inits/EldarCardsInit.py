@@ -382,6 +382,47 @@ def eldar_cards_init():
         CardClasses.EventCard("The Dance Without End", "Reaction: After a Harlequin unit enters your discard pile "
                                                        "from a planet, return it to your hand to deploy a Harlequin"
                                                        " unit with a different name at the same planet.", "Power.",
-                              1, faction, "Loyal", 2, False)
+                              1, faction, "Loyal", 2, False),
+        CardClasses.WarlordCard("Zen Xi Aonia", "Each unit at this planet loses the Area Effect keyword.\n"
+                                                "Forced Interrupt: When a unit you control at this planet is chosen as"
+                                                " a defender, declare another eligible unit at this planet as the"
+                                                " defender instead, if able.", "Shadowseer. Harlequin.",
+                                faction, 2, 6, "Bloodied.", 2, 6, 7, 7,
+                                ["2x Access to the Black Library", "1x Masters of the Webway", "1x Starmist Raiment",
+                                 "1x The Blinded Princess", "1x The Dawnsinger",
+                                 "1x The Sun Prince", "1x The Webway Witch"]),
+        CardClasses.EventCard("Access to the Black Library", "Deploy Action: Search your deck for 2 cards with a "
+                                                             "different name. Reveal them, have your opponent choose "
+                                                             "one, add it to your hand, and shuffle the remaining"
+                                                             " card in your deck.", "Power.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.SupportCard("Masters of the Webway", "Reaction: After the deploy phase begins, sacrifice this "
+                                                         "support to have each player exchange their "
+                                                         "command dial value the next time they reveal "
+                                                         "their command dial this round.", "Location.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("Starmist Raiment", "Attach to a Harlequin unit you control.\n"
+                                                       "Interrupt: When damage is assigned to a Harlequin unit you "
+                                                       "control at this planet, exhaust this attachment "
+                                                       "to reassign 1 of that damage to another non-warlord "
+                                                       "unit at this planet.", "Wargear. Armor.",
+                                   1, faction, "Signature", 3, True, required_traits="Harlequin",
+                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token",
+                                   must_be_own_unit=True),
+        CardClasses.ArmyCard("The Blinded Princess", "Forced Reaction: After this unit enters play, your opponent may "
+                                                     "exhaust a unit at a planet to move this unit to that planet.",
+                             "Warrior. Harlequin.", 1, faction, "Signature", 3, 3, 1, False),
+        CardClasses.ArmyCard("The Dawnsinger", "Reaction: After this unit is destroyed, your opponent must choose to "
+                                               "either put 2 cards from his hand on the top of his deck in any "
+                                               "order or you draw 2 cards.", "Psyker. Harlequin.",
+                             2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.ArmyCard("The Sun Prince", "Interrupt: When this unit leaves play, your opponent must choose, at "
+                                               "the same planet, either to exhaust a unit he controls "
+                                               "or ready a unit you control.", "Warrior. Harlequin.",
+                             2, faction, "Signature", 3, 2, 1, False),
+        CardClasses.ArmyCard("The Webway Witch", "Reaction: After you deploy this unit, the next time your opponent"
+                                                 " deploys a unit this phase, he must deploy it at this planet,"
+                                                 " if able.", "Psyker. Harlequin.",
+                             2, faction, "Signature", 1, 2, 2, False)
     ]
     return eldar_cards_array

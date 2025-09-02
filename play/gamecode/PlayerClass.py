@@ -4153,6 +4153,12 @@ class Player:
         return None
 
     def get_area_effect_given_pos(self, planet_id, unit_id):
+        if self.search_card_at_planet("Zen Xi Aonia"):
+            return 0
+        else:
+            other_player = self.get_other_player()
+            if other_player.search_card_at_planet("Zen Xi Aonia"):
+                return 0
         area_effect = self.cards_in_play[planet_id + 1][unit_id].get_area_effect()
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
