@@ -5966,6 +5966,11 @@ class Player:
                         if self.get_ability_given_pos(planet_num, i) == "Saint Erika":
                             self.game.create_reaction("Saint Erika", self.name_player,
                                                       (int(self.number), planet_num, i))
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Harlequin"):
+                if self.search_hand_for_card("The Dance Without End") and self.resources > 0:
+                    if not self.check_if_already_have_reaction("The Dance Without End"):
+                        self.game.create_reaction("The Dance Without End", self.name_player,
+                                                  (int(self.number), planet_num, -1))
         for i in range(len(card.get_attachments())):
             owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":

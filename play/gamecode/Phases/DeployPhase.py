@@ -335,6 +335,13 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                     if self.player_who_resolves_reaction[0] == self.name_2:
                         primary_player = self.p2
                         secondary_player = self.p1
+                if self.reactions_needing_resolving[0] == "The Dance Without End":
+                    is_a_reaction = True
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                    if self.player_who_resolves_reaction[0] == self.name_2:
+                        primary_player = self.p2
+                        secondary_player = self.p1
         if not is_an_interrupt and not is_a_reaction:
             if self.player_with_action == self.name_1:
                 primary_player = self.p1

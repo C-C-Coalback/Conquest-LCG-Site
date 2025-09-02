@@ -1,4 +1,5 @@
 from .. import FindCard
+from ..Phases import DeployPhase
 
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -85,6 +86,29 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                 if self.misc_counter > 1:
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "The Dance Without End":
+            chosen_planet = self.positions_of_unit_triggering_reaction[0][1]
+            if self.chosen_first_card:
+                card = primary_player.get_card_in_hand(hand_pos)
+                if card.get_name() != self.misc_target_choice and card.get_card_type() == "Army" and \
+                        card.check_for_a_trait("Harlequin"):
+                    self.chosen_second_card = True
+                    secondary_player.aiming_reticle_coords_hand = hand_pos
+                    secondary_player.aiming_reticle_color = "blue"
+                    self.discounts_applied = 0
+                    await self.calculate_available_discounts_unit(chosen_planet, card, primary_player)
+                    await self.calculate_automatic_discounts_unit(chosen_planet, card, primary_player)
+                    if card.check_for_a_trait("Elite"):
+                        primary_player.master_warpsmith_count = 0
+                    self.card_to_deploy = card
+                    if self.available_discounts > self.discounts_applied:
+                        self.stored_mode = self.mode
+                        self.mode = "DISCOUNT"
+                        self.planet_aiming_reticle_position = chosen_planet
+                        self.planet_aiming_reticle_active = True
+                    else:
+                        await DeployPhase.deploy_card_routine(self, name, chosen_planet,
+                                                              discounts=self.discounts_applied)
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
         elif current_reaction == "Jaricho Commit":

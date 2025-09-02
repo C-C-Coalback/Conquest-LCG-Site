@@ -378,6 +378,10 @@ def eldar_cards_init():
                                                               "Reaction: After a battle end at "
                                                               "this planet, draw a card.", "Tactic.",
                                    1, faction, "Common", 1, False,
-                                   deepstrike=0, planet_attachment=True, limit_one_per_unit=True)
+                                   deepstrike=0, planet_attachment=True, limit_one_per_unit=True),
+        CardClasses.EventCard("The Dance Without End", "Reaction: After a Harlequin unit enters your discard pile "
+                                                       "from a planet, return it to your hand to deploy a Harlequin"
+                                                       " unit with a different name at the same planet.", "Power.",
+                              1, faction, "Loyal", 2, False)
     ]
     return eldar_cards_array
