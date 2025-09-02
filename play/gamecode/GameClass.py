@@ -441,6 +441,8 @@ class Game:
         self.nectavus_actual_current_planet = -1
         self.grand_plan_queued = []  # (planet name, target round, num getting planet, p1 planned, p2 planned)
         self.grand_plan_active = False
+        self.trium_count = 0
+        self.trium_tracker = ("name", -1)
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -975,6 +977,9 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
+                        self.action_cleanup()
+                    elif self.action_chosen == "Attuned Gyrinx":
+                        await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
                     elif self.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
@@ -8758,6 +8763,8 @@ class Game:
                 reactions.append("Agra's Preachings")
             if loser.search_card_in_hq("Order of the Crimson Oath"):
                 reactions.append("Order of the Crimson Oath")
+            if loser.search_card_in_hq("Host of the Emissary", ready_relevant=True):
+                reactions.append("Host of the Emissary")
             if loser.resources > 0 and self.round_number == planet_id:
                 if loser.search_hand_for_card("The Grand Plan"):
                     reactions.append("The Grand Plan")
@@ -9133,6 +9140,9 @@ class Game:
                     if not p1_has_warlord and not p2_has_warlord:
                         p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
                         p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
+                    if not p1_has_warlord and not p2_has_warlord:
+                        p1_has_warlord = self.p1.check_yvraine_battle(i)
+                        p2_has_warlord = self.p2.check_yvraine_battle(i)
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
                         self.begin_combat_round()
@@ -9149,6 +9159,9 @@ class Game:
                     if not p1_has_warlord and not p2_has_warlord:
                         p1_has_warlord = self.p1.check_savage_warrior_prime_present(i)
                         p2_has_warlord = self.p2.check_savage_warrior_prime_present(i)
+                    if not p1_has_warlord and not p2_has_warlord:
+                        p1_has_warlord = self.p1.check_yvraine_battle(i)
+                        p2_has_warlord = self.p2.check_yvraine_battle(i)
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
                         self.begin_combat_round()

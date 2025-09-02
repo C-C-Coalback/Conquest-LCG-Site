@@ -97,6 +97,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.resolving_search_box = True
                                 card_chosen.exhaust_card()
                                 self.action_cleanup()
+                    elif ability == "Attuned Gyrinx":
+                        if player_owning_card.name_player == primary_player.get_name_player():
+                            if card_chosen.get_ready():
+                                card_chosen.exhaust_card()
+                                self.action_chosen = ability
+                                self.misc_counter = 0
+                                self.misc_target_unit = (-1, -1)
                     elif ability == "Memories of Fallen Comrades":
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if card_chosen.get_ready():

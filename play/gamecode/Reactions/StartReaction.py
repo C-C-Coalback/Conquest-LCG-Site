@@ -2037,6 +2037,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Yvraine's Entourage":
+            self.misc_misc = None
+            self.chosen_first_card = False
+        elif current_reaction == "Host of the Emissary":
+            primary_player.exhaust_card_in_hq_given_name("Host of the Emissary")
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
         elif current_reaction == "Impulsive Loota Reserve" or current_reaction == "Impulsive Loota In Play":
             self.chosen_first_card = False
             await self.send_update_message("Please choose the card to deepstrike.")

@@ -380,6 +380,12 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             if primary_player.search_hand_for_card("Optimized Protocol"):
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), planet_pos, position_of_unit))
+        elif self.action_chosen == "Triumvirate of Ynnead":
+            del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+            primary_player.aiming_reticle_coords_discard = -1
+            self.chosen_first_card = False
+            self.trium_tracker = (self.card_to_deploy.get_name(), planet_pos)
+            self.trium_count += 1
         elif self.action_chosen == "Anrakyr the Traveller":
             if self.anrakyr_deck_choice == primary_player.name_player:
                 del primary_player.discard[self.anrakyr_unit_position]
@@ -414,7 +420,11 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
             primary_player.set_aiming_reticle_in_play(planet_pos, position_of_unit, "red")
-    self.action_cleanup()
+    if self.action_chosen == "Triumvirate of Ynnead":
+        if self.trium_count > 1:
+            self.action_cleanup()
+    else:
+        self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
         if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
             self.delete_interrupt()

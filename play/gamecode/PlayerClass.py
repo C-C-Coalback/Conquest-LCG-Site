@@ -2850,6 +2850,11 @@ class Player:
                 hard_stop = hard_stop - 1
         return None
 
+    def check_yvraine_battle(self, planet):
+        for i in range(len(self.cards_in_play[planet + 1])):
+            if self.cards_in_play[planet + 1][i].yvraine_active:
+                return True
+        return False
     def check_savage_warrior_prime_present(self, planet):
         for i in range(len(self.cards_in_play[planet + 1])):
             if self.cards_in_play[planet + 1][i].get_ability() == "Savage Warrior Prime":
@@ -2997,6 +3002,9 @@ class Player:
                                                   (int(self.number), planet_pos - 1, i))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Starblaze":
                         self.game.create_reaction("Commander Starblaze", self.name_player,
+                                                  (int(self.number), planet_pos - 1, i))
+                    if headquarters_list[i].get_ability(bloodied_relevant=True) == "Yvraine":
+                        self.game.create_reaction("Yvraine", self.name_player,
                                                   (int(self.number), planet_pos - 1, i))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
                         self.game.create_reaction("The Swarmlord", self.name_player,
@@ -3852,6 +3860,7 @@ class Player:
                 self.headquarters[i].armorbane_eor = False
                 self.headquarters[i].positive_hp_until_eor = 0
                 self.headquarters[i].sweep_eor = 0
+                self.headquarters[i].yvraine_active = False
                 self.headquarters[i].retaliate_eor = 0
                 self.headquarters[i].mobile_eor = False
                 self.headquarters[i].extra_traits_eor = ""
@@ -3870,6 +3879,7 @@ class Player:
                 self.cards_in_play[i + 1][j].armorbane_eor = False
                 self.cards_in_play[i + 1][j].positive_hp_until_eor = 0
                 self.cards_in_play[i + 1][j].sweep_eor = 0
+                self.cards_in_play[i + 1][j].yvraine_active = False
                 self.cards_in_play[i + 1][j].retaliate_eor = 0
                 self.cards_in_play[i + 1][j].mobile_eor = False
                 self.cards_in_play[i + 1][j].extra_traits_eor = ""
@@ -5492,6 +5502,8 @@ class Player:
                 self.game.create_reaction("Da Swoopy", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Kabal of the Ebon Law":
                 self.game.create_reaction("Kabal of the Ebon Law", self.name_player, (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Yvraine's Entourage":
+                self.game.create_reaction("Yvraine's Entourage", self.name_player, (int(self.number), planet_num, i))
 
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if planet_id == -2:

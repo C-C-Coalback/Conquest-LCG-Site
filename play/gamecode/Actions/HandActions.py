@@ -57,7 +57,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(cost):
-                    if may_nullify and secondary_player.nullify_check():
+                    if may_nullify and secondary_player.nullify_check() and ability != "Triumvirate of Ynnead":
                         primary_player.add_resources(cost, refund=True)
                         await self.send_update_message(primary_player.name_player + " wants to play " +
                                                        ability + "; Nullify window offered.")
@@ -91,6 +91,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
                             self.action_chosen = ability
+                    elif ability == "Triumvirate of Ynnead":
+                        self.action_chosen = "Triumvirate of Ynnead"
+                        self.chosen_first_card = False
+                        self.trium_count = 0
+                        self.trium_tracker = ("name", -1)
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Rakarth's Experimentations":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

@@ -2320,6 +2320,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mode = "Normal"
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Attuned Gyrinx":
+        if abs(self.position_of_actioned_card[0] - planet_pos) == 1:
+            if self.misc_target_unit[0] != planet_pos:
+                if game_update_string[1] == primary_player.number:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.misc_counter += 1
+                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                        primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                        await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
+                                                       " gained +1 ATK and +1 HP!")
+                        if self.misc_counter > 1:
+                            self.action_cleanup()
     elif self.action_chosen == "The Emperor's Warrant":
         if not self.chosen_first_card:
             if not secondary_player.check_for_warlord(planet_pos):

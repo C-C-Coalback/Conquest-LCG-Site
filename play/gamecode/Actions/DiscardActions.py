@@ -171,6 +171,15 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.chosen_first_card = True
                         secondary_player.aiming_reticle_coords_discard = pos_discard
                         self.anrakyr_unit_position = pos_discard
+    elif self.action_chosen == "Triumvirate of Ynnead":
+        if not self.chosen_first_card:
+            if chosen_discard == int(primary_player.number):
+                card = self.preloaded_find_card(primary_player.discard[pos_discard])
+                if self.trium_tracker[0] != card.get_name():
+                    if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
+                        self.card_to_deploy = card
+                        self.chosen_first_card = True
+                        primary_player.aiming_reticle_coords_discard = pos_discard
     elif self.action_chosen == "Imotekh the Stormlord":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):

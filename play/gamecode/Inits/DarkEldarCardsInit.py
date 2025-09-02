@@ -360,6 +360,34 @@ def dark_eldar_cards_init():
                                                       "Then your opponent may choose 2 units he controls"
                                                       " (or his warlord if he controls no other unit) to draw 1 card."
                                                       " You may deal 1 damage to one of the chosen units.", "Torture.",
-                                1, faction, "Loyal", False)
+                                1, faction, "Loyal", False),
+        CardClasses.WarlordCard("Yvraine", "You cannot include Chaos Elite units in your deck.\n"
+                                           "Reaction: After this unit commits to a planet, a non-Elite army unit "
+                                           "you control at an adjacent planet is considered to be a warlord while "
+                                           "checking for a battle at that planet this round.", "Herald of Ynnead.",
+                                faction, 2, 7, 2, 5, "Bloodied.", 7, 7,
+                                ["1x Attuned Gyrinx", "1x Host of the Emissary",
+                                 "2x Triumvirate of Ynnead", "4x Yvraine's Entourage"]),
+        CardClasses.AttachmentCard("Attuned Gyrinx", "Attach to your warlord.\n"
+                                                     "Attached unit gets +1 HP.\n"
+                                                     "Combat Action: Exhaust this attachment to give an army unit you "
+                                                     "control at each adjacent planet +1 ATK and +1 HP until "
+                                                     "the end of the phase.", "Familiar.",
+                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True, extra_health=1,
+                                   action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Host of the Emissary", "Reaction: After your opponent wins a battle, exhaust this "
+                                                        "support to have your opponent sacrifice an army unit at "
+                                                        "that planet, if able.", "Warhost.",
+                                3, faction, "Signature", False),
+        CardClasses.EventCard("Triumvirate of Ynnead", "The effects of this event cannot be cancelled.\n"
+                                                       "Deploy Action: Deploy 2 non-Elite units with a different name"
+                                                       " from your discard pile at 2 different planets. "
+                                                       "Reduce their cost by 1.", "Prophecy.",
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Yvraine's Entourage", "Reaction: After a battle begins at this planet, switch the "
+                                                    "printed ATK values of two army units at this planet until"
+                                                    " the end of a combat round.", "Warrior.",
+                             2, faction, "Signature", 2, 2, 1, False)
     ]
     return dark_eldar_cards_array

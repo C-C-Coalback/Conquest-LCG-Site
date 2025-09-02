@@ -278,6 +278,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.action_cleanup()
             planet_name = self.get_planet_name(chosen_planet)
             await self.send_update_message(planet_name + " was targeted for Sacrificial Altar.")
+    elif self.action_chosen == "Triumvirate of Ynnead":
+        if self.chosen_first_card:
+            if self.trium_tracker[1] != chosen_planet:
+                await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
     elif self.action_chosen == "The Orgiastic Feast":
         card_names = self.misc_target_choice.split(sep="/")
         for i in range(len(card_names)):

@@ -91,6 +91,7 @@ class Card:
         self.deepstrike_card_name = ""
         self.cannot_ready_hq_phase = False
         self.return_to_hand_eor = False
+        self.yvraine_active = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
@@ -389,6 +390,7 @@ class UnitCard(Card):
         self.retaliate_eor = 0
         self.positive_hp_until_eor = 0
         self.flying_eocr = False
+        self.actual_attack = attack
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
@@ -713,6 +715,7 @@ class UnitCard(Card):
         self.brutal_eocr = False
         self.area_effect_eocr = 0
         self.flying_eocr = False
+        self.attack = self.actual_attack
 
     def get_brutal(self):
         if self.blanked_eop:

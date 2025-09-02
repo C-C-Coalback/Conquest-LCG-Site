@@ -1066,6 +1066,43 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Yvraine's Entourage":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if not self.chosen_first_card:
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.chosen_first_card = True
+                        self.misc_misc = (int(player_owning_card.get_number()), planet_pos, unit_pos)
+                    else:
+                        og_num, og_pla, og_pos = self.misc_misc
+                        temp_player = self.p1
+                        if og_num == 2:
+                            temp_player = self.p2
+                        attack_first = temp_player.cards_in_play[og_pla + 1][og_pos].attack
+                        attack_second = player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attack
+                        temp_player.cards_in_play[og_pla + 1][og_pos].attack = attack_second
+                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attack = attack_first
+                        temp_player.reset_all_aiming_reticles_play_hq()
+                        card_name_1 = temp_player.get_name_given_pos(og_pla, og_pos)
+                        card_name_2 = player_owning_card.get_name_given_pos(planet_pos, unit_pos)
+                        await self.send_update_message(card_name_1 + " and " + card_name_2 + " swapped printed ATK!")
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
+        elif current_reaction == "Host of the Emissary":
+            if self.last_planet_checked_for_battle == planet_pos:
+                if game_update_string[1] == primary_player.number:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                        self.delete_reaction()
+        elif current_reaction == "Yvraine":
+            if abs(self.positions_of_unit_triggering_reaction[0][1] - planet_pos) == 1:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+                        player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].yvraine_active = True
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Morkanaut Rekuperator":
             if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
