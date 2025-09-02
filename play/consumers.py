@@ -345,11 +345,30 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update(
                             self.name + " is using a command: " + "/".join(message)
                         )
-                    if message[1] == "planets":
-                        print("Need to load planets")
-                        for i in range(len(active_games)):
-                            if active_games[i].game_id == self.room_name:
-                                await active_games[i].send_planet_array()
+                    if (message[1] == "loaddeck" or message[1] == "LOADDECK") and len(message) > 2:
+                        deck_name = message[2]
+                        print(deck_name)
+                        path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + \
+                            self.user.username + "/" + deck_name
+                        print(path_to_player_decks)
+                        if os.path.exists(path_to_player_decks):
+                            print("Success")
+                            with open(path_to_player_decks, 'r') as f:
+                                deck_content = f.read()
+                            print(deck_content)
+                            for i in range(len(active_games)):
+                                if active_games[i].game_id == self.room_name:
+                                    print("In correct room")
+                                    if active_games[i].name_1 == self.name:
+                                        print("Need to load player one's deck")
+                                        if not active_games[i].p1.deck_loaded:
+                                            await active_games[i].p1.setup_player(deck_content,
+                                                                                  active_games[i].planet_array)
+                                    elif active_games[i].name_2 == self.name:
+                                        print("Need to load player two's deck")
+                                        if not active_games[i].p2.deck_loaded:
+                                            await active_games[i].p2.setup_player(deck_content,
+                                                                                  active_games[i].planet_array)
                     elif message[1] == "Error":
                         raise ValueError
                     elif message[1] == "force-quit-reactions":
@@ -375,6 +394,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif not active_games[self.game_position].safety_check():
+                        await self.receive_game_update(
+                            "Command prevented; game is in an unsafe state."
+                        )
                     elif message[1] == "rearrange-deck" and len(message) == 4:
                         try:
                             print("got here")
@@ -442,30 +465,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                         elif player_num == "2":
                             active_games[self.game_position].p2.resources = resources
                             await active_games[self.game_position].p2.send_resources()
-                    elif (message[1] == "loaddeck" or message[1] == "LOADDECK") and len(message) > 2:
-                        deck_name = message[2]
-                        print(deck_name)
-                        path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + \
-                            self.user.username + "/" + deck_name
-                        print(path_to_player_decks)
-                        if os.path.exists(path_to_player_decks):
-                            print("Success")
-                            with open(path_to_player_decks, 'r') as f:
-                                deck_content = f.read()
-                            print(deck_content)
-                            for i in range(len(active_games)):
-                                if active_games[i].game_id == self.room_name:
-                                    print("In correct room")
-                                    if active_games[i].name_1 == self.name:
-                                        print("Need to load player one's deck")
-                                        if not active_games[i].p1.deck_loaded:
-                                            await active_games[i].p1.setup_player(deck_content,
-                                                                                  active_games[i].planet_array)
-                                    elif active_games[i].name_2 == self.name:
-                                        print("Need to load player two's deck")
-                                        if not active_games[i].p2.deck_loaded:
-                                            await active_games[i].p2.setup_player(deck_content,
-                                                                                  active_games[i].planet_array)
                     elif message[1] == "addcard" and len(message) > 3:
                         card_name = message[3]
                         card = FindCard.find_card(card_name, active_games[self.game_position].card_array,

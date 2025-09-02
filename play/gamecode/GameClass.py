@@ -452,6 +452,25 @@ class Game:
             await self.send_update_message(self.queued_message)
             self.queued_message = ""
 
+    def safety_check(self):
+        if self.choices_available:
+            return False
+        if self.amount_that_can_be_removed_by_shield:
+            return False
+        if self.reactions_needing_resolving:
+            return False
+        if self.interrupts_waiting_on_resolution:
+            return False
+        if self.action_chosen:
+            return False
+        if self.rearranging_deck:
+            return False
+        if self.mode != "Normal":
+            return False
+        if self.resolving_search_box:
+            return False
+        return True
+
     async def send_queued_sound(self):
         if self.queued_sound:
             print("sending sound")
