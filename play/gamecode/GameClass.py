@@ -6660,6 +6660,18 @@ class Game:
                                     if self.amount_that_can_be_removed_by_shield[0] == 0:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Noble Shining Spears":
+                            if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                if primary_player.get_mobile_given_pos(hurt_planet, hurt_pos):
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                    damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                                    primary_player.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - 1
+                                    if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
                                     primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
@@ -7447,6 +7459,8 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         primary_player.reset_card_name_misc_ability("Follower of Gork")
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
+        primary_player.reset_card_name_misc_ability("Noble Shining Spears")
+        secondary_player.reset_card_name_misc_ability("Noble Shining Spears")
         if not self.retaliate_used:
             if self.amount_that_can_be_removed_by_shield[0] > 2:
                 player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]

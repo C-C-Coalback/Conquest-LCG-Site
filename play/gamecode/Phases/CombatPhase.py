@@ -1127,6 +1127,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     elif secondary_player.get_mobile_given_pos(self.defender_planet,
                                                                                self.defender_position):
                                         attack_value = attack_value * 2
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                        == "Noble Shining Spears":
+                                    if secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                             self.defender_position) == 0:
+                                        attack_value += 3
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                         self.attacker_position) \
                                         == "Stalking Ur-Ghul":

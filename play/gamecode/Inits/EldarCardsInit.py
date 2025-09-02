@@ -365,6 +365,11 @@ def eldar_cards_init():
                                                     "Reaction: After an attack against this unit resolves, exhaust "
                                                     "this unit to deal 2 damage to the attacker."
                                                     " (Limit once per phase.)", "Warrior. Harlequin.",
-                             2, faction, "Loyal", 0, 3, 1, False)
+                             2, faction, "Loyal", 0, 3, 1, False),
+        CardClasses.ArmyCard("Noble Shining Spears", "Mobile.\n"
+                                                     "This unit gets +3 ATK while attacking an undamaged unit.\n"
+                                                     "Reaction: After a Mobile unit you control is assigned damage at "
+                                                     "this planet, reassign 1 of that damage to this unit.",
+                             "Warrior. Hero.", 4, faction, "Common", 3, 4, 2, False, mobile=True)
     ]
     return eldar_cards_array
