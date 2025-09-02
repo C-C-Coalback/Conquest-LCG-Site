@@ -4155,7 +4155,7 @@ class Player:
         return None
 
     def get_area_effect_given_pos(self, planet_id, unit_id):
-        if self.search_card_at_planet("Zen Xi Aonia"):
+        if self.search_card_at_planet(planet_id, "Zen Xi Aonia"):
             return 0
         else:
             other_player = self.get_other_player()
