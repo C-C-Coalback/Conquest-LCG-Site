@@ -2037,6 +2037,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Close Quarters Doctrine":
+            primary_player.draw_card()
+            self.delete_reaction()
         elif current_reaction == "Yvraine's Entourage":
             self.misc_misc = None
             self.chosen_first_card = False

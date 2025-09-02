@@ -8779,6 +8779,9 @@ class Game:
     def check_reactions_from_losing_combat(self, winner, loser, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
+            for i in range(len(loser.attachments_at_planet[planet_id])):
+                if loser.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
+                    reactions.append("Close Quarters Doctrine")
             if loser.search_card_in_hq("Agra's Preachings", ready_relevant=True):
                 reactions.append("Agra's Preachings")
             if loser.search_card_in_hq("Order of the Crimson Oath"):
@@ -8804,6 +8807,9 @@ class Game:
     def check_reactions_from_winning_combat(self, winner, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
+            for i in range(len(winner.attachments_at_planet[planet_id])):
+                if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
+                    reactions.append("Close Quarters Doctrine")
             for i in range(len(winner.cards_in_play[planet_id + 1])):
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
                     reactions.append("Kabalite Blackguard")

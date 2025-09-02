@@ -4329,6 +4329,13 @@ class Player:
             for i in range(len(self.attachments_at_planet[planet_id])):
                 if self.attachments_at_planet[planet_id][i].get_ability() == "Supreme Strategist":
                     attack_value += 1
+        if self.get_cost_given_pos(planet_id, unit_id) > 2:
+            for i in range(len(self.attachments_at_planet[planet_id])):
+                if self.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
+                    attack_value = attack_value - 1
+            for i in range(len(other_player.attachments_at_planet[planet_id])):
+                if other_player.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
+                    attack_value = attack_value - 1
         if self.check_for_trait_given_pos(planet_id, unit_id, "Vostroya"):
             if self.search_card_in_hq("Cardinal Agra Decree"):
                 if self.check_if_control_faith():
