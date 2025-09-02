@@ -284,6 +284,7 @@ class Game:
         self.damage_moved_to_old_one_eye = 0
         self.old_one_eye_pos = (-1, -1)
         self.misc_target_choice = -1
+        self.masters_of_the_webway = False
         self.misc_target_player = ""
         self.resolve_destruction_checks_after_reactions = False
         self.ravenous_haruspex_gain = 0
@@ -333,6 +334,7 @@ class Game:
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
+        self.starmist_raiment = False
         self.dies_to_backlash = ["Sicarius's Chosen", "Captain Markis", "Burna Boyz", "Tomb Blade Squadron",
                                  "Veteran Barbrus", "Klaivex Warleader", "Rotten Plaguebearers",
                                  "Imperial Fists Siege Force", "Prodigal Sons Disciple", "Fire Prism",
@@ -6599,7 +6601,17 @@ class Game:
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
                         hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
-                        if self.alt_shield_mode_active:
+                        if self.starmist_raiment:
+                            if hurt_planet == planet_pos and hurt_pos != unit_pos:
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                    primary_player.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - 1
+                                    if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif self.alt_shield_mode_active:
                             if self.alt_shield_name == "Glorious Intervention":
                                 if game_update_string[1] == primary_player.get_number():
                                     pos_holder = self.positions_of_units_to_take_damage[0]
@@ -6873,7 +6885,14 @@ class Game:
                     if game_update_string[1] == "IN_PLAY":
                         if game_update_string[2] == self.number_who_is_shielding:
                             if int(game_update_string[3]) == planet_pos:
-                                if int(game_update_string[4]) == unit_pos:
+                                attachment_pos = int(game_update_string[5])
+                                attachment = primary_player.cards_in_play[planet_pos + 1][int(game_update_string[4])] \
+                                    .get_attachments()[attachment_pos]
+                                if attachment.get_ability() == "Starmist Raiment" and attachment.get_ready():
+                                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
+                                        attachment.exhaust_card()
+                                        self.starmist_raiment = True
+                                elif int(game_update_string[4]) == unit_pos:
                                     attachment_pos = int(game_update_string[5])
                                     attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                                         .get_attachments()[attachment_pos]
@@ -7473,6 +7492,7 @@ class Game:
         self.alt_shield_mode_active = False
         self.may_block_with_ols = True
         self.alt_shield_name = ""
+        self.starmist_raiment = False
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")
@@ -8986,6 +9006,7 @@ class Game:
         self.imperial_blockades_active = [0, 0, 0, 0, 0, 0, 0]
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.masters_of_the_webway = False
         self.p1.command_struggles_won_this_phase = 0
         self.p2.command_struggles_won_this_phase = 0
         self.p1.sac_altar_rewards = [0, 0, 0, 0, 0, 0, 0]

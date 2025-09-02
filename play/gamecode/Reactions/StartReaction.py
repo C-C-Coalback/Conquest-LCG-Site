@@ -2040,6 +2040,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Close Quarters Doctrine":
             primary_player.draw_card()
             self.delete_reaction()
+        elif current_reaction == "Masters of the Webway":
+            primary_player.sacrifice_card_in_hq(unit_pos)
+            self.masters_of_the_webway = True
+            self.delete_reaction()
         elif current_reaction == "The Dance Without End":
             if primary_player.resources > 0:
                 can_continue = True

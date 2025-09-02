@@ -188,6 +188,10 @@ async def update_game_event_command_section(self, name, game_update_string):
                         self.p1.committed_synapse and self.p2.committed_synapse \
                         and not self.reactions_needing_resolving:
                     print("Both warlords need to be committed.")
+                    if self.masters_of_the_webway:
+                        temp = self.p1.warlord_commit_location
+                        self.p1.warlord_commit_location = self.p2.warlord_commit_location
+                        self.p2.warlord_commit_location = temp
                     print(self.p1.warlord_commit_location, self.p2.warlord_commit_location)
                     self.p1.commit_warlord_to_planet()
                     self.p2.commit_warlord_to_planet()

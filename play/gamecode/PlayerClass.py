@@ -3371,6 +3371,8 @@ class Player:
 
     def search_card_at_planet(self, planet_id, name_of_card, bloodied_relevant=False, ability_checking=True,
                               ready_relevant=False, once_per_phase_relevant=False):
+        if planet_id == -2:
+            return False
         if not ability_checking:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 current_name = self.cards_in_play[planet_id + 1][i].get_name()
@@ -5080,6 +5082,13 @@ class Player:
                 return True
         return not self.check_damage_too_great_given_pos(planet_id, unit_id)
 
+    def increase_damage_at_pos(self, planet_id, unit_id, amount):
+        if planet_id == -2:
+            self.headquarters[unit_id].increase_damage(amount)
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].increase_damage(amount)
+        return None
+
     def remove_damage_from_pos(self, planet_id, unit_id, amount, healing=False):
         if healing:
             if self.search_card_at_planet(planet_id, "Hot-Shot Laspistol"):
@@ -5194,6 +5203,9 @@ class Player:
             if self.headquarters[i].get_ability() == "Weight of the Aeons":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Weight of the Aeons", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Masters of the Webway":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Masters of the Webway", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Obedience":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))
