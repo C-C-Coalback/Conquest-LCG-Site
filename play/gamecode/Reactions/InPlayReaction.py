@@ -1066,6 +1066,22 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_exhausting_unit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Morkanaut Rekuperator":
+            if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
+                                                        preventable=False, rickety_warbuggy=True)
+                if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
+                    primary_player.number_cards_to_search = 6
+                    if primary_player.number_cards_to_search > len(primary_player.deck):
+                        primary_player.number_cards_to_search = len(primary_player.deck)
+                    if primary_player.number_cards_to_search == 0:
+                        self.delete_reaction()
+                    else:
+                        self.choice_context = "Morkanaut Rekuperator Rally"
+                        self.name_player_making_choices = primary_player.name_player
+                        self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                else:
+                    self.delete_reaction()
         elif current_reaction == "Impulsive Loota In Play":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:

@@ -2502,6 +2502,11 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
+                    elif self.choice_context == "Morkanaut Rekuperator Rally":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        primary_player.bottom_remaining_cards()
+                        self.delete_reaction()
                     elif self.choice_context == "Krieg Armoured Regiment result:":
                         self.reset_choices_available()
                         self.delete_reaction()
@@ -3181,7 +3186,7 @@ class Game:
                                     i = 0
                                     while i < len(primary_player.attachments_at_planet[planet_pos]):
                                         if primary_player.attachments_at_planet[planet_pos][
-                                            i].get_ability() == "Supreme Strategist":
+                                                i].get_ability() == "Supreme Strategist":
                                             primary_player.add_card_to_discard("Supreme Strategist")
                                             del primary_player.attachments_at_planet[planet_pos][i]
                                             i = i - 1
@@ -3317,6 +3322,18 @@ class Game:
                             self.delete_reaction()
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "Morkanaut Rekuperator Rally":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Attachment":
+                            if not card.planet_attachment:
+                                _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                                if primary_player.attach_card(card, planet_pos, unit_pos):
+                                    del primary_player.deck[int(game_update_string[1])]
+                                    primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                    primary_player.bottom_remaining_cards()
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    self.delete_reaction()
                     elif self.choice_context == "Krieg Armoured Regiment result:":
                         card_name = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(card_name)
@@ -8466,6 +8483,8 @@ class Game:
                                     self.create_reaction("Blood Axe Strategist", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Ravening Psychopath":
                                 self.create_reaction("Ravening Psychopath", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Morkanaut Rekuperator":
+                                self.create_reaction("Morkanaut Rekuperator", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Heavy Flamer Retributor":
                                 self.create_reaction("Heavy Flamer Retributor", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "The Masque":
@@ -8524,6 +8543,8 @@ class Game:
                                 self.create_reaction("The Masque", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Junk Chucka Kommando":
                                 self.create_reaction("Junk Chucka Kommando", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Morkanaut Rekuperator":
+                                self.create_reaction("Morkanaut Rekuperator", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Prodigal Sons Disciple":
                                 self.create_reaction("Prodigal Sons Disciple", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Leman Russ Conqueror":

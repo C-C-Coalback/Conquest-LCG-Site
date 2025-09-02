@@ -389,7 +389,12 @@ def orks_cards_init():
                                                 "Reaction: After an attachment card is discarded, Deep Strike this"
                                                 " unit to deploy that attachment from your discard pile "
                                                 "attached to this unit.", "Soldier.",
-                             3, faction, "Common", 1, 3, 1, False, deepstrike=1)
+                             1, faction, "Common", 1, 3, 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Morkanaut Rekuperator", "Reaction: After this unit resolves its attack, deal 1 "
+                                                      "unpreventable damage to a unit at this planet. If that unit "
+                                                      "is destroyed by this effect, Rally 6 an attachment card,"
+                                                      " attach it to this unit.", "Oddboy. Machine.",
+                             3, faction, "Common", 2, 4, 1, False)
 
     ]
     return orks_card_array
