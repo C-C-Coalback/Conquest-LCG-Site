@@ -49,6 +49,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 await self.send_update_message("Please choose which Torturer's Masks to exhaust.")
             else:
                 self.delete_reaction()
+        elif current_reaction == "Dark Lance Raider":
+            self.choices_available = ["1 dmg to 2", "3 dmg to 1"]
+            self.choice_context = "Dark Lance Raider Damage"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Sneaky Lootin'":
             if primary_player.resources > 0:
                 can_continue = True

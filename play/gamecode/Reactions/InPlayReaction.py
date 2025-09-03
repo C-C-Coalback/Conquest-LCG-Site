@@ -112,6 +112,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           rickety_warbuggy=True)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Dark Lance Raider":
+            if secondary_player.number == game_update_string[1]:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if self.misc_target_choice == "1 dmg to 2":
+                        if (planet_pos, unit_pos) not in self.misc_misc:
+                            self.misc_misc.append((planet_pos, unit_pos))
+                            secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            if len(self.misc_misc) > 1:
+                                for i in range(len(self.misc_misc)):
+                                    og_pla, og_pos = self.misc_misc[i]
+                                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                self.delete_reaction()
+                    else:
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "The Plaguefather's Banner":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:

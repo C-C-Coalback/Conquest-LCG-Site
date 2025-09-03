@@ -768,6 +768,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Dark Lance Raider":
+                                self.create_reaction("Dark Lance Raider", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Spiritseer Erathal":
                                 self.create_reaction("Spiritseer Erathal", player.name_player,
                                                      (int(player.number), self.attacker_planet,

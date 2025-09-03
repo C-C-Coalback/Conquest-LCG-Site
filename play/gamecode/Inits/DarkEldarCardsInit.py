@@ -394,6 +394,12 @@ def dark_eldar_cards_init():
                                                        "Reaction: After you use a shield card, if you have no cards "
                                                        "in hand, exhaust this attachment to draw a card.", "Wargear.",
                                    1, faction, "Loyal", 2, False, ambush=True, extra_attack=1, extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.ArmyCard("Dark Lance Raider", "No Wargear Attachments. Flying.\n"
+                                                  "Reaction: After this unit is declared as an attacker, choose either "
+                                                  "to deal 1 damage to up to 2 different enemy units at this planet or "
+                                                  "3 damage to an enemy unit at this planet.",
+                             "Vehicle. Raider. Kabalite.", 3, faction, "Common", 0, 2, 1, False,
+                             flying=True, wargear_attachments_permitted=False)
     ]
     return dark_eldar_cards_array

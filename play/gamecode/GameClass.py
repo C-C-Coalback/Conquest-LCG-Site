@@ -3131,6 +3131,11 @@ class Game:
                             await self.update_game_event(secondary_player.name_player, new_string_list,
                                                          same_thread=True)
                             self.intercept_enabled = True
+                    elif self.choice_context == "Dark Lance Raider Damage":
+                        self.misc_target_choice = chosen_choice
+                        self.misc_misc = []
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Urien's Oubliette":
                         if game_update_string[1] == "0":
                             primary_player.discard_top_card_deck()
@@ -7415,6 +7420,13 @@ class Game:
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
                         self.infest_planet(self.misc_target_planet, primary_player)
+                    if self.reactions_needing_resolving[0] == "Dark Lance Raider":
+                        if self.misc_misc is not None:
+                            for i in range(len(self.misc_misc)):
+                                og_pla, og_pos = self.misc_misc[i]
+                                secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                                secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if self.reactions_needing_resolving[0] == "Sautekh Royal Crypt Damage":
                         for i in range(len(self.misc_misc_2)):
                             planet_pos, unit_pos = self.misc_misc_2[i]
