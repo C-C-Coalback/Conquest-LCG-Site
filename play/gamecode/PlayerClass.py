@@ -1732,6 +1732,13 @@ class Player:
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
         target_card.add_attachment(card, name_owner=name_owner)
+        if not not_own_attachment:
+            if planet != -2 and not card.check_for_a_trait("Drone"):
+                for i in range(len(self.cards_in_play[planet + 1])):
+                    if self.get_ability_given_pos(planet, i) == "Commander Bravestorm":
+                        if not self.get_once_per_phase_used_given_pos(planet, i) or not self.game.apoka:
+                            self.game.create_reaction("Commander Bravestorm", self.name_player,
+                                                      (int(self.number), planet, i))
         self.game.queued_sound = "onplay"
         return True
 

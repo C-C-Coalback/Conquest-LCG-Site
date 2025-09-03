@@ -314,6 +314,9 @@ def tau_cards_init():
         CardClasses.EventCard("Consumed by the Kindred", "Action: Exhaust a Kroot unit and sacrifice another "
                                                          "non-Vehicle unit to gain resources equal to the "
                                                          "sacrificed unit's printed cost.", "Tactic. Kroot.",
-                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Commander Bravestorm", "Reaction: After you attach a non-Drone attachment to a "
+                                                     "unit at this planet, draw a card.", "Soldier. Pilot. Shas'o.",
+                             3, faction, "Loyal", 2, 4, 1, False)
     ]
     return tau_cards_array

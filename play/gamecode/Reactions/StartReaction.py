@@ -2057,6 +2057,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.webway_witch = planet_pos
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Commander Bravestorm":
+            if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos) or not self.apoka:
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                primary_player.draw_card()
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "The Dance Without End":
             if primary_player.resources > 0:
                 can_continue = True

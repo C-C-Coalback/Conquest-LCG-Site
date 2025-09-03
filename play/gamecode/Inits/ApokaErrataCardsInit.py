@@ -79,6 +79,9 @@ def apoka_errata_cards_init():
                                                      "turn, prevent 1 of that damage and place 1 faith on it.\n"
                                                      "Reaction: After you deploy this unit, place 2 faith among units "
                                                      "you control at this planet.", "Soldier. Grey Knights.",
-                             3, "Space Marines", "Signature", 3, 3, 1, False, unstoppable=True)
+                             3, "Space Marines", "Signature", 3, 3, 1, False, unstoppable=True),
+        CardClasses.ArmyCard("Commander Bravestorm", "Reaction: After you attach a non-Drone attachment to a "
+                                                     "unit at this planet, draw a card.", "Soldier. Pilot. Shas'o.",
+                             3, "Tau", "Loyal", 2, 4, 1, False)
     ]
     return apoka_errata_cards_array
