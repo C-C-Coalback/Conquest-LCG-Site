@@ -7,7 +7,7 @@ import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
     InPlayActions, PlanetActions, DiscardActions
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction, \
-    AttachmentInPlayReaction
+    AttachmentInPlayReaction, AttachmentHQReaction
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
     AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
@@ -6735,6 +6735,11 @@ class Game:
                                                                           (int(primary_player.number),
                                                                            planet_pos, unit_pos))
                                         primary_player.discard_card_from_hand(hand_pos)
+                                        if not primary_player.cards:
+                                            if primary_player.search_for_card_everywhere("Torturer's Masks",
+                                                                                         ready_relevant=True):
+                                                self.create_reaction("Torturer's Masks", primary_player.name_player,
+                                                                     (int(primary_player.number), -1, -1))
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         self.queued_sound = "shield"
                                         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
@@ -7531,11 +7536,16 @@ class Game:
                                                 self.chosen_first_card = True
                                                 primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     defense_battery_activated = False
+                    elif game_update_string[1] == "HQ":
+                        await AttachmentHQReaction.resolve_attachment_hq_reaction(
+                            self, name, game_update_string, primary_player, secondary_player
+                        )
             elif len(game_update_string) == 6:
                 if game_update_string[0] == "ATTACHMENT":
                     if game_update_string[1] == "IN_PLAY":
                         await AttachmentInPlayReaction.resolve_attachment_in_play_reaction(
-                            self, name, game_update_string, primary_player, secondary_player)
+                            self, name, game_update_string, primary_player, secondary_player
+                        )
 
     async def resolve_mobile(self, name, game_update_string):
         if self.player_with_initiative == self.name_1:

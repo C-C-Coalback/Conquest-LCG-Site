@@ -43,6 +43,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             if primary_player.count_copies_in_play("Cultist") < 1:
                 primary_player.summon_token_at_hq("Cultist")
             self.delete_reaction()
+        elif current_reaction == "Torturer's Masks":
+            if not primary_player.cards:
+                self.chosen_first_card = False
+                await self.send_update_message("Please choose which Torturer's Masks to exhaust.")
+            else:
+                self.delete_reaction()
         elif current_reaction == "Sneaky Lootin'":
             if primary_player.resources > 0:
                 can_continue = True

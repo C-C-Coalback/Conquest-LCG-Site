@@ -21,3 +21,10 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     await self.send_update_message(attachment_name + " selected for Junk Chucka Kommando!")
                     self.chosen_first_card = True
                     self.misc_target_attachment = (og_pla, og_pos, attachment_pos)
+    elif current_reaction == "Torturer's Masks":
+        if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ability() == "Torturer's Masks":
+            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner == primary_player.name_player:
+                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
+                    player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
+                    primary_player.draw_card()
+                    self.delete_reaction()

@@ -388,6 +388,12 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Yvraine's Entourage", "Reaction: After a battle begins at this planet, switch the "
                                                     "printed ATK values of two army units at this planet until"
                                                     " the end of a combat round.", "Warrior.",
-                             2, faction, "Signature", 2, 2, 1, False)
+                             2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.AttachmentCard("Torturer's Masks", "Ambush.\n"
+                                                       "Attach to an army unit. Attached unit gets +1 ATK and +1 HP.\n"
+                                                       "Reaction: After you use a shield card, if you have no cards "
+                                                       "in hand, exhaust this attachment to draw a card.", "Wargear.",
+                                   1, faction, "Loyal", 2, False, ambush=True, extra_attack=1, extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return dark_eldar_cards_array
