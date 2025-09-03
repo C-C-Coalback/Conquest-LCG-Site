@@ -2510,10 +2510,16 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == card_name:
                 self.headquarters[i].misc_ability_used = False
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[j].get_ability() == card_name:
+                    self.headquarters[i].get_attachments()[j].misc_ability_used = False
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == card_name:
                     self.cards_in_play[i + 1][j].misc_ability_used = False
+                for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
+                    if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == card_name:
+                        self.cards_in_play[i + 1][j].get_attachments()[k].misc_ability_used = False
 
     def return_attachment_to_hand(self, planet_pos, unit_pos, attachment_pos):
         other_player = self.get_other_player()

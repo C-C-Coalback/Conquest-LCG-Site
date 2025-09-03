@@ -6672,6 +6672,18 @@ class Game:
                                                                                           by_enemy_unit=False)
                                                     await self.shield_cleanup(primary_player, secondary_player,
                                                                               planet_pos)
+                            elif self.alt_shield_name == "Data Analyzer":
+                                if hurt_planet == planet_pos and unit_pos != hurt_pos:
+                                    primary_player.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - 1
+                                    self.alt_shield_mode_active = False
+                                    self.alt_shield_name = ""
+                                    if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player,
+                                                                  planet_pos)
                             elif self.alt_shield_name == "Faith Denies Death":
                                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1) > 0:
                                     self.choice_context = "Faith Denies Death: Amount Blocked"
@@ -6920,6 +6932,13 @@ class Game:
                                     if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
                                         attachment.exhaust_card()
                                         self.starmist_raiment = True
+                                elif attachment.get_ability() == "Data Analyzer" and not attachment.misc_ability_used:
+                                    if self.positions_attackers_of_units_to_take_damage[0]:
+                                        if len(primary_player.cards_in_play[planet_pos + 1]) > 1:
+                                            self.alt_shield_mode_active = True
+                                            attachment.misc_ability_used = True
+                                            self.alt_shield_name = "Data Analyzer"
+                                            await self.send_update_message("Data Analyzer activated!")
                                 elif int(game_update_string[4]) == unit_pos:
                                     attachment_pos = int(game_update_string[5])
                                     attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
@@ -7521,6 +7540,8 @@ class Game:
         self.may_block_with_ols = True
         self.alt_shield_name = ""
         self.starmist_raiment = False
+        primary_player.reset_card_name_misc_ability("Data Analyzer")
+        secondary_player.reset_card_name_misc_ability("Data Analyzer")
         primary_player.reset_card_name_misc_ability("Steel Legion Chimera")
         primary_player.reset_card_name_misc_ability("Blood Angels Veterans")
         secondary_player.reset_card_name_misc_ability("Steel Legion Chimera")

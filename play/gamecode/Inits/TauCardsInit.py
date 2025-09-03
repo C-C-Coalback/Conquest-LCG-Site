@@ -346,6 +346,13 @@ def tau_cards_init():
                                                        "you control.", "Wargear. Experimental.",
                                    2, faction, "Loyal", 2, True, extra_health=1, extra_attack=1,
                                    type_of_units_allowed_for_attachment="Army",
-                                   action_in_play=True, allowed_phases_in_play="ALL")
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Data Analyzer", "Attach to an army unit.\n"
+                                                    "Attached unit gets +1 HP.\n"
+                                                    "Interrupt: When a unit is assigned damage by an attack at this"
+                                                    " planet, reassign 1 of that damage to another unit controlled"
+                                                    " by the same player at this planet.", "Wargear. Experimental.",
+                                   2, faction, "Loyal", 2, True, extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return tau_cards_array
