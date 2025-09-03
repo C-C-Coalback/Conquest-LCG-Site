@@ -338,6 +338,14 @@ def tau_cards_init():
                                                               "Reaction: After this card enters or leaves play, "
                                                               "deal 1 damage to a target unit at this planet.",
                                    "Wargear.", 1, faction, "Loyal", 2, False, extra_health=1, extra_attack=1,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.AttachmentCard("Positional Relay", "Attach to an army unit.\n"
+                                                       "Attached unit gets +1 ATK and +1 HP.\n"
+                                                       "Action: Exhaust this attachment to Rally X an attachment, "
+                                                       "add it to your hand. X equals the number of attachments "
+                                                       "you control.", "Wargear. Experimental.",
+                                   2, faction, "Loyal", 2, True, extra_health=1, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return tau_cards_array

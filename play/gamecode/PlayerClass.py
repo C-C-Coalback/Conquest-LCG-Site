@@ -4811,6 +4811,29 @@ class Player:
         del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
         return None
 
+    def count_attachments_controlled(self):
+        attachments_count = 0
+        for i in range(len(self.headquarters)):
+            for j in range(len(self.headquarters[i].get_attachments())):
+                if self.headquarters[i].get_attachments()[j].name_owner == self.name_player:
+                    attachments_count += 1
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
+                    if self.cards_in_play[i + 1][j].get_attachments()[k].name_owner == self.name_player:
+                        attachments_count += 1
+        other_player = self.get_other_player()
+        for i in range(len(other_player.headquarters)):
+            for j in range(len(other_player.headquarters[i].get_attachments())):
+                if other_player.headquarters[i].get_attachments()[j].name_owner == self.name_player:
+                    attachments_count += 1
+        for i in range(7):
+            for j in range(len(other_player.cards_in_play[i + 1])):
+                for k in range(len(other_player.cards_in_play[i + 1][j].get_attachments())):
+                    if other_player.cards_in_play[i + 1][j].get_attachments()[k].name_owner == self.name_player:
+                        attachments_count += 1
+        return attachments_count
+
     def discard_attachments_from_card(self, planet_pos, unit_pos):
         if planet_pos == -2:
             while self.headquarters[unit_pos].get_attachments():
