@@ -397,7 +397,11 @@ def orks_cards_init():
                              3, faction, "Common", 2, 4, 1, False),
         CardClasses.EventCard("Sneaky Lootin'", "Reaction: After an Orks Soldier unit you control damages an enemy"
                                                 " unit by an attack, move the attacker to your HQ to gain 3 resources.",
-                              "Tactic.", 1, faction, "Common", 1, False)
-
+                              "Tactic.", 1, faction, "Common", 1, False),
+        CardClasses.ArmyCard("Kamouflage Expert", "Deep Strike (2).\n"
+                                                  "Reaction: After you Deep Strike this unit, a card in reserve at this"
+                                                  " planet or an adjacent planet is treated as a 3 ATK, 3 HP Orks"
+                                                  " army unit until the end of the phase.", "Soldier.",
+                             3, faction, "Common", 3, 3, 1, False, deepstrike=2)
     ]
     return orks_card_array

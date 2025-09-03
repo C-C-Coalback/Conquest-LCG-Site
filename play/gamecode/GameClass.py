@@ -6229,9 +6229,9 @@ class Game:
                 self.p2.idden_base_transform()
                 self.p2.idden_base_active = True
         if self.phase == "HEADQUARTERS":
-            self.p1.idden_base_detransform()
+            self.p1.idden_base_detransform(force=True)
             self.p1.idden_base_active = False
-            self.p2.idden_base_detransform()
+            self.p2.idden_base_detransform(force=True)
             self.p2.idden_base_active = False
         sacrifice_locations = self.p1.sacrifice_check_eop()
         sacrifice_locations = self.p2.sacrifice_check_eop()
@@ -7471,7 +7471,24 @@ class Game:
                                 int(game_update_string[2])][int(game_update_string[3])].get_name()
                             await self.send_update_message(secondary_player.name_player + " has a " + name_card +
                                                            " at that position")
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    elif self.reactions_needing_resolving[0] == "Kamouflage Expert":
+                        if game_update_string[1] == primary_player.number:
+                            og_pla = self.positions_of_unit_triggering_reaction[0][1]
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if og_pla == planet_pos or (og_pla - unit_pos) == 1:
+                                card = CardClasses.ArmyCard("Cardback", "I am a Deepstriked Card.", "",
+                                                            0, "Orks", "Common", 3, 3, 0, False)
+                                card.actually_a_deepstrike = True
+                                card.not_idden_base_src = True
+                                card.deepstrike_card_name = primary_player.cards_in_reserve[planet_pos][unit_pos].get_name()
+                                card.name_owner = primary_player.name_player
+                                primary_player.cards_in_play[planet_pos + 1].append(card)
+                                del primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                self.delete_reaction()
                     elif self.reactions_needing_resolving[0] == "Impulsive Loota Reserve":
                         if not self.chosen_first_card:
                             if game_update_string[1] == primary_player.number:

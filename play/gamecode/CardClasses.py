@@ -89,6 +89,7 @@ class Card:
         self.damage = 0
         self.actually_a_deepstrike = False
         self.deepstrike_card_name = ""
+        self.not_idden_base_src = False
         self.cannot_ready_hq_phase = False
         self.return_to_hand_eor = False
         self.yvraine_active = False

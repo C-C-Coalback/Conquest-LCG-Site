@@ -620,6 +620,9 @@ class Player:
             if ability == "8th Company Assault Squad":
                 self.game.create_reaction("8th Company Assault Squad", self.name_player,
                                           (int(self.number), planet_id, last_element_index))
+            if ability == "Kamouflage Expert":
+                self.game.create_reaction("Kamouflage Expert", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
             if ability == "Patient Infiltrator":
                 if self.get_damage_given_pos(planet_id, last_element_index) > 0:
                     if not self.get_ready_given_pos(planet_id, last_element_index):
@@ -1404,11 +1407,11 @@ class Player:
                             i = i - 1
             i += 1
 
-    def idden_base_detransform(self):
+    def idden_base_detransform(self, force=False):
         for i in range(7):
             j = 0
             while j < len(self.cards_in_play[i + 1]):
-                if self.cards_in_play[i + 1][j].actually_a_deepstrike:
+                if self.cards_in_play[i + 1][j].actually_a_deepstrike and (not self.cards_in_play[i + 1][j].not_idden_base_src or force):
                     self.discard_attachments_from_card(i, j)
                     card = self.game.preloaded_find_card(self.cards_in_play[i + 1][j].deepstrike_card_name)
                     self.put_card_into_reserve(card, i, payment=False)
@@ -1417,7 +1420,7 @@ class Player:
                 j = j + 1
         j = 0
         while j < len(self.headquarters):
-            if self.headquarters[j].actually_a_deepstrike:
+            if self.headquarters[j].actually_a_deepstrike and (not self.headquarters[j].not_idden_base_src or force):
                 self.discard_attachments_from_card(-2, j)
                 card = self.game.preloaded_find_card(self.headquarters[j].deepstrike_card_name)
                 self.put_card_into_reserve(card, -2, payment=False)
