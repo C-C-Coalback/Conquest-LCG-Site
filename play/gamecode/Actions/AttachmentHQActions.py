@@ -122,6 +122,13 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             await self.send_update_message(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
+    elif self.action_chosen == "Smuggler's Den":
+        if card_chosen.name_owner == primary_player.get_name_player():
+            if not player_owning_card.headquarters[unit_pos].attachments[attachment_pos].check_for_a_trait("Drone"):
+                primary_player.add_resources(player_owning_card.headquarters[unit_pos].attachments[attachment_pos].get_cost())
+                primary_player.cards.append(player_owning_card.headquarters[unit_pos].attachments[attachment_pos].get_name())
+                del player_owning_card.headquarters[unit_pos].attachments[attachment_pos]
+                self.action_cleanup()
     elif self.action_chosen == "Subdual":
         if card_chosen.name_owner == self.name_1:
             self.p1.deck.insert(0, card_chosen.get_name())

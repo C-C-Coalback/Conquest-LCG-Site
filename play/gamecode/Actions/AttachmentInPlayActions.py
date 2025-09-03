@@ -264,6 +264,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         if card_chosen.name_owner == primary_player.get_name_player():
             player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
             self.action_chosen = "Breach and Clear 2"
+    elif self.action_chosen == "Smuggler's Den":
+        if card_chosen.name_owner == primary_player.get_name_player():
+            if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].check_for_a_trait("Drone"):
+                primary_player.add_resources(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_cost())
+                primary_player.cards.append(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_name())
+                del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos]
+                self.action_cleanup()
     elif self.action_chosen == "Accelerated Gestation":
         if card_chosen.from_magus_harid and card_chosen.name_owner == primary_player.get_name_player():
             if card_chosen.get_card_type() == "Army":

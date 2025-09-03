@@ -358,6 +358,10 @@ def tau_cards_init():
                                                   "Action: Exhaust a target army unit. Then you may sacrifice an "
                                                   "attachment to exhaust another target army unit at the same planet.",
                               "Tactic.", 2, faction, "Loyal", 2, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Smuggler's Den", "Action: Exhaust this support and pay 1 resource to return a target"
+                                                  " non-Drone attachment you control to your hand and gain resources "
+                                                  "equal to the printed cost of the attachment.",  "Location.",
+                                1, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return tau_cards_array

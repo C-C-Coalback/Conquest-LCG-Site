@@ -333,6 +333,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 card.set_once_per_phase_used(True)
                                 self.action_chosen = ability
                                 self.chosen_first_card = False
+                    elif ability == "Smuggler's Den":
+                        if card.get_ready():
+                            if primary_player.resources > 0:
+                                primary_player.spend_resources(1)
+                                primary_player.exhaust_given_pos(-2, unit_pos)
+                                self.action_chosen = ability
                     elif ability == "Webway Passage":
                         if card.get_ready():
                             card.exhaust_card()
