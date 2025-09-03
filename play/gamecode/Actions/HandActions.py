@@ -121,6 +121,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Breach and Clear":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
+                    elif ability == "Clash of Wings":
+                        warlord_pla, _ = primary_player.get_location_of_warlord()
+                        if warlord_pla != -2 and warlord_pla != -1:
+                            for i in range(len(primary_player.cards_in_play[warlord_pla + 1])):
+                                if primary_player.get_mobile_given_pos(warlord_pla, i):
+                                    primary_player.cards_in_play[warlord_pla + 1][i].flying_eocr = True
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_cleanup()
                     elif ability == "Muster the Guard":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):

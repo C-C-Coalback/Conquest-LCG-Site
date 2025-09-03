@@ -430,6 +430,10 @@ def eldar_cards_init():
                                                           "exhaust this attachment to prevent 2 of that damage. "
                                                           "If this attachment was already exhausted, ready it instead.",
                                    "Wargear. Armor.", 1, faction, "Common", 1, False, extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Clash of Wings", "Combat Action: Target a planet with your warlord. "
+                                                "Until the end of the combat round, each Mobile unit you control at"
+                                                " that planet gains Flying.", "Tactic.",
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return eldar_cards_array
