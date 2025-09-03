@@ -402,6 +402,11 @@ def orks_cards_init():
                                                   "Reaction: After you Deep Strike this unit, a card in reserve at this"
                                                   " planet or an adjacent planet is treated as a 3 ATK, 3 HP Orks"
                                                   " army unit until the end of the phase.", "Soldier.",
-                             3, faction, "Common", 3, 3, 1, False, deepstrike=2)
+                             3, faction, "Common", 3, 3, 1, False, deepstrike=2),
+        CardClasses.SupportCard("Truck Wreck Launcha", "Interrupt: When a Vehicle unit you control leaves play, "
+                                                       "exhaust this support to deal 1 damage to an enemy "
+                                                       "non-warlord unit at the same planet. If this support "
+                                                       "was already exhausted, ready it instead.", "Artillery.",
+                                1, faction, "Common", False)
     ]
     return orks_card_array

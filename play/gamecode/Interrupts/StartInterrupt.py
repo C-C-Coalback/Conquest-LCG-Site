@@ -52,6 +52,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if "Escort Drone" in primary_player.discard:
                 primary_player.discard.remove("Escort Drone")
             self.delete_interrupt()
+        elif current_interrupt == "Truck Wreck Launcha":
+            if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            else:
+                primary_player.ready_given_pos(planet_pos, unit_pos)
+                self.delete_interrupt()
         elif current_interrupt == "Frontline Counsellor":
             destination = int(self.extra_interrupt_info[0])
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

@@ -6168,6 +6168,11 @@ class Player:
                     if not already_queued_elysian_assault_team:
                         self.game.create_reaction("Elysian Assault Team", self.name_player,
                                                   (int(self.number), planet_num, -1))
+        if card.check_for_a_trait("Vehicle"):
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Truck Wreck Launcha":
+                    self.game.create_interrupt("Truck Wreck Launcha", self.name_player,
+                                               (int(self.number), -2, i), extra_info=planet_num)
         if self.get_ability_given_pos(planet_num, card_pos) == "Coteaz's Henchmen":
             self.game.create_reaction("Coteaz's Henchmen", self.name_player,
                                       (int(self.number), -1, -1))
