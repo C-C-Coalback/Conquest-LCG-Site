@@ -6139,7 +6139,13 @@ class Game:
                                              (int(primary_player.number), planet_pos, unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
-                                 (int(secondary_player.number), planet_pos, unit_pos))
+                                 (int(secondary_player.number), att_pla, att_pos))
+        if secondary_player.search_hand_for_card("Sneaky Lootin'"):
+            if secondary_player.resources > 0:
+                if secondary_player.get_faction_given_pos(att_pla, att_pos) == "Orks":
+                    if secondary_player.check_for_trait_given_pos(att_pla, att_pos, "Soldier"):
+                        self.create_reaction("Sneaky Lootin'", secondary_player.name_player,
+                                             (int(secondary_player.number), att_pla, att_pos))
         if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Searing Burst Cannon"):
             damage = self.amount_that_can_be_removed_by_shield[0]
             primary_player.cards_in_play[planet_pos + 1][unit_pos].damage += damage

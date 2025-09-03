@@ -394,7 +394,10 @@ def orks_cards_init():
                                                       "unpreventable damage to a unit at this planet. If that unit "
                                                       "is destroyed by this effect, Rally 6 an attachment card,"
                                                       " attach it to this unit.", "Oddboy. Machine.",
-                             3, faction, "Common", 2, 4, 1, False)
+                             3, faction, "Common", 2, 4, 1, False),
+        CardClasses.EventCard("Sneaky Lootin'", "Reaction: After an Orks Soldier unit you control damages an enemy"
+                                                " unit by an attack, move the attacker to your HQ to gain 3 resources.",
+                              "Tactic.", 1, faction, "Common", 1, False)
 
     ]
     return orks_card_array
