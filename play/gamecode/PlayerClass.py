@@ -1745,6 +1745,10 @@ class Player:
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
         target_card.add_attachment(card, name_owner=name_owner)
+        if card.get_ability() == "Fusion Cascade Defiance":
+            if planet != -2:
+                self.game.create_reaction("Fusion Cascade Defiance", self.name_player,
+                                          (int(self.number), planet, position))
         if not not_own_attachment:
             if planet != -2 and not card.check_for_a_trait("Drone"):
                 for i in range(len(self.cards_in_play[planet + 1])):
@@ -4801,6 +4805,9 @@ class Player:
             self.game.p2.add_card_to_discard(name_attachment)
         if name_attachment == "Savage Parasite":
             self.game.create_interrupt("Savage Parasite", name_owner, (int(self.number), -1, -1))
+        if name_attachment == "Fusion Cascade Defiance":
+            self.game.create_reaction("Fusion Cascade Defiance", name_owner,
+                                      (int(self.number), planet_pos, -1))
         del self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
         return None
 

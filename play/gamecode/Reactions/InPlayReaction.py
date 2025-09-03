@@ -1232,6 +1232,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if self.misc_counter > 3:
                     self.infest_planet(self.misc_target_planet, primary_player)
                     self.delete_reaction()
+        elif current_reaction == "Fusion Cascade Defiance":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                self.delete_reaction()
         elif current_reaction == "Erupting Aberrants":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True

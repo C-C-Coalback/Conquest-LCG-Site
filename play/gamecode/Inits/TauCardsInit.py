@@ -332,6 +332,12 @@ def tau_cards_init():
         CardClasses.ArmyCard("Scavenging Kroot Rider", "Reaction: After this unit enters play, attach an eligible "
                                                        "attachment from your discard pile to this unit and "
                                                        "exhaust a target enemy limited support card.",
-                             "Kroot.", 2, faction, "Common", 3, 3, 0, False)
+                             "Kroot.", 2, faction, "Common", 3, 3, 0, False),
+        CardClasses.AttachmentCard("Fusion Cascade Defiance", "Attach to an army unit.\n"
+                                                              "Attached unit gets +1 ATK and +1 HP.\n"
+                                                              "Reaction: After this card enters or leaves play, "
+                                                              "deal 1 damage to a target unit at this planet.",
+                                   "Wargear.", 1, faction, "Loyal", 2, False, extra_health=1, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return tau_cards_array
