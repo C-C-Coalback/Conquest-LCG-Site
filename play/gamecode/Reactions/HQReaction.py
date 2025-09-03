@@ -185,6 +185,31 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):
                 self.create_reaction("Vow of Honor", primary_player.name_player,
                                      (int(primary_player.number), -1, -1))
+    elif current_reaction == "Scavenging Kroot Rider":
+        if not self.chosen_first_card:
+            if game_update_string[1] == secondary_player.number:
+                if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
+                    if secondary_player.headquarters[unit_pos].get_limited():
+                        if secondary_player.get_ready_given_pos(-2, unit_pos):
+                            can_continue = True
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                -2, unit_pos, targeting_support=True)
+                            if possible_interrupts:
+                                can_continue = False
+                                await self.send_update_message("Some sort of interrupt may be used.")
+                                self.choices_available = possible_interrupts
+                                self.choices_available.insert(0, "No Interrupt")
+                                self.name_player_making_choices = secondary_player.name_player
+                                self.choice_context = "Interrupt Effect?"
+                                self.nullified_card_name = current_reaction
+                                self.cost_card_nullified = 0
+                                self.nullify_string = "/".join(game_update_string)
+                                self.first_player_nullified = primary_player.name_player
+                                self.nullify_context = "In Play Reaction"
+                            if can_continue:
+                                secondary_player.exhaust_given_pos(-2, unit_pos)
+                                self.chosen_first_card = True
+                                await self.send_update_message("Choose attachment.")
     elif self.reactions_needing_resolving[0] == "Imperial Fists Devastators":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

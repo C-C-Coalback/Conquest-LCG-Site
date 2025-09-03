@@ -2044,6 +2044,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.sacrifice_card_in_hq(unit_pos)
             self.masters_of_the_webway = True
             self.delete_reaction()
+        elif current_reaction == "Scavenging Kroot Rider":
+            self.chosen_first_card = False
+            await self.send_update_message("Exhaust enemy support first.")
         elif current_reaction == "The Dawnsinger":
             self.choices_available = ["Lose 2 cards", "Opponent draws 2 cards"]
             self.choice_context = "The Dawnsinger Choice"

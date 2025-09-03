@@ -1471,6 +1471,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Convoking Praetorians":
             self.game.create_reaction("Convoking Praetorians", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Scavenging Kroot Rider":
+            self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), -2,
+                                                                                   last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
             self.game.create_reaction("Devoted Hospitaller", self.name_player,
                                       (int(self.number), -2, last_element_index))
@@ -1924,6 +1927,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "The Blinded Princess":
             self.game.create_reaction("The Blinded Princess", self.name_player, (int(self.number), position,
                                                                                  last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
+            self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
+                                                                                   last_element_index))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id

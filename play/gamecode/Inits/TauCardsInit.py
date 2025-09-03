@@ -328,6 +328,10 @@ def tau_cards_init():
                                                      "(Limit once per phase.)\n"
                                                      "Forced Reaction: After this unit resolves its attack, "
                                                      "move it to your HQ.", "Soldier. Ethereal.",
-                             2, faction, "Common", 2, 1, 2, False)
+                             2, faction, "Common", 2, 1, 2, False),
+        CardClasses.ArmyCard("Scavenging Kroot Rider", "Reaction: After this unit enters play, attach an eligible "
+                                                       "attachment from your discard pile to this unit and "
+                                                       "exhaust a target enemy limited support card.",
+                             "Kroot.", 2, faction, "Common", 3, 3, 0, False)
     ]
     return tau_cards_array

@@ -94,6 +94,17 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             self.card_to_deploy = card
                             new_game_update_string = ["IN_PLAY", primary_player.number, str(planet_pos), str(unit_pos)]
                             await DeployPhase.deploy_card_routine_attachment(self, name, new_game_update_string)
+        elif current_reaction == "Scavenging Kroot Rider":
+            if self.chosen_first_card:
+                if chosen_discard == int(primary_player.number):
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.get_card_type() == "Attachment":
+                        if not card.planet_attachment:
+                            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            if primary_player.attach_card(card, planet_pos, unit_pos):
+                                primary_player.remove_card_from_discard(pos_discard)
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                self.delete_reaction()
         elif current_reaction == "The Dance Without End":
             if not self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
