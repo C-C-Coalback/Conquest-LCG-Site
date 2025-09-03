@@ -317,6 +317,11 @@ def tau_cards_init():
                               0, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Commander Bravestorm", "Reaction: After you attach a non-Drone attachment to a "
                                                      "unit at this planet, draw a card.", "Soldier. Pilot. Shas'o.",
-                             3, faction, "Loyal", 2, 4, 1, False)
+                             3, faction, "Loyal", 2, 4, 1, False),
+        CardClasses.ArmyCard("Escort Drone", "You may deploy this card as a Wargear attachment with the text "
+                                             "\"Attach to an army unit. Attached unit gains +2 ATK and +1 HP. "
+                                             "Interrupt: When attached unit leaves play detach this "
+                                             "card to have it become an army unit.\"", "Drone.",
+                             1, faction, "Loyal", 2, 1, 1, False)
     ]
     return tau_cards_array

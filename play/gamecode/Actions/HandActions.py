@@ -938,7 +938,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                       self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             if card.get_card_type() == "Attachment" or card.get_ability() == "Gun Drones" or \
-                    card.get_ability() == "Shadowsun's Stealth Cadre":
+                    card.get_ability() == "Shadowsun's Stealth Cadre" or \
+                    card.get_ability() == "Escort Drone":
                 if not card.get_limited() or primary_player.can_play_limited:
                     primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"

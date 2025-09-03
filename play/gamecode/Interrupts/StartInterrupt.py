@@ -1,6 +1,7 @@
 from .. import FindCard
 from ..Phases import DeployPhase
 from .. import CardClasses
+import copy
 
 
 async def start_resolving_interrupt(self, name, game_update_string):
@@ -40,6 +41,16 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.cards.append("M35 Galaxy Lasgun")
             if "M35 Galaxy Lasgun" in primary_player.cards_recently_discarded:
                 primary_player.cards_recently_discarded.remove("M35 Galaxy Lasgun")
+            self.delete_interrupt()
+        elif current_interrupt == "Escort Drone":
+            card = copy.deepcopy(self.preloaded_find_card("Escort Drone"))
+            card.name_owner = primary_player.name_player
+            if planet_pos == -2:
+                primary_player.headquarters.append(card)
+            else:
+                primary_player.cards_in_play[planet_pos + 1].append(card)
+            if "Escort Drone" in primary_player.discard:
+                primary_player.discard.remove("Escort Drone")
             self.delete_interrupt()
         elif current_interrupt == "The Sun Prince":
             self.player_resolving_interrupts[0] = secondary_player.name_player

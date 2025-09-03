@@ -29,7 +29,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     else:
                         not_owner = False
                     army = False
-                    if attachments[i].get_name() in ["Shadowsun's Stealth Cadre", "Gun Drones"]:
+                    if attachments[i].get_name() in ["Shadowsun's Stealth Cadre", "Gun Drones", "Escort Drone"]:
                         army = True
                     if not primary_player.attach_card(attachments[i], planet_pos, unit_pos,
                                                       not_own_attachment=not_owner, army_unit_as_attachment=army):

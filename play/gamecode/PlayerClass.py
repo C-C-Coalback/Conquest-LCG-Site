@@ -1621,7 +1621,8 @@ class Player:
         print("Moving attachment code")
         army_unit_as_attachment = False
         if target_attachment.get_ability() == "Gun Drones" or \
-                target_attachment.get_ability() == "Shadowsun's Stealth Cadre":
+                target_attachment.get_ability() == "Shadowsun's Stealth Cadre" or \
+                target_attachment.get_ability() == "Escort Drone":
             army_unit_as_attachment = True
         if self.attach_card(card=target_attachment, planet=destination_planet, position=destination_position,
                             not_own_attachment=False,
@@ -6011,6 +6012,8 @@ class Player:
             owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":
                 self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
+            if card.get_attachments()[i].get_ability() == "Escort Drone":
+                self.game.create_interrupt("Escort Drone", owner, (int(self.number), planet_num, -1))
             if card.get_attachments()[i].get_ability() == "The Shadow Suit":
                 self.game.create_interrupt("The Shadow Suit", owner, (int(self.number), -1, -1))
             if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":
@@ -6169,6 +6172,8 @@ class Player:
                     self.game.create_reaction("Straken's Cunning", owner, (int(self.number), -1, -1))
                 if card.get_attachments()[i].get_ability() == "Transcendent Blessing":
                     self.game.create_interrupt("Transcendent Blessing", owner, (int(self.number), -1, -1))
+                if card.get_attachments()[i].get_ability() == "Escort Drone":
+                    self.game.create_interrupt("Escort Drone", owner, (int(self.number), -2, -1))
                 if card.get_attachments()[i].get_ability() == "The Shadow Suit":
                     self.game.create_interrupt("The Shadow Suit", owner, (int(self.number), -1, -1))
                 if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":

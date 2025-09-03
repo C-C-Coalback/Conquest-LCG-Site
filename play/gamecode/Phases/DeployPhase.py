@@ -526,7 +526,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
     discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
     can_continue = False
     army_unit_as_attachment = False
-    non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre"]
+    non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
     if card.get_card_type() == "Attachment":
         can_continue = True
     elif card.get_ability() in non_attachs_that_can_be_played_as_attach:

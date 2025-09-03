@@ -1819,7 +1819,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
             army_unit_as_attachment = False
             discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
             if card.get_ability() == "Gun Drones" or \
-                    card.get_ability() == "Shadowsun's Stealth Cadre":
+                    card.get_ability() == "Shadowsun's Stealth Cadre" or \
+                    card.get_ability() == "Escort Drone":
                 army_unit_as_attachment = True
             if primary_player.get_number() == player_receiving_attachment.get_number():
                 print("Playing own card")

@@ -766,6 +766,8 @@ class UnitCard(Card):
                     attack += self.attachments[i].get_extra_attack()
             elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
                 attack += 2
+            elif self.attachments[i].get_ability() == "Escort Drone":
+                attack += 2
         if self.get_ability() == "Fire Warrior Strike Team":
             attack += len(self.attachments)
         return attack
@@ -784,6 +786,8 @@ class UnitCard(Card):
                     health += self.attachments[i].get_extra_health()
             elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
                 health += 2
+            elif self.attachments[i].get_ability() == "Escort Drone":
+                health += 1
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Cybork Body":
                 health = 2 * health
