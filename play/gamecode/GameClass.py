@@ -65,6 +65,9 @@ class Game:
         elif sector == "Veros":
             for i in range(20, 30):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
+        elif sector == "The Breach":
+            for i in range(30, 40):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
         else:
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -177,6 +180,7 @@ class Game:
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
         self.misc_counter = 0
+        self.wounded_scream_blanked = False
         self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
         self.position_of_selected_attachment = (-1, -1, -1)
@@ -2365,6 +2369,36 @@ class Game:
             if loser.spend_resources(1):
                 winner.add_resources(1)
             await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Wounded Scream":
+            if not self.wounded_scream_blanked:
+                winner.add_resources(2)
+                winner.draw_card()
+                self.choices_available = ["Yes", "No"]
+                self.choice_context = "Blank Wounded Scream?"
+                self.name_player_making_choices = winner.name_player
+                self.resolving_search_box = True
+            else:
+                await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Immortal Sorrows":
+            self.choices_available = ["Brutal", "Armorbane"]
+            self.choice_context = "Immortal Sorrows Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Hell's Theet":
+            self.choices_available = ["Health", "Faith"]
+            self.choice_context = "Hell's Theet Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Tool of Abolition":
+            self.choices_available = ["Exhaust", "Ready"]
+            self.choice_context = "Tool of Abolition Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Petrified Desolations":
+            self.choices_available = ["Heal", "Damage"]
+            self.choice_context = "Petrified Desolations Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
         elif self.battle_ability_to_resolve == "Barlus":
             interrupts = loser.search_triggered_interrupts_enemy_discard()
             if interrupts:
@@ -2436,6 +2470,21 @@ class Game:
             else:
                 await self.send_update_message("Too few cards in deck for search")
                 await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Clipped Wings":
+            self.choices_available = ["Draw 1", "Discard to Draw 4"]
+            self.choice_context = "Clipped Wings Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Beheaded Hope":
+            self.choices_available = ["Return", "Deploy"]
+            self.choice_context = "Beheaded Hope Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Freezing Tower":
+            self.choices_available = ["Move", "Rout"]
+            self.choice_context = "Freezing Tower Choice"
+            self.name_player_making_choices = winner.name_player
+            self.resolving_search_box = True
         elif self.battle_ability_to_resolve == "Navida Prime":
             self.choices_available = []
             for i in range(len(self.p1.victory_display)):
@@ -2446,6 +2495,17 @@ class Game:
                 await self.resolve_battle_conclusion(name, game_update_string)
             else:
                 self.choice_context = "Navida Prime Target"
+                self.name_player_making_choices = winner.name_player
+        elif self.battle_ability_to_resolve == "The Frozen Heart":
+            self.choices_available = []
+            for i in range(len(self.p1.victory_display)):
+                self.choices_available.append(self.p1.victory_display[i].get_name())
+            for i in range(len(self.p2.victory_display)):
+                self.choices_available.append(self.p2.victory_display[i].get_name())
+            if not self.choices_available:
+                await self.resolve_battle_conclusion(name, game_update_string)
+            else:
+                self.choice_context = "The Frozen Heart Target"
                 self.name_player_making_choices = winner.name_player
         elif self.battle_ability_to_resolve == "Anshan":
             winner.number_cards_to_search = len(winner.deck)
@@ -3406,6 +3466,68 @@ class Game:
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
                                     self.delete_reaction()
+                    elif self.choice_context == "Immortal Sorrows Choice":
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        if warlord_pla == -2:
+                            if chosen_choice == "Armorbane":
+                                primary_player.headquarters[warlord_pos].armorbane_eog = True
+                            else:
+                                primary_player.headquarters[warlord_pos].brutal_eog = True
+                        else:
+                            if chosen_choice == "Armorbane":
+                                primary_player.cards_in_play[warlord_pla + 1][warlord_pos].armorbane_eog = True
+                            else:
+                                primary_player.cards_in_play[warlord_pla + 1][warlord_pos].brutal_eog = True
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Hell's Theet Choice":
+                        self.misc_target_choice = chosen_choice
+                        if chosen_choice == "Faith":
+                            self.misc_counter = 5
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Blank Wounded Scream?":
+                        if chosen_choice == "Yes":
+                            self.wounded_scream_blanked = True
+                            await self.send_update_message("Wounded Scream was blanked.")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Tool of Abolition Choice":
+                        self.misc_target_choice = chosen_choice
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Petrified Desolations Choice":
+                        self.misc_target_choice = chosen_choice
+                        if chosen_choice == "Heal":
+                            self.misc_counter = 3
+                        else:
+                            self.misc_counter = 2
+                        self.misc_misc = []
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Clipped Wings Choice":
+                        if chosen_choice == "Draw 1":
+                            primary_player.draw_card()
+                        else:
+                            while primary_player.cards:
+                                primary_player.discard_card_from_hand(0)
+                            for _ in range(4):
+                                primary_player.draw_card()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Freezing Tower Choice":
+                        self.misc_target_choice = chosen_choice
+                        self.chosen_first_card = False
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Beheaded Hope Choice":
+                        self.misc_target_choice = chosen_choice
+                        self.chosen_first_card = False
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Krieg Armoured Regiment result:":
                         card_name = self.choices_available[int(game_update_string[1])]
                         card = self.preloaded_find_card(card_name)
@@ -3610,6 +3732,11 @@ class Game:
                                                          same_thread=True)
                             self.searing_brand_cancel_enabled = True
                     elif self.choice_context == "Navida Prime Target":
+                        self.battle_ability_to_resolve = chosen_choice
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "Resolve Battle Ability?"
+                        self.name_player_making_choices = name
+                    elif self.choice_context == "The Frozen Heart Target":
                         self.battle_ability_to_resolve = chosen_choice
                         self.choices_available = ["Yes", "No"]
                         self.choice_context = "Resolve Battle Ability?"
@@ -5060,6 +5187,70 @@ class Game:
                         self.choices_available = ["Yes", "No"]
                         self.choice_context = "Resolve Battle Ability?"
                         self.name_player_making_choices = name
+            elif self.battle_ability_to_resolve == "Hell's Theet":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if game_update_string[1] == primary_player.get_number():
+                            if self.misc_target_choice == "Health":
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 3,
+                                                                                  expiration="EOG")
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                            else:
+                                primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if game_update_string[1] == primary_player.get_number():
+                            if self.misc_target_choice == "Health":
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 3,
+                                                                                  expiration="EOG")
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                            else:
+                                primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Tool of Abolition":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+                            if self.misc_target_choice == "Ready":
+                                player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                                player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                            elif player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                self.damage_from_atrox = True
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+                            if self.misc_target_choice == "Ready":
+                                player_owning_card.ready_given_pos(planet_pos, unit_pos)
+                                player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                            elif player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
+                                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                                self.damage_from_atrox = True
             elif self.battle_ability_to_resolve == "Kunarog The Slave Market":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -5069,11 +5260,18 @@ class Game:
                                                                       int(game_update_string[1]),
                                                                       already_exhausted=True)
                             await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Baneful Veil":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if abs(self.last_planet_checked_for_battle - int(game_update_string[1])):
+                            self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                            self.choices_available = ["Yes", "No"]
+                            self.choice_context = "Resolve Battle Ability?"
+                            self.name_player_making_choices = name
             elif self.battle_ability_to_resolve == "Craftworld Lugath":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
                         if self.misc_target_choice == "Copy Adjacent":
-
                             if abs(self.last_planet_checked_for_battle - int(game_update_string[1])):
                                 self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
                                 self.choices_available = ["Yes", "No"]
@@ -5162,6 +5360,44 @@ class Game:
                                     self.choice_context = "BTD: Last Planet or HQ?"
                                     self.name_player_making_choices = primary_player.name_player
                                     self.resolving_search_box = True
+            elif self.battle_ability_to_resolve == "Beheaded Hope":
+                if self.misc_target_choice == "Return":
+                    if len(game_update_string) == 3:
+                        if game_update_string[0] == "HQ":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                    primary_player.add_resources(3)
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                    elif len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                                    primary_player.add_resources(3)
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                else:
+                    if self.chosen_first_card:
+                        if len(game_update_string) == 2:
+                            if game_update_string[0] == "PLANETS":
+                                await DeployPhase.deploy_card_routine(self, name, int(game_update_string[1]),
+                                                                      discounts=2)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                    else:
+                        if len(game_update_string) == 3:
+                            if game_update_string[0] == "HAND":
+                                if game_update_string[1] == primary_player.get_number():
+                                    hand_pos = int(game_update_string[2])
+                                    card = primary_player.get_card_in_hand(hand_pos)
+                                    if card.get_card_type() == "Army":
+                                        self.card_to_deploy = card
+                                        primary_player.aiming_reticle_coords_hand = hand_pos
+                                        primary_player.aiming_reticle_color = "blue"
+                                        self.chosen_first_card = True
             elif self.battle_ability_to_resolve == "Contaminated World Adracan":
                 if not self.chosen_first_card:
                     if len(game_update_string) == 4:
@@ -5185,6 +5421,49 @@ class Game:
                                         self.name_player_making_choices = primary_player.name_player
                                         self.resolving_search_box = True
                                         await self.send_update_message("Infest the planet?")
+            elif self.battle_ability_to_resolve == "Petrified Desolations":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if (int(player_owning_card.get_number()), planet_pos, unit_pos) not in self.misc_misc:
+                            if self.misc_target_choice == "Heal":
+                                if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                                    self.misc_counter = self.misc_counter - 1
+                                    self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
+                                    if self.misc_counter < 1:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
+                            else:
+                                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                self.misc_counter = self.misc_counter - 1
+                                self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
+                                if self.misc_counter < 1:
+                                    self.damage_from_atrox = True
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if (int(player_owning_card.get_number()), planet_pos, unit_pos) not in self.misc_misc:
+                            if self.misc_target_choice == "Heal":
+                                if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                                    self.misc_counter = self.misc_counter - 1
+                                    self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
+                                    if self.misc_counter < 1:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
+                            else:
+                                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                self.misc_counter = self.misc_counter - 1
+                                self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
+                                if self.misc_counter < 1:
+                                    self.damage_from_atrox = True
             elif self.battle_ability_to_resolve == "Mangeras":
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
@@ -5206,6 +5485,47 @@ class Game:
                                 self.misc_counter = self.misc_counter - 1
                                 if self.misc_counter < 1:
                                     await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Freezing Tower":
+                if self.misc_target_choice == "Rout":
+                    if len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            player_owning_card = self.p1
+                            if game_update_string[1] == "2":
+                                player_owning_card = self.p2
+                            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                player_owning_card.rout_unit(planet_pos, unit_pos)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                else:
+                    if len(game_update_string) == 2 and self.chosen_first_card:
+                        if game_update_string[0] == "PLANETS":
+                            destination = int(game_update_string[1])
+                            if destination != self.misc_target_unit[1]:
+                                og_pla, og_pos = self.misc_target_unit
+                                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                                primary_player.move_unit_to_planet(og_pla, og_pos, destination)
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                    elif len(game_update_string) == 3 and not self.chosen_first_card:
+                        if game_update_string[0] == "HQ":
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                            if game_update_string[1] == primary_player.get_number():
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 4:
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        self.chosen_first_card = True
+                                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    elif len(game_update_string) == 4 and not self.chosen_first_card:
+                        if game_update_string[0] == "IN_PLAY":
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if game_update_string[1] == primary_player.get_number():
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 4:
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        self.chosen_first_card = True
+                                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
             elif self.battle_ability_to_resolve == "Xenos World Tallin":
                 if len(game_update_string) == 2:
                     if not self.chosen_first_card:

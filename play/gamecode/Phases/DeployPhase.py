@@ -313,49 +313,59 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     planet_pos = int(planet_pos)
     primary_player = self.p1
     secondary_player = self.p2
-    if self.phase != "DEPLOY":
-        is_an_interrupt = False
-        is_a_reaction = False
-        if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
-            if self.interrupts_waiting_on_resolution[0] == "Magus Harid" or \
-                    self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors" or \
-                    self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
-                is_an_interrupt = True
+    is_an_interrupt = False
+    is_a_reaction = False
+    is_battle_ability = False
+    if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
+        if self.interrupts_waiting_on_resolution[0] == "Magus Harid" or \
+                self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors" or \
+                self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+            is_an_interrupt = True
+            primary_player = self.p1
+            secondary_player = self.p2
+            if self.player_resolving_interrupts[0] == self.name_2:
+                primary_player = self.p2
+                secondary_player = self.p1
+    if not is_an_interrupt:
+        if self.reactions_needing_resolving and self.already_resolving_reaction:
+            if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
+                is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
-                if self.player_resolving_interrupts[0] == self.name_2:
+                if self.player_who_resolves_reaction[0] == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
-        if not is_an_interrupt:
-            if self.reactions_needing_resolving and self.already_resolving_reaction:
-                if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
-                    is_a_reaction = True
-                    primary_player = self.p1
-                    secondary_player = self.p2
-                    if self.player_who_resolves_reaction[0] == self.name_2:
-                        primary_player = self.p2
-                        secondary_player = self.p1
-                if self.reactions_needing_resolving[0] == "The Dance Without End":
-                    is_a_reaction = True
-                    primary_player = self.p1
-                    secondary_player = self.p2
-                    if self.player_who_resolves_reaction[0] == self.name_2:
-                        primary_player = self.p2
-                        secondary_player = self.p1
-        if not is_an_interrupt and not is_a_reaction:
-            if self.player_with_action == self.name_1:
+            if self.reactions_needing_resolving[0] == "The Dance Without End":
+                is_a_reaction = True
+                primary_player = self.p1
+                secondary_player = self.p2
+                if self.player_who_resolves_reaction[0] == self.name_2:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+    if not is_an_interrupt and not is_a_reaction:
+        if self.battle_ability_to_resolve:
+            is_battle_ability = True
+            if self.player_resolving_battle_ability == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
             else:
                 primary_player = self.p2
                 secondary_player = self.p1
-    else:
-        if self.number_with_deploy_turn == "1":
-            primary_player = self.p1
-            secondary_player = self.p2
         else:
-            primary_player = self.p2
-            secondary_player = self.p1
+            if self.phase != "DEPLOY":
+                if self.player_with_action == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+            else:
+                if self.number_with_deploy_turn == "1":
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
     if primary_player.webway_witch > -1:
         if self.planets_in_play_array[primary_player.webway_witch]:
             planet_pos = primary_player.webway_witch
@@ -453,6 +463,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if self.reactions_needing_resolving and self.already_resolving_reaction:
         if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
             self.delete_reaction()
+    if is_battle_ability:
+        pass
     if primary_player.extra_deploy_turn_active:
         primary_player.extra_deploy_turn_active = False
         primary_player.has_passed = True

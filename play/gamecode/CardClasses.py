@@ -391,6 +391,8 @@ class UnitCard(Card):
         self.positive_hp_until_eor = 0
         self.flying_eocr = False
         self.actual_attack = attack
+        self.brutal_eog = False
+        self.armorbane_eog = False
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
@@ -622,6 +624,8 @@ class UnitCard(Card):
             return False
         if self.lost_keywords_eop:
             return False
+        if self.armorbane_eog:
+            return True
         if self.armorbane_eop:
             return True
         if self.armorbane_eor:
@@ -722,6 +726,8 @@ class UnitCard(Card):
             return False
         if self.lost_keywords_eop:
             return False
+        if self.brutal_eog:
+            return True
         if self.brutal_eocr:
             return True
         if self.brutal_eop:

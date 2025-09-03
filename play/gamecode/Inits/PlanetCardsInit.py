@@ -2,53 +2,65 @@ from .. import CardClasses
 
 
 def planet_cards_init():
-    planet_array = [CardClasses.PlanetCard("Plannum",
-                                           "Battle Ability: Move a non-warlord unit "
-                                           "you control to a planet of your choice.",
-                                           1, 1, False, True, True),
-                    CardClasses.PlanetCard("Atrox Prime", "Battle Ability: Deal 1 damage "
-                                                          "to each enemy unit at a target HQ or adjacent planet.",
-                                           1, 1, True, True, False),
-                    CardClasses.PlanetCard("Barlus", "Battle Ability: Discard 1 card at "
-                                                     "random from your opponent's hand.",
-                                           2, 0, False, False, True),
-                    CardClasses.PlanetCard("Elouith", "Battle Ability: Search the top 3 cards of your deck for a card. "
-                                                      "Add it to your hand, and place the remaining cards "
-                                                      "on the bottom of your deck in any order.", 2, 0, False, True,
-                                           False),
-                    CardClasses.PlanetCard("Carnath", "Battle Ability: Trigger the Battle ability "
-                                                      "of another planet in play",
-                                           1, 1, True, True, False),
-                    CardClasses.PlanetCard("Tarrus", "Battle Ability: If you control fewer units than your opponent, "
-                                                     "gain 3 resources or draw 3 cards.", 1, 1, True, False, True),
-                    CardClasses.PlanetCard("Osus IV", "Battle Ability: "
-                                                      "Take 1 resource from your opponent.", 0, 2, False, False, True),
-                    CardClasses.PlanetCard("Ferrin", "Battle Ability: Rout a target non-warlord unit.",
-                                           0, 2, True, False, False),
-                    CardClasses.PlanetCard("Y'varn", "Battle Ability: Each player puts a unit into play "
-                                                     "from his hand at his HQ.",
-                                           0, 1, True, True, True),
-                    CardClasses.PlanetCard("Iridial", "Battle Ability: Remove all damage from a target unit.",
-                                           1, 0, True, True, True),
-                    CardClasses.PlanetCard("Anshan", "", 1, 1, True, True, False),
-                    CardClasses.PlanetCard("Beckel", "", 1, 0, True, True, True),
-                    CardClasses.PlanetCard("Erida", "", 0, 1, True, True, True),
-                    CardClasses.PlanetCard("Excellor", "", 1, 1, False, True, True),
-                    CardClasses.PlanetCard("Jalayerid", "", 0, 2, True, False, False),
-                    CardClasses.PlanetCard("Jaricho", "", 1, 1, True, False, True),
-                    CardClasses.PlanetCard("Munos", "", 0, 2, False, False, True),
-                    CardClasses.PlanetCard("Navida Prime", "", 2, 0, False, False, True),
-                    CardClasses.PlanetCard("Nectavus XI", "", 1, 1, True, True, False),
-                    CardClasses.PlanetCard("Vargus", "", 2, 0, False, True, False),
-                    CardClasses.PlanetCard("Zarvoss Foundry", "", 1, 0, True, True, True),
-                    CardClasses.PlanetCard("Xenos World Tallin", "", 1, 1, False, True, True),
-                    CardClasses.PlanetCard("Mangeras", "", 1, 1, True, True, False),
-                    CardClasses.PlanetCard("Kunarog The Slave Market", "", 0, 2, True, False, False),
-                    CardClasses.PlanetCard("Ironforge", "", 2, 0, False, False, True),
-                    CardClasses.PlanetCard("Frontier World Jaris", "", 0, 1, True, True, True),
-                    CardClasses.PlanetCard("Daprian's Gate", "", 0, 2, False, False, True),
-                    CardClasses.PlanetCard("Craftworld Lugath", "", 2, 0, False, True, False),
-                    CardClasses.PlanetCard("Contaminated World Adracan", "", 1, 1, True, True, False),
-                    CardClasses.PlanetCard("Bhorsapolis The Decadent", "", 1, 1, True, False, True),
-                    CardClasses.PlanetCard("FINAL CARD", "", -1, -1, False, False, False, "NO IMAGE")]
+    planet_array = [
+        CardClasses.PlanetCard("Plannum",
+                               "Battle Ability: Move a non-warlord unit "
+                               "you control to a planet of your choice.",
+                               1, 1, False, True, True),
+        CardClasses.PlanetCard("Atrox Prime", "Battle Ability: Deal 1 damage "
+                                              "to each enemy unit at a target HQ or adjacent planet.",
+                               1, 1, True, True, False),
+        CardClasses.PlanetCard("Barlus", "Battle Ability: Discard 1 card at "
+                                         "random from your opponent's hand.",
+                               2, 0, False, False, True),
+        CardClasses.PlanetCard("Elouith", "Battle Ability: Search the top 3 cards of your deck for a card. "
+                                          "Add it to your hand, and place the remaining cards "
+                                          "on the bottom of your deck in any order.", 2, 0, False, True,
+                               False),
+        CardClasses.PlanetCard("Carnath", "Battle Ability: Trigger the Battle ability "
+                                          "of another planet in play",
+                               1, 1, True, True, False),
+        CardClasses.PlanetCard("Tarrus", "Battle Ability: If you control fewer units than your opponent, "
+                                         "gain 3 resources or draw 3 cards.", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Osus IV", "Battle Ability: "
+                                          "Take 1 resource from your opponent.", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Ferrin", "Battle Ability: Rout a target non-warlord unit.",
+                               0, 2, True, False, False),
+        CardClasses.PlanetCard("Y'varn", "Battle Ability: Each player puts a unit into play "
+                                         "from his hand at his HQ.",
+                               0, 1, True, True, True),
+        CardClasses.PlanetCard("Iridial", "Battle Ability: Remove all damage from a target unit.",
+                               1, 0, True, True, True),
+        CardClasses.PlanetCard("Anshan", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Beckel", "", 1, 0, True, True, True),
+        CardClasses.PlanetCard("Erida", "", 0, 1, True, True, True),
+        CardClasses.PlanetCard("Excellor", "", 1, 1, False, True, True),
+        CardClasses.PlanetCard("Jalayerid", "", 0, 2, True, False, False),
+        CardClasses.PlanetCard("Jaricho", "", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Munos", "", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Navida Prime", "", 2, 0, False, False, True),
+        CardClasses.PlanetCard("Nectavus XI", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Vargus", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("Zarvoss Foundry", "", 1, 0, True, True, True),
+        CardClasses.PlanetCard("Xenos World Tallin", "", 1, 1, False, True, True),
+        CardClasses.PlanetCard("Mangeras", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Kunarog The Slave Market", "", 0, 2, True, False, False),
+        CardClasses.PlanetCard("Ironforge", "", 2, 0, False, False, True),
+        CardClasses.PlanetCard("Frontier World Jaris", "", 0, 1, True, True, True),
+        CardClasses.PlanetCard("Daprian's Gate", "", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Craftworld Lugath", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("Contaminated World Adracan", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Bhorsapolis The Decadent", "", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Wounded Scream", "", 1, 1, True, True, True),
+        CardClasses.PlanetCard("Tool of Abolition", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("The Frozen Heart", "", 1, 0, True, True, True),
+        CardClasses.PlanetCard("Petrified Desolations", "", 0, 2, True, False, False),
+        CardClasses.PlanetCard("Immortal Sorrows", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Hell's Theet", "", 1, 1, False, True, True),
+        CardClasses.PlanetCard("Freezing Tower", "", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Clipped Wings", "", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Beheaded Hope", "", 2, 0, False, False, True),
+        CardClasses.PlanetCard("Baneful Veil", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("FINAL CARD", "", -1, -1, False, False, False, "NO IMAGE")
+    ]
     return planet_array
