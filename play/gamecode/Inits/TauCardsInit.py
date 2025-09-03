@@ -322,6 +322,12 @@ def tau_cards_init():
                                              "\"Attach to an army unit. Attached unit gains +2 ATK and +1 HP. "
                                              "Interrupt: When attached unit leaves play detach this "
                                              "card to have it become an army unit.\"", "Drone.",
-                             1, faction, "Loyal", 2, 1, 1, False)
+                             1, faction, "Loyal", 2, 1, 1, False),
+        CardClasses.ArmyCard("Frontline Counsellor", "Interrupt: When another unit you control is routed or moves"
+                                                     " from a planet, move this unit to that planet. "
+                                                     "(Limit once per phase.)\n"
+                                                     "Forced Reaction: After this unit resolves its attack, "
+                                                     "move it to your HQ.", "Soldier. Ethereal.",
+                             2, faction, "Common", 2, 1, 2, False)
     ]
     return tau_cards_array

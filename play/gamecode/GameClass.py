@@ -350,7 +350,8 @@ class Game:
         self.name_player_using_backlash = ""
         self.canceled_card_bonuses = [False, False, False, False, False, False, False]
         self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
-        self.units_move_hq_attack = ["Aun'ui Prelate", "Aun'shi", "Ethereal Envoy", "Herald of the Tau'va"]
+        self.units_move_hq_attack = ["Aun'ui Prelate", "Aun'shi", "Ethereal Envoy", "Herald of the Tau'va",
+                                     "Frontline Counsellor"]
         self.unit_will_move_after_attack = False
         self.need_to_move_to_hq = False
         self.just_moved_units = False

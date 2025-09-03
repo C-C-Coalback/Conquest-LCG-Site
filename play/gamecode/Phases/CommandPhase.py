@@ -232,7 +232,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     for i in range(len(self.p2.headquarters)):
                         if self.p2.get_card_type_given_pos(-2, i) == "Synapse":
                             self.create_reaction("Reinforced Synaptic Network", self.name_2, (2, -2, i))
-                        if self.p1.get_ability_given_pos(-2, i) == "Heralding Cherubim":
+                        if self.p2.get_ability_given_pos(-2, i) == "Heralding Cherubim":
                             self.create_reaction("Heralding Cherubim", self.name_2, (2, -2, i))
                     for i in range(7):
                         for j in range(len(self.p1.cards_in_play[i + 1])):

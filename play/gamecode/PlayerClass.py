@@ -1050,6 +1050,15 @@ class Player:
                         return True
         return False
 
+    def check_if_already_have_interrupt_of_position(self, interrupt_name, pla, pos):
+        for i in range(len(self.game.interrupts_waiting_on_resolution)):
+            if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
+                if self.game.player_resolving_interrupts[i] == self.name_player:
+                    num, og_pla, og_pos = self.game.positions_of_units_interrupting[i]
+                    if num == int(self.number) and pla == og_pla and og_pos == pos:
+                        return True
+        return False
+
     def check_if_already_have_interrupt(self, interrupt_name):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
             if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
@@ -2725,9 +2734,30 @@ class Player:
             self.cards_in_play[destination + 1].append(copy.deepcopy(self.cards_in_play[origin_planet + 1]
                                                                      [origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
+            last_element_index = new_pos
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
+            for i in range(len(self.headquarters)):
+                if i != last_element_index:
+                    if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
+                        if not self.get_once_per_phase_used_given_pos(-2, i):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
+                                                                                    self.name_player,
+                                                                                    (int(self.number), -2, i)):
+                                self.game.create_interrupt("Frontline Counsellor", self.name_player,
+                                                           (int(self.number), -2, i), extra_info=origin_planet)
+            for i in range(7):
+                if i != origin_planet:
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if j != last_element_index or i != destination:
+                            if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
+                                if not self.get_once_per_phase_used_given_pos(i, j):
+                                    if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
+                                                                                            self.name_player,
+                                                                                            (int(self.number), i, j)):
+                                        self.game.create_interrupt("Frontline Counsellor", self.name_player,
+                                                                   (int(self.number), i, j), extra_info=origin_planet)
             if self.game.last_planet_checked_for_battle == destination:
                 if other_player.search_hand_for_card("Wrathful Retribution"):
                     if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
@@ -6274,6 +6304,24 @@ class Player:
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.remove_card_from_play(planet_id, unit_id)
         last_element_index = len(self.headquarters) - 1
+        for i in range(len(self.headquarters)):
+            if i != last_element_index:
+                if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
+                    if not self.get_once_per_phase_used_given_pos(-2, i):
+                        if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", self.name_player,
+                                                                                (int(self.number), -2, i)):
+                            self.game.create_interrupt("Frontline Counsellor", self.name_player,
+                                                       (int(self.number), -2, i), extra_info=planet_id)
+        for i in range(7):
+            if i != planet_id:
+                for j in range(len(self.cards_in_play[i + 1])):
+                    if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
+                        if not self.get_once_per_phase_used_given_pos(i, j):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
+                                                                                    self.name_player,
+                                                                                    (int(self.number), i, j)):
+                                self.game.create_interrupt("Frontline Counsellor", self.name_player,
+                                                           (int(self.number), i, j), extra_info=planet_id)
         if self.get_ability_given_pos(-2, last_element_index) == "Growing Tide":
             if planet_id == self.game.round_number:
                 self.game.create_interrupt("Growing Tide", self.name_player,
