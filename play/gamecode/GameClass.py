@@ -1847,6 +1847,8 @@ class Game:
                 if self.nullified_card_name == "Overrun":
                     primary_player.draw_card()
                     primary_player.draw_card()
+                if self.nullified_card_name == "Breach and Clear":
+                    primary_player.add_resources(2)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
         if resolve_nullify_discard:
@@ -1949,6 +1951,8 @@ class Game:
             if self.nullified_card_name == "Overrun":
                 secondary_player.draw_card()
                 secondary_player.draw_card()
+            if self.nullified_card_name == "Breach and Clear":
+                secondary_player.add_resources(2)
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
@@ -1987,6 +1991,8 @@ class Game:
             if self.nullified_card_name == "Overrun":
                 secondary_player.draw_card()
                 secondary_player.draw_card()
+            if self.nullified_card_name == "Breach and Clear":
+                secondary_player.add_resources(2)
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
@@ -2149,6 +2155,8 @@ class Game:
                 if self.nullified_card_name == "Overrun":
                     secondary_player.draw_card()
                     secondary_player.draw_card()
+                if self.nullified_card_name == "Breach and Clear":
+                    secondary_player.add_resources(2)
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -2196,6 +2204,8 @@ class Game:
                 if self.nullified_card_name == "Overrun":
                     secondary_player.draw_card()
                     secondary_player.draw_card()
+                if self.nullified_card_name == "Breach and Clear":
+                    secondary_player.add_resources(2)
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -2242,6 +2252,8 @@ class Game:
                 if self.nullified_card_name == "Overrun":
                     secondary_player.draw_card()
                     secondary_player.draw_card()
+                if self.nullified_card_name == "Breach and Clear":
+                    secondary_player.add_resources(2)
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
@@ -2885,6 +2897,13 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
+                    elif self.choice_context == "BaC: Sacrifice Attachment?":
+                        if chosen_choice == "Sacrifice":
+                            pass
+                        else:
+                            self.action_cleanup()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "MtC Choose Trait:":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]

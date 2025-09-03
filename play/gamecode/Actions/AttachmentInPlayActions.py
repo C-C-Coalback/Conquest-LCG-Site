@@ -260,6 +260,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             await self.send_update_message(card_chosen.get_name() + " chosen")
             self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
             self.chosen_first_card = True
+    elif self.action_chosen == "Breach and Clear Sacrifice":
+        if card_chosen.name_owner == primary_player.get_name_player():
+            player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+            self.action_chosen = "Breach and Clear 2"
     elif self.action_chosen == "Accelerated Gestation":
         if card_chosen.from_magus_harid and card_chosen.name_owner == primary_player.get_name_player():
             if card_chosen.get_card_type() == "Army":

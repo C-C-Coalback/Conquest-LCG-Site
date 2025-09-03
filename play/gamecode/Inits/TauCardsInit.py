@@ -353,6 +353,11 @@ def tau_cards_init():
                                                     " planet, reassign 1 of that damage to another unit controlled"
                                                     " by the same player at this planet.", "Wargear. Experimental.",
                                    2, faction, "Loyal", 2, True, extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Breach and Clear", "If all effects of this event are cancelled, gain 2 resources.\n"
+                                                  "Action: Exhaust a target army unit. Then you may sacrifice an "
+                                                  "attachment to exhaust another target army unit at the same planet.",
+                              "Tactic.", 2, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return tau_cards_array

@@ -118,6 +118,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.name_player_making_choices = primary_player.name_player
                             self.chosen_first_card = False
                             self.misc_target_choice = ""
+                    elif ability == "Breach and Clear":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Muster the Guard":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
