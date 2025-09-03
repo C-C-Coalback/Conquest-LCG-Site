@@ -4630,6 +4630,15 @@ class Player:
         for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
             if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Until Justice is Done":
                 damage += 1
+        if damage > 0:
+            for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
+                if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[
+                        i].get_ability() == "Flickering Holosuit":
+                    if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ready():
+                        self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].exhaust_card()
+                        damage = damage - 2
+                    else:
+                        self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].ready_card()
         og_damage = damage
         too_many_bodyguards = False
         if att_pos is not None:
@@ -4885,6 +4894,14 @@ class Player:
         if self.get_ability_given_pos(-2, unit_id) == "Exalted Celestians":
             if self.get_has_faith_given_pos(-2, unit_id) > 0:
                 return False
+        if damage > 0:
+            for i in range(len(self.headquarters[unit_id].get_attachments())):
+                if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Flickering Holosuit":
+                    if self.headquarters[unit_id].get_attachments()[i].get_ready():
+                        self.headquarters[unit_id].get_attachments()[i].exhaust_card()
+                        damage = damage - 2
+                    else:
+                        self.headquarters[unit_id].get_attachments()[i].ready_card()
         prior_damage = self.headquarters[unit_id].get_damage()
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         afterwards_damage = self.headquarters[unit_id].get_damage()

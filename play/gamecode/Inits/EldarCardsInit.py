@@ -423,6 +423,13 @@ def eldar_cards_init():
         CardClasses.ArmyCard("The Webway Witch", "Reaction: After you deploy this unit, the next time your opponent"
                                                  " deploys a unit this phase, he must deploy it at this planet,"
                                                  " if able.", "Psyker. Harlequin.",
-                             2, faction, "Signature", 1, 2, 2, False)
+                             2, faction, "Signature", 1, 2, 2, False),
+        CardClasses.AttachmentCard("Flickering Holosuit", "Attach to an army unit.\n"
+                                                          "Attached unit gets +1 HP.\n"
+                                                          "Forced Interrupt: When attaced unit is assigned damage, "
+                                                          "exhaust this attachment to prevent 2 of that damage. "
+                                                          "If this attachment was already exhausted, ready it instead.",
+                                   "Wargear. Armor.", 1, faction, "Common", 1, False, extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return eldar_cards_array
