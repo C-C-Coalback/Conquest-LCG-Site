@@ -439,6 +439,14 @@ def chaos_cards_init():
         CardClasses.EventCard("Tides of Chaos", "Reaction: After your warlord commits to a planet, each army unit "
                                                 "gains an amount of command icons equal to their ATK value "
                                                 "until the end of the phase.", "Tactic.",
-                              1, faction, "Loyal", 2, False)
+                              1, faction, "Loyal", 2, False),
+        CardClasses.AttachmentCard("Medallion of Betrayal", "Attach to a non-warlord unit.\n"
+                                                            "Attached unit gets +1 ATK and +1 HP,"
+                                                            " double if it is a Cultist.\n"
+                                                            "Reaction: After this card enters your discard pile, if you"
+                                                            " control no Cultist token, put a Cultist token into "
+                                                            "play at your HQ.", "Wargear. Weapon. Slaanesh.",
+                                   1, faction, "Loyal", 2, False, extra_health=1, extra_attack=1,
+                                   type_of_units_allowed_for_attachment="Army/Synapse/Token")
     ]
     return chaos_card_array

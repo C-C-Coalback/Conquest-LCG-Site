@@ -4491,6 +4491,9 @@ class Player:
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
+            if attachments[i].get_ability() == "Medallion of Betrayal":
+                if self.check_for_trait_given_pos(planet_id, unit_id, "Cultist"):
+                    attack_value += 1
             if attachments[i].get_ability() == "Noxious Fleshborer" and not attachments[i].from_magus_harid:
                 if self.game.infested_planets[planet_id]:
                     attack_value += 1
@@ -5007,6 +5010,9 @@ class Player:
                     else:
                         other_player = self.get_other_player()
                         health += len(other_player.victory_display)
+                if attachment.get_ability() == "Medallion of Betrayal":
+                    if self.check_for_trait_given_pos(planet_id, unit_id, "Cultist"):
+                        health += 1
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         ability = self.get_ability_given_pos(planet_id, unit_id)
@@ -5126,6 +5132,9 @@ class Player:
                     health += len(other_player.victory_display)
             if attachments[i].get_ability() == "Noxious Fleshborer" and not attachments[i].from_magus_harid:
                 if self.game.infested_planets[planet_id]:
+                    health += 1
+            if attachments[i].get_ability() == "Medallion of Betrayal":
+                if self.check_for_trait_given_pos(planet_id, unit_id, "Cultist"):
                     health += 1
             if attachments[i].get_ability() == "Frostfang":
                 if self.number == "1":
@@ -5687,6 +5696,9 @@ class Player:
                                                                   (int(self.number), -1, -1))
             if card_name == "Cardinal Agra Decree":
                 self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
+            if card_name == "Medallion of Betrayal":
+                if not self.check_if_already_have_reaction("Medallion of Betrayal"):
+                    self.game.create_reaction("Medallion of Betrayal", self.name_player, (int(self.number), -1, -1))
 
     def search_for_preemptive_destroy_interrupts(self):
         for i in range(len(self.headquarters)):

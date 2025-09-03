@@ -39,6 +39,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choices_available = primary_player.deck[0:len(primary_player.deck)]
             self.choice_context = "First Line Rhinos Rally"
             self.name_player_making_choices = primary_player.name_player
+        elif current_reaction == "Medallion of Betrayal":
+            if primary_player.count_copies_in_play("Cultist") < 1:
+                primary_player.summon_token_at_hq("Cultist")
+            self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"
