@@ -352,6 +352,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             card.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    elif ability == "Sivarla Soulbinder":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
                     elif ability == "Uncontrollable Rioters":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
@@ -1604,6 +1611,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.choice_context = "BaC: Sacrifice Attachment?"
                     self.name_player_making_choices = primary_player.name_player
                     self.resolving_search_box = True
+    elif self.action_chosen == "Sivarla Soulbinder":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    self.chosen_first_card = True
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

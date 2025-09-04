@@ -467,6 +467,11 @@ def chaos_cards_init():
                                                   " control at the same planet instead as an attachment with the text: "
                                                   "\"Attach to a non-Daemon, non-Vehicle army unit. "
                                                   "Attached unit gets +3 ATK, +3 HP and the Khorne trait.\"",
-                             "Daemon. Cultist. Khorne.", 4, faction, "Common", 3, 3, 0, False)
+                             "Daemon. Cultist. Khorne.", 4, faction, "Common", 3, 3, 0, False),
+        CardClasses.ArmyCard("Sivarla Soulbinder", "Each Cultist token you control gets +1 ATK and +1 HP."
+                                                   " Your Cultist token limit is set to 2.\n"
+                                                   "Combat Action: Move a Cultist unit you control to a target planet. "
+                                                   "(Limit once per phase.)", "Daemon. Slaanesh.",
+                             2, faction, "Loyal", 1, 4, 1, False, action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return chaos_card_array

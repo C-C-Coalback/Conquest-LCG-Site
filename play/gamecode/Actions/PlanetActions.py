@@ -497,6 +497,16 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "Sivarla Soulbinder":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.misc_target_unit
+            siv_pla, siv_pos = self.position_of_actioned_card
+            if og_pla != chosen_planet:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.reset_aiming_reticle_in_play(siv_pla, siv_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                self.action_cleanup()
     elif self.action_chosen == "Archon's Palace":
         self.misc_target_planet = chosen_planet
         self.choices_available = ["Cards", "Resources"]

@@ -4341,6 +4341,9 @@ class Player:
             if card.get_ability() == "Eloquent Confessor":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     attack_value += 1
+            if card.get_ability() == "Cultist":
+                if self.search_for_card_everywhere("Sivarla Soulbinder"):
+                    attack_value += 1
             if card.get_ability() == "Neurotic Obliterator":
                 attack_value += len(card.get_attachments())
             if card.get_ability() == "Pyrrhian Eternals":
@@ -4400,6 +4403,9 @@ class Player:
                     attack_value += 1
         if ability == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
+                attack_value += 1
+        if ability == "Cultist":
+            if self.search_for_card_everywhere("Sivarla Soulbinder"):
                 attack_value += 1
         if ability == "Neurotic Obliterator":
             attack_value += len(card.get_attachments())
@@ -5058,6 +5064,9 @@ class Player:
                         health += 1
             if ability == "Fairly 'Quipped Kommando":
                 health += len(self.headquarters[unit_id].get_attachments())
+            if ability == "Cultist":
+                if self.search_for_card_everywhere("Sivarla Soulbinder"):
+                    health += 1
             if ability == "Shard of the Deceiver":
                 health += len(self.discard)
             for i in range(len(self.headquarters[unit_id].get_attachments())):
@@ -5104,6 +5113,9 @@ class Player:
                 health += 1
         if ability == "Improbable Runt Machine":
             health += min(len(card.get_attachments()), 3)
+        if ability == "Cultist":
+            if self.search_for_card_everywhere("Sivarla Soulbinder"):
+                health += 1
         if ability == "Charging Juggernaut":
             if card.get_attachments():
                 health += 1
@@ -6115,15 +6127,23 @@ class Player:
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if card.get_name() != "FINAL CARD":
-            if self.count_copies_in_play(card.get_name()) < 10:
+            limit = 10
+            if card.get_name() == "Cultist":
+                if self.search_for_card_everywhere("Sivarla Soulbinder"):
+                    limit = 2
+            if self.count_copies_in_play(card.get_name()) < limit:
                 self.add_card_to_planet(card, planet_num, already_exhausted=already_exhausted)
 
     def summon_token_at_hq(self, token_name, amount=1):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if card.get_name() != "FINAL CARD":
+            limit = 10
+            if card.get_name() == "Cultist":
+                if self.search_for_card_everywhere("Sivarla Soulbinder"):
+                    limit = 2
             for _ in range(amount):
-                if self.count_copies_in_play(card.get_name()) < 10:
+                if self.count_copies_in_play(card.get_name()) < limit:
                     self.add_to_hq(card)
 
     def remove_card_from_play(self, planet_num, card_pos):

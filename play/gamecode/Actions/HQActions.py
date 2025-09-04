@@ -306,6 +306,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Sivarla Soulbinder":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
                     elif ability == "Korporal Snagbrat":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -1584,6 +1591,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if can_continue:
                     player_being_hit.destroy_card_in_hq(unit_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Sivarla Soulbinder":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    self.chosen_first_card = True
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = -2
