@@ -40,6 +40,14 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_prey_on_the_weak[chosen_planet]:
             self.infest_planet(chosen_planet, primary_player)
             self.delete_interrupt()
+    elif current_interrupt == "Cajivak the Hateful":
+        card = self.preloaded_find_card("Cajivak the Hateful")
+        if primary_player.add_card_to_planet(card, chosen_planet) != -1:
+            primary_player.remove_card_name_from_hand("Cajivak the Hateful")
+            if primary_player.search_hand_for_card("Cajivak the Hateful"):
+                self.create_interrupt("Cajivak the Hateful", primary_player.name_player,
+                                      (int(primary_player.number), -1, -1))
+        self.delete_interrupt()
     elif current_interrupt == "Dodging Land Speeder":
         _, og_planet, og_pos = self.positions_of_units_interrupting[0]
         if abs(chosen_planet - og_planet) == 1:

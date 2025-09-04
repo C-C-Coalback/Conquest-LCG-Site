@@ -447,6 +447,11 @@ def chaos_cards_init():
                                                             " control no Cultist token, put a Cultist token into "
                                                             "play at your HQ.", "Wargear. Weapon. Slaanesh.",
                                    1, faction, "Loyal", 2, False, extra_health=1, extra_attack=1,
-                                   type_of_units_allowed_for_attachment="Army/Synapse/Token")
+                                   type_of_units_allowed_for_attachment="Army/Synapse/Token"),
+        CardClasses.ArmyCard("Cajivak the Hateful", "Interrupt: When damage equal to or greater than your warlord's "
+                                                    "remaining HP is assigned or moved to your warlord, either "
+                                                    "(choose one): put this unit into play from your hand at a planet,"
+                                                    " or discard this card from your hand to draw 2 cards.",
+                             "Warrior. Khorne.", 2, faction, "Loyal", 2, 2, 2, True)
     ]
     return chaos_card_array

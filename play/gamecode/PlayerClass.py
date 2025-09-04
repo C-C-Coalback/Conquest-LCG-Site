@@ -4767,6 +4767,12 @@ class Player:
             else:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
         if damage_on_card_after > damage_on_card_before:
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
+                if self.check_if_card_is_destroyed(planet_id, unit_id):
+                    if not self.check_if_already_have_interrupt("Cajivak the Hateful"):
+                        if self.search_hand_for_card("Cajivak the Hateful"):
+                            self.game.create_interrupt("Cajivak the Hateful", self.name_player,
+                                                       (int(self.number), -1, -1))
             if by_enemy_unit and not is_reassign:
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, i) == "Avenging Squad":
@@ -4937,6 +4943,12 @@ class Player:
                     if self.get_ability_given_pos(-2, unit_id) == "Fighting Company Daras":
                         self.increase_retaliate_given_pos_eop(-2, unit_id, 2)
         if total_that_can_be_blocked > 0:
+            if self.get_card_type_given_pos(-2, unit_id) == "Warlord":
+                if self.check_if_card_is_destroyed(-2, unit_id):
+                    if not self.check_if_already_have_interrupt("Cajivak the Hateful"):
+                        if self.search_hand_for_card("Cajivak the Hateful"):
+                            self.game.create_interrupt("Cajivak the Hateful", self.name_player,
+                                                       (int(self.number), -1, -1))
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)
             self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
@@ -5209,6 +5221,15 @@ class Player:
             if not self.check_if_control_faith():
                 return True
         return not self.check_damage_too_great_given_pos(planet_id, unit_id)
+
+    def resolve_moved_damage_to_pos(self, planet_id, unit_id, amount):
+        self.increase_damage_at_pos(planet_id, unit_id, amount)
+        if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
+            if self.check_if_card_is_destroyed(planet_id, unit_id):
+                if self.search_hand_for_card("Cajivak the Hateful"):
+                    if not self.check_if_already_have_interrupt("Cajivak the Hateful"):
+                        self.game.create_interrupt("Cajivak the Hateful", self.name_player,
+                                                   (int(self.number), -1, -1))
 
     def increase_damage_at_pos(self, planet_id, unit_id, amount):
         if planet_id == -2:

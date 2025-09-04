@@ -2231,7 +2231,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Soot-Blackened Axe":
         if planet_pos == self.misc_target_unit[0]:
             if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
-                player_owning_card.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                 original_player = self.p1
                 if self.misc_target_choice == "2":
                     original_player = self.p2

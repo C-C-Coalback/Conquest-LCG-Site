@@ -3208,6 +3208,20 @@ class Game:
                         else:
                             primary_player.add_resources(1)
                         self.choice_context = "Anshan opponent gains"
+                    elif self.choice_context == "Cajivak the Hateful Choice":
+                        if chosen_choice == "Draw 2":
+                            primary_player.discard_card_name_from_hand("Cajivak the Hateful")
+                            primary_player.draw_card()
+                            primary_player.draw_card()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            if primary_player.search_hand_for_card("Cajivak the Hateful"):
+                                self.create_interrupt("Cajivak the Hateful", primary_player.name_player,
+                                                      (int(primary_player.number), -1, -1))
+                            self.delete_interrupt()
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Access to the Black Library":
                         if not self.chosen_first_card:
                             self.misc_target_choice = chosen_choice
@@ -7021,7 +7035,7 @@ class Game:
                             if hurt_planet == planet_pos and hurt_pos != unit_pos:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                    primary_player.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                                    primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                                     self.amount_that_can_be_removed_by_shield[0] = \
                                         self.amount_that_can_be_removed_by_shield[0] - 1
                                     if self.amount_that_can_be_removed_by_shield[0] < 1:
@@ -7062,7 +7076,7 @@ class Game:
                                                                               planet_pos)
                             elif self.alt_shield_name == "Data Analyzer":
                                 if hurt_planet == planet_pos and unit_pos != hurt_pos:
-                                    primary_player.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                                    primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                     self.amount_that_can_be_removed_by_shield[0] = \
                                         self.amount_that_can_be_removed_by_shield[0] - 1
