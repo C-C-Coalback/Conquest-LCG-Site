@@ -412,6 +412,13 @@ def orks_cards_init():
                                                      " into play from your hand at your HQ. If this support is still "
                                                      "in play at the end of the phase, discard it and draw a card.",
                               "Tactic.", 0, faction, "Common", 2, False,
-                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.EventCard("Painboy Surjery", "Action: Target an Orks unit you control. Reveal the top card of your"
+                                                 " deck. If it's an eligible attachment, put it into play attached"
+                                                 " to this unit, otherwise deal it 1 damage and put the card at the"
+                                                 " bottom of your deck. Repeat until you reveal an eligible"
+                                                 " attachment or the unit is destroyed. Then shuffle your deck.",
+                              "Tactic.", 0, faction, "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return orks_card_array

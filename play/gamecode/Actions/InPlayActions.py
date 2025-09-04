@@ -2173,6 +2173,34 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Painboy Surjery":
+        if game_update_string[1] == primary_player.get_number():
+            if self.misc_target_unit == (-1, -1) or self.misc_target_unit == (planet_pos, unit_pos):
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                    if not primary_player.deck:
+                        self.action_cleanup()
+                    else:
+                        card_name = primary_player.deck[0]
+                        card = self.preloaded_find_card(card_name)
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        await self.send_update_message("Revealed a " + card.get_name())
+                        if card.get_card_type() == "Attachment":
+                            if not card.planet_attachment:
+                                if primary_player.attach_card(card, planet_pos, unit_pos):
+                                    del primary_player.deck[0]
+                                    self.action_cleanup()
+                                else:
+                                    primary_player.deck.append(primary_player.deck[0])
+                                    del primary_player.deck[0]
+                                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                            else:
+                                primary_player.deck.append(primary_player.deck[0])
+                                del primary_player.deck[0]
+                                primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                        else:
+                            primary_player.deck.append(primary_player.deck[0])
+                            del primary_player.deck[0]
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
     elif self.action_chosen == "Evangelizing Ships":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):

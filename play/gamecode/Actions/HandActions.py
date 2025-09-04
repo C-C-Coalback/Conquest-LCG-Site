@@ -407,6 +407,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Painboy Surjery":
+                        await self.send_update_message("For safety, you are required to click the "
+                                                       "unit again after every instance of damage.")
+                        self.misc_target_unit = (-1, -1)
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Noble Deed":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
