@@ -184,6 +184,20 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["1", "2"]
                         self.choice_context = "Brutal Cunning: amount of damage"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Everlasting Rage":
+                        if not primary_player.everlasting_rage_used:
+                            primary_player.everlasting_rage_used = True
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.action_chosen = ability
+                            self.choices_available = []
+                            copies_khorne = primary_player.count_units_with_trait("Khorne")
+                            if copies_khorne < 1:
+                                self.action_cleanup()
+                            else:
+                                for i in range(copies_khorne):
+                                    self.choices_available.append(str(i + 1))
+                                self.choice_context = "Everlasting Rage: Amount"
+                                self.name_player_making_choices = primary_player.name_player
                     elif ability == "Our Last Stand":
                         if not primary_player.our_last_stand_used:
                             primary_player.our_last_stand_used = True

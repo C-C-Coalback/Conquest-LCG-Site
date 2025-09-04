@@ -484,6 +484,11 @@ def chaos_cards_init():
                                                    " hand and draw a card instead. Then put it into play from your "
                                                    "discard pile attached to an eligible unit, if able.",
                                    "Blessing. Tzeentch.", 0, faction, "Common", 1, False, extra_health=1,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Everlasting Rage", "Action: Remove up to X damage from a Khorne unit, then this "
+                                                  "unit gets +X ATK for its next attack this phase. "
+                                                  "X is the number of Khorne units you control. (Max 1 per round.)",
+                              "Tactic. Khorne.", 2, faction, "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return chaos_card_array

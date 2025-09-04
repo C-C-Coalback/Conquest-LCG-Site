@@ -1591,6 +1591,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if can_continue:
                     player_being_hit.destroy_card_in_hq(unit_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Everlasting Rage":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    x_value = int(self.misc_target_choice)
+                    damage_on_unit = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                    if damage_on_unit > 0:
+                        damage_to_remove = min(damage_on_unit, x_value)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove, healing=True)
+                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, x_value,
+                                                                      expiration="NEXT")
+                        self.action_cleanup()
     elif self.action_chosen == "Sivarla Soulbinder":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():

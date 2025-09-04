@@ -3290,6 +3290,10 @@ class Game:
                         self.resolving_search_box = False
                         self.reset_choices_available()
                         self.delete_reaction()
+                    elif self.choice_context == "Everlasting Rage: Amount":
+                        self.misc_target_choice = chosen_choice
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Anshan opponent gains":
                         if chosen_choice == "Draw 1 card":
                             secondary_player.draw_card()
@@ -9625,6 +9629,8 @@ class Game:
         self.p2.accept_any_challenge_used = False
         self.p1.death_serves_used = False
         self.p2.death_serves_used = False
+        self.p1.everlasting_rage_used = False
+        self.p2.everlasting_rage_used = False
         self.p1.our_last_stand_used = False
         self.p2.our_last_stand_used = False
         self.p1.our_last_stand_bonus_active = False

@@ -1618,6 +1618,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+    elif self.action_chosen == "Everlasting Rage":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    x_value = int(self.misc_target_choice)
+                    damage_on_unit = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                    if damage_on_unit > 0:
+                        damage_to_remove = min(damage_on_unit, x_value)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove, healing=True)
+                        primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, x_value,
+                                                                      expiration="NEXT")
+                        self.action_cleanup()
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

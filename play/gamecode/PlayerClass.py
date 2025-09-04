@@ -157,6 +157,7 @@ class Player:
         self.defensive_protocols_active = False
         self.death_serves_used = False
         self.our_last_stand_used = False
+        self.everlasting_rage_used = False
         self.our_last_stand_bonus_active = False
         self.highest_death_serves_value = 0
         self.highest_cost_invasion_site = 0
@@ -354,6 +355,17 @@ class Player:
         if card_string != self.last_hand_string or force:
             self.last_hand_string = card_string
             await self.game.send_update_message(card_string)
+
+    def count_units_with_trait(self, trait):
+        copies = 0
+        for i in range(len(self.headquarters)):
+            if self.check_for_trait_given_pos(-2, i, trait):
+                copies += 1
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.check_for_trait_given_pos(i, j, trait):
+                    copies += 1
+        return copies
 
     def search_triggered_interrupts_enemy_discard(self):
         interrupts = []
