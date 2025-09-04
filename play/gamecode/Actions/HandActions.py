@@ -121,6 +121,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Breach and Clear":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
+                    elif ability == "Kwik' Konstruckshun":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Clash of Wings":
                         warlord_pla, _ = primary_player.get_location_of_warlord()
                         if warlord_pla != -2 and warlord_pla != -1:
@@ -1074,9 +1077,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 self.card_type_of_selected_card_in_hand = "Army"
+    elif self.action_chosen == "Kwik' Konstruckshun":
+        card = primary_player.get_card_in_hand(hand_pos)
+        if card.get_card_type() == "Support" and card.get_cost() < 4:
+            if primary_player.add_to_hq(card):
+                primary_player.remove_card_from_hand(hand_pos)
+                last_el_index = len(primary_player.headquarters) - 1
+                primary_player.headquarters[last_el_index].quick_construct = True
+                self.action_cleanup()
     elif self.action_chosen == "Crypt of Saint Camila":
         if not self.chosen_first_card:
-            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            card = primary_player.get_card_in_hand(hand_pos)
             if not card.check_for_a_trait("Elite") and card.get_faction() == "Space Marines":
                 if card.get_card_type() == "Army":
                     self.chosen_first_card = True

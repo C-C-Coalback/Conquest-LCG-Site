@@ -82,6 +82,11 @@ def apoka_errata_cards_init():
                              3, "Space Marines", "Signature", 3, 3, 1, False, unstoppable=True),
         CardClasses.ArmyCard("Commander Bravestorm", "Reaction: After you attach a non-Drone attachment to a "
                                                      "unit at this planet, draw a card.", "Soldier. Pilot. Shas'o.",
-                             3, "Tau", "Loyal", 2, 4, 1, False)
+                             3, "Tau", "Loyal", 2, 4, 1, False),
+        CardClasses.EventCard("Kwik' Konstruckshun", "Combat Action: Put an Orks support with printed cost 3 or lower"
+                                                     " into play from your hand at your HQ. If this support is still "
+                                                     "in play at the end of the phase, discard it and draw a card.",
+                              "Tactic.", 0, "Orks", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return apoka_errata_cards_array

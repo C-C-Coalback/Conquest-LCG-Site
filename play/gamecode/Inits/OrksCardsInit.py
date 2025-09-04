@@ -407,6 +407,11 @@ def orks_cards_init():
                                                        "exhaust this support to deal 1 damage to an enemy "
                                                        "non-warlord unit at the same planet. If this support "
                                                        "was already exhausted, ready it instead.", "Artillery.",
-                                1, faction, "Common", False)
+                                1, faction, "Common", False),
+        CardClasses.EventCard("Kwik' Konstruckshun", "Combat Action: Put an Orks support with printed cost 3 or lower"
+                                                     " into play from your hand at your HQ. If this support is still "
+                                                     "in play at the end of the phase, discard it and draw a card.",
+                              "Tactic.", 0, faction, "Common", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return orks_card_array

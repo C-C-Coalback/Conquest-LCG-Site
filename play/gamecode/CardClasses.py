@@ -93,6 +93,7 @@ class Card:
         self.cannot_ready_hq_phase = False
         self.return_to_hand_eor = False
         self.yvraine_active = False
+        self.quick_construct = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
