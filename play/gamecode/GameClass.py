@@ -9578,10 +9578,10 @@ class Game:
     def take_control_of_card(self, primary_player, secondary_player, planet_pos, unit_pos):
         if planet_pos == -2:
             primary_player.headquarters.append(secondary_player.headquarters[unit_pos])
-            del secondary_player.headquarters[unit_pos]
+            secondary_player.remove_card_from_hq(unit_pos)
             return None
         primary_player.cards_in_play[planet_pos + 1].append(secondary_player.cards_in_play[planet_pos + 1][unit_pos])
-        del secondary_player.cards_in_play[planet_pos + 1][unit_pos]
+        secondary_player.remove_card_from_play(planet_pos, unit_pos)
         return None
 
     async def reset_values_for_new_round(self):

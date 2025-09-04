@@ -5946,6 +5946,11 @@ class Player:
                 if not other_player.check_if_already_have_reaction("Berzerker Warriors"):
                     self.game.create_interrupt("Berzerker Warriors", other_player.name_player,
                                                (int(other_player.number), -1, -1))
+            if self.get_card_type_given_pos(planet_num, card_pos) == "Army":
+                for i in range(len(other_player.cards_in_play[planet_num + 1])):
+                    if other_player.get_ability_given_pos(planet_num, i) == "Mindless Pain Addict":
+                        self.game.create_reaction("Mindless Pain Addict", self.name_player,
+                                                  (int(other_player.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":
@@ -6572,6 +6577,8 @@ class Player:
             if self.get_all_attachments_at_pos(planet_id, unit_id):
                 if self.game.combat_round_number < 2:
                     return False
+        if self.get_ability_given_pos(planet_id, unit_id) == "Mindless Pain Addict":
+            return False
         if self.game.imperial_blockades_active[planet_id] > 0:
             other_player = self.get_other_player()
             resources_to_spend = self.game.imperial_blockades_active[planet_id]
@@ -6670,6 +6677,8 @@ class Player:
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_ability_given_pos(planet_id, unit_id) == "Growing Tide":
+                return False
+            if self.get_ability_given_pos(planet_id, unit_id) == "Mindless Pain Addict":
                 return False
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
             enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,

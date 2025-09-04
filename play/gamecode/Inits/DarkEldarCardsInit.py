@@ -405,6 +405,11 @@ def dark_eldar_cards_init():
                                                      "this planet by 1.\n"
                                                      "Forced Reaction: After you play a Torture card, deal 1 damage"
                                                      " to a target non-warlord unit at this planet.",
-                             "Scholar. Haemonculus.", 1, faction, "Loyal", 1, 1, 1, False)
+                             "Scholar. Haemonculus.", 1, faction, "Loyal", 1, 1, 1, False),
+        CardClasses.ArmyCard("Mindless Pain Addict", "Cannot retreat or be Routed.\n"
+                                                     "Reaction: After an army unit you control at this planet is"
+                                                     " destroyed, take control of this unit. "
+                                                     "Any player may use this ability.", "Creature. Abomination.",
+                             2, faction, "Common", 4, 4, 0, False)
     ]
     return dark_eldar_cards_array

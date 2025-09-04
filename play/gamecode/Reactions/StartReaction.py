@@ -1083,6 +1083,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Champion of Khorne":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.last_planet_checked_for_battle)
             self.delete_reaction()
+        elif current_reaction == "Mindless Pain Addict":
+            self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "War Walker Squadron":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             attachments = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()
