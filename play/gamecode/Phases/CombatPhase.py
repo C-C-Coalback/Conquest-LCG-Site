@@ -242,7 +242,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if primary_player.get_cost_given_pos(
                                             self.attacker_planet, self.attacker_position) < 3 \
                                             and primary_player.get_card_type_given_pos(
-                                            self.attacker_planet, self.attacker_position) == "Army":
+                                        self.attacker_planet, self.attacker_position) == "Army":
                                         shadow_field = True
                                     await self.aoe_routine(primary_player, secondary_player, chosen_planet,
                                                            amount_aoe, faction=faction,
@@ -414,7 +414,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         else:
                             card = self.preloaded_find_card(
                                 player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
-                        if (not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or\
+                        if (not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or \
                                 player_receiving_attachment.name_player != player.name_player:
                             if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
                                                                        not_own_attachment=not_own_att):
@@ -553,13 +553,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if self.misc_counter < 1:
                                         for i in range(len(self.misc_misc)):
                                             planet_pos, unit_pos = self.misc_misc[i]
-                                            can_shield = not primary_player.get_armorbane_given_pos(self.attacker_planet,
-                                                                                                    self.attacker_position)
+                                            can_shield = not primary_player.get_armorbane_given_pos(
+                                                self.attacker_planet,
+                                                self.attacker_position)
                                             shadow_field = False
                                             if primary_player.get_cost_given_pos(
                                                     self.attacker_planet, self.attacker_position) < 3 \
                                                     and primary_player.get_card_type_given_pos(
-                                                    self.attacker_planet, self.attacker_position) == "Army":
+                                                self.attacker_planet, self.attacker_position) == "Army":
                                                 shadow_field = True
                                             preventable = True
                                             if primary_player.search_attachments_at_pos(
@@ -702,7 +703,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                             for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
-                                if other_player.attachments_at_planet[self.attacker_planet][i]\
+                                if other_player.attachments_at_planet[self.attacker_planet][i] \
                                         .get_ability() == "Repulsor Minefield":
                                     player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
                                                                 by_enemy_unit=False)
@@ -738,7 +739,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.flamers_damage_active = True
                                 self.id_of_the_active_flamer = \
                                     player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
-                                    salamanders_flamers_id_number
+                                        salamanders_flamers_id_number
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
@@ -859,15 +860,15 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             exa = secondary_player.search_card_at_planet(self.defender_planet, "Dire Avenger Exarch")
                             print("Found exarch", exa)
                             is_ready_lych = (secondary_player.get_ability_given_pos(
-                                    self.defender_planet, self.defender_position) != "Lychguard Sentinel" or
-                                not secondary_player.get_ready_given_pos(
-                                    self.defender_planet, self.defender_position))
+                                self.defender_planet, self.defender_position) != "Lychguard Sentinel" or
+                                             not secondary_player.get_ready_given_pos(
+                                                 self.defender_planet, self.defender_position))
                             is_fl = secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz"
+                                self.defender_planet, self.defender_position) != "Front Line 'Ard Boyz"
                             is_exa_can = not (exa and secondary_player.check_for_trait_given_pos(
-                                        self.defender_planet, self.defender_position, "Warrior"))
+                                self.defender_planet, self.defender_position, "Warrior"))
                             is_gene_hybrid = secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) != "Genestealer Hybrids"
+                                self.defender_planet, self.defender_position) != "Genestealer Hybrids"
                             print(is_ready_lych, is_fl, is_exa_can)
                             if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
                                     .get_ability() == "Honored Librarian":
@@ -917,6 +918,25 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                             self.defender_position,
                                                                                             "red")
+                            if can_continue and self.may_move_defender:
+                                ready_runt = False
+                                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                                    if secondary_player.get_ready_given_pos(self.defender_planet, i) and \
+                                            secondary_player.check_for_trait_given_pos(self.defender_planet, i, "Runt"):
+                                        ready_runt = True
+                                if ready_runt:
+                                    if secondary_player.search_hand_for_card(
+                                            "Runts to the Front") and secondary_player.resources > 0:
+                                        can_continue = False
+                                        self.create_reaction("Runts to the Front", secondary_player.name_player,
+                                                             (int(secondary_player.number),
+                                                              self.defender_planet, -1))
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
+                                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                    self.defender_position,
+                                                                                    "red")
                             if can_continue and self.may_move_defender:
                                 for i in range(len(secondary_player.cards_in_reserve[self.defender_planet])):
                                     if secondary_player.cards_in_reserve[self.defender_planet][i].get_ability() \
@@ -981,7 +1001,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 elif secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position
                                 ) == "Dodging Land Speeder" and secondary_player.get_ready_given_pos(
-                                        self.defender_planet, self.defender_position
+                                    self.defender_planet, self.defender_position
                                 ):
                                     can_continue = False
                                     await self.send_update_message(
@@ -1053,12 +1073,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         == "Storming Librarian":
                                     value_storming_librarion = primary_player.cards_in_play[self.attacker_planet + 1][
                                         self.attacker_position].storming_librarian_id_number
-                                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].\
+                                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]. \
                                         hit_by_which_storming_librarians.append(value_storming_librarion)
                                 for i in range(
                                         len(primary_player.
-                                            cards_in_play[self.attacker_planet + 1][self.attacker_position]
-                                            .get_attachments())):
+                                                    cards_in_play[self.attacker_planet + 1][self.attacker_position]
+                                                    .get_attachments())):
                                     if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position] \
                                             .get_attachments()[i].get_ability() == "Hidden Strike Chainsword":
                                         if secondary_player.get_card_type_given_pos(
@@ -1129,8 +1149,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                     self.defender_planet, self.defender_position) == "Warlord":
                                                 attack_value = attack_value * 2
                                             elif primary_player.name_player in secondary_player.cards_in_play[
-                                                    self.defender_planet + 1][
-                                                    self.defender_position].hit_by_frenzied_wulfen_names:
+                                                self.defender_planet + 1][
+                                                self.defender_position].hit_by_frenzied_wulfen_names:
                                                 attack_value = attack_value * 2
                                 if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                               self.defender_position, "Vehicle"):
@@ -1195,7 +1215,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if primary_player.get_cost_given_pos(
                                         self.attacker_planet, self.attacker_position) < 3 \
                                         and primary_player.get_card_type_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Army":
+                                    self.attacker_planet, self.attacker_position) == "Army":
                                     shadow_field = True
                                 preventable = True
                                 if primary_player.search_attachments_at_pos(

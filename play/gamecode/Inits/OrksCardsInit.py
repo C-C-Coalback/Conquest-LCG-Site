@@ -419,6 +419,10 @@ def orks_cards_init():
                                                  " bottom of your deck. Repeat until you reveal an eligible"
                                                  " attachment or the unit is destroyed. Then shuffle your deck.",
                               "Tactic.", 0, faction, "Loyal", 2, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.EventCard("Runts to the Front", "Interrupt: When an enemy unit would declare an attack against a "
+                                                    "unit you control, declare a ready Runt unit you control at "
+                                                    "the same planet as the defender instead.", "Tactic. Snotling.",
+                              1, faction, "Common", 1, False)
     ]
     return orks_card_array

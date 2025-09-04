@@ -903,6 +903,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Thunderwolf Cavalry":
             if not primary_player.cards_in_play[planet_pos + 1]:
                 self.delete_reaction()
+        elif current_reaction == "Runts to the Front":
+            primary_player.spend_resources(1)
+            primary_player.discard_card_name_from_hand("Runts to the Front")
         elif current_reaction == "Deathwing Interceders":
             _, current_planet, current_unit = self.last_defender_position
             i = 0

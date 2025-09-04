@@ -7375,7 +7375,8 @@ class Game:
                         if self.misc_counter > 0:
                             secondary_player.assign_damage_to_pos(pla, pos, self.misc_counter)
                     if self.reactions_needing_resolving[0] == "Fire Warrior Elite" or \
-                            self.reactions_needing_resolving[0] == "Deathwing Interceders":
+                            self.reactions_needing_resolving[0] == "Deathwing Interceders" or \
+                            self.reactions_needing_resolving[0] == "Runts to the Front":
                         self.may_move_defender = False
                         _, current_planet, current_unit = self.last_defender_position
                         last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),

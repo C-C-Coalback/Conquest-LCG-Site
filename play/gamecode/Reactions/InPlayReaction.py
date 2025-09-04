@@ -1144,6 +1144,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
                 else:
                     self.delete_reaction()
+        elif current_reaction == "Runts to the Front":
+            _, current_planet, current_unit = self.last_defender_position
+            if current_planet == planet_pos:
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos) and\
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Runt"):
+                    primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
+                    self.may_move_defender = False
+                    print("Calling defender in the funny way")
+                    new_game_update_string = ["IN_PLAY", primary_player.get_number(), str(planet_pos),
+                                              str(unit_pos)]
+                    await CombatPhase.update_game_event_combat_section(
+                        self, secondary_player.name_player, new_game_update_string)
+                    self.delete_reaction()
         elif current_reaction == "Impulsive Loota In Play":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
