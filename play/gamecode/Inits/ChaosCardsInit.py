@@ -462,6 +462,11 @@ def chaos_cards_init():
         CardClasses.ArmyCard("Neurotic Obliterator", "This unit gets +1 ATK and +1 HP for each attachment on it.\n"
                                                      "Reaction: After this unit is chosen as a defender, exhaust a "
                                                      "Weapon attachment on it to deal 1 damage to the attacker.",
-                             "Warrior.", 3, faction, "Common", 1, 5, 1, False)
+                             "Warrior.", 3, faction, "Common", 1, 5, 1, False),
+        CardClasses.ArmyCard("Raging Daemonhost", "Interrupt: When this card leaves play, attach it to an army unit you"
+                                                  " control at the same planet instead as an attachment with the text: "
+                                                  "\"Attach to a non-Daemon, non-Vehicle army unit. "
+                                                  "Attached unit gets +3 ATK, +3 HP and the Khorne trait.\"",
+                             "Daemon. Cultist. Khorne.", 4, faction, "Common", 3, 3, 0, False)
     ]
     return chaos_card_array

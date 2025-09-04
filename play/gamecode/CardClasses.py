@@ -257,6 +257,8 @@ class Card:
                     extra_traits += "Warrior. Psyker."
             if self.attachments[i].get_ability() == "Great Iron Gob":
                 extra_traits += "Nob."
+            if self.attachments[i].get_ability() == "Raging Daemonhost":
+                extra_traits += "Khorne."
         return trait_to_find in (self.traits + self.extra_traits_eop + self.extra_traits_eor + extra_traits)
 
     def get_image_name(self):

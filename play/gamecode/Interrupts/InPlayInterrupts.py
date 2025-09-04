@@ -2,6 +2,7 @@ import copy
 
 from .. import FindCard
 from ..Phases import DeployPhase, CombatPhase
+from .. import CardClasses
 
 
 async def resolve_in_play_interrupt(self, name, game_update_string, primary_player, secondary_player):
@@ -61,6 +62,21 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
                     self.delete_interrupt()
+    elif current_interrupt == "Raging Daemonhost":
+        if self.positions_of_units_interrupting[0][1] == planet_pos:
+            card = CardClasses.AttachmentCard(
+                "Raging Daemonhost", "Attach to a non-Daemon, non-Vehicle army unit. \n"
+                                     "Attached unit gets +3 ATK, +3 HP and the Khorne trait.",
+                "Daemon. Cultist. Khorne.", 4, "Chaos", "Common", 0, False,
+                type_of_units_allowed_for_attachment="Army", extra_attack=3, extra_health=3
+            )
+            not_own_attachment = False
+            if player_owning_card.number != primary_player.number:
+                not_own_attachment = True
+            if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+                self.delete_interrupt()
+                if "Raging Daemonhost" in primary_player.discard:
+                    primary_player.discard.remove("Raging Daemonhost")
     elif current_interrupt == "Truck Wreck Launcha":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":

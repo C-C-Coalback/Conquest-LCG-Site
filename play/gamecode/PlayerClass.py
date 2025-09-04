@@ -1716,6 +1716,9 @@ class Player:
             else:
                 print("Wrong traits.")
                 return False
+        if card.get_ability() == "Raging Daemonhost":
+            if "Vehicle" in target_card.get_traits() or "Daemon" in target_card.get_traits():
+                return False
         if card.forbidden_traits in target_card.get_traits():
             return False
         if card.unit_must_be_unique:
@@ -6220,6 +6223,8 @@ class Player:
             self.game.create_interrupt("The Sun Prince", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
             self.game.create_interrupt("Vanguard Soldiers", self.name_player, (int(self.number), planet_num, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Raging Daemonhost":
+            self.game.create_interrupt("Raging Daemonhost", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Growing Tide":
             if self.game.round_number == planet_num:
                 self.game.create_interrupt("Growing Tide", self.name_player, (int(self.number), planet_num, -1))
