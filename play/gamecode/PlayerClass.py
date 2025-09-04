@@ -1497,6 +1497,12 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Advocator of Blood":
             self.game.create_reaction("Advocator of Blood", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.check_for_trait_given_pos(-2, last_element_index, "Khorne") and \
+                self.get_card_type_given_pos(-2, last_element_index) == "Army":
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Cult of Khorne":
+                    self.game.create_reaction("Cult of Khorne", self.name_player,
+                                              (int(self.number), -2, i))
         if self.get_card_type_given_pos(-2, last_element_index) == "Support":
             if self.search_card_in_hq("Citadel of Vamii"):
                 self.game.create_reaction("Citadel of Vamii", self.name_player,
@@ -1954,6 +1960,12 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
                                                                                    last_element_index))
+        if self.check_for_trait_given_pos(position, last_element_index, "Khorne") and \
+                self.get_card_type_given_pos(position, last_element_index) == "Army":
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Cult of Khorne":
+                    self.game.create_reaction("Cult of Khorne", self.name_player,
+                                              (int(self.number), -2, i))
         if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
             self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
                 self.game.current_flamers_id

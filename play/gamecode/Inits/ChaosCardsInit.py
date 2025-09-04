@@ -489,6 +489,12 @@ def chaos_cards_init():
                                                   "unit gets +X ATK for its next attack this phase. "
                                                   "X is the number of Khorne units you control. (Max 1 per round.)",
                               "Tactic. Khorne.", 2, faction, "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Cult of Khorne", "Interrupt: When a Khorne army unit enters play under your control,"
+                                                  " move 1 damage from a unit to this support. Then if this support"
+                                                  " has 2 damage on it, attach it to a unit as a Wargear attachment "
+                                                  "with the text: "
+                                                  "\"Attach to an army unit. Attached unit gets +2 ATK.\".",
+                                "Cult. Khorne.", 1, faction, "Loyal", False)
     ]
     return chaos_card_array

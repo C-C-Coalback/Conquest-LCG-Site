@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import CombatPhase
+from .. import CardClasses
 
 
 async def resolve_in_play_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -1393,6 +1394,31 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if "Dynastic Weaponry" in primary_player.discard:
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, position_of_unit))
+                    self.delete_reaction()
+        elif current_reaction == "Cult of Khorne Attachment":
+            card = CardClasses.AttachmentCard(
+                "Cult of Khorne", "Attach to an army unit. Attached unit gets +2 ATK.",
+                "Wargear.", 1, "Chaos", "Loyal", 0, False, type_of_units_allowed_for_attachment="Army", extra_attack=2
+            )
+            not_own_attachment = False
+            if player_owning_card.get_number() != primary_player.get_number():
+                not_own_attachment = True
+            if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                del primary_player.headquarters[og_pos]
+                primary_player.adjust_own_reactions(og_pla, og_pos)
+                self.delete_reaction()
+        elif current_reaction == "Cult of Khorne":
+            if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                if og_pla == -2:
+                    primary_player.headquarters[og_pos].increase_damage(1)
+                    if primary_player.headquarters[og_pos].get_damage() > 1:
+                        self.reactions_needing_resolving[0] = "Cult of Khorne Attachment"
+                    else:
+                        self.delete_reaction()
+                else:
                     self.delete_reaction()
         elif current_reaction == "Heavy Flamer Retributor":
             if secondary_player.get_number() == game_update_string[1]:
