@@ -410,6 +410,12 @@ def dark_eldar_cards_init():
                                                      "Reaction: After an army unit you control at this planet is"
                                                      " destroyed, take control of this unit. "
                                                      "Any player may use this ability.", "Creature. Abomination.",
-                             2, faction, "Common", 4, 4, 0, False)
+                             2, faction, "Common", 4, 4, 0, False),
+        CardClasses.ArmyCard("Pain Crafter", "Reaction: After you play a Dark Eldar event card, exhaust this unit to "
+                                             "attach that event card to a Dark Eldar unit as a Wargear attachment"
+                                             " with the text "
+                                             "\"Attach to an army unit. Attached unit gets +1 ATK and +1 HP.\". "
+                                             "(Limit once per phase.)", "Scholar. Haemonculus.",
+                             2, faction, "Loyal", 1, 2, 1, False)
     ]
     return dark_eldar_cards_array

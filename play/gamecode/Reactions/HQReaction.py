@@ -220,6 +220,35 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 player_being_hit.destroy_card_in_hq(unit_pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+    elif current_reaction == "Pain Crafter":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.number:
+                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Pain Crafter":
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.chosen_first_card = True
+        else:
+            card_name = ""
+            for i in range(len(primary_player.discard)):
+                card = self.preloaded_find_card(primary_player.discard[i])
+                if card.get_card_type() == "Event" and card.get_faction() == "Dark Eldar":
+                    card_name = card.get_name()
+            if card_name:
+                card = CardClasses.AttachmentCard(
+                    card_name, "Attach to an army unit. Attached unit gets +1 ATK and +1 HP.",
+                    "Wargear.", 1, "Dark Eldar", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                    extra_attack=1, extra_health=1
+                )
+                not_own_attachment = False
+                if player_owning_card.get_number() != primary_player.get_number():
+                    not_own_attachment = True
+                if player_owning_card.attach_card(card, planet_pos, unit_pos,
+                                                  not_own_attachment=not_own_attachment):
+                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    primary_player.discard.remove(card_name)
+                    self.delete_reaction()
     elif current_reaction == "Cult of Khorne Attachment":
         card = CardClasses.AttachmentCard(
             "Cult of Khorne", "Attach to an army unit. Attached unit gets +2 ATK.",

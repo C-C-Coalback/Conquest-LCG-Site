@@ -1080,6 +1080,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Pain Crafter":
+            self.chosen_first_card = False
+            await self.send_update_message("Choose Pain Crafter to exhaust.")
         elif current_reaction == "Champion of Khorne":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.last_planet_checked_for_battle)
             self.delete_reaction()

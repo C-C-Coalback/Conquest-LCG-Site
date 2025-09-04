@@ -2095,7 +2095,7 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].set_once_per_game_used(new_val)
         return None
 
-    def set_once_per_phase_used_given_pos(self, planet_id, unit_id, new_val):
+    def set_once_per_phase_used_given_pos(self, planet_id, unit_id, new_val=True):
         if planet_id == -2:
             self.headquarters[unit_id].set_once_per_phase_used(new_val)
             return None
@@ -2201,9 +2201,14 @@ class Player:
 
     async def dark_eldar_event_played(self):
         self.reset_reaction_beasthunter_wyches()
+        pain_crafter = False
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Beasthunter Wyches":
                 self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Pain Crafter":
+                if self.get_ready_given_pos(-2, i):
+                    if not self.get_once_per_phase_used_given_pos(-2, i):
+                        pain_crafter = True
             for attach in self.headquarters[i].get_attachments():
                 if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
                     self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), -2, i))
@@ -2211,9 +2216,15 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Beasthunter Wyches":
                     self.game.create_reaction("Beasthunter Wyches", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Pain Crafter":
+                    if self.get_ready_given_pos(i, j):
+                        if not self.get_once_per_phase_used_given_pos(i, j):
+                            pain_crafter = True
                 for attach in self.cards_in_play[i + 1][j].get_attachments():
                     if attach.get_ability() == "Hypex Injector" and attach.name_owner == self.name_player:
                         self.game.create_reaction("Hypex Injector", self.name_player, (int(self.number), i, j))
+        if pain_crafter:
+            self.game.create_reaction("Pain Crafter", self.name_player, (int(self.number), -1, -1))
         other_player = self.game.p1
         if other_player.name_player == self.name_player:
             other_player = self.game.p2
