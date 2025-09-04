@@ -702,16 +702,38 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 other_player = self.p1
                             player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
-                            for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
-                                if other_player.attachments_at_planet[self.attacker_planet][i] \
-                                        .get_ability() == "Repulsor Minefield":
-                                    player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
-                                                                by_enemy_unit=False)
+                            if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) != "Army":
+                                for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
+                                    if other_player.attachments_at_planet[self.attacker_planet][i] \
+                                            .get_ability() == "Repulsor Minefield":
+                                        player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
+                                                                    by_enemy_unit=False)
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     in self.units_move_hq_attack:
                                 self.unit_will_move_after_attack = True
                                 player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     ethereal_movement_active = True
+                            if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) != "Warlord":
+                                i = 0
+                                while i < len(player.attachments_at_planet[self.attacker_planet]):
+                                    if player.attachments_at_planet[self.attacker_planet][i] \
+                                            .get_ability() == "Improvised Minefield":
+                                        player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 3,
+                                                                    by_enemy_unit=False)
+                                        player.add_card_to_discard("Improvised Minefield")
+                                        del player.attachments_at_planet[self.attacker_planet][i]
+                                        i = i - 1
+                                    i = i + 1
+                                i = 0
+                                while i < len(other_player.attachments_at_planet[self.attacker_planet]):
+                                    if other_player.attachments_at_planet[self.attacker_planet][i] \
+                                            .get_ability() == "Improvised Minefield":
+                                        player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 3,
+                                                                    by_enemy_unit=False)
+                                        other_player.add_card_to_discard("Improvised Minefield")
+                                        del other_player.attachments_at_planet[self.attacker_planet][i]
+                                        i = i - 1
+                                    i = i + 1
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,

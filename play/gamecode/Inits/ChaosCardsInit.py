@@ -472,6 +472,11 @@ def chaos_cards_init():
                                                    " Your Cultist token limit is set to 2.\n"
                                                    "Combat Action: Move a Cultist unit you control to a target planet. "
                                                    "(Limit once per phase.)", "Daemon. Slaanesh.",
-                             2, faction, "Loyal", 1, 4, 1, False, action_in_play=True, allowed_phases_in_play="COMBAT")
+                             2, faction, "Loyal", 1, 4, 1, False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.AttachmentCard("Improvised Minefield", "Deep Strike (1). Attach to a planet.\n"
+                                                           "Forced Reaction: After a non-warlord unit is declared as"
+                                                           " an attacker at this planet, deal 3 damage to it and "
+                                                           "discard this card.", "Location.",
+                                   2, faction, "Common", 1, False, deepstrike=1, planet_attachment=True)
     ]
     return chaos_card_array
