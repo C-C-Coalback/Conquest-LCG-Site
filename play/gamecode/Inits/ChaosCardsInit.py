@@ -477,6 +477,13 @@ def chaos_cards_init():
                                                            "Forced Reaction: After a non-warlord unit is declared as"
                                                            " an attacker at this planet, deal 3 damage to it and "
                                                            "discard this card.", "Location.",
-                                   2, faction, "Common", 1, False, deepstrike=1, planet_attachment=True)
+                                   2, faction, "Common", 1, False, deepstrike=1, planet_attachment=True),
+        CardClasses.AttachmentCard("Scrying Pool", "Attach to an army unit. Attached unit gets +1 HP.\n"
+                                                   "Interrupt: When you would discard a card from your hand as a result"
+                                                   " of an opponent's triggered ability, discard this card from your"
+                                                   " hand and draw a card instead. Then put it into play from your "
+                                                   "discard pile attached to an eligible unit, if able.",
+                                   "Blessing. Tzeentch.", 0, faction, "Common", 1, False, extra_health=1,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return chaos_card_array

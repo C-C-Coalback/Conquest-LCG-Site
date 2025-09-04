@@ -358,6 +358,8 @@ class Player:
     def search_triggered_interrupts_enemy_discard(self):
         interrupts = []
         if self.game.interrupts_discard_enemy_allowed:
+            if self.search_hand_for_card("Scrying Pool"):
+                interrupts.append("Scrying Pool")
             if self.search_hand_for_card("Vale Tenndrac"):
                 interrupts.append("Vale Tenndrac")
             if self.search_hand_for_card("Blade of the Crimson Oath"):

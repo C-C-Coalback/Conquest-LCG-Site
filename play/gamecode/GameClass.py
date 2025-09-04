@@ -113,6 +113,7 @@ class Game:
         self.player_who_is_shielding = None
         self.planet_of_damaged_unit = None
         self.position_of_damaged_unit = None
+        self.discard_fully_prevented = False
         self.damage_on_unit_before_new_damage = None
         self.damage_on_units_list_before_new_damage = []
         self.mode = "Normal"
@@ -2927,6 +2928,14 @@ class Game:
                             self.interrupts_discard_enemy_allowed = False
                             await self.complete_enemy_discard(primary_player, secondary_player)
                             self.interrupts_discard_enemy_allowed = True
+                        elif chosen_choice == "Scrying Pool":
+                            primary_player.discard_card_name_from_hand("Scrying Pool")
+                            primary_player.draw_card()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.name_player_making_choices = primary_player.name_player
+                            self.interrupting_discard_effect_active = "Scrying Pool"
+                            await self.send_update_message("Choose target for Scrying Pool.")
                         elif chosen_choice == "Hjorvath Coldstorm":
                             self.interrupting_discard_effect_active = "Hjorvath Coldstorm"
                             self.chosen_first_card = False
@@ -5060,24 +5069,31 @@ class Game:
     async def complete_enemy_discard(self, secondary_player, primary_player):
         effect, number = self.stored_discard_and_target[0]
         if effect == "Barlus":
-            secondary_player.discard_card_at_random()
+            if not self.discard_fully_prevented:
+                secondary_player.discard_card_at_random()
             await self.resolve_battle_conclusion("", [])
         elif effect == "Murder of Razorwings":
-            secondary_player.discard_card_at_random()
+            if not self.discard_fully_prevented:
+                secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif effect == "Pact of the Haemonculi":
-            secondary_player.discard_card_at_random()
+            if not self.discard_fully_prevented:
+                secondary_player.discard_card_at_random()
             primary_player.draw_card()
             primary_player.draw_card()
             self.card_pos_to_deploy = -1
             self.action_cleanup()
             await primary_player.dark_eldar_event_played()
         elif effect == "Visions of Agony":
-            self.choices_available = secondary_player.cards
-            self.choice_context = "Visions of Agony Discard:"
-            self.name_player_making_choices = primary_player.name_player
-            self.resolving_search_box = True
+            if not self.discard_fully_prevented:
+                self.choices_available = secondary_player.cards
+                self.choice_context = "Visions of Agony Discard:"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                self.action_cleanup()
+                await primary_player.dark_eldar_event_played()
         del self.stored_discard_and_target[0]
 
     async def resolve_battle_ability_routine(self, name, game_update_string):
@@ -8719,6 +8735,42 @@ class Game:
                                     self.interrupts_discard_enemy_allowed = False
                                     await self.complete_enemy_discard(primary_player, secondary_player)
                                     self.interrupts_discard_enemy_allowed = True
+            elif self.interrupting_discard_effect_active == "Scrying Pool":
+                if len(game_update_string) == 1:
+                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                        self.interrupts_discard_enemy_allowed = False
+                        self.discard_fully_prevented = True
+                        await self.complete_enemy_discard(primary_player, secondary_player)
+                        self.discard_fully_prevented = False
+                        self.interrupts_discard_enemy_allowed = True
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        card = self.preloaded_find_card("Scrying Pool")
+                        if player_owning_card.attach_card(card, -2, int(game_update_string[2])):
+                            primary_player.discard.remove("Scrying Pool")
+                            self.interrupting_discard_effect_active = False
+                            self.interrupts_discard_enemy_allowed = False
+                            self.discard_fully_prevented = True
+                            await self.complete_enemy_discard(primary_player, secondary_player)
+                            self.discard_fully_prevented = False
+                            self.interrupts_discard_enemy_allowed = True
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        player_owning_card = self.p1
+                        if game_update_string[1] == "2":
+                            player_owning_card = self.p2
+                        card = self.preloaded_find_card("Scrying Pool")
+                        if player_owning_card.attach_card(card, int(game_update_string[2]), int(game_update_string[3])):
+                            primary_player.discard.remove("Scrying Pool")
+                            self.interrupting_discard_effect_active = False
+                            self.interrupts_discard_enemy_allowed = False
+                            self.discard_fully_prevented = True
+                            await self.complete_enemy_discard(primary_player, secondary_player)
+                            self.discard_fully_prevented = False
+                            self.interrupts_discard_enemy_allowed = True
             elif self.interrupting_discard_effect_active == "Hjorvath Coldstorm":
                 if not self.chosen_first_card:
                     if len(game_update_string) == 2:
