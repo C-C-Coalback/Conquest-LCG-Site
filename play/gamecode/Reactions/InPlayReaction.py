@@ -1141,7 +1141,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         self.choice_context = "Morkanaut Rekuperator Rally"
                         self.name_player_making_choices = primary_player.name_player
-                        self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                        self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
                 else:
                     self.delete_reaction()
         elif current_reaction == "Impulsive Loota In Play":
@@ -1152,7 +1152,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 == "Impulsive Loota":
                             cost = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
                             if primary_player.spend_resources(cost):
-                                last_el_index = primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                last_el_index = primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
                                 if last_el_index == -1:
                                     await self.send_update_message(
                                         "Could not Deep Strike the Impulsive Loota! Cancelling...")

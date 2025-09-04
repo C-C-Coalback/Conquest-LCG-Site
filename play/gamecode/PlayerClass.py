@@ -500,15 +500,15 @@ class Player:
             self.add_card_to_discard(self.cards_in_reserve[planet_id][0].get_name())
             del self.cards_in_reserve[planet_id][0]
 
-    def get_card_type_in_reserve(self, planet_id, unit_id):
-        if self.idden_base_active:
+    def get_card_type_in_reserve(self, planet_id, unit_id, in_play_card=False):
+        if self.idden_base_active and not in_play_card:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
             card = self.game.preloaded_find_card(card_name)
             return card.get_card_type()
         return self.cards_in_reserve[planet_id][unit_id].get_card_type()
 
-    def get_deepstrike_value_given_pos(self, planet_id, unit_id):
-        if self.idden_base_active:
+    def get_deepstrike_value_given_pos(self, planet_id, unit_id, in_play_card=False):
+        if self.idden_base_active and not in_play_card:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
             card = self.game.preloaded_find_card(card_name)
             ds_value = card.get_deepstrike_value()
@@ -546,8 +546,8 @@ class Player:
             ds_value = ds_value - 1
         return ds_value
 
-    def deepstrike_event(self, planet_id, unit_id):
-        if not self.idden_base_active:
+    def deepstrike_event(self, planet_id, unit_id, in_play_card=False):
+        if not self.idden_base_active and not in_play_card:
             ability = self.cards_in_reserve[planet_id][unit_id].get_name()
         else:
             ability = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
@@ -567,7 +567,7 @@ class Player:
             self.game.create_reaction("Burst Forth", self.name_player, (int(self.number), planet_id, -1))
         self.add_card_to_discard(ability)
         self.after_any_deepstrike(planet_id)
-        if not self.idden_base_active:
+        if not self.idden_base_active and not in_play_card:
             del self.cards_in_reserve[planet_id][unit_id]
         else:
             self.discard_attachments_from_card(planet_id, unit_id)
@@ -592,10 +592,10 @@ class Player:
     def belial_deepstrike(self, planet_id):
         self.after_any_deepstrike(planet_id)
 
-    def deepstrike_unit(self, planet_id, unit_id):
+    def deepstrike_unit(self, planet_id, unit_id, in_play_card=False):
         damage = 0
         ready = True
-        if not self.idden_base_active:
+        if not self.idden_base_active and not in_play_card:
             card = self.cards_in_reserve[planet_id][unit_id]
         else:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
@@ -605,7 +605,7 @@ class Player:
         if self.add_card_to_planet(card, planet_id, triggered_card_effect=False) != -1:
             self.after_any_deepstrike(planet_id)
             attachments = []
-            if not self.idden_base_active:
+            if not self.idden_base_active and not in_play_card:
                 del self.cards_in_reserve[planet_id][unit_id]
             else:
                 attachments = self.cards_in_play[planet_id + 1][unit_id].get_attachments()

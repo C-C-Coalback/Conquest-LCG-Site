@@ -29,9 +29,9 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.no_restrictions_on_chosen_card = False
             primary_player.number_cards_to_search = 6
             if len(primary_player.deck) > 5:
-                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
             else:
-                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_interrupt()

@@ -374,14 +374,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if card_chosen.actually_a_deepstrike:
                             actual_ability = card_chosen.deepstrike_card_name
                             if actual_ability == "Patient Infiltrator":
-                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos,
+                                                                                         in_play_card=True)
                                 if primary_player.spend_resources(ds_value):
-                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
                                     self.action_cleanup()
                             elif actual_ability == "XV25 Stealth Squad":
-                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos,
+                                                                                         in_play_card=True)
                                 if primary_player.spend_resources(ds_value):
-                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
                                     self.action_cleanup()
                     elif ability == "Slave-powered Wagons":
                         if not card_chosen.get_once_per_round_used():

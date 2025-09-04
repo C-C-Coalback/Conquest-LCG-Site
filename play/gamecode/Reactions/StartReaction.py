@@ -24,9 +24,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.no_restrictions_on_chosen_card = False
             primary_player.number_cards_to_search = 6
             if len(primary_player.deck) > 5:
-                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
             else:
-                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
@@ -34,9 +34,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.number_cards_to_search = 6
             self.resolving_search_box = True
             if len(primary_player.deck) > 5:
-                self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
             else:
-                self.choices_available = primary_player.deck[0:len(primary_player.deck)]
+                self.choices_available = primary_player.deck[:len(primary_player.deck)]
             self.choice_context = "First Line Rhinos Rally"
             self.name_player_making_choices = primary_player.name_player
         elif current_reaction == "Medallion of Betrayal":
@@ -89,17 +89,17 @@ async def start_resolving_reaction(self, name, game_update_string):
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6
                 if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
                 self.name_player_who_is_searching = self.p1.name_player
                 self.number_who_is_searching = str(self.p1.number)
             else:
                 self.p2.number_cards_to_search = 6
                 if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.misc_counter = 2
@@ -116,17 +116,17 @@ async def start_resolving_reaction(self, name, game_update_string):
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6
                 if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
                 self.name_player_who_is_searching = self.p1.name_player
                 self.number_who_is_searching = str(self.p1.number)
             else:
                 self.p2.number_cards_to_search = 6
                 if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -269,17 +269,17 @@ async def start_resolving_reaction(self, name, game_update_string):
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6
                 if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
                 self.name_player_who_is_searching = self.p1.name_player
                 self.number_who_is_searching = str(self.p1.number)
             else:
                 self.p2.number_cards_to_search = 6
                 if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = str(self.p2.number)
             self.delete_reaction()
@@ -289,17 +289,17 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = self.p1.name_player
                 self.number_who_is_searching = "1"
                 if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
             else:
                 self.p2.number_cards_to_search = 6
                 self.name_player_who_is_searching = self.p2.name_player
                 self.number_who_is_searching = "2"
                 if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"
             self.traits_of_searched_card = None
@@ -1315,9 +1315,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 except ValueError:
                     pass
                 if len(primary_player.deck) > 5:
-                    self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                    self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
                 else:
-                    self.choices_available = primary_player.deck[0:len(primary_player.deck)]
+                    self.choices_available = primary_player.deck[:len(primary_player.deck)]
                 self.choice_context = "Krieg Armoured Regiment result:"
                 self.name_player_making_choices = primary_player.name_player
             else:
@@ -1774,15 +1774,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6
                 if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[0:self.p1.number_cards_to_search]
+                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p1.deck[0:len(self.p1.deck)]
+                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
             else:
                 self.p2.number_cards_to_search = 6
                 if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[0:self.p2.number_cards_to_search]
+                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
                 else:
-                    self.cards_in_search_box = self.p2.deck[0:len(self.p2.deck)]
+                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
             self.resolving_search_box = True
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number

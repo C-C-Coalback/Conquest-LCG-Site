@@ -452,14 +452,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 else:
                                     player = self.p2
                                     other_player = self.p1
-                                cost = player.get_deepstrike_value_given_pos(chosen_planet, chosen_unit)
+                                cost = player.get_deepstrike_value_given_pos(chosen_planet, chosen_unit,
+                                                                             in_play_card=True)
                                 if cost != -1:
                                     if player.spend_resources(cost):
-                                        if player.get_card_type_in_reserve(chosen_planet, chosen_unit) != "Attachment":
-                                            if player.get_card_type_in_reserve(chosen_planet, chosen_unit) == "Army":
-                                                player.deepstrike_unit(chosen_planet, chosen_unit)
-                                            elif player.get_card_type_in_reserve(chosen_planet, chosen_unit) == "Event":
-                                                player.deepstrike_event(chosen_planet, chosen_unit)
+                                        if player.get_card_type_in_reserve(chosen_planet, chosen_unit,
+                                                                           in_play_card=True) != "Attachment":
+                                            if player.get_card_type_in_reserve(chosen_planet, chosen_unit,
+                                                                               in_play_card=True) == "Army":
+                                                player.deepstrike_unit(chosen_planet, chosen_unit, in_play_card=True)
+                                            elif player.get_card_type_in_reserve(chosen_planet, chosen_unit,
+                                                                                 in_play_card=True) == "Event":
+                                                player.deepstrike_event(chosen_planet, chosen_unit, in_play_card=True)
                                             if not player.check_for_cards_in_reserve(chosen_planet):
                                                 player.has_passed = True
                                                 if not other_player.has_passed:

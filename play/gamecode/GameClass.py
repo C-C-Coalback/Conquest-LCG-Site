@@ -1397,9 +1397,9 @@ class Game:
                                     player.exhaust_given_pos(-2, int(game_update_string[2]))
                                     player.number_cards_to_search += 3
                                     if len(player.deck) >= player.number_cards_to_search:
-                                        self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                                        self.cards_in_search_box = player.deck[:player.number_cards_to_search]
                                     else:
-                                        self.cards_in_search_box = player.deck[0:player.deck]
+                                        self.cards_in_search_box = player.deck[:player.deck]
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
@@ -2457,7 +2457,7 @@ class Game:
         elif self.battle_ability_to_resolve == "Elouith":
             if len(winner.deck) > 2:
                 winner.number_cards_to_search = 3
-                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                self.cards_in_search_box = winner.deck[:winner.number_cards_to_search]
                 self.name_player_who_is_searching = winner.name_player
                 self.number_who_is_searching = str(winner.number)
                 self.what_to_do_with_searched_card = "DRAW"
@@ -2512,7 +2512,7 @@ class Game:
             if len(winner.deck) > 5:
                 winner.number_cards_to_search = 6
             if winner.number_cards_to_search:
-                self.cards_in_search_box = winner.deck[0:winner.number_cards_to_search]
+                self.cards_in_search_box = winner.deck[:winner.number_cards_to_search]
                 self.name_player_who_is_searching = winner.name_player
                 self.number_who_is_searching = str(winner.number)
                 self.what_to_do_with_searched_card = "PLAY TO BATTLE"
@@ -2754,7 +2754,7 @@ class Game:
                                 self.misc_target_choice = card.get_name()
                                 primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
                                 del primary_player.deck[int(game_update_string[1])]
-                                self.choices_available = primary_player.deck[0:primary_player.number_cards_to_search]
+                                self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
                                 if not self.choices_available:
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
@@ -3583,9 +3583,9 @@ class Game:
                             self.resolving_search_box = True
                             primary_player.number_cards_to_search = 6
                             if len(primary_player.deck) > 5:
-                                self.cards_in_search_box = primary_player.deck[0:primary_player.number_cards_to_search]
+                                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
                             else:
-                                self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                                self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
                             self.name_player_who_is_searching = primary_player.name_player
                             self.number_who_is_searching = primary_player.number
                             self.what_to_do_with_searched_card = "DRAW"
@@ -4091,9 +4091,9 @@ class Game:
                         primary_player.number_cards_to_search = 3
                         if len(primary_player.deck) > 2:
                             self.cards_in_search_box = \
-                                primary_player.deck[0:primary_player.number_cards_to_search]
+                                primary_player.deck[:primary_player.number_cards_to_search]
                         else:
-                            self.cards_in_search_box = primary_player.deck[0:len(primary_player.deck)]
+                            self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
                         self.name_player_who_is_searching = primary_player.name_player
                         self.number_who_is_searching = primary_player.number
                         self.action_cleanup()
@@ -4974,7 +4974,7 @@ class Game:
                         if len(player.deck) > 2:
                             player.number_cards_to_search = 3
                             self.bottom_cards_after_search = False
-                            self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                            self.cards_in_search_box = player.deck[:player.number_cards_to_search]
                             self.name_player_who_is_searching = primary_player.name_player
                             self.number_who_is_searching = str(primary_player.number)
                             self.what_to_do_with_searched_card = "DISCARD"
@@ -4997,7 +4997,7 @@ class Game:
                         if len(player.deck) > 1:
                             player.number_cards_to_search = 2
                             self.bottom_cards_after_search = False
-                            self.cards_in_search_box = player.deck[0:player.number_cards_to_search]
+                            self.cards_in_search_box = player.deck[:player.number_cards_to_search]
                             self.name_player_who_is_searching = primary_player.name_player
                             self.number_who_is_searching = str(primary_player.number)
                             self.what_to_do_with_searched_card = "DISCARD"
