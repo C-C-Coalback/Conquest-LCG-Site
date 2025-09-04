@@ -4338,6 +4338,8 @@ class Player:
             if card.get_ability() == "Eloquent Confessor":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     attack_value += 1
+            if card.get_ability() == "Neurotic Obliterator":
+                attack_value += len(card.get_attachments())
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
@@ -4379,7 +4381,7 @@ class Player:
                     found_praetorian_shadow = True
             if found_praetorian_shadow:
                 attack_value += 1
-        if card.get_ability() == "Shard of the Deceiver":
+        if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
@@ -4396,6 +4398,8 @@ class Player:
         if ability == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
+        if ability == "Neurotic Obliterator":
+            attack_value += len(card.get_attachments())
         if ability == "Kabal of the Ebon Law":
             if planet_id != self.game.round_number:
                 attack_value += 1
@@ -5033,6 +5037,8 @@ class Player:
             if ability == "Lychguard Sentinel":
                 if self.count_units_in_discard() > 5:
                     health += 4
+            if ability == "Neurotic Obliterator":
+                health += len(self.headquarters[unit_id].get_attachments())
             if ability == "Improbable Runt Machine":
                 health += min(len(self.headquarters[unit_id].get_attachments()), 3)
             if ability == "Tenacious Novice Squad":
@@ -5102,6 +5108,8 @@ class Player:
             if self.game.round_number == planet_id:
                 if self.search_card_in_hq("Order of the Crimson Oath"):
                     health += 2
+        if ability == "Neurotic Obliterator":
+            health += len(card.get_attachments())
         if ability == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health = health - 2

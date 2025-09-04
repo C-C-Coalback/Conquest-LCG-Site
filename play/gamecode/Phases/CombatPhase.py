@@ -1145,6 +1145,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.create_reaction("Firedrake Terminators", secondary_player.name_player,
                                                          (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position))
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Neurotic Obliterator":
+                                    ready_weapon = False
+                                    for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments())):
+                                        if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments()[i].get_ready() and secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments()[i].check_for_a_trait("Weapon"):
+                                            ready_weapon = True
+                                    if ready_weapon:
+                                        self.create_reaction("Neurotic Obliterator", secondary_player.name_player,
+                                                             (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position))
                                 if secondary_player.search_attachments_at_pos(
                                         self.defender_planet, self.defender_position, "The Black Sword"
                                 ):

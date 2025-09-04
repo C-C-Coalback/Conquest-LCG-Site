@@ -458,6 +458,10 @@ def chaos_cards_init():
                                                    " Brutal and Immune to enemy events.\n"
                                                    "Forced Reaction: After a battle at an adjacent planet begins,"
                                                    " move this unit to that planet.", "Warrior. Khorne.",
-                             3, faction, "Loyal", 1, 6, 0, False)
+                             3, faction, "Loyal", 1, 6, 0, False),
+        CardClasses.ArmyCard("Neurotic Obliterator", "This unit gets +1 ATK and +1 HP for each attachment on it.\n"
+                                                     "Reaction: After this unit is chosen as a defender, exhaust a "
+                                                     "Weapon attachment on it to deal 1 damage to the attacker.",
+                             "Warrior.", 3, faction, "Common", 1, 5, 1, False)
     ]
     return chaos_card_array

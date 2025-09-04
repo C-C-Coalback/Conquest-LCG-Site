@@ -9015,7 +9015,7 @@ class Game:
                     for j in range(len(self.p2.cards_in_play[i + 1])):
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
-            if self.attack_being_resolved:
+            if self:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False
                 self.p2.celestian_amelia_active = False

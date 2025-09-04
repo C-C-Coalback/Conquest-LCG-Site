@@ -21,6 +21,15 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     await self.send_update_message(attachment_name + " selected for Junk Chucka Kommando!")
                     self.chosen_first_card = True
                     self.misc_target_attachment = (og_pla, og_pos, attachment_pos)
+    elif current_reaction == "Neurotic Obliterator":
+        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        if primary_player.get_number() == game_update_string[2]:
+            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Neurotic Obliterator":
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].check_for_a_trait("Weapon") and \
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
+                    secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
+                    self.delete_reaction()
     elif current_reaction == "Torturer's Masks":
         if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ability() == "Torturer's Masks":
             if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner == primary_player.name_player:
