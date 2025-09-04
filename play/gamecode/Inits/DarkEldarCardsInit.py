@@ -416,6 +416,9 @@ def dark_eldar_cards_init():
                                              " with the text "
                                              "\"Attach to an army unit. Attached unit gets +1 ATK and +1 HP.\". "
                                              "(Limit once per phase.)", "Scholar. Haemonculus.",
-                             2, faction, "Loyal", 1, 2, 1, False)
+                             2, faction, "Loyal", 1, 2, 1, False),
+        CardClasses.EventCard("Catatonic Pain", "Reaction: After an enemy army unit enters play at a planet, "
+                                                "move that unit to an adjacent planet of your choice.", "Torture.",
+                              3, faction, "Common", 1, False)
     ]
     return dark_eldar_cards_array

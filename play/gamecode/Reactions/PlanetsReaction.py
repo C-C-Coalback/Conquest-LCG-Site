@@ -35,6 +35,12 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.create_reaction(self.planet_array[chosen_planet] + " Commit", primary_player.name_player,
                                  (int(primary_player.number), self.positions_of_unit_triggering_reaction[0][1], -1))
             self.delete_reaction()
+    elif current_reaction == "Catatonic Pain":
+        if abs(planet_pos - chosen_planet) == 1:
+            secondary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+            await primary_player.dark_eldar_event_played()
+            primary_player.torture_event_played()
+            self.delete_reaction()
     elif current_reaction == "Vamii Industrial Complex":
         if self.chosen_first_card:
             if chosen_planet != self.round_number:
