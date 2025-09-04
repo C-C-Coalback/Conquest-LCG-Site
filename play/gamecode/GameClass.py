@@ -231,7 +231,7 @@ class Game:
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
         self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death", "Uphold His Honor"]
-        self.last_shield_string = ""
+        self.last_shield_string = []
         self.pos_shield_card = -1
         self.recently_damaged_units = []
         self.damage_taken_was_from_attack = []
@@ -427,6 +427,8 @@ class Game:
         self.damage_index_xv805 = -1
         self.player_using_xv805 = ""
         self.og_pos_xv805_target = (-1, -1)
+        self.liatha_available = True
+        self.liatha_active = False
         self.current_flamers_id = 0
         self.current_librarian_id = 0
         self.flamers_damage_active = False
@@ -1062,6 +1064,7 @@ class Game:
                                         if primary_player.spend_resources(4):
                                             primary_player.add_card_to_discard(ability)
                                             primary_player.cards_removed_from_game.remove(ability)
+                                            del primary_player.cards_removed_from_game_hidden[0]
                                             if vael_bloodied:
                                                 primary_player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
                                             else:
@@ -1077,6 +1080,21 @@ class Game:
                                                 self.name_player_making_choices = primary_player.name_player
                                                 self.resolving_search_box = True
                                                 self.action_chosen = ability
+                    elif self.action_chosen == "Reveal The Blade":
+                        if not self.chosen_first_card:
+                            if chosen_removed == int(primary_player.number):
+                                if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
+                                    card_name = primary_player.cards_removed_from_game[pos_removed]
+                                    card = self.preloaded_find_card(card_name)
+                                    if card.get_shields() == 0:
+                                        self.chosen_first_card = True
+                                        primary_player.cards_removed_from_game_hidden[pos_removed] = "N"
+                                        if card_name == "Connoisseur of Terror":
+                                            self.create_reaction("Connoisseur of Terror", primary_player.name_player,
+                                                                 (int(primary_player.number), -1, -1))
+                                        if card_name == "Liatha's Retinue":
+                                            self.create_reaction("Liatha's Retinue", primary_player.name_player,
+                                                                 (int(primary_player.number), -1, -1))
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayActions.update_game_event_action_in_play(self, name, game_update_string)
@@ -4810,6 +4828,53 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.auto_card_destruction = True
+                    elif self.choice_context == "Use Liatha?":
+                        if game_update_string[1] == "0":
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            await self.better_shield_card_resolution(name, self.last_shield_string, alt_shields=False)
+                        else:
+                            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                            current_val = primary_player.get_once_per_phase_used_given_pos(warlord_pla, warlord_pos)
+                            if not current_val:
+                                current_val = 0
+                            primary_player.set_once_per_phase_used_given_pos(warlord_pla, warlord_pos, current_val + 1)
+                            await self.send_update_message("Liatha is being used. The card may be flipped.")
+                            self.choice_context = "Flip Liatha?"
+                            self.choices_available = ["Pass", "Flip"]
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.liatha_active = True
+                    elif self.choice_context == "Flip Liatha?":
+                        if game_update_string[1] == "0":
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            await self.better_shield_card_resolution(
+                                secondary_player.name_player, self.last_shield_string, alt_shields=False)
+                        else:
+                            card_name = secondary_player.cards[int(self.last_shield_string[2])]
+                            card = self.preloaded_find_card(card_name)
+                            if card_name == "Connoisseur of Terror":
+                                self.create_reaction("Connoisseur of Terror", secondary_player.name_player,
+                                                     (int(secondary_player.number), -1, -1))
+                            if card_name == "Liatha's Retinue":
+                                self.create_reaction("Liatha's Retinue", secondary_player.name_player,
+                                                     (int(secondary_player.number), -1, -1))
+                            if card.get_shields() == 2:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                await self.better_shield_card_resolution(
+                                    secondary_player.name_player, self.last_shield_string,
+                                    alt_shields=False, liatha_called=True)
+                                self.create_interrupt("Liatha Punishment", secondary_player.name_player,
+                                                      (int(primary_player.number), -1, -1))
+                            else:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                secondary_player.remove_card_from_game(card_name)
+                                del secondary_player.cards[int(self.last_shield_string[2])]
+                                self.last_shield_string = ["pass-P1"]
+                                await self.better_shield_card_resolution(
+                                    secondary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Use alternative shield effect?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
@@ -6605,7 +6670,8 @@ class Game:
             self.positions_of_units_interrupting.append(pos_interrupter)
             self.extra_interrupt_info.append(extra_info)
 
-    async def better_shield_card_resolution(self, name, game_update_string, alt_shields=True, can_no_mercy=True):
+    async def better_shield_card_resolution(self, name, game_update_string,
+                                            alt_shields=True, can_no_mercy=True, liatha_called=False):
         if name == self.player_who_is_shielding:
             pos_holder = self.positions_of_units_to_take_damage[0]
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
@@ -6692,8 +6758,22 @@ class Game:
                         hand_pos = int(game_update_string[2])
                         tank = primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank")
                         shields = primary_player.get_shields_given_pos(hand_pos, planet_pos=planet_pos, tank=tank)
+                        if self.liatha_active:
+                            shields = 2
                         card_name = primary_player.cards[hand_pos]
                         alt_shield_check = False
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        liatha = False
+                        if self.liatha_available and alt_shields and not self.liatha_active:
+                            print("Liatha checking")
+                            if primary_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Liatha":
+                                print("is liatha")
+                                uses = primary_player.get_once_per_phase_used_given_pos(warlord_pla, warlord_pos)
+                                print(uses)
+                                if not uses:
+                                    liatha = True
+                                elif uses < 3:
+                                    liatha = True
                         self.pos_shield_card = hand_pos
                         if alt_shields and not primary_player.hit_by_gorgul:
                             if primary_player.cards[hand_pos] in self.alternative_shields:
@@ -6730,6 +6810,13 @@ class Game:
                                             self.name_player_making_choices = name
                                             self.choice_context = "Use alternative shield effect?"
                                             self.last_shield_string = game_update_string
+                        if liatha and not alt_shield_check:
+                            self.choices_available = ["Shield", "Liatha"]
+                            self.name_player_making_choices = name
+                            self.choice_context = "Use Liatha?"
+                            self.resolving_search_box = True
+                            self.last_shield_string = game_update_string
+                            alt_shield_check = True
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
                             if self.damage_can_be_shielded[0]:
@@ -6787,6 +6874,11 @@ class Game:
                                             shields += 1
                                         if self.woken_machine_spirit_active:
                                             shields += 1
+                                        if primary_player.search_attachments_at_pos(
+                                                warlord_pla, warlord_pos, "Cloak of Shade", ready_relevant=True):
+                                            primary_player.exhaust_attachment_name_pos(
+                                                warlord_pla, warlord_pos, "Cloak of Shade")
+                                            shields += 1
                                         self.maksim_squadron_enabled = True
                                         self.woken_machine_spirit_enabled = True
                                         self.guardian_mesh_armor_enabled = True
@@ -6820,7 +6912,15 @@ class Game:
                                                                           primary_player.name_player,
                                                                           (int(primary_player.number),
                                                                            planet_pos, unit_pos))
-                                        primary_player.discard_card_from_hand(hand_pos)
+                                        if self.liatha_active:
+                                            hidden = "H"
+                                            if liatha_called:
+                                                hidden = "N"
+                                            primary_player.remove_card_from_game(primary_player.cards[hand_pos],
+                                                                                 hidden=hidden)
+                                            del primary_player.cards[hand_pos]
+                                        else:
+                                            primary_player.discard_card_from_hand(hand_pos)
                                         if not primary_player.cards:
                                             if primary_player.search_for_card_everywhere("Torturer's Masks",
                                                                                          ready_relevant=True):
@@ -7559,6 +7659,28 @@ class Game:
                 elif game_update_string[0] == "IN_DISCARD":
                     await DiscardReaction.resolve_discard_reaction(self, name, game_update_string,
                                                                    primary_player, secondary_player)
+                elif game_update_string[0] == "REMOVED":
+                    chosen_removed = int(game_update_string[1])
+                    pos_removed = int(game_update_string[2])
+                    print("Check what player")
+                    print(self.player_who_resolves_reaction)
+                    current_reaction = self.reactions_needing_resolving[0]
+                    if current_reaction == "Shadow Hunt":
+                        if not self.chosen_first_card:
+                            if chosen_removed == int(primary_player.get_number()):
+                                card_name = primary_player.cards_removed_from_game[pos_removed]
+                                if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
+                                    card = self.preloaded_find_card(card_name)
+                                    if card.get_card_type() == "Army" and card.get_faction() == "Dark Eldar":
+                                        if not card.check_for_a_trait("Elite"):
+                                            primary_player.cards_removed_from_game_hidden[pos_removed] = "N"
+                                            if card_name == "Connoisseur of Terror":
+                                                self.create_reaction(
+                                                    "Connoisseur of Terror", primary_player.name_player,
+                                                    (int(primary_player.number), -1, -1)
+                                                )
+                                            self.chosen_first_card = True
+                                            self.misc_counter = pos_removed
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,
@@ -8023,6 +8145,8 @@ class Game:
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
         self.guardian_mesh_armor_active = False
+        self.liatha_active = False
+        self.liatha_available = True
         self.maksim_squadron_active = False
         self.maksim_squadron_enabled = True
         self.woken_machine_spirit_enabled = True

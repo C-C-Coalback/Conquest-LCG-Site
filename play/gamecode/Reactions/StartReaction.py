@@ -1146,7 +1146,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Use Nullify?"
                     self.nullified_card_pos = -1
-                    self.nullified_card_name = "Inspirational Fervor"
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = cost_card
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -1154,6 +1154,32 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if can_continue:
                     primary_player.spend_resources(cost_card)
                     primary_player.discard_card_name_from_hand("Catatonic Pain")
+            else:
+                self.delete_reaction()
+        elif current_reaction == "Shadow Hunt":
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play " +
+                        current_reaction + "; Nullify window offered."
+                    )
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = current_reaction
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Shadow Hunt")
+                        self.chosen_first_card = False
+                    else:
+                        self.delete_reaction()
             else:
                 self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
@@ -2246,6 +2272,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                         primary_player.spend_resources(1)
                         self.chosen_first_card = False
                         primary_player.cards_removed_from_game.remove("The Inevitable Decay")
+                        del primary_player.cards_removed_from_game_hidden[0]
                         primary_player.add_card_to_discard("The Inevitable Decay")
                         if vael_bloodied:
                             primary_player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
@@ -2276,6 +2303,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if vael_relevant:
                         primary_player.spend_resources(1)
                         primary_player.cards_removed_from_game.remove("The Grand Plan")
+                        del primary_player.cards_removed_from_game_hidden[0]
                         primary_player.add_card_to_discard("The Grand Plan")
                         if vael_bloodied:
                             primary_player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
@@ -2308,6 +2336,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if vael_relevant:
                         primary_player.spend_resources(1)
                         primary_player.cards_removed_from_game.remove("The Blood Pits")
+                        del primary_player.cards_removed_from_game_hidden[0]
                         primary_player.add_card_to_discard("The Blood Pits")
                         self.misc_misc = []
                         await self.send_update_message("Press pass button to deal the damage after choosing units.")

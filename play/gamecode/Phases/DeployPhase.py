@@ -48,6 +48,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.available_discounts = 0
                         if self.p2.search_hand_for_card("The Emperor's Retribution"):
                             self.create_reaction("The Emperor's Retribution", self.name_2, (2, -1, -1))
+                        if self.p2.search_hand_for_card("Shadow Hunt"):
+                            self.create_reaction("Shadow Hunt", self.name_2, (2, -1, -1))
                         await self.send_update_message(self.name_1 + " passes their deploy turn.")
                     else:
                         self.number_with_deploy_turn = "1"
@@ -57,6 +59,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.available_discounts = 0
                         if self.p1.search_hand_for_card("The Emperor's Retribution"):
                             self.create_reaction("The Emperor's Retribution", self.name_1, (1, -1, -1))
+                        if self.p1.search_hand_for_card("Shadow Hunt"):
+                            self.create_reaction("Shadow Hunt", self.name_1, (1, -1, -1))
                         await self.send_update_message(self.name_2 + " passes their deploy turn.")
                 elif self.mode == "DISCOUNT":
                     print("Play card with not all discounts")

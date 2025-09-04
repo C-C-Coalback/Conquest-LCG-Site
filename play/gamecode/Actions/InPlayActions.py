@@ -1618,6 +1618,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+    elif self.action_chosen == "Reveal The Blade":
+        if self.chosen_first_card:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
+                self.action_cleanup()
     elif self.action_chosen == "Everlasting Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):

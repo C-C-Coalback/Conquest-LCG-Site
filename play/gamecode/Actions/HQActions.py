@@ -114,6 +114,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 self.action_chosen = ability
                                 self.misc_counter = 4
                                 await self.send_update_message("4 targets left for Holy Chapel")
+                    elif ability == "Reveal The Blade":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                     elif ability == "Ork Kannon":
                         if card.get_ready():
                             self.action_chosen = ability
@@ -1101,6 +1106,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 primary_player.discard_card_name_from_hand("Overrun")
                 primary_player.aiming_reticle_coords_hand = None
+                self.action_cleanup()
+    elif self.action_chosen == "Reveal The Blade":
+        if self.chosen_first_card:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
                 self.action_cleanup()
     elif self.action_chosen == "Improbable Runt Machine":
         if game_update_string[1] == primary_player.get_number():

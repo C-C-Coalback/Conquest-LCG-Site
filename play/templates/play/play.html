@@ -464,27 +464,42 @@
                     document.getElementById(target_removed_pile_id).innerHTML = ``;
                     var target_expanded_removed = "expanded-removed-" + split_data[2] + "-settings";
                     document.getElementById(target_expanded_removed).innerHTML = ``;
-                    if (split_data.length >= 4) {
-                        for (var i = 3; i < split_data.length; i++) {
+                    if (split_data.length >= 5) {
+                        target_user = split_data[3];
+                        for (var i = 4; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
-                            var string_id = (i-3).toString();
+                            var hidden = card_data_split[1];
+                            var string_id = (i-4).toString();
+                            var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                             string_id = "REMOVED/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            var full_string = `<div class="Card-div">`;
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
-                            if (card_data_split[1] !== "") {
-                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                            if (hidden == "H") {
+                                route_text = "/static/images/CardImages/Cardback.jpg";
+                                if (target_user === "{{ user.username }}") {
+                                    enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                                }
                             }
+                            var full_string = `<div class="Card-div">`;
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card"` + enlarge_card_formula + ` onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
                             full_string += `</div>`;
                             document.getElementById(target_expanded_removed).innerHTML += full_string;
                         }
                         var card_name = split_data[split_data.length - 1].split("|")[0];
+                        var hidden = split_data[split_data.length - 1].split("|")[1];
                         var string_id = "REMOVED_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
+                        var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                         var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
+                        if (hidden == "H") {
+                            route_text = "/static/images/CardImages/Cardback.jpg";
+                            if (target_user === "{{ user.username }}") {
+                                enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                            }
+                        }
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card"` + enlarge_card_formula + ` onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
                         document.getElementById(target_removed_pile_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "RESOURCES") {

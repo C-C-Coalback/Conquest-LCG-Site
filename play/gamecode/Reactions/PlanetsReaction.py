@@ -30,6 +30,33 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 last_el_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
                 primary_player.cards_in_play[chosen_planet][last_el_index].command_until_combat += 1
                 self.delete_reaction()
+    elif current_reaction == "Shadow Hunt":
+        card_name = primary_player.cards_removed_from_game[self.misc_counter]
+        card = self.preloaded_find_card(card_name)
+        primary_player.add_card_to_planet(card, chosen_planet)
+        target_index = -1
+        for i in range(len(primary_player.cards_removed_from_game)):
+            if primary_player.cards_removed_from_game[i] == card_name:
+                if primary_player.cards_removed_from_game_hidden[i] == "N":
+                    target_index = i
+        if target_index != -1:
+            del primary_player.cards_removed_from_game[target_index]
+            del primary_player.cards_removed_from_game_hidden[target_index]
+        await primary_player.dark_eldar_event_played()
+        self.delete_reaction()
+    elif current_reaction == "Liatha's Retinue":
+        if chosen_planet != self.last_planet_checked_for_battle:
+            card = self.preloaded_find_card("Liatha's Retinue")
+            primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
+            retinue_index = -1
+            for i in range(len(primary_player.cards_removed_from_game)):
+                if primary_player.cards_removed_from_game[i] == "Liatha's Retinue":
+                    if primary_player.cards_removed_from_game_hidden[i] == "N":
+                        retinue_index = i
+            if retinue_index != -1:
+                del primary_player.cards_removed_from_game[retinue_index]
+                del primary_player.cards_removed_from_game_hidden[retinue_index]
+            self.delete_reaction()
     elif current_reaction == "Navida Prime Commit":
         if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:
             self.create_reaction(self.planet_array[chosen_planet] + " Commit", primary_player.name_player,

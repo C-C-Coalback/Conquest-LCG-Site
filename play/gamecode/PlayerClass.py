@@ -180,7 +180,8 @@ class Player:
         self.looted_skrap_active = False
         self.looted_skrap_count = 0
         self.looted_skrap_planet = -1
-        self.cards_removed_from_game = []
+        self.cards_removed_from_game = ["Connoisseur of Terror"]
+        self.cards_removed_from_game_hidden = ["H"]
         self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
         self.last_removed_string = ""
         self.played_grand_plan = False
@@ -300,8 +301,9 @@ class Player:
         self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = True
         return None
 
-    def remove_card_from_game(self, card_name):
+    def remove_card_from_game(self, card_name, hidden="N"):
         self.cards_removed_from_game.append(card_name)
+        self.cards_removed_from_game_hidden.append(hidden)
 
     def search_synapse_in_hq(self):
         for i in range(len(self.headquarters)):
@@ -847,10 +849,10 @@ class Player:
             )
 
     async def send_removed_cards(self, force=False):
-        joined_string = "GAME_INFO/REMOVED/" + str(self.number)
+        joined_string = "GAME_INFO/REMOVED/" + str(self.number) + "/" + self.name_player
         if self.cards_removed_from_game:
             for i in range(len(self.cards_removed_from_game)):
-                joined_string += "/" + self.cards_removed_from_game[i] + "|"
+                joined_string += "/" + self.cards_removed_from_game[i] + "|" + self.cards_removed_from_game_hidden[i]
         if joined_string != self.last_removed_string or force:
             self.last_removed_string = joined_string
             await self.game.send_update_message(joined_string)
@@ -3349,6 +3351,15 @@ class Player:
         return False
 
     def get_armorbane_given_pos(self, planet_id, unit_id, enemy_unit_damage=0):
+        warlord_pla, warlord_pos = self.get_location_of_warlord()
+        if warlord_pla == planet_id:
+            if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Cloak of Shade"):
+                return False
+        other_player = self.get_other_player()
+        warlord_pla, warlord_pos = other_player.get_location_of_warlord()
+        if warlord_pla == planet_id:
+            if other_player.search_attachments_at_pos(warlord_pla, warlord_pos, "Cloak of Shade"):
+                return False
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 return True
