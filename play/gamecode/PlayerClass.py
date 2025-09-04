@@ -3498,6 +3498,9 @@ class Player:
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster" and power:
             return True
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Champion of Khorne":
+            if self.game.bloodthirst_active[planet_pos]:
+                return True
         if self.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
             if self.search_card_at_planet(planet_pos, "Vostroyan Officer"):
                 return True
@@ -4312,6 +4315,9 @@ class Player:
             if nazdreg_check:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+            if self.game.bloodthirst_active[planet_id]:
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Champion of Khorne":
             if self.game.bloodthirst_active[planet_id]:
                 return True
         if self.search_attachments_at_pos(planet_id, unit_id, "Khornate Chain Axe"):
@@ -5677,6 +5683,16 @@ class Player:
 
     def resolve_battle_begins(self, planet_num):
         self.looted_skrap_active = False
+        if planet_num != 0:
+            for i in range(len(self.cards_in_play[planet_num])):
+                if self.get_ability_given_pos(planet_num - 1, i) == "Champion of Khorne":
+                    self.game.create_reaction("Champion of Khorne", self.name_player,
+                                              (int(self.number), planet_num - 1, i))
+        if planet_num != 6:
+            for i in range(len(self.cards_in_play[planet_num + 2])):
+                if self.get_ability_given_pos(planet_num + 1, i) == "Champion of Khorne":
+                    self.game.create_reaction("Champion of Khorne", self.name_player,
+                                              (int(self.number), planet_num + 1, i))
         for i in range(len(self.cards_in_play[planet_num + 1])):
             if self.search_attachments_at_pos(planet_num, i, "Fenrisian Wolf", must_match_name=True):
                 if self.get_ready_given_pos(planet_num, i):

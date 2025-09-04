@@ -325,7 +325,7 @@ class Game:
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
-                                 "The Blinded Princess"]
+                                 "The Blinded Princess", "Champion of Khorne"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1

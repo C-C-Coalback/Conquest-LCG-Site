@@ -452,6 +452,12 @@ def chaos_cards_init():
                                                     "remaining HP is assigned or moved to your warlord, either "
                                                     "(choose one): put this unit into play from your hand at a planet,"
                                                     " or discard this card from your hand to draw 2 cards.",
-                             "Warrior. Khorne.", 2, faction, "Loyal", 2, 2, 2, True)
+                             "Warrior. Khorne.", 2, faction, "Loyal", 2, 2, 2, True),
+        CardClasses.ArmyCard("Champion of Khorne", "Bloodthirst - During a combat round in which 1 or more units have"
+                                                   " been destroyed at this planet, this unit gains"
+                                                   " Brutal and Immune to enemy events.\n"
+                                                   "Forced Reaction: After a battle at an adjacent planet begins,"
+                                                   " move this unit to that planet.", "Warrior. Khorne.",
+                             3, faction, "Loyal", 1, 6, 0, False)
     ]
     return chaos_card_array
