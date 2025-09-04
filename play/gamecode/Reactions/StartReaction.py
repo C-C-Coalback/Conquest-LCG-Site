@@ -1068,6 +1068,18 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Fake Ooman Base":
+            primary_player.exhaust_card_in_hq_given_name("Fake Ooman Base")
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_combat_positions()
+            self.shining_blade_active = False
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            self.delete_reaction()
         elif current_reaction == "War Walker Squadron":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             attachments = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()

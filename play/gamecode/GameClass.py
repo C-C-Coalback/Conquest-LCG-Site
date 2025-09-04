@@ -1005,6 +1005,8 @@ class Game:
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
                         self.action_cleanup()
+                    elif self.action_chosen == "Soot-Blackened Axe":
+                        self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
@@ -1094,6 +1096,36 @@ class Game:
                                 if primary_player.spend_resources(cost):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos)
                                     self.action_cleanup()
+                    elif self.action_chosen == "Korporal Snagbrat":
+                        if not self.chosen_first_card:
+                            if game_update_string[1] == primary_player.get_number():
+                                self.chosen_first_card = True
+                                primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
+                                self.misc_target_choice = "RESERVE"
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                    elif self.action_chosen == "Kommando Cunning":
+                        if not self.chosen_first_card:
+                            if primary_player.get_number() == game_update_string[1]:
+                                actual_card = primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                if actual_card.get_card_type() == "Army":
+                                    primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                    self.action_cleanup()
+                                elif actual_card.get_card_type() == "Event":
+                                    primary_player.deepstrike_event(planet_pos, unit_pos)
+                                    self.action_cleanup()
+                                elif actual_card.get_card_type() == "Attachment":
+                                    if primary_player.cards_in_reserve[planet_pos][unit_pos].planet_attachment:
+                                        primary_player.add_attachment_to_planet(
+                                            planet_pos, primary_player.cards_in_reserve[planet_pos][unit_pos])
+                                        del primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                        primary_player.deepstrike_attachment_extras(planet_pos)
+                                        self.action_cleanup()
+                                    else:
+                                        self.chosen_first_card = True
+                                        primary_player.cards_in_reserve[planet_pos][
+                                            unit_pos].aiming_reticle_color = "blue"
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        self.misc_target_choice = "RESERVE"
                     elif self.action_chosen == "Vanguarding Horror":
                         if not self.chosen_first_card:
                             if primary_player.get_number() == game_update_string[1]:
@@ -3790,7 +3822,8 @@ class Game:
                             self.has_chosen_to_resolve = True
                         elif game_update_string[1] == "1":
                             if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit" or \
-                                    self.reactions_needing_resolving[0] == "War Walker Squadron":
+                                    self.reactions_needing_resolving[0] == "War Walker Squadron" or \
+                                    self.reactions_needing_resolving[0] == "Fake Ooman Base":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
@@ -7491,6 +7524,31 @@ class Game:
                                                            " at that position")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    elif self.reactions_needing_resolving[0] == "Snagbrat's Scouts":
+                        if game_update_string[1] == primary_player.number:
+                            if primary_player.cards_in_reserve[
+                                    int(game_update_string[2])][
+                                    int(game_update_string[3])].get_ability() == "Snagbrat's Scouts":
+                                ds_value = primary_player.get_deepstrike_value_given_pos(int(game_update_string[2]),
+                                                                                         int(game_update_string[3]))
+                                if primary_player.spend_resources(ds_value):
+                                    last_el_index = primary_player.deepstrike_unit(int(game_update_string[2]),
+                                                                                   int(game_update_string[3]))
+                                    if last_el_index != -1:
+                                        primary_player.cards_in_play[int(game_update_string[2]) + 1][
+                                            last_el_index].extra_command_eop += 2
+                                    found_one = False
+                                    for i in range(7):
+                                        for j in range(len(primary_player.cards_in_reserve[i])):
+                                            if primary_player.cards_in_reserve[
+                                                i][j].get_ability() == "Snagbrat's Scouts":
+                                                if primary_player.resources > 0:
+                                                    if not found_one:
+                                                        found_one = True
+                                                        self.create_reaction("Snagbrat's Scouts",
+                                                                             primary_player.name_player,
+                                                                             (int(primary_player.number), -1, -1))
+                                    self.delete_reaction()
                     elif self.reactions_needing_resolving[0] == "Kamouflage Expert":
                         if game_update_string[1] == primary_player.number:
                             og_pla = self.positions_of_unit_triggering_reaction[0][1]

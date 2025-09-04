@@ -5374,6 +5374,13 @@ class Player:
                 if self.attachments_at_planet[i][j].get_ability() == "Trapped Objective":
                     if phase == "COMBAT":
                         self.game.create_reaction("Trapped Objective", self.name_player, (int(self.number), i, -1))
+            for j in range(len(self.cards_in_reserve[i])):
+                if self.cards_in_reserve[i][j].get_ability() == "Snagbrat's Scouts":
+                    if phase == "COMMAND":
+                        if self.resources > 0:
+                            if not self.check_if_already_have_reaction("Snagbrat's Scouts"):
+                                self.game.create_reaction("Snagbrat's Scouts", self.name_player,
+                                                          (int(self.number), -1, -1))
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_ability() == "Warlock Destructor":
                     if phase == "DEPLOY":

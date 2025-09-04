@@ -97,6 +97,19 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.resolving_search_box = True
                                 card_chosen.exhaust_card()
                                 self.action_cleanup()
+                    elif ability == "Soot-Blackened Axe":
+                        card_chosen.aiming_reticle_color = None
+                        primary_player.cards_in_reserve[planet_pos].append(card_chosen)
+                        self.action_chosen = ability
+                        self.misc_target_choice = primary_player.get_number()
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+                        if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) < 1:
+                            self.action_cleanup()
+                        elif player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
+                            self.action_cleanup()
+                        else:
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif ability == "Attuned Gyrinx":
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if card_chosen.get_ready():

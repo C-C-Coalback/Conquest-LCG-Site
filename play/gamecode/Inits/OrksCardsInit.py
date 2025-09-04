@@ -423,6 +423,32 @@ def orks_cards_init():
         CardClasses.EventCard("Runts to the Front", "Interrupt: When an enemy unit would declare an attack against a "
                                                     "unit you control, declare a ready Runt unit you control at "
                                                     "the same planet as the defender instead.", "Tactic. Snotling.",
-                              1, faction, "Common", 1, False)
+                              1, faction, "Common", 1, False),
+        CardClasses.WarlordCard("Korporal Snagbrat", "Action: Move a card you control in reserve to an adjacent planet"
+                                                     " without an enemy warlord. (Limit once per phase.)",
+                                "Soldier. Blood Axe.", faction, 2, 6, 2, 6, "Bloodied.", 7, 7,
+                                ["1x Fake Ooman Base", "1x Soot-Blackened Axe",
+                                 "2x Kommando Cunning", "4x Snagbrat's Scouts"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Fake Ooman Base", "Reaction: After an Orks Soldier army unit you control is chosen "
+                                                   "as a defender, exhaust this support and move that unit to "
+                                                   "your HQ to cancel the attack.",
+                                "Location.", 1, faction, "Signature", False),
+        CardClasses.AttachmentCard("Soot-Blackened Axe", "Deep Strike (0).\n"
+                                                         "Attach to an Orks unit. "
+                                                         "Attached unit gets +1 ATK and +1 HP.\n"
+                                                         "Action: Put this card in reserve at this planet to move up"
+                                                         " to 1 damage from attached unit to a target non-unique"
+                                                         " unit at the same planet.", "Wargear. Blood Axe.",
+                                   1, faction, "Signature", 3, False, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army/Warlord/Synapse/Token", deepstrike=0,
+                                   extra_health=1, extra_attack=1, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Kommando Cunning", "Action: Deep Strike a card you control without paying"
+                                                  " its Deep Strike cost.", "Tactic.", 0, faction, "Signature", 1,
+                              False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Snagbrat's Scouts", "Deep Strike (1).\n"
+                                                  "Reaction: When the command phase begins, Deep Strike this unit"
+                                                  " to have it gain 2 command icons until the end of the phase.",
+                             "Soldier. Blood Axe.", 2, faction, "Signature", 2, 3, 1, False, deepstrike=1)
     ]
     return orks_card_array

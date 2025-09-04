@@ -1044,6 +1044,26 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.last_defender_position = (secondary_player.number,
                                                                        self.defender_planet,
                                                                        self.defender_position)
+                                elif secondary_player.search_card_in_hq("Fake Ooman Base", ready_relevant=True):
+                                    if secondary_player.get_faction_given_pos(
+                                            self.defender_planet, self.defender_position) == "Orks" and \
+                                            secondary_player.check_for_trait_given_pos(
+                                                self.defender_planet, self.defender_position, "Soldier"):
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "Fake Ooman Base can be used to cancel the attack"
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_reaction(
+                                            "Fake Ooman Base", secondary_player.name_player,
+                                            (int(secondary_player.number), self.defender_planet,
+                                             self.defender_position)
+                                        )
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
                             if can_continue:
                                 faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                                self.attacker_position)

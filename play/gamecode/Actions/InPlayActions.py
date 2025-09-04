@@ -267,6 +267,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.misc_target_planet = planet_pos
+                    elif ability == "Korporal Snagbrat":
+                        if not card.get_once_per_phase_used():
+                            card.set_once_per_phase_used(True)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.misc_target_choice = ""
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
                     elif ability == "Raging Krootox":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -1385,6 +1394,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.action_cleanup()
+    elif self.action_chosen == "Korporal Snagbrat":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].actually_a_deepstrike:
+                    self.chosen_first_card = True
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.misc_target_choice = "IN_PLAY"
+                    self.misc_target_unit = (planet_pos, unit_pos)
     elif self.action_chosen == "Rotten Plaguebearers":
         if planet_pos == self.position_of_actioned_card[0]:
             can_continue = True
@@ -2173,6 +2190,54 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Kommando Cunning":
+        if not self.chosen_first_card:
+            if primary_player.get_number() == game_update_string[1]:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].actually_a_deepstrike:
+                    actual_card_name = primary_player.cards_in_play[planet_pos + 1][unit_pos].deepstrike_card_name
+                    actual_card = self.preloaded_find_card(actual_card_name)
+                    if actual_card.get_card_type() == "Army":
+                        primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
+                        self.action_cleanup()
+                    elif actual_card.get_card_type() == "Event":
+                        primary_player.deepstrike_event(planet_pos, unit_pos, in_play_card=True)
+                        self.action_cleanup()
+                    elif actual_card.get_card_type() == "Attachment":
+                        if actual_card.planet_attachment:
+                            primary_player.add_attachment_to_planet(
+                                planet_pos, actual_card)
+                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                            primary_player.deepstrike_attachment_extras(planet_pos)
+                            self.action_cleanup()
+                        else:
+                            self.chosen_first_card = True
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.misc_target_choice = "IN_PLAY"
+        else:
+            og_pla, og_pos = self.misc_target_unit
+            if og_pla == planet_pos:
+                if self.misc_target_choice == "RESERVE":
+                    card = primary_player.cards_in_reserve[og_pla][og_pos]
+                    if player_owning_card.attach_card(card, planet_pos, unit_pos):
+                        del primary_player.cards_in_reserve[og_pla][og_pos]
+                        self.action_cleanup()
+                else:
+                    card_name = primary_player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name
+                    card = self.preloaded_find_card(card_name)
+                    if player_owning_card.attach_card(card, planet_pos, unit_pos):
+                        del primary_player.cards_in_play[og_pla + 1][og_pos]
+                        self.action_cleanup()
+    elif self.action_chosen == "Soot-Blackened Axe":
+        if planet_pos == self.misc_target_unit[0]:
+            if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
+                player_owning_card.increase_damage_at_pos(planet_pos, unit_pos, 1)
+                original_player = self.p1
+                if self.misc_target_choice == "2":
+                    original_player = self.p2
+                original_player.remove_damage_from_pos(self.misc_target_unit[0], self.misc_target_unit[1], 1)
+                original_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                self.action_cleanup()
     elif self.action_chosen == "Painboy Surjery":
         if game_update_string[1] == primary_player.get_number():
             if self.misc_target_unit == (-1, -1) or self.misc_target_unit == (planet_pos, unit_pos):

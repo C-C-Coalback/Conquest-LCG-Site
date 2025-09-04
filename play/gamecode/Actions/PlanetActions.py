@@ -461,7 +461,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.action_cleanup()
     elif self.action_chosen == "Vanguarding Horror":
         if self.chosen_first_card:
-            if abs(chosen_planet - self.misc_target_planet):
+            if abs(chosen_planet - self.misc_target_planet) == 1:
                 planet_pos, unit_pos = self.misc_target_unit
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
@@ -472,6 +472,31 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+    elif self.action_chosen == "Korporal Snagbrat":
+        if self.chosen_first_card:
+            if self.misc_target_choice == "RESERVE":
+                planet_pos, unit_pos = self.misc_target_unit
+                if abs(planet_pos - chosen_planet) == 1:
+                    if not secondary_player.check_for_warlord(chosen_planet):
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = None
+                        primary_player.cards_in_reserve[chosen_planet].append(
+                            primary_player.cards_in_reserve[planet_pos][unit_pos]
+                        )
+                        del primary_player.cards_in_reserve[planet_pos][unit_pos]
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                        self.action_cleanup()
+            else:
+                planet_pos, unit_pos = self.misc_target_unit
+                if abs(planet_pos - chosen_planet) == 1:
+                    if not secondary_player.check_for_warlord(chosen_planet):
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+                        self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                        self.action_cleanup()
     elif self.action_chosen == "Archon's Palace":
         self.misc_target_planet = chosen_planet
         self.choices_available = ["Cards", "Resources"]

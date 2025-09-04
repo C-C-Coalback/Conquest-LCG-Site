@@ -387,7 +387,7 @@ def eldar_cards_init():
                                                 "Forced Interrupt: When a unit you control at this planet is chosen as"
                                                 " a defender, declare another eligible unit at this planet as the"
                                                 " defender instead, if able.", "Shadowseer. Harlequin.",
-                                faction, 2, 6, "Bloodied.", 2, 6, 7, 7,
+                                faction, 2, 6, 2, 6, "Bloodied.", 7, 7,
                                 ["2x Access to the Black Library", "1x Masters of the Webway", "1x Starmist Raiment",
                                  "1x The Blinded Princess", "1x The Dawnsinger",
                                  "1x The Sun Prince", "1x The Webway Witch"]),
