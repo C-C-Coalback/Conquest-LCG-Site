@@ -2187,6 +2187,8 @@ class Player:
                 if self.cards_in_play[i + 1][j].get_ability() == "Uber Grotesque":
                     if not self.cards_in_play[i + 1][j].once_per_phase_used:
                         self.game.create_reaction("Uber Grotesque", self.name_player, (int(self.number), i, j))
+                if self.cards_in_play[i + 1][j].get_ability() == "Arrogant Haemonculus":
+                    self.game.create_reaction("Arrogant Haemonculus", self.name_player, (int(self.number), i, j))
 
     def count_tortures_in_discard(self):
         count = 0

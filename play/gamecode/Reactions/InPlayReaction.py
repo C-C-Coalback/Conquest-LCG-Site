@@ -1395,6 +1395,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, position_of_unit))
                     self.delete_reaction()
+        elif current_reaction == "Arrogant Haemonculus":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
+                                                            shadow_field_possible=True)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
         elif current_reaction == "Cult of Khorne Attachment":
             card = CardClasses.AttachmentCard(
                 "Cult of Khorne", "Attach to an army unit. Attached unit gets +2 ATK.",

@@ -400,6 +400,11 @@ def dark_eldar_cards_init():
                                                   "to deal 1 damage to up to 2 different enemy units at this planet or "
                                                   "3 damage to an enemy unit at this planet.",
                              "Vehicle. Raider. Kabalite.", 3, faction, "Common", 0, 2, 1, False,
-                             flying=True, wargear_attachments_permitted=False)
+                             flying=True, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Arrogant Haemonculus", "Increase the cost of each other Haemonculus unit deployed at "
+                                                     "this planet by 1.\n"
+                                                     "Forced Reaction: After you play a Torture card, deal 1 damage"
+                                                     " to a target non-warlord unit at this planet.",
+                             "Scholar. Haemonculus.", 1, faction, "Loyal", 1, 1, 1, False)
     ]
     return dark_eldar_cards_array

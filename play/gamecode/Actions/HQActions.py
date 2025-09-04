@@ -1855,6 +1855,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if player_owning_card.headquarters[unit_pos].get_limited():
                     primary_player.draw_card()
                     primary_player.add_resources(1)
+                await primary_player.dark_eldar_event_played()
                 self.action_cleanup()
     elif self.action_chosen == "Consumed by the Kindred":
         if game_update_string[1] == primary_player.get_number():

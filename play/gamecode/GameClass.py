@@ -326,7 +326,7 @@ class Game:
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
-                                 "The Blinded Princess", "Champion of Khorne"]
+                                 "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -6357,6 +6357,13 @@ class Game:
         other_player = self.p1
         if player.name_player == self.name_1:
             other_player = self.p2
+        if card.check_for_a_trait("Haemonculus"):
+            for i in range(len(player.cards_in_play[planet_chosen + 1])):
+                if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                    self.discounts_applied = self.discounts_applied - 1
+            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                    self.discounts_applied = self.discounts_applied - 1
         if card.get_faction() == "Astra Militarum":
             for i in range(len(player.attachments_at_planet[planet_chosen])):
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
@@ -6401,14 +6408,21 @@ class Game:
         other_player = self.p1
         if player.name_player == self.name_1:
             other_player = self.p2
+        self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
+                                                                  card.get_traits(),
+                                                                  planet_chosen=planet_chosen)
+        if card.check_for_a_trait("Haemonculus"):
+            for i in range(len(player.cards_in_play[planet_chosen + 1])):
+                if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                    self.available_discounts = self.available_discounts - 1
+            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                    self.available_discounts = self.available_discounts - 1
         if card.get_faction() == "Astra Militarum":
             for i in range(len(player.attachments_at_planet[planet_chosen])):
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
                     if card.get_cost() - self.available_discounts > 1:
                         self.available_discounts += 1
-        self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
-                                                                  card.get_traits(),
-                                                                  planet_chosen=planet_chosen)
         hand_disc = player.search_hand_for_discounts(card.get_faction())
         self.available_discounts += hand_disc
         if hand_disc > 0:
