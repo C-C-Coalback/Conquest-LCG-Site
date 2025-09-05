@@ -1182,6 +1182,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Herald of the WAAGH!":
+            self.herald_of_the_waagh_active = True
+            self.begin_battle(planet_pos)
+            self.begin_combat_round()
+            self.set_battle_initiative()
+            if not self.start_battle_deepstrike:
+                self.start_ranged_skirmish(planet_pos)
+            self.planet_aiming_reticle_active = True
+            self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+            self.p1.has_passed = False
+            self.p2.has_passed = False
+            self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
             if primary_player.resources > 0:
                 can_continue = True

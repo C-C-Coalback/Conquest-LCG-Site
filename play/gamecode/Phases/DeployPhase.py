@@ -1,11 +1,14 @@
 import copy
+from . import CombatPhase
 
 
 async def update_game_event_deploy_section(self, name, game_update_string):
     print("Need to run deploy turn code.")
     print(self.player_with_deploy_turn, self.number_with_deploy_turn)
     print(name == self.player_with_deploy_turn)
-    if self.mode == "ACTION":
+    if self.herald_of_the_waagh_active:
+        await CombatPhase.update_game_event_combat_section(self, name, game_update_string)
+    elif self.mode == "ACTION":
         await self.update_game_event_action(name, game_update_string)
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":

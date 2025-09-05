@@ -98,6 +98,7 @@ class Game:
                     self.all_traits.append(trait)
         self.last_planet_checked_for_battle = -1
         self.number_with_combat_turn = "1"
+        self.herald_of_the_waagh_active = False
         self.player_with_combat_turn = self.name_1
         self.attacker_planet = -1
         self.attacker_position = -1
@@ -678,13 +679,13 @@ class Game:
             info_string += "Unspecified/" + "Mobile"
         elif self.battle_ability_to_resolve:
             info_string += self.player_resolving_battle_ability + "/"
-        elif self.phase == "DEPLOY":
-            info_string += self.player_with_deploy_turn + "/"
-        elif self.phase == "COMBAT":
+        elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
             if self.start_battle_deepstrike:
                 info_string += self.name_player_deepstriking + "/"
             else:
                 info_string += self.player_with_combat_turn + "/"
+        elif self.phase == "DEPLOY":
+            info_string += self.player_with_deploy_turn + "/"
         else:
             info_string += "Unspecified/"
         info_string += "Phase: " + self.phase + "/"
@@ -742,6 +743,13 @@ class Game:
         elif self.battle_ability_to_resolve:
             info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
             info_string += self.player_resolving_battle_ability + "/"
+        elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
+            if self.start_battle_deepstrike:
+                info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
+            elif self.ranged_skirmish_active:
+                info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
+            else:
+                info_string += "Active: " + self.player_with_combat_turn + "/"
         elif self.phase == "DEPLOY":
             info_string += "Active: " + self.player_with_deploy_turn + "/"
         elif self.phase == "COMMAND":
@@ -755,13 +763,6 @@ class Game:
                 info_string += "During command struggle/"
             else:
                 info_string += "??????/"
-        elif self.phase == "COMBAT":
-            if self.start_battle_deepstrike:
-                info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
-            elif self.ranged_skirmish_active:
-                info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
-            else:
-                info_string += "Active: " + self.player_with_combat_turn + "/"
         elif self.phase == "HEADQUARTERS":
             info_string += "HQ action & reaction window/"
         else:
@@ -1585,7 +1586,7 @@ class Game:
                         if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
                             i = i - 1
                     i = i + 1
-                if self.round_number == self.last_planet_checked_for_battle:
+                if self.round_number == self.last_planet_checked_for_battle and not self.herald_of_the_waagh_active:
                     winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
                     winner.capture_planet(self.last_planet_checked_for_battle,
                                           self.planet_cards_array)
@@ -1608,6 +1609,11 @@ class Game:
             if self.kaerux_erameas_active:
                 self.kaerux_erameas_active = False
                 self.before_first_combat = True
+                self.last_planet_checked_for_battle = -1
+            elif self.herald_of_the_waagh_active:
+                self.p1.has_passed = False
+                self.p2.has_passed = False
+                self.herald_of_the_waagh_active = False
                 self.last_planet_checked_for_battle = -1
             else:
                 another_battle = self.find_next_planet_for_combat()
@@ -2429,6 +2435,9 @@ class Game:
                 self.name_player_making_choices = winner.name_player
                 self.resolving_search_box = True
             else:
+                await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Jaricho":
+            if self.phase != "COMBAT":
                 await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Immortal Sorrows":
             self.choices_available = ["Brutal", "Armorbane"]

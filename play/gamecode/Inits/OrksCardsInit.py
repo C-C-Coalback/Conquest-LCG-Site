@@ -449,6 +449,10 @@ def orks_cards_init():
         CardClasses.ArmyCard("Snagbrat's Scouts", "Deep Strike (1).\n"
                                                   "Reaction: When the command phase begins, Deep Strike this unit"
                                                   " to have it gain 2 command icons until the end of the phase.",
-                             "Soldier. Blood Axe.", 2, faction, "Signature", 2, 3, 1, False, deepstrike=1)
+                             "Soldier. Blood Axe.", 2, faction, "Signature", 2, 3, 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Herald of the WAAGH!", "Deploy Reaction: After this unit enters play, resolve a battle "
+                                                     "at this planet. (Only actions of the deploy phase are "
+                                                     "allowed and the planet cannot be captured.)", "Warrior. Nob.",
+                             4, faction, "Loyal", 2, 3, 1, False)
     ]
     return orks_card_array

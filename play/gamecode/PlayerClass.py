@@ -1966,6 +1966,10 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
                                                                                    last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Herald of the WAAGH!":
+            if self.game.phase == "DEPLOY":
+                self.game.create_reaction("Herald of the WAAGH!", self.name_player, (int(self.number), position,
+                                                                                     last_element_index))
         if self.check_for_trait_given_pos(position, last_element_index, "Khorne") and \
                 self.get_card_type_given_pos(position, last_element_index) == "Army":
             for i in range(len(self.headquarters)):
