@@ -336,6 +336,8 @@ class Player:
         return False
 
     def add_attachment_to_planet(self, planet_pos, card):
+        if card.get_limited():
+            self.can_play_limited = False
         self.attachments_at_planet[planet_pos].append(copy.deepcopy(card))
 
     def get_can_play_limited(self):
@@ -2543,6 +2545,10 @@ class Player:
                                             other_player.set_once_per_phase_used_given_pos(position, i, True)
                                     else:
                                         syren_ok = True
+                            for i in range(len(other_player.attachments_at_planet[position])):
+                                if other_player.attachments_at_planet[position][i].get_ability() == "Vanguard Pack":
+                                    self.game.create_reaction("Vanguard Pack", other_player.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if self.game.deploy_exhausted:
                                 self.exhaust_given_pos(position, location_of_unit)
                                 self.game.deploy_exhausted = False
@@ -4049,6 +4055,7 @@ class Player:
                 self.headquarters[i].yvraine_active = False
                 self.headquarters[i].retaliate_eor = 0
                 self.headquarters[i].mobile_eor = False
+                self.headquarters[i].ranged_eor = False
                 self.headquarters[i].extra_traits_eor = ""
                 self.headquarters[i].embarked_squads_active = False
                 if self.get_name_given_pos(-2, i) == "Caustic Tyrannofex":
@@ -4068,6 +4075,7 @@ class Player:
                 self.cards_in_play[i + 1][j].yvraine_active = False
                 self.cards_in_play[i + 1][j].retaliate_eor = 0
                 self.cards_in_play[i + 1][j].mobile_eor = False
+                self.cards_in_play[i + 1][j].ranged_eor = False
                 self.cards_in_play[i + 1][j].extra_traits_eor = ""
                 self.cards_in_play[i + 1][j].embarked_squads_active = False
                 if self.get_name_given_pos(i, j) == "Caustic Tyrannofex":
@@ -5446,6 +5454,13 @@ class Player:
                 if not self.check_for_trait_given_pos(i, j, trait):
                     return False
         return True
+
+    def check_if_faction_given_pos(self, planet_pos, unit_pos, faction):
+        if self.get_faction_given_pos(planet_pos, unit_pos) == faction:
+            return True
+        elif faction == "Astra Militarum" and self.get_ability_given_pos(planet_pos, unit_pos) == "Gue'vesa Overseer":
+            return True
+        return False
 
     def perform_own_reactions_on_phase_change(self, phase):
         # Forced reactions first

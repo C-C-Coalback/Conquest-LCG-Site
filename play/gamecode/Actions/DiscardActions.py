@@ -180,6 +180,43 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.card_to_deploy = card
                         self.chosen_first_card = True
                         primary_player.aiming_reticle_coords_discard = pos_discard
+    elif self.action_chosen == "Evolutionary Adaptation":
+        if chosen_discard == int(secondary_player.get_number()):
+            if not self.chosen_first_card:
+                choices = []
+                card = self.preloaded_find_card(secondary_player.discard[pos_discard])
+                if card.get_card_type() == "Army":
+                    if card.by_base_brutal:
+                        choices.append("Brutal")
+                    if card.by_base_flying:
+                        choices.append("Flying")
+                    if card.by_base_armorbane:
+                        choices.append("Armorbane")
+                    if card.by_base_mobile:
+                        choices.append("Mobile")
+                    if card.by_base_area_effect > 0:
+                        choices.append("Area Effect")
+                        self.stored_area_effect_value = self.cards_in_play[planet_pos + 1][
+                            unit_pos].by_base_area_effect
+                    if card.by_base_ranged:
+                        choices.append("Ranged")
+                    if choices:
+                        if len(choices) == 1:
+                            self.misc_target_choice = choices[0]
+                            await self.send_update_message(
+                                "Only one keyword: skipping asking which one to take."
+                            )
+                        else:
+                            self.choices_available = choices
+                            self.name_player_making_choices = primary_player.name_player
+                            self.choice_context = "Keyword copied from Evolutionary Adaptation"
+                        self.chosen_first_card = True
+                        secondary_player.remove_card_from_game(card.get_name())
+                        del secondary_player.discard[pos_discard]
+                    else:
+                        await self.send_update_message(
+                            "Target has no keywords to copy."
+                        )
     elif self.action_chosen == "Imotekh the Stormlord":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):

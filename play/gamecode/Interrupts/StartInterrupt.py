@@ -122,6 +122,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.choice_context = "Cajivak the Hateful Choice"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_interrupt == "Shaper Agnok":
+            self.choices_available = ["Card", "Resource"]
+            self.choice_context = "Shaper Agnok Gains"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_interrupt == "Grand Master Belial":
             planet_belial = -1
             pos_belial = -1

@@ -390,6 +390,33 @@ def tau_cards_init():
                                                      "an attachment or move a card in reserve you control to "
                                                      "another planet.", "Weapon.",
                                    0, faction, "Signature", 3, True, action_in_play=True, allowed_phases_in_play="ALL",
-                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True)
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
+        CardClasses.WarlordCard("Shaper Agnok", "Interrupt: When your opponent wins a command struggle at a planet "
+                                                "with one or more Kroot units you control, gain 1 resource or "
+                                                "draw 1 card.", "Kroot.", faction, 2, 7, 2, 5, "Bloodied.\n", 7, 7,
+                                ["4x Agnok's Shadows", "2x Behind Enemy Lines",
+                                 "1x Evolutionary Adaptation", "1x Vanguard Pack"]),
+        CardClasses.ArmyCard("Agnok's Shadows", "Combat Action: Exhaust this unit to have a target non-warlord unit at"
+                                                " this planet get -2 ATK until the end of the phase, then"
+                                                " move this unit to an adjacent planet.", "Warrior. Kroot.",
+                             2, faction, "Signature", 2, 3, 0, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Behind Enemy Lines", "Combat Action: Deploy a Kroot unit at a target planet. Then "
+                                                    "exhaust a target non-Elite enemy army unit at this planet.",
+                              "Tactic. Kroot.", 1, faction, "Signature", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.SupportCard("Evolutionary Adaptation", "Deploy Action: Exhaust this support to choose a unit in "
+                                                           "your opponent's discard pile and remove it from the game "
+                                                           "to give a target Kroot army unit a keyword "
+                                                           "(and all associated values) printed on the removed "
+                                                           "unit until the end of the round.", "Upgrade.",
+                                0, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.AttachmentCard("Vanguard Pack", "Limited.\n"
+                                                    "Attach to a planet.\n"
+                                                    "Reaction: After an enemy unit is deployed at this planet, "
+                                                    "exhaust it. Then your opponent may give you 1 resource to "
+                                                    "return this attachment to your hand.",
+                                   "Stratagem. Kroot.", 0, faction, "Signature", 3, False, limited=True,
+                                   planet_attachment=True)
     ]
     return tau_cards_array

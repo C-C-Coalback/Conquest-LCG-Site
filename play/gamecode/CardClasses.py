@@ -360,6 +360,7 @@ class UnitCard(Card):
         self.area_effect_eor = 0
         self.area_effect_eocr = 0
         self.mobile_eor = False
+        self.ranged_eor = False
         self.armorbane_eor = False
         self.negative_hp_until_eop = 0
         self.positive_hp_until_eop = 0
@@ -607,6 +608,8 @@ class UnitCard(Card):
         if self.lost_ranged_eop:
             return False
         if self.ranged_eop:
+            return True
+        if self.ranged_eor:
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Rokkit Launcha":

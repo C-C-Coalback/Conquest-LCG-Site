@@ -213,6 +213,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                    elif ability == "Agnok's Shadows":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            self.misc_target_planet = planet_pos
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                     elif ability == "Ravenwing Escort":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -525,6 +532,49 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_counter += 1
                     if self.misc_counter > 1:
                         self.action_cleanup()
+    elif self.action_chosen == "Agnok's Shadows":
+        if not self.chosen_first_card:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                if self.misc_target_planet == planet_pos:
+                    player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, -2, expiration="EOP")
+                    self.chosen_first_card = True
+                    await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
+                                                   " received -2 ATK!")
+    elif self.action_chosen == "Evolutionary Adaptation":
+        if self.chosen_first_card:
+            if primary_player.get_number() == game_update_string[1]:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and \
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
+                    if self.misc_target_choice == "Brutal":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eor = True
+                    if self.misc_target_choice == "Armorbane":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eor = True
+                    if self.misc_target_choice == "Flying":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eor = True
+                    if self.misc_target_choice == "Mobile":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].mobile_eor = True
+                    if self.misc_target_choice == "Ranged":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].ranged_eor = True
+                    if self.misc_target_choice == "Area Effect":
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eor = \
+                            self.stored_area_effect_value
+                    name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                    if self.misc_target_choice == "Area Effect":
+                        self.misc_target_choice += " (" + str(self.stored_area_effect_value) + ")"
+                    await self.send_update_message(
+                        name + " gained " + self.misc_target_choice + "."
+                    )
+                    self.action_cleanup()
+                    self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Behind Enemy Lines":
+        if self.chosen_second_card:
+            if game_update_string[1] == secondary_player.get_number():
+                if self.misc_target_planet == planet_pos:
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                            if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                                self.action_cleanup()
     elif self.action_chosen == "Mont'ka Strike":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

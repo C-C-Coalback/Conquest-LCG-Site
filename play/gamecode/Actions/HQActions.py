@@ -370,6 +370,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 card.set_once_per_phase_used(True)
                                 self.action_chosen = ability
                                 self.chosen_first_card = False
+                    elif ability == "Evolutionary Adaptation":
+                        if card.get_ready():
+                            card.exhaust_card()
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                     elif ability == "Smuggler's Den":
                         if card.get_ready():
                             if primary_player.resources > 0:
@@ -749,6 +754,32 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.name_player_who_is_searching = primary_player.name_player
                         self.number_who_is_searching = primary_player.number
                         self.action_cleanup()
+    elif self.action_chosen == "Evolutionary Adaptation":
+        if self.chosen_first_card:
+            if primary_player.get_number() == game_update_string[1]:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and \
+                        primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
+                    if self.misc_target_choice == "Brutal":
+                        primary_player.headquarters[unit_pos].brutal_eor = True
+                    if self.misc_target_choice == "Armorbane":
+                        primary_player.headquarters[unit_pos].armorbane_eor = True
+                    if self.misc_target_choice == "Flying":
+                        primary_player.headquarters[unit_pos].flying_eor = True
+                    if self.misc_target_choice == "Mobile":
+                        primary_player.headquarters[unit_pos].mobile_eor = True
+                    if self.misc_target_choice == "Ranged":
+                        primary_player.headquarters[unit_pos].ranged_eor = True
+                    if self.misc_target_choice == "Area Effect":
+                        primary_player.headquarters[unit_pos].area_effect_eor = \
+                            self.stored_area_effect_value
+                    name = primary_player.get_name_given_pos(planet_pos, unit_pos)
+                    if self.misc_target_choice == "Area Effect":
+                        self.misc_target_choice += " (" + str(self.stored_area_effect_value) + ")"
+                    await self.send_update_message(
+                        name + " gained " + self.misc_target_choice + "."
+                    )
+                    self.action_cleanup()
+                    self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "The Black Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

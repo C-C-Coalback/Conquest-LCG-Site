@@ -1078,6 +1078,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Support Fleet Transfer Target"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Vanguard Pack":
+            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+            if secondary_player.resources < 1:
+                self.delete_reaction()
+            else:
+                self.choices_available = ["Give 1 resource", "Pass"]
+                self.choice_context = "Vanguard Pack Payment"
+                self.name_player_making_choices = secondary_player.name_player
+                self.resolving_search_box = True
         elif current_reaction == "Support Fleet":
             primary_player.number_cards_to_search = 16
             self.misc_counter = 4

@@ -291,6 +291,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.add_resources(cost, refund=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_cleanup()
+                    elif ability == "Behind Enemy Lines":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.chosen_first_card = False
+                        self.chosen_second_card = False
+                        self.action_chosen = ability
                     elif ability == "Mind War":
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
@@ -1105,6 +1110,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             self.mask_jain_zar_check_actions(primary_player, secondary_player)
             self.action_cleanup()
+    elif self.action_chosen == "Behind Enemy Lines":
+        card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card.get_is_unit():
+            self.chosen_first_card = True
+            self.card_pos_to_deploy = int(game_update_string[2])
+            self.faction_of_card_to_play = card.get_faction()
+            self.name_of_card_to_play = card.get_name()
+            self.traits_of_card_to_play = card.get_traits()
+            primary_player.aiming_reticle_color = "blue"
+            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+            self.card_type_of_selected_card_in_hand = "Army"
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card.get_is_unit():

@@ -575,12 +575,22 @@ def try_entire_command(self, planet_pos):
                     return "INTERRUPT DURING STRUGGLE"
             if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
+            warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
+            if self.p2.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
+                if self.p2.check_for_trait_at_planet(planet_pos, "Kroot"):
+                    self.create_interrupt("Shaper Agnok", self.name_2, (2, -1, -1))
+                    return "INTERRUPT DURING STRUGGLE"
         elif name_winner == self.name_2:
             if self.get_green_icon(planet_pos):
                 if self.p2.search_hand_for_card("Wraithguard Revenant"):
                     return "INTERRUPT DURING STRUGGLE"
             if self.p1.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
+            warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
+            if self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
+                if self.p1.check_for_trait_at_planet(planet_pos, "Kroot"):
+                    self.create_interrupt("Shaper Agnok", self.name_1, (1, -1, -1))
+                    return "INTERRUPT DURING STRUGGLE"
     winnings = None
     if name_winner == self.name_1:
         winnings = resolve_winnings(self, self.p1, self.p2, planet_pos)

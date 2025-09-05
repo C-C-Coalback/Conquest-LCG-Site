@@ -486,6 +486,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 )
                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                 self.chosen_first_card = False
+    elif self.action_chosen == "Agnok's Shadows":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.position_of_actioned_card
+            if abs(og_pla - chosen_planet) == 1:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "The Dawn Blade":
         if self.misc_target_choice == "Move":
             if self.chosen_first_card:
@@ -791,6 +798,24 @@ async def update_game_event_action_planet(self, name, game_update_string):
         else:
             self.resolving_nurgling_bomb = False
         self.action_cleanup()
+    elif self.action_chosen == "Behind Enemy Lines":
+        if self.chosen_first_card:
+            planet_chosen = int(game_update_string[1])
+            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            self.discounts_applied = 0
+            await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
+            await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+            if card.check_for_a_trait("Elite"):
+                primary_player.master_warpsmith_count = 0
+            self.card_to_deploy = card
+            if self.available_discounts > self.discounts_applied:
+                self.stored_mode = self.mode
+                self.mode = "DISCOUNT"
+                self.planet_aiming_reticle_position = int(game_update_string[1])
+                self.planet_aiming_reticle_active = True
+            else:
+                await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
+                                                      discounts=self.discounts_applied)
     elif self.action_chosen == "Staging Ground":
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])

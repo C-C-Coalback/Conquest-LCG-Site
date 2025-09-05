@@ -406,7 +406,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card == "SUCCESS":
         primary_player.webway_witch = -1
         self.queued_sound = "onplay"
-        if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground") \
+        if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground" or
+                self.action_chosen == "Behind Enemy Lines") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
@@ -464,6 +465,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if self.action_chosen == "Triumvirate of Ynnead":
         if self.trium_count > 1:
             self.action_cleanup()
+    elif self.action_chosen == "Behind Enemy Lines":
+        self.chosen_second_card = True
+        self.misc_target_planet = planet_pos
     else:
         self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:

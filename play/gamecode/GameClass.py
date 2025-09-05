@@ -3181,8 +3181,31 @@ class Game:
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                    elif self.choice_context == "Vanguard Pack Payment":
+                        if chosen_choice == "Give 1 resource":
+                            primary_player.spend_resources(1)
+                            secondary_player.add_resources(1)
+                            target_planet = self.positions_of_unit_triggering_reaction[0][1]
+                            i = 0
+                            while i < len(secondary_player.attachments_at_planet[target_planet]):
+                                if secondary_player.attachments_at_planet[target_planet][i].get_ability() ==\
+                                        "Vanguard Pack":
+                                    secondary_player.cards.append("Vanguard Pack")
+                                    del secondary_player.attachments_at_planet[target_planet][i]
+                                    i = i - 1
+                                i = i + 1
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
+                    elif self.choice_context == "Shaper Agnok Gains":
+                        if chosen_choice == "Card":
+                            primary_player.draw_card()
+                        else:
+                            primary_player.add_resources(1)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_interrupt()
                     elif self.choice_context == "Target Planet Vale Tenndrac":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         i = 0
                         found_planet = False
                         while i < 7 and not found_planet:
@@ -4743,7 +4766,8 @@ class Game:
                                 "Autarch Celachia gained Mobile."
                             )
                         self.position_of_actioned_card = (-1, -1)
-                    elif self.choice_context == "Keyword copied from Brood Chamber":
+                    elif self.choice_context == "Keyword copied from Brood Chamber" or \
+                            self.choice_context == "Evolutionary Adaptation":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = []
                         self.choice_context = ""
