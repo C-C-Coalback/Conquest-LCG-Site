@@ -374,6 +374,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.misc_target_planet = planet_pos
+                    elif ability == "Lekor Blight-Tongue":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Improbable Runt Machine":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
@@ -1653,6 +1657,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, x_value,
                                                                       expiration="NEXT")
                         self.action_cleanup()
+    elif self.action_chosen == "Lekor Blight-Tongue":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor += 1
+            await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
+                                           " gained an infection token!")
+            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor > 1:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor = 0
+            self.action_cleanup()
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

@@ -182,8 +182,8 @@ class Player:
         self.looted_skrap_active = False
         self.looted_skrap_count = 0
         self.looted_skrap_planet = -1
-        self.cards_removed_from_game = ["Connoisseur of Terror"]
-        self.cards_removed_from_game_hidden = ["H"]
+        self.cards_removed_from_game = []
+        self.cards_removed_from_game_hidden = []
         self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
         self.last_removed_string = ""
         self.played_grand_plan = False

@@ -94,6 +94,7 @@ class Card:
         self.return_to_hand_eor = False
         self.yvraine_active = False
         self.quick_construct = False
+        self.infection_lekor = 0
 
     def get_once_per_game_used(self):
         return self.once_per_game_used

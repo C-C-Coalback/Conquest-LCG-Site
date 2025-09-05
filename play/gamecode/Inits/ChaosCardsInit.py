@@ -500,6 +500,12 @@ def chaos_cards_init():
                                                       "Reaction: After you deploy a Nurgle unit at this planet, "
                                                       "at this planet move 1 damage from an army unit to "
                                                       "another army unit. (Limit once per phase.)", "Daemon. Nurgle.",
-                             3, faction, "Common", 2, 6, 2, False, lumbering=True, retaliate=2)
+                             3, faction, "Common", 2, 6, 2, False, lumbering=True, retaliate=2),
+        CardClasses.ArmyCard("Lekor Blight-Tongue", "Sweep (1).\n"
+                                                    "Headquarters Action: Exhaust this unit to place a token on a "
+                                                    "target army unit. Then if there is 2 tokens or more on that "
+                                                    "unit, remove them to deal it 3 damage.", "Cultist. Nurgle.",
+                             2, faction, "Loyal", 1, 3, 1, True, sweep=1,
+                             action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
     ]
     return chaos_card_array

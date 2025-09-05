@@ -328,6 +328,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Lekor Blight-Tongue":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Kaptin Bluddflagg":
                         if not card.get_once_per_round_used():
                             card.set_once_per_round_used(True)
@@ -1023,6 +1027,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if can_continue:
                     player_being_hit.destroy_card_in_hq(unit_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Lekor Blight-Tongue":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            player_owning_card.headquarters[unit_pos].infection_lekor += 1
+            await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
+                                           " gained an infection token!")
+            if player_owning_card.headquarters[unit_pos].infection_lekor > 1:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3)
+                player_owning_card.headquarters[unit_pos].infection_lekor = 0
+            self.action_cleanup()
     elif self.action_chosen == "Evangelizing Ships":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
