@@ -203,6 +203,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         self.chosen_first_card = False
                         self.chosen_second_card = False
+                    elif ability == "Torturer of Worlds":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.chosen_first_card = False
+                        self.misc_target_unit = (-1, -1)
+                        self.action_chosen = ability
                     elif ability == "Our Last Stand":
                         if not primary_player.our_last_stand_used:
                             primary_player.our_last_stand_used = True

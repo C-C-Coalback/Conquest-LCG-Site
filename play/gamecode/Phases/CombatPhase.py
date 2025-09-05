@@ -715,6 +715,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     ethereal_movement_active = True
                             if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) != "Warlord":
                                 i = 0
+                                self.attack_being_resolved = True
                                 while i < len(player.attachments_at_planet[self.attacker_planet]):
                                     if player.attachments_at_planet[self.attacker_planet][i] \
                                             .get_ability() == "Improvised Minefield":

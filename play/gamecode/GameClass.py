@@ -56,6 +56,7 @@ class Game:
         self.running = True
         self.planet_array = []
         self.sector = sector
+        self.cult_duplicity_available = True
         if sector == "Traxis":
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -71,16 +72,22 @@ class Game:
         else:
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
+        self.available_breach_planets = []
+        for i in range(30, 40):
+            self.available_breach_planets.append(self.planet_cards_array[i].get_name())
         random.shuffle(self.planet_array)
         self.planets_removed_from_game = copy.deepcopy(self.planet_array[-3:])
         self.planet_array = self.planet_array[:7]
+        self.original_planet_array = copy.deepcopy(self.planet_array)
         self.planets_in_play_array = [True, True, True, True, True, False, False]
+        self.replaced_planets = [False, False, False, False, False, False, False]
         self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
         self.card_pos_to_deploy = -1
         self.planet_pos_to_deploy = -1
         self.all_traits = []
+        self.most_recently_revealed_planet = -1
         for i in range(len(self.card_array)):
             card = self.preloaded_find_card(self.card_array[i].get_name())
             traits = card.get_traits()
@@ -327,7 +334,8 @@ class Game:
                                  "Reinforced Synaptic Network", "Saint Erika", "Charging Juggernaut",
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
-                                 "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus"]
+                                 "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
+                                 "Tras the Corrupter"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -1019,6 +1027,8 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Soot-Blackened Axe":
                         self.action_cleanup()
+                    elif self.action_chosen == "Iridescent Wand":
+                        self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
@@ -1558,6 +1568,7 @@ class Game:
     async def resolve_battle_conclusion(self, name, game_string):
         self.p1.foretell_permitted = True
         self.p2.foretell_permitted = True
+        self.cult_duplicity_available = True
         self.p1.rok_bombardment_active = []
         self.p2.rok_bombardment_active = []
         self.nectavus_active = False
@@ -2988,7 +2999,7 @@ class Game:
                             self.choice_context = "Target Planet Shas'el Lyst"
                             for i in range(len(self.planets_in_play_array)):
                                 if self.planets_in_play_array[i]:
-                                    self.choices_available.append(primary_player.cards_in_play[0][i])
+                                    self.choices_available.append(self.planet_array[i])
                             if not self.choices_available:
                                 self.reset_choices_available()
                                 self.resolving_search_box = False
@@ -3000,7 +3011,7 @@ class Game:
                             self.choice_context = "Target Planet Vale Tenndrac"
                             for i in range(len(self.planets_in_play_array)):
                                 if self.planets_in_play_array[i]:
-                                    self.choices_available.append(primary_player.cards_in_play[0][i])
+                                    self.choices_available.append(self.planet_array[i])
                             if not self.choices_available:
                                 self.reset_choices_available()
                                 self.resolving_search_box = False
@@ -3030,8 +3041,25 @@ class Game:
                         self.interrupts_discard_enemy_allowed = False
                         await self.complete_enemy_discard(primary_player, secondary_player)
                         self.interrupts_discard_enemy_allowed = True
+                    elif self.choice_context == "Tras Replacement":
+                        self.most_recently_revealed_planet = self.misc_target_planet
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_ability_given_pos(-2, i) == "War Cabal":
+                                self.create_reaction("War Cabal", primary_player.name_player,
+                                                     (int(primary_player.number), -2, i))
+                        for i in range(7):
+                            if i != self.misc_target_planet:
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.get_ability_given_pos(i, j) == "War Cabal":
+                                        self.create_reaction("War Cabal", primary_player.name_player,
+                                                             (int(primary_player.number), i, j))
+                        self.replaced_planets[self.misc_target_planet] = True
+                        self.planet_array[self.misc_target_planet] = chosen_choice
+                        self.available_breach_planets.remove(chosen_choice)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Mobilize the Chapter Reward:":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Gain 1 Resource":
                             primary_player.add_resources(1)
                         else:
@@ -3097,7 +3125,7 @@ class Game:
                         i = 0
                         found_planet = False
                         while i < 7 and not found_planet:
-                            if primary_player.cards_in_play[0][i] == chosen_choice:
+                            if self.planet_array[i] == chosen_choice:
                                 found_planet = True
                                 card = self.preloaded_find_card("Vale Tenndrac")
                                 primary_player.add_card_to_planet(card, i)
@@ -3258,6 +3286,76 @@ class Game:
                         else:
                             primary_player.add_resources(1)
                         self.choice_context = "Anshan opponent gains"
+                    elif self.choice_context == "Cult of Duplicity":
+                        if chosen_choice == "Duplicate":
+                            if primary_player.spend_resources(1):
+                                self.cult_duplicity_available = False
+                                if self.misc_target_choice == "Health":
+                                    self.misc_target_choice = "Faith"
+                                    self.misc_counter = 5
+                                elif self.misc_target_choice == "Faith":
+                                    self.misc_target_choice = "Health"
+                                elif self.misc_target_choice == "Ready":
+                                    self.misc_target_choice = "Exhaust"
+                                elif self.misc_target_choice == "Exhaust":
+                                    self.misc_target_choice = "Ready"
+                                elif self.misc_target_choice == "Return":
+                                    self.misc_target_choice = "Deploy"
+                                elif self.misc_target_choice == "Deploy":
+                                    self.misc_target_choice = "Return"
+                                elif self.misc_target_choice == "Heal":
+                                    self.misc_target_choice = "Damage"
+                                    self.misc_counter = 2
+                                elif self.misc_target_choice == "Damage":
+                                    self.misc_target_choice = "Heal"
+                                    self.misc_counter = 3
+                                elif self.misc_target_choice == "Rout":
+                                    self.misc_target_choice = "Move"
+                                elif self.misc_target_choice == "Move":
+                                    self.misc_target_choice = "Rout"
+                                elif self.misc_target_choice == "Draw 1":
+                                    while primary_player.cards:
+                                        primary_player.discard_card_from_hand(0)
+                                    for _ in range(4):
+                                        primary_player.draw_card()
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                elif self.misc_target_choice == "Discard to Draw 4":
+                                    primary_player.draw_card()
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                elif self.misc_target_choice == "Brutal":
+                                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                                    if warlord_pla == -2:
+                                        primary_player.headquarters[warlord_pos].armorbane_eog = True
+                                    else:
+                                        primary_player.cards_in_play[warlord_pla + 1][warlord_pos].armorbane_eog = True
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                elif self.misc_target_choice == "Armorbane":
+                                    warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                                    if warlord_pla == -2:
+                                        primary_player.headquarters[warlord_pos].brutal_eog = True
+                                    else:
+                                        primary_player.cards_in_play[warlord_pla + 1][warlord_pos].brutal_eog = True
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                else:
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                            else:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Cajivak the Hateful Choice":
                         if chosen_choice == "Draw 2":
                             primary_player.discard_card_name_from_hand("Cajivak the Hateful")
@@ -3572,6 +3670,7 @@ class Game:
                                     self.resolving_search_box = False
                                     self.delete_reaction()
                     elif self.choice_context == "Immortal Sorrows Choice":
+                        self.misc_target_choice = chosen_choice
                         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_pla == -2:
                             if chosen_choice == "Armorbane":
@@ -3585,7 +3684,18 @@ class Game:
                                 primary_player.cards_in_play[warlord_pla + 1][warlord_pos].brutal_eog = True
                         self.reset_choices_available()
                         self.resolving_search_box = False
-                        await self.resolve_battle_conclusion(name, game_update_string)
+                        another_trigger = False
+                        if primary_player.resources > 0 and self.cult_duplicity_available:
+                            if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                    another_trigger = True
+                        if another_trigger:
+                            self.choices_available = ["Duplicate", "Pass"]
+                            self.choice_context = "Cult of Duplicity"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                        else:
+                            await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Hell's Theet Choice":
                         self.misc_target_choice = chosen_choice
                         if chosen_choice == "Faith":
@@ -3613,6 +3723,7 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Clipped Wings Choice":
+                        self.misc_target_choice = chosen_choice
                         if chosen_choice == "Draw 1":
                             primary_player.draw_card()
                         else:
@@ -3622,7 +3733,18 @@ class Game:
                                 primary_player.draw_card()
                         self.reset_choices_available()
                         self.resolving_search_box = False
-                        await self.resolve_battle_conclusion(name, game_update_string)
+                        another_trigger = False
+                        if primary_player.resources > 0 and self.cult_duplicity_available:
+                            if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                    another_trigger = True
+                        if another_trigger:
+                            self.choices_available = ["Duplicate", "Pass"]
+                            self.choice_context = "Cult of Duplicity"
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                        else:
+                            await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Freezing Tower Choice":
                         self.misc_target_choice = chosen_choice
                         self.chosen_first_card = False
@@ -5358,12 +5480,34 @@ class Game:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                     primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 3,
                                                                                   expiration="EOG")
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
                             else:
                                 primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
                                 self.misc_counter = self.misc_counter - 1
                                 if self.misc_counter < 1:
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         planet_pos = int(game_update_string[2])
@@ -5373,12 +5517,34 @@ class Game:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                     primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 3,
                                                                                   expiration="EOG")
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
                             else:
                                 primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
                                 self.misc_counter = self.misc_counter - 1
                                 if self.misc_counter < 1:
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
             elif self.battle_ability_to_resolve == "Tool of Abolition":
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
@@ -5391,7 +5557,18 @@ class Game:
                             if self.misc_target_choice == "Ready":
                                 player_owning_card.ready_given_pos(planet_pos, unit_pos)
                                 player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                another_trigger = False
+                                if primary_player.resources > 0 and self.cult_duplicity_available:
+                                    if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                        if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                            another_trigger = True
+                                if another_trigger:
+                                    self.choices_available = ["Duplicate", "Pass"]
+                                    self.choice_context = "Cult of Duplicity"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                             elif player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                 player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
                                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
@@ -5407,7 +5584,18 @@ class Game:
                             if self.misc_target_choice == "Ready":
                                 player_owning_card.ready_given_pos(planet_pos, unit_pos)
                                 player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                another_trigger = False
+                                if primary_player.resources > 0 and self.cult_duplicity_available:
+                                    if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                        if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                            another_trigger = True
+                                if another_trigger:
+                                    self.choices_available = ["Duplicate", "Pass"]
+                                    self.choice_context = "Cult of Duplicity"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                             elif player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                 player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
                                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
@@ -5531,7 +5719,18 @@ class Game:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                     primary_player.return_card_to_hand(planet_pos, unit_pos)
                                     primary_player.add_resources(3)
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
                     elif len(game_update_string) == 4:
                         if game_update_string[0] == "IN_PLAY":
                             if game_update_string[1] == primary_player.get_number():
@@ -5540,14 +5739,36 @@ class Game:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                     primary_player.return_card_to_hand(planet_pos, unit_pos)
                                     primary_player.add_resources(3)
-                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    another_trigger = False
+                                    if primary_player.resources > 0 and self.cult_duplicity_available:
+                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                another_trigger = True
+                                    if another_trigger:
+                                        self.choices_available = ["Duplicate", "Pass"]
+                                        self.choice_context = "Cult of Duplicity"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                    else:
+                                        await self.resolve_battle_conclusion(name, game_update_string)
                 else:
                     if self.chosen_first_card:
                         if len(game_update_string) == 2:
                             if game_update_string[0] == "PLANETS":
                                 await DeployPhase.deploy_card_routine(self, name, int(game_update_string[1]),
                                                                       discounts=2)
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                another_trigger = False
+                                if primary_player.resources > 0 and self.cult_duplicity_available:
+                                    if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                        if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                            another_trigger = True
+                                if another_trigger:
+                                    self.choices_available = ["Duplicate", "Pass"]
+                                    self.choice_context = "Cult of Duplicity"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                     else:
                         if len(game_update_string) == 3:
                             if game_update_string[0] == "HAND":
@@ -5597,7 +5818,18 @@ class Game:
                                     self.misc_counter = self.misc_counter - 1
                                     self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
                                     if self.misc_counter < 1:
-                                        await self.resolve_battle_conclusion(name, game_update_string)
+                                        another_trigger = False
+                                        if primary_player.resources > 0 and self.cult_duplicity_available:
+                                            if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                                if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                    another_trigger = True
+                                        if another_trigger:
+                                            self.choices_available = ["Duplicate", "Pass"]
+                                            self.choice_context = "Cult of Duplicity"
+                                            self.name_player_making_choices = primary_player.name_player
+                                            self.resolving_search_box = True
+                                        else:
+                                            await self.resolve_battle_conclusion(name, game_update_string)
                             else:
                                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
                                 self.misc_counter = self.misc_counter - 1
@@ -5618,7 +5850,18 @@ class Game:
                                     self.misc_counter = self.misc_counter - 1
                                     self.misc_misc.append((int(player_owning_card.get_number()), planet_pos, unit_pos))
                                     if self.misc_counter < 1:
-                                        await self.resolve_battle_conclusion(name, game_update_string)
+                                        another_trigger = False
+                                        if primary_player.resources > 0 and self.cult_duplicity_available:
+                                            if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                                if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                    another_trigger = True
+                                        if another_trigger:
+                                            self.choices_available = ["Duplicate", "Pass"]
+                                            self.choice_context = "Cult of Duplicity"
+                                            self.name_player_making_choices = primary_player.name_player
+                                            self.resolving_search_box = True
+                                        else:
+                                            await self.resolve_battle_conclusion(name, game_update_string)
                             else:
                                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
                                 self.misc_counter = self.misc_counter - 1
@@ -5657,7 +5900,18 @@ class Game:
                                 player_owning_card = self.p2
                             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                 player_owning_card.rout_unit(planet_pos, unit_pos)
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                another_trigger = False
+                                if primary_player.resources > 0 and self.cult_duplicity_available:
+                                    if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                        if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                            another_trigger = True
+                                if another_trigger:
+                                    self.choices_available = ["Duplicate", "Pass"]
+                                    self.choice_context = "Cult of Duplicity"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                 else:
                     if len(game_update_string) == 2 and self.chosen_first_card:
                         if game_update_string[0] == "PLANETS":
@@ -5666,7 +5920,18 @@ class Game:
                                 og_pla, og_pos = self.misc_target_unit
                                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                                 primary_player.move_unit_to_planet(og_pla, og_pos, destination)
-                                await self.resolve_battle_conclusion(name, game_update_string)
+                                another_trigger = False
+                                if primary_player.resources > 0 and self.cult_duplicity_available:
+                                    if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                        if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                            another_trigger = True
+                                if another_trigger:
+                                    self.choices_available = ["Duplicate", "Pass"]
+                                    self.choice_context = "Cult of Duplicity"
+                                    self.name_player_making_choices = primary_player.name_player
+                                    self.resolving_search_box = True
+                                else:
+                                    await self.resolve_battle_conclusion(name, game_update_string)
                     elif len(game_update_string) == 3 and not self.chosen_first_card:
                         if game_update_string[0] == "HQ":
                             planet_pos = -2
@@ -9251,7 +9516,7 @@ class Game:
                     for j in range(len(self.p2.cards_in_play[i + 1])):
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
-            if self:
+            if self.attack_being_resolved and self.defender_position == -1 and self.attacker_position == -1:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False
                 self.p2.celestian_amelia_active = False
@@ -9875,8 +10140,46 @@ class Game:
         self.p2.refresh_all_once_per_round()
         if self.round_number == 0:
             self.planets_in_play_array[5] = True
+            self.most_recently_revealed_planet = 5
+            for i in range(len(self.p1.headquarters)):
+                if self.p1.get_ability_given_pos(-2, i) == "War Cabal":
+                    self.create_reaction("War Cabal", self.p1.name_player,
+                                         (int(self.p1.number), -2, i))
+            for i in range(7):
+                for j in range(len(self.p1.cards_in_play[i + 1])):
+                    if self.p1.get_ability_given_pos(i, j) == "War Cabal":
+                        self.create_reaction("War Cabal", self.p1.name_player,
+                                             (int(self.p1.number), i, j))
+            for i in range(len(self.p2.headquarters)):
+                if self.p2.get_ability_given_pos(-2, i) == "War Cabal":
+                    self.create_reaction("War Cabal", self.p2.name_player,
+                                         (int(self.p2.number), -2, i))
+            for i in range(7):
+                for j in range(len(self.p2.cards_in_play[i + 1])):
+                    if self.p2.get_ability_given_pos(i, j) == "War Cabal":
+                        self.create_reaction("War Cabal", self.p2.name_player,
+                                             (int(self.p2.number), i, j))
         elif self.round_number == 1:
             self.planets_in_play_array[6] = True
+            self.most_recently_revealed_planet = 6
+            for i in range(len(self.p1.headquarters)):
+                if self.p1.get_ability_given_pos(-2, i) == "War Cabal":
+                    self.create_reaction("War Cabal", self.p1.name_player,
+                                         (int(self.p1.number), -2, i))
+            for i in range(7):
+                for j in range(len(self.p1.cards_in_play[i + 1])):
+                    if self.p1.get_ability_given_pos(i, j) == "War Cabal":
+                        self.create_reaction("War Cabal", self.p1.name_player,
+                                             (int(self.p1.number), i, j))
+            for i in range(len(self.p2.headquarters)):
+                if self.p2.get_ability_given_pos(-2, i) == "War Cabal":
+                    self.create_reaction("War Cabal", self.p2.name_player,
+                                         (int(self.p2.number), -2, i))
+            for i in range(7):
+                for j in range(len(self.p2.cards_in_play[i + 1])):
+                    if self.p2.get_ability_given_pos(i, j) == "War Cabal":
+                        self.create_reaction("War Cabal", self.p2.name_player,
+                                             (int(self.p2.number), i, j))
         self.round_number += 1
         i = 0
         while i < len(self.grand_plan_queued):

@@ -200,7 +200,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             message = "The following planets can be hit by Sautekh Royal Crypt: "
             for i in range(len(self.misc_misc)):
                 if self.misc_misc[i]:
-                    message += primary_player.cards_in_play[0][i] + ", "
+                    message += self.planet_array[chosen_planet] + ", "
             message += ". Press pass when done."
             self.misc_misc_2 = []
             await self.send_update_message(message)
@@ -1071,6 +1071,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Death Guard Preachers":
             self.chosen_first_card = False
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+        elif current_reaction == "War Cabal":
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.most_recently_revealed_planet)
+            last_el_index = len(primary_player.cards_in_play[self.most_recently_revealed_planet + 1]) - 1
+            if last_el_index != -1:
+                primary_player.exhaust_given_pos(self.most_recently_revealed_planet, last_el_index)
+            self.delete_reaction()
+        elif current_reaction == "Tras the Corrupter":
+            await self.send_update_message("Choose planet to replace.")
         elif current_reaction == "Quartermasters":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

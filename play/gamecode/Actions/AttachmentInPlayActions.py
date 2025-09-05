@@ -63,6 +63,15 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                                 self.misc_target_player = player_owning_card.name_player
                                 await self.send_update_message(ability + " activated")
+                    elif ability == "Iridescent Wand":
+                        if primary_player.get_name_player() == player_owning_card.name_player:
+                            if card_chosen.get_ready():
+                                if self.replaced_planets[planet_pos]:
+                                    card_chosen.exhaust_card()
+                                    self.misc_counter = 2
+                                    self.action_chosen = ability
+                                    self.misc_target_unit = (-1, -1)
+                                    self.misc_target_planet = planet_pos
                     elif ability == "Departmento Munitorum Aid":
                         if primary_player.get_name_player() == player_owning_card.name_player:
                             if card_chosen.get_ready():

@@ -670,8 +670,34 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                     self.action_cleanup()
                     await self.send_update_message(card_name + " at " +
-                                                   primary_player.cards_in_play[0][planet_pos] + " gained " +
+                                                   self.planet_array[planet_pos] + " gained " +
                                                    self.misc_target_player + "'s text box!")
+    elif self.action_chosen == "Iridescent Wand":
+        if planet_pos == self.misc_target_planet:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if self.misc_target_unit != (planet_pos, unit_pos):
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    player_owning_card.cards_in_play[planet_pos + 1][unit_pos].increase_sweep_eop(1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.action_cleanup()
+    elif self.action_chosen == "Torturer of Worlds":
+        if game_update_string[1] == primary_player.get_number():
+            if self.replaced_planets[planet_pos]:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if self.misc_target_unit[0] != planet_pos:
+                        if not self.chosen_first_card:
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.chosen_first_card = True
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        else:
+                            og_pla, og_pos = self.misc_target_unit
+                            primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                            primary_player.cards_in_play[planet_pos + 1].append(primary_player.cards_in_play[og_pla + 1][og_pos])
+                            primary_player.cards_in_play[og_pla + 1].append(primary_player.cards_in_play[planet_pos + 1][unit_pos])
+                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
+                            del primary_player.cards_in_play[og_pla + 1][og_pos]
+                            self.action_cleanup()
     elif self.action_chosen == "Canoptek Spyder":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -709,7 +735,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                         self.action_cleanup()
                         await self.send_update_message(card_name + " at " +
-                                                       primary_player.cards_in_play[0][planet_pos] + " gained " +
+                                                       self.planet_array[planet_pos] + " gained " +
                                                        self.misc_target_player + "'s text box!")
         else:
             if game_update_string[1] == secondary_player.number:

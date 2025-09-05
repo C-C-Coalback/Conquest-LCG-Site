@@ -511,6 +511,33 @@ def chaos_cards_init():
                                                     "Headquarters Action: Ready this unit to deal 2 damage to a "
                                                     "target non-unique unit.", "Vehicle. Nurgle. Daemon.",
                              2, faction, "Loyal", 2, 4, 1, False, lumbering=True,
-                             action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
+                             action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.WarlordCard("Tras the Corrupter", "Forced Reaction: After you commit your warlord, replace a "
+                                                      "planet with one from The Breach sector (each planet can "
+                                                      "only be used once). After that planet is captured, "
+                                                      "replace it again with the original.", "Chosen. Tzeentch.",
+                                faction, 2, 6, 2, 5,
+                                "Bloodied.\n"
+                                "Forced Reaction: After you commit your warlord, replace a planet with one from "
+                                "The Breach sector (each planet can only be used once). After that planet is "
+                                "captured, replace it again with the original.", 7, 7,
+                                ["1x Cult of Duplicity", "1x Iridescent Wand",
+                                 "2x Torturer of Worlds", "4x War Cabal"]),
+        CardClasses.SupportCard("Cult of Duplicity", "While triggering battle abilities with a choice on a replaced "
+                                                     "planet, you may pay 1 resource to choose both.", "Cult.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("Iridescent Wand", "Attach to your warlord.\n"
+                                                      "Action: Exhaust this attachment to have up to 2 army units at "
+                                                      "this planet gain Sweep (1) until the end of the phase. "
+                                                      "Can only be used at a replaced planet.",
+                                   "Wargear. Tzeentch.", 1, faction, "Signature", 3, False,
+                                   action_in_play=True, allowed_phases_in_play="ALL", must_be_own_unit=True,
+                                   type_of_units_allowed_for_attachment="Warlord"),
+        CardClasses.EventCard("Torturer of Worlds", "Action: Switch the location of two target army units you control."
+                                                    " Each target must be at a replaced planet.", "Tactic. Tzeentch.",
+                              1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("War Cabal", "Reaction: After a planet replaces another or is revealed, move this unit "
+                                          "to that planet and exhaust it if able.", "Soldier. Tzeentch.",
+                             2, faction, "Signature", 2, 3, 1, False)
     ]
     return chaos_card_array

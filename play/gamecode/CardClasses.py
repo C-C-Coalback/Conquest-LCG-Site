@@ -398,12 +398,17 @@ class UnitCard(Card):
         self.actual_attack = attack
         self.brutal_eog = False
         self.armorbane_eog = False
+        self.sweep_eop = 0
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
 
+    def increase_sweep_eop(self, value):
+        self.sweep_eop += value
+
     def reset_all_eop(self):
         self.retaliate_eop = 0
+        self.sweep_eop = 0
 
     def get_retaliate(self):
         retaliate_value = self.retaliate
@@ -447,6 +452,7 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "Crown of Control":
                 sweep += 1
         sweep += self.sweep_eor
+        sweep += self.sweep_eop
         return sweep
 
     def get_lumbering(self):

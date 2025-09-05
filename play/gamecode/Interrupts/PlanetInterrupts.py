@@ -78,7 +78,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             else:
                 await self.send_update_message(primary_player.name_player + " is trying to put The Shadow Suit into "
                                                                             "reserve at " +
-                                               primary_player.cards_in_play[0][chosen_planet] + ". You may exhaust a " +
+                                               self.planet_array[chosen_planet] + ". You may exhaust a " +
                                                "unit at that planet to cancel this effect.")
                 self.player_resolving_interrupts[0] = secondary_player.name_player
                 self.chosen_first_card = True

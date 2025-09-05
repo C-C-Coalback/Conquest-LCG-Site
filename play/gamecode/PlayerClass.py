@@ -3152,16 +3152,20 @@ class Player:
                                                       (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
                         self.game.create_reaction("Old Zogwort", self.name_player,
-                                                  (int(self.number), planet_pos - 1, i))
+                                                  (int(self.number), planet_pos - 1, -1))
+                    if headquarters_list[i].get_ability() == "Tras the Corrupter" or \
+                            headquarters_list[i].get_ability() == "Tras the Corrupter BLOODIED":
+                        self.game.create_reaction("Tras the Corrupter", self.name_player,
+                                                  (int(self.number), planet_pos - 1, -1))
                     if self.search_attachments_at_pos(-2, i, "The Blade of Antwyr"):
                         self.game.create_reaction("The Blade of Antwyr", self.name_player,
-                                                  (int(self.number), planet_pos - 1, i))
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Starblaze":
                         self.game.create_reaction("Commander Starblaze", self.name_player,
-                                                  (int(self.number), planet_pos - 1, i))
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Yvraine":
                         self.game.create_reaction("Yvraine", self.name_player,
-                                                  (int(self.number), planet_pos - 1, i))
+                                                  (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "The Swarmlord":
                         self.game.create_reaction("The Swarmlord", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
@@ -6533,9 +6537,6 @@ class Player:
             else:
                 j = 0
                 while j < len(self.cards_in_play[i + 1]):
-                    print("TEST", self.cards_in_play[0][i], "planet", i)
-                    print(self.cards_in_play[0])
-                    print(len(self.cards_in_play[i + 1]))
                     if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
                         self.move_unit_at_planet_to_hq(i, j)
                         return None
@@ -6877,11 +6878,8 @@ class Player:
         return None
 
     def check_if_units_present(self, planet_id):
-        print("Checking for cards at:", self.cards_in_play[0][planet_id])
         if not self.cards_in_play[planet_id + 1]:
-            print("No cards present.")
             return 0
-        print("Cards present.")
         return 1
 
     def retreat_all_at_planet(self, planet_id):
@@ -6893,7 +6891,7 @@ class Player:
             self.move_unit_at_planet_to_hq(planet_id, 0)
 
     def capture_planet(self, planet_id, planet_cards):
-        planet_name = self.cards_in_play[0][planet_id]
+        planet_name = self.game.original_planet_array[planet_id]
         print("Attempting to capture planet.")
         print("Planet to capture:", planet_name)
         i = 0

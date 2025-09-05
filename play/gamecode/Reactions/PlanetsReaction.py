@@ -44,6 +44,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             del primary_player.cards_removed_from_game_hidden[target_index]
         await primary_player.dark_eldar_event_played()
         self.delete_reaction()
+    elif current_reaction == "Tras the Corrupter":
+        self.misc_target_planet = chosen_planet
+        await self.send_update_message("Replacing " + self.planet_array[chosen_planet] + ". Choose new planet.")
+        self.choices_available = self.available_breach_planets
+        if not self.choices_available:
+            await self.send_update_message("No planets left to replace with!")
+            self.delete_reaction()
+        else:
+            self.choice_context = "Tras Replacement"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
     elif current_reaction == "Liatha's Retinue":
         if chosen_planet != self.last_planet_checked_for_battle:
             card = self.preloaded_find_card("Liatha's Retinue")
@@ -158,7 +169,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             if abs(planet_pos - chosen_planet) == 1:
                 self.misc_target_planet = chosen_planet
                 self.chosen_first_card = True
-                planet_name = primary_player.cards_in_play[0][chosen_planet]
+                planet_name = self.planet_array[chosen_planet]
                 await self.send_update_message("You may now move units to " + planet_name + ".")
     elif self.reactions_needing_resolving[0] == "Cry of the Wind":
         if self.chosen_first_card:
@@ -217,7 +228,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     self.misc_target_unit = (-1, -1)
     elif current_reaction == "Sautekh Royal Crypt":
         secondary_player.sautekh_royal_crypt = chosen_planet
-        await self.send_update_message(secondary_player.cards_in_play[0][chosen_planet] +
+        await self.send_update_message(self.planet_array[chosen_planet] +
                                        " was predicted as the warlord commit location.")
         self.delete_reaction()
         await CommandPhase.update_game_event_command_section(self, secondary_player.name_player, game_update_string)
