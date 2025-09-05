@@ -58,7 +58,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(cost):
                     if may_nullify and secondary_player.nullify_check() and ability != "Triumvirate of Ynnead" and \
-                            ability != "Daring Assault":
+                            ability != "Daring Assault" and ability != "The Siege Masters":
                         primary_player.add_resources(cost, refund=True)
                         await self.send_update_message(primary_player.name_player + " wants to play " +
                                                        ability + "; Nullify window offered.")
