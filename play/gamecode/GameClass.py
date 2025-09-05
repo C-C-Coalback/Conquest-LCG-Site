@@ -7085,6 +7085,11 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Extra Boomsticks":
+                            if primary_player.headquarters[hq_pos].get_ready():
+                                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                                    primary_player.exhaust_given_pos(-2, hq_pos)
+                                    primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
                             print("is rockcrete bunker")
                             if primary_player.headquarters[hq_pos].get_ready():

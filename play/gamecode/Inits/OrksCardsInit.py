@@ -477,6 +477,9 @@ def orks_cards_init():
         CardClasses.ArmyCard("Quartermasters", "This unit may be deployed in your HQ. If you do so, "
                                                "reduce its cost by 1.\n"
                                                "Reaction: After this unit moves to a planet, remove 1 damage from it.",
-                             "Krew. Soldier.", 2, faction, "Signature", 2, 3, 1, False)
+                             "Krew. Soldier.", 2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.SupportCard("Extra Boomsticks", "When an Orks unit is assigned damage, exhaust this support to"
+                                                    " give it Retaliate (2) until the end of the phase.", "Upgrade.",
+                                2, faction, "Loyal", False)
     ]
     return orks_card_array
