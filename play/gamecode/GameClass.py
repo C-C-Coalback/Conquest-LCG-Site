@@ -1141,6 +1141,37 @@ class Game:
                                 primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
                                 self.misc_target_choice = "RESERVE"
                                 self.misc_target_unit = (planet_pos, unit_pos)
+                    elif self.action_chosen == "Daring Assault":
+                        if not self.chosen_first_card:
+                            if game_update_string[1] == primary_player.get_number():
+                                self.chosen_first_card = True
+                                primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
+                                self.misc_target_unit = (planet_pos, unit_pos)
+                    elif self.action_chosen == "The Dawn Blade":
+                        if self.misc_target_choice == "Move":
+                            if not self.chosen_first_card:
+                                if game_update_string[1] == primary_player.get_number():
+                                    self.chosen_first_card = True
+                                    primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
+                                    self.misc_target_unit = (planet_pos, unit_pos)
+                        else:
+                            if primary_player.get_number() == game_update_string[1]:
+                                actual_card = primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                if actual_card.get_card_type() == "Attachment":
+                                    ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
+                                    if primary_player.spend_resources(ds_value):
+                                        if primary_player.cards_in_reserve[planet_pos][unit_pos].planet_attachment:
+                                            primary_player.add_attachment_to_planet(
+                                                planet_pos, primary_player.cards_in_reserve[planet_pos][unit_pos])
+                                            del primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                            primary_player.deepstrike_attachment_extras(planet_pos)
+                                            self.action_cleanup()
+                                        else:
+                                            self.chosen_first_card = True
+                                            primary_player.cards_in_reserve[planet_pos][
+                                                unit_pos].aiming_reticle_color = "blue"
+                                            self.misc_target_unit = (planet_pos, unit_pos)
+                                            self.misc_target_choice = "RESERVE"
                     elif self.action_chosen == "Kommando Cunning":
                         if not self.chosen_first_card:
                             if primary_player.get_number() == game_update_string[1]:
@@ -2675,6 +2706,11 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         primary_player.shuffle_deck()
+                    elif self.choice_context == "Support Fleet Rally":
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        primary_player.shuffle_deck()
                     elif self.choice_context == "Prophetic Farseer Discard":
                         self.choice_context = "Prophetic Farseer Rearrange"
                     elif self.choice_context == "Prophetic Farseer Rearrange":
@@ -2749,6 +2785,31 @@ class Game:
                         self.choice_context = "Beckel Gain"
                         self.choices_available = ["Yes", "No"]
                         self.name_player_making_choices = primary_player.name_player
+                    elif self.choice_context == "Support Fleet Rally":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Attachment":
+                            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            primary_player.headquarters[unit_pos].attachments.append(card)
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                            self.misc_counter = self.misc_counter - 1
+                            if self.misc_counter < 1:
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                self.delete_reaction()
+                                primary_player.bottom_remaining_cards()
+                                primary_player.shuffle_deck()
+                    elif self.choice_context == "The Dawn Blade Choice":
+                        self.misc_target_choice = chosen_choice
+                        self.reset_choices_available()
+                    elif self.choice_context == "Support Fleet Transfer Target":
+                        primary_player.cards.append(chosen_choice)
+                        _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                        del primary_player.headquarters[unit_pos].attachments[int(game_update_string[1])]
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Nurgling Bomb Choice:":
                         planet, unit = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet, unit)

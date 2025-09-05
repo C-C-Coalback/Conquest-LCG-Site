@@ -132,6 +132,7 @@ class Player:
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
         self.bluddflagg_relevant = False
+        self.farsight_relevant = False
         self.bluddflagg_used = False
         self.vael_relevent = False
         self.castellan_crowe_relevant = False
@@ -170,7 +171,7 @@ class Player:
         self.planet_absorption_played = False
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
-        self.preparation_cards = ["Pulsating Carapace", "Mobilize the Chapter"]
+        self.preparation_cards = ["Pulsating Carapace", "Mobilize the Chapter", "Support Fleet"]
         self.played_necrodermis = False
         self.necrodermis_allowed = True
         self.etekh_trait = ""
@@ -219,6 +220,8 @@ class Player:
             self.subject_omega_relevant = True
         if self.headquarters[0].get_name() == "Grigory Maksim":
             self.grigory_maksim_relevant = True
+        if self.headquarters[0].get_name() == "Farsight":
+            self.farsight_relevant = True
         if self.headquarters[0].get_name() == "Illuminor Szeras":
             self.illuminor_szeras_relevant = True
         if self.headquarters[0].get_name() == "Kaptin Bluddflagg":
@@ -528,7 +531,7 @@ class Player:
         return self.cards_in_reserve[planet_id][unit_id].get_card_type()
 
     def get_deepstrike_value_given_pos(self, planet_id, unit_id, in_play_card=False):
-        if self.idden_base_active and not in_play_card:
+        if self.idden_base_active or in_play_card:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
             card = self.game.preloaded_find_card(card_name)
             ds_value = card.get_deepstrike_value()
@@ -549,6 +552,9 @@ class Player:
                 ds_value = ds_value - 1
             return ds_value
         ds_value = self.cards_in_reserve[planet_id][unit_id].get_deepstrike_value()
+        if self.cards_in_reserve[planet_id][unit_id].get_card_type() == "Attachment":
+            if self.farsight_relevant:
+                ds_value = 0
         other_player = self.game.p1
         if other_player.name_player == self.name_player:
             other_player = self.game.p2
@@ -598,6 +604,10 @@ class Player:
         if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Epistolary Vezuel":
             self.game.create_reaction("Epistolary Vezuel", self.name_player,
                                       (int(self.number), warlord_pla, warlord_pos))
+        if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Farsight":
+            if not self.get_once_per_phase_used_given_pos(warlord_pla, warlord_pos):
+                self.game.create_reaction("Farsight", self.name_player,
+                                          (int(self.number), warlord_pla, warlord_pos))
         if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Fulgaris"):
             self.game.create_reaction("Fulgaris", self.name_player,
                                       (int(self.number), warlord_pla, warlord_pos))
@@ -1498,6 +1508,8 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), -2,
                                                                                    last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Support Fleet":
+            self.game.create_reaction("Support Fleet", self.name_player, (int(self.number), -2, last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
             self.game.create_reaction("Devoted Hospitaller", self.name_player,
                                       (int(self.number), -2, last_element_index))
@@ -1656,10 +1668,10 @@ class Player:
         else:
             target_attachment = self.cards_in_play[origin_planet + 1][origin_position]. \
                 get_attachments()[origin_attachment_position]
-        if destination_planet == -2:
-            target_card = self.headquarters[destination_position]
-        else:
-            target_card = self.cards_in_play[destination_planet + 1][destination_position]
+        # if destination_planet == -2:
+        #     target_card = self.headquarters[destination_position]
+        # else:
+        #     target_card = self.cards_in_play[destination_planet + 1][destination_position]
         print("Moving attachment code")
         army_unit_as_attachment = False
         if target_attachment.get_ability() == "Gun Drones" or \
@@ -5486,6 +5498,11 @@ class Player:
             if self.headquarters[i].get_ability() == "Masters of the Webway":
                 if phase == "DEPLOY":
                     self.game.create_reaction("Masters of the Webway", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Support Fleet":
+                if phase == "DEPLOY":
+                    if self.headquarters[i].attachments:
+                        self.game.create_reaction("Support Fleet Transfer", self.name_player,
+                                                  (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Obedience":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))

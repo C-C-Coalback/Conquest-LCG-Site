@@ -98,6 +98,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player = self.p2
                             secondary_player = self.p1
                         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+                        has_deepstrike = card.get_has_deepstrike()
+                        if card.get_card_type() == "Attachment" and primary_player.farsight_relevant:
+                            has_deepstrike = True
                         self.faction_of_card_to_play = card.get_faction()
                         self.name_of_card_to_play = card.get_name()
                         self.traits_of_card_to_play = card.get_traits()
@@ -132,7 +135,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                         await self.send_update_message("Both passed, move to warlord movement.")
                                         await self.change_phase("COMMAND")
                             self.card_pos_to_deploy = -1
-                        elif card.get_has_deepstrike() and primary_player.resources > 0 and self.deepstrike_allowed:
+                        elif has_deepstrike and primary_player.resources > 0 and self.deepstrike_allowed:
                             print("deepstrike", card.get_deepstrike_value())
                             self.stored_deploy_string = game_update_string
                             self.choices_available = ["Normal Deploy", "Deploy into Reserve"]

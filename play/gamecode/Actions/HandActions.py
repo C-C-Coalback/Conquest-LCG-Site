@@ -57,7 +57,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         primary_player.aiming_reticle_color = "blue"
                 elif primary_player.spend_resources(cost):
-                    if may_nullify and secondary_player.nullify_check() and ability != "Triumvirate of Ynnead":
+                    if may_nullify and secondary_player.nullify_check() and ability != "Triumvirate of Ynnead" and \
+                            ability != "Daring Assault":
                         primary_player.add_resources(cost, refund=True)
                         await self.send_update_message(primary_player.name_player + " wants to play " +
                                                        ability + "; Nullify window offered.")
@@ -203,6 +204,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         self.chosen_first_card = False
                         self.chosen_second_card = False
+                    elif ability == "Daring Assault":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        primary_player.draw_card()
+                        self.chosen_first_card = False
                     elif ability == "Torturer of Worlds":
                         primary_player.discard_card_from_hand(hand_pos)
                         self.chosen_first_card = False

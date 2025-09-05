@@ -2286,6 +2286,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "The Dawn Blade":
+        if self.chosen_first_card:
+            og_pla, og_pos = self.misc_target_unit
+            if og_pla == planet_pos:
+                card = primary_player.cards_in_reserve[og_pla][og_pos]
+                if player_owning_card.attach_card(card, planet_pos, unit_pos):
+                    del primary_player.cards_in_reserve[og_pla][og_pos]
+                    self.action_cleanup()
     elif self.action_chosen == "Kommando Cunning":
         if not self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:

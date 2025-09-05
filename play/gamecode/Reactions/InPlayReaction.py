@@ -1335,6 +1335,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Farsight Vanguard":
+            if not self.chosen_first_card:
+                if primary_player.get_number() == game_update_string[1]:
+                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    if og_pla != planet_pos or og_pos != unit_pos:
+                        self.chosen_first_card = True
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Hydrae Stalker":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":

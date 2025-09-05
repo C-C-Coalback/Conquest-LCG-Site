@@ -1071,6 +1071,33 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Death Guard Preachers":
             self.chosen_first_card = False
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+        elif current_reaction == "Support Fleet Transfer":
+            self.choices_available = []
+            for i in range(len(primary_player.headquarters[unit_pos].attachments)):
+                self.choices_available.append(primary_player.headquarters[unit_pos].attachments[i].get_name())
+            self.choice_context = "Support Fleet Transfer Target"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        elif current_reaction == "Support Fleet":
+            primary_player.number_cards_to_search = 16
+            self.misc_counter = 4
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            if primary_player.number_cards_to_search < 1:
+                self.delete_reaction()
+            else:
+                self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                self.choice_context = "Support Fleet Rally"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+        elif current_reaction == "Farsight Vanguard":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            self.chosen_first_card = False
+        elif current_reaction == "Farsight":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.add_resources(2)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "War Cabal":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.most_recently_revealed_planet)
             last_el_index = len(primary_player.cards_in_play[self.most_recently_revealed_planet + 1]) - 1

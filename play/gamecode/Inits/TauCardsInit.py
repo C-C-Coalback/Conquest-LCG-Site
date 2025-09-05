@@ -362,6 +362,34 @@ def tau_cards_init():
         CardClasses.SupportCard("Smuggler's Den", "Action: Exhaust this support and pay 1 resource to return a target"
                                                   " non-Drone attachment you control to your hand and gain resources "
                                                   "equal to the printed cost of the attachment.",  "Location.",
-                                1, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL")
+                                1, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.WarlordCard("Farsight", "Your attachment cards are considered to have Deep Strike (0).\n"
+                                            "Reaction: After you Deep Strike a card, gain 2 resources. "
+                                            "(Limit once per phase.)", "Shas'o.", faction,
+                                2, 7, 2, 5, "Bloodied.\n"
+                                            "Your attachment cards are considered to have Deep Strike (0).", 7, 7,
+                                ["2x Daring Assault", "4x Farsight Vanguard",
+                                 "1x Support Fleet", "1x The Dawn Blade"]),
+        CardClasses.EventCard("Daring Assault", "The effects of this event cannot be cancelled.\n"
+                                                "Action: Draw a card. Then you may move each card in reserve you "
+                                                "control to a different planet.", "Tactic.",
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Farsight Vanguard", "Reaction: After this unit is declared as an attacker or defender, "
+                                                  "choose a unit you control. Move a non-Drone attachment you control "
+                                                  "between this unit and the chosen unit. (Limit once per phase.)",
+                             "Soldier.", 2, faction, "Signature", 2, 2, 1, False),
+        CardClasses.SupportCard("Support Fleet", "This support cannot be targeted nor discarded.\n"
+                                                 "After you play this support, Rally 16 for up to 4 attachments,"
+                                                 " place them on this support. Then shuffle your deck.\n"
+                                                 "Reaction: After the deploy phase begins, transfer a card from this "
+                                                 "support to your hand.", "Fleet.",
+                                1, faction, "Signature", False),
+        CardClasses.AttachmentCard("The Dawn Blade", "Attach to your warlord.\n"
+                                                     "Attached unit gets Sweep (1).\n"
+                                                     "Combat Action: Exhaust this attachment to either Deep Strike "
+                                                     "an attachment or move a card in reserve you control to "
+                                                     "another planet.", "Weapon.",
+                                   0, faction, "Signature", 3, True, action_in_play=True, allowed_phases_in_play="ALL",
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True)
     ]
     return tau_cards_array

@@ -126,6 +126,16 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.action_chosen = ability
                                 self.misc_counter = 0
                                 self.misc_target_unit = (-1, -1)
+                    elif ability == "The Dawn Blade":
+                        if card_chosen.get_ready():
+                            if player_owning_card.name_player == primary_player.get_name_player():
+                                card_chosen.exhaust_card()
+                                self.action_chosen = "The Dawn Blade"
+                                self.misc_target_choice = ""
+                                self.chosen_first_card = False
+                                self.choices_available = ["Deepstrike", "Move"]
+                                self.choice_context = "The Dawn Blade Choice"
+                                self.name_player_making_choices = primary_player.get_name_player()
                     elif ability == "Positional Relay":
                         if card_chosen.get_ready():
                             if player_owning_card.name_player == primary_player.get_name_player():

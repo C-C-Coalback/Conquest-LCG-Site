@@ -451,6 +451,8 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Crown of Control":
                 sweep += 1
+            if self.attachments[i].get_ability() == "The Dawn Blade":
+                sweep += 1
         sweep += self.sweep_eor
         sweep += self.sweep_eop
         return sweep

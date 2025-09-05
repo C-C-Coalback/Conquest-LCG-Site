@@ -764,6 +764,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                         salamanders_flamers_id_number
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Farsight Vanguard":
+                                if not player.get_once_per_phase_used_given_pos(self.attacker_planet,
+                                                                                self.attacker_position):
+                                    self.create_reaction("Farsight Vanguard", player.name_player,
+                                                         (int(player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Flayed Ones Pack":
                                 for _ in range(3):
                                     player.discard_top_card_deck()
@@ -1179,6 +1186,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             .get_card_type() != "Warlord":
                                         secondary_player.exhaust_given_pos(self.defender_planet,
                                                                            self.defender_position)
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Farsight Vanguard":
+                                    if not secondary_player.get_once_per_phase_used_given_pos(
+                                            self.defender_planet, self.defender_position):
+                                        self.create_reaction("Farsight Vanguard", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              self.defender_position))
                                 if secondary_player.cards_in_play[
                                     self.defender_planet + 1][self.defender_position] \
                                         .get_card_type() == "Warlord":
