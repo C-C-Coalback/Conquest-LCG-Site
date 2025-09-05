@@ -997,6 +997,14 @@ class Game:
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.misc_counter = 0
                         self.action_cleanup()
+                    elif self.action_chosen == "Indiscriminate Bombing":
+                        if not self.chosen_second_card:
+                            self.chosen_second_card = True
+                            self.player_with_action = secondary_player.name_player
+                            await self.send_update_message("Indiscriminate Bombing passed.")
+                        else:
+                            self.action_cleanup()
+                            await self.send_update_message("Indiscriminate Bombing passed.")
                     elif self.action_chosen == "Biomass Sacrifice":
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.action_cleanup()
@@ -2796,6 +2804,12 @@ class Game:
                             self.name_player_making_choices = ""
                             await self.complete_nullify()
                             self.nullify_count = 0
+                    elif self.choice_context == "Quartermasters to HQ?":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if chosen_choice == "HQ":
+                            self.card_to_deploy = self.preloaded_find_card("Quartermasters")
+                            await DeployPhase.deploy_card_routine(self, name, -2, discounts=1)
                     elif self.choice_context == "The Orgiastic Feast Rally 2":
                         card = self.preloaded_find_card(chosen_choice)
                         if card.get_card_type() == "Army":
@@ -3877,7 +3891,8 @@ class Game:
                         elif game_update_string[1] == "1":
                             if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit" or \
                                     self.reactions_needing_resolving[0] == "War Walker Squadron" or \
-                                    self.reactions_needing_resolving[0] == "Fake Ooman Base":
+                                    self.reactions_needing_resolving[0] == "Fake Ooman Base" or \
+                                    self.reactions_needing_resolving[0] == "Kaptin's Hook":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
@@ -6312,6 +6327,19 @@ class Game:
                 self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             elif player_num == 2:
                 self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
+
+    def determine_leftmost_planet(self):
+        if self.player_with_initiative == self.name_1:
+            for i in range(7):
+                if self.planets_in_play_array[i]:
+                    return i
+        else:
+            last_planet = -1
+            for i in range(7):
+                if self.planets_in_play_array[i]:
+                    last_planet = i
+            return last_planet
+        return -1
 
     def conclude_mind_shackle_scarab(self):
         i = 0
@@ -9721,6 +9749,8 @@ class Game:
         self.imperial_blockades_active = [0, 0, 0, 0, 0, 0, 0]
         self.p1.has_passed = False
         self.p2.has_passed = False
+        self.p1.bluddflagg_used = False
+        self.p2.bluddflagg_used = False
         self.masters_of_the_webway = False
         self.p1.command_struggles_won_this_phase = 0
         self.p2.command_struggles_won_this_phase = 0

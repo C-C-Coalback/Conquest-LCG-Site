@@ -1068,6 +1068,23 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Quartermasters":
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reactino()
+        elif current_reaction == "Kaptin's Hook":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.exhaust_attachment_name_pos(warlord_pla, warlord_pos, "Kaptin's Hook")
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_combat_positions()
+            self.shining_blade_active = False
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            self.delete_reaction()
         elif current_reaction == "Fake Ooman Base":
             primary_player.exhaust_card_in_hq_given_name("Fake Ooman Base")
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

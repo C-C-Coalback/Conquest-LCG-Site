@@ -1086,6 +1086,29 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.last_defender_position = (secondary_player.number,
                                                                        self.defender_planet,
                                                                        self.defender_position)
+                                else:
+                                    warlord_pla, warlord_pos = secondary_player.get_location_of_warlord()
+                                    if abs(warlord_pla - self.defender_planet) == 1:
+                                        if not secondary_player.check_for_trait_given_pos(self.defender_planet,
+                                                                                          self.defender_position,
+                                                                                          "Elite"):
+                                            if secondary_player.search_attachments_at_pos(warlord_pla, warlord_pos,
+                                                                                          "Kaptin's Hook"):
+                                                can_continue = False
+                                                await self.send_update_message(
+                                                    "Kaptin's Hook can be used to cancel the attack"
+                                                )
+                                                secondary_player.set_aiming_reticle_in_play(
+                                                    self.defender_planet, self.defender_position, "blue"
+                                                )
+                                                self.create_reaction(
+                                                    "Kaptin's Hook", secondary_player.name_player,
+                                                    (int(secondary_player.number), self.defender_planet,
+                                                     self.defender_position)
+                                                )
+                                                self.last_defender_position = (secondary_player.number,
+                                                                               self.defender_planet,
+                                                                               self.defender_position)
                             if can_continue:
                                 faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                                self.attacker_position)

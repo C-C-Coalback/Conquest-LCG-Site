@@ -120,6 +120,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = -1
                             print(played_support)
                             if played_support == "SUCCESS":
+                                primary_player.cards.remove(primary_player.cards[self.card_pos_to_deploy])
                                 self.queued_sound = "onplay"
                                 if not secondary_player.has_passed:
                                     self.player_with_deploy_turn = secondary_player.get_name_player()
@@ -165,6 +166,11 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                         primary_player.aiming_reticle_color = "blue"
                                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                         self.card_type_of_selected_card_in_hand = "Army"
+                                        if card.get_name() == "Quartermasters":
+                                            self.choices_available = ["HQ", "Normal"]
+                                            self.choice_context = "Quartermasters to HQ?"
+                                            self.name_player_making_choices = primary_player.name_player
+                                            self.resolving_search_box = True
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
@@ -385,6 +391,10 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_deck_choice == secondary_player.get_name_player():
             own_card = False
+    if (primary_player.bluddflagg_relevant or secondary_player.bluddflagg_relevant) and not primary_player.bluddflagg_used:
+        if self.card_to_deploy is not None:
+            if self.card_to_deploy.get_card_type() == "Army":
+                planet_pos = -2
     played_card, position_of_unit = primary_player.play_card(planet_pos,
                                                              card=self.card_to_deploy,
                                                              discounts=discounts,

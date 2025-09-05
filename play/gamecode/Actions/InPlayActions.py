@@ -380,6 +380,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Kaptin Bluddflagg":
+                        if not card.get_once_per_round_used():
+                            card.set_once_per_round_used(True)
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Ireful Vanguard":
                         if not card.get_once_per_round_used():
                             if secondary_player.won_command_struggles_planets_round[planet_pos]:
@@ -1470,6 +1477,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if magus_card:
             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.action_cleanup()
+    elif self.action_chosen == "Indiscriminate Bombing":
+        if self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if self.misc_target_planet == planet_pos:
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+                        if not self.chosen_second_card:
+                            self.player_with_action = secondary_player.name_player
+                            self.chosen_second_card = True
+                        else:
+                            self.action_cleanup()
     elif self.action_chosen == "Kraktoof Hall":
         if not self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:

@@ -276,6 +276,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 if card.get_cost() > 2:
                                     primary_player.summon_token_at_hq("Cultist", 2)
                                 self.action_cleanup()
+                    elif ability == "Naval Surgeon":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.action_chosen = ability
                     elif ability == "Ba'ar Zul's Cleavers":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -322,6 +326,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
                             self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Kaptin Bluddflagg":
+                        if not card.get_once_per_round_used():
+                            card.set_once_per_round_used(True)
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Chaplain Mavros":
@@ -1131,6 +1142,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 og_pla, og_pos = self.misc_target_unit
                 secondary_player.rout_unit(og_pla, og_pos)
                 self.action_cleanup()
+    elif self.action_chosen == "Naval Surgeon":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                self.action_cleanup()
     elif self.action_chosen == "Hate":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1161,11 +1178,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if not primary_player.harbinger_of_eternity_active:
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.get_number()
+            self.action_cleanup()
+    elif self.action_chosen == "Kaptin Bluddflagg":
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        self.chosen_first_card = True
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Imperial Bastion":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

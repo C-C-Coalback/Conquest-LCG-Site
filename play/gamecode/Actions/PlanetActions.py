@@ -499,6 +499,27 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "Indiscriminate Bombing":
+        if not self.chosen_first_card:
+            self.chosen_first_card = True
+            planet_name = self.planet_array[chosen_planet]
+            self.misc_target_planet = chosen_planet
+            await self.send_update_message(planet_name + " targeted for Indiscriminate Bombing.")
+    elif self.action_chosen == "Kaptin Bluddflagg":
+        if self.chosen_first_card:
+            if chosen_planet != self.determine_leftmost_planet():
+                og_pla, og_pos = self.misc_target_unit
+                siv_pla, siv_pos = self.position_of_actioned_card
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.reset_aiming_reticle_in_play(siv_pla, siv_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                last_element_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+                if last_element_index != -1:
+                    primary_player.ready_given_pos(chosen_planet, last_element_index)
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                self.action_cleanup()
+            else:
+                await self.send_update_message("That is the leftmost planet!")
     elif self.action_chosen == "Sivarla Soulbinder":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit

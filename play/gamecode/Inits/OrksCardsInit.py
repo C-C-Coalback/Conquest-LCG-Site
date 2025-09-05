@@ -453,6 +453,30 @@ def orks_cards_init():
         CardClasses.ArmyCard("Herald of the WAAGH!", "Deploy Reaction: After this unit enters play, resolve a battle "
                                                      "at this planet. (Only actions of the deploy phase are "
                                                      "allowed and the planet cannot be captured.)", "Warrior. Nob.",
-                             4, faction, "Loyal", 2, 3, 1, False)
+                             4, faction, "Loyal", 2, 3, 1, False),
+        CardClasses.WarlordCard("Kaptin Bluddflagg", "The first unit each player deploys each round must"
+                                                     " be deploy in their HQ.\n"
+                                                     "Action: Move a non-Elite unit from your HQ to a target "
+                                                     "non-leftmost planet and ready it. (Limit once per round.)",
+                                "Soldier. Freebooter.", faction, 2, 7, 2, 5, "Bloodied.", 7, 7,
+                                ["1x Naval Surgeon", "1x Kaptin's Hook",
+                                 "2x Indiscriminate Bombing", "4x Quartermasters"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Naval Surgeon", "Action: Exhaust this support to have a target army unit in "
+                                                 "your HQ gain +1 ATK and +1 HP.", "Specialised Crew.",
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.AttachmentCard("Kaptin's Hook", "Attach to your warlord.\n"
+                                                    "Reaction: After a non-Elite unit you control at an adjacent planet"
+                                                    " is declared as a defender, exhaust this attachment to cancel"
+                                                    " the attack, move that unit to this planet and exhaust it.",
+                                   "Wargear.", 1, faction, "Signature", 3, False, must_be_own_unit=True,
+                                   type_of_units_allowed_for_attachment="Warlord"),
+        CardClasses.EventCard("Indiscriminate Bombing", "Action: Target a planet. Each player must move an army unit "
+                                                        "they control from that planet to their HQ.", "Tactic.",
+                              2, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Quartermasters", "This unit may be deployed in your HQ. If you do so, "
+                                               "reduce its cost by 1.\n"
+                                               "Reaction: After this unit moves to a planet, remove 1 damage from it.",
+                             "Krew. Soldier.", 2, faction, "Signature", 2, 3, 1, False)
     ]
     return orks_card_array

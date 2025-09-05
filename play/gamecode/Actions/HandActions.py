@@ -198,6 +198,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     self.choices_available.append(str(i + 1))
                                 self.choice_context = "Everlasting Rage: Amount"
                                 self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Indiscriminate Bombing":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        self.chosen_second_card = False
                     elif ability == "Our Last Stand":
                         if not primary_player.our_last_stand_used:
                             primary_player.our_last_stand_used = True

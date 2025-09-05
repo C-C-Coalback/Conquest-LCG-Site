@@ -131,6 +131,8 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.bluddflagg_relevant = False
+        self.bluddflagg_used = False
         self.vael_relevent = False
         self.castellan_crowe_relevant = False
         self.castellan_crowe_2_relevant = False
@@ -219,6 +221,8 @@ class Player:
             self.grigory_maksim_relevant = True
         if self.headquarters[0].get_name() == "Illuminor Szeras":
             self.illuminor_szeras_relevant = True
+        if self.headquarters[0].get_name() == "Kaptin Bluddflagg":
+            self.bluddflagg_relevant = True
         if self.headquarters[0].get_name() == "Castellan Crowe":
             self.castellan_crowe_relevant = True
             self.castellan_crowe_2_relevant = True
@@ -1224,6 +1228,7 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.bluddflagg_relevant = False
         self.vael_relevent = False
         self.castellan_crowe_2_relevant = False
         self.retreat_warlord()
@@ -2274,6 +2279,10 @@ class Player:
                         discounts += 1
                         self.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
             cost = card.get_cost() - discounts
+            other_player = self.get_other_player()
+            if self.bluddflagg_relevant or other_player.bluddflagg_relevant:
+                if not self.bluddflagg_used:
+                    position = -2
             if position == -2:
                 print("Play card to HQ")
                 print(card.get_limited(), self.can_play_limited)
@@ -2281,8 +2290,18 @@ class Player:
                     if self.can_play_limited:
                         if self.spend_resources(cost):
                             if self.add_to_hq(card):
-                                self.cards.remove(card.get_name())
                                 self.set_can_play_limited(False)
+                                location_of_unit = len(self.headquarters) - 1
+                                if card.get_card_type() == "Army":
+                                    self.bluddflagg_used = True
+                                    if damage_to_take > 0:
+                                        if self.game.bigga_is_betta_active:
+                                            while damage_on_play > 0:
+                                                self.assign_damage_to_pos(position, location_of_unit, 1,
+                                                                          by_enemy_unit=False)
+                                                damage_on_play -= 1
+                                        else:
+                                            self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 print("Played card to HQ")
                                 return "SUCCESS", -1
                             self.add_resources(cost, refund=True)
@@ -2295,7 +2314,6 @@ class Player:
                             return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                     if self.spend_resources(cost):
                         if self.add_to_hq(card):
-                            self.cards.remove(card.get_name())
                             location_of_unit = len(self.headquarters) - 1
                             print("Played card to HQ")
                             if card.get_ability() == "Murder of Razorwings":
@@ -2315,6 +2333,16 @@ class Player:
                                     self.game.create_reaction("Eldritch Council", self.name_player,
                                                               (int(self.number), -1, -1))
                                     self.game.eldritch_council_value = card.get_cost()
+                            if card.get_card_type() == "Army":
+                                self.bluddflagg_used = True
+                                if damage_to_take > 0:
+                                    if self.game.bigga_is_betta_active:
+                                        while damage_on_play > 0:
+                                            self.assign_damage_to_pos(position, location_of_unit, 1,
+                                                                      by_enemy_unit=False)
+                                            damage_on_play -= 1
+                                    else:
+                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
@@ -2717,6 +2745,10 @@ class Player:
             if self.get_ability_given_pos(destination, new_pos) == "Sacred Rose Immolator":
                 if self.cards_in_play[destination + 1][new_pos].counter < 2:
                     self.game.create_reaction("Sacred Rose Immolator", self.name_player,
+                                              (int(self.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
+                if self.get_damage_given_pos(destination, new_pos) > 0:
+                    self.game.create_reaction("Quartermasters", self.name_player,
                                               (int(self.number), destination, new_pos))
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
@@ -5625,6 +5657,7 @@ class Player:
                 self.subject_omega_relevant = False
                 self.grigory_maksim_relevant = False
                 self.illuminor_szeras_relevant = False
+                self.bluddflagg_relevant = False
                 self.vael_relevent = False
                 self.castellan_crowe_2_relevant = False
             else:
