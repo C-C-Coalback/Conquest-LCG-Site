@@ -495,6 +495,11 @@ def chaos_cards_init():
                                                   " has 2 damage on it, attach it to a unit as a Wargear attachment "
                                                   "with the text: "
                                                   "\"Attach to an army unit. Attached unit gets +2 ATK.\".",
-                                "Cult. Khorne.", 1, faction, "Loyal", False)
+                                "Cult. Khorne.", 1, faction, "Loyal", False),
+        CardClasses.ArmyCard("Death Guard Preachers", "Lumbering. Retaliate (2).\n"
+                                                      "Reaction: After you deploy a Nurgle unit at this planet, "
+                                                      "at this planet move 1 damage from an army unit to "
+                                                      "another army unit. (Limit once per phase.)", "Daemon. Nurgle.",
+                             3, faction, "Common", 2, 6, 2, False, lumbering=True, retaliate=2)
     ]
     return chaos_card_array

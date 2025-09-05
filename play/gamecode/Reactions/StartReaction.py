@@ -1068,10 +1068,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Death Guard Preachers":
+            self.chosen_first_card = False
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
         elif current_reaction == "Quartermasters":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reactino()
+            self.delete_reaction()
         elif current_reaction == "Kaptin's Hook":
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.exhaust_attachment_name_pos(warlord_pla, warlord_pos, "Kaptin's Hook")

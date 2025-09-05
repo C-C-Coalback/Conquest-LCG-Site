@@ -2495,6 +2495,14 @@ class Player:
                                     if self.get_ability_given_pos(-2, i) == "Tower of Worship":
                                         self.game.create_reaction("Tower of Worship", self.name_player,
                                                                   (int(self.number), -2, i))
+                            if card.check_for_a_trait("Nurgle", self.etekh_trait):
+                                for i in range(len(self.cards_in_play[position + 1])):
+                                    if self.get_ability_given_pos(position, i) == "Death Guard Preachers":
+                                        if not self.get_once_per_phase_used_given_pos(position, i):
+                                            if not self.check_if_already_have_reaction_of_position(
+                                                    "Death Guard Preachers", position, i):
+                                                self.game.create_reaction("Death Guard Preachers", self.name_player,
+                                                                          (int(self.number), position, i))
                             if card.get_faction() != "Necrons":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):

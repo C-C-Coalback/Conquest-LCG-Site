@@ -1313,6 +1313,28 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.game.create_reaction("Erupting Aberrants", primary_player.name_player,
                                                       (int(primary_player.number), -1, -1))
                     self.delete_reaction()
+        elif current_reaction == "Death Guard Preachers":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if not self.chosen_first_card:
+                    if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.misc_target_player = player_owning_card.name_player
+                            self.chosen_first_card = True
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                else:
+                    if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if self.misc_target_player != player_owning_card.name_player or \
+                                self.misc_target_unit != (planet_pos, unit_pos):
+                            og_player = self.p1
+                            if self.misc_target_player == self.name_2:
+                                og_player = self.p2
+                            og_pla, og_pos = self.misc_target_unit
+                            og_player.remove_damage_from_pos(og_pla, og_pos, 1)
+                            og_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                            player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
         elif current_reaction == "Hydrae Stalker":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
