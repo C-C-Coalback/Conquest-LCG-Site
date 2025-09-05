@@ -506,6 +506,11 @@ def chaos_cards_init():
                                                     "target army unit. Then if there is 2 tokens or more on that "
                                                     "unit, remove them to deal it 3 damage.", "Cultist. Nurgle.",
                              2, faction, "Loyal", 1, 3, 1, True, sweep=1,
+                             action_in_play=True, allowed_phases_in_play="HEADQUARTERS"),
+        CardClasses.ArmyCard("Plagueburst Crawler", "Lumbering.\n"
+                                                    "Headquarters Action: Ready this unit to deal 2 damage to a "
+                                                    "target non-unique unit.", "Vehicle. Nurgle. Daemon.",
+                             2, faction, "Loyal", 2, 4, 1, False, lumbering=True,
                              action_in_play=True, allowed_phases_in_play="HEADQUARTERS")
     ]
     return chaos_card_array

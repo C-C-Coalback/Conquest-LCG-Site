@@ -332,6 +332,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if card.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
+                    elif ability == "Plagueburst Crawler":
+                        if not card.get_ready():
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Kaptin Bluddflagg":
                         if not card.get_once_per_round_used():
                             card.set_once_per_round_used(True)
@@ -850,6 +854,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
                     self.action_cleanup()
+    elif self.action_chosen == "Plagueburst Crawler":
+        if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
+            player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+            self.action_cleanup()
     elif self.action_chosen == "Prey on the Weak":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Synapse":

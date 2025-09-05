@@ -378,6 +378,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if card.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
+                    elif ability == "Plagueburst Crawler":
+                        if not card.get_ready():
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Improbable Runt Machine":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
@@ -1657,6 +1661,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, x_value,
                                                                       expiration="NEXT")
                         self.action_cleanup()
+    elif self.action_chosen == "Plagueburst Crawler":
+        if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
+            player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+            self.action_cleanup()
     elif self.action_chosen == "Lekor Blight-Tongue":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor += 1
