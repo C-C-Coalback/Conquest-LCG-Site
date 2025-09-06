@@ -448,6 +448,11 @@ def tau_cards_init():
                                                   "Reaction: After this unit enters play, a non-Tau army unit at an "
                                                   "adjacent planet gets +1 ATK and another gets +1 HP until the end"
                                                   " of the game. (Each unit can be at a different planet.)",
-                             "Soldier.", 2, faction, "Common", 1, 3, 1, False)
+                             "Soldier.", 2, faction, "Common", 1, 3, 1, False),
+        CardClasses.EventCard("Guerrilla Tactics", "Command Action: Choose a planet with an enemy unit. Your opponent "
+                                                   "loses resources equalt to the resource bonus and must discard "
+                                                   "cards equal to the card bonus. Then move a Kroot army unit you "
+                                                   "control at that planet to the first planet.", "Tactic. Kroot.",
+                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
     ]
     return tau_cards_array

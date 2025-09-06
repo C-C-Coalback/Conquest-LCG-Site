@@ -1035,6 +1035,8 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Soot-Blackened Axe":
                         self.action_cleanup()
+                    elif self.action_chosen == "Guerrilla Tactics Move":
+                        self.action_cleanup()
                     elif self.action_chosen == "Iridescent Wand":
                         self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":

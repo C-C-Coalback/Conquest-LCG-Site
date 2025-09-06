@@ -1771,6 +1771,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Drone"):
                 player_owning_card.cards_in_play[planet_pos + 1][unit_pos].sweep_next += 2
                 self.action_cleanup()
+    elif self.action_chosen == "Guerrilla Tactics Move":
+        if game_update_string[1] == primary_player.number:
+            if planet_pos == self.misc_target_planet:
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
+                        if planet_pos != self.round_number:
+                            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.round_number)
+                        self.action_cleanup()
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

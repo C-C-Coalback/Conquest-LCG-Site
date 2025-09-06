@@ -486,6 +486,21 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 )
                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                 self.chosen_first_card = False
+    elif self.action_chosen == "Guerrilla Tactics":
+        if secondary_player.cards_in_play[chosen_planet + 1]:
+            target_planet = FindCard.find_planet_card(self.planet_array[chosen_planet], self.planet_cards_array)
+            secondary_player.spend_resources(min(target_planet.get_resources(), secondary_player.resources))
+            cards_to_discard = min(target_planet.get_cards(), len(secondary_player.cards))
+            self.misc_target_planet = chosen_planet
+            await self.send_update_message(target_planet.get_name() + " targeted for Guerrilla Tactics!")
+            if cards_to_discard > 0:
+                self.action_chosen = "Guerrilla Tactics Discard"
+                self.misc_counter = cards_to_discard
+                self.player_with_action = secondary_player.name_player
+            else:
+                self.action_chosen = "Guerrilla Tactics Move"
+                self.chosen_first_card = False
+                self.misc_target_unit = (-1, -1)
     elif self.action_chosen == "Agnok's Shadows":
         if self.chosen_first_card:
             og_pla, og_pos = self.position_of_actioned_card

@@ -129,6 +129,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.choice_context = "Tempting Ceasefire Number"
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
+                    elif ability == "Guerrilla Tactics":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        self.chosen_first_card = False
+                        self.misc_target_planet = -1
                     elif ability == "Breach and Clear":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
@@ -1075,6 +1080,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_card_type() == "Army":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True
+    elif self.action_chosen == "Guerrilla Tactics Discard":
+        primary_player.discard_card_from_hand(hand_pos)
+        self.misc_counter = self.misc_counter - 1
+        if self.misc_counter < 1:
+            self.action_chosen = "Guerrilla Tactics Move"
+            self.chosen_first_card = False
+            self.misc_target_unit = (-1, -1)
+            self.player_with_action = secondary_player.name_player
     elif self.action_chosen == "Twisted Wracks":
         card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
