@@ -3585,8 +3585,20 @@ class Game:
                             self.damage_from_atrox = True
                         if not self.damage_from_atrox:
                             await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Trap Laying Hunter Trap":
+                        if chosen_choice == "3 Damage":
+                            for i in range(7):
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.cards_in_play[i + 1][j].resolving_attack:
+                                        primary_player.assign_damage_to_pos(i, j, 3, rickety_warbuggy=True)
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.delete_interrupt()
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.player_resolving_interrupts[0] = primary_player.name_player
                     elif self.choice_context == "Pulsating Carapace choice":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         if chosen_choice == "Infest planet":
                             self.infest_planet(self.misc_target_planet, primary_player)
                         else:

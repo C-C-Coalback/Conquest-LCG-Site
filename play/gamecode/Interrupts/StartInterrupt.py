@@ -125,6 +125,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Arrangement at Elova IV":
             primary_player.add_resources(1)
             self.delete_interrupt()
+        elif current_interrupt == "Trap Laying Hunter":
+            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+            self.choices_available = ["3 Damage", "Exhaust"]
+            self.choice_context = "Trap Laying Hunter Trap"
+            self.name_player_making_choices = secondary_player.name_player
+            self.resolving_search_box = True
         elif current_interrupt == "Shaper Agnok":
             self.choices_available = ["Card", "Resource"]
             self.choice_context = "Shaper Agnok Gains"

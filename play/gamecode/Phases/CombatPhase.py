@@ -713,7 +713,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.unit_will_move_after_attack = True
                                 player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     ethereal_movement_active = True
-                            if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) != "Warlord":
+                            if player.get_card_type_given_pos(self.attacker_planet,
+                                                              self.attacker_position) != "Warlord":
                                 i = 0
                                 self.attack_being_resolved = True
                                 while i < len(player.attachments_at_planet[self.attacker_planet]):
@@ -1050,7 +1051,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 elif "Catachan Devils Patrol" in secondary_player.cards:
                                     card = self.preloaded_find_card("Catachan Devils Patrol")
                                     self.discounts_applied = 0
-                                    hand_dis = secondary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
+                                    hand_dis = secondary_player.search_hand_for_discounts(card.get_faction(),
+                                                                                          card.get_traits())
                                     hq_dis = secondary_player.search_hq_for_discounts(card.get_faction(),
                                                                                       card.get_traits())
                                     in_play_dis = secondary_player.search_all_planets_for_discounts(card.get_traits(),
@@ -1213,10 +1215,22 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                              (int(secondary_player.number), self.defender_planet,
                                                               self.defender_position))
                                 if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Trap Laying Hunter":
+                                    if not secondary_player.cards_in_play[self.defender_planet + 1][
+                                            self.defender_position].misc_ability_used:
+                                        self.create_interrupt("Trap Laying Hunter", secondary_player.name_player,
+                                                              (int(secondary_player.number), self.defender_planet,
+                                                               self.defender_position))
+                                if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Neurotic Obliterator":
                                     ready_weapon = False
-                                    for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments())):
-                                        if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments()[i].get_ready() and secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments()[i].check_for_a_trait("Weapon"):
+                                    for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][
+                                                           self.defender_position].get_attachments())):
+                                        if secondary_player.cards_in_play[self.defender_planet + 1][
+                                            self.defender_position].get_attachments()[i].get_ready() and \
+                                                secondary_player.cards_in_play[self.defender_planet + 1][
+                                                    self.defender_position].get_attachments()[i].check_for_a_trait(
+                                                        "Weapon"):
                                             ready_weapon = True
                                     if ready_weapon:
                                         self.create_reaction("Neurotic Obliterator", secondary_player.name_player,

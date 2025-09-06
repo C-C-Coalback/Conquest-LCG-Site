@@ -473,6 +473,11 @@ def tau_cards_init():
                                                   " this unit to 3.\n"
                                                   "Reaction: After this unit is declared as a defender, exhaust "
                                                   "it to deal 4 damage to the attacker.",
-                             "Creature. Kroot. Elite.", 5, faction, "Loyal", 4, 7, 0, False, no_attachments=True)
+                             "Creature. Kroot. Elite.", 5, faction, "Loyal", 4, 7, 0, False, no_attachments=True),
+        CardClasses.ArmyCard("Trap Laying Hunter", "Interrupt: When this unit is chosen as a defender, your opponent"
+                                                   " must choose to either deal 3 damage to the attacker or exhaust "
+                                                   "a unit he controls at the same planet. "
+                                                   "(Limit once per combat round.)", "Warrior. Kroot.",
+                             3, faction, "Common", 4, 2, 0, False)
     ]
     return tau_cards_array

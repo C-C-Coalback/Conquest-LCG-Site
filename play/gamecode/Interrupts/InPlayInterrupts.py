@@ -80,6 +80,13 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 self.delete_interrupt()
                 if "Raging Daemonhost" in primary_player.discard:
                     primary_player.discard.remove("Raging Daemonhost")
+    elif current_interrupt == "Trap Laying Hunter":
+        if self.positions_of_units_interrupting[0][1] == planet_pos:
+            if primary_player.get_number() == game_update_string[1]:
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    self.mask_jain_zar_check_interrupts(secondary_player, primary_player)
+                    self.delete_interrupt()
     elif current_interrupt == "Truck Wreck Launcha":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":

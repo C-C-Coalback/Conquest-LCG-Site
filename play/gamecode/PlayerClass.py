@@ -5426,6 +5426,7 @@ class Player:
             self.cards_in_play[planet_id + 1][unit_id].remove_damage(amount)
 
     def reset_eocr_values(self):
+        self.reset_card_name_misc_ability("Trap Laying Hunter")
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].reset_own_eocr_values()
