@@ -576,10 +576,21 @@ def try_entire_command(self, planet_pos):
             if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
+            auto_interrupts = False
             if self.p2.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
                 if self.p2.check_for_trait_at_planet(planet_pos, "Kroot"):
                     self.create_interrupt("Shaper Agnok", self.name_2, (2, -1, -1))
-                    return "INTERRUPT DURING STRUGGLE"
+                    auto_interrupts = True
+            tau_present = False
+            for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
+                if self.p2.get_faction_given_pos(planet_pos, i) == "Tau":
+                    tau_present = True
+            if tau_present:
+                if self.p2.search_for_card_everywhere("Arrangement at Elova IV"):
+                    self.create_interrupt("Arrangement at Elova IV", self.name_2, (2, -1, -1))
+                    auto_interrupts = True
+            if auto_interrupts:
+                return "INTERRUPT DURING STRUGGLE"
         elif name_winner == self.name_2:
             if self.get_green_icon(planet_pos):
                 if self.p2.search_hand_for_card("Wraithguard Revenant"):
@@ -587,10 +598,21 @@ def try_entire_command(self, planet_pos):
             if self.p1.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
+            auto_interrupts = False
             if self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
                 if self.p1.check_for_trait_at_planet(planet_pos, "Kroot"):
                     self.create_interrupt("Shaper Agnok", self.name_1, (1, -1, -1))
-                    return "INTERRUPT DURING STRUGGLE"
+                    auto_interrupts = True
+            tau_present = False
+            for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
+                if self.p1.get_faction_given_pos(planet_pos, i) == "Tau":
+                    tau_present = True
+            if tau_present:
+                if self.p1.search_for_card_everywhere("Arrangement at Elova IV"):
+                    self.create_interrupt("Arrangement at Elova IV", self.name_1, (1, -1, -1))
+                    auto_interrupts = True
+            if auto_interrupts:
+                return "INTERRUPT DURING STRUGGLE"
     winnings = None
     if name_winner == self.name_1:
         winnings = resolve_winnings(self, self.p1, self.p2, planet_pos)

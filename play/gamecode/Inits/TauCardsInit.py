@@ -456,6 +456,12 @@ def tau_cards_init():
                               1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMMAND"),
         CardClasses.EventCard("Optimized Landing", "Interrupt: When you deploy a non-Drone army unit, reduce its cost"
                                                    " by X (Max 2). X is the amount of attachments you control."
-                                                   " (Max 1 per round.)", "Tactic.", 0, faction, "Loyal", 1, False)
+                                                   " (Max 1 per round.)", "Tactic.", 0, faction, "Loyal", 1, False),
+        CardClasses.AttachmentCard("Arrangement at Elova IV", "Attach to a Tau army unit you control.\n"
+                                                              "Attached unit gains, \"Reaction: When your opponent "
+                                                              "wins a command struggle at a planet with one or more "
+                                                              "Tau units you control, gain 1 resource.\"",
+                                   "Negotiation.", 0, faction, "Loyal", 2, True, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
     ]
     return tau_cards_array
