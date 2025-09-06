@@ -1206,6 +1206,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                          (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position))
                                 if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Rampaging Knarloc":
+                                    if secondary_player.get_ready_given_pos(
+                                            self.defender_planet, self.defender_position):
+                                        self.create_reaction("Rampaging Knarloc", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              self.defender_position))
+                                if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Neurotic Obliterator":
                                     ready_weapon = False
                                     for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position].get_attachments())):

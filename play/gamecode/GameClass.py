@@ -8622,13 +8622,22 @@ class Game:
                 player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
                 if primary_player.search_attachments_at_pos(planet_pos, unit_pos, "Pulsating Carapace"):
                     damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 2
+                    self.amount_that_can_be_removed_by_shield[0] = 2
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
+            if self.amount_that_can_be_removed_by_shield[0] > 3:
+                player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Rampaging Knarloc":
+                    if primary_player.resources > 3:
+                        damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 3
+                        self.amount_that_can_be_removed_by_shield[0] = 3
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
             if self.amount_that_can_be_removed_by_shield[0] > 1:
                 player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
                 if primary_player.celestian_amelia_active \
                         and primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Celesitan Amelia":
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
                         damage_to_remove = self.amount_that_can_be_removed_by_shield[0] - 1
+                        self.amount_that_can_be_removed_by_shield[0] = 1
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
             if self.amount_that_can_be_removed_by_shield[0] > 0:
                 num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]

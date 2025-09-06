@@ -1461,6 +1461,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif self.reactions_needing_resolving[0] == "Rampaging Knarloc":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if secondary_player.cards_in_play[i + 1][j].resolving_attack:
+                        secondary_player.assign_damage_to_pos(i, j, 4, rickety_warbuggy=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "The Black Sword":
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
             self.delete_reaction()

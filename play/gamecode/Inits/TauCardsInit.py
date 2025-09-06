@@ -467,6 +467,12 @@ def tau_cards_init():
                                              "Reaction: After a Kroot unit you control damages an enemy unit by an"
                                              " attack at this planet, exhaust this unit to deal 2 damage to "
                                              "that enemy unit.", "Creature. Kroot.",
-                             2, faction, "Common", 3, 3, 0, False, no_attachments=True)
+                             2, faction, "Common", 3, 3, 0, False, no_attachments=True),
+        CardClasses.ArmyCard("Rampaging Knarloc", "No Attachments.\n"
+                                                  "While you have 4 resources or more, reduce all damage taken by"
+                                                  " this unit to 3.\n"
+                                                  "Reaction: After this unit is declared as a defender, exhaust "
+                                                  "it to deal 4 damage to the attacker.",
+                             "Creature. Kroot. Elite.", 5, faction, "Loyal", 4, 7, 0, False, no_attachments=True)
     ]
     return tau_cards_array
