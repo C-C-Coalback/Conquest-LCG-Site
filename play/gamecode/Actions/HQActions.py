@@ -322,6 +322,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.misc_target_unit = (-1, -1)
                             self.chosen_first_card = False
+                    elif ability == "Forward Outpost":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
                     elif ability == "Korporal Snagbrat":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -780,6 +784,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     )
                     self.action_cleanup()
                     self.position_of_actioned_card = (-1, -1)
+    elif self.action_chosen == "Forward Outpost":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Drone"):
+                player_owning_card.headquarters[unit_pos].sweep_next += 2
+                self.action_cleanup()
     elif self.action_chosen == "The Black Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

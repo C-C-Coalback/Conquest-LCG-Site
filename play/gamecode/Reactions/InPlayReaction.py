@@ -1335,6 +1335,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+        elif current_reaction == "Rail Rifle":
+            if planet_pos == self.misc_target_planet:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                self.delete_reaction()
         elif current_reaction == "Farsight Vanguard":
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:

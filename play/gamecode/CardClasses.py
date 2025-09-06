@@ -400,6 +400,7 @@ class UnitCard(Card):
         self.brutal_eog = False
         self.armorbane_eog = False
         self.sweep_eop = 0
+        self.sweep_next = 0
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
@@ -410,6 +411,7 @@ class UnitCard(Card):
     def reset_all_eop(self):
         self.retaliate_eop = 0
         self.sweep_eop = 0
+        self.sweep_next = 0
 
     def get_retaliate(self):
         retaliate_value = self.retaliate
@@ -456,6 +458,8 @@ class UnitCard(Card):
                 sweep += 1
         sweep += self.sweep_eor
         sweep += self.sweep_eop
+        sweep += self.sweep_next
+        self.sweep_next = 0
         return sweep
 
     def get_lumbering(self):

@@ -471,21 +471,29 @@ class Game:
 
     def safety_check(self):
         if self.choices_available:
+            print("Choices are available")
             return False
         if self.amount_that_can_be_removed_by_shield:
+            print("damage is being done")
             return False
         if self.reactions_needing_resolving:
+            print("reactions are being done")
             return False
         if self.interrupts_waiting_on_resolution:
+            print("interrupts are being done")
             return False
         if self.action_chosen:
+            print("action being done")
             return False
         if self.rearranging_deck:
+            print("rearranging deck")
             return False
         if self.mode != "Normal":
+            print("mode is not normal")
             return False
-        if self.resolving_search_box:
-            return False
+        # if self.resolving_search_box:
+        #     print("search box active")
+        #     return False
         return True
 
     async def send_queued_sound(self):
@@ -1604,9 +1612,20 @@ class Game:
         self.p2.rok_bombardment_active = []
         self.nectavus_active = False
         self.nectavus_target = -1
+        self.resolving_search_box = False
         if self.nectavus_actual_current_planet != -1:
             self.last_planet_checked_command_struggle = self.nectavus_actual_current_planet
         self.nectavus_actual_current_planet = -1
+        winner = self.p2
+        if self.player_resolving_battle_ability == self.name_1:
+            winner = self.p1
+        for i in range(7):
+            if self.planet_array[i] == self.battle_ability_to_resolve:
+                for j in range(len(winner.cards_in_play[i + 1])):
+                    if winner.get_ability_given_pos(i, j) == "Pathfinder Team":
+                        if winner.get_ready_given_pos(i, j):
+                            self.create_reaction("Pathfinder Team", winner.name_player,
+                                                 (int(winner.number), i, j))
         if not self.tense_negotiations_active:
             winner = None
             if self.player_resolving_battle_ability == self.name_2:
@@ -2471,6 +2490,7 @@ class Game:
         self.choice_context = "Choose Enslaved Faction:"
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
+        self.quick_battle_ability_queued = False
         self.reset_choices_available()
         if self.battle_ability_to_resolve == "Osus IV":
             if loser.spend_resources(1):
@@ -3707,6 +3727,29 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Tempting Ceasefire Number":
+                        if not self.chosen_first_card:
+                            self.chosen_first_card = True
+                            self.misc_target_choice = chosen_choice
+                            self.name_player_making_choices = secondary_player.name_player
+                        else:
+                            owner_value = int(self.misc_target_choice)
+                            enemy_value = int(chosen_choice)
+                            diff = owner_value - enemy_value
+                            for i in range(owner_value):
+                                secondary_player.draw_card()
+                            for i in range(enemy_value):
+                                primary_player.draw_card()
+                            if diff == 0:
+                                secondary_player.draw_card()
+                            elif diff < 0:
+                                if primary_player.spend_resources(-diff):
+                                    secondary_player.add_resources(-diff)
+                            elif diff > 0:
+                                primary_player.add_resources(diff)
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.action_cleanup()
                     elif self.choice_context == "Eldritch Reaping: Enemy Announce":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
                         await self.send_update_message(primary_player.name_player + " selected " +
@@ -9633,6 +9676,8 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p1.search_attachments_at_pos(planet, i, "Rail Rifle"):
+                                self.create_reaction("Rail Rifle", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Fierce Purgator":
                                 self.create_reaction("Fierce Purgator", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
@@ -9687,6 +9732,8 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p2.search_attachments_at_pos(planet, i, "Rail Rifle"):
+                                self.create_reaction("Rail Rifle", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Fierce Purgator":
                                 self.create_reaction("Fierce Purgator", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Furious Wraithblade":
@@ -10151,6 +10198,8 @@ class Game:
         self.p2.illegal_commits_synapse = 0
         self.p1.primal_howl_used = False
         self.p2.primal_howl_used = False
+        self.p1.tempting_ceasefire_used = False
+        self.p2.tempting_ceasefire_used = False
         self.p1.etekh_trait = ""
         self.p2.etekh_trait = ""
         self.p1.gut_and_pillage_used = False

@@ -274,6 +274,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.misc_target_planet = planet_pos
+                    elif ability == "Aun'Len BLOODIED":
+                        if self.planet_array[planet_pos] != "Jaricho" and \
+                                (self.planet_array[
+                                     planet_pos] != "Nectavus XI" or self.resolve_remaining_cs_after_reactions):
+                            if not primary_player.get_once_per_game_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
+                                self.action_cleanup()
+                                self.need_to_resolve_battle_ability = True
+                                self.resolving_search_box = True
+                                self.battle_ability_to_resolve = self.planet_array[planet_pos]
+                                self.player_resolving_battle_ability = primary_player.name_player
+                                self.number_resolving_battle_ability = primary_player.number
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Resolve Battle Ability?"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.tense_negotiations_active = True
                     elif ability == "Korporal Snagbrat":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -1750,6 +1766,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3)
                 player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor = 0
             self.action_cleanup()
+    elif self.action_chosen == "Forward Outpost":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Drone"):
+                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].sweep_next += 2
+                self.action_cleanup()
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

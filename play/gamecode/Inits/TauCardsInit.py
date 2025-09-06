@@ -393,7 +393,7 @@ def tau_cards_init():
                                    type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True),
         CardClasses.WarlordCard("Shaper Agnok", "Interrupt: When your opponent wins a command struggle at a planet "
                                                 "with one or more Kroot units you control, gain 1 resource or "
-                                                "draw 1 card.", "Kroot.", faction, 2, 7, 2, 5, "Bloodied.\n", 7, 7,
+                                                "draw 1 card.", "Kroot.", faction, 2, 7, 2, 5, "Bloodied.", 7, 7,
                                 ["4x Agnok's Shadows", "2x Behind Enemy Lines",
                                  "1x Evolutionary Adaptation", "1x Vanguard Pack"]),
         CardClasses.ArmyCard("Agnok's Shadows", "Combat Action: Exhaust this unit to have a target non-warlord unit at"
@@ -417,6 +417,32 @@ def tau_cards_init():
                                                     "exhaust it. Then your opponent may give you 1 resource to "
                                                     "return this attachment to your hand.",
                                    "Stratagem. Kroot.", 0, faction, "Signature", 3, False, limited=True,
-                                   planet_attachment=True)
+                                   planet_attachment=True),
+        CardClasses.WarlordCard("Aun'Len", "Reaction: After the deploy phase ends, have a player trigger the battle "
+                                           "ability of a target planet with a unit you control. "
+                                           "(You cannot target the same planet twice.)", "Prophet.",
+                                faction, 2, 6, 2, 6,
+                                "Bloodied.\n"
+                                "Action: Trigger the battle ability of this planet. (Limit once per game.)", 7, 7,
+                                ["1x Forward Outpost", "4x Pathfinder Team",
+                                 "1x Rail Rifle", "2x Tempting Ceasefire"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Forward Outpost", "Combat Action: Exhaust this support to give a non-Drone army unit "
+                                                   "Sweep (2) for its next attack this phase.", "Location.",
+                                1, faction, "Signature", False, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Pathfinder Team", "Reaction: After this planet battle ability is "
+                                                "triggered, exhaust this unit to draw a card.", "Soldier.",
+                             2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.AttachmentCard("Rail Rifle", "Attach to your warlord.\n"
+                                                 "Reaction: After your warlord resolves an attack, retreat it to deal"
+                                                 " 1 damage to a target unit at this planet.", "Weapon.",
+                                   1, faction, "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True),
+        CardClasses.EventCard("Tempting Ceasefire", "Deploy Action: Each player secretly chooses a number on the "
+                                                    "command dial, reveal it and draw that many cards. Then if you"
+                                                    " set a lower number, take the difference in resources from your "
+                                                    "opponent. If not he takes the difference in resources from "
+                                                    "the token bank. If equal draw a card. Max 1 per round.", "Tactic.",
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
     ]
     return tau_cards_array

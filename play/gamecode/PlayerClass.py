@@ -137,6 +137,8 @@ class Player:
         self.vael_relevent = False
         self.castellan_crowe_relevant = False
         self.castellan_crowe_2_relevant = False
+        self.tempting_ceasefire_used = False
+        self.valid_aunlen_planets = [True, True, True, True, True, True, True]
         self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
@@ -5518,6 +5520,10 @@ class Player:
                     if self.headquarters[i].attachments:
                         self.game.create_reaction("Support Fleet Transfer", self.name_player,
                                                   (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i, bloodied_relevant=True) == "Aun'Len":
+                if phase == "COMMAND":
+                    self.game.create_reaction("Aun'Len", self.name_player,
+                                              (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Obedience":
                 if self.get_ready_given_pos(-2, i):
                     self.game.create_reaction("Obedience", self.name_player, (int(self.number), -2, i))

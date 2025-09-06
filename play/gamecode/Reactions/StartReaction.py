@@ -994,7 +994,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
         elif current_reaction == "Sword Brethren Dreadnought":
             if self.planet_array[planet_pos] != "Jaricho" and \
-                    (self.planet_array[planet_pos] != "Nectavus XI" and self.resolve_remaining_cs_after_reactions):
+                    (self.planet_array[planet_pos] != "Nectavus XI" or self.resolve_remaining_cs_after_reactions):
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 self.delete_reaction()
                 self.need_to_resolve_battle_ability = True
@@ -1078,6 +1078,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Support Fleet Transfer Target"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Rail Rifle":
+            if primary_player.retreat_unit(planet_pos, unit_pos):
+                self.misc_target_planet = planet_pos
+            else:
+                self.delete_reaction()
+        elif current_reaction == "Pathfinder Team":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            primary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Vanguard Pack":
             secondary_player.exhaust_given_pos(planet_pos, unit_pos)
             if secondary_player.resources < 1:

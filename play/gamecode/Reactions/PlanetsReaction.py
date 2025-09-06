@@ -44,6 +44,25 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             del primary_player.cards_removed_from_game_hidden[target_index]
         await primary_player.dark_eldar_event_played()
         self.delete_reaction()
+    elif current_reaction == "Aun'Len":
+        if primary_player.valid_aunlen_planets[chosen_planet]:
+            if primary_player.cards_in_play[chosen_planet + 1]:
+                if self.planet_array[chosen_planet] != "Jaricho" and \
+                        (self.planet_array[chosen_planet] != "Nectavus XI" or
+                         self.resolve_remaining_cs_after_reactions):
+                    self.delete_reaction()
+                    primary_player.valid_aunlen_planets[chosen_planet] = False
+                    self.need_to_resolve_battle_ability = True
+                    self.resolving_search_box = True
+                    self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+                    self.player_resolving_battle_ability = primary_player.name_player
+                    self.number_resolving_battle_ability = primary_player.number
+                    self.choices_available = ["Yes", "No"]
+                    self.choice_context = "Resolve Battle Ability?"
+                    self.name_player_making_choices = primary_player.name_player
+                    self.tense_negotiations_active = True
+                else:
+                    self.delete_reaction()
     elif current_reaction == "Tras the Corrupter":
         self.misc_target_planet = chosen_planet
         await self.send_update_message("Replacing " + self.planet_array[chosen_planet] + ". Choose new planet.")
