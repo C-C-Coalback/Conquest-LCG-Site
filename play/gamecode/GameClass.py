@@ -865,24 +865,27 @@ class Game:
                         if self.card_to_deploy.get_card_type() == "Army":
                             discount_received, damage = player.perform_discount_at_pos_hand(
                                 int(game_update_string[2]),
-                                self.card_to_deploy.get_faction()
+                                self.card_to_deploy.get_faction(),
+                                self.card_to_deploy.get_traits()
                             )
+                            card_name = player.cards[int(game_update_string[2])]
                             if discount_received > 0:
                                 if secondary_player.nullify_check() and self.nullify_enabled:
                                     await self.send_update_message(
-                                        player.name_player + " wants to play Bigga Is Betta; "
+                                        player.name_player + " wants to play " + card_name + "; "
                                                              "Nullify window offered.")
                                     self.choices_available = ["Yes", "No"]
                                     self.name_player_making_choices = secondary_player.name_player
                                     self.choice_context = "Use Nullify?"
                                     self.nullified_card_pos = int(game_update_string[2])
-                                    self.nullified_card_name = "Bigga Is Betta"
+                                    self.nullified_card_name = card_name
                                     self.cost_card_nullified = 0
                                     self.nullify_string = "/".join(game_update_string)
                                     self.first_player_nullified = player.name_player
-                                    self.nullify_context = "Bigga Is Betta"
+                                    self.nullify_context = card_name
                                 else:
                                     self.discounts_applied += discount_received
+                                    player.optimized_landing_used = True
                                     player.discard_card_from_hand(int(game_update_string[2]))
                                     if self.card_pos_to_deploy > int(game_update_string[2]):
                                         self.card_pos_to_deploy -= 1
@@ -1756,7 +1759,7 @@ class Game:
                 primary_player.aiming_reticle_color = "blue"
                 self.create_interrupt("Glorious Intervention", primary_player.name_player,
                                       (int(primary_player.number), -1, -1))
-            elif self.nullify_context == "Bigga Is Betta":
+            elif self.nullify_context == "Bigga Is Betta" or self.nullify_context == "Optimized Landing":
                 self.nullify_enabled = False
                 new_string_list = self.nullify_string.split(sep="/")
                 await DeployPhase.update_game_event_deploy_section(self, self.first_player_nullified,
@@ -2015,7 +2018,8 @@ class Game:
                             if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p2.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
-                if self.card_pos_to_deploy != -1 and self.nullify_context == "Bigga Is Betta":
+                if self.card_pos_to_deploy != -1 and (self.nullify_context == "Bigga Is Betta" or
+                        self.nullify_context == "Optimized Landing"):
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
         self.nullify_count = 0
         if self.choice_context != "Use Interrupt?" and self.nullify_context != "Foretell":
@@ -6920,12 +6924,17 @@ class Game:
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
                     if card.get_cost() - self.available_discounts > 1:
                         self.available_discounts += 1
-        hand_disc = player.search_hand_for_discounts(card.get_faction())
+        hand_disc = player.search_hand_for_discounts(card.get_faction(), card.get_traits())
         self.available_discounts += hand_disc
         if hand_disc > 0:
-            await self.send_update_message(
-                "Bigga Is Betta detected, may be used as a discount."
-            )
+            if card.get_faction() == "Orks":
+                await self.send_update_message(
+                    "Bigga Is Betta detected, may be used as a discount."
+                )
+            else:
+                await self.send_update_message(
+                    "Optimized Landing detected, may be used as a discount."
+                )
         temp_av_disc, _ = player. \
             search_same_planet_for_discounts(self.faction_of_card_to_play, planet_pos=planet_chosen)
         if player.gorzod_relevant:
@@ -10214,6 +10223,8 @@ class Game:
         self.p2.death_serves_used = False
         self.p1.everlasting_rage_used = False
         self.p2.everlasting_rage_used = False
+        self.p1.optimized_landing_used = False
+        self.p2.optimized_landing_used = False
         self.p1.our_last_stand_used = False
         self.p2.our_last_stand_used = False
         self.p1.our_last_stand_bonus_active = False

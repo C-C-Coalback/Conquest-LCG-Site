@@ -1050,7 +1050,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 elif "Catachan Devils Patrol" in secondary_player.cards:
                                     card = self.preloaded_find_card("Catachan Devils Patrol")
                                     self.discounts_applied = 0
-                                    hand_dis = secondary_player.search_hand_for_discounts(card.get_faction())
+                                    hand_dis = secondary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
                                     hq_dis = secondary_player.search_hq_for_discounts(card.get_faction(),
                                                                                       card.get_traits())
                                     in_play_dis = secondary_player.search_all_planets_for_discounts(card.get_traits(),

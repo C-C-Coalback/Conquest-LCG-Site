@@ -146,6 +146,7 @@ class Player:
         self.primal_howl_used = False
         self.extra_deploy_turn_active = False
         self.discard_inquis_caius_wroth = False
+        self.optimized_landing_used = False
         self.enemy_has_wyrdboy_stikk = False
         self.accept_any_challenge_used = False
         self.rok_bombardment_active = []
@@ -3920,12 +3921,16 @@ class Player:
             return self.headquarters[unit_pos].get_card_type()
         return self.cards_in_play[planet_pos + 1][unit_pos].get_card_type()
 
-    def search_hand_for_discounts(self, faction_of_card):
+    def search_hand_for_discounts(self, faction_of_card, traits=""):
         discounts_available = 0
         for i in range(len(self.cards)):
             if self.cards[i] == "Bigga Is Betta":
                 if faction_of_card == "Orks":
                     discounts_available += 2
+        if "Drone" not in traits:
+            if not self.optimized_landing_used:
+                if self.search_hand_for_card("Optimized Landing"):
+                    discounts_available += min(2, self.count_attachments_controlled())
         return discounts_available
 
     def search_attachments_at_pos(self, planet_pos, unit_pos, card_abil, ready_relevant=False, must_match_name=False):
@@ -4300,13 +4305,17 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].world_engine_owner = False
                 self.cards_in_play[planet_pos + 1][unit_pos].world_engine_enemy = False
 
-    def perform_discount_at_pos_hand(self, pos, faction_of_card):
+    def perform_discount_at_pos_hand(self, pos, faction_of_card, traits):
         discount = 0
         damage = 0
         if self.cards[pos] == "Bigga Is Betta":
             if faction_of_card == "Orks":
                 discount += 2
                 damage += 1
+        if self.cards[pos] == "Optimized Landing":
+            if "Drone" not in traits:
+                if not self.optimized_landing_used:
+                    discount += min(2, self.count_attachments_controlled())
         return discount, damage
 
     def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits):

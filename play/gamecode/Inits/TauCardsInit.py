@@ -453,6 +453,9 @@ def tau_cards_init():
                                                    "loses resources equalt to the resource bonus and must discard "
                                                    "cards equal to the card bonus. Then move a Kroot army unit you "
                                                    "control at that planet to the first planet.", "Tactic. Kroot.",
-                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
+                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMMAND"),
+        CardClasses.EventCard("Optimized Landing", "Interrupt: When you deploy a non-Drone army unit, reduce its cost"
+                                                   " by X (Max 2). X is the amount of attachments you control."
+                                                   " (Max 1 per round.)", "Tactic.", 0, faction, "Loyal", 1, False)
     ]
     return tau_cards_array

@@ -319,7 +319,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                 self.faction_of_card_to_play = card.get_faction()
                 self.name_of_card_to_play = card.get_name()
                 self.discounts_applied = 0
-                hand_dis = primary_player.search_hand_for_discounts(card.get_faction())
+                hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
                 hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits(),
                                                                 planet_chosen=planet_pos)
                 in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
