@@ -1078,6 +1078,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Support Fleet Transfer Target"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Gue'vesa Overseer":
+            self.misc_target_unit = (-1, -1)
+            self.chosen_first_card = False
+            await self.send_update_message("Choose target for +1 ATK first.")
         elif current_reaction == "Rail Rifle":
             if primary_player.retreat_unit(planet_pos, unit_pos):
                 self.misc_target_planet = planet_pos

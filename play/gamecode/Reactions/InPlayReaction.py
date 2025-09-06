@@ -1339,6 +1339,26 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == self.misc_target_planet:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.delete_reaction()
+        elif current_reaction == "Gue'vesa Overseer":
+            if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+                if not self.chosen_first_card:
+                    if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) != "Tau":
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
+                                                           " received +1 ATK! Now choose the +1 HP target.")
+                else:
+                    if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) != "Tau":
+                        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                            if self.misc_target_unit != (planet_pos, unit_pos):
+                                player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                                await self.send_update_message(
+                                    player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
+                                    " received +1 HP!")
+                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                self.delete_reaction()
         elif current_reaction == "Farsight Vanguard":
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:

@@ -1987,6 +1987,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
                                                                                    last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
+            self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
+                                                                              last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Herald of the WAAGH!":
             if self.game.phase == "DEPLOY":
                 self.game.create_reaction("Herald of the WAAGH!", self.name_player, (int(self.number), position,
@@ -5460,7 +5463,9 @@ class Player:
     def check_if_faction_given_pos(self, planet_pos, unit_pos, faction):
         if self.get_faction_given_pos(planet_pos, unit_pos) == faction:
             return True
-        elif faction == "Astra Militarum" and self.get_ability_given_pos(planet_pos, unit_pos) == "Gue'vesa Overseer":
+        elif faction == "Astra Militarum" and \
+                self.get_ability_given_pos(planet_pos, unit_pos) == "Gue'vesa Overseer" or \
+                (self.game.apoka and self.get_ability_given_pos(planet_pos, unit_pos) == "Ardent Auxiliaries"):
             return True
         return False
 

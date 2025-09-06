@@ -443,6 +443,11 @@ def tau_cards_init():
                                                     " set a lower number, take the difference in resources from your "
                                                     "opponent. If not he takes the difference in resources from "
                                                     "the token bank. If equal draw a card. Max 1 per round.", "Tactic.",
-                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY")
+                              0, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.ArmyCard("Gue'vesa Overseer", "This unit is an Astra Militarum unit in addition to Tau.\n"
+                                                  "Reaction: After this unit enters play, a non-Tau army unit at an "
+                                                  "adjacent planet gets +1 ATK and another gets +1 HP until the end"
+                                                  " of the game. (Each unit can be at a different planet.)",
+                             "Soldier.", 2, faction, "Common", 1, 3, 1, False)
     ]
     return tau_cards_array
