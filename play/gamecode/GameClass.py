@@ -7026,6 +7026,12 @@ class Game:
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Mandrake Fearmonger":
             self.create_reaction("Mandrake Fearmonger", secondary_player.name_player,
                                  (int(secondary_player.number), -1, -1))
+        if secondary_player.check_for_trait_given_pos(att_pla, att_pos, "Kroot"):
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_ability_given_pos(planet_pos, i) == "Kroot Hounds":
+                    if secondary_player.get_ready_given_pos(planet_pos, i):
+                        self.create_reaction("Kroot Hounds", secondary_player.name_player,
+                                             (int(primary_player.number), planet_pos, unit_pos))
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                 self.create_reaction("Solarite Avetys", primary_player.name_player,

@@ -1339,6 +1339,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == self.misc_target_planet:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.delete_reaction()
+        elif current_reaction == "Kroot Hounds":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Kroot Hounds":
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                            secondary_player.assign_damage_to_pos(og_pla, og_pos, 2, shadow_field_possible=True,
+                                                                  rickety_warbuggy=True)
+                            self.delete_reaction()
         elif current_reaction == "Gue'vesa Overseer":
             if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
                 if not self.chosen_first_card:

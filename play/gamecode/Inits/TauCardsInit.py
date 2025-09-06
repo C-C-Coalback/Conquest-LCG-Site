@@ -462,6 +462,11 @@ def tau_cards_init():
                                                               "wins a command struggle at a planet with one or more "
                                                               "Tau units you control, gain 1 resource.\"",
                                    "Negotiation.", 0, faction, "Loyal", 2, True, unit_must_match_faction=True,
-                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True)
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Kroot Hounds", "No Attachments.\n"
+                                             "Reaction: After a Kroot unit you control damages an enemy unit by an"
+                                             " attack at this planet, exhaust this unit to deal 2 damage to "
+                                             "that enemy unit.", "Creature. Kroot.",
+                             2, faction, "Common", 3, 3, 0, False, no_attachments=True)
     ]
     return tau_cards_array
