@@ -95,6 +95,7 @@ class Card:
         self.yvraine_active = False
         self.quick_construct = False
         self.infection_lekor = 0
+        self.blanked_eor_2 = False
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
@@ -184,6 +185,8 @@ class Card:
             return "BLANKED"
         if self.blanked_eor:
             return "BLANKED"
+        if self.blanked_eor_2:
+            return "BLANKED"
         if self.new_ability:
             return self.new_ability
         if bloodied_relevant:
@@ -196,12 +199,18 @@ class Card:
             self.blanked_eop = new_val
         if exp == "EOR":
             self.blanked_eor = new_val
+        if exp == "EOR2":
+            self.blanked_eor_2 = new_val
 
     def reset_blanked_eop(self):
         self.blanked_eop = False
 
     def reset_blanked_eor(self):
         self.blanked_eor = False
+
+    def reset_blanked_eor2(self):
+        self.blanked_eor = self.blanked_eor_2
+        self.blanked_eor_2 = False
 
     def get_blanked(self):
         return self.blanked_eop
@@ -401,6 +410,10 @@ class UnitCard(Card):
         self.armorbane_eog = False
         self.sweep_eop = 0
         self.sweep_next = 0
+        self.sweep_eog = 0
+        self.mobile_eog = False
+        self.flying_eog = False
+        self.retaliate_eog = False
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value
@@ -422,6 +435,7 @@ class UnitCard(Card):
                 retaliate_value += 3
         retaliate_value = retaliate_value + self.retaliate_eop
         retaliate_value += self.retaliate_eor
+        retaliate_value += self.retaliate_eog
         return retaliate_value
 
     def set_retaliate(self, retaliate):
@@ -459,6 +473,7 @@ class UnitCard(Card):
         sweep += self.sweep_eor
         sweep += self.sweep_eop
         sweep += self.sweep_next
+        sweep += self.sweep_eog
         self.sweep_next = 0
         return sweep
 
@@ -562,6 +577,8 @@ class UnitCard(Card):
         if self.mobile_eop:
             return True
         if self.mobile_eor:
+            return True
+        if self.mobile_eog:
             return True
         if self.get_ability() == "Vectored Vyper Squad":
             if self.damage == 0:
@@ -703,6 +720,8 @@ class UnitCard(Card):
         if self.flying_eor:
             return True
         if self.flying_eocr:
+            return True
+        if self.flying_eog:
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Valkyris Pattern Jump Pack":
@@ -880,6 +899,9 @@ class WarlordCard(UnitCard):
         self.bloodied_attack = bloodied_attack
         self.bloodied_health = bloodied_health
         self.bloodied_text = bloodied_text
+        self.hale_attack = attack
+        self.hale_health = health
+        self.hale_text = text
         self.starting_resources = starting_resources
         self.starting_cards = starting_cards
         self.signature_squad = signature_squad
@@ -907,6 +929,15 @@ class WarlordCard(UnitCard):
 
     def get_starting_cards(self):
         return self.starting_cards
+
+    def hale_warlord(self):
+        self.damage = 0
+        self.health = self.hale_health
+        self.attack = self.hale_attack
+        self.text = self.hale_text
+        self.bloodied = False
+        if self.name == "Baharroth":
+            self.mobile = True
 
     def bloody_warlord(self):
         self.damage = 0

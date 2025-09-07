@@ -408,7 +408,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         self.queued_sound = "onplay"
         if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground" or
                 self.action_chosen == "Behind Enemy Lines") \
-                and not self.misc_player_storage == "RESOLVING MAGUS HARID":
+                and not self.misc_player_storage == "RESOLVING MAGUS HARID" \
+                and not self.misc_player_storage == "RESOLVING Ice World Hydras IV":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]

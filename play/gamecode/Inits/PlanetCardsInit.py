@@ -71,6 +71,16 @@ def planet_cards_init():
         CardClasses.PlanetCard("Coradim", "", 0, 2, True, False, False),
         CardClasses.PlanetCard("Belis", "", 1, 1, True, True, True),
         CardClasses.PlanetCard("Agerath Minor", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Radex", "", 0, 1, True, True, True),
+        CardClasses.PlanetCard("Langeran", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Josoon", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("Ice World Hydras IV", "", 2, 0, False, False, True),
+        CardClasses.PlanetCard("Heletine", "", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Fortress World Garid", "", 0, 2, True, False, False),
+        CardClasses.PlanetCard("Fenos", "", 1, 1, False, True, True),
+        CardClasses.PlanetCard("Essio", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("Daemon World Ivandis", "", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Chiros The Great Bazaar", "", 1, 0, True, True, True),
         CardClasses.PlanetCard("FINAL CARD", "", -1, -1, False, False, False, "NO IMAGE")
     ]
     return planet_array

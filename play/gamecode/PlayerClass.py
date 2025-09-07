@@ -195,6 +195,7 @@ class Player:
         self.played_grand_plan = False
         self.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
         self.webway_witch = -1
+        self.fortress_world_garid_used = False
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -1243,6 +1244,47 @@ class Player:
             return self.headquarters[unit_id].check_for_a_trait(trait, self.etekh_trait)
         return self.cards_in_play[planet_id + 1][unit_id].check_for_a_trait(trait, self.etekh_trait)
 
+    def make_warlord_hale_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            self.headquarters[unit_id].hale_warlord()
+            name_card = self.headquarters[unit_id].get_name()
+            if name_card == "Urien Rakarth":
+                self.urien_relevant = True
+            if name_card == "Gorzod":
+                self.gorzod_relevant = True
+            if name_card == "Subject Omega-X62113":
+                self.subject_omega_relevant = True
+            if name_card == "Grigory Maksim":
+                self.grigory_maksim_relevant = True
+            if name_card == "Illuminor Szeras":
+                self.illuminor_szeras_relevant = True
+            if name_card == "Kaptin Bluddflagg":
+                self.bluddflagg_relevant = True
+            if name_card == "Vael the Gifted":
+                self.vael_relevent = True
+            if name_card == "Castellan Crowe":
+                castellan_crowe_2_relevant = True
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].hale_warlord()
+        name_card = self.cards_in_play[planet_id + 1][unit_id].get_name()
+        if name_card == "Urien Rakarth":
+            self.urien_relevant = True
+        if name_card == "Gorzod":
+            self.gorzod_relevant = True
+        if name_card == "Subject Omega-X62113":
+            self.subject_omega_relevant = True
+        if name_card == "Grigory Maksim":
+            self.grigory_maksim_relevant = True
+        if name_card == "Illuminor Szeras":
+            self.illuminor_szeras_relevant = True
+        if name_card == "Kaptin Bluddflagg":
+            self.bluddflagg_relevant = True
+        if name_card == "Vael the Gifted":
+            self.vael_relevent = True
+        if name_card == "Castellan Crowe":
+            castellan_crowe_2_relevant = True
+
+
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
         self.urien_relevant = False
@@ -1904,6 +1946,9 @@ class Player:
                 else:
                     self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
                                                " resources were spent due to Imperial Blockade."
+        if card.get_card_type() == "Army" and self.game.phase == "COMBAT":
+            if self.game.planet_array[position] == "Fenos":
+                return -1
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
@@ -3425,9 +3470,11 @@ class Player:
     def reset_all_blanked_eor(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].reset_blanked_eor()
+            self.headquarters[i].reset_blanked_eor2()
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eor()
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_blanked_eor2()
 
     def reset_all_blanked_eop(self):
         for i in range(len(self.headquarters)):
@@ -4536,6 +4583,8 @@ class Player:
                     attack_value += 1
         if card.get_card_type() == "Warlord":
             found_praetorian_shadow = False
+            if self.game.planet_array[planet_id] == "Chiros The Great Bazaar":
+                attack_value += 1
             if self.search_card_at_planet(planet_id, "Praetorian Shadow"):
                 found_praetorian_shadow = True
             if not found_praetorian_shadow and planet_id != 0:
@@ -5193,6 +5242,10 @@ class Player:
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
             ability = self.get_ability_given_pos(planet_id, unit_id)
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
+                for i in range(len(self.victory_display)):
+                    if self.victory_display[i].get_name() == "Daemon World Ivandis":
+                        health += 2
             if self.headquarters[unit_id].health_set_eop != -1:
                 return self.headquarters[unit_id].health_set_eop
             if self.get_faction_given_pos(-2, unit_id) == "Orks":
@@ -5242,6 +5295,10 @@ class Player:
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
         ability = self.get_ability_given_pos(planet_id, unit_id)
+        if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
+            for i in range(len(self.victory_display)):
+                if self.victory_display[i].get_name() == "Daemon World Ivandis":
+                    health += 2
         if self.cards_in_play[planet_id + 1][unit_id].health_set_eop != -1:
             return self.cards_in_play[planet_id + 1][unit_id].health_set_eop
         card = self.cards_in_play[planet_id + 1][unit_id]
@@ -5535,6 +5592,9 @@ class Player:
                 for i in range(self.erekiels_queued):
                     self.game.create_reaction("Erekiel Next", self.name_player, (int(self.number), -1, -1))
                 self.erekiels_queued = 0
+            for i in range(len(self.victory_display)):
+                if self.victory_display[i].get_name() == "Josoon":
+                    self.add_resources(1)
         if self.search_hand_for_card("Hunter's Ploy"):
             if phase == "HEADQUARTERS":
                 self.game.create_reaction("Hunter's Ploy", self.name_player, (int(self.number), -1, -1))
