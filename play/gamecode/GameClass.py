@@ -384,6 +384,8 @@ class Game:
         self.guardian_mesh_armor_enabled = True
         self.guardian_mesh_armor_active = False
         self.maksim_squadron_enabled = True
+        self.distorted_talos_enabled = True
+        self.distorted_talos_active = False
         self.woken_machine_spirit_enabled = False
         self.maksim_squadron_active = False
         self.woken_machine_spirit_active = False
@@ -4598,6 +4600,23 @@ class Game:
                             self.reset_choices_available()
                             await self.better_shield_card_resolution(
                                 primary_player.name_player, self.last_shield_string, alt_shields=False)
+                    elif self.choice_context == "Use Distorted Talos?":
+                        self.distorted_talos_enabled = False
+                        if game_update_string[1] == "0":
+                            self.distorted_talos_active = True
+                            pos_holder = self.positions_of_units_to_take_damage[0]
+                            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+                            damage_total = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+                            damage_removed = damage_total - self.amount_that_can_be_removed_by_shield[0]
+                            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_removed, healing=True)
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
+                        else:
+                            self.reset_choices_available()
+                            await self.better_shield_card_resolution(
+                                primary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Use Maksim's Squadron?":
                         self.maksim_squadron_enabled = False
                         if game_update_string[1] == "0":
@@ -7302,6 +7321,17 @@ class Game:
                                                 self.name_player_making_choices = primary_player.name_player
                                                 can_continue = False
                                 if can_continue:
+                                    if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                            == "Distorted Talos":
+                                        if not primary_player.get_once_per_phase_used_given_pos(
+                                                planet_pos, unit_pos):
+                                            if self.distorted_talos_enabled and not primary_player.hit_by_gorgul:
+                                                self.last_shield_string = game_update_string
+                                                self.choice_context = "Use Distorted Talos?"
+                                                self.choices_available = ["Yes", "No"]
+                                                self.name_player_making_choices = primary_player.name_player
+                                                can_continue = False
+                                if can_continue:
                                     if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                                 "Woken Machine Spirit"):
                                         if self.woken_machine_spirit_enabled and not primary_player.hit_by_gorgul:
@@ -7341,6 +7371,7 @@ class Game:
                                         self.maksim_squadron_enabled = True
                                         self.woken_machine_spirit_enabled = True
                                         self.guardian_mesh_armor_enabled = True
+                                        self.distorted_talos_enabled = True
                                         shields = min(shields, self.amount_that_can_be_removed_by_shield[0])
                                         self.amount_that_can_be_removed_by_shield[0] = \
                                             self.amount_that_can_be_removed_by_shield[0] - shields
@@ -8613,6 +8644,7 @@ class Game:
         self.liatha_available = True
         self.maksim_squadron_active = False
         self.maksim_squadron_enabled = True
+        self.distorted_talos_enabled = True
         self.woken_machine_spirit_enabled = True
         self.guardian_mesh_armor_enabled = True
         self.alt_shield_mode_active = False

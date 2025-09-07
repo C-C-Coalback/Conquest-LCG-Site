@@ -448,6 +448,10 @@ def dark_eldar_cards_init():
         CardClasses.EventCard("Shadow Hunt", "Reaction: After your opponent passes during the deploy phase, "
                                              "put a face-down, non-Elite Dark Eldar unit you removed from "
                                              "the game into play face-up at a target planet.", "Tactic.",
-                              1, faction, "Signature", 1, False)
+                              1, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Distorted Talos", "Lumbering.\n"
+                                                "Interrupt: When you use a shield card on this unit, remove all "
+                                                "damage from it. (Limit once per phase.)",
+                             "Abomination. Creature. Elite.", 3, faction, "Loyal", 5, 4, 1, False, lumbering=True)
     ]
     return dark_eldar_cards_array
