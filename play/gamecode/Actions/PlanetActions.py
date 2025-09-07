@@ -58,6 +58,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.action_cleanup()
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
+    elif self.action_chosen == "Theater of War":
+        self.action_cleanup()
+        self.need_to_resolve_battle_ability = True
+        self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+        self.player_resolving_battle_ability = primary_player.name_player
+        self.number_resolving_battle_ability = str(primary_player.number)
+        self.choices_available = ["Yes", "No"]
+        self.choice_context = "Resolve Battle Ability?"
+        self.name_player_making_choices = primary_player.name_player
+        self.tense_negotiations_active = True
+        self.theater_of_war_active = True
     elif self.action_chosen == "Evangelizing Ships":
         if not self.chosen_second_card:
             if not self.get_green_icon(chosen_planet):

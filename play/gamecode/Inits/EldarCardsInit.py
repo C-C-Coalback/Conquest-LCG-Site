@@ -482,6 +482,11 @@ def eldar_cards_init():
         CardClasses.EventCard("Lost in the Webway", "Combat Action: Either (choose one): Switch the location of two"
                                                     " Harlequin units you control or your opponent must switch the "
                                                     "location of two army units he controls.", "Power. Harlequin.",
-                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.EventCard("Theater of War", "Play only if an enemy warlord is ready.\n"
+                                                "Command Action: Exhaust your warlord to trigger the Battle ability of "
+                                                "a target planet. Then your opponent may exhaust his warlord to trigger"
+                                                " the Battle ability of another planet.", "Power. Harlequin.",
+                              1, faction, "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
     ]
     return eldar_cards_array

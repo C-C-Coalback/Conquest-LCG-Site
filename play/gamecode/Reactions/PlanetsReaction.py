@@ -169,6 +169,20 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 target_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 target_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                 self.delete_reaction()
+    elif current_reaction == "Theater of War Response":
+        planet_name = self.planet_array[chosen_planet]
+        if planet_name != self.forbidden_theater_of_war:
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
+            self.delete_reaction()
+            self.need_to_resolve_battle_ability = True
+            self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+            self.player_resolving_battle_ability = primary_player.name_player
+            self.number_resolving_battle_ability = str(primary_player.number)
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "Resolve Battle Ability?"
+            self.name_player_making_choices = primary_player.name_player
+            self.tense_negotiations_active = True
     elif self.reactions_needing_resolving[0] == "Foresight":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])

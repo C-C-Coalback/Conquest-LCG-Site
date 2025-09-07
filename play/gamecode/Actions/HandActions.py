@@ -208,6 +208,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["Harlequin", "Opponent"]
                         self.choice_context = "Lost in the Webway"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Theater of War":
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        enemy_pla, enemy_pos = secondary_player.get_location_of_warlord()
+                        if primary_player.get_ready_given_pos(warlord_pla, warlord_pos) and \
+                                secondary_player.get_ready_given_pos(warlord_pla, warlord_pos):
+                            primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
+                            primary_player.discard_card_from_hand(hand_pos)
+                            self.action_chosen = ability
+                            await self.send_update_message("Choose planet.")
+                        else:
+                            primary_player.add_resources(1, refund=True)
                     elif ability == "Everlasting Rage":
                         if not primary_player.everlasting_rage_used:
                             primary_player.everlasting_rage_used = True

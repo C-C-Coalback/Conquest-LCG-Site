@@ -400,6 +400,8 @@ class Game:
         self.maksim_squadron_active = False
         self.woken_machine_spirit_active = False
         self.tense_negotiations_active = False
+        self.theater_of_war_active = False
+        self.forbidden_theater_of_war = ""
         self.shining_blade_active = False
         self.value_doom_siren = 0
         self.misc_counter_2 = 0
@@ -1638,8 +1640,10 @@ class Game:
             self.last_planet_checked_command_struggle = self.nectavus_actual_current_planet
         self.nectavus_actual_current_planet = -1
         winner = self.p2
+        loser = self.p1
         if self.player_resolving_battle_ability == self.name_1:
             winner = self.p1
+            loser = self.p2
         for i in range(7):
             if self.planet_array[i] == self.battle_ability_to_resolve:
                 for j in range(len(winner.cards_in_play[i + 1])):
@@ -1720,6 +1724,10 @@ class Game:
                         "Window provided for reactions and actions during HQ phase."
                     )
         self.tense_negotiations_active = False
+        if self.theater_of_war_active:
+            self.theater_of_war_active = False
+            self.forbidden_theater_of_war = self.battle_ability_to_resolve
+            self.create_reaction("Theater of War Response", loser.name_player, (int(loser.number), -1, -1))
         self.damage_from_atrox = False
         self.reset_battle_resolve_attributes()
 
