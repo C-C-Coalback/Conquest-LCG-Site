@@ -380,10 +380,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "Superiority"
                             elif primary_player.spend_resources(cost):
-                                self.positions_of_unit_triggering_reaction.append((int(primary_player.get_number()),
-                                                                                   -1, -1))
-                                self.reactions_needing_resolving.append("Superiority")
-                                self.player_who_resolves_reaction.append(primary_player.name_player)
+                                self.create_reaction("Superiority", primary_player.name_player,
+                                                     (int(primary_player.get_number()), -1, -1))
                                 primary_player.aiming_reticle_color = "blue"
                                 primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         elif primary_player.cards[hand_pos] == "War of Ideas":
@@ -440,6 +438,57 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.name_player_making_choices = primary_player.name_player
                                 self.position_of_actioned_card = (-2, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                        elif primary_player.get_ability_given_pos(-2, unit_pos) == "The Duke of Debris":
+                            if not primary_player.get_once_per_phase_used_given_pos(-2, unit_pos):
+                                planet_pos = -2
+                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                                self.resolving_search_box = True
+                                self.what_to_do_with_searched_card = "DRAW"
+                                self.traits_of_searched_card = None
+                                self.card_type_of_searched_card = None
+                                self.faction_of_searched_card = None
+                                self.max_cost_of_searched_card = 999
+                                self.all_conditions_searched_card_required = True
+                                self.no_restrictions_on_chosen_card = False
+                                self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
+                                primary_player.number_cards_to_search = 2
+                                if len(primary_player.deck) < 2:
+                                    primary_player.number_cards_to_search = len(primary_player.deck)
+                                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                                self.name_player_who_is_searching = primary_player.name_player
+                                self.number_who_is_searching = primary_player.number
+        elif len(game_update_string) == 4:
+            if game_update_string[0] == "IN_PLAY":
+                if name == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+                if self.interrupts_before_cs_allowed:
+                    pass
+                if self.interrupts_during_cs_allowed:
+                    if game_update_string[1] == primary_player.get_number():
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "The Duke of Debris":
+                            if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                                self.resolving_search_box = True
+                                self.what_to_do_with_searched_card = "DRAW"
+                                self.traits_of_searched_card = None
+                                self.card_type_of_searched_card = None
+                                self.faction_of_searched_card = None
+                                self.max_cost_of_searched_card = 999
+                                self.all_conditions_searched_card_required = True
+                                self.no_restrictions_on_chosen_card = False
+                                primary_player.number_cards_to_search = 2
+                                self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
+                                if len(primary_player.deck) < 2:
+                                    primary_player.number_cards_to_search = len(primary_player.deck)
+                                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                                self.name_player_who_is_searching = primary_player.name_player
+                                self.number_who_is_searching = primary_player.number
     elif self.after_command_struggle:
         print("After command struggle")
         if len(game_update_string) == 1:
@@ -573,6 +622,8 @@ def try_entire_command(self, planet_pos):
             if self.get_green_icon(planet_pos):
                 if self.p1.search_hand_for_card("Wraithguard Revenant"):
                     return "INTERRUPT DURING STRUGGLE"
+            if self.p1.search_for_card_everywhere("The Duke of Debris", limit_phase_rel=True):
+                return "INTERRUPT DURING STRUGGLE"
             if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p2.get_location_of_warlord()

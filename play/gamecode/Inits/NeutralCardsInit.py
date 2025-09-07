@@ -65,6 +65,11 @@ def neutral_cards_init():
                                                     " place the remaining cards on top of your deck in any order. "
                                                     "Then if your opponent has more cards in hand than you, draw a"
                                                     " card.", "Relic.",
-                                0, "Neutral", "Common", True)
+                                0, "Neutral", "Common", True),
+        CardClasses.ArmyCard("The Duke of Debris", "Interrupt: When you win a command struggle, instead of taking the "
+                                                   "card bonus search the top 2 cards of your deck for a card. Add "
+                                                   "it to your hand, and place the remaining cards on the bottom "
+                                                   "of your deck in any order. (Limit once per phase.)",
+                             "Scavenger. Ally.", 1, "Neutral", "Common", 0, 2, 1, True)
     ]
     return neutral_card_array
