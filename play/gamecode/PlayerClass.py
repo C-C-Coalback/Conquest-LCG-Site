@@ -4846,6 +4846,7 @@ class Player:
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
                              context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False,
                              by_enemy_unit=True):
+        other_player = self.get_other_player()
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
         if shadow_field_possible:
@@ -4926,9 +4927,6 @@ class Player:
             self.game.damage_bodyguard = og_damage
             return False, len(bodyguard_damage_list)
         if zara_check and damage > 0:
-            other_player = self.game.p1
-            if other_player.name_player == self.name_player:
-                other_player = self.game.p2
             if not other_player.hit_by_gorgul:
                 damage += 1
         if self.search_attachments_at_pos(planet_id, unit_id, "Heavy Marker Drone"):
@@ -5002,6 +5000,11 @@ class Player:
             else:
                 self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
         if damage_on_card_after > damage_on_card_before:
+            if att_pos is not None:
+                for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                    if other_player.search_attachments_at_pos(planet_id, i, "Data Analyzer"):
+                        self.game.create_interrupt("Data Analyzer Aggressive", other_player.name_player,
+                                                   (int(self.number), planet_id, unit_id))
             if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
                 if self.check_if_card_is_destroyed(planet_id, unit_id):
                     if not self.check_if_already_have_interrupt("Cajivak the Hateful"):

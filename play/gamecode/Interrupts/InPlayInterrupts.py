@@ -93,6 +93,38 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if planet_pos == self.extra_interrupt_info[0]:
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.delete_interrupt()
+    elif current_interrupt == "Data Analyzer Aggressive":
+        if game_update_string[1] == secondary_player.get_number():
+            _, og_pla, og_pos = self.positions_of_units_interrupting[0]
+            if og_pla == planet_pos:
+                if (og_pla, og_pos) != (planet_pos, unit_pos):
+                    secondary_player.remove_damage_from_pos(og_pla, og_pos, 1)
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1,
+                                                          by_enemy_unit=False, is_reassign=True)
+                    secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.delete_interrupt()
+                    need_to_cleanup_shielding = False
+                    need_to_delete_shielding = False
+                    position_damage = -1
+                    for i in range(len(self.positions_attackers_of_units_to_take_damage)):
+                        if self.positions_attackers_of_units_to_take_damage[i] is not None:
+                            self.amount_that_can_be_removed_by_shield[i] += -1
+                            if self.amount_that_can_be_removed_by_shield[i] < 0:
+                                if i == 0:
+                                    need_to_cleanup_shielding = True
+                                else:
+                                    position_damage = i
+                                    need_to_delete_shielding = True
+                    if need_to_cleanup_shielding:
+                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                    elif need_to_delete_shielding:
+                        del self.damage_on_units_list_before_new_damage[position_damage]
+                        del self.damage_is_preventable[position_damage]
+                        del self.positions_of_units_to_take_damage[position_damage]
+                        del self.damage_can_be_shielded[position_damage]
+                        del self.positions_attackers_of_units_to_take_damage[position_damage]
+                        del self.card_names_triggering_damage[position_damage]
+                        del self.amount_that_can_be_removed_by_shield[position_damage]
     elif current_interrupt == "Singing Spear":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
