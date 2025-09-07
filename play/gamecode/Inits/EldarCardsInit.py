@@ -478,6 +478,10 @@ def eldar_cards_init():
                                                      "Combat Action: Exhaust this support to move 1 damage from a targ"
                                                      "et enemy unit at a planet with a unit you control with a printed"
                                                      " ATK of 0 to another unit at the same planet.", "Upgrade.",
-                                1, faction, "Loyal", True, action_in_play=True, allowed_phases_in_play="COMBAT")
+                                1, faction, "Loyal", True, action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.EventCard("Lost in the Webway", "Combat Action: Either (choose one): Switch the location of two"
+                                                    " Harlequin units you control or your opponent must switch the "
+                                                    "location of two army units he controls.", "Power. Harlequin.",
+                              1, faction, "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
     ]
     return eldar_cards_array

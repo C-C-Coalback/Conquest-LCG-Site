@@ -3919,6 +3919,16 @@ class Game:
                             self.delete_reaction()
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "Lost in the Webway":
+                        if chosen_choice == "Harlequin":
+                            await self.send_update_message("Swapping Harlequins")
+                            self.action_chosen = "Lost in the Webway Harlequin"
+                        else:
+                            await self.send_update_message("Opponent must swap two army units.")
+                            self.action_chosen = "Lost in the Webway Opponent"
+                            self.player_with_action = secondary_player.name_player
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Select new synapse (RSN):":
                         card = self.preloaded_find_card(chosen_choice)
                         primary_player.add_to_hq(card)

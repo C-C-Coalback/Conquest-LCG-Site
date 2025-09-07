@@ -200,6 +200,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["1", "2"]
                         self.choice_context = "Brutal Cunning: amount of damage"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Lost in the Webway":
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        self.action_chosen = ability
+                        self.misc_target_unit = (-1, -1)
+                        self.chosen_first_card = False
+                        self.choices_available = ["Harlequin", "Opponent"]
+                        self.choice_context = "Lost in the Webway"
+                        self.name_player_making_choices = primary_player.name_player
                     elif ability == "Everlasting Rage":
                         if not primary_player.everlasting_rage_used:
                             primary_player.everlasting_rage_used = True
