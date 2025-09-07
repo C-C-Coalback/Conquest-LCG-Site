@@ -225,6 +225,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                                 primary_player.mulligan_hand()
                                 self.action_cleanup()
+                    elif ability == "Wraithbone Armour":
+                        if card.get_ready():
+                            self.chosen_first_card = False
+                            self.action_chosen = ability
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                     elif ability == "Nesting Chamber":
                         if card.get_ready():
                             card.exhaust_card()

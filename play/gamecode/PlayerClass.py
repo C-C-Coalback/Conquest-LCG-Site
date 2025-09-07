@@ -5249,6 +5249,9 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            if self.headquarters[unit_id].attack == 0:
+                if self.search_card_in_hq("Wraithbone Armour"):
+                    health += 1
             ability = self.get_ability_given_pos(planet_id, unit_id)
             if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
                 for i in range(len(self.victory_display)):
@@ -5302,6 +5305,9 @@ class Player:
                         health += 1
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        if self.cards_in_play[planet_id + 1][unit_id].attack == 0:
+            if self.search_card_in_hq("Wraithbone Armour"):
+                health += 1
         ability = self.get_ability_given_pos(planet_id, unit_id)
         if self.get_card_type_given_pos(planet_id, unit_id) == "Warlord":
             for i in range(len(self.victory_display)):

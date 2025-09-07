@@ -1791,6 +1791,25 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if planet_pos != self.round_number:
                             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.round_number)
                         self.action_cleanup()
+    elif self.action_chosen == "Wraithbone Armour":
+        if not self.chosen_first_card:
+            if game_update_string[1] == secondary_player.get_number():
+                zero_attack = False
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.cards_in_play[planet_pos + 1][i].attack == 0:
+                        zero_attack = True
+                if zero_attack:
+                    if secondary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.chosen_first_card = True
+        else:
+            if planet_pos == self.misc_target_unit[0]:
+                og_pla, og_pos = self.misc_target_unit
+                secondary_player.remove_damage_from_pos(og_pla, og_pos, 1)
+                player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
+                secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                self.action_cleanup()
     elif self.action_chosen == "Breach and Clear 2":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos) and planet_pos == self.misc_target_planet:

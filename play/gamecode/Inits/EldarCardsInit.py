@@ -473,6 +473,11 @@ def eldar_cards_init():
                                                  "your deck for a card with the Deep Strike keyword. Reveal it, "
                                                  "and add it to your hand. Then, put each remaining card on the "
                                                  "bottom of your deck in any order.", "Psyker.",
-                             3, faction, "Loyal", 2, 3, 1, False)
+                             3, faction, "Loyal", 2, 3, 1, False),
+        CardClasses.SupportCard("Wraithbone Armour", "Units you control with a printed ATK of 0 get +1 HP.\n"
+                                                     "Combat Action: Exhaust this support to move 1 damage from a targ"
+                                                     "et enemy unit at a planet with a unit you control with a printed"
+                                                     " ATK of 0 to another unit at the same planet.", "Upgrade.",
+                                1, faction, "Loyal", True, action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return eldar_cards_array
