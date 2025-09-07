@@ -1493,6 +1493,14 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Scheming Warlock":
+            primary_player.number_cards_to_search = 3
+            if 3 > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.choice_context = "Scheming Warlock Rally"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Luring Troupe":
             self.chosen_first_card = False
         elif current_reaction == "Cegorach's Jesters":

@@ -2493,6 +2493,9 @@ class Player:
                             if card.get_ability() == "Triarch Stalkers Procession":
                                 other_player.draw_card()
                                 other_player.draw_card()
+                            if card.get_ability() == "Scheming Warlock":
+                                self.game.create_reaction("Scheming Warlock", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Brotherhood Justicar":
                                 self.game.create_reaction("Brotherhood Justicar", self.name_player,
                                                           (int(self.number), position, location_of_unit))

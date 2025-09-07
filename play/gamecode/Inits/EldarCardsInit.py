@@ -468,6 +468,11 @@ def eldar_cards_init():
         CardClasses.ArmyCard("Luring Troupe", "Reaction: After you deploy this unit, move a target army unit at this "
                                               "planet to an adjacent planet. At the end of next phase, move "
                                               "that unit back to this planet, if able.", "Psyker. Harlequin.",
-                             2, faction, "Loyal", 3, 2, 1, False)
+                             2, faction, "Loyal", 3, 2, 1, False),
+        CardClasses.ArmyCard("Scheming Warlock", "Reaction: After you deploy this unit, look at the top 3 cards of "
+                                                 "your deck for a card with the Deep Strike keyword. Reveal it, "
+                                                 "and add it to your hand. Then, put each remaining card on the "
+                                                 "bottom of your deck in any order.", "Psyker.",
+                             3, faction, "Loyal", 2, 3, 1, False)
     ]
     return eldar_cards_array

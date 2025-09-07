@@ -2847,6 +2847,12 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         primary_player.shuffle_deck()
+                    elif self.choice_context == "Scheming Warlock Rally":
+                        primary_player.bottom_remaining_cards()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
                     elif self.choice_context == "Support Fleet Rally":
                         self.delete_reaction()
                         self.reset_choices_available()
@@ -3111,6 +3117,17 @@ class Game:
                             )
                         self.choice_context = "Raving Cryptek: Deploy choice"
                         self.name_player_making_choices = secondary_player.name_player
+                    elif self.choice_context == "Scheming Warlock Rally":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_has_deepstrike():
+                            primary_player.cards.append(card.get_name())
+                            del primary_player.deck[int(game_update_string[1])]
+                            primary_player.number_cards_to_search += -1
+                            primary_player.bottom_remaining_cards()
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.delete_reaction()
                     elif self.choice_context == "Raving Cryptek: Deploy choice":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         self.card_to_deploy = self.preloaded_find_card(target_choice)
