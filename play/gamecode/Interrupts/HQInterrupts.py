@@ -66,6 +66,12 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                 if "Transcendent Blessing" in primary_player.discard:
                     primary_player.discard.remove("Transcendent Blessing")
                 self.delete_interrupt()
+    elif current_interrupt == "Singing Spear":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                last_planet = self.determine_last_planet()
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, last_planet)
+                self.delete_interrupt()
     elif current_interrupt == "Liatha Punishment":
         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
         self.delete_interrupt()

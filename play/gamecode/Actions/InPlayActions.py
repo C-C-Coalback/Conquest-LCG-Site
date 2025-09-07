@@ -439,6 +439,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 if primary_player.spend_resources(ds_value):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
                                     self.action_cleanup()
+                    elif ability == "Farseer Tadheris":
+                        if not card.get_bloodied():
+                            if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+                                primary_player.mulligan_hand()
+                                self.action_cleanup()
+                        else:
+                            if not primary_player.get_once_per_game_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
+                                primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                                primary_player.mulligan_hand()
+                                self.action_cleanup()
                     elif ability == "Slave-powered Wagons":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)

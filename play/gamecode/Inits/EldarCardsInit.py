@@ -434,6 +434,31 @@ def eldar_cards_init():
         CardClasses.EventCard("Clash of Wings", "Combat Action: Target a planet with your warlord. "
                                                 "Until the end of the combat round, each Mobile unit you control at"
                                                 " that planet gains Flying.", "Tactic.",
-                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT")
+                              1, faction, "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.WarlordCard("Farseer Tadheris", "You choose your allied faction as if you were Astra Militarum.\n"
+                                                    "Action: Perform a mulligan with your current hand size."
+                                                    " (Limit once per round.)", "Psyker. Prophet.", faction,
+                                2, 6, 2, 5, "Bloodied.\n"
+                                            "Action: Deal 1 damage to this unit to perform a mulligan with your "
+                                            "current hand size. (Limit once per game.)", 7, 7,
+                                ["2x Back to the Shadows", "4x Elusive Escort",
+                                 "1x Singing Spear", "1x Wisdom of Biel-tan"],
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Back to the Shadows", "Interrupt: When an army unit you control is assigned damage, "
+                                                     "return it and each attachment you control on it to"
+                                                     " your hand. Then draw a card.", "Power.",
+                              0, faction, "Signature", 1, False),
+        CardClasses.ArmyCard("Elusive Escort", "Reaction: After this unit enters play, draw a card. Then remove from "
+                                               "the game facedown a card from your hand. When this unit "
+                                               "leaves play, return the facedown card to your hand.",
+                             "Scout.", 2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.AttachmentCard("Singing Spear", "Attach to an army unit.\n"
+                                                    "Attached unit gets +2 ATK and +2 HP.\n"
+                                                    "Interrupt: When you perform a mulligan, reveal this card from"
+                                                    " your hand to move an army unit you control to the last planet.",
+                                   "Wargear.", 0, faction, "Signature", 3, False, extra_health=2, extra_attack=2,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.SupportCard("Wisdom of Biel-tan", "Reaction: After you perform a mulligan, draw a card.",
+                                "Doctrine.", 0, faction, "Signature", False)
     ]
     return eldar_cards_array

@@ -111,6 +111,16 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                                                               discounts=self.discounts_applied)
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
+        elif current_reaction == "Elusive Escort":
+            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos == -2:
+                primary_player.headquarters[unit_pos].misc_string = primary_player.cards[hand_pos]
+            else:
+                primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_string = primary_player.cards[hand_pos]
+            primary_player.remove_card_from_game(primary_player.cards[hand_pos], hidden="H")
+            del primary_player.cards[hand_pos]
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "The Dawnsinger":
             primary_player.deck.insert(0, primary_player.cards[hand_pos])
             del primary_player.cards[hand_pos]

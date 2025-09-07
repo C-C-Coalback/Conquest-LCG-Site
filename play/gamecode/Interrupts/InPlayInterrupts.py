@@ -93,6 +93,13 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if planet_pos == self.extra_interrupt_info[0]:
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.delete_interrupt()
+    elif current_interrupt == "Singing Spear":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                last_planet = self.determine_last_planet()
+                if planet_pos != last_planet:
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, last_planet)
+                    self.delete_interrupt()
     elif current_interrupt == "The Sun Prince":
         if planet_pos == self.positions_of_units_interrupting[0][1]:
             if game_update_string[1] == primary_player.get_number():

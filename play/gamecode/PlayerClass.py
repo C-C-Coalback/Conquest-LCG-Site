@@ -943,6 +943,9 @@ class Player:
 
     def mulligan_hand(self):
         num_cards = 0
+        if self.search_hand_for_card("Singing Spear"):
+            if not self.game.choices_available:
+                self.game.create_interrupt("Singing Spear", self.name_player, (int(self.number), -1, -1))
         while self.cards:
             num_cards += 1
             self.deck.append(self.cards[0])
@@ -966,6 +969,8 @@ class Player:
                 i = i + 1
             for i in range(num_cards):
                 self.draw_card()
+        if self.search_card_in_hq("Wisdom of Biel-tan"):
+            self.game.create_reaction("Wisdom of Biel-tan", self.name_player, (int(self.number), -1, -1))
 
     def get_headquarters(self):
         return self.headquarters
@@ -1514,6 +1519,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), -2,
                                                                                    last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Elusive Escort":
+            self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), -2,
+                                                                           last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Support Fleet":
             self.game.create_reaction("Support Fleet", self.name_player, (int(self.number), -2, last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Devoted Hospitaller":
@@ -1992,6 +2000,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
             self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
                                                                               last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Elusive Escort":
+            self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), position,
+                                                                           last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Herald of the WAAGH!":
             if self.game.phase == "DEPLOY":
                 self.game.create_reaction("Herald of the WAAGH!", self.name_player, (int(self.number), position,
@@ -6409,6 +6420,13 @@ class Player:
             if self.search_card_in_hq("Endless Legions", ready_relevant=True):
                 self.game.create_reaction("Endless Legions", self.name_player,
                                           (int(self.number), -1, -1))
+        if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Elusive Escort":
+            temp_card_name = self.cards_in_play[planet_num + 1][card_pos].misc_string
+            if temp_card_name:
+                if temp_card_name in self.cards_removed_from_game:
+                    self.cards_removed_from_game.remove(temp_card_name)
+                    del self.cards_removed_from_game_hidden[0]
+                    self.cards.append(temp_card_name)
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "The Sun Prince":
@@ -6565,6 +6583,13 @@ class Player:
             self.game.create_reaction("Kabalite Halfborn", self.name_player, (int(self.number), -1, -1))
         if self.get_ability_given_pos(-2, card_pos) == "Coteaz's Henchmen":
             self.game.create_reaction("Coteaz's Henchmen", self.name_player, (int(self.number), -1, -1))
+        if self.get_ability_given_pos(-2, card_pos) == "Elusive Escort":
+            temp_card_name = self.headquarters[card_pos].misc_string
+            if temp_card_name:
+                if temp_card_name in self.cards_removed_from_game:
+                    self.cards_removed_from_game.remove(temp_card_name)
+                    del self.cards_removed_from_game_hidden[0]
+                    self.cards.append(temp_card_name)
         if card.get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), -2, -1))
         if card.get_ability() == "Vanguard Soldiers":

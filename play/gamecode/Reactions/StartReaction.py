@@ -1493,6 +1493,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Elusive Escort":
+            primary_player.draw_card()
+        elif current_reaction == "Wisdom of Biel-tan":
+            primary_player.draw_card()
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Rampaging Knarloc":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             for i in range(7):

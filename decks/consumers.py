@@ -66,11 +66,15 @@ def second_part_deck_validation(deck):
         if position_main_faction != -1:
             ally_pos_1 = (position_main_faction + 1) % 7
             ally_pos_2 = (position_main_faction - 1) % 7
-            if factions[1] == alignment_wheel[ally_pos_1] \
-                    or factions[1] == alignment_wheel[ally_pos_2]:
-                return deck_validation(deck, remaining_signature_squad, factions)
+            if (factions[1] == alignment_wheel[ally_pos_1] or factions[1] == alignment_wheel[ally_pos_2]) \
+                    and warlord_card.get_name() != "Farseer Tadheris" and \
+                    warlord_card.get_name() != "Commander Starblaze":
+                return deck_validation(deck, remaining_signature_squad, factions, warlord=warlord_card.get_name())
             elif factions[1] == "Astra Militarum" and warlord_card.get_name() == "Commander Starblaze":
                 return deck_validation(deck, remaining_signature_squad, factions, "Commander Starblaze")
+            elif warlord_card.get_name() == "Farseer Tadheris":
+                if factions[1] == "Space Marines" or factions[1] == "Orks":
+                    return deck_validation(deck, remaining_signature_squad, factions, "Farseer Tadheris")
         return "Issue with faction matching."
     return "Unknown issue"
 
@@ -277,6 +281,10 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     ally_pos_2 = (position_main_faction - 1) % 7
                     if self.warlord == "Commander Starblaze":
                         if split_message[1] == "Astra Militarum":
+                            self.ally_faction = split_message[1]
+                            changed_ally = True
+                    elif self.warlord == "Farseer Tadheris":
+                        if split_message[1] == "Space Marines" or split_message[1] == "Orks":
                             self.ally_faction = split_message[1]
                             changed_ally = True
                     elif self.warlord == "Gorzod":

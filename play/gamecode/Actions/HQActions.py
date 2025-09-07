@@ -213,6 +213,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                             self.misc_counter = 0
+                    elif ability == "Farseer Tadheris":
+                        if not card.get_bloodied():
+                            if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+                                primary_player.mulligan_hand()
+                                self.action_cleanup()
+                        else:
+                            if not primary_player.get_once_per_game_used_given_pos(planet_pos, unit_pos):
+                                primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
+                                primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                                primary_player.mulligan_hand()
+                                self.action_cleanup()
                     elif ability == "Nesting Chamber":
                         if card.get_ready():
                             card.exhaust_card()
