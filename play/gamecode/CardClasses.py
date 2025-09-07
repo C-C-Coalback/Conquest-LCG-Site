@@ -414,6 +414,8 @@ class UnitCard(Card):
         self.mobile_eog = False
         self.flying_eog = False
         self.retaliate_eog = False
+        self.move_to_planet_end_of_phase_planet = -1
+        self.move_to_planet_end_of_phase_phase = ""
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value

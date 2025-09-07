@@ -464,6 +464,10 @@ def eldar_cards_init():
                                                    " reveal any number of cards from him hand. He cannot use "
                                                    "unrevealed event or attachment cards as shield cards during "
                                                    "this battle.", "Psyker. Harlequin.",
-                             2, faction, "Loyal", 2, 2, 1, False)
+                             2, faction, "Loyal", 2, 2, 1, False),
+        CardClasses.ArmyCard("Luring Troupe", "Reaction: After you deploy this unit, move a target army unit at this "
+                                              "planet to an adjacent planet. At the end of next phase, move "
+                                              "that unit back to this planet, if able.", "Psyker. Harlequin.",
+                             2, faction, "Loyal", 3, 2, 1, False)
     ]
     return eldar_cards_array

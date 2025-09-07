@@ -1349,6 +1349,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(og_pla, og_pos, 2, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
                             self.delete_reaction()
+        elif current_reaction == "Luring Troupe":
+            if not self.chosen_first_card:
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                    if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.chosen_first_card = True
+                        player_owning_card.cards_in_play[planet_pos + 1][
+                            unit_pos].move_to_planet_end_of_phase_planet = planet_pos
+                        next_phase = ""
+                        self.misc_target_player = player_owning_card.name_player
+                        if self.phase == "DEPLOY":
+                            next_phase = "COMMAND"
+                        if self.phase == "COMMAND":
+                            next_phase = "COMBAT"
+                        if self.phase == "COMBAT":
+                            next_phase = "HEADQUARTERS"
+                        if self.phase == "HEADQUARTERS":
+                            next_phase = "DEPLOY"
+                        player_owning_card.cards_in_play[planet_pos + 1][
+                            unit_pos].move_to_planet_end_of_phase_phase = next_phase
         elif current_reaction == "Erekiel Next":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):

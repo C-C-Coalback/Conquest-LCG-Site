@@ -159,6 +159,16 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.number_cards_to_search = 6
             else:
                 self.delete_reaction()
+    elif self.reactions_needing_resolving[0] == "Luring Troupe":
+        if self.chosen_first_card:
+            planet_pos, unit_pos = self.misc_target_unit
+            if abs(planet_pos - chosen_planet) == 1:
+                target_player = self.p1
+                if self.misc_target_player == self.name_2:
+                    target_player = self.p2
+                target_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                target_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+                self.delete_reaction()
     elif self.reactions_needing_resolving[0] == "Foresight":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])

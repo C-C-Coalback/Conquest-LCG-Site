@@ -2496,6 +2496,9 @@ class Player:
                             if card.get_ability() == "Brotherhood Justicar":
                                 self.game.create_reaction("Brotherhood Justicar", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Luring Troupe":
+                                self.game.create_reaction("Luring Troupe", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "The Webway Witch":
                                 self.game.create_reaction("The Webway Witch", self.name_player,
                                                           (int(self.number), position, location_of_unit))
