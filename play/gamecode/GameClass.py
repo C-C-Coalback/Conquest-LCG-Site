@@ -10280,6 +10280,8 @@ class Game:
         self.p2.accept_any_challenge_used = False
         self.p1.death_serves_used = False
         self.p2.death_serves_used = False
+        self.p1.counterblow_used = False
+        self.p2.counterblow_used = False
         self.p1.everlasting_rage_used = False
         self.p2.everlasting_rage_used = False
         self.p1.optimized_landing_used = False

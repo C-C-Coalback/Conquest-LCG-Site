@@ -161,6 +161,7 @@ class Player:
         self.hit_by_gorgul = False
         self.concealing_darkness_active = False
         self.defensive_protocols_active = False
+        self.counterblow_used = False
         self.death_serves_used = False
         self.our_last_stand_used = False
         self.everlasting_rage_used = False

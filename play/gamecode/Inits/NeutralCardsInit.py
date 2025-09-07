@@ -70,6 +70,10 @@ def neutral_cards_init():
                                                    "card bonus search the top 2 cards of your deck for a card. Add "
                                                    "it to your hand, and place the remaining cards on the bottom "
                                                    "of your deck in any order. (Limit once per phase.)",
-                             "Scavenger. Ally.", 1, "Neutral", "Common", 0, 2, 1, True)
+                             "Scavenger. Ally.", 1, "Neutral", "Common", 0, 2, 1, True),
+        CardClasses.EventCard("Counterblow", "Interrupt: When your warlord is chosen as a defender, deal 1"
+                                             " unpreventable damage to the attacker. Then, if your warlord "
+                                             "is exhausted, draw one card. (Max 1 per round.)", "Tactic.",
+                              0, "Neutral", "Common", 1, False)
     ]
     return neutral_card_array

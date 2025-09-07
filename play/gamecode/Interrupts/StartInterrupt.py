@@ -131,6 +131,16 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.choice_context = "Trap Laying Hunter Trap"
             self.name_player_making_choices = secondary_player.name_player
             self.resolving_search_box = True
+        elif current_interrupt == "Counterblow":
+            if primary_player.urien_relevant:
+                primary_player.spend_resources(1)
+            primary_player.counterblow_used = True
+            primary_player.discard_card_name_from_hand("Counterblow")
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False, preventable=False)
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            if not primary_player.get_ready_given_pos(warlord_pla, warlord_pos):
+                primary_player.draw_card()
+            self.delete_interrupt()
         elif current_interrupt == "Shaper Agnok":
             self.choices_available = ["Card", "Resource"]
             self.choice_context = "Shaper Agnok Gains"
@@ -201,6 +211,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.add_resources(2)
                 primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             else:
+                primary_player.death_serves_used = True
                 primary_player.add_resources(primary_player.highest_death_serves_value)
                 primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
