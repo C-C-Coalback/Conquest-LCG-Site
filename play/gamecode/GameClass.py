@@ -57,6 +57,7 @@ class Game:
         self.planet_array = []
         self.sector = sector
         self.cult_duplicity_available = True
+        self.forced_battle_abilities = []
         if sector == "Traxis":
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -69,9 +70,14 @@ class Game:
         elif sector == "The Breach":
             for i in range(30, 40):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
+        elif sector == "Nepthis":
+            for i in range(40, 50):
+                self.planet_array.append(self.planet_cards_array[i].get_name())
         else:
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
+        for i in range(40, 50):
+            self.forced_battle_abilities.append(self.planet_cards_array[i].get_name())
         self.available_breach_planets = []
         for i in range(30, 40):
             self.available_breach_planets.append(self.planet_cards_array[i].get_name())
@@ -2541,6 +2547,40 @@ class Game:
             self.choice_context = "Hell's Theet Choice"
             self.name_player_making_choices = winner.name_player
             self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Erekiel":
+            self.choices_available = ["This Turn", "Next Turn"]
+            self.choice_context = "Erekiel Choice"
+            self.name_player_making_choices = loser.name_player
+            self.resolving_search_box = True
+        elif self.battle_ability_to_resolve == "Diamat":
+            winner.total_indirect_damage = 2
+            winner.indirect_damage_applied = 0
+            self.location_of_indirect = "ALL"
+            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+        elif self.battle_ability_to_resolve == "Gareth Prime":
+            self.misc_target_unit = (-1, -1)
+            self.player_resolving_battle_ability = loser.name_player
+        elif self.battle_ability_to_resolve == "Selphini VII":
+            self.chosen_first_card = False
+            self.chosen_second_card = False
+            self.player_resolving_battle_ability = loser.name_player
+            self.misc_target_unit = (-1, -1)
+            self.misc_target_player = ""
+        elif self.battle_ability_to_resolve == "New Vulcan":
+            warlord_pla, warlord_pos = winner.get_location_of_warlord()
+            last_planet = self.determine_last_planet()
+            if warlord_pla != last_planet:
+                winner.move_unit_to_planet(warlord_pla, warlord_pos, last_planet)
+            last_el_index = len(winner.cards_in_play[last_planet + 1]) - 1
+            if last_el_index != -1:
+                winner.exhaust_given_pos(last_planet, last_el_index)
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Hissan XI":
+            self.player_resolving_battle_ability = loser.name_player
+        elif self.battle_ability_to_resolve == "Agerath Minor":
+            loser.add_resources(1)
+            loser.draw_card()
+            await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Tool of Abolition":
             self.choices_available = ["Exhaust", "Ready"]
             self.choice_context = "Tool of Abolition Choice"
@@ -3863,6 +3903,16 @@ class Game:
                             self.misc_counter = 5
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "Erekiel Choice":
+                        self.misc_target_choice = chosen_choice
+                        if chosen_choice == "This Turn":
+                            self.misc_counter = 4
+                            self.player_resolving_battle_ability = primary_player.name_player
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if chosen_choice == "Next Turn":
+                            primary_player.erekiels_queued += 1
+                            await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Blank Wounded Scream?":
                         if chosen_choice == "Yes":
                             self.wounded_scream_blanked = True
@@ -4217,7 +4267,12 @@ class Game:
                             self.name_player_making_choices = self.player_using_battle_ability
                             await self.update_game_event(self.player_using_battle_ability, ["CHOICE", "0"], True)
                     elif self.choice_context == "Resolve Battle Ability?":
-                        if self.choices_available[int(game_update_string[1])] == "Yes":
+                        forced = False
+                        if self.battle_ability_to_resolve in self.forced_battle_abilities:
+                            forced = True
+                        if self.choices_available[int(game_update_string[1])] == "Yes" or forced:
+                            if self.choices_available[int(game_update_string[1])] != "Yes":
+                                await self.send_update_message("The battle ability is forced.")
                             print("Wants to resolve battle ability")
                             if name == self.name_2:
                                 winner = self.p2
@@ -5546,6 +5601,9 @@ class Game:
                 secondary_player = self.p1
                 primary_player = self.p2
             if name == self.name_1 or name == self.name_2:
+                if self.battle_ability_to_resolve in ["Selphini VII", "Hissan XI", "Gareth Prime",
+                                                      "Erekiel"]:
+                    self.player_resolving_battle_ability = secondary_player.name_player
                 if self.battle_ability_to_resolve == "Xenos World Tallin":
                     if self.chosen_first_card and not self.chosen_second_card:
                         if len(game_update_string) == 1:
@@ -5664,6 +5722,71 @@ class Game:
                         self.choices_available = ["Yes", "No"]
                         self.choice_context = "Resolve Battle Ability?"
                         self.name_player_making_choices = name
+            elif self.battle_ability_to_resolve == "Hissan XI":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        self.player_resolving_battle_ability = secondary_player.name_player
+                        self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                        self.choices_available = ["Yes", "No"]
+                        self.choice_context = "Resolve Battle Ability?"
+                        self.name_player_making_choices = secondary_player.name_player
+            elif self.battle_ability_to_resolve == "Xorlom":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == primary_player.get_number():
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                primary_player.rout_unit(planet_pos, unit_pos)
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
+            elif self.battle_ability_to_resolve == "Coradim":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if game_update_string[1] == primary_player.get_number():
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                primary_player.sacrifice_card_in_hq(unit_pos)
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if game_update_string[1] == primary_player.get_number():
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                     game_update_string)
+            elif self.battle_ability_to_resolve == "Belis":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HAND":
+                        if game_update_string[1] == primary_player.get_number():
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
+            elif self.battle_ability_to_resolve == "Erekiel":
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[2])
+                        if game_update_string[1] == primary_player.get_number():
+                            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                                primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                                self.misc_counter = self.misc_counter - 1
+                                if self.misc_counter < 1:
+                                    self.player_resolving_battle_ability = secondary_player.name_player
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if game_update_string[1] == primary_player.get_number():
+                            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                            self.misc_counter = self.misc_counter - 1
+                            if self.misc_counter < 1:
+                                await self.resolve_battle_conclusion(name, game_update_string)
             elif self.battle_ability_to_resolve == "Hell's Theet":
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
@@ -5687,21 +5810,22 @@ class Game:
                                     else:
                                         await self.resolve_battle_conclusion(name, game_update_string)
                             else:
-                                primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                                self.misc_counter = self.misc_counter - 1
-                                if self.misc_counter < 1:
-                                    another_trigger = False
-                                    if primary_player.resources > 0 and self.cult_duplicity_available:
-                                        if self.replaced_planets[self.last_planet_checked_for_battle]:
-                                            if primary_player.search_card_in_hq("Cult of Duplicity"):
-                                                another_trigger = True
-                                    if another_trigger:
-                                        self.choices_available = ["Duplicate", "Pass"]
-                                        self.choice_context = "Cult of Duplicity"
-                                        self.name_player_making_choices = primary_player.name_player
-                                        self.resolving_search_box = True
-                                    else:
-                                        await self.resolve_battle_conclusion(name, game_update_string)
+                                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                                    self.misc_counter = self.misc_counter - 1
+                                    if self.misc_counter < 1:
+                                        another_trigger = False
+                                        if primary_player.resources > 0 and self.cult_duplicity_available:
+                                            if self.replaced_planets[self.last_planet_checked_for_battle]:
+                                                if primary_player.search_card_in_hq("Cult of Duplicity"):
+                                                    another_trigger = True
+                                        if another_trigger:
+                                            self.choices_available = ["Duplicate", "Pass"]
+                                            self.choice_context = "Cult of Duplicity"
+                                            self.name_player_making_choices = primary_player.name_player
+                                            self.resolving_search_box = True
+                                        else:
+                                            await self.resolve_battle_conclusion(name, game_update_string)
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         planet_pos = int(game_update_string[2])
@@ -6348,6 +6472,42 @@ class Game:
                                         primary_player.add_resources(1)
                                     player_owning_first_card.reset_all_aiming_reticles_play_hq()
                                     await self.resolve_battle_conclusion(name, game_update_string)
+            elif self.battle_ability_to_resolve == "Selphini VII":
+                if len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == "1":
+                            player_owning_card = self.p1
+                        else:
+                            player_owning_card = self.p2
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+                            if (planet_pos, unit_pos) != self.misc_target_unit or\
+                                    self.misc_target_player != player_owning_card.name_player:
+                                if not self.chosen_first_card:
+                                    if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                        self.misc_target_player = player_owning_card.name_player
+                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        self.chosen_first_card = True
+                                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                                elif not self.chosen_second_card:
+                                    og_pla, og_pos = self.misc_target_unit
+                                    player_owning_first_card = self.p1
+                                    if self.misc_target_player != player_owning_first_card.name_player:
+                                        player_owning_first_card = self.p2
+                                    self.chosen_second_card = True
+                                    player_owning_first_card.remove_damage_from_pos(og_pla, og_pos, 1)
+                                    damage = player_owning_card.get_damage_given_pos(planet_pos, unit_pos)
+                                    player_owning_card.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
+                                    if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                        primary_player.add_resources(1)
+                                    player_owning_first_card.reset_all_aiming_reticles_play_hq()
+                                    self.misc_target_unit = (-1, -1)
+                                else:
+                                    if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                        player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, True)
+                                        self.player_resolving_battle_ability = secondary_player.name_player
+                                        await self.resolve_battle_conclusion(name, game_update_string)
             elif self.battle_ability_to_resolve == "Excellor":
                 if len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -6472,6 +6632,36 @@ class Game:
                                 self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99, healing=True)
                                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                                      game_update_string)
+            elif self.battle_ability_to_resolve == "Gareth Prime":
+                if len(game_update_string) == 2:
+                    if game_update_string[0] == "PLANETS":
+                        if self.chosen_first_card:
+                            og_pla, og_pos = self.misc_target_unit
+                            destination = int(game_update_string[1])
+                            secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                            secondary_player.move_unit_to_planet(og_pla, og_pos, destination)
+                            self.player_resolving_battle_ability = secondary_player.name_player
+                            await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                                 game_update_string)
+                elif len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == secondary_player.number:
+                            unit_pos = int(game_update_string[2])
+                            if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
+                                if not self.chosen_first_card:
+                                    self.chosen_first_card = True
+                                    self.misc_target_unit = (-2, unit_pos)
+                                    secondary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == secondary_player.number:
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                if not self.chosen_first_card:
+                                    self.chosen_first_card = True
+                                    self.misc_target_unit = (planet_pos, unit_pos)
+                                    secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
             elif self.battle_ability_to_resolve == "Plannum":
                 if len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
@@ -8438,6 +8628,8 @@ class Game:
         if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
                 self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
+            if self.battle_ability_to_resolve == "Diamat":
+                self.damage_from_atrox = True
             self.indirect_exhaust_only = False
             self.forbidden_traits_indirect = ""
             self.p1.total_indirect_damage = 0

@@ -1349,6 +1349,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(og_pla, og_pos, 2, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
                             self.delete_reaction()
+        elif current_reaction == "Erekiel Next":
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.delete_reaction()
         elif current_reaction == "Gue'vesa Overseer":
             if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
                 if not self.chosen_first_card:

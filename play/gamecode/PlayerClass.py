@@ -108,6 +108,7 @@ class Player:
         self.dark_possession_remove_after_play = False
         self.enslaved_faction = ""
         self.chosen_enslaved_faction = False
+        self.erekiels_queued = 0
         self.nahumekh_value = 0
         self.last_hand_string = ""
         self.last_hq_string = ""
@@ -5529,6 +5530,11 @@ class Player:
                         j = j - 1
                     j = j + 1
                 i = i + 1
+        if phase == "DEPLOY":
+            if self.erekiels_queued > 0:
+                for i in range(self.erekiels_queued):
+                    self.game.create_reaction("Erekiel Next", self.name_player, (int(self.number), -1, -1))
+                self.erekiels_queued = 0
         if self.search_hand_for_card("Hunter's Ploy"):
             if phase == "HEADQUARTERS":
                 self.game.create_reaction("Hunter's Ploy", self.name_player, (int(self.number), -1, -1))

@@ -61,6 +61,16 @@ def planet_cards_init():
         CardClasses.PlanetCard("Clipped Wings", "", 1, 1, True, False, True),
         CardClasses.PlanetCard("Beheaded Hope", "", 2, 0, False, False, True),
         CardClasses.PlanetCard("Baneful Veil", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("Xorlom", "", 0, 2, False, False, True),
+        CardClasses.PlanetCard("Selphini VII", "", 1, 1, True, True, False),
+        CardClasses.PlanetCard("New Vulcan", "", 1, 1, False, True, True),
+        CardClasses.PlanetCard("Hissan XI", "", 2, 0, False, True, False),
+        CardClasses.PlanetCard("Gareth Prime", "", 1, 0, True, True, True),
+        CardClasses.PlanetCard("Erekiel", "", 2, 0, False, False, True),
+        CardClasses.PlanetCard("Diamat", "", 1, 1, True, False, True),
+        CardClasses.PlanetCard("Coradim", "", 0, 2, True, False, False),
+        CardClasses.PlanetCard("Belis", "", 1, 1, True, True, True),
+        CardClasses.PlanetCard("Agerath Minor", "", 1, 1, True, True, False),
         CardClasses.PlanetCard("FINAL CARD", "", -1, -1, False, False, False, "NO IMAGE")
     ]
     return planet_array
