@@ -1630,6 +1630,10 @@ class Game:
         self.nectavus_active = False
         self.nectavus_target = -1
         self.resolving_search_box = False
+        self.p1.cegorach_jesters_active = False
+        self.p1.cegorach_jesters_permitted = []
+        self.p2.cegorach_jesters_active = False
+        self.p2.cegorach_jesters_permitted = []
         if self.nectavus_actual_current_planet != -1:
             self.last_planet_checked_command_struggle = self.nectavus_actual_current_planet
         self.nectavus_actual_current_planet = -1
@@ -7861,7 +7865,15 @@ class Game:
                             alt_shield_check = True
                         if shields > 0 and not alt_shield_check:
                             print("Just before can shield check")
-                            if self.damage_can_be_shielded[0]:
+                            cego_check = False
+                            if primary_player.cegorach_jesters_active:
+                                card = self.preloaded_find_card(card_name)
+                                if card.get_card_type() == "Attachment" or card.get_card_type() == "Event":
+                                    if card_name not in primary_player.cegorach_jesters_permitted:
+                                        cego_check = True
+                            if cego_check:
+                                await self.send_update_message("That card was not revealed for Cegorach's Jesters!")
+                            elif self.damage_can_be_shielded[0]:
                                 can_continue = True
                                 if primary_player.search_attachments_at_pos(planet_pos, unit_pos,
                                                                             "Guardian Mesh Armor",
@@ -8661,6 +8673,17 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Willing Submission":
                         primary_player.reset_all_aiming_reticles_play_hq()
                         secondary_player.reset_all_aiming_reticles_play_hq()
+                    if self.reactions_needing_resolving[0] == "Cegorach's Jesters":
+                        primary_player.cegorach_jesters_permitted = []
+                        for i in range(len(self.misc_misc)):
+                            primary_player.cegorach_jesters_permitted.append(primary_player.cards[self.misc_misc[i]])
+                        self.misc_misc = []
+                        total_string = "Cards Revealed: "
+                        for i in range(len(primary_player.cegorach_jesters_permitted)):
+                            total_string += primary_player.cegorach_jesters_permitted[i] + ", "
+                        total_string += "."
+                        await self.send_update_message(total_string)
+                        self.mask_jain_zar_check_reactions(secondary_player, primary_player)
                     if self.reactions_needing_resolving[0] == "Soul Grinder":
                         planet_pos = self.positions_of_unit_triggering_reaction[0][1]
                         unit_pos = self.positions_of_unit_triggering_reaction[0][2]

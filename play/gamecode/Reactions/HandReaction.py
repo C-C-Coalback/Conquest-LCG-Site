@@ -111,6 +111,12 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                                                               discounts=self.discounts_applied)
         elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
+        elif current_reaction == "Cegorach's Jesters":
+            if hand_pos not in self.misc_misc:
+                self.misc_misc.append(hand_pos)
+            else:
+                self.misc_misc.remove(hand_pos)
+            await self.send_update_message("Currently revealing " + str(len(self.misc_misc)) + " cards.")
         elif current_reaction == "Elusive Escort":
             _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos == -2:

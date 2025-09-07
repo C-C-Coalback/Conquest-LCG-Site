@@ -196,6 +196,8 @@ class Player:
         self.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
         self.webway_witch = -1
         self.fortress_world_garid_used = False
+        self.cegorach_jesters_active = False
+        self.cegorach_jesters_permitted = []
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -5974,6 +5976,8 @@ class Player:
                 self.game.create_reaction("Kabal of the Ebon Law", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Yvraine's Entourage":
                 self.game.create_reaction("Yvraine's Entourage", self.name_player, (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Cegorach's Jesters":
+                self.game.create_reaction("Cegorach's Jesters", self.name_player, (int(self.number), planet_num, i))
 
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if planet_id == -2:

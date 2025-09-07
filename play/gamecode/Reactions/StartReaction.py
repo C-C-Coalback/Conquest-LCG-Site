@@ -1493,6 +1493,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Cegorach's Jesters":
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
+            secondary_player.cegorach_jesters_active = True
+            await self.send_update_message("Making Cegorach's Jesters choices. Choose which cards to reveal. "
+                                           "Press pass to confirm revealed cards.")
+            self.misc_misc = []
         elif current_reaction == "Erekiel Next":
             self.misc_counter = 4
         elif current_reaction == "Elusive Escort":

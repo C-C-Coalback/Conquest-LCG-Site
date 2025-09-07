@@ -459,6 +459,11 @@ def eldar_cards_init():
                                    "Wargear.", 0, faction, "Signature", 3, False, extra_health=2, extra_attack=2,
                                    type_of_units_allowed_for_attachment="Army"),
         CardClasses.SupportCard("Wisdom of Biel-tan", "Reaction: After you perform a mulligan, draw a card.",
-                                "Doctrine.", 0, faction, "Signature", False)
+                                "Doctrine.", 0, faction, "Signature", False),
+        CardClasses.ArmyCard("Cegorach's Jesters", "Reaction: After a battle at this planet begins, your opponent may"
+                                                   " reveal any number of cards from him hand. He cannot use "
+                                                   "unrevealed event or attachment cards as shield cards during "
+                                                   "this battle.", "Psyker. Harlequin.",
+                             2, faction, "Loyal", 2, 2, 1, False)
     ]
     return eldar_cards_array
