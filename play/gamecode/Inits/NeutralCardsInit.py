@@ -74,6 +74,11 @@ def neutral_cards_init():
         CardClasses.EventCard("Counterblow", "Interrupt: When your warlord is chosen as a defender, deal 1"
                                              " unpreventable damage to the attacker. Then, if your warlord "
                                              "is exhausted, draw one card. (Max 1 per round.)", "Tactic.",
-                              0, "Neutral", "Common", 1, False)
+                              0, "Neutral", "Common", 1, False),
+        CardClasses.EventCard("Calibration Error", "Reaction: After an enemy non-warlord unit moves from a planet to"
+                                                   " another planet, exhaust that unit. Then, have your opponent deal "
+                                                   "an amount of indirect damage equal to that unit's printed ATK "
+                                                   "value among non-warlord units he controls at the same planet.",
+                              "Disaster.", 2, "Neutral", "Common", 1, False)
     ]
     return neutral_card_array

@@ -2902,6 +2902,16 @@ class Player:
                         cost_card_wrath = self.get_cost_given_pos(destination, new_pos)
                         if other_player.wrathful_retribution_value < cost_card_wrath:
                             other_player.wrathful_retribution_value = cost_card_wrath
+            if other_player.search_hand_for_card("Calibration Error"):
+                if self.get_card_type_given_pos(destination, new_pos) != "Warlord":
+                    if self.get_ready_given_pos(destination, new_pos):
+                        cost = 2
+                        if other_player.urien_relevant:
+                            cost += 1
+                        if other_player.resources >= cost:
+                            if not other_player.check_if_already_have_reaction("Calibration Error"):
+                                self.game.create_reaction("Calibration Error", other_player.name_player,
+                                                          (int(other_player.number), destination, new_pos))
             if self.search_hand_for_card("Cry of the Wind"):
                 already_cry = False
                 self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True

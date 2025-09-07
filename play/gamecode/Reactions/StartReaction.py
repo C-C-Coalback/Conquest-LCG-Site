@@ -1429,7 +1429,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             can_continue = True
             if self.nullify_enabled:
                 if secondary_player.nullify_check():
-                    await self.send_update_message(primary_player.name_player + " wants to play Cry of the Wind" +
+                    await self.send_update_message(primary_player.name_player + " wants to play Primal Howl" +
                                                    "; Nullify window offered.")
                     self.choices_available = ["Yes", "No"]
                     self.name_player_making_choices = secondary_player.name_player
@@ -1461,6 +1461,38 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "Calibration Error":
+            cost = 2
+            if primary_player.urien_relevant:
+                cost += 1
+            can_continue = True
+            if primary_player.resources >= cost:
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play Calibration Error" +
+                                                       "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = "Calibration Error"
+                        self.cost_card_nullified = cost
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    primary_player.spend_resources(cost)
+                    primary_player.discard_card_name_from_hand("Calibration Error")
+                    secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    printed_attack = secondary_player.cards_in_play[planet_pos + 1][unit_pos].attack
+                    secondary_player.total_indirect_damage = printed_attack
+                    secondary_player.indirect_damage_applied = 0
+                    self.location_of_indirect = "PLANET"
+                    self.valid_targets_for_indirect = ["Army", "Synapse", "Token"]
+                    self.planet_of_indirect = planet_pos
+                    self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Rampaging Knarloc":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             for i in range(7):
