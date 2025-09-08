@@ -1652,6 +1652,8 @@ class Game:
                             self.create_reaction("Pathfinder Team", winner.name_player,
                                                  (int(winner.number), i, j))
         if not self.tense_negotiations_active:
+            self.p1.senatorum_directives_used = False
+            self.p2.senatorum_directives_used = False
             winner = None
             if self.player_resolving_battle_ability == self.name_2:
                 winner = self.p2
@@ -3717,6 +3719,19 @@ class Game:
                         self.player_with_action = ""
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "Senatorum Directives Reassign":
+                        planet_pos, unit_pos = self.misc_target_unit
+                        if chosen_choice == "Reassign":
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, is_reassign=True,
+                                                                by_enemy_unit=False)
+                            _, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                            self.amount_that_can_be_removed_by_shield[0] += -1
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if self.amount_that_can_be_removed_by_shield[0] < 1:
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                     elif self.choice_context == "Access to the Black Library":
                         if not self.chosen_first_card:
                             self.misc_target_choice = chosen_choice
@@ -8238,6 +8253,18 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Senatorum Directives":
+                            if not primary_player.senatorum_directives_used:
+                                if planet_pos != -2:
+                                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Catachan"):
+                                        primary_player.senatorum_directives_used = True
+                                        primary_player.summon_token_at_planet("Guardsman", planet_pos)
+                                        self.choices_available = ["Reassign", "Pass"]
+                                        self.choice_context = "Senatorum Directives Reassign"
+                                        self.name_player_making_choices = primary_player.name_player
+                                        self.resolving_search_box = True
+                                        last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                                        self.misc_target_unit = (planet_pos, last_el)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Extra Boomsticks":
                             if primary_player.headquarters[hq_pos].get_ready():
                                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":

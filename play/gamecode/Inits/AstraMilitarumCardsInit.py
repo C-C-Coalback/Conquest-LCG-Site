@@ -668,6 +668,11 @@ def astra_militarum_cards_init():
                                                      "Lasgun, a Hot-Shot Laspistol, a Bodyguard, a Seal of the Ebon "
                                                      "Chalice, and a Defense Battery on this card.",
                                 "Pledge.", 1, faction, "Common", False,
-                                action_in_play=True, allowed_phases_in_play="ALL")
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Senatorum Directives", "Reaction: After a Catachan unit you control is assigned "
+                                                        "damage, put a Guardsman token into play at the same planet. "
+                                                        "You may then reassign one of that damage to it. "
+                                                        "(Limit once per battle.)", "Pledge.",
+                                1, faction, "Loyal", False)
     ]
     return astra_militarum_cards_array
