@@ -452,6 +452,8 @@ class Player:
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Vamii Industrial Complex":
                     single_card_string += str(current_card.counter)
+                elif current_card.check_for_a_trait("Pledge"):
+                    single_card_string += str(current_card.counter)
                 else:
                     single_card_string += "0"
                 single_card_string += "|"

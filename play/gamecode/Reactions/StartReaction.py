@@ -1493,6 +1493,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Anvil Strike Force":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
         elif current_reaction == "Theater of War Response":
             await self.send_update_message("You may exhaust your warlord to use a different battle ability. "
                                            "Please choose a planet if you wish to do so.")

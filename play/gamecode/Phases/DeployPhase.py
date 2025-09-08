@@ -135,7 +135,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                         if self.p1.has_passed and self.p2.has_passed:
                                             await self.send_update_message("Both passed, move to warlord movement.")
                                             await self.change_phase("COMMAND")
-                                self.card_pos_to_deploy = -1
+                            self.card_pos_to_deploy = -1
                         elif has_deepstrike and primary_player.resources > 0 and self.deepstrike_allowed:
                             print("deepstrike", card.get_deepstrike_value())
                             self.stored_deploy_string = game_update_string

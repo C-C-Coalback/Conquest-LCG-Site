@@ -8024,6 +8024,14 @@ class Game:
                                         self.choices_available = ["Yes", "No"]
                                         self.name_player_making_choices = secondary_player.name_player
                                     else:
+                                        if shields == 1:
+                                            for i in range(len(primary_player.headquarters)):
+                                                if primary_player.get_ability_given_pos(-2, i) == "Anvil Strike Force":
+                                                    if primary_player.headquarters[i].counter > 0:
+                                                        if not primary_player.get_once_per_round_used_given_pos(-2, i):
+                                                            shields += 1
+                                                            primary_player.set_once_per_round_used_given_pos(-2, i,
+                                                                                                             True)
                                         if self.guardian_mesh_armor_active:
                                             shields = shields * 2
                                         if self.maksim_squadron_active:
@@ -10759,8 +10767,12 @@ class Game:
                 if winner.get_ability_given_pos(planet_id, i) == "Raiding Kabal":
                     reactions.append("Raiding Kabal")
             if winner.search_card_in_hq("Clearing the Path"):
-                if winner.check_for_warlord(planet_id, True, self.name_player):
+                if winner.check_for_warlord(planet_id, True, winner.name_player):
                     reactions.append("Clearing the Path")
+            if winner.search_card_in_hq("Anvil Strike Force"):
+                if planet_id == self.round_number:
+                    if winner.check_for_warlord(planet_id, True, winner.name_player):
+                        reactions.append("Anvil Strike Force")
             if self.get_blue_icon(planet_id):
                 if winner.resources > 0:
                     if not winner.accept_any_challenge_used:
