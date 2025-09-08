@@ -45,6 +45,18 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Gladius Strike Force":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()
+        elif current_reaction == "Munitorum Support":
+            card = self.preloaded_find_card("M35 Galaxy Lasgun")
+            primary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player)
+            card = self.preloaded_find_card("Hot-Shot Laspistol")
+            primary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player)
+            card = self.preloaded_find_card("Bodyguard")
+            primary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player)
+            card = self.preloaded_find_card("Seal of the Ebon Chalice")
+            primary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player)
+            card = self.preloaded_find_card("Defense Battery")
+            primary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player)
+            self.delete_reaction()
         elif current_reaction == "Talon Strike Force":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()

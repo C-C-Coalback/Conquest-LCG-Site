@@ -661,6 +661,13 @@ def astra_militarum_cards_init():
         CardClasses.SupportCard("Holy Crusade", "Each other non-signature card in your deck must be Ecclesiarchy.\n"
                                                 "Action: Exhaust this support to place 2 faith among units you "
                                                 "control.", "Pledge.", 1, faction, "Loyal", False,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Munitorum Support", "Once per round you may deploy a card on this support as if it "
+                                                     "were in your hand.\n"
+                                                     "Reaction: After you deploy this support, place a M35 Galaxy "
+                                                     "Lasgun, a Hot-Shot Laspistol, a Bodyguard, a Seal of the Ebon "
+                                                     "Chalice, and a Defense Battery on this card.",
+                                "Pledge.", 1, faction, "Common", False,
                                 action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return astra_militarum_cards_array

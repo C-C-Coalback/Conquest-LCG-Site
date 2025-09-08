@@ -2415,6 +2415,9 @@ class Player:
                             if card.get_ability() == "Mobilize the Chapter":
                                 self.game.create_reaction("Mobilize the Chapter Initiation", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Munitorum Support":
+                                self.game.create_reaction("Munitorum Support", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))

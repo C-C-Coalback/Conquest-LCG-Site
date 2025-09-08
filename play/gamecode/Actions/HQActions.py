@@ -88,6 +88,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.misc_counter = 2
                                 await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                    elif ability == "Munitorum Support":
+                        if not card.get_once_per_round_used():
+                            if card.attachments:
+                                card.set_once_per_round_used(True)
+                                self.choices_available = []
+                                for i in range(len(card.attachments)):
+                                    self.choices_available.append(card.attachments[i].get_name())
+                                self.choice_context = "Munitorum Support Take"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                self.resolving_search_box = True
                     elif ability == "Mycetic Spores":
                         if card.get_ready():
                             self.action_chosen = ability
