@@ -5209,6 +5209,15 @@ class Game:
                                 self.resolving_search_box = False
                                 primary_player.number_cards_to_search += -1
                                 primary_player.bottom_remaining_cards()
+                    elif self.choice_context == "Myriad Excesses Correct":
+                        planet_pos, unit_pos = self.misc_target_unit
+                        if chosen_choice == "Take Control":
+                            self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
+                        elif chosen_choice == "Destroy":
+                            secondary_player.destroy_card_in_play(planet_pos, unit_pos)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Damage Drifting Spore Mines?":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

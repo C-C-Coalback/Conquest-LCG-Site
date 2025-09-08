@@ -154,6 +154,24 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
                 self.misc_player_storage = ""
                 self.delete_reaction()
+    elif current_reaction == "Myriad Excesses":
+        if not self.chosen_first_card:
+            self.player_who_resolves_reaction[0] = secondary_player.name_player
+            self.misc_counter = chosen_planet
+            self.chosen_first_card = True
+            await self.send_update_message("Planet confirmed. Opponent choose planet.")
+        else:
+            secondary_player.summon_token_at_planet("Cultist", self.misc_counter)
+            secondary_player.summon_token_at_planet("Cultist", self.misc_counter)
+            if self.misc_counter == chosen_planet:
+                last_el = len(secondary_player.cards_in_play[chosen_planet + 1]) - 1
+                self.misc_target_unit = (chosen_planet, last_el)
+                self.choices_available = ["Take Control", "Destroy", "Do Nothing"]
+                self.choice_context = "Myriad Excesses Correct"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                self.delete_reaction()
     elif current_reaction == "Agra's Preachings":
         if len(secondary_player.cards_in_play[chosen_planet + 1]) > 0:
             if len(primary_player.deck) > 5:

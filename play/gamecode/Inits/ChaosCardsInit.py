@@ -544,6 +544,12 @@ def chaos_cards_init():
                                                    "Reaction: After the deploy phase begins, Rally 6 a card with the "
                                                    "chosen trait, then deploy it at a target planet reducing its cost "
                                                    "by 1. Use this ability only if each unit you control shares the "
-                                                   "chosen trait.", "Pledge.", 1, faction, "Loyal", False)
+                                                   "chosen trait.", "Pledge.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("Myriad Excesses", "You cannot sacrifice tokens.\n"
+                                                   "Reaction: After the deploy phase ends, both players set their "
+                                                   "command dial then reveal it. Place 2 Cultist tokens into play at "
+                                                   "the planet you chose. Then, if your opponent chose the same planet,"
+                                                   " they may choose either to destroy one of those tokens or take "
+                                                   "control of it.", "Pledge.", 2, faction, "Loyal", False)
     ]
     return chaos_card_array

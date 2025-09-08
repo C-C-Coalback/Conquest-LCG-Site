@@ -2374,13 +2374,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
                     "Cultist", primary_player.etekh_trait):
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
-                                                      self.position_of_actioned_card[1], 999, healing=True)
-                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-                self.mask_jain_zar_check_actions(primary_player, secondary_player)
-                self.action_cleanup()
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    if planet_pos == self.position_of_actioned_card[0]:
+                        if self.position_of_actioned_card[1] > unit_pos:
+                            self.position_of_actioned_card = (planet_pos, self.position_of_actioned_card[1] - 1)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    primary_player.remove_damage_from_pos(self.position_of_actioned_card[0],
+                                                          self.position_of_actioned_card[1], 999, healing=True)
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                    self.action_cleanup()
     elif self.action_chosen == "Chaplain Mavros":
         if primary_player.get_number() == game_update_string[1]:
             if self.get_blue_icon(planet_pos):
@@ -2396,14 +2399,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
                     "Cultist", primary_player.etekh_trait):
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                primary_player.ready_given_pos(self.position_of_actioned_card[0],
-                                               self.position_of_actioned_card[1])
-                primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-                self.mask_jain_zar_check_actions(primary_player, secondary_player)
-                self.action_cleanup()
-                self.position_of_actioned_card = (-1, -1)
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    if planet_pos == self.position_of_actioned_card[0]:
+                        if self.position_of_actioned_card[1] > unit_pos:
+                            self.position_of_actioned_card = (planet_pos, self.position_of_actioned_card[1] - 1)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    primary_player.ready_given_pos(self.position_of_actioned_card[0],
+                                                   self.position_of_actioned_card[1])
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                    self.action_cleanup()
+                    self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "The Dawn Blade":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit

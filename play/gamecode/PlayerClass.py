@@ -4126,8 +4126,8 @@ class Player:
                 self.reset_aiming_reticle_in_play(-2, pos)
         if "Daemon" in traits:
             if self.headquarters[pos].get_ability() == "Cultist":
-                discount += 1
-                self.sacrifice_card_in_hq(pos)
+                if self.sacrifice_card_in_hq(pos):
+                    discount += 1
             elif self.headquarters[pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
                 self.sacrifice_card_in_hq(pos)
@@ -4322,9 +4322,9 @@ class Player:
             unit_pos = 0
             while unit_pos < len(self.cards_in_play[planet_pos + 1]):
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_sacrifice_end_of_phase():
-                    self.sacrifice_card_in_play(planet_pos, unit_pos)
-                    sacrificed_locations[planet_pos + 1] = True
-                    unit_pos = unit_pos - 1
+                    if self.sacrifice_card_in_play(planet_pos, unit_pos):
+                        sacrificed_locations[planet_pos + 1] = True
+                        unit_pos = unit_pos - 1
                 unit_pos += 1
         return sacrificed_locations
 
@@ -4445,8 +4445,8 @@ class Player:
                 self.discard_top_card_deck()
         if "Daemon" in traits:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
-                discount += 1
-                self.sacrifice_card_in_play(planet_pos, unit_pos)
+                if self.sacrifice_card_in_play(planet_pos, unit_pos):
+                    discount += 1
             elif self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
                 self.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -5654,6 +5654,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Myriad Excesses":
+                if phase == "COMMAND":
+                    self.game.create_reaction("Myriad Excesses", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Dark Allegiance":
                 if phase == "DEPLOY":
                     if self.check_if_all_units_have_trait(self.headquarters[i].misc_string):
@@ -5787,6 +5790,8 @@ class Player:
         if self.headquarters[card_pos].get_card_type() == "Warlord":
             return False
         if self.headquarters[card_pos].get_name() == "Cultist":
+            if self.search_card_in_hq("Myriad Excesses"):
+                return False
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Master Warpsmith":
                     if self.game.card_to_deploy is not None:
@@ -5822,6 +5827,8 @@ class Player:
                                                   (int(self.number), -2, -1))
                         self.last_planet_sacrifice = planet_num
         if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Cultist":
+            if self.search_card_in_hq("Myriad Excesses"):
+                return False
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Master Warpsmith":
                     if self.game.card_to_deploy is not None:

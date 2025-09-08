@@ -934,6 +934,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Dark Allegiance Rally"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Myriad Excesses":
+            self.chosen_first_card = False
+            await self.send_update_message("Choose planet.")
         elif current_reaction == "Dark Allegiance Trait":
             self.choices_available = ["Nurgle", "Khorne", "Slaanesh", "Tzeentch"]
             self.choice_context = "DA Choose Trait:"
