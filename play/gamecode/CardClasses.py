@@ -411,6 +411,7 @@ class UnitCard(Card):
         self.sweep_eop = 0
         self.sweep_next = 0
         self.sweep_eog = 0
+        self.extra_attack_until_end_of_round = 0
         self.mobile_eog = False
         self.flying_eog = False
         self.retaliate_eog = False
@@ -798,6 +799,12 @@ class UnitCard(Card):
     def increase_extra_attack_until_end_of_game(self, value):
         self.extra_attack_until_end_of_game += value
 
+    def increase_extra_attack_until_end_of_round(self, value):
+        self.extra_attack_until_end_of_round += value
+
+    def get_extra_attack_until_end_of_round(self):
+        return self.extra_attack_until_end_of_round
+
     def increase_extra_health_until_end_of_game(self, value):
         self.positive_hp_until_eog += value
 
@@ -807,6 +814,7 @@ class UnitCard(Card):
         attack += self.get_extra_attack_until_next_attack()
         attack += self.get_extra_attack_until_end_of_phase()
         attack += self.get_extra_attack_until_end_of_game()
+        attack += self.get_extra_attack_until_end_of_round()
         for i in range(len(self.attachments)):
             if self.attachments[i].get_card_type() == "Attachment":
                 if not self.attachments[i].from_magus_harid:

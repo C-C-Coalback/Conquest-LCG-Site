@@ -4160,6 +4160,7 @@ class Player:
                 self.headquarters[i].sweep_eor = 0
                 self.headquarters[i].yvraine_active = False
                 self.headquarters[i].retaliate_eor = 0
+                self.headquarters[i].extra_attack_until_end_of_round = 0
                 self.headquarters[i].mobile_eor = False
                 self.headquarters[i].ranged_eor = False
                 self.headquarters[i].extra_traits_eor = ""
@@ -4177,6 +4178,7 @@ class Player:
                 self.cards_in_play[i + 1][j].flying_eor = False
                 self.cards_in_play[i + 1][j].armorbane_eor = False
                 self.cards_in_play[i + 1][j].positive_hp_until_eor = 0
+                self.cards_in_play[i + 1][j].extra_attack_until_end_of_round = 0
                 self.cards_in_play[i + 1][j].sweep_eor = 0
                 self.cards_in_play[i + 1][j].yvraine_active = False
                 self.cards_in_play[i + 1][j].retaliate_eor = 0
@@ -4223,6 +4225,8 @@ class Player:
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_phase(amount)
             elif expiration == "EOG":
                 self.headquarters[unit_pos].increase_extra_attack_until_end_of_game(amount)
+            elif expiration == "EOR":
+                self.headquarters[unit_pos].increase_extra_attack_until_end_of_round(amount)
             return None
         if expiration == "EOB":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_battle(amount)
@@ -4232,6 +4236,8 @@ class Player:
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_phase(amount)
         elif expiration == "EOG":
             self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_game(amount)
+        elif expiration == "EOR":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_attack_until_end_of_round(amount)
         return None
 
     def increase_attack_of_all_units_at_hq(self, amount, required_faction=None, expiration="EOB"):

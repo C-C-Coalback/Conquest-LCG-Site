@@ -202,6 +202,10 @@ async def update_game_event_command_section(self, name, game_update_string):
                     if self.p1.warlord_commit_location == self.p2.warlord_commit_location:
                         warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
                         vael_relevant = False
+                        if self.p1.search_card_in_hq("WAAAGH! Zanzag"):
+                            self.create_reaction("WAAAGH! Zanzag", self.name_1, (1, -1, -1))
+                        if self.p2.search_card_in_hq("WAAAGH! Zanzag"):
+                            self.create_reaction("WAAAGH! Zanzag", self.name_2, (2, -1, -1))
                         if self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Vael the Gifted" and not \
                                 self.p1.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
                             vael_relevant = True

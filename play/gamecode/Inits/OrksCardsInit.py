@@ -484,6 +484,9 @@ def orks_cards_init():
         CardClasses.SupportCard("WAAAGH! Arbuttz", "Reaction: When you deploy an attachment, exhaust this support and "
                                                    "deal 1 damage to attached unit to reduce its cost by 1. "
                                                    "Then Rally 6 an attachment, add it to your hand.", "Pledge.",
-                                1, faction, "Loyal", False)
+                                1, faction, "Loyal", False),
+        CardClasses.SupportCard("WAAAGH! Zanzag", "Reaction: After your warlord commits to a planet with an enemy"
+                                                  " warlord, it gains +1 ATK until the end of a battle at that planet.",
+                                "Pledge.", 1, faction, "Loyal", False)
     ]
     return orks_card_array

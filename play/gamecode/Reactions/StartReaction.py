@@ -114,6 +114,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "WAAAGH! Zanzag":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.increase_attack_of_unit_at_pos(warlord_pla, warlord_pos, 1, expiration="EOR")
+            self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"
