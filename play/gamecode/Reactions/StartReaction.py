@@ -98,6 +98,22 @@ async def start_resolving_reaction(self, name, game_update_string):
                         primary_player.add_resources(3)
                     self.delete_reaction()
             self.delete_reaction()
+        elif current_reaction == "WAAAGH! Arbuttz Rally":
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "DRAW"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Attachment"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 99
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            primary_player.number_cards_to_search = 6
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
+            self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"
@@ -107,22 +123,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.max_cost_of_searched_card = 99
             self.all_conditions_searched_card_required = True
             self.no_restrictions_on_chosen_card = False
-            if self.player_who_resolves_reaction[0] == self.name_1:
-                self.p1.number_cards_to_search = 6
-                if len(self.p1.deck) > 5:
-                    self.cards_in_search_box = self.p1.deck[:self.p1.number_cards_to_search]
-                else:
-                    self.cards_in_search_box = self.p1.deck[:len(self.p1.deck)]
-                self.name_player_who_is_searching = self.p1.name_player
-                self.number_who_is_searching = str(self.p1.number)
-            else:
-                self.p2.number_cards_to_search = 6
-                if len(self.p2.deck) > 5:
-                    self.cards_in_search_box = self.p2.deck[:self.p2.number_cards_to_search]
-                else:
-                    self.cards_in_search_box = self.p2.deck[:len(self.p2.deck)]
-                self.name_player_who_is_searching = self.p2.name_player
-                self.number_who_is_searching = str(self.p2.number)
+            primary_player.number_cards_to_search = 6
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
             self.misc_counter = 2
             await self.send_update_message("Place 2 faith after the rally.")
         elif self.reactions_needing_resolving[0] == "Genestealer Brood":

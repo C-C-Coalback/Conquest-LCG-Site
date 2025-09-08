@@ -124,6 +124,7 @@ class Player:
         self.last_discard_string = ""
         self.used_reanimation_protocol = False
         self.senatorum_directives_used = False
+        self.waaagh_arbuttz_active = False
         self.harbinger_of_eternity_active = False
         self.position_discard_of_card = -1
         self.attachments_at_planet = [[], [], [], [], [], [], []]

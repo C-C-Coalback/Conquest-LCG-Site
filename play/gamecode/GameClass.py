@@ -2470,6 +2470,8 @@ class Game:
         self.sanguinary_ambush_active = False
         self.p1.harbinger_of_eternity_active = False
         self.p2.harbinger_of_eternity_active = False
+        self.p1.waaagh_arbuttz_active = False
+        self.p2.waaagh_arbuttz_active = False
         if self.phase == "DEPLOY":
             if self.number_with_deploy_turn == "1":
                 self.player_with_deploy_turn = self.name_2
@@ -3217,6 +3219,12 @@ class Game:
                         else:
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Use WAAAGH! Arbuttz?":
+                        if chosen_choice == "Yes":
+                            primary_player.exhaust_card_in_hq_given_name("WAAAGH! Arbuttz")
+                            primary_player.waaagh_arbuttz_active = True
                         self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Interrupt Enemy Movement Effect?":

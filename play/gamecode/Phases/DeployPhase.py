@@ -179,6 +179,11 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             self.card_type_of_selected_card_in_hand = "Attachment"
+                            if primary_player.search_card_in_hq("WAAAGH! Arbuttz", ready_relevant=True):
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Use WAAAGH! Arbuttz?"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.resolving_search_box = True
                         else:
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
         elif game_update_string[0] == "HQ":
@@ -562,6 +567,8 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
     if card is None:
         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
     discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
+    if primary_player.waaagh_arbuttz_active:
+        discounts += 1
     can_continue = False
     army_unit_as_attachment = False
     non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
@@ -601,6 +608,18 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                     if primary_player.get_ability_given_pos(-2, i) == "Talon Strike Force":
                         self.create_reaction("Talon Strike Force", primary_player.name_player,
                                              (int(primary_player.number), -2, i))
+                if not enemy_card:
+                    if primary_player.waaagh_arbuttz_active:
+                        primary_player.assign_damage_to_pos(int(game_update_string[2]), int(game_update_string[3]), 1,
+                                                            by_enemy_unit=False)
+                        self.create_reaction("WAAAGH! Arbuttz Rally", primary_player.name_player,
+                                             (int(primary_player.number), -2, -1))
+                else:
+                    if primary_player.waaagh_arbuttz_active:
+                        secondary_player.assign_damage_to_pos(int(game_update_string[2]), int(game_update_string[3]), 1,
+                                                              by_enemy_unit=False)
+                        self.create_reaction("WAAAGH! Arbuttz Rally", primary_player.name_player,
+                                             (int(primary_player.number), -2, -1))
                 primary_player.remove_card_from_hand(self.card_pos_to_deploy)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1

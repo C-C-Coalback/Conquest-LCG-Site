@@ -480,6 +480,10 @@ def orks_cards_init():
                              "Krew. Soldier.", 2, faction, "Signature", 2, 3, 1, False),
         CardClasses.SupportCard("Extra Boomsticks", "When an Orks unit is assigned damage, exhaust this support to"
                                                     " give it Retaliate (2) until the end of the phase.", "Upgrade.",
-                                2, faction, "Loyal", False)
+                                2, faction, "Loyal", False),
+        CardClasses.SupportCard("WAAAGH! Arbuttz", "Reaction: When you deploy an attachment, exhaust this support and "
+                                                   "deal 1 damage to attached unit to reduce its cost by 1. "
+                                                   "Then Rally 6 an attachment, add it to your hand.", "Pledge.",
+                                1, faction, "Loyal", False)
     ]
     return orks_card_array
