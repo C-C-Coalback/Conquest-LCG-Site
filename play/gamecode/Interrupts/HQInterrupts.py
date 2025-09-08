@@ -66,6 +66,11 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                 if "Transcendent Blessing" in primary_player.discard:
                     primary_player.discard.remove("Transcendent Blessing")
                 self.delete_interrupt()
+    elif current_interrupt == "The Broken Sigil Sacrifice Unit":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.delete_interrupt()
     elif current_interrupt == "Singing Spear":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

@@ -154,6 +154,15 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
                 self.misc_player_storage = ""
                 self.delete_reaction()
+    elif current_reaction == "The Broken Sigil":
+        if chosen_planet != -1:
+            await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +
+                                           " for Broken Sigil. Please choose the effect.")
+            primary_player.broken_sigil_planet = chosen_planet
+            self.choice_context = "The Broken Sigil Effect"
+            self.choices_available = ["Sacrifice Unit", "Draw Three Cards"]
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
     elif current_reaction == "Myriad Excesses":
         if not self.chosen_first_card:
             self.player_who_resolves_reaction[0] = secondary_player.name_player

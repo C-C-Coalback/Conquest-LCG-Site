@@ -93,6 +93,11 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if planet_pos == self.extra_interrupt_info[0]:
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.delete_interrupt()
+    elif current_interrupt == "The Broken Sigil Sacrifice Unit":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.delete_interrupt()
     elif current_interrupt == "Data Analyzer Aggressive":
         if game_update_string[1] == secondary_player.get_number():
             _, og_pla, og_pos = self.positions_of_units_interrupting[0]

@@ -206,6 +206,8 @@ class Player:
         self.cards_removed_from_game_hidden = []
         self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
         self.last_removed_string = ""
+        self.broken_sigil_planet = -1
+        self.broken_sigil_effect = ""
         self.played_grand_plan = False
         self.won_command_struggles_planets_round = [False, False, False, False, False, False, False]
         self.webway_witch = -1
@@ -2423,6 +2425,9 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "WAAAGH! Ungskar":
                                 self.game.create_reaction("WAAAGH! Ungskar", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "The Broken Sigil":
+                                self.game.create_reaction("The Broken Sigil", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Dark Allegiance":
                                 self.game.create_reaction("Dark Allegiance Trait", self.name_player,
@@ -7124,6 +7129,20 @@ class Player:
         print("Planet to capture:", planet_name)
         i = 0
         other_player = self.get_other_player()
+        print(planet_id)
+        print(self.broken_sigil_planet)
+        if self.broken_sigil_planet == planet_id:
+            print("Broken sigil planet ok")
+            if self.broken_sigil_effect:
+                print("Broken sigil effect ok")
+                self.game.create_interrupt("The Broken Sigil " + self.broken_sigil_effect, self.name_player,
+                                           (int(self.number), -1, -1))
+        if other_player.broken_sigil_planet == planet_id:
+            print("Broken sigil planet ok")
+            if other_player.broken_sigil_effect:
+                print("Broken sigil effect ok")
+                self.game.create_interrupt("The Broken Sigil " + other_player.broken_sigil_effect, self.name_player,
+                                           (int(self.number), -1, -1))
         if other_player.search_hand_for_card("Erupting Aberrants"):
             self.game.create_reaction("Erupting Aberrants", other_player.name_player,
                                       (int(other_player.number), -1, -1))

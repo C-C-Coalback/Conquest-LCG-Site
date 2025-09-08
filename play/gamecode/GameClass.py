@@ -386,7 +386,8 @@ class Game:
         self.auto_card_destruction = True
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
-        self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia"]
+        self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia",
+                                  "The Broken Sigil Sacrifice Unit"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.ebon_chalice_value = 0
@@ -3160,6 +3161,12 @@ class Game:
                             self.resolving_search_box = False
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    elif self.choice_context == "The Broken Sigil Effect":
+                        primary_player.broken_sigil_effect = chosen_choice
+                        await self.send_update_message("The Broken Sigil effect selected. Try not to forget it!")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Raving Cryptek: Deploy choice":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         self.card_to_deploy = self.preloaded_find_card(target_choice)

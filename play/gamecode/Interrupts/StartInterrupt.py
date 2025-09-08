@@ -134,6 +134,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.choice_context = "Trap Laying Hunter Trap"
             self.name_player_making_choices = secondary_player.name_player
             self.resolving_search_box = True
+        elif current_interrupt == "The Broken Sigil Draw Three Cards":
+            for _ in range(3):
+                primary_player.draw_card()
+            self.delete_interrupt()
         elif current_interrupt == "Singing Spear":
             await self.send_update_message("Singing Spear is revealed prior to the mulligan.")
         elif current_interrupt == "Counterblow":

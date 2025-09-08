@@ -455,6 +455,12 @@ def dark_eldar_cards_init():
                              "Abomination. Creature. Elite.", 3, faction, "Loyal", 5, 4, 1, False, lumbering=True),
         CardClasses.SupportCard("Prophets of Flesh", "Interrupt: When you deploy an Abomination or Scholar unit, "
                                                      "exhaust this support to reduce its cost by 1.",
+                                "Pledge.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("The Broken Sigil", "Target a non-first planet and choose a secret number"
+                                                    " while deploying this card.\n"
+                                                    "Forced Interrupt: When that planet is captured, reveal the secret"
+                                                    " number, if it is odd the capturing player must sacrifice a unit,"
+                                                    " otherwise they may draw 3 cards.",
                                 "Pledge.", 1, faction, "Loyal", False)
     ]
     return dark_eldar_cards_array
