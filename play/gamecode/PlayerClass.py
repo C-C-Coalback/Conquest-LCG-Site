@@ -141,6 +141,7 @@ class Player:
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
         self.illuminor_szeras_relevant = False
+        self.unstoppable_tide_value = 0
         self.bluddflagg_relevant = False
         self.farsight_relevant = False
         self.bluddflagg_used = False
@@ -5634,6 +5635,8 @@ class Player:
                         j = j - 1
                     j = j + 1
                 i = i + 1
+        if self.unstoppable_tide_value > 0:
+            self.game.create_reaction("Unstoppable Tide", self.name_player, (int(self.number), -1, -1))
         if phase == "DEPLOY":
             if self.erekiels_queued > 0:
                 for i in range(self.erekiels_queued):

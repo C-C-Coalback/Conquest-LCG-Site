@@ -937,6 +937,11 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Myriad Excesses":
             self.chosen_first_card = False
             await self.send_update_message("Choose planet.")
+        elif current_reaction == "Unstoppable Tide":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.assign_damage_to_pos(warlord_pla, warlord_pos, primary_player.unstoppable_tide_value)
+            primary_player.unstoppable_tide_value = 0
+            self.delete_reaction()
         elif current_reaction == "Dark Allegiance Trait":
             self.choices_available = ["Nurgle", "Khorne", "Slaanesh", "Tzeentch"]
             self.choice_context = "DA Choose Trait:"

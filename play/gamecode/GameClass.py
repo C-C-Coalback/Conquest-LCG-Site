@@ -345,7 +345,7 @@ class Game:
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
-                                 "Tras the Corrupter"]
+                                 "Tras the Corrupter", "Unstoppable Tide"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -8289,6 +8289,16 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Unstoppable Tide":
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":
+                                if primary_player.get_ready_given_pos(-2, hq_pos):
+                                    primary_player.exhaust_given_pos(-2, hq_pos)
+                                    primary_player.unstoppable_tide_value = self.amount_that_can_be_removed_by_shield[0]
+                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos,
+                                                                          self.amount_that_can_be_removed_by_shield[0])
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    self.amount_that_can_be_removed_by_shield[0] = 0
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Senatorum Directives":
                             if not primary_player.senatorum_directives_used:
                                 if planet_pos != -2:

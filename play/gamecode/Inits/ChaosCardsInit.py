@@ -550,6 +550,10 @@ def chaos_cards_init():
                                                    "command dial then reveal it. Place 2 Cultist tokens into play at "
                                                    "the planet you chose. Then, if your opponent chose the same planet,"
                                                    " they may choose either to destroy one of those tokens or take "
-                                                   "control of it.", "Pledge.", 2, faction, "Loyal", False)
+                                                   "control of it.", "Pledge.", 2, faction, "Loyal", False),
+        CardClasses.SupportCard("Unstoppable Tide", "After your warlord is assigned damage, exhaust this support to "
+                                                    "prevent all of that damage. At the end of the phase, deal an "
+                                                    "amount of damage to your warlord equal to the damage prevented.",
+                                "Pledge.", 0, faction, "Loyal", False)
     ]
     return chaos_card_array
