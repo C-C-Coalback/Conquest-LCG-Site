@@ -452,6 +452,9 @@ def dark_eldar_cards_init():
         CardClasses.ArmyCard("Distorted Talos", "Lumbering.\n"
                                                 "Interrupt: When you use a shield card on this unit, remove all "
                                                 "damage from it. (Limit once per phase.)",
-                             "Abomination. Creature. Elite.", 3, faction, "Loyal", 5, 4, 1, False, lumbering=True)
+                             "Abomination. Creature. Elite.", 3, faction, "Loyal", 5, 4, 1, False, lumbering=True),
+        CardClasses.SupportCard("Prophets of Flesh", "Interrupt: When you deploy an Abomination or Scholar unit, "
+                                                     "exhaust this support to reduce its cost by 1.",
+                                "Pledge.", 1, faction, "Loyal", False)
     ]
     return dark_eldar_cards_array

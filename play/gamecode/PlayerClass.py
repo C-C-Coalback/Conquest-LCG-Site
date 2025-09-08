@@ -3805,6 +3805,11 @@ class Player:
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 2
                         self.set_aiming_reticle_in_play(-2, i, "green")
+            if self.headquarters[i].get_ability() == "Prophets of Flesh":
+                if "Abomination" in traits or "Scholar" in traits:
+                    if self.get_ready_given_pos(-2, i):
+                        discounts_available += 1
+                        self.set_aiming_reticle_in_play(-2, i, "green")
             if "Ecclesiarchy" in traits:
                 if self.search_attachments_at_pos(-2, i, "Banner of the Sacred Rose", ready_relevant=True):
                     other_player = self.get_other_player()
@@ -4112,6 +4117,11 @@ class Player:
             if self.headquarters[pos].aiming_reticle_color == "green":
                 self.exhaust_given_pos(-2, pos)
                 discount += 2
+                self.reset_aiming_reticle_in_play(-2, pos)
+        if self.headquarters[pos].get_ability() == "Prophets of Flesh":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.exhaust_given_pos(-2, pos)
+                discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
         if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
