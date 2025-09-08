@@ -21,16 +21,16 @@
 
 .auto-deck-build {
     background: rgba(47, 40, 153, 0.3);
-    width: 450px;
+    width: 525px;
     height: 500px;
     border: 5px solid green;
     display: grid;
-    grid-template-columns: 75px 75px 50px 100px 150px;
+    grid-template-columns: 75px 75px 25px 50px 50px 75px 50px 125px;
     grid-template-rows: 100px 200px 200px;
     grid-template-areas:
-    "warlord-card synapse-card details details details"
-    "signature-squad-cards signature-squad-cards army-cards army-cards army-cards"
-    "event-cards event-cards attachment-cards attachment-cards support-cards";
+    "warlord-card synapse-card pledge-card pledge-card details details details details"
+    "signature-squad-cards signature-squad-cards signature-squad-cards army-cards army-cards army-cards army-cards army-cards"
+    "event-cards event-cards event-cards attachment-cards attachment-cards attachment-cards support-cards support-cards";
 }
 
 .auto-deck-build > #details {
@@ -48,6 +48,10 @@
 
 #warlord-card {
     grid-area: warlord-card;
+}
+
+#pledge-card {
+    grid-area: pledge-card;
 }
 
 #synapse-card {

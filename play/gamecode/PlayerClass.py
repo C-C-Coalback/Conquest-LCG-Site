@@ -13,6 +13,11 @@ def clean_received_deck(raw_deck):
     split_deck = [x for x in split_deck if x]
     del split_deck[0]
     del split_deck[1]
+    pledge = split_deck[1]
+    if pledge == "Signature Squad":
+        pledge = ""
+    else:
+        del split_deck[1]
     i = 0
     while i < len(split_deck):
         if split_deck[i] == "Signature Squad" or split_deck[i] == "Army" or split_deck[i] == "Event" or \
@@ -29,6 +34,8 @@ def clean_received_deck(raw_deck):
         i = i + 1
         for _ in range(int(number_of_cards)):
             deck_as_single_cards.append(card_name)
+    if pledge:
+        deck_as_single_cards.append(pledge)
     print(deck_as_single_cards)
     return deck_as_single_cards
 
@@ -177,6 +184,9 @@ class Player:
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
         self.preparation_cards = ["Pulsating Carapace", "Mobilize the Chapter", "Support Fleet"]
+        for i in range(len(self.card_array)):
+            if "Pledge" in self.card_array[i].traits:
+                self.preparation_cards.append(self.card_array[i].get_name())
         self.played_necrodermis = False
         self.necrodermis_allowed = True
         self.etekh_trait = ""

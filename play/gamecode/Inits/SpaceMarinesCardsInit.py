@@ -633,6 +633,12 @@ def space_marines_cards_init():
                                                     "Reaction: After a support card enters play, treat its printed"
                                                     " text box as blank until the end of the round and remove "
                                                     "1 damage from a support card.", "Location.",
-                                2, faction, "Signature", False)
+                                2, faction, "Signature", False),
+        CardClasses.SupportCard("Anvil Strike Force", "While there is a token on this support, "
+                                                      "the first shield card with 1 printed shield icon "
+                                                      "you play each round gains 1 shield icon.\n"
+                                                      "Reaction: After you win a battle at the first planet with your "
+                                                      "warlord, put a token on this support.", "Pledge.",
+                                0, faction, "Loyal", False)
     ]
     return space_marines_card_array

@@ -84,6 +84,18 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
     global cards_dict
     print("Can continue")
     current_index = 4
+    if len(factions) == 1:
+        factions.append("")
+    if deck[3] != "Signature Squad":
+        current_name = deck[3]
+        card_result = FindCard.find_card(current_name, cards_array, cards_dict)
+        current_index = 5
+        if card_result.get_faction() == factions[0]:
+            print("Pledge ok")
+        elif card_result.get_faction() == factions[1] and card_result.get_loyalty() == "Common":
+            print("Pledge ok")
+        else:
+            return "Unexpected card in pledge area: " + current_name
     while deck[current_index] != "Army":
         if deck[current_index] in remaining_signature_squad:
             print("Found a match")
@@ -117,6 +129,8 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
             except ValueError:
                 return "Number missing"
             card_result = FindCard.find_card(current_name, cards_array, cards_dict)
+            if card_result.check_for_a_trait("Pledge"):
+                return "Pledge card found outside of pledge area: " + current_name
             if card_result.get_name() != current_name:
                 print("Card not found in database", current_name)
                 return "Card not found in database: " + current_name
@@ -224,7 +238,16 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     self.main_faction = card_object.get_faction()
                     self.warlord = card_object.get_name()
                 if card_loyalty != "Signature" or card_type == "Warlord":
-                    if self.main_faction == card_object.get_faction():
+                    if card_object.check_for_a_trait("Pledge"):
+                        message = "Pledge/" + card_object.get_name()
+                        print("New message", message)
+                        if self.main_faction == card_object.get_faction():
+                            print("sending")
+                            await self.send(text_data=json.dumps({"message": message}))
+                        elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
+                            print("sending")
+                            await self.send(text_data=json.dumps({"message": message}))
+                    elif self.main_faction == card_object.get_faction():
                         await self.send(text_data=json.dumps({"message": message}))
                     elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
                         if self.warlord == "Yvraine":
@@ -316,6 +339,14 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         await self.send(text_data=json.dumps({"message": warlord}))
                         factions = deck_list_content[3]
                         factions = factions.split(sep=" (")
+                        pledge = deck_list_content[4]
+                        num_to_delete = 4
+                        if pledge != "----------------------------------------------------------------------"\
+                                and pledge:
+                            print("pledge: ", pledge)
+                            pledge = "Pledge/" + pledge
+                            num_to_delete = 5
+                            await self.send(text_data=json.dumps({"message": pledge}))
                         for i in range(len(factions)):
                             factions[i] = factions[i].replace(")", "")
                             if i == 0:
@@ -328,7 +359,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                                 ally = "SetAlly/" + factions[i]
                                 await self.send(text_data=json.dumps({"message": ally}))
                         await self.send(text_data=json.dumps({"message": "Ally"}))
-                        for i in range(4):
+                        for i in range(num_to_delete):
                             del deck_list_content[0]
                         i = 0
                         while i < len(deck_list_content):
