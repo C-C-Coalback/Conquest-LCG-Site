@@ -10840,6 +10840,11 @@ class Game:
     def check_reactions_from_winning_combat(self, winner, planet_id):
         reactions = []
         if self.reactions_on_winning_combat_permitted:
+            if self.round_number > 0:
+                if winner.search_card_in_hq("WAAAGH! Ungskar"):
+                    for i in range(len(winner.cards_in_reserve[planet_id])):
+                        if winner.cards_in_reserve[planet_id][i].get_ability() == "Squiggoth Brute":
+                            reactions.append("WAAAGH! Ungskar Deepstrike")
             for i in range(len(winner.attachments_at_planet[planet_id])):
                 if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     reactions.append("Close Quarters Doctrine")

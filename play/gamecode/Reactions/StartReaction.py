@@ -118,6 +118,22 @@ async def start_resolving_reaction(self, name, game_update_string):
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.increase_attack_of_unit_at_pos(warlord_pla, warlord_pos, 1, expiration="EOR")
             self.delete_reaction()
+        elif current_reaction == "WAAAGH! Ungskar Deepstrike":
+            found_brute = False
+            i = 0
+            while i < len(primary_player.cards_in_reserve[planet_pos]) and not found_brute:
+                if primary_player.cards_in_reserve[planet_pos][i].get_ability() == "Squiggoth Brute":
+                    if primary_player.spend_resources(2):
+                        primary_player.deepstrike_unit(planet_pos, i, in_play_card=False)
+                        found_brute = True
+                i = i + 1
+            self.delete_reaction()
+        elif current_reaction == "WAAAGH! Ungskar":
+            last_planet = self.determine_last_planet()
+            card = copy.deepcopy(self.preloaded_find_card("Squiggoth Brute"))
+            card.deepstrike = 99
+            primary_player.cards_in_reserve[last_planet].append(card)
+            self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "DRAW"

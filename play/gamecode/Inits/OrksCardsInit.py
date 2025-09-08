@@ -487,6 +487,10 @@ def orks_cards_init():
                                 1, faction, "Loyal", False),
         CardClasses.SupportCard("WAAAGH! Zanzag", "Reaction: After your warlord commits to a planet with an enemy"
                                                   " warlord, it gains +1 ATK until the end of a battle at that planet.",
-                                "Pledge.", 1, faction, "Loyal", False)
+                                "Pledge.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("WAAAGH! Ungskar", "Reaction: After you deploy this support, put a Squiggoth Brute in "
+                                                   "reserve at the last planet. Starting from the second round, "
+                                                   "if you win a battle at that planet, you may Deep Strike it "
+                                                   "for 2 resources.", "Pledge.", 1, faction, "Loyal", False)
     ]
     return orks_card_array
