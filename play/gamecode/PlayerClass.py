@@ -194,6 +194,7 @@ class Player:
         self.command_struggles_won_this_phase = 0
         self.celestian_amelia_active = False
         self.wrathful_retribution_value = 0
+        self.can_play_pledge = True
         self.last_kagrak_trait = ""
         self.looted_skrap_active = False
         self.looted_skrap_count = 0

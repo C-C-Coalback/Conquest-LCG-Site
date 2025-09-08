@@ -2472,9 +2472,11 @@ class Game:
             if self.number_with_deploy_turn == "1":
                 self.player_with_deploy_turn = self.name_2
                 self.number_with_deploy_turn = "2"
+                self.p1.can_play_pledge = False
             elif self.number_with_deploy_turn == "2":
                 self.player_with_deploy_turn = self.name_1
                 self.number_with_deploy_turn = "1"
+                self.p2.can_play_pledge = False
 
     def move_interrupt_to_front(self, interrupt_pos):
         if self.interrupts_waiting_on_resolution[interrupt_pos] == "Magus Harid":

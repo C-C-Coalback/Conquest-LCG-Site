@@ -117,24 +117,25 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                                                "You may continue deployment.")
                                 self.paying_shrieking_exarch_cost = False
                         elif card.get_card_type() == "Support":
-                            played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
-                                                                                 already_checked=True, card=card)[0]
-                            primary_player.aiming_reticle_color = ""
-                            primary_player.aiming_reticle_coords_hand = -1
-                            print(played_support)
-                            if played_support == "SUCCESS":
-                                primary_player.cards.remove(primary_player.cards[self.card_pos_to_deploy])
-                                self.queued_sound = "onplay"
-                                if not secondary_player.has_passed:
-                                    self.player_with_deploy_turn = secondary_player.get_name_player()
-                                    self.number_with_deploy_turn = secondary_player.get_number()
-                                if primary_player.extra_deploy_turn_active:
-                                    primary_player.extra_deploy_turn_active = False
-                                    primary_player.has_passed = True
-                                    if self.p1.has_passed and self.p2.has_passed:
-                                        await self.send_update_message("Both passed, move to warlord movement.")
-                                        await self.change_phase("COMMAND")
-                            self.card_pos_to_deploy = -1
+                            if card.check_for_a_trait("Pledge") and not primary_player.can_play_pledge:
+                                await self.send_update_message("Pledges can only be played on the first deploy turn.")
+                            else:
+                                played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
+                                                                                     already_checked=True, card=card)[0]
+                                primary_player.aiming_reticle_color = ""
+                                primary_player.aiming_reticle_coords_hand = -1
+                                print(played_support)
+                                if played_support == "SUCCESS":
+                                    primary_player.cards.remove(primary_player.cards[self.card_pos_to_deploy])
+                                    self.queued_sound = "onplay"
+                                    self.action_cleanup()
+                                    if primary_player.extra_deploy_turn_active:
+                                        primary_player.extra_deploy_turn_active = False
+                                        primary_player.has_passed = True
+                                        if self.p1.has_passed and self.p2.has_passed:
+                                            await self.send_update_message("Both passed, move to warlord movement.")
+                                            await self.change_phase("COMMAND")
+                                self.card_pos_to_deploy = -1
                         elif has_deepstrike and primary_player.resources > 0 and self.deepstrike_allowed:
                             print("deepstrike", card.get_deepstrike_value())
                             self.stored_deploy_string = game_update_string
