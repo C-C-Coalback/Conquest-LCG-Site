@@ -45,6 +45,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Gladius Strike Force":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()
+        elif current_reaction == "Talon Strike Force":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
         elif current_reaction == "Medallion of Betrayal":
             if primary_player.count_copies_in_play("Cultist") < 1:
                 primary_player.summon_token_at_hq("Cultist")

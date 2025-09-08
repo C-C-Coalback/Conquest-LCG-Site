@@ -597,6 +597,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
             if played_card:
                 if limited:
                     primary_player.can_play_limited = False
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.get_ability_given_pos(-2, i) == "Talon Strike Force":
+                        self.create_reaction("Talon Strike Force", primary_player.name_player,
+                                             (int(primary_player.number), -2, i))
                 primary_player.remove_card_from_hand(self.card_pos_to_deploy)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1

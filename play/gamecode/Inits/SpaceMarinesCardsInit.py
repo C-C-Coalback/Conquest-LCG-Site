@@ -644,6 +644,10 @@ def space_marines_cards_init():
                                                         " you perform is increased by 2.\n"
                                                         "Reaction: After your warlord resolves an attack against an"
                                                         " enemy warlord, put a token on this support.",
-                                "Pledge.", 0, faction, "Loyal", False)
+                                "Pledge.", 0, faction, "Loyal", False),
+        CardClasses.SupportCard("Talon Strike Force", "While there are 3 tokens on this support, you may use each "
+                                                      "attachment you control as a shield for the attached unit.\n"
+                                                      "Reaction: After you deploy an attachment card, place a token "
+                                                      "on this support.", "Pledge.", 0, faction, "Loyal", False)
     ]
     return space_marines_card_array

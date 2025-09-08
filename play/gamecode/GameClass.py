@@ -8237,6 +8237,11 @@ class Game:
                                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                                     primary_player.exhaust_given_pos(-2, hq_pos)
                                     primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Talon Strike Force":
+                            if primary_player.headquarters[hq_pos].counter > 2:
+                                self.alt_shield_mode_active = True
+                                self.alt_shield_name = "Talon Strike Force"
+                                await self.send_update_message("Talon Strike Force shielding effect activated!")
                         elif primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
                             print("is rockcrete bunker")
                             if primary_player.headquarters[hq_pos].get_ready():
@@ -8622,7 +8627,19 @@ class Game:
                                 if int(game_update_string[3]) == unit_pos:
                                     attachment_pos = int(game_update_string[4])
                                     attachment = primary_player.headquarters[unit_pos].get_attachments()[attachment_pos]
-                                    if attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
+                                    if self.alt_shield_mode_active:
+                                        if self.alt_shield_name == "Talon Strike Force":
+                                            if attachment.name_owner == primary_player.name_player:
+                                                primary_player.return_attachment_to_hand(-2, unit_pos, attachment_pos)
+                                                last_card_in_hand = len(primary_player.cards) - 1
+                                                if last_card_in_hand != -1:
+                                                    self.alt_shield_name = ""
+                                                    self.alt_shield_mode_active = False
+                                                    new_game_update_string = ["HAND", primary_player.number,
+                                                                              str(last_card_in_hand)]
+                                                    await self.better_shield_card_resolution(
+                                                        name, new_game_update_string, alt_shields=False)
+                                    elif attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
                                             attachment.name_owner == primary_player.name_player:
                                         attachment.exhaust_card()
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -8653,7 +8670,20 @@ class Game:
                                 attachment_pos = int(game_update_string[5])
                                 attachment = primary_player.cards_in_play[planet_pos + 1][int(game_update_string[4])] \
                                     .get_attachments()[attachment_pos]
-                                if attachment.get_ability() == "Starmist Raiment" and attachment.get_ready():
+                                if self.alt_shield_mode_active:
+                                    if self.alt_shield_name == "Talon Strike Force":
+                                        if attachment.name_owner == primary_player.name_player:
+                                            primary_player.return_attachment_to_hand(planet_pos, unit_pos,
+                                                                                     attachment_pos)
+                                            last_card_in_hand = len(primary_player.cards) - 1
+                                            if last_card_in_hand != -1:
+                                                self.alt_shield_name = ""
+                                                self.alt_shield_mode_active = False
+                                                new_game_update_string = ["HAND", primary_player.number,
+                                                                          str(last_card_in_hand)]
+                                                await self.better_shield_card_resolution(
+                                                    name, new_game_update_string, alt_shields=False)
+                                elif attachment.get_ability() == "Starmist Raiment" and attachment.get_ready():
                                     if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
                                         attachment.exhaust_card()
                                         self.starmist_raiment = True
