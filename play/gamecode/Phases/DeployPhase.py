@@ -364,6 +364,13 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 if self.player_who_resolves_reaction[0] == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
+            if self.reactions_needing_resolving[0] == "Dark Allegiance":
+                is_a_reaction = True
+                primary_player = self.p1
+                secondary_player = self.p2
+                if self.player_who_resolves_reaction[0] == self.name_2:
+                    primary_player = self.p2
+                    secondary_player = self.p1
     if not is_an_interrupt and not is_a_reaction:
         if self.battle_ability_to_resolve:
             is_battle_ability = True
@@ -415,7 +422,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground" or
                 self.action_chosen == "Behind Enemy Lines") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID" \
-                and not self.misc_player_storage == "RESOLVING Ice World Hydras IV":
+                and not self.misc_player_storage == "RESOLVING Ice World Hydras IV" \
+                and not self.misc_player_storage == "RESOLVING DARK ALLEGIANCE":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
@@ -545,11 +553,15 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
     card = None
     magus_harid = False
     impulsive_loota = False
+    extra_discounts = 0
     if self.reactions_needing_resolving:
         if self.reactions_needing_resolving[0] == "Impulsive Loota Reserve"\
-                or self.reactions_needing_resolving[0] == "Impulsive Loota In Play":
+                or self.reactions_needing_resolving[0] == "Impulsive Loota In Play" or \
+                self.reactions_needing_resolving[0] == "Dark Allegiance":
             card = self.card_to_deploy
             impulsive_loota = True
+            if self.reactions_needing_resolving[0] == "Dark Allegiance":
+                extra_discounts = 1
             primary_player = self.p1
             secondary_player = self.p2
             if self.player_who_resolves_reaction[0] == self.name_2:
@@ -569,6 +581,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
     discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
     if primary_player.waaagh_arbuttz_active:
         discounts += 1
+    discounts += extra_discounts
     can_continue = False
     army_unit_as_attachment = False
     non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
@@ -620,7 +633,8 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                                                               by_enemy_unit=False)
                         self.create_reaction("WAAAGH! Arbuttz Rally", primary_player.name_player,
                                              (int(primary_player.number), -2, -1))
-                primary_player.remove_card_from_hand(self.card_pos_to_deploy)
+                if self.card_pos_to_deploy != -1:
+                    primary_player.remove_card_from_hand(self.card_pos_to_deploy)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1
                 self.card_pos_to_deploy = -1

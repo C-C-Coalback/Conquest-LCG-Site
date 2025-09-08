@@ -1,5 +1,5 @@
 from .. import FindCard
-from ..Phases import CombatPhase
+from ..Phases import CombatPhase, DeployPhase
 from .. import CardClasses
 
 
@@ -1370,6 +1370,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             next_phase = "DEPLOY"
                         player_owning_card.cards_in_play[planet_pos + 1][
                             unit_pos].move_to_planet_end_of_phase_phase = next_phase
+        elif current_reaction == "Dark Allegiance":
+            if self.card_to_deploy is not None:
+                if self.card_to_deploy.get_card_type() == "Attachment":
+                    await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string)
+                    self.delete_reaction()
         elif current_reaction == "Erekiel Next":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):

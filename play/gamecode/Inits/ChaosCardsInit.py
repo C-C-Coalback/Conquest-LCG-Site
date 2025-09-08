@@ -538,6 +538,12 @@ def chaos_cards_init():
                               1, faction, "Signature", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("War Cabal", "Reaction: After a planet replaces another or is revealed, move this unit "
                                           "to that planet and exhaust it if able.", "Soldier. Tzeentch.",
-                             2, faction, "Signature", 2, 3, 1, False)
+                             2, faction, "Signature", 2, 3, 1, False),
+        CardClasses.SupportCard("Dark Allegiance", "When deployed, choose a trait among: "
+                                                   "Nurgle, Khorne, Slaanesh, Tzeentch.\n"
+                                                   "Reaction: After the deploy phase begins, Rally 6 a card with the "
+                                                   "chosen trait, then deploy it at a target planet reducing its cost "
+                                                   "by 1. Use this ability only if each unit you control shares the "
+                                                   "chosen trait.", "Pledge.", 1, faction, "Loyal", False)
     ]
     return chaos_card_array

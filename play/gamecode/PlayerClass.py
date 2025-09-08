@@ -2423,6 +2423,9 @@ class Player:
                             if card.get_ability() == "WAAAGH! Ungskar":
                                 self.game.create_reaction("WAAAGH! Ungskar", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Dark Allegiance":
+                                self.game.create_reaction("Dark Allegiance Trait", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -5651,6 +5654,10 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Dark Allegiance":
+                if phase == "DEPLOY":
+                    if self.check_if_all_units_have_trait(self.headquarters[i].misc_string):
+                        self.game.create_reaction("Dark Allegiance", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Vamii Industrial Complex":
                 if phase == "COMBAT":
                     self.game.create_reaction("Vamii Industrial Complex", self.name_player, (int(self.number), -2, i))

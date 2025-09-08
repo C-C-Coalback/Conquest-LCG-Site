@@ -2874,6 +2874,11 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         primary_player.shuffle_deck()
+                    elif self.choice_context == "Dark Allegiance Rally":
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        primary_player.shuffle_deck()
                     elif self.choice_context == "Scheming Warlock Rally":
                         primary_player.bottom_remaining_cards()
                         self.reset_choices_available()
@@ -3387,10 +3392,16 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "MtC Choose Trait:":
-                        chosen_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]
                         primary_player.headquarters[pos].misc_string = chosen_choice
                         await self.send_update_message("Mobilize the Chapter: Chose " + chosen_choice + " trait.")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
+                    elif self.choice_context == "DA Choose Trait:":
+                        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                        primary_player.headquarters[pos].misc_string = chosen_choice
+                        await self.send_update_message("Dark Allegiance: Chose " + chosen_choice + " trait.")
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
@@ -5186,10 +5197,18 @@ class Game:
                                     "No valid targets for Shrine of Warpflame")
                                 self.resolving_search_box = False
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
+                    elif self.choice_context == "Dark Allegiance Rally":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Attachment" or card.get_card_type() == "Army":
+                            if card.check_for_a_trait(self.misc_target_choice):
+                                self.card_to_deploy = card
+                                del primary_player.deck[int(game_update_string[1])]
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                primary_player.number_cards_to_search += -1
+                                primary_player.bottom_remaining_cards()
                     elif self.choice_context == "Damage Drifting Spore Mines?":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

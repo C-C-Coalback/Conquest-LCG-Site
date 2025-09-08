@@ -922,6 +922,23 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "MtC Choose Trait:"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Dark Allegiance":
+            self.misc_target_choice = ""
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.headquarters[i].get_ability() == "Dark Allegiance":
+                    self.misc_target_choice = primary_player.headquarters[i].misc_string
+            primary_player.number_cards_to_search = 6
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.choice_context = "Dark Allegiance Rally"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        elif current_reaction == "Dark Allegiance Trait":
+            self.choices_available = ["Nurgle", "Khorne", "Slaanesh", "Tzeentch"]
+            self.choice_context = "DA Choose Trait:"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string
             if primary_player.check_if_all_units_have_trait(chosen_trait):
@@ -931,6 +948,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.resolving_search_box = True
             else:
                 self.delete_reaction()
+
         elif current_reaction == "The Emperor's Retribution":
             if "The Emperor's Retribution" in primary_player.cards and primary_player.resources > 0:
                 primary_player.spend_resources(1)

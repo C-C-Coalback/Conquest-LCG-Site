@@ -147,6 +147,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             if "Undying Saint" in primary_player.discard:
                 self.create_reaction("Undying Saint", primary_player.name_player, (int(primary_player.number), -1, -1))
             self.delete_reaction()
+    elif current_reaction == "Dark Allegiance":
+        if self.card_to_deploy is not None:
+            if self.card_to_deploy.get_card_type() == "Army":
+                self.misc_player_storage = "RESOLVING DARK ALLEGIANCE"
+                await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
+                self.misc_player_storage = ""
+                self.delete_reaction()
     elif current_reaction == "Agra's Preachings":
         if len(secondary_player.cards_in_play[chosen_planet + 1]) > 0:
             if len(primary_player.deck) > 5:
