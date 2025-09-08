@@ -138,6 +138,11 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.misc_counter = self.misc_counter - 1
                 if self.misc_counter < 1:
                     self.delete_reaction()
+    elif current_reaction == "The Flayed Mask Surprise":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.delete_reaction()
     elif current_reaction == "Wrathful Retribution":
         if player_owning_card.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
             if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):

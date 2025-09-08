@@ -461,6 +461,11 @@ def dark_eldar_cards_init():
                                                     "Forced Interrupt: When that planet is captured, reveal the secret"
                                                     " number, if it is odd the capturing player must sacrifice a unit,"
                                                     " otherwise they may draw 3 cards.",
+                                "Pledge.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("The Flayed Mask", "Secretly choose a non-first planet when you deploy this support.\n"
+                                                   "Interrupt: When your opponent captures the chosen planet, reveal "
+                                                   "your choice to have them choose either to: deal 5 indirect damage "
+                                                   "among units they control, sacrifice a unit or forgo the capture.",
                                 "Pledge.", 1, faction, "Loyal", False)
     ]
     return dark_eldar_cards_array

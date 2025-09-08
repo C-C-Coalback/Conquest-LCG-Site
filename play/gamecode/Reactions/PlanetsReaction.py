@@ -154,8 +154,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
                 self.misc_player_storage = ""
                 self.delete_reaction()
+    elif current_reaction == "The Flayed Mask":
+        if chosen_planet != 0:
+            await self.send_update_message("Planet chosen for The Flayed Mask.")
+            primary_player.the_flayed_mask_planet = chosen_planet
+            self.delete_reaction()
     elif current_reaction == "The Broken Sigil":
-        if chosen_planet != -1:
+        if chosen_planet != 0:
             await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +
                                            " for Broken Sigil. Please choose the effect.")
             primary_player.broken_sigil_planet = chosen_planet

@@ -5062,6 +5062,20 @@ class Game:
                         self.misc_counter = card.attack
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "The Flayed Mask Choice:":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if chosen_choice == "Forgo Capture":
+                            primary_player.flayed_mask_active = True
+                            self.delete_reaction()
+                        elif chosen_choice == "Sacrifice Unit":
+                            self.player_who_resolves_reaction[0] = primary_player.name_player
+                        else:
+                            self.delete_reaction()
+                            self.location_of_indirect = "ALL"
+                            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+                            primary_player.indirect_damage_applied = 0
+                            primary_player.total_indirect_damage = 5
                     elif self.choice_context == "Target The Emperor Protects:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.discard_card_name_from_hand("The Emperor Protects")
@@ -10866,6 +10880,8 @@ class Game:
                 reactions.append("Order of the Crimson Oath")
             if loser.search_card_in_hq("Host of the Emissary", ready_relevant=True):
                 reactions.append("Host of the Emissary")
+            if loser.the_flayed_mask_planet == planet_id:
+                reactions.append("The Flayed Mask Surprise")
             if loser.resources > 0 and self.round_number == planet_id:
                 if loser.search_hand_for_card("The Grand Plan"):
                     reactions.append("The Grand Plan")

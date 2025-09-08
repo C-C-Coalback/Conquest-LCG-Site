@@ -155,6 +155,8 @@ class Player:
         self.illegal_commits_warlord = 0
         self.illegal_commits_synapse = 0
         self.primal_howl_used = False
+        self.the_flayed_mask_planet = -1
+        self.flayed_mask_active = False
         self.extra_deploy_turn_active = False
         self.discard_inquis_caius_wroth = False
         self.optimized_landing_used = False
@@ -2428,6 +2430,9 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "The Broken Sigil":
                                 self.game.create_reaction("The Broken Sigil", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "The Flayed Mask":
+                                self.game.create_reaction("The Flayed Mask", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Dark Allegiance":
                                 self.game.create_reaction("Dark Allegiance Trait", self.name_player,
@@ -7157,6 +7162,9 @@ class Player:
             )
             self.game.p1.played_grand_plan = False
             self.game.p2.played_grand_plan = False
+            return 0
+        if self.flayed_mask_active:
+            self.flayed_mask_active = False
             return 0
         while planet_cards[i].get_name() != "FINAL CARD":
             print(planet_cards[i].get_name(), planet_name)

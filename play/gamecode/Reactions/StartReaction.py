@@ -947,6 +947,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "DA Choose Trait:"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "The Flayed Mask Surprise":
+            self.choices_available = ["Five Indirect", "Sacrifice Unit", "Forgo Capture"]
+            self.choice_context = "The Flayed Mask Choice:"
+            self.name_player_making_choices = secondary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string
             if primary_player.check_if_all_units_have_trait(chosen_trait):
@@ -956,7 +961,6 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.resolving_search_box = True
             else:
                 self.delete_reaction()
-
         elif current_reaction == "The Emperor's Retribution":
             if "The Emperor's Retribution" in primary_player.cards and primary_player.resources > 0:
                 primary_player.spend_resources(1)

@@ -557,6 +557,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             if self.misc_counter < 1:
                                 primary_player.reset_all_aiming_reticles_play_hq()
                                 self.delete_reaction()
+        elif current_reaction == "The Flayed Mask Surprise":
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        self.delete_reaction()
         elif current_reaction == "The Grand Plan":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
