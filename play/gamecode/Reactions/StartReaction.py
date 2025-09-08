@@ -32,13 +32,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "First Line Rhinos":
             primary_player.number_cards_to_search = 6
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                    if primary_player.headquarters[i].counter > 0:
+                        primary_player.number_cards_to_search += 2
             self.resolving_search_box = True
-            if len(primary_player.deck) > 5:
-                self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
-            else:
-                self.choices_available = primary_player.deck[:len(primary_player.deck)]
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
             self.choice_context = "First Line Rhinos Rally"
             self.name_player_making_choices = primary_player.name_player
+        elif current_reaction == "Gladius Strike Force":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
         elif current_reaction == "Medallion of Betrayal":
             if primary_player.count_copies_in_play("Cultist") < 1:
                 primary_player.summon_token_at_hq("Cultist")

@@ -2706,7 +2706,11 @@ class Game:
             await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Zarvoss Foundry":
             winner.number_cards_to_search = 8
-            if len(winner.deck) < 8:
+            for i in range(len(winner.headquarters)):
+                if winner.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                    if winner.headquarters[i].counter > 0:
+                        winner.number_cards_to_search += 2
+            if len(winner.deck) < winner.number_cards_to_search:
                 winner.number_cards_to_search = len(winner.deck)
             self.choices_available = winner.deck[:winner.number_cards_to_search]
             if self.choices_available:
@@ -2718,6 +2722,10 @@ class Game:
         elif self.battle_ability_to_resolve == "Elouith":
             if len(winner.deck) > 2:
                 winner.number_cards_to_search = 3
+                for i in range(len(winner.headquarters)):
+                    if winner.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                        if winner.headquarters[i].counter > 0:
+                            winner.number_cards_to_search += 2
                 self.cards_in_search_box = winner.deck[:winner.number_cards_to_search]
                 self.name_player_who_is_searching = winner.name_player
                 self.number_who_is_searching = str(winner.number)
@@ -2772,6 +2780,11 @@ class Game:
             winner.number_cards_to_search = len(winner.deck)
             if len(winner.deck) > 5:
                 winner.number_cards_to_search = 6
+                if len(winner.deck) > 7:
+                    for i in range(len(winner.headquarters)):
+                        if winner.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                            if winner.headquarters[i].counter > 0:
+                                winner.number_cards_to_search += 2
             if winner.number_cards_to_search:
                 self.cards_in_search_box = winner.deck[:winner.number_cards_to_search]
                 self.name_player_who_is_searching = winner.name_player

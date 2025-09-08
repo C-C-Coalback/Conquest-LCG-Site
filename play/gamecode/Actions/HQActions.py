@@ -829,7 +829,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.all_conditions_searched_card_required = True
                         self.no_restrictions_on_chosen_card = False
                         primary_player.number_cards_to_search = 8
-                        if len(primary_player.deck) > 7:
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                                if primary_player.headquarters[i].counter > 0:
+                                    primary_player.number_cards_to_search += 2
+                        if len(primary_player.deck) > primary_player.number_cards_to_search:
                             self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
                         else:
                             self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]

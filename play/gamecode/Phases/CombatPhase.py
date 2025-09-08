@@ -1198,6 +1198,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if secondary_player.cards_in_play[
                                     self.defender_planet + 1][self.defender_position] \
                                         .get_card_type() == "Warlord":
+                                    if primary_player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) == "Warlord":
+                                        for i in range(len(primary_player.headquarters)):
+                                            if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                                                self.create_reaction("Gladius Strike Force", primary_player.name_player,
+                                                                     (int(primary_player.number), -2, i))
                                     if secondary_player.search_card_in_hq("Zogwort's Hovel"):
                                         self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,

@@ -452,7 +452,11 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.no_restrictions_on_chosen_card = False
                                 self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
                                 primary_player.number_cards_to_search = 2
-                                if len(primary_player.deck) < 2:
+                                for i in range(len(primary_player.headquarters)):
+                                    if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                                        if primary_player.headquarters[i].counter > 0:
+                                            primary_player.number_cards_to_search += 2
+                                if len(primary_player.deck) < primary_player.number_cards_to_search:
                                     primary_player.number_cards_to_search = len(primary_player.deck)
                                 self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
                                 self.name_player_who_is_searching = primary_player.name_player
@@ -483,8 +487,12 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.all_conditions_searched_card_required = True
                                 self.no_restrictions_on_chosen_card = False
                                 primary_player.number_cards_to_search = 2
+                                for i in range(len(primary_player.headquarters)):
+                                    if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                                        if primary_player.headquarters[i].counter > 0:
+                                            primary_player.number_cards_to_search += 2
                                 self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
-                                if len(primary_player.deck) < 2:
+                                if len(primary_player.deck) < primary_player.number_cards_to_search:
                                     primary_player.number_cards_to_search = len(primary_player.deck)
                                 self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
                                 self.name_player_who_is_searching = primary_player.name_player

@@ -639,6 +639,11 @@ def space_marines_cards_init():
                                                       "you play each round gains 1 shield icon.\n"
                                                       "Reaction: After you win a battle at the first planet with your "
                                                       "warlord, put a token on this support.", "Pledge.",
-                                0, faction, "Loyal", False)
+                                0, faction, "Loyal", False),
+        CardClasses.SupportCard("Gladius Strike Force", "While there is a token on this support, each Rally and Search"
+                                                        " you perform is increased by 2.\n"
+                                                        "Reaction: After your warlord resolves an attack against an"
+                                                        " enemy warlord, put a token on this support.",
+                                "Pledge.", 0, faction, "Loyal", False)
     ]
     return space_marines_card_array
