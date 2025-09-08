@@ -657,6 +657,10 @@ def astra_militarum_cards_init():
                                                              "Reaction: After your opponent wins a battle, Rally 6 a"
                                                              " unit, add it to your hand. Then place 2 faith among"
                                                              " army units you control.",
-                                "Location. Ecclesiarchy.", 0, faction, "Signature", False)
+                                "Location. Ecclesiarchy.", 0, faction, "Signature", False),
+        CardClasses.SupportCard("Holy Crusade", "Each other non-signature card in your deck must be Ecclesiarchy.\n"
+                                                "Action: Exhaust this support to place 2 faith among units you "
+                                                "control.", "Pledge.", 1, faction, "Loyal", False,
+                                action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return astra_militarum_cards_array

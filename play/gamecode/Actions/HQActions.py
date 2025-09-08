@@ -73,6 +73,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.draw_card()
                             primary_player.draw_card()
                             self.misc_counter = 0
+                    elif ability == "Holy Crusade":
+                        if card.get_ready():
+                            self.action_chosen = ability
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.misc_counter = 2
                     elif ability == "Canoness Vardina":
                         if not card_chosen.bloodied:
                             if not card_chosen.get_once_per_round_used():
@@ -935,6 +941,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.increase_health_of_unit_at_pos(-2, unit_pos, highest_cost, expiration="EOP")
                 name_unit = player_being_hit.get_name_given_pos(-2, unit_pos)
                 await self.send_update_message(name_unit + " gained +" + str(highest_cost) + " HP.")
+                self.action_cleanup()
+    elif self.action_chosen == "Holy Crusade":
+        if game_update_string[1] == primary_player.get_number():
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.misc_counter = self.misc_counter - 1
+            if self.misc_counter < 1:
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
                 self.action_cleanup()
     elif self.action_chosen == "Canoness Vardina":
         if game_update_string[1] == primary_player.get_number():

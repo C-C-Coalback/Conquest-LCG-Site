@@ -1331,6 +1331,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+    elif self.action_chosen == "Holy Crusade":
+        if game_update_string[1] == primary_player.get_number():
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.misc_counter = self.misc_counter - 1
+            if self.misc_counter < 1:
+                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                            self.position_of_actioned_card[1])
+                self.action_cleanup()
     elif self.action_chosen == "Canoness Vardina BLD":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Ecclesiarchy"):

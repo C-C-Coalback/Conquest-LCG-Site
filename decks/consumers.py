@@ -86,10 +86,13 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
     current_index = 4
     if len(factions) == 1:
         factions.append("")
+    holy_crusade_relevant = False
     if deck[3] != "Signature Squad":
         current_name = deck[3]
         card_result = FindCard.find_card(current_name, cards_array, cards_dict)
         current_index = 5
+        if card_result.get_name() == "Holy Crusade":
+            holy_crusade_relevant = True
         if card_result.get_faction() == factions[0]:
             print("Pledge ok")
         elif card_result.get_faction() == factions[1] and card_result.get_loyalty() == "Common":
@@ -129,6 +132,9 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
             except ValueError:
                 return "Number missing"
             card_result = FindCard.find_card(current_name, cards_array, cards_dict)
+            if holy_crusade_relevant:
+                if not card_result.check_for_a_trait("Ecclesiarchy"):
+                    return "Non-Ecclesiarchy unit found: " + current_name
             if card_result.check_for_a_trait("Pledge"):
                 return "Pledge card found outside of pledge area: " + current_name
             if card_result.get_name() != current_name:
