@@ -440,9 +440,15 @@ class Player:
                     single_card_string += "_apoka"
                 single_card_string = single_card_string + "|"
                 if current_card.ready:
-                    single_card_string += "R|"
+                    if current_card.check_for_a_trait("Pledge"):
+                        single_card_string += "PR|"
+                    else:
+                        single_card_string += "R|"
                 else:
-                    single_card_string += "E|"
+                    if current_card.check_for_a_trait("Pledge"):
+                        single_card_string += "PE|"
+                    else:
+                        single_card_string += "E|"
                 card_type = current_card.get_card_type()
                 if current_card.is_unit:
                     single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())

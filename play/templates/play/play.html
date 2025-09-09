@@ -647,7 +647,11 @@
                         if (is_ready === "E") {
                             card_class = "Exhausted-Card";
                             rotation = " style='transform:rotate(90deg);'";
-                            route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                        } else if (is_ready === "PR") {
+                            card_class = "Exhausted-Card";
+                            rotation = " style='transform:rotate(270deg);'";
+                        } else if (is_ready === "PE") {
+
                         }
                         for (var j = 6; j < card_data_split.length; j++) {
                             var attachment_string_id = (j-6).toString();
@@ -684,18 +688,22 @@
                             }
                             full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
-                        var style_string = "";
+                        var style_string = ``;
                         if (card_data_split.length > 6) {
-                            if (rotation === "") {
+                            if (is_ready === "R") {
                                 style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                             } else {
                                 style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
                             }
                         } else {
-                            if (rotation === "") {
+                            if (is_ready === "R") {
                                 style_string = ``;
-                            } else {
+                            } else if (is_ready === "E") {
                                 style_string = ` style="rotate: 90deg;"`;
+                            } else if (is_ready === "PR") {
+                                style_string = ` style="rotate: 270deg;"`;
+                            } else {
+                                style_string = ``;
                             }
                         }
                         full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
