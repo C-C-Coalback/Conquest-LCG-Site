@@ -690,9 +690,9 @@
                             }
                             var attachment_style_string = "";
                             if (attachment_rotation === "") {
-                                attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
+                                attachment_style_string = ` style="margin-left: ` + (j - 7).toString() + `vw"`;
                             } else {
-                                attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 6).toString() + `vw"`;
+                                attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 7).toString() + `vw"`;
                             }
                             full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
