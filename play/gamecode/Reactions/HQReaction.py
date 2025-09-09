@@ -166,8 +166,9 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.chosen_first_card = True
                 await self.send_update_message("Select card in discard to bring back.")
     elif current_reaction == "Hydra Flak Tank":
-        if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
-            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+        if player_owning_card.headquarters[unit_pos].valid_defense_battery_target:
+            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            primary_player.set_once_per_phase_used_given_pos(og_pla, og_pos, True)
             damage = 1
             if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
                 damage = 2
