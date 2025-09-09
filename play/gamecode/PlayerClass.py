@@ -2436,6 +2436,9 @@ class Player:
                             if card.get_ability() == "Bork'an Sept":
                                 self.game.create_reaction("Bork'an Sept", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Novokh Dynasty":
+                                self.game.create_reaction("Novokh Dynasty Burying", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "WAAAGH! Ungskar":
                                 self.game.create_reaction("WAAAGH! Ungskar", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -2464,6 +2467,10 @@ class Player:
                                     self.game.eldritch_council_value = card.get_cost()
                             if card.get_card_type() == "Army":
                                 self.bluddflagg_used = True
+                                if card.get_faction() != "Necrons":
+                                    if self.search_card_in_hq("Sautekh Dynasty", ready_relevant=True):
+                                        self.game.create_reaction("Sautekh Dynasty", self.name_player,
+                                                                  (int(self.number), position, location_of_unit))
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
                                         while damage_on_play > 0:
@@ -2540,6 +2547,10 @@ class Player:
                             if card.get_ability() == "Imperial Fists Devastators":
                                 if self.game.get_blue_icon(position):
                                     self.game.create_reaction("Imperial Fists Devastators", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
+                            if card.get_faction() != "Necrons":
+                                if self.search_card_in_hq("Sautekh Dynasty", ready_relevant=True):
+                                    self.game.create_reaction("Sautekh Dynasty", self.name_player,
                                                               (int(self.number), position, location_of_unit))
                             if card.get_ability() == "First Line Rhinos":
                                 self.game.create_reaction("First Line Rhinos", self.name_player,
@@ -5734,6 +5745,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Vamii Industrial Complex":
                 if phase == "COMBAT":
                     self.game.create_reaction("Vamii Industrial Complex", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Maynarkh Dynasty":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Maynarkh Dynasty", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Shard of the Deceiver":
                 self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Weight of the Aeons":

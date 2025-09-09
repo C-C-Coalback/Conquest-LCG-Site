@@ -1,6 +1,7 @@
 from .. import FindCard
 from ..Phases import CommandPhase
 from ..Phases import DeployPhase
+import copy
 
 
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -175,6 +176,20 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if not self.infested_planets[chosen_planet]:
             self.infest_planet(chosen_planet, primary_player)
             self.delete_reaction()
+    elif current_reaction == "Novokh Dynasty Burying":
+        if self.misc_target_choice:
+            if not primary_player.cards_in_reserve[chosen_planet]:
+                card = copy.deepcopy(self.preloaded_find_card(self.misc_target_choice))
+                card.deepstrike = 99
+                primary_player.cards_in_reserve[chosen_planet].append(card)
+                self.misc_counter = self.misc_counter - 1
+                if self.misc_counter > 0:
+                    self.choices_available = copy.deepcopy(self.misc_misc)
+                    self.choice_context = "ND: Faction"
+                    self.name_player_making_choices = primary_player.name_player
+                    self.resolving_search_box = True
+                else:
+                    self.delete_reaction()
     elif current_reaction == "The Broken Sigil":
         if chosen_planet != 0:
             await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +

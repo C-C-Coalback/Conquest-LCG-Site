@@ -2540,7 +2540,6 @@ class Game:
         self.choice_context = "Choose Enslaved Faction:"
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
-        self.quick_battle_ability_queued = False
         self.reset_choices_available()
         if self.battle_ability_to_resolve == "Osus IV":
             if loser.spend_resources(1):
@@ -3881,6 +3880,15 @@ class Game:
                             self.reset_choices_available()
                             self.resolving_search_box = False
                             self.player_resolving_interrupts[0] = primary_player.name_player
+                    elif self.choice_context == "SD: Change Enslavement?":
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        if chosen_choice == "Yes":
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.get_ability_given_pos(-2, i) == "Sautekh Dynasty":
+                                    primary_player.headquarters[i].cannot_ready_hq_phase = True
+                            await self.create_necrons_wheel_choice(primary_player)
+                        self.delete_reaction()
                     elif self.choice_context == "Pulsating Carapace choice":
                         if chosen_choice == "Infest planet":
                             self.infest_planet(self.misc_target_planet, primary_player)
@@ -4795,6 +4803,20 @@ class Game:
                         else:
                             self.chosen_first_card = False
                             self.action_chosen = target_choice
+                    elif self.choice_context == "ND: Faction":
+                        self.misc_misc.remove(chosen_choice)
+                        self.choices_available = []
+                        self.choice_context = "ND: Unit"
+                        for i in range(len(self.card_array)):
+                            if self.card_array[i].get_faction() == chosen_choice:
+                                if self.card_array[i].get_loyalty() == "Common":
+                                    if not self.card_array[i].get_has_deepstrike():
+                                        if self.card_array[i].get_card_type() == "Army":
+                                            self.choices_available.append(self.card_array[i].get_name())
+                    elif self.choice_context == "ND: Unit":
+                        self.misc_target_choice = chosen_choice
+                        self.resolving_search_box = False
+                        self.reset_choices_available()
                     elif self.choice_context == "Target Doom Scythe Invader:":
                         target_choice = self.choices_available[int(game_update_string[1])]
                         num, pla, pos = self.positions_of_unit_triggering_reaction[0]
@@ -10942,6 +10964,10 @@ class Game:
                     for i in range(len(winner.cards_in_reserve[planet_id])):
                         if winner.cards_in_reserve[planet_id][i].get_ability() == "Squiggoth Brute":
                             reactions.append("WAAAGH! Ungskar Deepstrike")
+            if winner.search_card_in_hq("Novokh Dynasty"):
+                for i in range(len(winner.cards_in_reserve[planet_id])):
+                    if winner.get_deepstrike_value_given_pos(planet_id, i, in_play_card=False) > 50:
+                        reactions.append("Novokh Dynasty Deepstrike")
             for i in range(len(winner.attachments_at_planet[planet_id])):
                 if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     reactions.append("Close Quarters Doctrine")

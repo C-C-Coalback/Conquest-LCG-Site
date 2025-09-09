@@ -403,6 +403,20 @@ def necrons_cards_init():
                                                         "put this card into play from your discard pile attached to "
                                                         "that unit, if eligible.", "Upgrade.",
                                    0, faction, "Common", 2, False, limit_one_per_unit=True, extra_attack=1,
-                                   type_of_units_allowed_for_attachment="Army", unit_must_match_faction=True)
+                                   type_of_units_allowed_for_attachment="Army", unit_must_match_faction=True),
+        CardClasses.SupportCard("Maynarkh Dynasty", "Reaction: After the deployment phase begins, remove 1 damage from "
+                                                    "your warlord.", "Pledge.", 1, faction, "Common", False),
+        CardClasses.SupportCard("Novokh Dynasty", "Place 5 non-Necrons non-Deep Strike common units, with a different "
+                                                  "faction, from the card collection in reserve at 5 different "
+                                                  "planets as buried units.\n"
+                                                  "Interrupt: When you win a battle, gain 1 resource to Deep Strike "
+                                                  "your buried unit at that planet, its Deep Strike value equals its "
+                                                  "printed cost.", "Pledge.", 2, faction, "Common", False),
+        CardClasses.SupportCard("Sautekh Dynasty", "Reaction: After you deploy a non-Necrons unit, exhaust this support"
+                                                   " to give it +X HP until the end of the round. X equals the number"
+                                                   " of factions in your discard pile. Then, you may set your "
+                                                   "enslavement dial to any faction, if you do so, this support does"
+                                                   " not ready during the next headquarters phase.",
+                                "Pledge.", 1, faction, "Common", False)
     ]
     return necrons_card_array

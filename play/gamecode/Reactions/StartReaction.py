@@ -986,6 +986,38 @@ async def start_resolving_reaction(self, name, game_update_string):
             if primary_player.headquarters[unit_pos].counter > 1:
                 primary_player.dalyth_sept_active = True
             self.delete_reaction()
+        elif current_reaction == "Sautekh Dynasty":
+            primary_player.exhaust_card_in_hq_given_name("Sautekh Dynasty")
+            non_necron_count = primary_player.count_non_necron_factions()
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, non_necron_count, expiration="EOR")
+            self.choices_available = ["Yes", "No"]
+            self.choice_context = "SD: Change Enslavement?"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        elif current_reaction == "Novokh Dynasty Deepstrike":
+            battle_planet = self.last_planet_checked_for_battle
+            novokh_id = -1
+            for i in range(len(primary_player.cards_in_reserve[battle_planet])):
+                if primary_player.get_deepstrike_value_given_pos(battle_planet, i):
+                    novokh_id = i
+            if novokh_id != -1:
+                cost = primary_player.cards_in_reserve[battle_planet][novokh_id].get_cost()
+                if primary_player.resources >= cost - 1:
+                    primary_player.add_resources(1)
+                    primary_player.spend_resources(cost)
+                    primary_player.deepstrike_unit(battle_planet, novokh_id, in_play_card=False)
+            self.delete_reaction()
+        elif current_reaction == "Novokh Dynasty Burying":
+            self.misc_misc = ["Space Marines", "Astra Militarum", "Orks", "Chaos", "Dark Eldar", "Eldar", "Tau"]
+            self.choices_available = copy.deepcopy(self.misc_misc)
+            self.choice_context = "ND: Faction"
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+            self.misc_counter = 5
+        elif current_reaction == "Maynarkh Dynasty":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.remove_damage_from_pos(warlord_pla, warlord_pos, 1, healing=True)
+            self.delete_reaction()
         elif current_reaction == "Hive Fleet Kraken":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()
