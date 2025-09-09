@@ -3,8 +3,8 @@ Repo for the Warhammer 40k Conquest website using Python Django.
 
 # Live from the Traxis Sector:
 
-All FFG cards supported. _except for 'idden Base and Storm of Silence in some cases._
-Working on Apoka fan cards now.
+All cards supported. (Though not all working exactly as written; getting there though!)
+
 # What is this?
 
 Warhammer 40k Conquest card game. See the Board Game Geek page: 
