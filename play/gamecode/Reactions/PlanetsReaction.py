@@ -171,6 +171,10 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             if primary_player.headquarters[unit_pos].counter > 2:
                 primary_player.sacrifice_card_in_hq(unit_pos)
             self.delete_reaction()
+    elif current_reaction == "Hive Fleet Leviathan":
+        if not self.infested_planets[chosen_planet]:
+            self.infest_planet(chosen_planet, primary_player)
+            self.delete_reaction()
     elif current_reaction == "The Broken Sigil":
         if chosen_planet != 0:
             await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +

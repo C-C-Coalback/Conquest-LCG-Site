@@ -516,6 +516,18 @@ def tyranids_cards_init():
                                                          "Action: Exhaust this attachment to remove 2 damage from "
                                                          "attached unit or infest this planet.", "Biomorph.",
                                    2, faction, "Common", 1, False, action_in_play=True, allowed_phases_in_play="ALL",
-                                   type_of_units_allowed_for_attachment="Warlord", required_traits="Behemoth")
+                                   type_of_units_allowed_for_attachment="Warlord", required_traits="Behemoth"),
+        CardClasses.SupportCard("Hive Fleet Behemoth", "Reaction: After you capture a planet, put a token on this "
+                                                       "support. Then if there are 2 tokens or more on this support, "
+                                                       "put a Termagant token into play at each planet.",
+                                "Pledge.", 1, faction, "Common", False),
+        CardClasses.SupportCard("Hive Fleet Kraken", "While there are 4 tokens or more on this support, each Hive-mind"
+                                                     " unit you control at a planet with a warlord or synapse unit you"
+                                                     " control gets +1 HP.\n"
+                                                     "Reaction: After you deploy a Hive-mind unit put a token on this "
+                                                     "support.", "Pledge.", 1, faction, "Common", False),
+        CardClasses.SupportCard("Hive Fleet Leviathan", "Reduce damage dealt by Area Effect to 1.\n"
+                                                        "Reaction: After you deploy this support, infest a target "
+                                                        "planet.", "Pledge.", 0, faction, "Common", False)
     ]
     return tyranids_card_array

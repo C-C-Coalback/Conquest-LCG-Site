@@ -986,6 +986,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             if primary_player.headquarters[unit_pos].counter > 1:
                 primary_player.dalyth_sept_active = True
             self.delete_reaction()
+        elif current_reaction == "Hive Fleet Kraken":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
+        elif current_reaction == "Hive Fleet Behemoth":
+            primary_player.headquarters[unit_pos].counter += 1
+            if primary_player.headquarters[unit_pos].counter > 1:
+                for i in range(7):
+                    if self.planets_in_play_array[i]:
+                        primary_player.summon_token_at_planet("Termagant", i)
+            self.delete_reaction()
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string
             if primary_player.check_if_all_units_have_trait(chosen_trait):

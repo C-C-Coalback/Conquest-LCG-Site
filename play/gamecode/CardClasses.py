@@ -515,7 +515,7 @@ class UnitCard(Card):
             return False
         if self.lost_keywords_eop:
             return False
-        return self.hive_mind
+        return self.has_hive_mind
 
     def get_reaction_available(self):
         return self.reaction_available

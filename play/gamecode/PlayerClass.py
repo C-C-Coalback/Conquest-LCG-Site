@@ -2445,6 +2445,9 @@ class Player:
                             if card.get_ability() == "The Flayed Mask":
                                 self.game.create_reaction("The Flayed Mask", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Hive Fleet Leviathan":
+                                self.game.create_reaction("Hive Fleet Leviathan", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Dark Allegiance":
                                 self.game.create_reaction("Dark Allegiance Trait", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -2469,6 +2472,11 @@ class Player:
                                             damage_on_play -= 1
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
+                                if card.get_has_hive_mind():
+                                    for i in range(len(self.headquarters)):
+                                        if self.headquarters[i].get_ability() == "Hive Fleet Kraken":
+                                            self.game.create_reaction("Hive Fleet Kraken", self.name_player,
+                                                                      (int(self.number), -2, i))
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
@@ -2663,6 +2671,11 @@ class Player:
                                             other_player.set_once_per_phase_used_given_pos(position, i, True)
                                     else:
                                         syren_ok = True
+                            if card.get_has_hive_mind():
+                                for i in range(len(self.headquarters)):
+                                    if self.headquarters[i].get_ability() == "Hive Fleet Kraken":
+                                        self.game.create_reaction("Hive Fleet Kraken", self.name_player,
+                                                                  (int(self.number), -2, i))
                             for i in range(len(other_player.attachments_at_planet[position])):
                                 if other_player.attachments_at_planet[position][i].get_ability() == "Vanguard Pack":
                                     self.game.create_reaction("Vanguard Pack", other_player.name_player,
@@ -3605,8 +3618,8 @@ class Player:
 
     def get_has_hive_mind_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
-            return self.headquarters[unit_id].has_hive_mind
-        return self.cards_in_play[planet_id + 1][unit_id].has_hive_mind
+            return self.headquarters[unit_id].get_has_hive_mind()
+        return self.cards_in_play[planet_id + 1][unit_id].get_has_hive_mind()
 
     def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
         if planet_id == -2:
@@ -5267,6 +5280,8 @@ class Player:
         for i in range(len(self.cards_in_play[planet_id + 1])):
             genestealer_hybrids_relevant = False
             if actual_area_effect:
+                if self.search_card_in_hq("Hive Fleet Leviathan"):
+                    amount = min(1, amount)
                 for j in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, j) == "Genestealer Hybrids" and i != j:
                         genestealer_hybrids_relevant = True
@@ -5395,6 +5410,14 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 health += 1
+        if card.get_has_hive_mind():
+            for i in range(len(self.headquarters)):
+                if self.headquarters[i].get_ability() == "Hive Fleet Kraken":
+                    if self.headquarters[i].counter > 3:
+                        if self.check_for_warlord(planet_id):
+                            health += 1
+                        elif self.search_synapse_at_planet(planet_id):
+                            health += 1
         if ability == "Ireful Vanguard":
             warlord_pla, warlord_pos = self.get_location_of_warlord()
             if self.get_bloodied_given_pos(warlord_pla, warlord_pos):
@@ -7175,6 +7198,9 @@ class Player:
         if other_player.search_hand_for_card("Erupting Aberrants"):
             self.game.create_reaction("Erupting Aberrants", other_player.name_player,
                                       (int(other_player.number), -1, -1))
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == "Hive Fleet Behemoth":
+                self.game.create_reaction("Hive Fleet Behemoth", self.name_player, (int(self.number), -2, i))
         for i in range(len(other_player.headquarters)):
             if other_player.get_ability_given_pos(-2, i) == "Dal'yth Sept":
                 self.game.create_reaction("Dal'yth Sept", other_player.name_player,
