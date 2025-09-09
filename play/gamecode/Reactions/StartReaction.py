@@ -970,8 +970,21 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = primary_player.name_player
                 self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "Bork'an Sept":
+            primary_player.number_cards_to_search = 6
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.choice_context = "Bork'an Sept Rally"
+            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
         elif current_reaction == "Followers of Asuryan":
             primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
+        elif current_reaction == "Dal'yth Sept":
+            primary_player.headquarters[unit_pos].counter += 1
+            if primary_player.headquarters[unit_pos].counter > 1:
+                primary_player.dalyth_sept_active = True
             self.delete_reaction()
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string

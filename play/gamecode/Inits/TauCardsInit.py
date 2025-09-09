@@ -269,7 +269,7 @@ def tau_cards_init():
         CardClasses.AttachmentCard("Missile Pod", "Attach to a Pilot or Vehicle unit you control."
                                                   "Deploy Action: Sacrifice this attachment to deal 3 damage to a "
                                                   "target enemy army unit in your opponent's HQ or destroy a target "
-                                                  "support card.", "Hardpoint.",2, faction, "Common", 1, False,
+                                                  "support card.", "Hardpoint.", 2, faction, "Common", 1, False,
                                    must_be_own_unit=True, required_traits="Pilot/Vehicle", action_in_play=True,
                                    allowed_phases_in_play="DEPLOY"),
         CardClasses.ArmyCard("Sniper Drone Team", "Ranged.\n"
@@ -361,7 +361,7 @@ def tau_cards_init():
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.SupportCard("Smuggler's Den", "Action: Exhaust this support and pay 1 resource to return a target"
                                                   " non-Drone attachment you control to your hand and gain resources "
-                                                  "equal to the printed cost of the attachment.",  "Location.",
+                                                  "equal to the printed cost of the attachment.", "Location.",
                                 1, faction, "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.WarlordCard("Farsight", "Your attachment cards are considered to have Deep Strike (0).\n"
                                             "Reaction: After you Deep Strike a card, gain 2 resources. "
@@ -478,6 +478,18 @@ def tau_cards_init():
                                                    " must choose to either deal 3 damage to the attacker or exhaust "
                                                    "a unit he controls at the same planet. "
                                                    "(Limit once per combat round.)", "Warrior. Kroot.",
-                             3, faction, "Common", 4, 2, 0, False)
+                             3, faction, "Common", 4, 2, 0, False),
+        CardClasses.SupportCard("Bork'an Sept", "Reaction: After you deploy this support, search your deck for a "
+                                                "non-signature non-hardpoint Tau attachment, reveal it, add it to your "
+                                                "hand and shuffle your deck.", "Pledge.", 0, faction, "Loyal", False),
+        CardClasses.SupportCard("Dal'yth Sept", "While there are two or more tokens on this support, you may use it "
+                                                "from play as a shield card with 4 shield icons.\n"
+                                                "Reaction: After your opponent captures a planet, put "
+                                                "a token on this support.", "Pledge.", 1, faction, "Loyal", False),
+        CardClasses.SupportCard("Vior'la Sept", "If there are 3 or more tokens on this support, sacrifice it.\n"
+                                                "Reaction: After the phase command ends, put a Defense Battery into "
+                                                "play from the card collection at a planet without Defense Battery you "
+                                                "control and put a token on this support.",
+                                "Pledge.", 1, faction, "Loyal", False)
     ]
     return tau_cards_array

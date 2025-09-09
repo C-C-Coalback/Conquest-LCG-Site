@@ -217,6 +217,7 @@ class Player:
         self.fortress_world_garid_used = False
         self.cegorach_jesters_active = False
         self.cegorach_jesters_permitted = []
+        self.dalyth_sept_active = False
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -1209,6 +1210,9 @@ class Player:
                     shields = 2
         if card_object.get_name() == "Humanity's Shield":
             shields = 2
+        if card_object.get_name() == "Dal'yth Sept":
+            if self.dalyth_sept_active:
+                shields = 4
         if shields > 0:
             if card_object.get_faction() == "Tau":
                 if planet_pos is not None:
@@ -2428,6 +2432,9 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Munitorum Support":
                                 self.game.create_reaction("Munitorum Support", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Bork'an Sept":
+                                self.game.create_reaction("Bork'an Sept", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "WAAAGH! Ungskar":
                                 self.game.create_reaction("WAAAGH! Ungskar", self.name_player,
@@ -5694,6 +5701,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Myriad Excesses":
                 if phase == "COMMAND":
                     self.game.create_reaction("Myriad Excesses", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Vior'la Sept":
+                if phase == "COMBAT":
+                    self.game.create_reaction("Vior'la Sept", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Dark Allegiance":
                 if phase == "DEPLOY":
                     if self.check_if_all_units_have_trait(self.headquarters[i].misc_string):
@@ -7165,6 +7175,10 @@ class Player:
         if other_player.search_hand_for_card("Erupting Aberrants"):
             self.game.create_reaction("Erupting Aberrants", other_player.name_player,
                                       (int(other_player.number), -1, -1))
+        for i in range(len(other_player.headquarters)):
+            if other_player.get_ability_given_pos(-2, i) == "Dal'yth Sept":
+                self.game.create_reaction("Dal'yth Sept", other_player.name_player,
+                                          (int(other_player.number), -2, i))
         for letter in planet_name:
             if letter == "_":
                 planet_name = planet_name.replace(letter, " ")

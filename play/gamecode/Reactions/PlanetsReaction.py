@@ -159,6 +159,18 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             await self.send_update_message("Planet chosen for The Flayed Mask.")
             primary_player.the_flayed_mask_planet = chosen_planet
             self.delete_reaction()
+    elif current_reaction == "Vior'la Sept":
+        defense_battery = False
+        for i in range(len(primary_player.attachments_at_planet[chosen_planet])):
+            if primary_player.attachments_at_planet[chosen_planet][i].get_ability() == "Defense Battery":
+                defense_battery = True
+        if not defense_battery:
+            card = self.preloaded_find_card("Defense Battery")
+            primary_player.add_attachment_to_planet(chosen_planet, card)
+            primary_player.headquarters[unit_pos].counter += 1
+            if primary_player.headquarters[unit_pos].counter > 2:
+                primary_player.sacrifice_card_in_hq(unit_pos)
+            self.delete_reaction()
     elif current_reaction == "The Broken Sigil":
         if chosen_planet != 0:
             await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +
