@@ -952,6 +952,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "The Flayed Mask Choice:"
             self.name_player_making_choices = secondary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Children of the Stars":
+            primary_player.headquarters[unit_pos].counter += 1
+            if primary_player.headquarters[unit_pos].counter > 2:
+                self.resolving_search_box = True
+                self.what_to_do_with_searched_card = "DRAW"
+                self.traits_of_searched_card = None
+                self.card_type_of_searched_card = "Attachment"
+                self.faction_of_searched_card = None
+                self.max_cost_of_searched_card = 99
+                self.all_conditions_searched_card_required = True
+                self.no_restrictions_on_chosen_card = False
+                primary_player.number_cards_to_search = 6
+                if primary_player.number_cards_to_search > len(primary_player.deck):
+                    primary_player.number_cards_to_search = len(primary_player.deck)
+                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                self.name_player_who_is_searching = primary_player.name_player
+                self.number_who_is_searching = primary_player.number
+            self.delete_reaction()
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string
             if primary_player.check_if_all_units_have_trait(chosen_trait):

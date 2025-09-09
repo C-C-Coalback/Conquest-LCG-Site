@@ -617,6 +617,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
             if played_card:
                 if limited:
                     primary_player.can_play_limited = False
+                if card.check_for_a_trait("Wargear"):
+                    if primary_player.search_card_in_hq("Children of the Stars"):
+                        self.create_reaction("Children of the Stars", primary_player.name_player,
+                                             (int(primary_player.number), -1, -1))
                 for i in range(len(primary_player.headquarters)):
                     if primary_player.get_ability_given_pos(-2, i) == "Talon Strike Force":
                         self.create_reaction("Talon Strike Force", primary_player.name_player,

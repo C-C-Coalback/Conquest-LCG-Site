@@ -487,6 +487,10 @@ def eldar_cards_init():
                                                 "Command Action: Exhaust your warlord to trigger the Battle ability of "
                                                 "a target planet. Then your opponent may exhaust his warlord to trigger"
                                                 " the Battle ability of another planet.", "Power. Harlequin.",
-                              1, faction, "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND")
+                              1, faction, "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="COMMAND"),
+        CardClasses.SupportCard("Children of the Stars", "Reaction: After you deploy a Wargear attachment, put a token"
+                                                         " on this support. Then if there are 3 tokens or more on this"
+                                                         " support, Rally 6 an attachment, add it to your hand.",
+                                "Pledge.", 0, faction, "Common", False)
     ]
     return eldar_cards_array
