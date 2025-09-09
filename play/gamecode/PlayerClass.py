@@ -7202,7 +7202,6 @@ class Player:
         planet_name = self.game.original_planet_array[planet_id]
         print("Attempting to capture planet.")
         print("Planet to capture:", planet_name)
-        i = 0
         other_player = self.get_other_player()
         print(planet_id)
         print(self.broken_sigil_planet)
@@ -7243,6 +7242,7 @@ class Player:
         if self.flayed_mask_active:
             self.flayed_mask_active = False
             return 0
+        i = 0
         while planet_cards[i].get_name() != "FINAL CARD":
             print(planet_cards[i].get_name(), planet_name)
             if planet_cards[i].get_name() == planet_name:
