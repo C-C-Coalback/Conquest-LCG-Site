@@ -20,7 +20,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Ambush":
         if self.card_pos_to_deploy != -1 and self.planet_pos_to_deploy == -1 and \
                 (not self.omega_ambush_active or self.infested_planets[chosen_planet]) and \
-                (not self.sanguinary_ambush_active or primary_player.check_for_warlord(chosen_planet)):
+                (not self.sanguinary_ambush_active or primary_player.check_for_warlord(chosen_planet)) and \
+                (not primary_player.followers_of_asuryan_relevant or self.round_number != chosen_planet):
             self.planet_pos_to_deploy = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
             self.traits_of_card_to_play = card.get_traits()

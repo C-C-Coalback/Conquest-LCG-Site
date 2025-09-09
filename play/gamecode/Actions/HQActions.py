@@ -88,6 +88,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.misc_counter = 2
                                 await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                    elif ability == "Followers of Asuryan":
+                        if not card.get_once_per_phase_used():
+                            if card.counter > 3:
+                                card_chosen.set_once_per_phase_used(True)
+                                primary_player.followers_of_asuryan_relevant = True
+                                await self.send_update_message("Followers of Asuryan activated!")
                     elif ability == "Munitorum Support":
                         if not card.get_once_per_round_used():
                             if card.attachments:

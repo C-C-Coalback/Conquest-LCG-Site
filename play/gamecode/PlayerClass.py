@@ -140,6 +140,7 @@ class Player:
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
         self.grigory_maksim_relevant = False
+        self.followers_of_asuryan_relevant = False
         self.illuminor_szeras_relevant = False
         self.unstoppable_tide_value = 0
         self.bluddflagg_relevant = False
@@ -645,6 +646,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Deathstorm Drop Pod":
                 self.game.create_reaction("Deathstorm Drop Pod", self.name_player,
                                           (int(self.number), planet_id, -1))
+            if self.get_ability_given_pos(-2, i) == "Followers of Asuryan":
+                self.game.create_reaction("Followers of Asuryan", self.name_player,
+                                          (int(self.number), -2, i))
 
     def deepstrike_attachment_extras(self, planet_id):
         self.after_any_deepstrike(planet_id)
@@ -3617,6 +3621,10 @@ class Player:
         if card.get_faction() == "Eldar":
             if card.get_is_unit():
                 if self.concealing_darkness_active:
+                    return True
+        if self.followers_of_asuryan_relevant:
+            if card.get_is_unit():
+                if card.get_cost() < 4:
                     return True
         return card.get_ambush()
 

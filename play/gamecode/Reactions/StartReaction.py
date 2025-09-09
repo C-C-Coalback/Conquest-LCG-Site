@@ -970,6 +970,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_who_is_searching = primary_player.name_player
                 self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "Followers of Asuryan":
+            primary_player.headquarters[unit_pos].counter += 1
+            self.delete_reaction()
         elif current_reaction == "Mobilize the Chapter":
             chosen_trait = primary_player.headquarters[unit_pos].misc_string
             if primary_player.check_if_all_units_have_trait(chosen_trait):

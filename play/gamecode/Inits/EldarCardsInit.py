@@ -491,6 +491,13 @@ def eldar_cards_init():
         CardClasses.SupportCard("Children of the Stars", "Reaction: After you deploy a Wargear attachment, put a token"
                                                          " on this support. Then if there are 3 tokens or more on this"
                                                          " support, Rally 6 an attachment, add it to your hand.",
-                                "Pledge.", 0, faction, "Common", False)
+                                "Pledge.", 0, faction, "Common", False),
+        CardClasses.SupportCard("Followers of Asuryan", "While there are 4 tokens on this support, you may deploy "
+                                                        "a unit with printed cost 3 or lower from your hand at a "
+                                                        "non-first planet as though it had ambush. "
+                                                        "(Limit once per phase.)\n"
+                                                        "Reaction: After you Deep Strike or Ambush, put a token on "
+                                                        "this support.", "Pledge.", 1, faction, "Loyal", False,
+                                action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return eldar_cards_array
