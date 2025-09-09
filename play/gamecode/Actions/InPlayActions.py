@@ -1446,13 +1446,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.get_number():
             if self.misc_target_planet == -1:
                 if card_chosen.get_faction() == "Astra Militarum":
-                    card_chosen.set_ranged(True)
+                    card_chosen.ranged_eop = True
                     self.misc_target_planet = planet_pos
                     self.misc_counter -= 1
                     await self.send_update_message(str(self.misc_counter) + " uses left")
             elif self.misc_target_planet == planet_pos:
                 if card_chosen.get_faction() == "Astra Militarum":
-                    card_chosen.set_ranged(True)
+                    card_chosen.ranged_eop = True
                     self.misc_counter -= 1
                     await self.send_update_message(str(self.misc_counter) + " uses left")
                     if self.misc_counter == 0:

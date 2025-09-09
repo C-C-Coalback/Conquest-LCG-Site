@@ -481,6 +481,7 @@ class Player:
                     single_card_string += "D|"
                 else:
                     single_card_string += "H|"
+                single_card_string += current_card.get_extra_info_string() + "|"
                 if current_card.aiming_reticle_color is not None:
                     single_card_string += current_card.aiming_reticle_color
                 attachments_list = current_card.get_attachments()
@@ -522,6 +523,7 @@ class Player:
                 else:
                     single_card_string += "0"
                 single_card_string += "|D|"
+                single_card_string += current_card.get_extra_info_string() + "|"
                 if current_card.aiming_reticle_color is not None:
                     single_card_string += current_card.aiming_reticle_color
                 attachments_list = current_card.get_attachments()
@@ -771,6 +773,7 @@ class Player:
                         else:
                             single_card_string += "H"
                         single_card_string += "|"
+                        single_card_string += current_card.get_extra_info_string() + "|"
                         if current_card.aiming_reticle_color is not None:
                             single_card_string += current_card.aiming_reticle_color
                         attachments_list = current_card.get_attachments()

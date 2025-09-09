@@ -97,6 +97,42 @@ class Card:
         self.infection_lekor = 0
         self.blanked_eor_2 = False
 
+    def get_extra_info_string(self):
+        string = ""
+        if self.blanked_eop:
+            string += "Blanked (EOP)\n"
+        if self.blanked_eor:
+            string += "Blanked (EOR)\n"
+        if self.blanked_eor_2:
+            string += "BLANKED (EOR 2)\n"
+        if self.extra_traits_eop:
+            string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
+        if self.extra_traits_eor:
+            string += "Extra Traits (EOR): " + self.extra_traits_eor + "\n"
+        if self.once_per_game_used:
+            string += "Once per game ability used\n"
+        if self.once_per_round_used:
+            string += "Once per round ability used\n"
+        if self.once_per_phase_used:
+            string += "Once per phase ability used\n"
+        if self.once_per_combat_round_used:
+            string += "Once per combat round ability used\n"
+        if self.cannot_ready_hq_phase:
+            string += "Cannot ready this HQ phase\n"
+        if self.cannot_ready_phase:
+            string += "Cannot ready this phase\n"
+        if self.lost_keywords_eop:
+            string += "Lost keywords this phase\n"
+        if self.yvraine_active:
+            string += "Yvraine target\n"
+        if self.sacrifice_end_of_phase:
+            string += "Sacrifice EOP\n"
+        if self.return_to_hand_eor:
+            string += "Return to hand EOR\n"
+        if not string:
+            return "None"
+        return string
+
     def get_once_per_game_used(self):
         return self.once_per_game_used
 
@@ -417,6 +453,124 @@ class UnitCard(Card):
         self.retaliate_eog = False
         self.move_to_planet_end_of_phase_planet = -1
         self.move_to_planet_end_of_phase_phase = ""
+
+    def get_extra_info_string(self):
+        string = ""
+        if self.blanked_eop:
+            string += "Blanked (EOP)\n"
+        if self.blanked_eor:
+            string += "Blanked (EOR)\n"
+        if self.blanked_eor_2:
+            string += "BLANKED (EOR 2)\n"
+        if self.extra_traits_eop:
+            string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
+        if self.extra_traits_eor:
+            string += "Extra Traits (EOR): " + self.extra_traits_eor + "\n"
+        if self.once_per_game_used:
+            string += "Once per game ability used\n"
+        if self.once_per_round_used:
+            string += "Once per round ability used\n"
+        if self.once_per_phase_used:
+            string += "Once per phase ability used\n"
+        if self.once_per_combat_round_used:
+            string += "Once per combat round ability used\n"
+        if self.cannot_ready_hq_phase:
+            string += "Cannot ready this HQ phase\n"
+        if self.cannot_ready_phase:
+            string += "Cannot ready this phase\n"
+        if self.lost_keywords_eop:
+            string += "Lost keywords this phase\n"
+        if self.yvraine_active:
+            string += "Yvraine target\n"
+        if self.sacrifice_end_of_phase:
+            string += "Sacrifice EOP\n"
+        if self.return_to_hand_eor:
+            string += "Return to hand EOR\n"
+        if self.brutal_eocr:
+            string += "Brutal (EOCR)\n"
+        if self.brutal_eop:
+            string += "Brutal (EOP)\n"
+        if self.brutal_eor:
+            string += "Brutal (EOR)\n"
+        if self.brutal_eog:
+            string += "Brutal (EOG)\n"
+        if self.armorbane_eop:
+            string += "Armorbane (EOP)\n"
+        if self.armorbane_eor:
+            string += "Armorbane (EOR)\n"
+        if self.armorbane_eog:
+            string += "Armorbane (EOG)\n"
+        if self.flying_eocr:
+            string += "Flying (EOCR)\n"
+        if self.flying_eop:
+            string += "Flying (EOP)\n"
+        if self.flying_eor:
+            string += "Flying (EOR)\n"
+        if self.flying_eog:
+            string += "Flying (EOG)\n"
+        if self.mobile_eop:
+            string += "Mobile (EOP)\n"
+        if self.mobile_eor:
+            string += "Mobile (EOR)\n"
+        if self.mobile_eog:
+            string += "Mobile (EOG)\n"
+        if self.area_effect_eocr > 0:
+            string += "Area Effect (" + str(self.area_effect_eocr) + ") (EOCR)\n"
+        if self.area_effect_eop:
+            string += "Area Effect (" + str(self.area_effect_eop) + ") (EOP)\n"
+        if self.area_effect_eor:
+            string += "Area Effect (" + str(self.area_effect_eor) + ") (EOR)\n"
+        if self.ranged_eop:
+            string += "Ranged (EOP)\n"
+        if self.ranged_eor:
+            string += "Ranged (EOR)\n"
+        if self.sweep_next:
+            string += "Sweep (" + str(self.sweep_next) + ") (NEXT)\n"
+        if self.sweep_eop:
+            string += "Sweep (" + str(self.sweep_eop) + ") (EOP)\n"
+        if self.sweep_eor:
+            string += "Sweep (" + str(self.sweep_eor) + ") (EOR)\n"
+        if self.sweep_eog:
+            string += "Sweep (" + str(self.sweep_eog) + ") (EOG)\n"
+        if self.retaliate_eop:
+            string += "Retaliate (" + str(self.retaliate_eop) + ") (EOP)\n"
+        if self.retaliate_eor:
+            string += "Retaliate (" + str(self.retaliate_eor) + ") (EOR)\n"
+        if self.retaliate_eog:
+            string += "Retaliate (" + str(self.retaliate_eog) + ") (EOG)\n"
+        if self.new_ability:
+            string += "New Textbox: " + self.new_ability + "\n"
+        if self.extra_command_eop != 0:
+            string += "Extra Command (EOP): " + str(self.extra_command_eop) + "\n"
+        if self.command_until_combat:
+            string += "Command Until Combat: " + str(self.command_until_combat) + "\n"
+        if self.attack_set_eop != -1:
+            string += "Attack Set (EOP): " + str(self.attack_set_eop) + "\n"
+        if self.extra_attack_until_next_attack != 0:
+            string += "Extra Attack (NEXT): " + str(self.extra_attack_until_next_attack) + "\n"
+        if self.extra_attack_until_end_of_battle != 0:
+            string += "Extra Attack (EOB): " + str(self.extra_attack_until_end_of_battle) + "\n"
+        if self.extra_attack_until_end_of_phase != 0:
+            string += "Extra Attack (EOP): " + str(self.extra_attack_until_end_of_phase) + "\n"
+        if self.extra_attack_until_end_of_round != 0:
+            string += "Extra Attack (EOR): " + str(self.extra_attack_until_end_of_round) + "\n"
+        if self.health_set_eop != -1:
+            string += "Health Set (EOP): " + str(self.health_set_eop) + "\n"
+        if self.health_eocr != 0:
+            string += "Extra Health (EOCR): " + str(self.health_eocr) + "\n"
+        if self.positive_hp_until_eob != 0:
+            string += "Extra Health (EOB): " + str(self.positive_hp_until_eob) + "\n"
+        if self.positive_hp_until_eop != 0:
+            string += "Extra Health (EOP): " + str(self.positive_hp_until_eop) + "\n"
+        if self.positive_hp_until_eor != 0:
+            string += "Extra Health (EOR): " + str(self.positive_hp_until_eor) + "\n"
+        if self.positive_hp_until_eog != 0:
+            string += "Extra Health (EOG): " + str(self.positive_hp_until_eog) + "\n"
+        if self.negative_hp_until_eop != 0:
+            string += "Negative Health (EOP): " + str(self.negative_hp_until_eop) + "\n"
+        if not string:
+            return "None"
+        return string
 
     def increase_retaliate_eop(self, value):
         self.retaliate_eop += value

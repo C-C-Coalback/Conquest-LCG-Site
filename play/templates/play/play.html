@@ -5,7 +5,10 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
-<div class="box">
+<div class="box" onmousemove="getCursor(event)">
+    <div id="helper-text-box">
+
+    </div>
     <div id="chat-log">Use "/loaddeck/{deck_name}" to load a deck<br></div><br>
     <input id="chat-message-input" type="text"><br>
     <input id="chat-message-submit" type="button" value="Send">
@@ -174,6 +177,9 @@
         cardHeight = 100;
         cardWidth = 63;
         var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
+
+        var mouse_x = 0;
+        var mouse_y = 0;
 
         function playSound(url) {
             console.log(url);
@@ -523,9 +529,10 @@
                             var damage = card_data_split[2];
                             var faith = card_data_split[3];
                             var hale = card_data_split[4];
+                            var additional_helper_text = card_data_split[5];
                             var deepstrike = "False";
                             var original_text = "";
-                            var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                            var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                             if (hale === "D") {
                                 if (target_user === "{{ user.username }}") {
                                     original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -548,8 +555,8 @@
                                 card_class = "Exhausted-Card";
                                 route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             }
-                            for (var j = 6; j < card_data_split.length; j++) {
-                                var attachment_string_id = (j-6).toString();
+                            for (var j = 7; j < card_data_split.length; j++) {
+                                var attachment_string_id = (j-7).toString();
                                 var attachment_data_split = card_data_split[j].split("+");
                                 var attachment_name = attachment_data_split[0].split(' ').join('_');
                                 var attachment_ready = attachment_data_split[1];
@@ -577,18 +584,18 @@
                                 }
                                 var attachment_style_string = "";
                                 if (attachment_rotation === "") {
-                                    attachment_style_string = ` style="margin-left: ` + (j - 6).toString() + `vw"`;
+                                    attachment_style_string = ` style="margin-left: ` + (j - 7).toString() + `vw"`;
                                 } else {
-                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 6).toString() + `vw"`;
+                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 7).toString() + `vw"`;
                                 }
                                 full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             }
                             var style_string = "";
-                            if (card_data_split.length > 6) {
+                            if (card_data_split.length > 7) {
                                 if (rotation === "") {
-                                    style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                                    style_string = ` style="margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
                                 } else {
-                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 6).toString() + `vw;"`;
+                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 7).toString() + `vw;"`;
                                 }
                             } else {
                                 if (rotation === "") {
@@ -598,8 +605,8 @@
                                 }
                             }
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                            if (card_data_split[5] !== "") {
-                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[5] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            if (card_data_split[6] !== "") {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                             }
                             if (damage === "0") {
 
@@ -626,9 +633,10 @@
                         var damage = card_data_split[2];
                         var faith = card_data_split[3];
                         var hale = card_data_split[4];
+                        var additional_helper_text = card_data_split[5];
                         var string_id = (i-4).toString();
                         var card_class = "Card";
-                        var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                        var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                         if (hale === "D") {
                             if (target_user === "{{ user.username }}") {
                                 original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -653,8 +661,8 @@
                         } else if (is_ready === "PE") {
 
                         }
-                        for (var j = 6; j < card_data_split.length; j++) {
-                            var attachment_string_id = (j-6).toString();
+                        for (var j = 7; j < card_data_split.length; j++) {
+                            var attachment_string_id = (j-7).toString();
                             var attachment_data_split = card_data_split[j].split("+");
                             var attachment_name = attachment_data_split[0].split(' ').join('_');
                             var attachment_ready = attachment_data_split[1];
@@ -689,11 +697,11 @@
                             full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         }
                         var style_string = ``;
-                        if (card_data_split.length > 6) {
+                        if (card_data_split.length > 7) {
                             if (is_ready === "R") {
-                                style_string = ` style="margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                                style_string = ` style="margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
                             } else {
-                                style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 6).toString() + `vw"`;
+                                style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
                             }
                         } else {
                             if (is_ready === "R") {
@@ -707,8 +715,8 @@
                             }
                         }
                         full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                        if (card_data_split[5] !== "") {
-                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[5] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                        if (card_data_split[6] !== "") {
+                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                         }
                         if (damage === "0") {
 
@@ -888,8 +896,22 @@
             document.getElementById("LargeHelperCard").src=og_image_src;
         }
 
-        function changeDefOut() {
+        function changeDefAndHelp(image_src, help_text) {
+            var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            document.getElementById("LargeHelperCard").src=og_image_src;
+            help_text = help_text.replace("\n", "<br>")
+            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
+            console.log(help_text);
+            var helper = document.getElementById("helper-text-box")
+            helper.style.left = mouse_x + 'px';
+            helper.style.top = mouse_y + 'px';
+            helper.style.display = "Block";
+            helper.innerHTML = help_text;
+        }
 
+        function changeDefOut() {
+            var helper = document.getElementById("helper-text-box")
+            helper.style.display = "None";
         }
 
         function showDiscard(discard_id) {
@@ -901,6 +923,11 @@
             } else {
                 x.style.display = "none";
             }
+        }
+
+        function getCursor(event) {
+            mouse_x = event.clientX;
+            mouse_y = event.clientY;
         }
 
         function showRemoved(removed_id) {

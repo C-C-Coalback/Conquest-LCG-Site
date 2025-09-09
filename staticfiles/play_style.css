@@ -10,6 +10,16 @@ h4 {
     overflow: hidden;
 }
 
+#helper-text-box {
+    position: absolute;
+    display: none;
+    z-index: 1000;
+    border-width: 2px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+}
+
 #in-play-box {
     position: absolute;
     top: 25%;
