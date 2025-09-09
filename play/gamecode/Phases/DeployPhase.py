@@ -620,6 +620,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                         primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
                 enemy_card = True
             if played_card:
+                primary_player.followers_of_asuryan_relevant = False
                 if limited:
                     primary_player.can_play_limited = False
                 if card.check_for_a_trait("Wargear"):

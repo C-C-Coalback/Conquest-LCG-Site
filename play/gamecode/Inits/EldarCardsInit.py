@@ -497,7 +497,13 @@ def eldar_cards_init():
                                                         "non-first planet as though it had ambush. "
                                                         "(Limit once per phase.)\n"
                                                         "Reaction: After you Deep Strike or Ambush, put a token on "
-                                                        "this support.", "Pledge.", 1, faction, "Loyal", False,
-                                action_in_play=True, allowed_phases_in_play="COMBAT")
+                                                        "this support.", "Pledge.", 1, faction, "Common", False,
+                                action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Ghosts of Cegorach", "While each unit you control has the Harlequin trait, "
+                                                      "your warlord gets +3 HP.\n"
+                                                      "Reaction: After a Harlequin unit is assigned damage at the same"
+                                                      " planet as your warlord, exhaust this support to reassign 1 of "
+                                                      "that damage to your warlord.",
+                                "Pledge.", 1, faction, "Loyal", False)
     ]
     return eldar_cards_array

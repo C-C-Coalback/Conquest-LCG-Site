@@ -4907,7 +4907,7 @@ class Player:
                              by_enemy_unit=True):
         other_player = self.get_other_player()
         if planet_id == -2:
-            return self.assign_damage_to_pos_hq(unit_id, damage, can_shield)
+            return self.assign_damage_to_pos_hq(unit_id, damage, can_shield=can_shield)
         if shadow_field_possible:
             if self.search_attachments_at_pos(planet_id, unit_id, "Shadow Field"):
                 return False, 0
@@ -5319,6 +5319,9 @@ class Player:
                 for i in range(len(self.victory_display)):
                     if self.victory_display[i].get_name() == "Daemon World Ivandis":
                         health += 2
+                if self.search_card_in_hq("Ghosts of Cegorach"):
+                    if self.check_if_all_units_have_trait("Harlequin"):
+                        health += 3
             if self.headquarters[unit_id].health_set_eop != -1:
                 return self.headquarters[unit_id].health_set_eop
             if self.get_faction_given_pos(-2, unit_id) == "Orks":
@@ -5375,6 +5378,9 @@ class Player:
             for i in range(len(self.victory_display)):
                 if self.victory_display[i].get_name() == "Daemon World Ivandis":
                     health += 2
+            if self.search_card_in_hq("Ghosts of Cegorach"):
+                if self.check_if_all_units_have_trait("Harlequin"):
+                    health += 3
         if self.cards_in_play[planet_id + 1][unit_id].health_set_eop != -1:
             return self.cards_in_play[planet_id + 1][unit_id].health_set_eop
         card = self.cards_in_play[planet_id + 1][unit_id]

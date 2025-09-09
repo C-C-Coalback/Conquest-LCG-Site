@@ -8310,6 +8310,22 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Ghosts of Cegorach":
+                            if primary_player.get_ready_given_pos(-2, hq_pos):
+                                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
+                                    if planet_pos != -2:
+                                        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                                            if primary_player.check_for_warlord(planet_pos):
+                                                primary_player.exhaust_given_pos(-2, hq_pos)
+                                                primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                                warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                                                primary_player.assign_damage_to_pos(
+                                                    warlord_pla, warlord_pos, 1, is_reassign=True, by_enemy_unit=False)
+                                                self.amount_that_can_be_removed_by_shield[0] += -1
+                                                if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                                    await self.shield_cleanup(primary_player, secondary_player,
+                                                                              planet_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Unstoppable Tide":
                             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":
                                 if primary_player.get_ready_given_pos(-2, hq_pos):
