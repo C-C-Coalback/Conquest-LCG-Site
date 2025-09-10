@@ -4306,6 +4306,7 @@ class Game:
                             card_name = self.choices_available[int(game_update_string[1])]
                             primary_player.discard_card_name_from_hand(card_name)
                         self.reset_choices_available()
+                        self.resolving_search_box = False
                         self.action_cleanup()
                         await secondary_player.dark_eldar_event_played()
                         secondary_player.torture_event_played("Rakarth's Experimentations")
@@ -4860,8 +4861,6 @@ class Game:
                         self.action_cleanup()
                     elif self.choice_context == "Visions of Agony Discard:":
                         secondary_player.discard_card_from_hand(int(game_update_string[1]))
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()

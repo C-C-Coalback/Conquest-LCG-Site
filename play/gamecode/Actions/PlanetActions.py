@@ -791,8 +791,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                       self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
             primary_player.add_card_to_planet(card, chosen_planet, is_owner_of_card=False)
             del secondary_player.discard[self.anrakyr_unit_position]
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
+            await primary_player.dark_eldar_event_played()
+            primary_player.torture_event_played("Soul Seizure")
             self.action_cleanup()
     elif self.action_chosen == "Rain of Mycetic Spores":
         if abs(self.misc_target_planet - chosen_planet) == 1:

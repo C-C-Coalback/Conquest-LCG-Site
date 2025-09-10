@@ -6,7 +6,6 @@ def find_card(card_to_find, card_array, card_dict=None):
     i = 0
     while card_array[i].get_shields() != -1:
         if card_to_find == card_array[i].get_name():
-            # print("Card found! :", orks_card_array[i].get_name())
             return card_array[i]
         else:
             i = i + 1

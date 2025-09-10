@@ -32,11 +32,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
             card = primary_player.headquarters[self.position_of_actioned_card[1]]
             card_chosen = card
             ability = card.get_ability()
-            print("Ability:", ability)
             if card.get_has_action_while_in_play():
                 if card.get_allowed_phases_while_in_play() == self.phase or \
                         card.get_allowed_phases_while_in_play() == "ALL":
-                    print("trying to resolve combat special")
                     if card.get_ability() == "Catachan Outpost":
                         if card.get_ready():
                             self.action_chosen = "Catachan Outpost"
@@ -1098,6 +1096,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.choice_context = "Big Mek Kagdrak Keyword"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+    elif self.action_chosen == "Power from Pain":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if primary_player.sacrifice_card_in_hq(unit_pos):
+                    self.action_cleanup()
+                    await secondary_player.dark_eldar_event_played()
+                    secondary_player.torture_event_played("Power from Pain")
     elif self.action_chosen == "A Thousand Cuts":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1126,12 +1131,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                 if can_continue:
                     player_being_hit.assign_damage_to_pos(-2, unit_pos, 1, by_enemy_unit=False)
-                    primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
-                    primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.shuffle_deck()
                     primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
-                    primary_player.torture_event_played()
+                    primary_player.torture_event_played("A Thousand Cuts")
                     self.action_cleanup()
     elif self.action_chosen == "Keep Firing!":
         if game_update_string[1] == primary_player.number:

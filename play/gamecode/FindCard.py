@@ -19,7 +19,6 @@ def find_card(card_to_find, card_array, card_dict=None, card_errata=None, card_e
 def find_planet_card(card_to_find, planet_array):
     i = 0
     for i in range(len(planet_array)):
-        print(planet_array[i].get_name())
         if card_to_find.lower() == planet_array[i].get_name().lower():
             return planet_array[i]
     return planet_array[len(planet_array) - 1]

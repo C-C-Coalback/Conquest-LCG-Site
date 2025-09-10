@@ -360,12 +360,9 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "A Thousand Cuts":
         primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
-        secondary_player.deck.append(secondary_player.cards[secondary_player.aiming_reticle_coords_hand])
-        secondary_player.remove_card_from_hand(secondary_player.aiming_reticle_coords_hand)
         secondary_player.shuffle_deck()
-        secondary_player.aiming_reticle_coords_hand = None
         await secondary_player.dark_eldar_event_played()
-        secondary_player.torture_event_played()
+        secondary_player.torture_event_played("A Thousand Cuts")
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Missile Pod":

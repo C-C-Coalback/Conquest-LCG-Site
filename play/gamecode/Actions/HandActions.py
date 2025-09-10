@@ -375,8 +375,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_cleanup()
                     elif ability == "A Thousand Cuts":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.deck.append(primary_player.cards[hand_pos])
+                        primary_player.remove_card_from_hand(hand_pos)
                     elif ability == "Overrun":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -442,24 +442,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                             secondary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
                             self.action_cleanup()
                     elif ability == "Battle Cry":
-                        print("Resolve Battle Cry")
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
                                                                             expiration="EOB")
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.mode = "Normal"
-                        self.player_with_action = ""
+                        self.action_cleanup()
                     elif ability == "Power from Pain":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.reactions_needing_resolving.append(ability)
-                        self.player_who_resolves_reaction.append(secondary_player.name_player)
-                        self.positions_of_unit_triggering_reaction.append((int(secondary_player.get_number()),
-                                                                           -1, -1))
-                        self.mode = "Normal"
-                        self.player_with_action = ""
+                        self.action_chosen = ability
+                        self.player_with_action = secondary_player.name_player
                     elif ability == "Soul Seizure":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.chosen_first_card = False
                         primary_player.soul_seizure_value = primary_player.count_tortures_in_discard()
                     elif ability == "Suppressive Fire":
@@ -517,8 +510,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Searing Brand":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Cacophonic Choir":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
@@ -647,14 +639,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 )
                                 self.action_cleanup()
                     elif ability == "Dark Possession":
-                        self.action_chosen = ""
-                        self.name_player_with_action = ""
-                        self.mode = "Normal"
                         primary_player.dark_possession_active = True
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        if self.phase == "DEPLOY":
-                            self.player_with_deploy_turn = secondary_player.name_player
-                            self.number_with_deploy_turn = secondary_player.number
+                        self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
                     elif ability == "Hate":
@@ -1014,9 +1001,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.resolving_search_box = True
                                 self.stored_discard_and_target.append((ability, primary_player.number))
                             else:
+                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                primary_player.aiming_reticle_coords_hand = None
                                 self.choices_available = secondary_player.cards
                                 self.choice_context = "Visions of Agony Discard:"
                                 self.name_player_making_choices = primary_player.name_player
+                                self.resolving_search_box = True
                         else:
                             primary_player.add_resources(cost, refund=True)
                             await self.send_update_message("No cards to look at with Visions of Agony")

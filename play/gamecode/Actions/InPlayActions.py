@@ -1018,8 +1018,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False,
                                                                   by_enemy_unit=False)
-                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                            primary_player.aiming_reticle_coords_hand = None
                             await primary_player.dark_eldar_event_played()
                             primary_player.torture_event_played("Searing Brand")
                             self.action_cleanup()
@@ -1066,13 +1064,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_context = "Event Action"
                 if can_continue:
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
-                    primary_player.deck.append(primary_player.cards[primary_player.aiming_reticle_coords_hand])
-                    primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.shuffle_deck()
-                    primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
-                    primary_player.torture_event_played()
+                    primary_player.torture_event_played("A Thousand Cuts")
                     self.action_cleanup()
+    elif self.action_chosen == "Power from Pain":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.action_cleanup()
+                    await secondary_player.dark_eldar_event_played()
+                    secondary_player.torture_event_played("Power from Pain")
     elif self.action_chosen == "Overrun":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

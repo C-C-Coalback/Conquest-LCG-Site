@@ -451,19 +451,34 @@ async def start_resolving_reaction(self, name, game_update_string):
             card_target = primary_player.ichor_gauntlet_target
             card = FindCard.find_card(card_target, self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
-            primary_player.add_resources(card.get_cost(urien_relevant=primary_player.urien_relevant), refund=True)
-            if card_target in primary_player.discard and card_target != "A Thousand Cuts":
-                primary_player.discard.remove(card_target)
-            primary_player.cards.append(card_target)
-            last_element = len(primary_player.cards) - 1
-            self.player_with_action = primary_player.name_player
-            if self.phase == "DEPLOY":
-                self.player_with_deploy_turn = primary_player.name_player
-                self.number_with_deploy_turn = primary_player.number
-            self.mode = "ACTION"
-            string_to_use = ["HAND", primary_player.number, str(last_element)]
+            if card.get_name() == "Rakarth's Experimentations":
+                self.action_chosen = "Rakarth's Experimentations"
+                self.player_with_action = primary_player.name_player
+                self.choices_available = ["Army", "Support", "Attachment", "Event"]
+                self.choice_context = "Rakarth's Experimentations card type"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+                self.mode = "ACTION"
+            elif card.get_name() == "Visions of Agony":
+                self.action_chosen = "Visions of Agony"
+                self.player_with_action = primary_player.name_player
+                self.choices_available = secondary_player.cards
+                self.choice_context = "Visions of Agony Discard:"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+                self.mode = "ACTION"
+            elif card.get_name() == "Power from Pain":
+                self.action_chosen = "Power from Pain"
+                self.player_with_action = secondary_player.name_player
+                self.mode = "ACTION"
+            elif card.has_action_while_in_hand:
+                self.mode = "ACTION"
+                self.player_with_action = primary_player.name_player
+                self.action_chosen = card.get_name()
+            else:
+                self.create_reaction(card.get_name(),
+                                     primary_player.name_player, (int(primary_player.number), -1, -1))
             self.delete_reaction()
-            await self.update_game_event_action(name, string_to_use)
         elif self.reactions_needing_resolving[0] == "Deathmark Assassins":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.discard_top_card_deck():
