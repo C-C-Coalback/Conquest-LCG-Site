@@ -623,6 +623,12 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 primary_player.followers_of_asuryan_relevant = False
                 if limited:
                     primary_player.can_play_limited = False
+                if card.check_for_a_trait("Torture"):
+                    for i in range(7):
+                        for j in range(len(primary_player.cards_in_play[i + 1])):
+                            if primary_player.get_ability_given_pos(i, j) == "Arrogant Haemonculus":
+                                primary_player.game.create_reaction("Arrogant Haemonculus", primary_player.name_player,
+                                                                    (int(primary_player.number), i, j))
                 if card.check_for_a_trait("Wargear"):
                     for i in range(len(primary_player.headquarters)):
                         if primary_player.get_ability_given_pos(-2, i) == "Children of the Stars":

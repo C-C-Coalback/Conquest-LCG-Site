@@ -2442,6 +2442,12 @@ class Player:
                             if card.get_ability() == "Munitorum Support":
                                 self.game.create_reaction("Munitorum Support", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.check_for_a_trait("Torture"):
+                                for i in range(7):
+                                    for j in range(len(self.cards_in_play[i + 1])):
+                                        if self.get_ability_given_pos(i, j) == "Arrogant Haemonculus":
+                                            self.game.create_reaction("Arrogant Haemonculus", self.name_player,
+                                                                      (int(self.number), i, j))
                             if card.get_ability() == "Bork'an Sept":
                                 self.game.create_reaction("Bork'an Sept", self.name_player,
                                                           (int(self.number), position, location_of_unit))
