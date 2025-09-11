@@ -1096,6 +1096,7 @@ class WarlordCard(UnitCard):
 
     def hale_warlord(self):
         self.damage = 0
+        self.actual_attack = self.hale_attack
         self.health = self.hale_health
         self.attack = self.hale_attack
         self.text = self.hale_text
@@ -1107,6 +1108,7 @@ class WarlordCard(UnitCard):
         self.damage = 0
         self.area_effect = 0
         self.health = self.bloodied_health
+        self.actual_attack = self.bloodied_attack
         self.attack = self.bloodied_attack
         self.text = self.bloodied_text
         self.bloodied = True
