@@ -6254,11 +6254,10 @@ class Player:
                         self.game.create_interrupt("Trazyn the Infinite", self.name_player, (int(self.number), i, j))
                     if self.get_card_type_given_pos(i, j) == "Warlord":
                         if self.cards_in_play[i + 1][j].get_bloodied():
-                            if self.get_ability_given_pos(planet_num, card_pos) == "Saint Celestine" and not \
-                                    self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(planet_num,
-                                                                                                     card_pos):
+                            if self.get_ability_given_pos(i, card_pos) == "Saint Celestine" and not \
+                                    self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(i, card_pos):
                                 self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
-                                                           (int(self.number), planet_num, card_pos))
+                                                           (int(self.number), i, card_pos))
                             elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
                                 if self.search_hand_for_card("Necrodermis"):
                                     self.game.create_interrupt("Necrodermis", self.name_player,
