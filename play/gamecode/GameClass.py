@@ -2493,7 +2493,7 @@ class Game:
                     count_harid += 1
                 i += 1
             player = self.p1
-            if player.name_player == self.name_2:
+            if self.player_resolving_interrupts[0] == self.name_2:
                 player = self.p2
             player.magus_harid_waiting_cards.insert(0, player.magus_harid_waiting_cards.pop(count_harid))
         self.interrupts_waiting_on_resolution.insert(
