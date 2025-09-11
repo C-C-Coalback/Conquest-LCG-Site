@@ -2225,8 +2225,8 @@ class Player:
             while j < len(self.cards_in_play[i + 1]):
                 if self.cards_in_play[i + 1][j].return_to_hand_eor:
                     self.return_card_to_hand(i, j, return_attachments=False)
-                    i = i - 1
-                i = i + 1
+                    j = j - 1
+                j = j + 1
 
     def get_once_per_phase_used_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
