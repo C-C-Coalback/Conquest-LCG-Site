@@ -6120,26 +6120,27 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
-        if primary_player.check_if_card_is_destroyed(planet, pos):
-            if self.on_kill_effects_of_attacker[i]:
-                for j in range(len(self.on_kill_effects_of_attacker[i])):
-                    self.create_reaction(self.on_kill_effects_of_attacker[i][j], secondary_player.name_player,
-                                         (int(secondary_player.number), planet, pos))
-                    self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
+        if planet != -1 and pos != -1:
+            if primary_player.check_if_card_is_destroyed(planet, pos):
+                if self.on_kill_effects_of_attacker[i]:
+                    for j in range(len(self.on_kill_effects_of_attacker[i])):
+                        self.create_reaction(self.on_kill_effects_of_attacker[i][j], secondary_player.name_player,
+                                             (int(secondary_player.number), planet, pos))
+                        self.name_of_attacked_unit = primary_player.get_name_given_pos(planet, pos)
 
-            if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
-                if (primary_player.check_for_trait_given_pos(planet, pos, "Warrior") or
-                    primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
-                        primary_player.get_faction_given_pos(planet, pos) == "Necrons":
-                    if primary_player.search_card_at_planet(planet, "Ghost Ark of Orikan"):
-                        if primary_player.get_cost_given_pos(planet, pos) > 0:
-                            self.create_reaction("Ghost Ark of Orikan", primary_player.name_player,
-                                                 (int(primary_player.number), planet, -1))
-                            self.ghost_ark_of_orikan = primary_player.get_cost_given_pos(planet, pos)
+                if self.positions_of_attacker_of_unit_that_took_damage[i] is not None:
+                    if (primary_player.check_for_trait_given_pos(planet, pos, "Warrior") or
+                        primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
+                            primary_player.get_faction_given_pos(planet, pos) == "Necrons":
+                        if primary_player.search_card_at_planet(planet, "Ghost Ark of Orikan"):
+                            if primary_player.get_cost_given_pos(planet, pos) > 0:
+                                self.create_reaction("Ghost Ark of Orikan", primary_player.name_player,
+                                                     (int(primary_player.number), planet, -1))
+                                self.ghost_ark_of_orikan = primary_player.get_cost_given_pos(planet, pos)
 
-                if primary_player.search_hand_for_card("Vengeance!"):
-                    self.create_reaction("Vengeance!", primary_player.name_player,
-                                         (int(primary_player.number), planet, pos))
+                    if primary_player.search_hand_for_card("Vengeance!"):
+                        self.create_reaction("Vengeance!", primary_player.name_player,
+                                             (int(primary_player.number), planet, pos))
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0

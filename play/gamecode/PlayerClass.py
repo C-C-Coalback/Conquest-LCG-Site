@@ -809,6 +809,7 @@ class Player:
                         single_card_string += "|"
                         single_card_string += "D"
                         single_card_string += "|"
+                        single_card_string += "None" + "|"
                         if current_card.aiming_reticle_color is not None:
                             single_card_string += current_card.aiming_reticle_color
                         attachments_list = current_card.get_attachments()
@@ -1458,6 +1459,23 @@ class Player:
         return True
 
     def adjust_own_damage(self, planet_pos, unit_pos):
+        i = 0
+        while i < len(self.game.recently_damaged_units):
+            num, pla, pos = self.game.recently_damaged_units[i]
+            if num == int(self.number):
+                if pla == planet_pos:
+                    if pos > unit_pos:
+                        pos -= 1
+                        self.game.recently_damaged_units[i] = (num, pla, pos)
+                    elif pos == unit_pos:
+                        del self.game.recently_damaged_units[i]
+                        del self.game.damage_taken_was_from_attack[i]
+                        del self.game.positions_of_attacker_of_unit_that_took_damage[i]
+                        del self.game.faction_of_attacker[i]
+                        del self.game.card_names_that_caused_damage[i]
+                        del self.game.on_kill_effects_of_attacker[i]
+                        i = i - 1
+            i = i + 1
         i = 0
         while i < len(self.game.amount_that_can_be_removed_by_shield):
             num, pla, pos = self.game.positions_of_units_to_take_damage[i]
