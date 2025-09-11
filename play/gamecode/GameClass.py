@@ -8151,6 +8151,9 @@ class Game:
                                         self.choice_context = "Use No Mercy?"
                                         self.choices_available = ["Yes", "No"]
                                         self.name_player_making_choices = secondary_player.name_player
+                                        shield_string = "No Mercy can be played. A " + str(shields) + \
+                                                        "-shield card, " + card_name + ", is being played."
+                                        await self.send_update_message(shield_string)
                                     else:
                                         if shields == 1:
                                             for i in range(len(primary_player.headquarters)):
