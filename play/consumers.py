@@ -291,6 +291,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.receive_game_update(self.name + " left the lobby")
 
     async def chat_message(self, event):
         message = event["message"]
