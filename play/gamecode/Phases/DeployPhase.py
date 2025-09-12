@@ -350,7 +350,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 secondary_player = self.p1
     if not is_an_interrupt:
         if self.reactions_needing_resolving and self.already_resolving_reaction:
-            if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
+            if self.reactions_needing_resolving[0] == "Vamii Industrial Complex" or \
+                    self.reactions_needing_resolving[0] == "Dark Allegiance":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -488,6 +489,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     elif self.action_chosen == "Behind Enemy Lines":
         self.chosen_second_card = True
         self.misc_target_planet = planet_pos
+    elif is_a_reaction:
+        pass
     else:
         self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
@@ -557,6 +560,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         player_gaining_attachment = self.p2
     card = None
     magus_harid = False
+    is_reaction = False
     impulsive_loota = False
     extra_discounts = 0
     if self.reactions_needing_resolving:
@@ -564,7 +568,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 or self.reactions_needing_resolving[0] == "Impulsive Loota In Play" or \
                 self.reactions_needing_resolving[0] == "Dark Allegiance":
             card = self.card_to_deploy
-            impulsive_loota = True
+            is_reaction = True
+            if self.reactions_needing_resolving[0] == "Impulsive Loota Reserve" \
+                    or self.reactions_needing_resolving[0] == "Impulsive Loota In Play":
+                impulsive_loota = True
             if self.reactions_needing_resolving[0] == "Dark Allegiance":
                 extra_discounts = 1
             primary_player = self.p1
@@ -655,7 +662,8 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand = -1
                 self.card_pos_to_deploy = -1
-                self.action_cleanup()
+                if not is_reaction:
+                    self.action_cleanup()
                 if primary_player.extra_deploy_turn_active:
                     primary_player.extra_deploy_turn_active = False
                     primary_player.has_passed = True
