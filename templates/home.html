@@ -18,6 +18,10 @@
             left: 20px;
         }
 
+        .profile-pic-entry-box {
+          width: 30vw;
+        }
+
         .profile-pic-entry {
           background-color: lightblue;
           border: 2px solid blue;
@@ -47,14 +51,16 @@
     {% csrf_token %}
     <button type="submit">Log Out</button>
   </form>
-  <div>Change your profile picture by uploading a file here.</div>
-  <div>Please note that it could take several minutes for your profile picture to update.</div>
-  <div class="profile-pic-entry">
-  <form method="post" enctype="multipart/form-data" action="simple_upload/">
-    {% csrf_token %}
-    <input type="file" name="file">
-    <button type="submit">Upload</button>
-  </form>
+  <div class="profile-pic-entry-box">
+    <div>Change your profile picture by uploading a file here.</div>
+    <div>Please note that it could take several minutes for your profile picture to update.</div>
+    <div class="profile-pic-entry">
+    <form method="post" enctype="multipart/form-data" action="simple_upload/">
+      {% csrf_token %}
+      <input type="file" name="file">
+      <button type="submit">Upload</button>
+    </form>
+    </div>
   </div>
 </div>
 {% else %}
