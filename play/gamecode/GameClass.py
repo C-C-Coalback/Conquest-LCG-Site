@@ -122,6 +122,8 @@ class Game:
         self.defender_position = -1
         self.p1_has_warlord = False
         self.p2_has_warlord = False
+        self.allow_damage_abilities_defender = True
+        self.damage_abilities_defender_active = False
         self.number_with_initiative = "1"
         self.player_with_initiative = self.name_1
         self.number_reset_combat_turn = "1"
@@ -3570,6 +3572,14 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
+                            elif self.reactions_needing_resolving[0] == "Counterblow":
+                                self.allow_damage_abilities_defender = False
+                                self.shadow_thorns_body_allowed = False
+                                _, current_planet, current_unit = self.last_defender_position
+                                last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                                           str(current_unit)]
+                                await CombatPhase.update_game_event_combat_section(
+                                    self, secondary_player.name_player, last_game_update_string)
                             self.delete_reaction()
                             self.delete_interrupt()
                         self.reset_choices_available()
@@ -4483,6 +4493,15 @@ class Game:
                                     self.reactions_needing_resolving[0] == "War Walker Squadron" or \
                                     self.reactions_needing_resolving[0] == "Fake Ooman Base" or \
                                     self.reactions_needing_resolving[0] == "Kaptin's Hook":
+                                self.shadow_thorns_body_allowed = False
+                                _, current_planet, current_unit = self.last_defender_position
+                                last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
+                                                           str(current_unit)]
+                                await CombatPhase.update_game_event_combat_section(
+                                    self, secondary_player.name_player, last_game_update_string)
+                            elif self.reactions_needing_resolving[0] == "Firedrake Terminators" or \
+                                    self.reactions_needing_resolving[0] == "Rampaging Knarloc":
+                                self.allow_damage_abilities_defender = False
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
@@ -6142,6 +6161,14 @@ class Game:
                         self.create_reaction("Vengeance!", primary_player.name_player,
                                              (int(primary_player.number), planet, pos))
 
+    def toggle_combat_turn_values(self):
+        if self.player_with_combat_turn == self.name_1:
+            self.player_with_combat_turn = self.name_2
+            self.number_with_combat_turn = "2"
+        else:
+            self.player_with_combat_turn = self.name_1
+            self.number_with_combat_turn = "1"
+
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
         destroyed_something = False
@@ -6150,9 +6177,17 @@ class Game:
                 if self.player_with_combat_turn == player.name_player:
                     player.set_aiming_reticle_in_play(planet_num, i, "blue")
             if player.check_if_card_is_destroyed(planet_num, i):
-                if self.attacker_planet == planet_num and self.attacker_position == i:
-                    self.attacker_planet = -1
-                    self.attacker_position = -1
+                if self.player_with_combat_turn == player.name_player:
+                    if self.attacker_planet == planet_num:
+                        if self.attacker_position == i:
+                            self.attacker_planet = -1
+                            self.attacker_position = -1
+                            if self.attack_being_resolved:
+                                self.attack_being_resolved = False
+                                self.reset_combat_positions()
+                                self.toggle_combat_turn_values()
+                        elif self.attacker_position > i:
+                            self.attacker_position = self.attacker_position - 1
                 player.destroy_card_in_play(planet_num, i)
                 destroyed_something = True
                 i = i - 1
@@ -9450,19 +9485,39 @@ class Game:
                             self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
                             self.p2.cards_in_play[i + 1][j].just_entered_play = False
             if not self.attack_being_resolved and not self.reactions_needing_resolving:
-                for i in range(len(self.p1.headquarters)):
-                    self.p1.headquarters[i].valid_sweep_target = True
-                    self.p1.headquarters[i].recently_assigned_damage = False
-                for i in range(len(self.p2.headquarters)):
-                    self.p2.headquarters[i].valid_sweep_target = True
-                    self.p2.headquarters[i].recently_assigned_damage = False
-                for i in range(7):
-                    for j in range(len(self.p1.cards_in_play[i + 1])):
-                        self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
-                        self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
-                    for j in range(len(self.p2.cards_in_play[i + 1])):
-                        self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
-                        self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
+                if self.damage_abilities_defender_active:
+                    if self.attacker_position == -1:
+                        self.damage_abilities_defender_active = False
+                        self.allow_damage_abilities_defender = True
+                        self.p1.reset_all_aiming_reticles_play_hq()
+                        self.p2.reset_all_aiming_reticles_play_hq()
+                    else:
+                        primary_player = self.p1
+                        secondary_player = self.p2
+                        if self.number_with_combat_turn == "2":
+                            primary_player = self.p2
+                            secondary_player = self.p1
+                        self.shadow_thorns_body_allowed = False
+                        self.allow_damage_abilities_defender = False
+                        def_num, current_planet, current_unit = self.last_defender_position
+                        last_game_update_string = ["IN_PLAY", def_num, str(current_planet), str(current_unit)]
+                        await CombatPhase.update_game_event_combat_section(
+                            self, primary_player.name_player, last_game_update_string)
+                        self.damage_abilities_defender_active = False
+                else:
+                    for i in range(len(self.p1.headquarters)):
+                        self.p1.headquarters[i].valid_sweep_target = True
+                        self.p1.headquarters[i].recently_assigned_damage = False
+                    for i in range(len(self.p2.headquarters)):
+                        self.p2.headquarters[i].valid_sweep_target = True
+                        self.p2.headquarters[i].recently_assigned_damage = False
+                    for i in range(7):
+                        for j in range(len(self.p1.cards_in_play[i + 1])):
+                            self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
+                            self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
+                        for j in range(len(self.p2.cards_in_play[i + 1])):
+                            self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
+                            self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
             if self.attack_being_resolved and self.defender_position == -1 and self.attacker_position == -1:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False

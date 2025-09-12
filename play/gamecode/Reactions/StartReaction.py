@@ -1627,6 +1627,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Firedrake Terminators":
+            self.damage_abilities_defender_active = True
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif current_reaction == "Calibration Error":
@@ -1691,6 +1692,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.draw_card()
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Rampaging Knarloc":
+            self.damage_abilities_defender_active = True
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             for i in range(7):
                 for j in range(len(secondary_player.cards_in_play[i + 1])):

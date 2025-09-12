@@ -1119,7 +1119,60 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 self.last_defender_position = (secondary_player.number,
                                                                                self.defender_planet,
                                                                                self.defender_position)
+                            if can_continue and self.allow_damage_abilities_defender:
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Firedrake Terminators":
+                                    can_continue = False
+                                    await self.send_update_message(
+                                        "Firedrake Terminators must fire before the rest of the attack."
+                                    )
+                                    secondary_player.set_aiming_reticle_in_play(
+                                        self.defender_planet, self.defender_position, "blue"
+                                    )
+                                    self.create_reaction("Firedrake Terminators", secondary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                    self.last_defender_position = (secondary_player.number,
+                                                                   self.defender_planet,
+                                                                   self.defender_position)
+                            if can_continue and self.allow_damage_abilities_defender:
+                                if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Rampaging Knarloc":
+                                    if secondary_player.get_ready_given_pos(
+                                            self.defender_planet, self.defender_position):
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "Rampaging Knarloc must fire before the rest of the attack."
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_reaction("Rampaging Knarloc", secondary_player.name_player,
+                                                             (int(secondary_player.number), self.defender_planet,
+                                                              self.defender_position))
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
+                            if can_continue and self.allow_damage_abilities_defender:
+                                if secondary_player.get_card_type_given_pos(
+                                        self.defender_planet, self.defender_position) == "Warlord":
+                                    if not secondary_player.counterblow_used and secondary_player.search_hand_for_card(
+                                            "Counterblow"):
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "Counterblow must fire before the rest of the attack."
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_interrupt("Counterblow", secondary_player.name_player,
+                                                              (int(primary_player.number), self.attacker_planet,
+                                                               self.attacker_position))
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
                             if can_continue:
+                                self.allow_damage_abilities_defender = True
                                 faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                                self.attacker_position)
                                 print("atk faction:", faction)
@@ -1207,25 +1260,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               -1))
-                                if secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) == "Firedrake Terminators":
-                                    self.create_reaction("Firedrake Terminators", secondary_player.name_player,
-                                                         (int(primary_player.number), self.attacker_planet,
-                                                          self.attacker_position))
-                                if secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) == "Rampaging Knarloc":
-                                    if secondary_player.get_ready_given_pos(
-                                            self.defender_planet, self.defender_position):
-                                        self.create_reaction("Rampaging Knarloc", secondary_player.name_player,
-                                                             (int(secondary_player.number), self.defender_planet,
-                                                              self.defender_position))
-                                if secondary_player.get_card_type_given_pos(
-                                        self.defender_planet, self.defender_position) == "Warlord":
-                                    if not secondary_player.counterblow_used and secondary_player.search_hand_for_card(
-                                            "Counterblow"):
-                                        self.create_interrupt("Counterblow", secondary_player.name_player,
-                                                              (int(primary_player.number), self.attacker_planet,
-                                                               self.attacker_position))
                                 if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Trap Laying Hunter":
                                     if not secondary_player.cards_in_play[self.defender_planet + 1][

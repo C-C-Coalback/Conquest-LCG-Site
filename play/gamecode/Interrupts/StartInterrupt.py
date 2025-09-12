@@ -141,6 +141,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Singing Spear":
             await self.send_update_message("Singing Spear is revealed prior to the mulligan.")
         elif current_interrupt == "Counterblow":
+            self.damage_abilities_defender_active = True
             if primary_player.urien_relevant:
                 primary_player.spend_resources(1)
             primary_player.counterblow_used = True
