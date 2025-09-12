@@ -5080,29 +5080,30 @@ class Player:
             if self.get_unstoppable_given_pos(planet_id, unit_id):
                 if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
                     self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True
-                    self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
-                    total_damage_that_can_be_blocked = total_damage_that_can_be_blocked - 1
-                    damage_on_card_after = damage_on_card_after - 1
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Righteous Initiate":
-                        self.cards_in_play[planet_id + 1][unit_id].extra_attack_until_end_of_phase += 2
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Brotherhood Justicar":
-                        self.increase_faith_given_pos(planet_id, unit_id, 1)
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Dutiful Castellan":
-                        self.game.create_reaction("Dutiful Castellan", self.name_player,
-                                                  (int(self.number), planet_id, unit_id))
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
-                        self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
-                                                  (int(self.number), planet_id, unit_id))
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Steadfast Sword Brethren":
-                        self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
-                                                  (int(self.number), planet_id, unit_id))
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Wrathful Dreadnought":
-                        self.game.create_reaction("Wrathful Dreadnought", self.name_player,
-                                                  (int(self.number), planet_id, unit_id))
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Fighting Company Daras":
-                        self.increase_retaliate_given_pos_eop(planet_id, unit_id, 2)
-                    if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
-                        self.ready_given_pos(planet_id, unit_id)
+                    if preventable:
+                        self.cards_in_play[planet_id + 1][unit_id].set_damage(damage_on_card_after - 1)
+                        total_damage_that_can_be_blocked = total_damage_that_can_be_blocked - 1
+                        damage_on_card_after = damage_on_card_after - 1
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Righteous Initiate":
+                            self.cards_in_play[planet_id + 1][unit_id].extra_attack_until_end_of_phase += 2
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Brotherhood Justicar":
+                            self.increase_faith_given_pos(planet_id, unit_id, 1)
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Dutiful Castellan":
+                            self.game.create_reaction("Dutiful Castellan", self.name_player,
+                                                      (int(self.number), planet_id, unit_id))
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
+                            self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
+                                                      (int(self.number), planet_id, unit_id))
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Steadfast Sword Brethren":
+                            self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
+                                                      (int(self.number), planet_id, unit_id))
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Wrathful Dreadnought":
+                            self.game.create_reaction("Wrathful Dreadnought", self.name_player,
+                                                      (int(self.number), planet_id, unit_id))
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Fighting Company Daras":
+                            self.increase_retaliate_given_pos_eop(planet_id, unit_id, 2)
+                        if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
+                            self.ready_given_pos(planet_id, unit_id)
             for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
                 if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].\
                         get_ability() == "Ancient Crozius Arcanum":
