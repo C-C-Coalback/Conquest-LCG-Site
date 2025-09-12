@@ -4500,7 +4500,8 @@ class Game:
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
                             elif self.reactions_needing_resolving[0] == "Firedrake Terminators" or \
-                                    self.reactions_needing_resolving[0] == "Rampaging Knarloc":
+                                    self.reactions_needing_resolving[0] == "Rampaging Knarloc" or \
+                                    self.reactions_needing_resolving[0] == "Neurotic Obliterator":
                                 self.allow_damage_abilities_defender = False
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position

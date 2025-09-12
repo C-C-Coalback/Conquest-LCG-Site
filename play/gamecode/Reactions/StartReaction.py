@@ -1686,6 +1686,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.misc_misc = []
         elif current_reaction == "Erekiel Next":
             self.misc_counter = 4
+        elif current_reaction == "Neurotic Obliterator":
+            self.damage_abilities_defender_active = True
         elif current_reaction == "Elusive Escort":
             primary_player.draw_card()
         elif current_reaction == "Wisdom of Biel-tan":
