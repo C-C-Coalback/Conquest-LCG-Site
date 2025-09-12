@@ -224,7 +224,7 @@
                         if (typeof(element) != 'undefined' && element != null)
                         {
                             document.getElementById(container_id).innerHTML = ``;
-                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDefRotate(this.src)" onmouseout="changeDefOut()">`
                             if (card_data_split.length >= 2) {
                                 if (card_data_split[1] === "I") {
                                     full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
@@ -893,6 +893,12 @@
 
         function changeDef(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            document.getElementById("LargeHelperCard").src=og_image_src;
+        }
+
+        function changeDefRotate(image_src) {
+            var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
             document.getElementById("LargeHelperCard").src=og_image_src;
         }
 

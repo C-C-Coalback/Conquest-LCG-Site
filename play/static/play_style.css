@@ -649,17 +649,16 @@ legend {
 
 #info-box {
     position: absolute;
-    width: 15vw;
-    max-width: 15vw;
+    width: 14vw;
+    max-width: 14vw;
     min-height: 4vh;
     max-height: 20vh;
     top: 40%;
     border: 5px solid blue;
     right: 0;
     margin: auto;
-    overflow-x:auto;
-    overflow-y:hidden;
-    white-space:nowrap;
+    overflow-x:hidden;
+    overflow-y:auto;
     display: flex;
     flex-direction: column;
     pointer-events: auto;
