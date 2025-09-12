@@ -33,9 +33,9 @@ h4 {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 19vh 10vh 19vh;
     grid-template-areas:
-    "play10 play11 play12 play13 play14 play15 play16"
+    "play20 play21 play22 play23 play24 play25 play26"
     "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
-    "play20 play21 play22 play23 play24 play25 play26";
+    "play10 play11 play12 play13 play14 play15 play16";
 }
 
 #player-1-cards-planet-0 {
@@ -260,7 +260,7 @@ h4 {
     width: 10vw;
 }
 
-#victory-display-player-1 {
+#victory-display-player-2 {
     display:flex;
     flex-direction:column;
     position: absolute;
@@ -282,7 +282,7 @@ h4 {
     margin-top:0;
 }
 
-#victory-display-player-2 {
+#victory-display-player-1 {
     display:flex;
     flex-direction:column;
     position: absolute;
@@ -296,13 +296,6 @@ h4 {
     border: 5px solid yellow;
 }
 
-.planet-in-victory-display-1 {
-    pointer-events: auto;
-    height: 10vh;
-    margin-top:-8vh;
-    width: 10vw;
-}
-
 .planet-in-victory-display-2 {
     pointer-events: auto;
     height: 10vh;
@@ -310,25 +303,11 @@ h4 {
     width: 10vw;
 }
 
-.player-1-in-play {
-    margin-left:1vw;
-    margin:auto;
-    float:left;
-    max-width:10vw;
-    min-width:10vw;
-    border-width: 6px;
-    border-style: double;
-    border-color: lightblue;
-    background: rgba(47, 40, 153, 0.3);
-    height:18vh;
-    max-height: 18vh;
-    overflow-x:auto;
-    overflow-y:hidden;
-    white-space:nowrap;
-    display:grid;
-    grid-template-rows: auto auto;
-    grid-auto-flow: column;
+.planet-in-victory-display-1 {
     pointer-events: auto;
+    height: 10vh;
+    margin-top:-8vh;
+    width: 10vw;
 }
 
 .player-2-in-play {
@@ -352,7 +331,28 @@ h4 {
     pointer-events: auto;
 }
 
-#headquarters-player-2 {
+.player-1-in-play {
+    margin-left:1vw;
+    margin:auto;
+    float:left;
+    max-width:10vw;
+    min-width:10vw;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+    height:18vh;
+    max-height: 18vh;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    pointer-events: auto;
+}
+
+#headquarters-player-1 {
     position:absolute;
     bottom:11vh;
     border: 5px solid red;
@@ -366,7 +366,7 @@ h4 {
     pointer-events: auto;
 }
 
-#headquarters-player-1 {
+#headquarters-player-2 {
     position:absolute;
     top:11vh;
     border: 5px solid green;
@@ -380,24 +380,27 @@ h4 {
     pointer-events: auto;
 }
 
-#resources-player-2 {
+#resources-player-1 {
     position:absolute;
     bottom:calc(7vh + 20px);
 }
 
-#resources-player-1 {
+#resources-player-2 {
     position:absolute;
     top:calc(7vh + 20px);
+}
+
+#pass-P1 {
+    width: calc(10vw + 30px);
+    height: 35px;
 }
 
 #pass-player-1 {
     position:absolute;
-    top:calc(7vh + 20px);
-}
-
-#pass-player-2 {
-    position:absolute;
-    bottom:calc(7vh + 20px);
+    right:0;
+    bottom:calc(85px + 20vh);
+    width: auto;
+    height: 35px;
 }
 
 #request-action-div {
@@ -446,7 +449,7 @@ h4 {
     height: 20vh;
 }
 
-#current-hand-player-1 {
+#current-hand-player-2 {
     position:absolute;
     top:0;
     left: 15vw;
@@ -462,7 +465,7 @@ h4 {
     pointer-events: auto;
 }
 
-#current-deck-player-1 {
+#current-deck-player-2 {
     position:absolute;
     top:0;
     left: 10vw;
@@ -490,7 +493,7 @@ summary:focus {
   outline-style: none;
 }
 
-.attachments-planet-1 {
+.attachments-planet-2 {
     position:absolute;
     height:calc(4vh + 15px);
     width:3vw;
@@ -502,7 +505,7 @@ summary:focus {
     left:0;
 }
 
-.attachments-planet-2 {
+.attachments-planet-1 {
     position:absolute;
     height:calc(4vh + 15px);
     width:3vw;
@@ -514,18 +517,18 @@ summary:focus {
     right:0;
 }
 
-#current-discard-player-1 {
+#current-discard-player-2 {
     position:absolute;
     top:0;
     left:5vw;
 }
 
-#current-removed-player-1 {
+#current-removed-player-2 {
     position:absolute;
     top:0;
 }
 
-#current-hand-player-2 {
+#current-hand-player-1 {
     position:absolute;
     bottom:0;
     left: 15vw;
@@ -541,57 +544,26 @@ summary:focus {
     pointer-events: auto;
 }
 
-#current-deck-player-2 {
+#current-deck-player-1 {
     position:absolute;
     bottom:0;
     left: 10vw;
 }
 
-#current-discard-player-2 {
+#current-discard-player-1 {
     position:absolute;
     bottom:0;
     left: 5vw;
 }
 
-#current-removed-player-2 {
+#current-removed-player-1 {
     position:absolute;
     bottom:0;
-}
-
-#expanded-DISCARD_PILE-1 {
-    position: absolute;
-    top: 8vh;
-    left: 5vw;
-    display:none;
-    border: 5px solid blue;
-    background-color: lightblue;
-}
-
-#expanded-discard-1-settings {
-    max-width: 30vw;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-}
-
-#expanded-REMOVED_PILE-1 {
-    position: absolute;
-    top: 8vh;
-    display:none;
-    border: 5px solid blue;
-    background-color: lightblue;
-}
-
-#expanded-removed-1-settings {
-    max-width: 30vw;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
 }
 
 #expanded-DISCARD_PILE-2 {
-    position:absolute;
-    bottom: 8vh;
+    position: absolute;
+    top: 8vh;
     left: 5vw;
     display:none;
     border: 5px solid blue;
@@ -606,6 +578,37 @@ summary:focus {
 }
 
 #expanded-REMOVED_PILE-2 {
+    position: absolute;
+    top: 8vh;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-removed-2-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-DISCARD_PILE-1 {
+    position:absolute;
+    bottom: 8vh;
+    left: 5vw;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-discard-1-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-REMOVED_PILE-1 {
     position:absolute;
     bottom: 8vh;
     display:none;
@@ -613,7 +616,7 @@ summary:focus {
     background-color: lightblue;
 }
 
-#expanded-removed-2-settings {
+#expanded-removed-1-settings {
     max-width: 30vw;
     display: flex;
     flex-wrap: wrap;
