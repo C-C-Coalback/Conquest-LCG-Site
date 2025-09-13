@@ -97,6 +97,7 @@ class Game:
         self.planet_pos_to_deploy = -1
         self.all_traits = []
         self.most_recently_revealed_planet = -1
+        self.sweep_active = False
         for i in range(len(self.card_array)):
             card = self.preloaded_find_card(self.card_array[i].get_name())
             traits = card.get_traits()
@@ -9509,26 +9510,6 @@ class Game:
                         await CombatPhase.update_game_event_combat_section(
                             self, primary_player.name_player, last_game_update_string)
                         self.damage_abilities_defender_active = False
-                else:
-                    for i in range(len(self.p1.headquarters)):
-                        self.p1.headquarters[i].valid_target_vow_of_honor = False
-                    for i in range(len(self.p2.headquarters)):
-                        self.p2.headquarters[i].valid_target_vow_of_honor = False
-                    for i in range(len(self.p1.headquarters)):
-                        self.p1.headquarters[i].valid_sweep_target = True
-                        self.p1.headquarters[i].recently_assigned_damage = False
-                    for i in range(len(self.p2.headquarters)):
-                        self.p2.headquarters[i].valid_sweep_target = True
-                        self.p2.headquarters[i].recently_assigned_damage = False
-                    for i in range(7):
-                        for j in range(len(self.p1.cards_in_play[i + 1])):
-                            self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
-                            self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
-                            self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
-                        for j in range(len(self.p2.cards_in_play[i + 1])):
-                            self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
-                            self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
-                            self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
             if self.attack_being_resolved and self.defender_position == -1 and self.attacker_position == -1:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False
@@ -9550,7 +9531,7 @@ class Game:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_2,
                                                                  (1, planet, i))
                             sweep = self.p1.get_sweep_given_pos(planet, i)
-                            if sweep > 0:
+                            if sweep > 0 and not self.sweep_active:
                                 self.create_reaction("Sweep", self.name_1, (1, planet, i))
                                 self.sweep_value = sweep
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
@@ -9605,7 +9586,7 @@ class Game:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_1,
                                                                  (2, planet, i))
                             sweep = self.p2.get_sweep_given_pos(planet, i)
-                            if sweep > 0:
+                            if sweep > 0 and not self.sweep_active:
                                 self.create_reaction("Sweep", self.name_2, (2, planet, i))
                                 self.sweep_value = sweep
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
@@ -9658,10 +9639,34 @@ class Game:
                 self.p2.ethereal_movement_resolution()
                 self.p1.hit_by_gorgul = False
                 self.p2.hit_by_gorgul = False
+                self.sweep_active = False
                 self.p1.reset_resolving_attacks_everywhere()
                 self.p2.reset_resolving_attacks_everywhere()
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
+            if not self.attack_being_resolved and not self.reactions_needing_resolving and not \
+                    self.damage_abilities_defender_active:
+                for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].valid_target_vow_of_honor = False
+                for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].valid_target_vow_of_honor = False
+                for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].valid_sweep_target = True
+                    self.p1.headquarters[i].recently_assigned_damage = False
+                for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].valid_sweep_target = True
+                    self.p2.headquarters[i].recently_assigned_damage = False
+                for i in range(7):
+                    for j in range(len(self.p1.cards_in_play[i + 1])):
+                        print("reseting sweep")
+                        self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
+                        self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
+                        self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
+                    for j in range(len(self.p2.cards_in_play[i + 1])):
+                        print("reseting sweep")
+                        self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
+                        self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
+                        self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         await self.update_interrupts(name, game_update_string)

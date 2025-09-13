@@ -885,8 +885,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.defender_planet = int(game_update_string[2])
                             self.defender_position = u_pos
                             print("Defender:", self.defender_planet, self.defender_position)
-                            attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
-                                                                               self.attacker_position)
+                            attack_value = 0
+                            if self.sweep_active:
+                                attack_value = self.sweep_value
+                            else:
+                                attack_value = primary_player.get_attack_given_pos(self.attacker_planet,
+                                                                                   self.attacker_position)
                             can_continue = True
                             exa = secondary_player.search_card_at_planet(self.defender_planet, "Dire Avenger Exarch")
                             print("Found exarch", exa)
@@ -920,7 +924,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 self.defender_planet, i, "Warrior")):
                                         can_continue = False
                                         print("Found FL")
-                            if self.may_move_defender:
+                            if self.sweep_active and can_continue:
+                                if not secondary_player.cards_in_play[self.defender_planet + 1][
+                                        self.defender_position].valid_sweep_target:
+                                    can_continue = False
+                                    await self.send_update_message("That unit has already been attacked!")
+                                else:
+                                    print(secondary_player.cards_in_play[self.defender_planet + 1][
+                                              self.defender_position].valid_sweep_target)
+                                    print("Sweep ok")
+                            if self.may_move_defender and can_continue:
                                 if secondary_player.search_card_at_planet(self.defender_planet, "Zen Xi Aonia"):
                                     can_continue = False
                                     self.create_interrupt("Zen Xi Aonia", secondary_player.name_player,
@@ -1210,50 +1223,50 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.defender_planet, self.defender_position) == "Tomb Blade Diversionist":
                                     secondary_player.cards_in_play[
                                         self.defender_planet + 1][self.defender_position].misc_ability_used = True
-                                if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                        self.attacker_position) == "Starbane's Council":
-                                    if not secondary_player.get_ready_given_pos(self.defender_planet,
-                                                                                self.defender_position):
-                                        attack_value += 2
-                                if primary_player.get_ability_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Dark Angels Vindicator":
-                                    command = secondary_player.get_command_given_pos(self.defender_planet,
-                                                                                     self.defender_position)
-                                    if secondary_player.get_card_type_given_pos(self.defender_planet,
-                                                                                self.defender_position) == "Warlord":
-                                        command = command - 999
-                                    attack_value += 2 * max(command, 0)
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                                        == "Storming Librarian":
-                                    value_storming_librarion = primary_player.cards_in_play[self.attacker_planet + 1][
-                                        self.attacker_position].storming_librarian_id_number
-                                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]. \
-                                        hit_by_which_storming_librarians.append(value_storming_librarion)
-                                for i in range(
-                                        len(primary_player.
-                                                    cards_in_play[self.attacker_planet + 1][self.attacker_position]
-                                                    .get_attachments())):
-                                    if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position] \
-                                            .get_attachments()[i].get_ability() == "Hidden Strike Chainsword":
-                                        if secondary_player.get_card_type_given_pos(
-                                                self.defender_planet, self.defender_position) != "Warlord":
-                                            attack_value += 2
-                                if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
-                                        .get_card_type() != "Warlord":
-                                    attack_value += self.banshee_power_sword_extra_attack
-                                    self.banshee_power_sword_extra_attack = 0
                                 for i in range(len(primary_player.cards_in_play[self.defender_planet + 1])):
                                     if primary_player.get_ability_given_pos(
                                             self.defender_planet, i) == "Sickening Helbrute":
                                         self.create_reaction("Sickening Helbrute", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               self.defender_position))
+                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                        == "Storming Librarian":
+                                    value_storming_librarion = primary_player.cards_in_play[self.attacker_planet + 1][
+                                        self.attacker_position].storming_librarian_id_number
+                                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]. \
+                                        hit_by_which_storming_librarians.append(value_storming_librarion)
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if secondary_player.get_ability_given_pos(
                                             self.defender_planet, i) == "Sickening Helbrute":
                                         self.create_reaction("Sickening Helbrute", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               self.defender_position))
+                                if not self.sweep_active:
+                                    if primary_player.get_ability_given_pos(
+                                            self.attacker_planet, self.attacker_position) == "Starbane's Council":
+                                        if not secondary_player.get_ready_given_pos(self.defender_planet,
+                                                                                    self.defender_position):
+                                            attack_value += 2
+                                    if primary_player.get_ability_given_pos(
+                                            self.attacker_planet, self.attacker_position) == "Dark Angels Vindicator":
+                                        command = secondary_player.get_command_given_pos(self.defender_planet,
+                                                                                         self.defender_position)
+                                        if secondary_player.get_card_type_given_pos(
+                                                self.defender_planet, self.defender_position) == "Warlord":
+                                            command = command - 999
+                                        attack_value += 2 * max(command, 0)
+                                    for i in range(len(primary_player.cards_in_play[self.attacker_planet + 1][
+                                            self.attacker_position].get_attachments())):
+                                        if primary_player.cards_in_play[self.attacker_planet + 1][
+                                                self.attacker_position].get_attachments()[
+                                                i].get_ability() == "Hidden Strike Chainsword":
+                                            if secondary_player.get_card_type_given_pos(
+                                                    self.defender_planet, self.defender_position) != "Warlord":
+                                                attack_value += 2
+                                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]\
+                                            .get_card_type() != "Warlord":
+                                        attack_value += self.banshee_power_sword_extra_attack
+                                        self.banshee_power_sword_extra_attack = 0
                                 att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
                                                                                  self.attacker_position)
                                 def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
@@ -1277,7 +1290,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if secondary_player.cards_in_play[
                                     self.defender_planet + 1][self.defender_position] \
                                         .get_card_type() == "Warlord":
-                                    if primary_player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) == "Warlord":
+                                    if primary_player.get_card_type_given_pos(self.attacker_planet,
+                                                                              self.attacker_position) == "Warlord":
                                         for i in range(len(primary_player.headquarters)):
                                             if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
                                                 self.create_reaction("Gladius Strike Force", primary_player.name_player,
@@ -1305,61 +1319,64 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.damage_on_unit_before_new_damage = \
                                     secondary_player.get_damage_given_pos(self.defender_planet,
                                                                           self.defender_position)
-                                primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
-                                                                                              self.attacker_position
-                                                                                              )
-                                if primary_player.check_for_trait_given_pos(self.attacker_planet,
-                                                                            self.attacker_position, "Space Wolves"):
-                                    if primary_player.search_card_in_hq("Ragnar's Warcamp"):
-                                        if primary_player.check_for_warlord(self.attacker_planet, True,
-                                                                            primary_player.name_player):
-                                            if secondary_player.get_card_type_given_pos(
-                                                    self.defender_planet, self.defender_position) == "Warlord":
-                                                attack_value = attack_value * 2
-                                            elif primary_player.name_player in secondary_player.cards_in_play[
-                                                self.defender_planet + 1][
-                                                self.defender_position].hit_by_frenzied_wulfen_names:
-                                                attack_value = attack_value * 2
-                                if secondary_player.check_for_trait_given_pos(self.defender_planet,
-                                                                              self.defender_position, "Vehicle"):
+                                if not self.sweep_active:
+                                    primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
+                                                                                                  self.attacker_position
+                                                                                                  )
+                                    if primary_player.check_for_trait_given_pos(self.attacker_planet,
+                                                                                self.attacker_position, "Space Wolves"):
+                                        if primary_player.search_card_in_hq("Ragnar's Warcamp"):
+                                            if primary_player.check_for_warlord(self.attacker_planet, True,
+                                                                                primary_player.name_player):
+                                                if secondary_player.get_card_type_given_pos(
+                                                        self.defender_planet, self.defender_position) == "Warlord":
+                                                    attack_value = attack_value * 2
+                                                elif primary_player.name_player in secondary_player.cards_in_play[
+                                                    self.defender_planet + 1][
+                                                    self.defender_position].hit_by_frenzied_wulfen_names:
+                                                    attack_value = attack_value * 2
+                                    if secondary_player.check_for_trait_given_pos(self.defender_planet,
+                                                                                  self.defender_position, "Vehicle"):
+                                        if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                                self.attacker_position) \
+                                                == "Tankbusta Bommaz":
+                                            attack_value = attack_value * 2
                                     if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                             self.attacker_position) \
-                                            == "Tankbusta Bommaz":
-                                        attack_value = attack_value * 2
-                                if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                        self.attacker_position) \
-                                        == "Hydra Flak Tank":
-                                    if secondary_player.get_flying_given_pos(self.defender_planet,
-                                                                             self.defender_position):
-                                        attack_value = attack_value * 2
-                                    elif secondary_player.get_mobile_given_pos(self.defender_planet,
-                                                                               self.defender_position):
-                                        attack_value = attack_value * 2
-                                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                                        == "Noble Shining Spears":
-                                    if secondary_player.get_damage_given_pos(self.defender_planet,
-                                                                             self.defender_position) == 0:
-                                        attack_value += 3
-                                if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                        self.attacker_position) \
-                                        == "Stalking Ur-Ghul":
-                                    if secondary_player.get_card_type_given_pos(self.defender_planet,
-                                                                                self.defender_position) \
-                                            == "Warlord":
-                                        attack_value = attack_value - 5
-                                    elif secondary_player.get_card_type_given_pos(self.defender_planet,
-                                                                                  self.defender_position) \
-                                            == "Army":
+                                            == "Hydra Flak Tank":
+                                        if secondary_player.get_flying_given_pos(self.defender_planet,
+                                                                                 self.defender_position):
+                                            attack_value = attack_value * 2
+                                        elif secondary_player.get_mobile_given_pos(self.defender_planet,
+                                                                                   self.defender_position):
+                                            attack_value = attack_value * 2
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
+                                            == "Noble Shining Spears":
                                         if secondary_player.get_damage_given_pos(self.defender_planet,
                                                                                  self.defender_position) == 0:
+                                            attack_value += 3
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
+                                            == "Stalking Ur-Ghul":
+                                        if secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                    self.defender_position) \
+                                                == "Warlord":
                                             attack_value = attack_value - 5
-                                if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                                        self.attacker_position) \
-                                        == "Roghrax Bloodhand":
-                                    if self.bloodthirst_active[self.attacker_planet]:
-                                        attack_value = attack_value * 2
+                                        elif secondary_player.get_card_type_given_pos(self.defender_planet,
+                                                                                      self.defender_position) \
+                                                == "Army":
+                                            if secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                                     self.defender_position) == 0:
+                                                attack_value = attack_value - 5
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
+                                            == "Roghrax Bloodhand":
+                                        if self.bloodthirst_active[self.attacker_planet]:
+                                            attack_value = attack_value * 2
                                 secondary_player.cards_in_play[self.defender_planet + 1][
                                     self.defender_position].valid_sweep_target = False
+                                print("unit is no longer a valid sweep target")
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
