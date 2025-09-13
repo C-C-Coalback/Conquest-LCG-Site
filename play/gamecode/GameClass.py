@@ -1480,6 +1480,7 @@ class Game:
         self.choices_available = ["Yes", "No"]
         self.choice_context = "Mulligan Opening Hand?"
         self.name_player_making_choices = self.name_1
+        self.resolving_search_box = True
 
     def reset_search_values(self):
         self.searching_enemy_deck = False
@@ -4614,6 +4615,7 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
+                            self.resolving_search_box = False
                             await self.send_update_message(
                                 "Both players setup, good luck and have fun!")
                             if self.p1.search_hand_for_card("Adaptative Thorax Swarm"):
@@ -4624,6 +4626,7 @@ class Game:
                                 await self.create_necrons_wheel_choice(self.p1)
                             elif self.p2.warlord_faction == "Necrons":
                                 await self.create_necrons_wheel_choice(self.p2)
+                            await self.change_phase("DEPLOY")
                     elif self.choice_context == "Choose Enslaved Faction:":
                         chosen_faction = self.choices_available[int(game_update_string[1])]
                         primary_player.chosen_enslaved_faction = True
@@ -6508,6 +6511,7 @@ class Game:
         if last_phase == "COMBAT":
             self.p1.start_agras_preachings_deployment()
             self.p2.start_agras_preachings_deployment()
+        print("Phase change called")
         self.p1.reset_extra_attack_eop()
         self.p2.reset_extra_attack_eop()
         self.p1.reset_extra_abilities_eop()
