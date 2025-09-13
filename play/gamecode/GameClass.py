@@ -9507,6 +9507,10 @@ class Game:
                         self.damage_abilities_defender_active = False
                 else:
                     for i in range(len(self.p1.headquarters)):
+                        self.p1.headquarters[i].valid_target_vow_of_honor = False
+                    for i in range(len(self.p2.headquarters)):
+                        self.p2.headquarters[i].valid_target_vow_of_honor = False
+                    for i in range(len(self.p1.headquarters)):
                         self.p1.headquarters[i].valid_sweep_target = True
                         self.p1.headquarters[i].recently_assigned_damage = False
                     for i in range(len(self.p2.headquarters)):
@@ -9516,9 +9520,11 @@ class Game:
                         for j in range(len(self.p1.cards_in_play[i + 1])):
                             self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
                             self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
+                            self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
                         for j in range(len(self.p2.cards_in_play[i + 1])):
                             self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
                             self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
+                            self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
             if self.attack_being_resolved and self.defender_position == -1 and self.attacker_position == -1:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False
@@ -9528,12 +9534,7 @@ class Game:
                 planet = self.last_planet_checked_for_battle
                 name_player_who_resolved_attack = ""
                 if planet > -1:
-                    for i in range(len(self.p1.headquarters)):
-                        self.p1.headquarters[i].valid_target_vow_of_honor = False
-                    for i in range(len(self.p2.headquarters)):
-                        self.p2.headquarters[i].valid_target_vow_of_honor = False
                     for i in range(len(self.p1.cards_in_play[planet + 1])):
-                        self.p1.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p1.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_1
                             for j in range(len(self.p1.cards_in_play[planet + 1])):
@@ -9589,7 +9590,6 @@ class Game:
                                 elif not self.p1.get_immune_to_enemy_events(planet, i):
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                     for i in range(len(self.p2.cards_in_play[planet + 1])):
-                        self.p2.cards_in_play[planet + 1][i].valid_target_vow_of_honor = False
                         if self.p2.cards_in_play[planet + 1][i].resolving_attack:
                             name_player_who_resolved_attack = self.name_2
                             for j in range(len(self.p2.cards_in_play[planet + 1])):
