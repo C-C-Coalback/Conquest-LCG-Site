@@ -364,6 +364,7 @@ h4 {
     flex-direction: row;
     left: 100px;
     pointer-events: auto;
+    max-width: 60vw;
 }
 
 #headquarters-player-2 {
@@ -378,6 +379,7 @@ h4 {
     flex-direction: row;
     left: 100px;
     pointer-events: auto;
+    max-width: 60vw;
 }
 
 #resources-player-1 {

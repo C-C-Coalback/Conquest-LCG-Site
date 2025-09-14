@@ -705,14 +705,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Shrieking Exarch":
             if self.apoka:
                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-        elif self.reactions_needing_resolving[0] == "Shrieking Harpy":
+        elif current_reaction == "Shrieking Harpy":
             if self.apoka:
                 secondary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                if (secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and not
-                        secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite")) or \
-                        secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Token":
-                    secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                if (secondary_player.get_card_type_given_pos(planet_pos, i) == "Army" and not
+                        secondary_player.check_for_trait_given_pos(planet_pos, i, "Elite")) or \
+                        secondary_player.get_card_type_given_pos(planet_pos, i) == "Token":
+                    secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Sautekh Complex":

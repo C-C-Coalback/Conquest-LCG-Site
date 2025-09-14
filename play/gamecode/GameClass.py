@@ -10155,6 +10155,8 @@ class Game:
         self.p2.ready_all_in_play()
         self.p1.return_cards_to_hand_eor()
         self.p2.return_cards_to_hand_eor()
+        self.p1.ready_all_planet_attach()
+        self.p2.ready_all_planet_attach()
         i = 0
         while i < len(self.p1.headquarters):
             if self.p1.headquarters[i].get_ability() == "Promethium Mine":

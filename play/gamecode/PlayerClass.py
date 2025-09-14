@@ -1186,12 +1186,20 @@ class Player:
         return None
 
     def discard_card_name_from_hand(self, card_name):
-        self.move_synapse_to_hq()
         for i in range(len(self.cards)):
             if self.cards[i] == card_name:
                 self.discard_card_from_hand(i)
                 return i
         return -1
+
+    def ready_all_planet_attach(self):
+        for i in range(7):
+            self.ready_all_attached_at_planet(planet_pos=i)
+
+    def ready_all_attached_at_planet(self, planet_pos):
+        for i in range(len(self.attachments_at_planet[planet_pos])):
+            if not self.attachments_at_planet[planet_pos][i].get_ready():
+                self.attachments_at_planet[planet_pos][i].ready_card()
 
     def discard_card_from_hand(self, card_pos):
         if len(self.cards) > card_pos:
@@ -1605,10 +1613,11 @@ class Player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_in_hq("Dissection Chamber"):
                 self.assign_damage_to_pos(-2, last_element_index, 1, by_enemy_unit=False)
-        if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
-            if not other_player.check_if_already_have_reaction("Magus Harid"):
-                self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
-            self.headquarters[last_element_index].valid_target_magus_harid = True
+        if self.check_is_unit_at_pos(-2, last_element_index):
+            if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
+                if not other_player.check_if_already_have_reaction("Magus Harid"):
+                    self.game.create_reaction("Magus Harid", other_player.name_player, (int(other_player.number), -1, -1))
+                self.headquarters[last_element_index].valid_target_magus_harid = True
         if self.get_ability_given_pos(-2, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(-2, last_element_index, 2, preventable=False, by_enemy_unit=False)
         elif self.headquarters[last_element_index].get_ability() == "Promethium Mine":
@@ -4246,8 +4255,8 @@ class Player:
     def round_ends_reset_values(self):
         self.reset_all_blanked_eor()
         for i in range(len(self.headquarters)):
+            self.headquarters[i].set_once_per_round_used(False)
             if self.headquarters[i].get_is_unit():
-                self.headquarters[i].set_once_per_round_used(False)
                 self.headquarters[i].techmarine_aspirant_available = True
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
