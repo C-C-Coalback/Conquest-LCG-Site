@@ -285,9 +285,9 @@
                     if (planetsChanged === "true") {
                         console.log("trying to change planets");
                         var new_grid_template_areas = `
-                        "play10 play11 play12 play13 play14 play15 play16"
+                        "play20 play21 play22 play23 play24 play25 play26"
                         "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
-                        "play20 play21 play22 play23 play24 play25 play26"`;
+                        "play10 play11 play12 play13 play14 play15 play16"`;
                         var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr 1fr`;
                         var encountered_in_play_planet = "false";
                         var first_pos_in_play = -1;
@@ -317,9 +317,9 @@
                         if (first_pos_in_play === 1) {
                             var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr`;
                             new_grid_template_areas = `
-                            "play11 play12 play13 play14 play15 play16"
+                            "play21 play22 play23 play24 play25 play26"
                             "planet1 planet2 planet3 planet4 planet5 planet6"
-                            "play21 play22 play23 play24 play25 play26"`;
+                            "play11 play12 play13 play14 play15 play16"`;
                             document.getElementById("player-1-cards-planet-1").style.maxWidth = "11vw";
                             document.getElementById("player-1-cards-planet-2").style.maxWidth = "11vw";
                             document.getElementById("player-1-cards-planet-3").style.maxWidth = "11vw";
@@ -335,9 +335,9 @@
                         } else if (first_pos_in_play === 2) {
                             var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr`;
                             new_grid_template_areas = `
-                            "play12 play13 play14 play15 play16"
+                            "play22 play23 play24 play25 play26"
                             "planet2 planet3 planet4 planet5 planet6"
-                            "play22 play23 play24 play25 play26"`;
+                            "play12 play13 play14 play15 play16"`;
                             document.getElementById("player-1-cards-planet-2").style.maxWidth = "13vw";
                             document.getElementById("player-1-cards-planet-3").style.maxWidth = "13vw";
                             document.getElementById("player-1-cards-planet-4").style.maxWidth = "13vw";
@@ -351,9 +351,9 @@
                         } else if (first_pos_in_play === 3) {
                             var new_grid_template_columns = `1fr 1fr 1fr 1fr`;
                             new_grid_template_areas = `
-                            "play13 play14 play15 play16"
+                            "play23 play24 play25 play26"
                             "planet3 planet4 planet5 planet6"
-                            "play23 play24 play25 play26"`;
+                            "play13 play14 play15 play16"`;
                             document.getElementById("player-1-cards-planet-3").style.maxWidth = "17vw";
                             document.getElementById("player-1-cards-planet-4").style.maxWidth = "17vw";
                             document.getElementById("player-1-cards-planet-5").style.maxWidth = "17vw";
@@ -365,9 +365,9 @@
                         } else if (first_pos_in_play === 4) {
                             var new_grid_template_columns = `1fr 1fr 1fr`;
                             new_grid_template_areas = `
-                            "play14 play15 play16"
+                            "play24 play25 play26"
                             "planet4 planet5 planet6"
-                            "play24 play25 play26"`;
+                            "play14 play15 play16"`;
                             document.getElementById("player-1-cards-planet-4").style.maxWidth = "23vw";
                             document.getElementById("player-1-cards-planet-5").style.maxWidth = "23vw";
                             document.getElementById("player-1-cards-planet-6").style.maxWidth = "23vw";
@@ -377,9 +377,9 @@
                         } else if (first_pos_in_play === 5) {
                             var new_grid_template_columns = `1fr 1fr`;
                             new_grid_template_areas = `
-                            "play15 play16"
+                            "play25 play26"
                             "planet5 planet6"
-                            "play25 play26"`;
+                            "play15 play16"`;
                             document.getElementById("player-1-cards-planet-5").style.maxWidth = "35vw";
                             document.getElementById("player-1-cards-planet-6").style.maxWidth = "35vw";
                             document.getElementById("player-2-cards-planet-5").style.maxWidth = "35vw";
@@ -387,9 +387,9 @@
                         } else if (first_pos_in_play === 6) {
                             var new_grid_template_columns = `1fr`;
                             new_grid_template_areas = `
-                            "play16"
+                            "play26"
                             "planet6"
-                            "play26"`;
+                            "play16"`;
                             document.getElementById("player-1-cards-planet-6").style.maxWidth = "70vw";
                             document.getElementById("player-2-cards-planet-6").style.maxWidth = "70vw";
                         }
