@@ -717,17 +717,15 @@ def resolve_winnings(self, winner, loser, planet_id):
         winner.draw_card()
         winner.add_resources(1)
     winner.won_command_struggles_planets_round[planet_id] = True
-    if self.canceled_resource_bonuses[planet_id]:
-        resources_won = 0
-    else:
-        resources_won = chosen_planet.get_resources()
-    if self.canceled_card_bonuses[planet_id]:
-        cards_won = 0
-    else:
-        cards_won = chosen_planet.get_cards()
+    resources_won = chosen_planet.get_resources()
+    cards_won = chosen_planet.get_cards()
     extra_resources, extra_cards = winner.get_bonus_winnings_at_planet(planet_id)
     resources_won += extra_resources
     cards_won += extra_cards
+    if self.canceled_resource_bonuses[planet_id]:
+        resources_won = 0
+    if self.canceled_card_bonuses[planet_id]:
+        cards_won = 0
     ret_val = [winner.number, resources_won, cards_won]
     already_noxious = False
     if winner.search_card_in_hq("Omega Zero Command"):
