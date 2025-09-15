@@ -180,7 +180,7 @@
         cardHeight = 100;
         cardWidth = 63;
         var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
-
+        var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
         var mouse_x = 0;
         var mouse_y = 0;
 
@@ -548,6 +548,9 @@
                             }
                             var string_id = (i-5).toString();
                             var card_class = "Card";
+                            if (tokenNames.includes(card_name)) {
+                                card_class = "Token-Card";
+                            }
                             string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
                             if (hale === "B") {
                                 card_name += "_bloodied";
@@ -558,6 +561,9 @@
                             if (is_ready === "E") {
                                 rotation = "rotate: 90deg;";
                                 card_class = "Exhausted-Card";
+                                if (tokenNames.includes(card_name)) {
+                                    card_class = "Exhausted-Token-Card";
+                                }
                                 route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             }
                             for (var j = 7; j < card_data_split.length; j++) {
@@ -641,6 +647,9 @@
                         var additional_helper_text = card_data_split[5];
                         var string_id = (i-4).toString();
                         var card_class = "Card";
+                        if (tokenNames.includes(card_name)) {
+                            card_class = "Token-Card";
+                        }
                         var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                         if (hale === "D") {
                             if (target_user === "{{ user.username }}") {
@@ -659,6 +668,9 @@
                         var full_string = `<div class="Card-div small-sep">`;
                         if (is_ready === "E") {
                             card_class = "Exhausted-Card";
+                            if (tokenNames.includes(card_name)) {
+                                card_class = "Exhausted-Token-Card";
+                            }
                             rotation = " style='transform:rotate(90deg);'";
                         } else if (is_ready === "PR") {
                             card_class = "Exhausted-Card";
