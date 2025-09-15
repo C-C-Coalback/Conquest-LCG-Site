@@ -4444,9 +4444,9 @@ class Player:
         self.the_princes_might_active = [False, False, False, False, False, False, False]
         self.concealing_darkness_active = False
         for i in range(len(self.headquarters)):
+            if self.game.phase == "DEPLOY":
+                self.headquarters[i].cannot_ready_hq_phase = False
             if self.headquarters[i].get_is_unit():
-                if self.game.phase == "DEPLOY":
-                    self.headquarters[i].cannot_ready_hq_phase = False
                 self.headquarters[i].negative_hp_until_eop = 0
                 self.headquarters[i].hit_by_which_salamanders = []
                 self.headquarters[i].new_ability = ""
