@@ -558,6 +558,38 @@ summary:focus {
     min-height: 9vh;
 }
 
+#count-deck-p1 > p {
+    text-align: center;
+    font-size: 6vh;
+    color: yellow;
+}
+
+#count-deck-p2 > p {
+    text-align: center;
+    font-size: 6vh;
+    color: yellow;
+}
+
+#count-deck-p1 {
+    position:absolute;
+    bottom:5vh;
+    left: 10vw;
+    height:9vh;
+    width:6.63vh;
+    display: none;
+    pointer-events: none;
+}
+
+#count-deck-p2 {
+    position:absolute;
+    top:-5vh;
+    left: 10vw;
+    height:9vh;
+    width:6.63vh;
+    display: none;
+    pointer-events: none;
+}
+
 #current-deck-player-1 {
     position:absolute;
     bottom:0;

@@ -648,6 +648,8 @@ class Game:
         if self.p2.deck:
             if self.p1.search_card_in_hq("Urien's Oubliette"):
                 card_two = self.p2.deck[0]
+        card_one = card_one + "/" + str(len(self.p1.deck))
+        card_two = card_two + "/" + str(len(self.p2.deck))
         if force or self.last_deck_string_1 != card_one:
             self.last_deck_string_1 = card_one
             await self.send_update_message("GAME_INFO/DECK/1/" + card_one)

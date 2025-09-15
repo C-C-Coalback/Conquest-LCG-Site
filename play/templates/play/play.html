@@ -93,6 +93,12 @@
     <div id="current-deck-player-2">
         <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
     </div>
+    <div id="count-deck-p1">
+        <p>10</p>
+    </div>
+    <div id="count-deck-p2">
+        <p>10</p>
+    </div>
     <div id="headquarters-player-1">
         <p>Test hq p1</p>
     </div>
@@ -425,14 +431,15 @@
                 } else if (split_data[1] === "DECK") {
                     var target_deck_id = "current-deck-player-" + split_data[2];
                     var card_name = split_data[3].split(' ').join('_')
+                    var card_count = split_data[4];
                     if (card_name === "Cardback") {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" id="deck-p1" class="Card">`;
+                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)">`;
                     } else {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" id="deck-p1" class="Card">`;
+                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)">`;
                     }
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
@@ -893,6 +900,15 @@
             document.getElementById("LargeHelperCard").src=og_image_src;
         }
 
+        function changeDefDeck(image_src, card_count, user_num) {
+            var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            document.getElementById("LargeHelperCard").src=og_image_src;
+            var target_deck_id = "count-" + user_num;
+            var e = document.getElementById(target_deck_id);
+            e.innerHTML = `<p>` + card_count + `</p>`;
+            e.style.display = "block";
+        }
+
         function changeDefRotate(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
@@ -915,6 +931,12 @@
         function changeDefOut() {
             var helper = document.getElementById("helper-text-box")
             helper.style.display = "None";
+        }
+
+        function changeDefDeckOut(user_num) {
+            var target_deck_id = "count-" + user_num;
+            var e = document.getElementById(target_deck_id);
+            e.style.display = "none";
         }
 
         function showDiscard(discard_id) {
