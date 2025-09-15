@@ -38,6 +38,10 @@ h4 {
     "play10 play11 play12 play13 play14 play15 play16";
 }
 
+.small-sep {
+    padding-right: 20px;
+}
+
 #player-1-cards-planet-0 {
     grid-area:play10;
 }
@@ -365,6 +369,8 @@ h4 {
     left: 100px;
     pointer-events: auto;
     max-width: 60vw;
+    min-width: 20vw;
+    min-height: 9vh;
 }
 
 #headquarters-player-2 {
@@ -380,6 +386,8 @@ h4 {
     left: 100px;
     pointer-events: auto;
     max-width: 60vw;
+    min-width: 20vw;
+    min-height: 9vh;
 }
 
 #resources-player-1 {
@@ -465,6 +473,8 @@ h4 {
     display: flex;
     flex-direction: row;
     pointer-events: auto;
+    min-width: 20vw;
+    min-height: 9vh;
 }
 
 #current-deck-player-2 {
@@ -544,6 +554,8 @@ summary:focus {
     display: flex;
     flex-direction: row;
     pointer-events: auto;
+    min-width: 20vw;
+    min-height: 9vh;
 }
 
 #current-deck-player-1 {
