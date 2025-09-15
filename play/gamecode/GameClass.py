@@ -48,6 +48,7 @@ class Game:
         self.stored_deck_2 = None
         self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor"]
         self.attack_being_resolved = False
+        self.attack_resolution_cleanup = False
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, apoka_errata_cards, self)
         self.phase = "SETUP"
@@ -6176,6 +6177,8 @@ class Game:
             self.player_with_combat_turn = self.name_1
             self.number_with_combat_turn = "1"
 
+
+
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
         destroyed_something = False
@@ -6190,6 +6193,7 @@ class Game:
                             self.attacker_planet = -1
                             self.attacker_position = -1
                             if self.attack_being_resolved:
+                                self.attack_resolution_cleanup = True
                                 self.attack_being_resolved = False
                                 self.reset_combat_positions()
                                 self.toggle_combat_turn_values()
@@ -9492,7 +9496,14 @@ class Game:
                         for j in range(len(self.p2.cards_in_play[i + 1])):
                             self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
                             self.p2.cards_in_play[i + 1][j].just_entered_play = False
-            if not self.attack_being_resolved and not self.reactions_needing_resolving:
+            if self.attack_resolution_cleanup and not self.attack_being_resolved:
+                self.attack_resolution_cleanup = False
+                if self.damage_abilities_defender_active:
+                    self.damage_abilities_defender_active = False
+                    self.allow_damage_abilities_defender = True
+                    self.p1.reset_all_aiming_reticles_play_hq()
+                    self.p2.reset_all_aiming_reticles_play_hq()
+            if self.attack_being_resolved and not self.reactions_needing_resolving:
                 if self.damage_abilities_defender_active:
                     if self.attacker_position == -1:
                         self.damage_abilities_defender_active = False
@@ -9512,6 +9523,7 @@ class Game:
                         await CombatPhase.update_game_event_combat_section(
                             self, primary_player.name_player, last_game_update_string)
                         self.damage_abilities_defender_active = False
+                        await self.update_game_event(name, [], same_thread=True)
             if self.attack_being_resolved and self.defender_position == -1 and self.attacker_position == -1:
                 self.attack_being_resolved = False
                 self.p1.celestian_amelia_active = False
