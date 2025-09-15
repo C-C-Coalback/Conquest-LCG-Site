@@ -271,17 +271,19 @@ async def start_resolving_interrupt(self, name, game_update_string):
                                 "----GAME END----"
                                 "Victory for " + secondary_player.name_player + "; "
                                 + primary_player.name_player + " played a second Necrodermis whilst "
-                                + primary_player.name_player + "already have one active."
+                                + primary_player.name_player + "already has one active."
                                                                "----GAME END----"
                             )
+                            await self.send_victory_proper(secondary_player.name_player, "Necrodermis")
                         elif secondary_player.played_necrodermis:
                             await self.send_update_message(
                                 "----GAME END----"
                                 "Victory for " + primary_player.name_player + "; "
                                 + primary_player.name_player + " played a second Necrodermis whilst "
-                                + secondary_player.name_player + "already have one active."
+                                + secondary_player.name_player + "already has one active."
                                                                  "----GAME END----"
                             )
+                            await self.send_victory_proper(primary_player.name_player, "Necrodermis")
                         primary_player.played_necrodermis = True
                         self.delete_interrupt()
                     else:

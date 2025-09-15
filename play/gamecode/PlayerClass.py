@@ -906,6 +906,7 @@ class Player:
                 "Victory for " + self.name_player + "; sufficient icons on captured planets."
                                                     "----GAME END----"
             )
+            await self.game.send_victory_proper(self.name_player, "icons on captured planets")
 
     async def send_removed_cards(self, force=False):
         joined_string = "GAME_INFO/REMOVED/" + str(self.number) + "/" + self.name_player

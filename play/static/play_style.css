@@ -43,6 +43,21 @@ h4 {
     padding-left: 10px;
 }
 
+#victory-message-box {
+    position: absolute;
+    left: 35vw;
+    top: 40vh;
+    max-width: 50vw;
+    border-width: 2px;
+    border-style: double;
+    border-color: yellow;
+    background: rgba(102, 151, 163, 0.8);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+
 #player-1-cards-planet-0 {
     grid-area:play10;
 }

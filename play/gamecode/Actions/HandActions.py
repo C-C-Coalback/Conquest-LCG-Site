@@ -967,6 +967,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 + primary_player.name_player + " played a second Planet Absorption."
                                 "----GAME END----"
                             )
+                            await self.send_victory_proper(secondary_player.name_player, "Planet Absorption")
                         primary_player.draw_card()
                         primary_player.draw_card()
                         primary_player.draw_card()

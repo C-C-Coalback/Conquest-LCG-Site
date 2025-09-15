@@ -1383,6 +1383,10 @@ class Game:
         self.p1.force_due_to_dark_possession = False
         self.p2.force_due_to_dark_possession = False
 
+    async def send_victory_proper(self, winner_name, reason):
+        victory_string = "GAME_INFO/VICTORY_MESSAGE/" + winner_name + "/" + reason
+        await self.send_update_message(victory_string)
+
     def determine_last_planet(self):
         last = -1
         for i in range(len(self.planets_in_play_array)):
@@ -6365,18 +6369,21 @@ class Game:
                 "Victory for " + self.name_2 + "; " + self.name_1 + "'s warlord was destroyed."
                                                                     "----GAME END----"
             )
+            await self.send_victory_proper(self.name_2, "warlord destruction")
         elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_1 + "; " + self.name_2 + "'s warlord was destroyed."
                                                                     "----GAME END----"
             )
+            await self.send_victory_proper(self.name_1, "warlord destruction")
         elif self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
                 "Both warlords just died. I guess it is a draw?"
                 "----GAME END----"
             )
+            await self.send_victory_proper("Who knows who", "warlord destruction")
         self.p1.warlord_just_got_destroyed = False
         self.p2.warlord_just_got_destroyed = False
         self.reset_resolving_attack_on_units = True
@@ -6597,6 +6604,7 @@ class Game:
                 + self.name_1 + " played a Necrodermis this phase."
                                 "----GAME END----"
             )
+            await self.send_victory_proper(self.name_2, "Necrodermis")
         if self.p2.played_necrodermis:
             await self.send_update_message(
                 "----GAME END----"
@@ -6604,6 +6612,7 @@ class Game:
                 + self.name_2 + " played a Necrodermis this phase."
                                 "----GAME END----"
             )
+            await self.send_victory_proper(self.name_1, "Necrodermis")
         self.create_reactions_phase_begins()
 
     async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
@@ -9738,6 +9747,7 @@ class Game:
                 "Victory for " + self.name_2 + "; " + self.name_1 + " was unable to draw a card from their deck."
                                                                     "----GAME END----"
             )
+            await self.send_victory_proper(self.name_2, "deck out")
             self.p1.already_lost_due_to_deck = True
         if self.p2.lost_due_to_deck and not self.p2.already_lost_due_to_deck:
             await self.send_update_message(
@@ -9745,6 +9755,7 @@ class Game:
                 "Victory for " + self.name_1 + "; " + self.name_2 + " was unable to draw a card from their deck."
                                                                     "----GAME END----"
             )
+            await self.send_victory_proper(self.name_1, "deck out")
             self.p2.already_lost_due_to_deck = True
         print("---\nDEBUG INFO\n---")
         print(self.interrupts_waiting_on_resolution)
@@ -10125,6 +10136,7 @@ class Game:
                 + self.name_1 + " lost from Planet Absorption."
                                 "----GAME END----"
             )
+            await self.send_victory_proper(self.name_2, "Planet Absorption")
         if self.p2.planet_absorption_played:
             await self.game.send_update_message(
                 "----GAME END----"
@@ -10132,6 +10144,7 @@ class Game:
                 + self.name_2 + " lost from Planet Absorption."
                                 "----GAME END----"
             )
+            await self.send_victory_proper(self.name_1, "Planet Absorption")
         if self.p1.reinforced_synaptic_network_played:
             i = 0
             while i < len(self.p1.headquarters):
