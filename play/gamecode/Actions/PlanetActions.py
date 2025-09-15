@@ -86,6 +86,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.action_cleanup()
     elif self.action_chosen == "Imperial Blockade":
         self.imperial_blockades_active[chosen_planet] = self.imperial_blockades_active[chosen_planet] + 1
+        planet_name = self.get_planet_name(chosen_planet)
+        await self.send_update_message(planet_name + " targeted for Imperial Blockade.")
         self.action_cleanup()
     elif self.action_chosen == "Saim-Hann Jetbike":
         if not self.chosen_first_card:
@@ -136,9 +138,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         else:
             await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                   discounts=self.discounts_applied)
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
+            self.action_cleanup()
             self.card_pos_to_deploy = -1
             self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Exterminatus":
@@ -156,11 +156,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
             self.card_pos_to_deploy = -1
-            self.player_with_action = ""
-            self.action_chosen = ""
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.number
-            self.mode = self.stored_mode
+            self.action_cleanup()
     elif self.action_chosen == "Predation":
         adj_1 = chosen_planet - 1
         adj_2 = chosen_planet + 1
@@ -253,9 +249,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.cards_in_play[origin_planet + 1][origin_pos].set_once_per_phase_used(True)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
-            self.action_chosen = ""
-            self.mode = "Normal"
-            self.player_with_action = ""
+            self.action_cleanup()
             self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Shroud Cruiser":
         if self.chosen_first_card:
@@ -749,12 +743,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 secondary_player.discard_attachments_from_card(chosen_planet, i)
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
-        if self.phase == "DEPLOY":
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.get_number()
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.mode = "Normal"
+        self.action_cleanup()
     elif self.action_chosen == "Spore Burst":
         if self.infested_planets[chosen_planet]:
             primary_player.discard.remove(self.misc_target_choice)
@@ -763,11 +752,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.add_card_to_planet(card, chosen_planet)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.get_number()
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
+            self.action_cleanup()
     elif self.action_chosen == "Ork Kannon":
         self.location_of_indirect = "PLANET"
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
@@ -776,11 +761,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.p2.total_indirect_damage = 1
         self.p1.indirect_damage_applied = 0
         self.p2.indirect_damage_applied = 0
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.mode = "Normal"
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
+        self.action_cleanup()
     elif self.action_chosen == "Rapid Evolution Termagant":
         primary_player.summon_token_at_planet("Termagant", chosen_planet)
         self.action_chosen = "Rapid Evolution"
