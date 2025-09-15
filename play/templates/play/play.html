@@ -208,6 +208,7 @@
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         var string_id = (i-2).toString();
+                        var additional_helper_text = card_data_split[5];
                         if (card_name === "CardbackRotated") {
                             if (had_in_play_planet === "false") {
                                 outOfPlayPlanets.push(string_id);
@@ -227,7 +228,7 @@
                         if (typeof(element) != 'undefined' && element != null)
                         {
                             document.getElementById(container_id).innerHTML = ``;
-                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDefRotate(this.src)" onmouseout="changeDefOut()">`
+                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` data-helpertext="` + additional_helper_text + `" onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDefRotateAndHelp(this.src, this.dataset.helpertext)" onmouseout="changeDefOut()">`
                             if (card_data_split.length >= 2) {
                                 if (card_data_split[1] === "I") {
                                     full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
@@ -913,6 +914,20 @@
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
             document.getElementById("LargeHelperCard").src=og_image_src;
+        }
+
+        function changeDefRotateAndHelp(image_src, help_text) {
+            var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+            document.getElementById("LargeHelperCard").src=og_image_src;
+            help_text = help_text.replace("\n", "<br>")
+            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
+            console.log(help_text);
+            var helper = document.getElementById("helper-text-box")
+            helper.style.left = mouse_x + 'px';
+            helper.style.top = mouse_y + 'px';
+            helper.style.display = "Block";
+            helper.innerHTML = help_text;
         }
 
         function changeDefAndHelp(image_src, help_text) {

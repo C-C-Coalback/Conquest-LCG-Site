@@ -842,6 +842,51 @@ class Game:
                     planet_string += "E"
                 if j != len(self.p2.attachments_at_planet[i]) - 1:
                     planet_string += "_"
+            planet_string += "|"
+            info_string = ""
+            if self.imperial_blockades_active[i]:
+                info_string += "Imperial Blockades: " + str(self.imperial_blockades_active[i]) + ".\n"
+            if self.p1.rok_bombardment_active and i == self.last_planet_checked_for_battle:
+                info_string += self.name_1 + ": " + str(len(self.p1.rok_bombardment_active)) + " Rok Bombardments.\n"
+            if self.p2.rok_bombardment_active and i == self.last_planet_checked_for_battle:
+                info_string += self.name_2 + ": " + str(len(self.p2.rok_bombardment_active)) + " Rok Bombardments.\n"
+            if self.bloodthirst_active[i]:
+                info_string += "Bloodthirst is active.\n"
+            if self.wounded_scream_blanked and self.get_planet_name(i) == "Wounded Scream":
+                info_string += "Blanked.\n"
+            if self.additional_icons_planets_eob[i]:
+                info_string += "Additional Icons (EOB)\n"
+                if "blue" in self.additional_icons_planets_eob[i]:
+                    info_string += "Technology (Blue)\n"
+                if "green" in self.additional_icons_planets_eob[i]:
+                    info_string += "Strongpoint (Green)\n"
+                if "red" in self.additional_icons_planets_eob[i]:
+                    info_string += "Material (Red)\n"
+            if self.additional_icons_planets_eop[i]:
+                info_string += "Additional Icons (EOP)\n"
+                if "blue" in self.additional_icons_planets_eob[i]:
+                    info_string += "Technology (Blue)\n"
+                if "green" in self.additional_icons_planets_eob[i]:
+                    info_string += "Strongpoint (Green)\n"
+                if "red" in self.additional_icons_planets_eob[i]:
+                    info_string += "Material (Red)\n"
+            if self.p1.sac_altar_rewards[i]:
+                info_string += "Sacrifical Altar " + self.name_1 + " (" \
+                               + str(self.p1.sac_altar_rewards[i]) + ").\n"
+            if self.p2.sac_altar_rewards[i]:
+                info_string += "Sacrifical Altar " + self.name_2 + " (" \
+                               + str(self.p2.sac_altar_rewards[i]) + ").\n"
+            if self.p1.looted_skrap_active and self.p1.looted_skrap_planet == i:
+                info_string += "Looted Skrap " + self.name_1 + " (" + str(self.p1.looted_skrap_count) + ").\n"
+            if self.p2.looted_skrap_active and self.p2.looted_skrap_planet == i:
+                info_string += "Looted Skrap " + self.name_2 + " (" + str(self.p2.looted_skrap_count) + ").\n"
+            if self.p1.the_princes_might_active[i]:
+                info_string += "The Prince's Might " + self.name_1 + ".\n"
+            if self.p2.the_princes_might_active[i]:
+                info_string += "The Prince's Might " + self.name_2 + ".\n"
+            if not info_string:
+                info_string = "None"
+            planet_string += info_string
             if i != 6:
                 planet_string += "/"
         if planet_string != self.saved_planet_string or force:
