@@ -112,9 +112,15 @@ class Card:
         if self.once_per_game_used:
             string += "Once per game ability used\n"
         if self.once_per_round_used:
-            string += "Once per round ability used\n"
+            if isinstance(self.once_per_round_used, int):
+                string += str(self.once_per_round_used) + "x uses of ability.\n"
+            else:
+                string += "Once per round ability used\n"
         if self.once_per_phase_used:
-            string += "Once per phase ability used\n"
+            if isinstance(self.once_per_phase_used, int):
+                string += str(self.once_per_phase_used) + "x uses of ability.\n"
+            else:
+                string += "Once per phase ability used\n"
         if self.once_per_combat_round_used:
             string += "Once per combat round ability used\n"
         if self.cannot_ready_hq_phase:
@@ -469,9 +475,15 @@ class UnitCard(Card):
         if self.once_per_game_used:
             string += "Once per game ability used\n"
         if self.once_per_round_used:
-            string += "Once per round ability used\n"
+            if isinstance(self.once_per_round_used, int):
+                string += str(self.once_per_round_used) + "x uses of ability.\n"
+            else:
+                string += "Once per round ability used\n"
         if self.once_per_phase_used:
-            string += "Once per phase ability used\n"
+            if isinstance(self.once_per_phase_used, int):
+                string += str(self.once_per_phase_used) + "x uses of ability.\n"
+            else:
+                string += "Once per phase ability used\n"
         if self.once_per_combat_round_used:
             string += "Once per combat round ability used\n"
         if self.cannot_ready_hq_phase:

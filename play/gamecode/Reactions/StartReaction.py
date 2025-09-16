@@ -1775,7 +1775,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Sacred Rose Immolator":
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             if planet_pos != -2:
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].counter += 1
+                if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                    primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, 1)
+                else:
+                    primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, 2)
                 self.misc_misc = []
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
             else:

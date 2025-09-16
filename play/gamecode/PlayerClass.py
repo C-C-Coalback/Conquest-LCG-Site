@@ -2954,7 +2954,10 @@ class Player:
                     self.game.create_reaction("Convent Prioris Advisor", self.name_player,
                                               (int(self.number), destination, new_pos))
             if self.get_ability_given_pos(destination, new_pos) == "Sacred Rose Immolator":
-                if self.cards_in_play[destination + 1][new_pos].counter < 2:
+                if not self.get_once_per_round_used_given_pos(destination, new_pos):
+                    self.game.create_reaction("Sacred Rose Immolator", self.name_player,
+                                              (int(self.number), destination, new_pos))
+                elif self.get_once_per_round_used_given_pos(destination, new_pos) < 2:
                     self.game.create_reaction("Sacred Rose Immolator", self.name_player,
                                               (int(self.number), destination, new_pos))
             if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
@@ -3127,7 +3130,10 @@ class Player:
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
                 self.game.create_reaction("Piranha Hunter", self.name_player, (int(self.number), destination, new_pos))
             if self.get_ability_given_pos(destination, new_pos) == "Sacred Rose Immolator":
-                if self.cards_in_play[destination + 1][new_pos].counter < 2:
+                if not self.get_once_per_round_used_given_pos(destination, new_pos):
+                    self.game.create_reaction("Sacred Rose Immolator", self.name_player,
+                                              (int(self.number), destination, new_pos))
+                elif self.get_once_per_round_used_given_pos(destination, new_pos) < 2:
                     self.game.create_reaction("Sacred Rose Immolator", self.name_player,
                                               (int(self.number), destination, new_pos))
             for i in range(len(self.cards_in_play[origin_planet + 1])):

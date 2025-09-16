@@ -9613,7 +9613,9 @@ class Game:
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Sacred Rose Immolator":
-                                if self.p1.cards_in_play[planet + 1][i].counter < 2:
+                                if not self.p1.get_once_per_round_used_given_pos(planet, i):
+                                    self.create_reaction("Sacred Rose Immolator", self.name_1, (1, planet, i))
+                                elif self.p1.get_once_per_round_used_given_pos(planet, i) < 2:
                                     self.create_reaction("Sacred Rose Immolator", self.name_1, (1, planet, i))
                             if self.p1.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p1.search_card_at_planet(planet, "Blood Axe Strategist"):
@@ -9668,7 +9670,9 @@ class Game:
                                 if not self.p2.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Sacred Rose Immolator":
-                                if self.p2.cards_in_play[planet + 1][i].counter < 2:
+                                if not self.p2.get_once_per_round_used_given_pos(planet, i):
+                                    self.create_reaction("Sacred Rose Immolator", self.name_2, (2, planet, i))
+                                elif self.p2.get_once_per_round_used_given_pos(planet, i) < 2:
                                     self.create_reaction("Sacred Rose Immolator", self.name_2, (2, planet, i))
                             if self.p2.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p2.search_card_at_planet(planet, "Blood Axe Strategist"):
