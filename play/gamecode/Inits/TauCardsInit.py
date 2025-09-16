@@ -65,7 +65,7 @@ def tau_cards_init():
                              3, 3, 1, False, ranged=True),
         CardClasses.ArmyCard("Fireblade Kais'vre", "Interrupt: When you use a Tau card as a shield card "
                                                    "at this planet, it gains 1 shield icon.",
-                             "Solider. Hero.", 3, faction, "Loyal", 2, 3, 2, True),
+                             "Soldier. Hero.", 3, faction, "Loyal", 2, 3, 2, True),
         CardClasses.ArmyCard("Experimental Devilfish", "No Wargear Attachments.\n"
                                                        "Reaction: After this unit commits to a "
                                                        "planet, ready it.", "Vehicle. Transport.",
