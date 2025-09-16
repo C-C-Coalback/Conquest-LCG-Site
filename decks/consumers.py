@@ -219,12 +219,17 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 await self.send_deck(filename)
 
     async def send_deck(self, filename):
-        with open("decks/DeckStorage/" + self.name + "/" + filename, "r") as file:
-            content = file.readlines()
-        print("Name:", content[0].replace('\n', ''))
-        print("Warlord:", content[2].replace('\n', ''))
-        message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
-        await self.send(text_data=json.dumps({"message": message}))
+        username = self.name
+        if not self.name:
+            username = "Anonymous"
+        else:
+            target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + username + "/" + filename
+            with open(target_deck_dir, "r") as file:
+                content = file.readlines()
+            print("Name:", content[0].replace('\n', ''))
+            print("Warlord:", content[2].replace('\n', ''))
+            message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
+            await self.send(text_data=json.dumps({"message": message}))
 
     async def receive(self, text_data): # noqa
         global cards_array
@@ -407,13 +412,21 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     print("Need to save deck")
                     print(os.path.dirname(os.path.realpath(__file__)))
                     print(os.getcwd())
-                    if not os.path.isdir("decks/DeckStorage/" + self.name):
+                    username = self.name
+                    if not self.name:
+                        username = "Anonymous"
+                    print("username:", username)
+                    target_user_dir = os.getcwd() + "/decks/DeckStorage/" + username
+                    target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + username + "/" + deck_name
+                    print(target_user_dir)
+                    print(target_deck_dir)
+                    if not os.path.isdir(target_user_dir):
                         print("Path does not exist")
-                        os.mkdir("decks/DeckStorage/" + self.name)
+                        os.mkdir(target_user_dir)
                     will_send = False
-                    if not os.path.exists("decks/DeckStorage/" + self.name + "/" + deck_name):
+                    if not os.path.exists(target_deck_dir):
                         will_send = True
-                    with open("decks/DeckStorage/" + self.name + "/" + deck_name, "w") as file:
+                    with open(target_deck_dir, "w") as file:
                         file.write(split_message[1])
                     if will_send:
                         await self.send_deck(deck_name)
