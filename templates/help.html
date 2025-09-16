@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+        .box {
+            top: 80px;
+            margin-left:auto;
+            margin-right:auto;
+            width: 30vw;
+            height: auto;
+            background-color: lightblue;
+            opacity:0.8;
+            border: 2px solid blue;
+            padding: 2px;
+        }
+        .greetings {
+            position:absolute;
+            top: 80px;
+            left: 20px;
+        }
+
+        .profile-pic-entry-box {
+          width: 30vw;
+        }
+
+        .profile-pic-entry {
+          background-color: lightblue;
+          border: 2px solid blue;
+          width: 180px
+        }
+</style>
+<div class="box">
+  <h1>Debug commands</h1>
+  <p>Below are a list of debug commands that can be used during the game.</p>
+  <p>Commands are presented in the form of how they should be typed into the chat box in-game. If the command contains any "{}", you will need to replace this with what is indicated in the brackets. For example, a "{planet_pos}" indicates you need to replace this part with a planet number, i.e. 0, 1, 2, etc. Do not include any brackets in your command.</p>
+  <p>There are two kinds of command: safe and unsafe.</p>
+  <p>Safe commands require the game to be in a safe state, i.e. nothing is currently happening.</p>
+  <p>Unsafe commands do not require the game to be in a safe state, but have a higher risk of breaking something irreparably.</p>
+  <h3>Unsafe commands</h3>
+  <p><b>/loaddeck/{deck_name}</b> - Loads a deck that you own with the given name. Once you have loaded a deck, this command does nothing. If your deck is not found, nothing will happen.</p>
+  <p><b>/force-quit-action</b> - Forcefully quits action mode.</p>
+  <p><b>/force-quit-reactions</b> - Forcefully quits all queued reactions.</p>
+  <p><b>/force-quit-effects</b> - Forcefully quits all queued interrupts.</p>
+  <p><b>/force-quit-damage</b> - Forcefully quits all queued instances of damage.</p>
+  <p><b>/force-quit-moves</b> - Forcefully quits all queued moves.</p>
+  <h3>Safe commands</h3>
+  <p><b>/rearrange-deck/{player_num}/{num_cards}</b> - Allows you to rearrange the top {num_cards} of a player's deck.</p>
+  <p><b>/stop-rearrange-deck</b> - Stops rearranging a deck.</p>
+  <p><b>/set-resources/{player_num}/{amount}</b> - Set the resources of a player to {amount}.</p>
+  <p><b>/addcard/{player_num}/{card_name}</b> - Adds a card with the name {card_name} to a player's hand. If the card does not exist, nothing happens.</p>
+  <p><b>/draw/{player_num}/{amount}</b> - A player draws {amount} cards. Default amount is 1.</p>
+  <p><b>/discard/{player_num}/{card_pos}</b> - A player discards the card at {card_pos} in their hand.</p>
+  <p><b>/clear-reticle/{player_num}/{planet_pos}/{unit_pos}</b> - Clears a reticle at the given position. Use -2 for {planet_pos} to target the HQ.</p>
+  <p><b>/infest-planet/{planet_pos}</b> - Infest target planet.</p>
+  <p><b>/clear-infestation/{planet_pos}</b> - Remove infestation from target planet.</p>
+  <p><b>/ready-card/{player_num}/{planet_pos}/{unit_pos}</b> - Readies a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
+  <p><b>/exhaust-card/{player_num}/{planet_pos}/{unit_pos}</b> - Exhausts a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
+  <p><b>/set-damage/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Sets the damage on a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
+  <p><b>/set-faith/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Sets the faith on a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
+</div>
+{% endblock %}

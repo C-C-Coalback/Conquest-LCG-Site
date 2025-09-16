@@ -377,7 +377,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].reset_reactions_data()
                         await active_games[self.game_position].send_info_box()
                     elif message[1] == "force-quit-effects":
-                        await self.receive_game_update("FORCEFULLY QUITTING REACTIONS")
+                        await self.receive_game_update("FORCEFULLY QUITTING EFFECTS")
                         active_games[self.game_position].reset_effects_data()
                         await active_games[self.game_position].send_info_box()
                     elif message[1] == "force-quit-damage":

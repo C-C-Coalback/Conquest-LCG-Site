@@ -31,6 +31,7 @@ urlpatterns = [
     path("play/", include("play.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
     path('simple_upload/', views.simple_upload, name='simple_upload'),
+    path('help/', TemplateView.as_view(template_name="help.html"), name="help"),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     # path('favicon.ico/', RedirectView.as_view(url='/media/images/favicon.png')),
