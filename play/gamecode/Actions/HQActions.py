@@ -1515,7 +1515,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                         self.action_cleanup()
-    elif self.action_chosen == "Command-Link Drone":
+    elif self.action_chosen == "Command-link Drone":
         planet_pos = -2
         unit_pos = int(game_update_string[2])
         if primary_player.get_number() == game_update_string[1]:

@@ -30,7 +30,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                 print("ability:", ability)
                 if card_chosen.name_owner == self.player_with_action:
                     print("ok owner")
-                    if ability == "Command-Link Drone":
+                    if ability == "Command-link Drone":
                         if primary_player.spend_resources(1):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

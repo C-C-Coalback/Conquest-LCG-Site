@@ -1380,7 +1380,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_first_card = True
                     else:
                         self.action_cleanup()
-    elif self.action_chosen == "Command-Link Drone":
+    elif self.action_chosen == "Command-link Drone":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                 planet, position, attachment_position = self.position_of_selected_attachment
@@ -1912,7 +1912,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.action_cleanup()
-    elif self.action_chosen == "Call the Storm":
+    elif self.action_chosen == "Call The Storm":
         if not self.chosen_first_card:
             if planet_pos == self.misc_target_planet:
                 if game_update_string[1] == secondary_player.get_number():

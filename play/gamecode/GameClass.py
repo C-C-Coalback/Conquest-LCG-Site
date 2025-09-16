@@ -1342,7 +1342,7 @@ class Game:
                                             self.action_chosen = "Rain of Mycetic Spores"
                                             self.misc_target_planet = pos_planet
                         elif player_with_attach.attachments_at_planet[pos_planet][
-                                pos_attachment].get_ability() == "Call the Storm":
+                                pos_attachment].get_ability() == "Call The Storm":
                             if primary_player.number == game_update_string[2]:
                                 if player_with_attach.attachments_at_planet[pos_planet][
                                         pos_attachment].get_ready():
@@ -1350,7 +1350,7 @@ class Game:
                                                                               primary_player.name_player):
                                         player_with_attach.attachments_at_planet[pos_planet][
                                             pos_attachment].exhaust_card()
-                                        self.action_chosen = "Call the Storm"
+                                        self.action_chosen = "Call The Storm"
                                         self.chosen_first_card = False
                                         self.misc_target_planet = pos_planet
                     elif self.action_chosen == "Subdual":

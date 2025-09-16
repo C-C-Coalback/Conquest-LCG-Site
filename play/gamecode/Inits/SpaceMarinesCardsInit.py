@@ -510,7 +510,7 @@ def space_marines_cards_init():
                                                             "unit from your hand at a non-first planet, reducing its "
                                                             "cost by the number of tokens on this support.",
                                 "Location.", 3, faction, "Common", False, limited=True),
-        CardClasses.AttachmentCard("Call the Storm", "Attach to a planet.\n"
+        CardClasses.AttachmentCard("Call The Storm", "Attach to a planet.\n"
                                                      "Combat Action: If there is no enemy warlord at this planet, "
                                                      "exhaust this attachment to move a target enemy army unit at "
                                                      "this planet to a planet with a Space Wolves unit you control.",

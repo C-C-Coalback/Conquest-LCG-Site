@@ -20,7 +20,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 ability = card_chosen.get_ability()
-                if ability == "Command-Link Drone":
+                if ability == "Command-link Drone":
                     if primary_player.get_name_player() == self.player_with_action:
                         if primary_player.spend_resources(1):
                             self.action_chosen = ability

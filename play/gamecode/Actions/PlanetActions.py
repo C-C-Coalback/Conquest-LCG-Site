@@ -305,7 +305,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         for _ in range(num_snotlings):
             primary_player.summon_token_at_planet("Snotlings", chosen_planet)
         self.action_cleanup()
-    elif self.action_chosen == "Call the Storm":
+    elif self.action_chosen == "Call The Storm":
         if chosen_planet != self.misc_target_planet:
             if self.chosen_first_card:
                 if primary_player.check_for_trait_at_planet(chosen_planet, "Space Wolves"):
