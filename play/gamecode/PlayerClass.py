@@ -5074,6 +5074,8 @@ class Player:
             if self.search_attachments_at_pos(planet_id, unit_id, "Armour of Saint Katherine"):
                 damage = 3
         damage_on_card_before = self.cards_in_play[planet_id + 1][unit_id].get_damage()
+        if damage < 0:
+            damage = 0
         self.cards_in_play[planet_id + 1][unit_id].damage_card(self, damage, can_shield)
         damage_on_card_after = self.cards_in_play[planet_id + 1][unit_id].get_damage()
         total_damage_that_can_be_blocked = damage_on_card_after - prior_damage
