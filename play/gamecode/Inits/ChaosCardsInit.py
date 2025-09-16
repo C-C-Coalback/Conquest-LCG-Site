@@ -136,7 +136,7 @@ def chaos_cards_init():
                              1, "Chaos", "Loyal", 3, 3, 1, False),
         CardClasses.WarlordCard("Ku'gath Plaguefather", "Reaction: After this warlord is declared as an attacker, "
                                                         "move 1 damage from this warlord to another unit "
-                                                        "at this planet.", "Deamon. Nurgle.", "Chaos",
+                                                        "at this planet.", "Daemon. Nurgle.", "Chaos",
                                 1, 7, 1, 5, "Bloodied.", 7, 7,
                                 ["4x Ku'gath's Nurglings", "1x Vile Laboratory",
                                  "1x The Plaguefather's Banner", "2x Fetid Haze"]),
