@@ -3418,7 +3418,7 @@ class Player:
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
+                if self.check_for_trait_given_pos(planet_id, i, "Ethereal"):
                     command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
@@ -4847,7 +4847,7 @@ class Player:
                 attack_value += 2
         if ability == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].check_for_a_trait("Ethereal"):
+                if self.check_for_trait_given_pos(planet_id, i, "Ethereal"):
                     attack_value += 2
         if ability == "Sacaellum Shrine Guard" or ability == "Saim-Hann Kinsman":
             if self.game.get_green_icon(planet_id):
