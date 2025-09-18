@@ -6616,15 +6616,10 @@ class Player:
             card_name = card.deepstrike_card_name
         if card.get_card_type() == "Army":
             for i in range(len(self.cards_in_play[planet_num + 1])):
-                if self.cards_in_play[planet_num + 1][i].get_ability() == "Cadian Mortar Squad":
-                    already_cadian_mortar_squad = False
-                    for j in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[j] == "Cadian Mortar Squad":
-                            if self.game.player_who_resolves_reaction[j] == self.name_player:
-                                already_cadian_mortar_squad = True
-                    if not already_cadian_mortar_squad:
-                        self.game.create_reaction("Cadian Mortar Squad", self.name_player, (int(self.number),
-                                                                                            planet_num, -1))
+                if self.get_ability_given_pos(planet_num, i) == "Cadian Mortar Squad":
+                    if not self.check_if_already_have_reaction_of_position("Cadian Mortar Squad", planet_num, i):
+                        self.game.create_reaction("Cadian Mortar Squad", self.name_player,
+                                                  (int(self.number), planet_num, i))
                 for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
                     if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() \
                             == "Commissarial Bolt Pistol":
