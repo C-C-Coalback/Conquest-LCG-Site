@@ -18,6 +18,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     print(card.get_has_action_while_in_hand())
     if not self.action_chosen:
         self.card_pos_to_deploy = int(game_update_string[2])
+        can_continue = True
         if primary_player.subject_omega_relevant and self.phase == "COMBAT":
             if primary_player.get_ambush_of_card(card):
                 if not primary_player.enemy_holding_cell_check(card.get_name()):
@@ -28,7 +29,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                     primary_player.aiming_reticle_color = "blue"
                     self.omega_ambush_active = True
-        elif card.get_ability() == "Sanguinary Guard" and self.phase == "COMBAT":
+                    can_continue = False
+        if card.get_ability() == "Sanguinary Guard" and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
                 self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
@@ -37,7 +39,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 primary_player.aiming_reticle_color = "blue"
                 self.sanguinary_ambush_active = True
-        elif primary_player.get_ambush_of_card(card) and self.phase == "COMBAT":
+        elif primary_player.get_ambush_of_card(card) and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
                 self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
@@ -45,7 +47,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 primary_player.aiming_reticle_color = "blue"
-        elif card.get_has_action_while_in_hand() and not self.action_chosen:
+        elif card.get_has_action_while_in_hand() and not self.action_chosen and can_continue:
             if card.get_allowed_phases_while_in_hand() == self.phase or \
                     card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.get_ambush_of_card(card):
