@@ -50,7 +50,9 @@
   <p><b>/addcard/{player_num}/{card_name}</b> - Adds a card with the name {card_name} to a player's hand. If the card does not exist, nothing happens.</p>
   <p><b>/draw/{player_num}/{amount}</b> - A player draws {amount} cards. Default amount is 1.</p>
   <p><b>/discard/{player_num}/{card_pos}</b> - A player discards the card at {card_pos} in their hand.</p>
-  <p><b>/remove/{player_num}/{card_pos}</b> - A player removes the card at {card_pos} in their hand from the game.</p>
+  <p><b>/remove-hand/{player_num}/{card_pos}</b> - A player removes the card at {card_pos} in their hand from the game.</p>
+  <p><b>/remove-discard/{player_num}/{card_pos}</b> - A player removes the card at {card_pos} in their discard pile from the game.</p>
+  <p><b>/fully-remove/{player_num}/{card_pos}</b> - A player removes the card at {card_pos} in their removed from game pile completely.</p>
   <p><b>/infest-planet/{planet_pos}</b> - Infest target planet.</p>
   <p><b>/clear-infestation/{planet_pos}</b> - Remove infestation from target planet.</p>
   <p><b>/clear-reticle/{player_num}/{planet_pos}/{unit_pos}</b> - Clears a reticle at the given position. Use -2 for {planet_pos} to target the HQ.</p>
