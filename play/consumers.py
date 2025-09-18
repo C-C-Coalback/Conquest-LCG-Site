@@ -516,6 +516,20 @@ class GameConsumer(AsyncWebsocketConsumer):
                             active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                             await active_games[self.game_position].p2.send_hand()
                             await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "remove" and len(message) > 3:
+                        hand_pos = int(message[3])
+                        if message[2] == "1":
+                            card_name = active_games[self.game_position].p1.cards[hand_pos]
+                            active_games[self.game_position].p1.remove_card_from_game(card_name)
+                            del active_games[self.game_position].p1.cards[hand_pos]
+                            await active_games[self.game_position].p1.send_hand()
+                            await active_games[self.game_position].p1.send_removed_cards()
+                        elif message[2] == "2":
+                            card_name = active_games[self.game_position].p2.cards[hand_pos]
+                            active_games[self.game_position].p2.remove_card_from_game(card_name)
+                            del active_games[self.game_position].p2.cards[hand_pos]
+                            await active_games[self.game_position].p2.send_hand()
+                            await active_games[self.game_position].p2.send_removed_cards()
                     elif message[1] == "clear-reticle" and len(message) > 3:
                         num_player = message[2]
                         planet_pos = int(message[3])
