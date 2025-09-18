@@ -44,7 +44,7 @@ li a {
 
 body {
     background: black url("images/ImperialAquila.jpg") no-repeat;
-    background-size: cover;
+    background-size: 100%;
 }
 
 p {
