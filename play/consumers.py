@@ -669,6 +669,33 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     self.room_group_name, {"type": "chat.message",
                                                            "message": "server: Incorrect set-damage usage"}
                                 )
+                    elif message[1] == "assign-damage" and len(message) > 4:
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        damage = int(message[5])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
+                        if active_games[self.game_position].validate_received_game_string(unit_position):
+                            try:
+                                if num_player == "1":
+                                    if active_games[self.game_position].p1.check_is_unit_at_pos(
+                                            planet_pos, unit_pos):
+                                        active_games[self.game_position].p1.assign_damage_to_pos(
+                                            planet_pos, unit_pos, damage, by_enemy_unit=False)
+                                        await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
+                                elif unit_position[1] == "2":
+                                    if active_games[self.game_position].p2.check_is_unit_at_pos(
+                                            planet_pos, unit_pos):
+                                        active_games[self.game_position].p2.assign_damage_to_pos(
+                                            planet_pos, unit_pos, damage, by_enemy_unit=False)
+                                        await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
+                            except:
+                                await self.channel_layer.group_send(
+                                    self.room_group_name, {"type": "chat.message",
+                                                           "message": "server: Incorrect set-damage usage"}
+                                )
                 else:
                     message = self.name + ": " + "/".join(message)
                     print("receive:", message)
