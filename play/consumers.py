@@ -517,29 +517,22 @@ class GameConsumer(AsyncWebsocketConsumer):
                             await active_games[self.game_position].p2.send_hand()
                             await active_games[self.game_position].p2.send_discard()
                     elif message[1] == "clear-reticle" and len(message) > 3:
-                        unit_position = message[2:]
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
                             try:
-                                if unit_position[1] == "1":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p1.reset_aiming_reticle_in_play(
-                                            -2, int(unit_position[2]))
-                                        await active_games[self.game_position].p1.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p1.reset_aiming_reticle_in_play(
-                                            int(unit_position[2]), int(unit_position[3]))
-                                        await active_games[self.game_position].p1.send_units_at_planet(
-                                            int(unit_position[2]))
+                                if num_player == "1":
+                                    active_games[self.game_position].p1.reset_aiming_reticle_in_play(
+                                        planet_pos, unit_pos)
+                                    await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
                                 elif unit_position[1] == "2":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p2.reset_aiming_reticle_in_play(
-                                            -2, int(unit_position[2]))
-                                        await active_games[self.game_position].p2.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p2.reset_aiming_reticle_in_play(
-                                            int(unit_position[2]), int(unit_position[3]))
-                                        await active_games[self.game_position].p2.send_units_at_planet(
-                                            int(unit_position[2]))
+                                    active_games[self.game_position].p2.reset_aiming_reticle_in_play(
+                                        planet_pos, unit_pos)
+                                    await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
                             except:
                                 await self.channel_layer.group_send(
                                     self.room_group_name, {"type": "chat.message", "message": "server: "
@@ -554,123 +547,127 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].infested_planets[planet_pos] = False
                         await active_games[self.game_position].send_planet_array()
                     elif message[1] == "ready-card" and len(message) > 3:
-                        unit_position = message[2:]
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
                             try:
-                                if unit_position[1] == "1":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p1.ready_given_pos(-2, int(unit_position[2]))
-                                        await active_games[self.game_position].p1.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p1.ready_given_pos(int(unit_position[2]),
-                                                                                            int(unit_position[3]))
-                                        await active_games[self.game_position].p1.send_units_at_planet(
-                                            int(unit_position[2]))
+                                if num_player == "1":
+                                    active_games[self.game_position].p1.ready_given_pos(planet_pos, unit_pos)
+                                    await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
                                 elif unit_position[1] == "2":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p2.ready_given_pos(-2, int(unit_position[2]))
-                                        await active_games[self.game_position].p2.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p2.ready_given_pos(int(unit_position[2]),
-                                                                                            int(unit_position[3]))
-                                        await active_games[self.game_position].p2.send_units_at_planet(
-                                            int(unit_position[2]))
+                                    active_games[self.game_position].p2.ready_given_pos(planet_pos, unit_pos)
+                                    await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
                             except:
                                 await self.channel_layer.group_send(
                                     self.room_group_name, {"type": "chat.message", "message": "server: "
                                                                                               "Incorrect ready usage"}
                                 )
                     elif message[1] == "exhaust-card" and len(message) > 3:
-                        unit_position = message[2:]
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
                             try:
-                                if unit_position[1] == "1":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p1.exhaust_given_pos(-2, int(unit_position[2]))
-                                        await active_games[self.game_position].p1.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p1.exhaust_given_pos(int(unit_position[2]),
-                                                                                            int(unit_position[3]))
-                                        await active_games[self.game_position].p1.send_units_at_planet(
-                                            int(unit_position[2]))
+                                if num_player == "1":
+                                    active_games[self.game_position].p1.exhaust_given_pos(planet_pos, unit_pos)
+                                    await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
                                 elif unit_position[1] == "2":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p2.exhaust_given_pos(-2, int(unit_position[2]))
-                                        await active_games[self.game_position].p2.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p2.exhaust_given_pos(int(unit_position[2]),
-                                                                                            int(unit_position[3]))
-                                        await active_games[self.game_position].p2.send_units_at_planet(
-                                            int(unit_position[2]))
+                                    active_games[self.game_position].p2.exhaust_given_pos(planet_pos, unit_pos)
+                                    await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name, {"type": "chat.message", "message": "server: Incorrect exhaust usage"}
+                                    self.room_group_name, {"type": "chat.message", "message": "server: "
+                                                                                              "Incorrect exhaust usage"}
                                 )
-                    elif message[1] == "set-faith" and len(message) > 3:
-                        unit_position = message[2:]
-                        unit_position = unit_position[:-1]
-                        faith = message[-1]
-                        print(unit_position, faith)
+                    elif message[1] == "move-unit" and len(message) > 4:
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        destination = int(message[5])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
                             try:
-                                faith = int(faith)
-                                if unit_position[1] == "1":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p1.set_faith_given_pos(
-                                            -2, int(unit_position[2]), faith)
-                                        await active_games[self.game_position].p1.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p1.set_faith_given_pos(
-                                            int(unit_position[2]), int(unit_position[3]), faith)
-                                        await active_games[self.game_position].p1.send_units_at_planet(
-                                            int(unit_position[2]))
-                                elif unit_position[1] == "2":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p2.set_faith_given_pos(
-                                            -2, int(unit_position[2]), faith)
-                                        await active_games[self.game_position].p2.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p2.set_faith_given_pos(
-                                            int(unit_position[2]), int(unit_position[3]), faith)
-                                        await active_games[self.game_position].p2.send_units_at_planet(
-                                            int(unit_position[2]))
+                                if (active_games[self.game_position].planets_in_play_array[destination]
+                                        and 0 <= destination <= 6) or destination == -2:
+                                    if num_player == "1":
+                                        if active_games[self.game_position].p1.check_is_unit_at_pos(
+                                                planet_pos, unit_pos):
+                                            if destination == -2:
+                                                active_games[self.game_position].p1.move_unit_at_planet_to_hq(
+                                                    planet_pos, unit_pos)
+                                            else:
+                                                active_games[self.game_position].p1.move_unit_to_planet(
+                                                    planet_pos, unit_pos, destination)
+                                            await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
+                                            await active_games[self.game_position].p1.send_units_at_planet(destination)
+                                    elif unit_position[1] == "2":
+                                        if active_games[self.game_position].p2.check_is_unit_at_pos(
+                                                planet_pos, unit_pos):
+                                            if destination == -2:
+                                                active_games[self.game_position].p2.move_unit_at_planet_to_hq(
+                                                    planet_pos, unit_pos)
+                                            else:
+                                                active_games[self.game_position].p2.move_unit_to_planet(
+                                                    planet_pos, unit_pos, destination)
+                                            await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
+                                            await active_games[self.game_position].p2.send_units_at_planet(destination)
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name,
-                                    {"type": "chat.message", "message": "server: Incorrect SET-FAITH usage"}
+                                    self.room_group_name, {"type": "chat.message",
+                                                           "message": "server: Incorrect set-faith usage"}
                                 )
-                    elif message[1] == "set-damage" and len(message) > 3:
-                        unit_position = message[2:]
-                        unit_position = unit_position[:-1]
-                        damage = message[-1]
-                        print(unit_position, damage)
+                    elif message[1] == "set-faith" and len(message) > 4:
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        faith = int(message[5])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
                         if active_games[self.game_position].validate_received_game_string(unit_position):
                             try:
-                                damage = int(damage)
-                                if unit_position[1] == "1":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p1.set_damage_given_pos(
-                                            -2, int(unit_position[2]), damage)
-                                        await active_games[self.game_position].p1.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p1.set_damage_given_pos(
-                                            int(unit_position[2]), int(unit_position[3]), damage)
-                                        await active_games[self.game_position].p1.send_units_at_planet(
-                                            int(unit_position[2]))
+                                if num_player == "1":
+                                    active_games[self.game_position].p1.set_faith_given_pos(planet_pos, unit_pos, faith)
+                                    await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
                                 elif unit_position[1] == "2":
-                                    if unit_position[0] == "HQ":
-                                        active_games[self.game_position].p2.set_damage_given_pos(
-                                            -2, int(unit_position[2]), damage)
-                                        await active_games[self.game_position].p2.send_hq()
-                                    elif unit_position[0] == "IN_PLAY":
-                                        active_games[self.game_position].p2.set_damage_given_pos(
-                                            int(unit_position[2]), int(unit_position[3]), damage)
-                                        await active_games[self.game_position].p2.send_units_at_planet(
-                                            int(unit_position[2]))
+                                    active_games[self.game_position].p2.set_faith_given_pos(planet_pos, unit_pos, faith)
+                                    await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
                             except:
                                 await self.channel_layer.group_send(
-                                    self.room_group_name,
-                                    {"type": "chat.message", "message": "server: Incorrect SET-DAMAGE usage"}
+                                    self.room_group_name, {"type": "chat.message",
+                                                           "message": "server: Incorrect set-faith usage"}
+                                )
+                    elif message[1] == "set-damage" and len(message) > 4:
+                        num_player = message[2]
+                        planet_pos = int(message[3])
+                        unit_pos = int(message[4])
+                        damage = int(message[5])
+                        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+                        if message[3] == "-2":
+                            unit_position = ["HQ", message[2], message[4]]
+                        if active_games[self.game_position].validate_received_game_string(unit_position):
+                            try:
+                                if num_player == "1":
+                                    active_games[self.game_position].p1.set_damage_given_pos(
+                                        planet_pos, unit_pos, damage)
+                                    await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
+                                elif unit_position[1] == "2":
+                                    active_games[self.game_position].p2.set_damage_given_pos(
+                                        planet_pos, unit_pos, damage)
+                                    await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
+                            except:
+                                await self.channel_layer.group_send(
+                                    self.room_group_name, {"type": "chat.message",
+                                                           "message": "server: Incorrect set-damage usage"}
                                 )
                 else:
                     message = self.name + ": " + "/".join(message)
