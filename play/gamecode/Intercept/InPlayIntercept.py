@@ -592,6 +592,15 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
             except ValueError:
                 pass
             self.complete_intercept()
+    elif name_effect == "Soot-Blackend Axe":
+        primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
+        original_player = self.p1
+        if self.misc_target_choice == "2":
+            original_player = self.p2
+        original_player.remove_damage_from_pos(self.misc_target_unit[0], self.misc_target_unit[1], 1)
+        original_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+        self.action_cleanup()
+        self.complete_intercept()
     elif name_effect == "Keep Firing!":
         primary_player.ready_given_pos(planet_pos, unit_pos)
         self.action_cleanup()
