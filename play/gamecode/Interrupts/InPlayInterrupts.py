@@ -330,20 +330,43 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                             self.delete_interrupt()
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif current_interrupt == "Savage Parasite":
-        player_owning_card = self.p1
-        if player_owning_card.get_number() != game_update_string[1]:
-            player_owning_card = self.p2
-        not_own_card = True
+        can_continue = True
+        possible_interrupts = []
         if player_owning_card.name_player == primary_player.name_player:
-            not_own_card = False
-        card = FindCard.find_card("Savage Parasite", self.card_array, self.cards_dict,
-                                  self.apoka_errata_cards, self.cards_that_have_errata)
-        if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_card):
-            self.delete_interrupt()
-            try:
-                primary_player.discard.remove("Savage Parasite")
-            except ValueError:
-                pass
+            possible_interrupts = secondary_player.intercept_check()
+        if player_owning_card.name_player == secondary_player.name_player:
+            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                planet_pos, unit_pos, intercept_possible=True)
+            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                can_continue = False
+                await self.send_update_message("Immune to enemy card abilities.")
+        if possible_interrupts and can_continue:
+            can_continue = False
+            await self.send_update_message("Some sort of interrupt may be used.")
+            self.choices_available = possible_interrupts
+            self.choices_available.insert(0, "No Interrupt")
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Interrupt Effect?"
+            self.nullified_card_name = self.reactions_needing_resolving[0]
+            self.cost_card_nullified = 0
+            self.nullify_string = "/".join(game_update_string)
+            self.first_player_nullified = primary_player.name_player
+            self.nullify_context = "Interrupt"
+        if can_continue:
+            player_owning_card = self.p1
+            if player_owning_card.get_number() != game_update_string[1]:
+                player_owning_card = self.p2
+            not_own_card = True
+            if player_owning_card.name_player == primary_player.name_player:
+                not_own_card = False
+            card = FindCard.find_card("Savage Parasite", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_card):
+                self.delete_interrupt()
+                try:
+                    primary_player.discard.remove("Savage Parasite")
+                except ValueError:
+                    pass
     elif current_interrupt == "Magus Harid":
         if planet_pos == self.misc_target_planet:
             await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string)

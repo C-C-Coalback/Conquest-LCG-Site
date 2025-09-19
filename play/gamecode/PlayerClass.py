@@ -4061,7 +4061,7 @@ class Player:
                                 possible_interrupts.append("Immortal Loyalist")
                     for i in range(len(self.cards_in_play[planet_pos + 1])):
                         if self.get_ability_given_pos(planet_pos, i, bloodied_relevant=True) == "Jain Zar":
-                            if not self.cards_in_play[planet_pos + 1][unit_pos].once_per_round_used:
+                            if not self.cards_in_play[planet_pos + 1][i].once_per_round_used:
                                 possible_interrupts.append("Jain Zar")
         return possible_interrupts
 
@@ -4418,14 +4418,14 @@ class Player:
         i = 0
         while i < len(self.headquarters):
             if self.headquarters[i].get_sacrifice_end_of_phase():
-                self.sacrifice_card_in_hq(i)
-                sacrificed_locations[0] = True
-                i = i - 1
+                if self.sacrifice_card_in_hq(i):
+                    sacrificed_locations[0] = True
+                    i = i - 1
             elif self.headquarters[i].quick_construct:
-                self.sacrifice_card_in_hq(i)
-                sacrificed_locations[0] = True
-                i = i - 1
-                self.draw_card()
+                if self.sacrifice_card_in_hq(i):
+                    sacrificed_locations[0] = True
+                    i = i - 1
+                    self.draw_card()
             i = i + 1
         for planet_pos in range(7):
             unit_pos = 0

@@ -1322,9 +1322,32 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Naval Surgeon":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
-                primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
-                self.action_cleanup()
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True, event=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                    primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
+                    self.action_cleanup()
     elif self.action_chosen == "Hate":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
