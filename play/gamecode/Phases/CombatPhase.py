@@ -1305,7 +1305,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Trap Laying Hunter":
                                     if not secondary_player.cards_in_play[self.defender_planet + 1][
-                                        self.defender_position].misc_ability_used:
+                                            self.defender_position].misc_ability_used:
                                         self.create_interrupt("Trap Laying Hunter", secondary_player.name_player,
                                                               (int(secondary_player.number), self.defender_planet,
                                                                self.defender_position))

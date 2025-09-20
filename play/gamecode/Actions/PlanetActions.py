@@ -589,14 +589,15 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.choice_context = "Archon's Palace"
         self.name_player_making_choices = primary_player.name_player
     elif self.action_chosen == "Drudgery":
-        card = FindCard.find_card(self.misc_target_choice, self.card_array, self.cards_dict,
-                                  self.apoka_errata_cards, self.cards_that_have_errata)
-        primary_player.add_card_to_planet(card, chosen_planet)
-        primary_player.discard.remove(self.misc_target_choice)
-        if not primary_player.harbinger_of_eternity_active:
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
-        self.action_cleanup()
+        if self.chosen_first_card:
+            card = self.preloaded_find_card(self.misc_target_choice)
+            primary_player.add_card_to_planet(card, chosen_planet)
+            primary_player.aiming_reticle_coords_discard = None
+            primary_player.discard.remove(self.misc_target_choice)
+            if primary_player.search_hand_for_card("Optimized Protocol") and primary_player.resources > 0:
+                self.create_reaction("Optimized Protocol", primary_player.name_player,
+                                     (int(primary_player.get_number()), chosen_planet, -1))
+            self.action_cleanup()
     elif self.action_chosen == "Warpstorm":
         first_unit_damaged = True
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):

@@ -87,23 +87,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.harbinger_of_eternity_active = True
                             primary_player.remove_card_from_game(ability)
-                            self.name_player_making_choices = primary_player.name_player
-                            self.choices_available = []
-                            self.choice_context = ability
-                            for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.get_is_unit() and card.get_faction() != "Necrons" and card.get_cost() < 4:
-                                    self.choices_available.append(card.get_name())
-                            self.resolving_search_box = True
-                            if not self.choices_available:
-                                self.choice_context = ""
-                                self.name_player_making_choices = ""
-                                self.resolving_search_box = False
-                                await self.send_update_message(
-                                    "No valid targets for Drudgery"
-                                )
-                                self.action_cleanup()
+                            self.chosen_first_card = False
             elif ability == "Recycle":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):
@@ -153,6 +137,14 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         del primary_player.discard[pos_discard]
                         primary_player.used_reanimation_protocol = True
                         primary_player.remove_card_from_game(ability)
+    elif self.action_chosen == "Drudgery":
+        if not self.chosen_first_card:
+            if chosen_discard == int(primary_player.number):
+                card = self.preloaded_find_card(primary_player.discard[pos_discard])
+                if card.get_cost() < 4 and card.get_faction() != "Necrons" and card.get_card_type() == "Army":
+                    self.chosen_first_card = True
+                    self.misc_target_choice = card.get_name()
+                    primary_player.aiming_reticle_coords_discard = pos_discard
     elif self.action_chosen == "Eternity Gate":
         if chosen_discard == int(primary_player.number):
             primary_player.move_to_top_of_discard(pos_discard)
@@ -164,8 +156,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
     elif self.action_chosen == "Soul Seizure":
         if not self.chosen_first_card:
             if chosen_discard == int(secondary_player.number):
-                card = FindCard.find_card(secondary_player.discard[pos_discard], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(secondary_player.discard[pos_discard])
                 if card.get_card_type() == "Army":
                     if card.get_cost(primary_player.urien_relevant) <= primary_player.soul_seizure_value:
                         self.chosen_first_card = True

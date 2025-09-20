@@ -5765,11 +5765,6 @@ class Game:
                             )
                             primary_player.shuffle_deck()
                             self.action_cleanup()
-                    elif self.choice_context == "Drudgery":
-                        self.misc_target_choice = self.choices_available[int(game_update_string[1])]
-                        self.reset_choices_available()
-                        self.resolving_search_box = False
-
                     elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?" or \
                             self.choice_context == "Homing Beacon: Gain Card or Resource?":
                         self.reset_choices_available()
