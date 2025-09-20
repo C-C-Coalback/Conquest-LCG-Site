@@ -472,6 +472,11 @@ class UnitCard(Card):
             string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
         if self.extra_traits_eor:
             string += "Extra Traits (EOR): " + self.extra_traits_eor + "\n"
+        if self.hit_by_frenzied_wulfen_names:
+            string += "Hit by Frenzied Wulfen: "
+            for i in range(len(self.hit_by_frenzied_wulfen_names)):
+                string += self.hit_by_frenzied_wulfen_names[i] + " "
+            string += "\n"
         if self.once_per_game_used:
             string += "Once per game ability used\n"
         if self.once_per_round_used:
