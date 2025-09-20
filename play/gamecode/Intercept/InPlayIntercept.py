@@ -53,8 +53,6 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Zarathur's Flamers":
         primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True, shadow_field_possible=True)
-        og_pla, og_pos = self.position_of_actioned_card
-        secondary_player.sacrifice_card_in_play(og_pla, og_pos)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Tzeentch's Firestorm":

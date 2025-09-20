@@ -360,6 +360,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Zarathur's Flamers":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     elif ability == "Saint Celestine":
                         if not card_chosen.get_once_per_phase_used():
                             if not card_chosen.bloodied:
@@ -3238,10 +3239,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_cleanup()
                         await secondary_player.dark_eldar_event_played()
     elif self.action_chosen == "Zarathur's Flamers":
-        if game_update_string[1] == "1":
-            player_receiving_damage = self.p1
-        else:
-            player_receiving_damage = self.p2
         can_continue = True
         possible_interrupts = []
         if player_owning_card.name_player == primary_player.name_player:
@@ -3266,22 +3263,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.nullify_context = "In Play Action"
         if can_continue:
             if planet_pos == self.position_of_actioned_card[0]:
-                hitting_self = False
-                if player_receiving_damage.get_number() == primary_player.get_number():
-                    if int(game_update_string[3]) == self.position_of_actioned_card[1]:
-                        hitting_self = True
-                        await self.send_update_messagee("Dont hit yourself")
-                if not hitting_self:
-                    player_receiving_damage.assign_damage_to_pos(planet_pos, unit_pos, 2, shadow_field_possible=True,
-                                                                 rickety_warbuggy=True)
-                    primary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                          self.position_of_actioned_card[1])
-                    self.position_of_actioned_card = (-1, -1)
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, shadow_field_possible=True,
+                                                        rickety_warbuggy=True)
+                self.action_cleanup()
     elif self.action_chosen == "Inevitable Betrayal":
         if secondary_player.number == game_update_string[1]:
             if self.misc_target_planet == -1 or self.misc_target_planet == planet_pos:

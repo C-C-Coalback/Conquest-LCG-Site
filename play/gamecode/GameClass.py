@@ -2197,9 +2197,6 @@ class Game:
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
-            if self.nullified_card_name == "Zarathur's Flamers":
-                secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
             self.position_of_actioned_card = (-1, -1)
         elif self.nullify_context == "Reaction":
             self.delete_reaction()
@@ -2236,9 +2233,6 @@ class Game:
             self.action_chosen = ""
             self.player_with_action = ""
             self.mode = "Normal"
-            if self.nullified_card_name == "Zarathur's Flamers":
-                secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
             if self.nullified_card_name in self.dies_to_backlash:
                 secondary_player.destroy_card_in_play(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1])
@@ -2401,9 +2395,6 @@ class Game:
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
-                if self.nullified_card_name == "Zarathur's Flamers":
-                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
@@ -2450,9 +2441,6 @@ class Game:
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
-                if self.nullified_card_name == "Zarathur's Flamers":
-                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
@@ -2498,9 +2486,6 @@ class Game:
                 self.action_chosen = ""
                 self.player_with_action = ""
                 self.mode = "Normal"
-                if self.nullified_card_name == "Zarathur's Flamers":
-                    secondary_player.sacrifice_card_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
