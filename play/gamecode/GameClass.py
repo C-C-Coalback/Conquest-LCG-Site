@@ -341,7 +341,15 @@ class Game:
             "Sowing Chaos", "Blood For The Blood God!", "Inevitable Betrayal", "Rok Bombardment", "Mind War",
             "Mont'ka Strike", "Biomass Sacrifice", "Rapid Assault", "Eldritch Storm", "Sudden Adaptation",
             "Path of the Leader", "Bolster the Defense", "Warp Rift", "No Surprises", "A Thousand Cuts",
-            "Keep Firing!", "Vivisection", "Repent!", "Ominous Wind", "Daemonic Incursion", "Piercing Wail"
+            "Keep Firing!", "Vivisection", "Repent!", "Ominous Wind", "Daemonic Incursion", "Piercing Wail",
+            "The Siege Masters", "The Bloodied Host", "Our Last Stand", "Kwik' Konstruckshun",
+            "Painboy Surjery", "Looted Skrap", "Indiscriminate Bombing", "Kommando Cunning", "Everlasting Rage",
+            "Torturer of Worlds", "The Orgiastic Feast", "Supply Line Incursion", "Triumvirate of Ynnead",
+            "Theater of War", "Clash of Wings", "Lost in the Webway", "Access to the Black Library",
+            "Breach and Clear", "Consumed by the Kindred", "Guerrilla Tactics", "Tempting Ceasefire",
+            "Daring Assault", "Behind Enemy Lines", "Overrun", "Rapid Evolution", "Accelerated Gestation",
+            "Planet Absorption", "Reinforced Synaptic Network", "The Strength of the Enemy",
+            "Eldritch Reaping", "Imperial Blockade"
         ]
         self.forced_reactions = ["Anxious Infantry Platoon", "Warlock Destructor", "Treacherous Lhamaean",
                                  "Sickening Helbrute", "Shard of the Deceiver", "Drifting Spore Mines",
