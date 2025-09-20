@@ -658,6 +658,8 @@ def try_entire_command(self, planet_pos):
             if self.get_green_icon(planet_pos):
                 if self.p2.search_hand_for_card("Wraithguard Revenant"):
                     return "INTERRUPT DURING STRUGGLE"
+            if self.p2.search_for_card_everywhere("The Duke of Debris", limit_phase_rel=True):
+                return "INTERRUPT DURING STRUGGLE"
             if self.p1.search_card_in_hq("Archon's Palace", ready_relevant=True):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
