@@ -10207,20 +10207,16 @@ class Game:
         i = 0
         while i < len(self.p1.headquarters):
             if self.p1.headquarters[i].get_ability() == "Promethium Mine":
-                self.p1.headquarters[i].decrement_counter()
-                self.p1.add_resources(1)
-                if self.p1.headquarters[i].get_counter() <= 0:
-                    self.p1.destroy_card_in_hq(i)
-                    i = i - 1
+                if self.p1.headquarters[i].counter > 0:
+                    self.p1.headquarters[i].decrement_counter()
+                    self.p1.add_resources(1)
             i = i + 1
         i = 0
         while i < len(self.p2.headquarters):
             if self.p2.headquarters[i].get_ability() == "Promethium Mine":
-                self.p2.headquarters[i].decrement_counter()
-                self.p2.add_resources(1)
-                if self.p2.headquarters[i].get_counter() <= 0:
-                    self.p2.destroy_card_in_hq(i)
-                    i = i - 1
+                if self.p2.headquarters[i].counter > 0:
+                    self.p2.headquarters[i].decrement_counter()
+                    self.p2.add_resources(1)
             i = i + 1
         self.p1.set_can_play_limited(True)
         self.p2.set_can_play_limited(True)
