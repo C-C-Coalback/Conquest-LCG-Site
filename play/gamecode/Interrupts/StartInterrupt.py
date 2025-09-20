@@ -326,6 +326,9 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 await self.send_update_message("No planet to move to!")
             self.delete_interrupt()
+        elif current_interrupt == "Slumbering Gardens Special":
+            primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
+            self.delete_interrupt()
         elif current_interrupt == "Magus Harid":
             self.misc_player_storage = "RESOLVING MAGUS HARID"
             card_name = primary_player.magus_harid_waiting_cards[0]

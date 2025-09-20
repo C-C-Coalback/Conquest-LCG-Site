@@ -2789,8 +2789,12 @@ class Player:
             while j < len(self.cards_in_play[i + 1]):
                 if self.cards_in_play[i + 1][j].ethereal_movement_active:
                     self.cards_in_play[i + 1][j].ethereal_movement_active = False
-                    self.move_unit_at_planet_to_hq(i, j)
-                    j = j - 1
+                    if self.search_card_in_hq("Slumbering Gardens", ready_relevant=True):
+                        self.game.create_interrupt("Slumbering Gardens Special", self.name_player,
+                                                   (int(self.number), i, j))
+                    else:
+                        self.move_unit_at_planet_to_hq(i, j)
+                        j = j - 1
                 j = j + 1
 
     def reset_card_name_misc_ability(self, card_name):

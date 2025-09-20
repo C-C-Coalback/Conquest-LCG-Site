@@ -3606,6 +3606,9 @@ class Game:
                                 num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
                                 primary_player.discard_attachment_name_from_card(planet_pos, unit_pos,
                                                                                  "Ulthwe Spirit Stone")
+                            elif self.interrupts_waiting_on_resolution[0] == "Slumbering Gardens Special":
+                                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                                primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
                             elif self.interrupts_waiting_on_resolution[0] == "Trazyn the Infinite":
                                 num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
                                 if planet_pos == -2:
@@ -4947,7 +4950,6 @@ class Game:
                         self.shining_blade_active = False
                         self.number_with_combat_turn = primary_player.get_number()
                         self.player_with_combat_turn = primary_player.get_name_player()
-                        self.need_to_move_to_hq = True
                         self.attack_being_resolved = False
                         self.reset_choices_available()
                         self.resolving_search_box = False
