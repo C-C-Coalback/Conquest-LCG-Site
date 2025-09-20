@@ -1289,7 +1289,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                               self.defender_position))
                                 if secondary_player.cards_in_play[
                                     self.defender_planet + 1][self.defender_position] \
-                                        .get_card_type() == "Warlord":
+                                        .get_card_type() == "Warlord" or primary_player.name_player \
+                                        in secondary_player.cards_in_play[self.defender_planet + 1][
+                                        self.defender_position].hit_by_frenzied_wulfen_names:
                                     if primary_player.get_card_type_given_pos(self.attacker_planet,
                                                                               self.attacker_position) == "Warlord":
                                         for i in range(len(primary_player.headquarters)):
