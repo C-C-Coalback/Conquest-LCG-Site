@@ -29,20 +29,6 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.location_hand_attachment_shadowsun = hand_pos
                     primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
-        elif self.reactions_needing_resolving[0] == "Elysian Assault Team":
-            hand_pos = int(game_update_string[2])
-            if primary_player.cards[hand_pos] == "Elysian Assault Team":
-                planet_pos = self.positions_of_unit_triggering_reaction[0][1]
-                card = FindCard.find_card("Elysian Assault Team", self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                primary_player.add_card_to_planet(card, planet_pos)
-                del primary_player.cards[hand_pos]
-                more = False
-                for i in range(len(primary_player.cards)):
-                    if primary_player.cards[i] == "Elysian Assault Team":
-                        more = True
-                if not more:
-                    self.delete_reaction()
         elif current_reaction == "Adaptative Thorax Swarm":
             if hand_pos not in self.misc_player_storage:
                 primary_player.aiming_reticle_coords_hand_2 = hand_pos

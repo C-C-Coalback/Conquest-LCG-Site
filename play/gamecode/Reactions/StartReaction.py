@@ -2343,6 +2343,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Parasite of Mortrex: Search which area?"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Elysian Assault Team":
+            if primary_player.search_hand_for_card("Elysian Assault Team"):
+                card = self.preloaded_find_card("Elysian Assault Team")
+                primary_player.add_card_to_planet(card, planet_pos)
+                primary_player.remove_card_name_from_hand("Elysian Assault Team")
+                if primary_player.search_hand_for_card("Elysian Assault Team"):
+                    self.create_reaction("Elysian Assault Team", primary_player.name_player,
+                                         (int(primary_player.number), planet_pos, -1))
+            self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "The Emperor Protects":
             if secondary_player.nullify_check() and self.nullify_enabled:
                 await self.send_update_message(
