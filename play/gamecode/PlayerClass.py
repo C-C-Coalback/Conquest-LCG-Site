@@ -6607,6 +6607,7 @@ class Player:
         if planet_num == -2:
             self.add_card_in_hq_to_discard(card_pos)
             return None
+        self.game.reactions_on_destruction_permitted = True
         other_player = self.game.p1
         if other_player.name_player == self.name_player:
             other_player = self.game.p2
@@ -6788,6 +6789,7 @@ class Player:
         return False
 
     def add_card_in_hq_to_discard(self, card_pos):
+        self.game.reactions_on_destruction_permitted = True
         card = self.headquarters[card_pos]
         card_name = card.get_name()
         if card.actually_a_deepstrike:

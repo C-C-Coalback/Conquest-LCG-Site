@@ -2344,11 +2344,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
         elif self.reactions_needing_resolving[0] == "The Emperor Protects":
-            self.resolving_search_box = True
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use The Emperor Protects?"
-            self.name_player_making_choices = self.player_who_resolves_reaction[0]
-            self.delete_reaction()
+            if secondary_player.nullify_check() and self.nullify_enabled:
+                await self.send_update_message(
+                    primary_player.name_player + " wants to play The Emperor Protects; "
+                                                 "Nullify window offered.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Nullify?"
+                self.nullified_card_pos = -1
+                self.nullified_card_name = "The Emperor Protects"
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "The Emperor Protects"
+            else:
+                self.choices_available = primary_player.stored_targets_the_emperor_protects
+                self.choice_context = "Target The Emperor Protects:"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
         elif current_reaction == "Kroot Hunter":
             primary_player.add_resources(1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

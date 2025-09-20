@@ -482,6 +482,7 @@ class Game:
         self.grand_plan_active = False
         self.trium_count = 0
         self.trium_tracker = ("name", -1)
+        self.reactions_on_destruction_permitted = True
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -5204,6 +5205,7 @@ class Game:
                         self.emp_protecc()
                         self.resolving_search_box = False
                         self.reset_choices_available()
+                        self.delete_reaction()
                     elif self.choice_context == "Target Fall Back:":
                         primary_player.spend_resources(1)
                         if primary_player.urien_relevant:
@@ -6285,7 +6287,7 @@ class Game:
 
     async def complete_destruction_checks(self):
         if not self.reactions_needing_resolving and not self.interrupts_waiting_on_resolution \
-                and not self.resolving_search_box:
+                and not self.cards_in_search_box and not self.choices_available:
             self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
             self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
             self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
@@ -6295,74 +6297,76 @@ class Game:
             self.p2.stored_cards_recently_discarded += copy.deepcopy(self.p2.cards_recently_discarded)
             self.p1.stored_cards_recently_destroyed += copy.deepcopy(self.p1.cards_recently_destroyed)
             self.p2.stored_cards_recently_destroyed += copy.deepcopy(self.p2.cards_recently_destroyed)
-        if self.fall_back_check(self.p1):
-            already_fall_back = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Fall Back!":
-                    if self.player_who_resolves_reaction[i] == self.name_1:
-                        already_fall_back = True
-            if not already_fall_back:
-                self.create_reaction("Fall Back!", self.name_1, (1, -1, -1))
-        if self.fall_back_check(self.p2):
-            already_fall_back = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Fall Back!":
-                    if self.player_who_resolves_reaction[i] == self.name_2:
-                        already_fall_back = True
-            if not already_fall_back:
-                self.create_reaction("Fall Back!", self.name_2, (2, -1, -1))
-        if self.leviathan_hive_ship_check(self.p1):
-            already_hive_ship = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
-                    if self.player_who_resolves_reaction[i] == self.name_1:
-                        already_hive_ship = True
-            if not already_hive_ship:
-                self.create_reaction("Leviathan Hive Ship", self.name_1, (1, -1, -1))
-        if self.leviathan_hive_ship_check(self.p2):
-            already_hive_ship = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
-                    if self.player_who_resolves_reaction[i] == self.name_2:
-                        already_hive_ship = True
-            if not already_hive_ship:
-                self.create_reaction("Leviathan Hive Ship", self.name_2, (2, -1, -1))
-        if self.holy_sepulchre_check(self.p1):
-            already_sepulchre = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Holy Sepulchre":
-                    if self.player_who_resolves_reaction[i] == self.name_1:
-                        already_sepulchre = True
-            if not already_sepulchre:
-                self.create_reaction("Holy Sepulchre", self.name_1, (1, -1, -1))
-        if self.holy_sepulchre_check(self.p2):
-            already_sepulchre = False
-            for i in range(len(self.reactions_needing_resolving)):
-                if self.reactions_needing_resolving[i] == "Holy Sepulchre":
-                    if self.player_who_resolves_reaction[i] == self.name_2:
-                        already_sepulchre = True
-            if not already_sepulchre:
-                self.create_reaction("Holy Sepulchre", self.name_2, (2, -1, -1))
-        if self.p2.stored_cards_recently_destroyed:
-            if self.p1.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
-                already_warp_flame = False
+        if self.reactions_on_destruction_permitted:
+            self.reactions_on_destruction_permitted = False
+            if self.fall_back_check(self.p1):
+                already_fall_back = False
                 for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                    if self.reactions_needing_resolving[i] == "Fall Back!":
                         if self.player_who_resolves_reaction[i] == self.name_1:
-                            already_warp_flame = True
-                if not already_warp_flame:
-                    self.create_reaction("Shrine of Warpflame", self.name_1, (1, -1, -1))
-        if self.p1.stored_cards_recently_destroyed:
-            if self.p2.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
-                already_warp_flame = False
+                            already_fall_back = True
+                if not already_fall_back:
+                    self.create_reaction("Fall Back!", self.name_1, (1, -1, -1))
+            if self.fall_back_check(self.p2):
+                already_fall_back = False
                 for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                    if self.reactions_needing_resolving[i] == "Fall Back!":
                         if self.player_who_resolves_reaction[i] == self.name_2:
-                            already_warp_flame = True
-                if not already_warp_flame:
-                    self.create_reaction("Shrine of Warpflame", self.name_2, (2, -1, -1))
-        self.emp_protecc()
-        self.made_ta_fight()
+                            already_fall_back = True
+                if not already_fall_back:
+                    self.create_reaction("Fall Back!", self.name_2, (2, -1, -1))
+            if self.leviathan_hive_ship_check(self.p1):
+                already_hive_ship = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
+                        if self.player_who_resolves_reaction[i] == self.name_1:
+                            already_hive_ship = True
+                if not already_hive_ship:
+                    self.create_reaction("Leviathan Hive Ship", self.name_1, (1, -1, -1))
+            if self.leviathan_hive_ship_check(self.p2):
+                already_hive_ship = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Leviathan Hive Ship":
+                        if self.player_who_resolves_reaction[i] == self.name_2:
+                            already_hive_ship = True
+                if not already_hive_ship:
+                    self.create_reaction("Leviathan Hive Ship", self.name_2, (2, -1, -1))
+            if self.holy_sepulchre_check(self.p1):
+                already_sepulchre = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Holy Sepulchre":
+                        if self.player_who_resolves_reaction[i] == self.name_1:
+                            already_sepulchre = True
+                if not already_sepulchre:
+                    self.create_reaction("Holy Sepulchre", self.name_1, (1, -1, -1))
+            if self.holy_sepulchre_check(self.p2):
+                already_sepulchre = False
+                for i in range(len(self.reactions_needing_resolving)):
+                    if self.reactions_needing_resolving[i] == "Holy Sepulchre":
+                        if self.player_who_resolves_reaction[i] == self.name_2:
+                            already_sepulchre = True
+                if not already_sepulchre:
+                    self.create_reaction("Holy Sepulchre", self.name_2, (2, -1, -1))
+            if self.p2.stored_cards_recently_destroyed:
+                if self.p1.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                    already_warp_flame = False
+                    for i in range(len(self.reactions_needing_resolving)):
+                        if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                            if self.player_who_resolves_reaction[i] == self.name_1:
+                                already_warp_flame = True
+                    if not already_warp_flame:
+                        self.create_reaction("Shrine of Warpflame", self.name_1, (1, -1, -1))
+            if self.p1.stored_cards_recently_destroyed:
+                if self.p2.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                    already_warp_flame = False
+                    for i in range(len(self.reactions_needing_resolving)):
+                        if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
+                            if self.player_who_resolves_reaction[i] == self.name_2:
+                                already_warp_flame = True
+                    if not already_warp_flame:
+                        self.create_reaction("Shrine of Warpflame", self.name_2, (2, -1, -1))
+            self.emp_protecc()
+            self.made_ta_fight()
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
@@ -6418,9 +6422,6 @@ class Game:
             await self.complete_destruction_checks()
         else:
             self.resolve_destruction_checks_after_reactions = True
-            # await self.game_sockets[0].receive_game_update(
-            #     "Some damage/destruction reactions need to be resolved before actual destruction is done."
-            # )
 
     def advance_damage_aiming_reticle(self):
         if self.positions_of_units_to_take_damage:
@@ -9073,21 +9074,11 @@ class Game:
     def emp_protecc(self):
         if self.p1.stored_targets_the_emperor_protects:
             if self.p1.search_hand_for_card("The Emperor Protects"):
-                already_present = False
-                for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "The Emperor Protects":
-                        if self.player_who_resolves_reaction[i] == self.name_1:
-                            already_present = True
-                if not already_present:
+                if not self.p1.check_if_already_have_reaction("The Emperor Protects"):
                     self.create_reaction("The Emperor Protects", self.name_1, (1, -1, -1))
         if self.p2.stored_targets_the_emperor_protects:
             if self.p2.search_hand_for_card("The Emperor Protects"):
-                already_present = False
-                for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "The Emperor Protects":
-                        if self.player_who_resolves_reaction[i] == self.name_2:
-                            already_present = True
-                if not already_present:
+                if not self.p2.check_if_already_have_reaction("The Emperor Protects"):
                     self.create_reaction("The Emperor Protects", self.name_2, (2, -1, -1))
 
     def change_to_reserve(self, game_update_string):
