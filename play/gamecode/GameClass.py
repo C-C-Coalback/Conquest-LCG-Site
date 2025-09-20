@@ -3135,10 +3135,19 @@ class Game:
                         if choice_pos == 0:
                             pass
                         else:
+                            del self.choices_available[choice_pos]
                             choice_pos = choice_pos - 1
                             card_name = primary_player.deck[choice_pos]
                             primary_player.deck.append(card_name)
                             del primary_player.deck[choice_pos]
+                        self.rearranging_deck = True
+                        self.name_player_rearranging_deck = primary_player.name_player
+                        self.deck_part_being_rearranged = primary_player.deck[:len(self.choices_available) - 1]
+                        self.deck_part_being_rearranged.append("FINISH")
+                        self.number_cards_to_rearrange = len(self.choices_available) - 1
+                        self.choice_context = "Eldritch Council: Complete"
+                        self.choices_available = ["Click to complete."]
+                    elif self.choice_context == "Eldritch Council: Complete":
                         if len(primary_player.cards) < len(secondary_player.cards):
                             primary_player.draw_card()
                         self.delete_reaction()
@@ -9281,15 +9290,6 @@ class Game:
                     )
 
     def stop_rearranging_deck(self):
-        if self.choice_context == "Eldritch Council: Choose Card":
-            player = self.p1
-            if self.name_player_rearranging_deck == self.name_2:
-                player = self.p2
-            new_choices = ["Move Nothing"]
-            for i in range(len(self.choices_available)):
-                new_choices.append(player.deck[i])
-            self.choices_available = new_choices
-            self.queued_message = "Now choose a card to place on the bottom of your deck."
         self.rearranging_deck = False
         self.name_player_rearranging_deck = ""
         self.deck_part_being_rearranged = []
