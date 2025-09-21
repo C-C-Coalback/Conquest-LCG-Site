@@ -4119,6 +4119,8 @@ class Player:
         self.discard_card_name_from_hand("Foretell")
         if self.urien_relevant:
             self.spend_resources(1)
+        if self.search_hand_for_card("Banshee Assault Squad"):
+            self.game.create_reaction("Banshee Assault Squad", self.name_player, (int(self.number), -1, -1))
 
     def search_hand_for_card(self, card_name):
         for i in range(len(self.cards)):
