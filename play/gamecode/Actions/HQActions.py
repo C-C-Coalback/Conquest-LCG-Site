@@ -1843,22 +1843,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].get_is_unit():
                 primary_player.return_card_to_hand(planet_pos, unit_pos)
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
+                self.action_cleanup()
+                primary_player.reset_all_aiming_reticles_play_hq()
     elif self.action_chosen == "Reanimation Protocol":
         if primary_player.get_number() == game_update_string[1]:
-            unit_pos = int(game_update_string[2])
             if primary_player.get_faction_given_pos(-2, unit_pos) == "Necrons" and \
                     primary_player.headquarters[unit_pos].get_is_unit():
                 primary_player.remove_damage_from_pos(-2, unit_pos, 2, healing=True)
@@ -1876,31 +1866,18 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].check_for_a_trait("Ethereal", primary_player.etekh_trait):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.chosen_first_card = True
     elif self.action_chosen == "Khymera Den":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].get_name() == "Khymera":
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].check_for_a_trait("Cultist", primary_player.etekh_trait):
                 if primary_player.sacrifice_card_in_hq(unit_pos):
                     if planet_pos == self.position_of_actioned_card[0]:

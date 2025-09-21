@@ -2418,10 +2418,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_context = "In Play Action"
                 if can_continue:
                     primary_player.return_card_to_hand(planet_pos, unit_pos)
-                    self.action_cleanup()
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
-                    self.position_of_actioned_card = (-1, -1)
+                    self.action_cleanup()
     elif self.action_chosen == "World Engine Beam":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
