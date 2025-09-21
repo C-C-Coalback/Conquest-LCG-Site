@@ -2225,10 +2225,27 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Contaminated Convoys":
-            if primary_player.spend_resources(1):
-                primary_player.discard_card_name_from_hand("Contaminated Convoys")
-                primary_player.contaminated_convoys = True
-            self.delete_reaction()
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Accept Any Challenge; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Accept Any Challenge"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Contaminated Convoys")
+                        primary_player.contaminated_convoys = True
+                    self.delete_reaction()
         elif current_reaction == "Drifting Spore Mines":
             if planet_pos != 6 or self.planets_in_play_array[5]:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
