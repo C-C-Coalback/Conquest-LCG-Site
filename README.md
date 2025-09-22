@@ -24,7 +24,9 @@ I assume you already have some knowledge of git, python and docker.
 
 You will need Python 3.13.1 and docker installed.
 
-First run "py -m pip install -r requirements.txt" to install dependencies.
+Git clone the repo and cd into it.
+
+Run "py -m pip install -r requirements.txt" to install dependencies.
 
 In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
 
