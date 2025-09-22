@@ -1,5 +1,6 @@
-# Conquest-LCG-site
-Repo for the Warhammer 40k Conquest website using Python Django.
+# Iridial.net - Play the Warhammer 40,000: Conquest LCG in your browser!
+
+![Iridial preview](staticfiles/images/IridialPreview.png)
 
 # Live from the Traxis Sector:
 
