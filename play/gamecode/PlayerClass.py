@@ -1869,6 +1869,9 @@ class Player:
         if type_of_card not in allowed_types:
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
+        if card.unit_must_match_faction:
+            if card.get_faction() != target_card.get_faction():
+                return False
         if card.required_traits not in target_card.get_traits():
             if card.get_name() == "Drone Defense System":
                 if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
@@ -3370,9 +3373,6 @@ class Player:
                             self.game.create_reaction("Experimental Devilfish", self.name_player,
                                                       (int(self.number), planet_pos - 1, -1))
                             self.game.player_who_resolves_reaction.append(self.name_player)
-                        if headquarters_list[i].get_ability() == "Ardent Auxiliaries":
-                            self.game.create_reaction("Ardent Auxiliaries", self.name_player,
-                                                      (int(self.number), planet_pos - 1, -1))
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
                         self.game.create_reaction("Old Zogwort", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
@@ -3402,6 +3402,10 @@ class Player:
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
                     self.move_unit_to_planet(-2, i, planet_pos - 1, card_effect=False)
+                    last_element_index = len(self.cards_in_play[planet_pos]) - 1
+                    if self.get_ability_given_pos(planet_pos - 1, last_element_index) == "Ardent Auxiliaries":
+                        self.game.create_reaction("Ardent Auxiliaries", self.name_player,
+                                                  (int(self.number), planet_pos - 1, last_element_index))
                     if card_type == "Warlord":
                         if self.search_hand_for_card("Tides of Chaos"):
                             if self.resources > 0:

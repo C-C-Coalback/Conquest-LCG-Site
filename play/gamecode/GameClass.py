@@ -10332,7 +10332,7 @@ class Game:
             self.choice_context = "Deepstrike cards?"
             self.resolving_search_box = True
             if self.p1.check_for_cards_in_reserve(planet_pos) and self.p2.check_for_cards_in_reserve(planet_pos):
-                if self.game.player_with_initiative == self.name_1:
+                if self.player_with_initiative == self.name_1:
                     self.name_player_making_choices = self.name_1
                 else:
                     self.name_player_making_choices = self.name_2

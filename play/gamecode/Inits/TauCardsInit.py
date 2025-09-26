@@ -485,7 +485,7 @@ def tau_cards_init():
         CardClasses.SupportCard("Dal'yth Sept", "While there are two or more tokens on this support, you may use it "
                                                 "from play as a shield card with 4 shield icons.\n"
                                                 "Reaction: After your opponent captures a planet, put "
-                                                "a token on this support.", "Pledge.", 1, faction, "Loyal", False),
+                                                "a token on this support.", "Pledge.", 0, faction, "Loyal", False),
         CardClasses.SupportCard("Vior'la Sept", "If there are 3 or more tokens on this support, sacrifice it.\n"
                                                 "Reaction: After the phase command ends, put a Defense Battery into "
                                                 "play from the card collection at a planet without Defense Battery you "
