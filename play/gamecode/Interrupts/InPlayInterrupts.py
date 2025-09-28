@@ -166,6 +166,16 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             if can_continue:
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
+    elif current_interrupt == "Prognosticator":
+        valid_planet = False
+        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+            if primary_player.cards_in_play[planet_pos + 1][i].recently_assigned_damage:
+                valid_planet = True
+        if valid_planet:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
+                self.delete_interrupt()
     elif current_interrupt == "Blood of Martyrs":
         if game_update_string[1] == primary_player.number:
             if not self.chosen_first_card:

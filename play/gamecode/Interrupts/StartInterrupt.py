@@ -326,6 +326,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 await self.send_update_message("No planet to move to!")
             self.delete_interrupt()
+        elif current_interrupt == "Prognosticator":
+            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
         elif current_interrupt == "Slumbering Gardens Special":
             primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
             self.delete_interrupt()

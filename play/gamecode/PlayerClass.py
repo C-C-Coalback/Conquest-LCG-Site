@@ -5095,16 +5095,16 @@ class Player:
                 for i in range(len(self.headquarters)):
                     if self.get_ability_given_pos(-2, i) == "Prognosticator":
                         if not self.get_once_per_round_used_given_pos(-2, i):
-                            if not self.check_if_already_have_reaction_of_position("Prognosticator", -2, i):
-                                self.game.create_reaction("Prognosticator", self.name_player,
-                                                          (int(self.number), -2, i))
+                            if not self.check_if_already_have_interrupt_of_position("Prognosticator", -2, i):
+                                self.game.create_interrupt("Prognosticator", self.name_player,
+                                                           (int(self.number), -2, i))
                 for i in range(7):
                     for j in range(len(self.cards_in_play[i + 1])):
                         if self.get_ability_given_pos(i, j) == "Prognosticator":
                             if not self.get_once_per_round_used_given_pos(i, j):
-                                if not self.check_if_already_have_reaction_of_position("Prognosticator", i, j):
-                                    self.game.create_reaction("Prognosticator", self.name_player,
-                                                              (int(self.number), i, j))
+                                if not self.check_if_already_have_interrupt_of_position("Prognosticator", i, j):
+                                    self.game.create_interrupt("Prognosticator", self.name_player,
+                                                               (int(self.number), i, j))
             if self.get_unstoppable_given_pos(planet_id, unit_id):
                 if not self.cards_in_play[planet_id + 1][unit_id].once_per_round_used:
                     self.cards_in_play[planet_id + 1][unit_id].once_per_round_used = True
