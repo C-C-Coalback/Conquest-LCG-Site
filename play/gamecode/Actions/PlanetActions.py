@@ -325,7 +325,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if primary_player.check_for_warlord(chosen_planet) == 0 and \
                     secondary_player.check_for_warlord(chosen_planet) == 0:
                 self.kaerux_erameas_active = True
-                self.before_first_combat = False
+                self.actions_between_battle = False
                 self.p1.has_passed = False
                 self.p2.has_passed = False
                 self.begin_battle(chosen_planet)

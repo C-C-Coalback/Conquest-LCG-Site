@@ -545,7 +545,8 @@ async def update_game_event_command_section(self, name, game_update_string):
             self.before_command_struggle = False
             self.after_command_struggle = False
             await self.change_phase("COMBAT")
-            self.before_first_combat = True
+            self.actions_between_battle = True
+            self.last_planet_checked_for_battle = -1
             self.p1.has_passed = False
             self.p2.has_passed = False
             self.p1.set_available_mobile_all(True)

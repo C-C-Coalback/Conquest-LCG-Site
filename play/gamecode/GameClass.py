@@ -421,7 +421,7 @@ class Game:
         self.shining_blade_active = False
         self.value_doom_siren = 0
         self.misc_counter_2 = 0
-        self.before_first_combat = False
+        self.actions_between_battle = False
         self.last_planet_checked_command_struggle = -1
         self.planet_aiming_reticle_active = True
         self.during_command_struggle = False
@@ -1759,6 +1759,9 @@ class Game:
                     self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     await winner.send_victory_display()
+                elif self.round_number != self.last_planet_checked_for_battle and not self.herald_of_the_waagh_active:
+                    if winner.check_for_warlord(self.last_planet_checked_for_battle):
+                        winner.retreat_warlord()
                 self.planet_aiming_reticle_active = False
             self.planet_aiming_reticle_position = -1
             self.p1.reset_extra_attack_eob()
@@ -1773,7 +1776,7 @@ class Game:
             self.mode = "Normal"
             if self.kaerux_erameas_active:
                 self.kaerux_erameas_active = False
-                self.before_first_combat = True
+                self.actions_between_battle = True
                 self.last_planet_checked_for_battle = -1
             elif self.herald_of_the_waagh_active:
                 self.p1.has_passed = False
@@ -1781,19 +1784,8 @@ class Game:
                 self.herald_of_the_waagh_active = False
                 self.last_planet_checked_for_battle = -1
             else:
-                another_battle = self.find_next_planet_for_combat()
-                if another_battle:
-                    self.set_battle_initiative()
-                    if not self.start_battle_deepstrike:
-                        self.p1.has_passed = False
-                        self.p2.has_passed = False
-                    self.planet_aiming_reticle_active = True
-                    self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
-                else:
-                    await self.change_phase("HEADQUARTERS")
-                    await self.send_update_message(
-                        "Window provided for reactions and actions during HQ phase."
-                    )
+                self.actions_between_battle = True
+                await self.send_update_message("Window allowed for actions between battles.")
         self.tense_negotiations_active = False
         if self.theater_of_war_active:
             self.theater_of_war_active = False

@@ -1,7 +1,7 @@
 async def update_game_event_combat_section(self, name, game_update_string):
     if self.mode == "ACTION":
         await self.update_game_event_action(name, game_update_string)
-    elif self.before_first_combat:
+    elif self.actions_between_battle:
         if game_update_string[0] == "action-button":
             if self.get_actions_allowed():
                 self.stored_mode = self.mode
@@ -19,27 +19,32 @@ async def update_game_event_combat_section(self, name, game_update_string):
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             if name == self.name_1:
                 if not self.p1.has_passed:
-                    await self.send_update_message(self.name_1 + " is ready to proceed to the battle "
-                                                                 "for the first planet")
+                    await self.send_update_message(self.name_1 + " is ready to proceed to the next battle.")
                 self.p1.has_passed = True
             else:
                 if not self.p2.has_passed:
-                    await self.send_update_message(self.name_2 + " is ready to proceed to the battle "
-                                                                 "for the first planet")
+                    await self.send_update_message(self.name_2 + " is ready to proceed to the next battle.")
                 self.p2.has_passed = True
             if self.p1.has_passed and self.p2.has_passed:
-                self.before_first_combat = False
+                self.actions_between_battle = False
                 self.p1.has_passed = False
                 self.p2.has_passed = False
-                self.last_planet_checked_for_battle = -1
-                if self.bloodrain_tempest_active:
-                    self.last_planet_checked_for_battle = 7
-                self.find_next_planet_for_combat()
-                await self.send_update_message("Battle begins at the first planet. Players take combat turns. "
-                                               "Press the action button between turns to take an action.")
-                self.set_battle_initiative()
-                self.planet_aiming_reticle_active = True
-                self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                another_battle = self.find_next_planet_for_combat()
+                if another_battle:
+                    self.set_battle_initiative()
+                    if not self.start_battle_deepstrike:
+                        self.p1.has_passed = False
+                        self.p2.has_passed = False
+                    self.planet_aiming_reticle_active = True
+                    self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
+                    await self.send_update_message(
+                        "Battle begins at the " + self.get_planet_name(self.last_planet_checked_for_battle) +
+                        ". Players take combat turns. Press the action button between turns to take an action.")
+                else:
+                    await self.change_phase("HEADQUARTERS")
+                    await self.send_update_message(
+                        "Window provided for reactions and actions during HQ phase."
+                    )
     elif len(game_update_string) == 1:
         if game_update_string[0] == "action-button":
             if self.get_actions_allowed():
