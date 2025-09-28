@@ -956,7 +956,7 @@
         function changeDefAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             document.getElementById("LargeHelperCard").src=og_image_src;
-            help_text = help_text.replace("\n", "<br>")
+            help_text = help_text.replaceAll("\n", "<br>")
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
             var helper = document.getElementById("helper-text-box")
