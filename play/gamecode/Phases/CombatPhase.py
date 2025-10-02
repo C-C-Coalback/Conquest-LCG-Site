@@ -918,17 +918,19 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         can_continue = False
                             if is_ready_lych and is_fl and is_exa_can and is_gene_hybrid:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
-                                    if (secondary_player.get_ability_given_pos(
-                                            self.defender_planet, i) == "Lychguard Sentinel" and
-                                        secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
-                                            secondary_player.get_ability_given_pos(
-                                                self.defender_planet, i) == "Front Line 'Ard Boyz" or \
-                                            secondary_player.get_ability_given_pos(
-                                                self.defender_planet, i) == "Genestealer Hybrids" or \
-                                            (exa and secondary_player.check_for_trait_given_pos(
-                                                self.defender_planet, i, "Warrior")):
-                                        can_continue = False
-                                        print("Found FL")
+                                    if not self.sweep_active or secondary_player.cards_in_play[
+                                            self.defender_planet + 1][i].valid_sweep_target:
+                                        if (secondary_player.get_ability_given_pos(
+                                                self.defender_planet, i) == "Lychguard Sentinel" and
+                                            secondary_player.get_ready_given_pos(self.defender_planet, i)) or \
+                                                secondary_player.get_ability_given_pos(
+                                                    self.defender_planet, i) == "Front Line 'Ard Boyz" or \
+                                                secondary_player.get_ability_given_pos(
+                                                    self.defender_planet, i) == "Genestealer Hybrids" or \
+                                                (exa and secondary_player.check_for_trait_given_pos(
+                                                    self.defender_planet, i, "Warrior")):
+                                            can_continue = False
+                                            print("Found FL")
                             if self.sweep_active and can_continue:
                                 if not secondary_player.cards_in_play[self.defender_planet + 1][
                                         self.defender_position].valid_sweep_target:

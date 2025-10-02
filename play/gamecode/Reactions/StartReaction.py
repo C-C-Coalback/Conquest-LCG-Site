@@ -1689,6 +1689,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.damage_abilities_defender_active = True
         elif current_reaction == "Sweep":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+            primary_player.cards_in_play[planet_pos + 1][unit_pos].resolving_attack = True
             self.attacker_planet = planet_pos
             self.attacker_position = unit_pos
             self.number_with_combat_turn = primary_player.get_number()
