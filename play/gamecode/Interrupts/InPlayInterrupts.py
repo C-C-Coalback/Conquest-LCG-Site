@@ -106,7 +106,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     secondary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1,
                                                           by_enemy_unit=False, is_reassign=True)
-                    secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.delete_interrupt()
                     need_to_cleanup_shielding = False
                     need_to_delete_shielding = False

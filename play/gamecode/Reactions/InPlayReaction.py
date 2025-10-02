@@ -782,7 +782,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             else:
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
-                            secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Fire Prism":
@@ -2183,7 +2182,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         attack = primary_player.get_attack_given_pos(origin_planet, origin_pos)
                         player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack,
                                                               by_enemy_unit=False)
-                        player_being_hit.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                         self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Burna Boyz":
             if primary_player.get_number() != game_update_string[1]:
@@ -2232,7 +2230,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             damage = secondary_player.get_command_given_pos(origin_planet, target_unit_pos)
                             secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, damage,
                                                                   rickety_warbuggy=True)
-                            secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":

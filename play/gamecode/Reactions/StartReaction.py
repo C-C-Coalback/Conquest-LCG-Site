@@ -394,10 +394,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
                 self.p1.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
-                self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             elif num == 2:
                 self.p2.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
-                self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Vengeance!":
             if primary_player.resources < 1:

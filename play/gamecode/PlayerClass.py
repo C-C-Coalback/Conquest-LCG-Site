@@ -849,10 +849,6 @@ class Player:
                 if damage > 0:
                     self.assign_damage_to_pos(-2, i, damage, by_enemy_unit=False)
                     self.headquarters[i].reset_indirect_damage()
-                    self.set_aiming_reticle_in_play(-2, i, "blue")
-                    if self.game.first_card_damaged:
-                        self.game.first_card_damaged = False
-                        self.set_aiming_reticle_in_play(-2, i, "red")
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 if self.cards_in_play[i + 1][j].get_is_unit():
@@ -861,10 +857,6 @@ class Player:
                     if damage > 0:
                         self.assign_damage_to_pos(i, j, damage, by_enemy_unit=False)
                         self.cards_in_play[i + 1][j].reset_indirect_damage()
-                        self.set_aiming_reticle_in_play(i, j, "blue")
-                        if self.game.first_card_damaged:
-                            self.game.first_card_damaged = False
-                            self.set_aiming_reticle_in_play(i, j, "red")
 
     def increase_retaliate_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
@@ -5147,10 +5139,6 @@ class Player:
                             damage_on_card_after = damage_on_card_after - 1
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
-            if i == 0 or bodyguard_damage_list[i] == bodyguard_damage_list[0]:
-                self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "red")
-            else:
-                self.set_aiming_reticle_in_play(planet_id, bodyguard_damage_list[i], "blue")
         if damage_on_card_after > damage_on_card_before:
             if att_pos is not None:
                 for i in range(len(other_player.cards_in_play[planet_id + 1])):
@@ -5169,7 +5157,10 @@ class Player:
                         if i != unit_id:
                             self.game.create_reaction("Avenging Squad", self.name_player,
                                                       (int(self.number), planet_id, i))
-
+            if not self.game.positions_of_units_to_take_damage:
+                self.set_aiming_reticle_in_play(planet_id, unit_id, "red")
+            else:
+                self.set_aiming_reticle_in_play(planet_id, unit_id, "blue")
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)
             self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
@@ -5339,6 +5330,10 @@ class Player:
                         if self.search_hand_for_card("Cajivak the Hateful"):
                             self.game.create_interrupt("Cajivak the Hateful", self.name_player,
                                                        (int(self.number), -1, -1))
+            if not self.game.positions_of_units_to_take_damage:
+                self.set_aiming_reticle_in_play(-2, unit_id, "red")
+            else:
+                self.set_aiming_reticle_in_play(-2, unit_id, "blue")
             self.game.damage_on_units_list_before_new_damage.append(prior_damage)
             self.game.damage_is_preventable.append(preventable)
             self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))

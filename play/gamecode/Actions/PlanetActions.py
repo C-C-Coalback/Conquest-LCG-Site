@@ -605,19 +605,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments() and \
                         primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
                     primary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-                    primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                    if first_unit_damaged:
-                        primary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
-                        first_unit_damaged = False
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
                 if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
                     if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                         secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-                        secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                        if first_unit_damaged:
-                            secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "red")
-                            first_unit_damaged = False
         self.mode = "Normal"
         primary_player.discard_card_from_hand(self.card_pos_to_deploy)
         primary_player.aiming_reticle_color = None

@@ -1000,7 +1000,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
                 if player_being_hit.headquarters[unit_pos].check_for_a_trait("Elite"):
                     player_being_hit.assign_damage_to_pos(-2, unit_pos, self.misc_counter, by_enemy_unit=False)
-                    player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
@@ -1234,7 +1233,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if can_continue:
                 player_being_hit.assign_damage_to_pos(-2, unit_pos, self.amount_spend_for_tzeentch_firestorm,
                                                       by_enemy_unit=False)
-                player_being_hit.set_aiming_reticle_in_play(-2, unit_pos, "red")
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
@@ -1591,8 +1589,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.assign_damage_to_pos(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1], 1,
                                                         by_enemy_unit=False)
-                    primary_player.set_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1], "red")
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "+1 ATK Warrior":

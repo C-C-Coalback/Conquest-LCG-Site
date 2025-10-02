@@ -45,9 +45,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.infest_planet(planet_pos, player_owning_card)
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                            secondary_player.set_aiming_reticle_in_play(planet_pos, i, "blue")
-                            if i == 0:
-                                secondary_player.set_aiming_reticle_in_play(planet_pos, i, "red")
                             secondary_player.assign_damage_to_pos(planet_pos, i, 1, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
                         self.action_cleanup()
@@ -503,8 +500,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 if not card_chosen.get_ready():
                                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
                                                                             by_enemy_unit=False)
-                                    player_owning_card.set_aiming_reticle_in_play(planet_pos,
-                                                                                  unit_pos, "red")
                                     player_owning_card.ready_given_pos(planet_pos, unit_pos)
                                     card_chosen.set_once_per_phase_used(True)
                                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
@@ -989,9 +984,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                             by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
                 self.misc_counter = 0
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
+                self.action_cleanup()
     elif self.action_chosen == "Particle Whip":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1282,7 +1275,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if can_continue:
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.amount_spend_for_tzeentch_firestorm,
                                                       by_enemy_unit=False)
-                player_being_hit.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
@@ -1774,7 +1766,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_context = "In Play Action"
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, by_enemy_unit=False)
-                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                 self.chosen_second_card = True
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])

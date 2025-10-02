@@ -5295,7 +5295,6 @@ class Game:
                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                             primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 1,
                                                                 can_shield=False, is_reassign=True)
-                            primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
                             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                      (int(primary_player.number), hurt_planet, hurt_pos))
@@ -5305,7 +5304,6 @@ class Game:
                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 2)
                             primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 2,
                                                                 can_shield=False, is_reassign=True)
-                            primary_player.set_aiming_reticle_in_play(old_one_planet, old_one_pos, "blue")
                             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                      (int(primary_player.number), hurt_planet, hurt_pos))
@@ -9014,7 +9012,6 @@ class Game:
             if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
                 self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
                 self.p1.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
-                self.p1.set_aiming_reticle_in_play(planet_id, i, "blue")
                 i = i - 1
             i += 1
         i = 0
@@ -9022,7 +9019,6 @@ class Game:
             if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
                 self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
                 self.p2.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
-                self.p2.set_aiming_reticle_in_play(planet_id, i, "blue")
                 i = i - 1
             i += 1
         self.resolving_nurgling_bomb = False
@@ -9693,7 +9689,7 @@ class Game:
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
             if not self.attack_being_resolved and not self.reactions_needing_resolving and not \
-                    self.damage_abilities_defender_active:
+                    self.damage_abilities_defender_active and not self.positions_of_units_to_take_damage:
                 for i in range(len(self.p1.headquarters)):
                     self.p1.headquarters[i].valid_target_vow_of_honor = False
                 for i in range(len(self.p2.headquarters)):
