@@ -10054,6 +10054,20 @@ class Game:
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     await winner.send_victory_display()
 
+    async def check_stalemate(self, name):
+        self.combat_reset_eocr_values()
+        p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
+        p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
+        if p1_has_units or p2_has_units:
+            pass
+        else:
+            if not p1_has_units and not p2_has_units:
+                if self.round_number == self.last_planet_checked_for_battle:
+                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                await self.resolve_battle_conclusion(name, ["", ""])
+
     async def check_combat_end(self, name):
         self.combat_reset_eocr_values()
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)

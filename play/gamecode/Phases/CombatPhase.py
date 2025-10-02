@@ -196,7 +196,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p2.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
                             self.reset_combat_turn()
                             self.mode = "RETREAT"
-                            await self.check_combat_end(name)
+                            if self.combat_round_number > 2:
+                                await self.check_stalemate(name)
                     elif self.mode == "RETREAT":
                         self.p1.has_passed = False
                         self.p2.has_passed = False
@@ -205,7 +206,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         self.reset_combat_turn()
                         self.mode = "Normal"
                         self.begin_combat_round()
-                        await self.check_combat_end(name)
     elif len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if self.mode == "Normal":
