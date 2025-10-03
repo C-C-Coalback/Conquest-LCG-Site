@@ -1381,10 +1381,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
-                    if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
-                        self.chosen_first_card = True
-                        self.misc_target_unit = (planet_pos, unit_pos)
-                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Imperial Bastion":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
