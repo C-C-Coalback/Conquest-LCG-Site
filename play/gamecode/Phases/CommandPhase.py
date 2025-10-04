@@ -418,7 +418,26 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.p2.has_passed = True
                                 self.canceled_resource_bonuses[self.last_planet_checked_command_struggle] = True
                                 self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
-            if game_update_string[0] == "HQ":
+            elif game_update_string[0] == "IN_DISCARD":
+                if name == self.name_1:
+                    primary_player = self.p1
+                    secondary_player = self.p2
+                else:
+                    primary_player = self.p2
+                    secondary_player = self.p1
+                if self.interrupts_during_cs_allowed:
+                    if game_update_string[1] == primary_player.get_number():
+                        discard_pos = int(game_update_string[2])
+                        if primary_player.discard[discard_pos] == "Wraithguard Revenant":
+                            if self.get_green_icon(self.last_planet_checked_command_struggle):
+                                card = primary_player.get_card_in_discard(discard_pos)
+                                primary_player.add_card_to_planet(card, self.last_planet_checked_command_struggle)
+                                del primary_player.discard[discard_pos]
+                                self.p1.has_passed = True
+                                self.p2.has_passed = True
+                                self.canceled_resource_bonuses[self.last_planet_checked_command_struggle] = True
+                                self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
+            elif game_update_string[0] == "HQ":
                 if name == self.name_1:
                     primary_player = self.p1
                     secondary_player = self.p2
@@ -635,6 +654,8 @@ def try_entire_command(self, planet_pos):
             if self.get_green_icon(planet_pos):
                 if self.p1.search_hand_for_card("Wraithguard Revenant"):
                     return "INTERRUPT DURING STRUGGLE"
+                if self.p1.search_discard_for_card("Wraithguard Revenant"):
+                    return "INTERRUPT DURING STRUGGLE"
             if self.p1.search_for_card_everywhere("The Duke of Debris", limit_phase_rel=True):
                 return "INTERRUPT DURING STRUGGLE"
             if self.p2.search_card_in_hq("Archon's Palace", ready_relevant=True):
@@ -658,6 +679,8 @@ def try_entire_command(self, planet_pos):
         elif name_winner == self.name_2:
             if self.get_green_icon(planet_pos):
                 if self.p2.search_hand_for_card("Wraithguard Revenant"):
+                    return "INTERRUPT DURING STRUGGLE"
+                if self.p2.search_discard_for_card("Wraithguard Revenant"):
                     return "INTERRUPT DURING STRUGGLE"
             if self.p2.search_for_card_everywhere("The Duke of Debris", limit_phase_rel=True):
                 return "INTERRUPT DURING STRUGGLE"

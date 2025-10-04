@@ -5343,6 +5343,11 @@ class Player:
             self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
         return damage_too_great
 
+    def search_discard_for_card(self, card_name):
+        if card_name in self.discard:
+            return True
+        return False
+
     def suffer_area_effect(self, planet_id, amount, faction="", shadow_field_possible=False, rickety_warbuggy=False,
                            actual_area_effect=False):
         for i in range(len(self.cards_in_play[planet_id + 1])):
