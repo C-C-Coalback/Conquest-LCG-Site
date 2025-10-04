@@ -818,7 +818,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos):
+                        if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                             can_continue = True
                             possible_interrupts = []
                             if player_owning_card.name_player == primary_player.name_player:

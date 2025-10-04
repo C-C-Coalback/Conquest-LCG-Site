@@ -758,15 +758,17 @@ def resolve_winnings(self, winner, loser, planet_id):
         self.create_reaction("Omega Zero Command", winner.name_player, (int(winner.get_number()), planet_id, -1))
     if loser.search_card_in_hq("Humanity's Shield"):
         self.create_reaction("Humanity's Shield", loser.name_player, (int(loser.get_number()), planet_id, -1))
+    if self.infested_planets[planet_id]:
+        for i in range(len(self.planet_array)):
+            for j in range(len(winner.cards_in_play[i + 1])):
+                if winner.get_ability_given_pos(i, j) == "Devourer Venomthrope":
+                    self.create_reaction("Devourer Venomthrope", winner.name_player,
+                                         (int(winner.get_number()), i, j))
     for i in range(len(winner.cards_in_play[planet_id + 1])):
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
             self.create_reaction("Toxic Venomthrope", winner.name_player, (int(winner.get_number()), planet_id, i))
-        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Devourer Venomthrope":
-            if self.infested_planets[planet_id]:
-                self.create_reaction("Devourer Venomthrope", winner.name_player,
-                                     (int(winner.get_number()), planet_id, i))
         if winner.cards_in_play[planet_id + 1][i].get_ability() == "Caustic Tyrannofex":
             self.create_reaction("Caustic Tyrannofex", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.check_for_trait_given_pos(planet_id, i, "Kabalite"):
