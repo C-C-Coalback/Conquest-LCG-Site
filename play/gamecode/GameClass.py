@@ -9702,12 +9702,10 @@ class Game:
                     self.p2.headquarters[i].recently_assigned_damage = False
                 for i in range(7):
                     for j in range(len(self.p1.cards_in_play[i + 1])):
-                        print("reseting sweep")
                         self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
                         self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
                     for j in range(len(self.p2.cards_in_play[i + 1])):
-                        print("reseting sweep")
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
                         self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False

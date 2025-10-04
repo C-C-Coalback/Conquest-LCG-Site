@@ -3770,7 +3770,6 @@ class Player:
         if not ability_checking:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 current_name = self.cards_in_play[planet_id + 1][i].get_name()
-                print(current_name, name_of_card)
                 if self.cards_in_play[planet_id + 1][i].get_name() == name_of_card:
                     if not bloodied_relevant:
                         return True
@@ -3782,7 +3781,6 @@ class Player:
             return False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             current_name = self.cards_in_play[planet_id + 1][i].get_ability()
-            print(current_name, name_of_card)
             if current_name == name_of_card:
                 if not ready_relevant or self.get_ready_given_pos(planet_id, i):
                     if not bloodied_relevant:
@@ -5554,7 +5552,7 @@ class Player:
             if self.game.infested_planets[planet_id]:
                 if self.search_for_card_everywhere("Aberrant Alpha"):
                     health += 1
-        if ability== "Ramshackle Trukk":
+        if ability == "Ramshackle Trukk":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 health += 4
         if ability == "Goliath Rockgrinder":
