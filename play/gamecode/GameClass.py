@@ -1701,6 +1701,8 @@ class Game:
         self.nectavus_active = False
         self.nectavus_target = -1
         self.resolving_search_box = False
+        self.p1.has_passed = False
+        self.p2.has_passed = False
         self.p1.cegorach_jesters_active = False
         self.p1.cegorach_jesters_permitted = []
         self.p2.cegorach_jesters_active = False
