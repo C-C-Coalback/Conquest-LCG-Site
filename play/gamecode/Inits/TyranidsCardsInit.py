@@ -337,7 +337,7 @@ def tyranids_cards_init():
                                    type_of_units_allowed_for_attachment="Army/Synapse/Token"),
         CardClasses.ArmyCard("Swarming Rippers", "Each enemy unit with 1 or more Condition attachments "
                                                  "at this planet gets -1 ATK.", "Creature. Swarm.",
-                             2, faction, "Signature", 2, 2, 1, False),
+                             2, faction, "Signature", 2, 3, 0, False),
         CardClasses.EventCard("Sweep Attack", "Reaction: After your warlord commits to a planet, "
                                               "search your discard pile or your deck for a Condition attachment. "
                                               "Reveal it, and put it into play attached to an eligible "
