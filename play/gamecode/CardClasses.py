@@ -571,6 +571,8 @@ class UnitCard(Card):
             string += "Extra Attack (EOP): " + str(self.extra_attack_until_end_of_phase) + "\n"
         if self.extra_attack_until_end_of_round != 0:
             string += "Extra Attack (EOR): " + str(self.extra_attack_until_end_of_round) + "\n"
+        if self.extra_attack_until_end_of_game != 0:
+            string += "Extra Attack (EOG): " + str(self.extra_attack_until_end_of_game) + "\n"
         if self.health_set_eop != -1:
             string += "Health Set (EOP): " + str(self.health_set_eop) + "\n"
         if self.health_eocr != 0:
