@@ -1609,6 +1609,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Primal Howl")
                 for _ in range(3):
                     primary_player.draw_card()
+                self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Mighty Wraithknight":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
