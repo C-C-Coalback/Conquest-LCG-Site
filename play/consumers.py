@@ -45,7 +45,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.accept()
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + active_lobbies[4][i]
+                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
             await self.chat_message({"type": "chat.message", "message": message})
         i = 0
         print("CURRENT SPEC")
