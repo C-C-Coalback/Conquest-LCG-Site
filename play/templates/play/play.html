@@ -435,7 +435,7 @@
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                         var display_class = "planet-in-victory-display-" + split_data[2];
-                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class=` + display_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                        var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class=` + display_class + ` onmouseover="changeDefRotate(this.src)" onmouseout="changeDefOut()">`;
                         document.getElementById(target_victory_display_id).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "DECK") {
