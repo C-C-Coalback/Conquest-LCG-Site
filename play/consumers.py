@@ -395,6 +395,48 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "debug-reactions":
+                        sent_string = "Current Reaction Info: "
+                        sent_string += active_games[self.game_position].name_1
+                        sent_string += ": "
+                        for i in range(len(active_games[self.game_position].reactions_needing_resolving)):
+                            if active_games[self.game_position].player_who_resolves_reaction[i] \
+                                    == active_games[self.game_position].name_1:
+                                sent_string += active_games[self.game_position].reactions_needing_resolving[i]
+                                sent_string += ", "
+                        sent_string += ". "
+                        sent_string += active_games[self.game_position].name_2
+                        sent_string += ": "
+                        for i in range(len(active_games[self.game_position].reactions_needing_resolving)):
+                            if active_games[self.game_position].player_who_resolves_reaction[i] \
+                                    == active_games[self.game_position].name_2:
+                                sent_string += active_games[self.game_position].reactions_needing_resolving[i]
+                                sent_string += ", "
+                        sent_string += "."
+                        await self.receive_game_update(
+                            sent_string
+                        )
+                    elif message[1] == "debug-interrupts":
+                        sent_string = "Current Interrupt Info: "
+                        sent_string += active_games[self.game_position].name_1
+                        sent_string += ": "
+                        for i in range(len(active_games[self.game_position].interrupts_waiting_on_resolution)):
+                            if active_games[self.game_position].player_resolving_interrupts[i] \
+                                    == active_games[self.game_position].name_1:
+                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i]
+                                sent_string += ", "
+                        sent_string += ". "
+                        sent_string += active_games[self.game_position].name_2
+                        sent_string += ": "
+                        for i in range(len(active_games[self.game_position].interrupts_waiting_on_resolution)):
+                            if active_games[self.game_position].player_resolving_interrupts[i] \
+                                    == active_games[self.game_position].name_2:
+                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i]
+                                sent_string += ", "
+                        sent_string += "."
+                        await self.receive_game_update(
+                            sent_string
+                        )
                     elif not active_games[self.game_position].safety_check():
                         await self.receive_game_update(
                             "Command prevented; game is in an unsafe state."
