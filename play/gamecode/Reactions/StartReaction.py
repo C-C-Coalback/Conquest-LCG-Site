@@ -1590,7 +1590,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for _ in range(4):
                 primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Primal Howl":
+        elif current_reaction == "Primal Howl":
             can_continue = True
             if self.nullify_enabled:
                 if secondary_player.nullify_check():
@@ -1606,6 +1606,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.nullify_context = "Reaction Event"
                     can_continue = False
             if can_continue:
+                self.primal_howl_used = True
                 primary_player.discard_card_name_from_hand("Primal Howl")
                 for _ in range(3):
                     primary_player.draw_card()

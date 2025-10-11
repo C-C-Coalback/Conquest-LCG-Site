@@ -3206,10 +3206,9 @@ class Player:
                                                           (int(self.number), j, k))
                 if summon_khymera:
                     self.summon_token_at_planet("Khymera", dest_planet)
-                if self.number == "1":
-                    self.game.p2.resolve_enemy_warlord_committed_to_planet(dest_planet)
-                else:
-                    self.game.p1.resolve_enemy_warlord_committed_to_planet(dest_planet)
+                other_player = self.get_other_player()
+                self.resolve_additional_warlord_after_commit_effects(dest_planet)
+                other_player.resolve_enemy_warlord_committed_to_planet(dest_planet)
             i += 1
 
     def move_synapse_to_hq(self):
@@ -4608,12 +4607,14 @@ class Player:
                 area_effect += 2
         return area_effect
 
-    def resolve_enemy_warlord_committed_to_planet(self, planet_pos):
-        if self.check_for_warlord(planet_pos):
+    def resolve_additional_warlord_after_commit_effects(self, planet_pos):
+        other_player = self.get_other_player()
+        if other_player.check_for_warlord(planet_pos, card_effect=True, searching_name=self.name_player):
             if self.search_hand_for_card("Primal Howl"):
                 if not self.primal_howl_used:
-                    self.primal_howl_used = True
                     self.game.create_reaction("Primal Howl", self.name_player, (self.number, -1, -1))
+
+    def resolve_enemy_warlord_committed_to_planet(self, planet_pos):
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             for j in range(len(self.cards_in_play[planet_pos + 1][i].get_attachments())):
                 if self.cards_in_play[planet_pos + 1][i].get_attachments()[j].get_ability() == "Blacksun Filter":

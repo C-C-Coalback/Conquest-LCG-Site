@@ -8640,9 +8640,10 @@ class Game:
             if count < 10:
                 p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
-                if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
-                    self.last_player_who_resolved_interrupt != self.name_1) or \
-                        (p_one_count > 0 and p_two_count == 0):
+                if p_one_count > 0 and ((self.player_with_initiative == self.name_1 and
+                                         self.last_player_who_resolved_interrupt != self.name_1)
+                                        or (self.last_player_who_resolved_interrupt == self.name_2) or
+                                        p_two_count == 0):
                     print("\n\nInterrupts update UPDATE P1\n\n")
                     self.stored_interrupt_indexes = self.get_positions_of_players_interrupts(self.name_1)
                     if p_one_count > 1:
@@ -8712,17 +8713,15 @@ class Game:
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
-            # print(self.already_resolving_reaction)
-            # print(self.resolving_search_box)
-            # print(self.interrupts_waiting_on_resolution)
             if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
                     self.resolving_search_box and not self.interrupts_waiting_on_resolution \
                     and not self.positions_of_units_to_take_damage and not self.queued_moves:
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
-                if (self.player_with_initiative == self.name_1 and p_one_count > 0 and
-                    self.last_player_who_resolved_reaction != self.name_1) or \
-                        (p_one_count > 0 and p_two_count == 0):
+                if p_one_count > 0 and ((self.player_with_initiative == self.name_1 and
+                                         self.last_player_who_resolved_reaction != self.name_1)
+                                        or (self.last_player_who_resolved_reaction == self.name_2) or
+                                        p_two_count == 0):
                     print("\n\nREACTION UPDATE P1\n\n")
                     self.stored_reaction_indexes = self.get_positions_of_players_reactions(self.name_1)
                     if p_one_count > 1:
