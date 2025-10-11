@@ -1586,7 +1586,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.discard.remove("Dynastic Weaponry")
                     if "Dynastic Weaponry" in primary_player.discard:
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
-                                             (int(primary_player.get_number()), planet_pos, position_of_unit))
+                                             (int(primary_player.get_number()), planet_pos, unit_pos))
                     self.delete_reaction()
         elif current_reaction == "Arrogant Haemonculus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
