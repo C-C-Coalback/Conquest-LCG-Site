@@ -7102,6 +7102,9 @@ class Game:
                                         self.name_player_making_choices = secondary_player.name_player
                                         shield_string = "No Mercy can be played. A " + str(shields) + \
                                                         "-shield card, " + card_name + ", is being played."
+                                        if self.liatha_active:
+                                            shield_string = "No Mercy can be played. A " + str(shields) + \
+                                                            "-shield card, from Liatha's ability, is being played."
                                         await self.send_update_message(shield_string)
                                     else:
                                         if shields == 1:
