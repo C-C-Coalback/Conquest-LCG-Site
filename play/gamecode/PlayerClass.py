@@ -4607,6 +4607,9 @@ class Player:
                 area_effect += 2
         return area_effect
 
+    def get_resources(self):
+        return self.resources
+
     def resolve_additional_warlord_after_commit_effects(self, planet_pos):
         other_player = self.get_other_player()
         if other_player.check_for_warlord(planet_pos, card_effect=True, searching_name=self.name_player):

@@ -44,6 +44,9 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             del primary_player.cards_removed_from_game[target_index]
             del primary_player.cards_removed_from_game_hidden[target_index]
         await primary_player.dark_eldar_event_played()
+        if primary_player.get_resources() > 0:
+            if primary_player.search_hand_for_card("Shadow Hunt"):
+                self.create_reaction("Shadow Hunt", primary_player.name_player, (int(primary_player.number), -1, -1))
         self.delete_reaction()
     elif current_reaction == "Aun'Len":
         if primary_player.valid_aunlen_planets[chosen_planet]:
