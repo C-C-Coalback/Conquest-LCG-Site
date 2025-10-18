@@ -2532,13 +2532,15 @@ class Game:
 
     def move_interrupt_to_front(self, interrupt_pos):
         if self.interrupts_waiting_on_resolution[interrupt_pos] == "Magus Harid":
-            count_harid = 0
+            count_harid = -1
             i = 0
             while i < interrupt_pos:
                 if self.interrupts_waiting_on_resolution[i] == "Magus Harid" \
                         and self.player_resolving_interrupts[0] == self.player_resolving_interrupts[i]:
                     count_harid += 1
                 i += 1
+            if count_harid < 0:
+                count_harid = 0
             player = self.p1
             if self.player_resolving_interrupts[0] == self.name_2:
                 player = self.p2
