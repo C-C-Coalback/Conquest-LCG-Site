@@ -245,7 +245,23 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Interrupt Event"
             if can_continue:
-                primary_player.discard_card_name_from_hand("Surrogate Host")
+                in_hand = False
+                in_discard = False
+                if primary_player.search_hand_for_card("Surrogate Host"):
+                    in_hand = True
+                if primary_player.search_discard_for_card("Surrogate Host") and \
+                        primary_player.search_for_card_everywhere("Harbinger of Eternity"):
+                    in_discard = True
+                if in_hand and in_discard:
+                    self.choice_context = "Surrogate Host from discard or hand?"
+                    self.choices_available = ["Discard", "Hand"]
+                    self.name_player_making_choices = primary_player.name_player
+                    self.resolving_search_box = True
+                elif in_hand:
+                    primary_player.discard_card_name_from_hand("Surrogate Host")
+                elif in_discard:
+                    primary_player.remove_card_from_game("Surrogate Host")
+                    primary_player.remove_card_name_from_discard("Surrogate Host")
         elif current_interrupt == "Necrodermis":
             if primary_player.resources > 0:
                 if secondary_player.nullify_check() and self.nullify_enabled:

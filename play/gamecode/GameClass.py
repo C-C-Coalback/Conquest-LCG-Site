@@ -4115,6 +4115,22 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Optimized Protocol from discard or hand?":
+                        if chosen_choice == "Discard":
+                            primary_player.remove_card_name_from_discard("Optimized Protocol")
+                            primary_player.remove_card_from_game("Optimized Protocol")
+                        else:
+                            primary_player.remove_card_name_from_hand("Optimized Protocol")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                    elif self.choice_context == "Surrogate Host from discard or hand?":
+                        if chosen_choice == "Discard":
+                            primary_player.remove_card_name_from_discard("Surrogate Host")
+                            primary_player.remove_card_from_game("Surrogate Host")
+                        else:
+                            primary_player.remove_card_name_from_hand("Surrogate Host")
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "Tempting Ceasefire Number":
                         if not self.chosen_first_card:
                             self.chosen_first_card = True
@@ -4913,7 +4929,7 @@ class Game:
                                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                                     self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                          (int(primary_player.get_number()), pla, position_of_unit))
-                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                            if primary_player.optimized_protocol_check():
                                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), pla, position_of_unit))
                             primary_player.discard.remove(target_choice)
@@ -4933,7 +4949,7 @@ class Game:
                                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                                     self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                          (int(primary_player.get_number()), planet, position_of_unit))
-                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                            if primary_player.optimized_protocol_check():
                                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet, position_of_unit))
                             primary_player.discard.remove(target_choice)

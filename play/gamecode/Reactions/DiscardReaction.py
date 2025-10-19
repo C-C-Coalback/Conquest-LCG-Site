@@ -52,7 +52,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                                     self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                          (int(primary_player.get_number()), planet, position_of_unit))
-                            if primary_player.search_hand_for_card("Optimized Protocol"):
+                            if primary_player.optimized_protocol_check():
                                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet, position_of_unit))
                             primary_player.remove_card_from_discard(pos_discard)
@@ -130,7 +130,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                                 self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet, position_of_unit))
-                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                        if primary_player.optimized_protocol_check():
                             self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet, position_of_unit))
                         primary_player.remove_card_from_discard(pos_discard)

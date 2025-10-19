@@ -593,7 +593,23 @@ async def start_resolving_reaction(self, name, game_update_string):
                     can_continue = False
             if can_continue:
                 primary_player.spend_resources(1)
-                primary_player.discard_card_name_from_hand("Optimized Protocol")
+                in_hand = False
+                in_discard = False
+                if primary_player.search_hand_for_card("Optimized Protocol"):
+                    in_hand = True
+                if primary_player.search_discard_for_card("Optimized Protocol") and \
+                        primary_player.search_for_card_everywhere("Harbinger of Eternity"):
+                    in_discard = True
+                if in_hand and in_discard:
+                    self.choice_context = "Optimized Protocol from discard or hand?"
+                    self.choices_available = ["Discard", "Hand"]
+                    self.name_player_making_choices = primary_player.name_player
+                    self.resolving_search_box = True
+                elif in_hand:
+                    primary_player.discard_card_name_from_hand("Optimized Protocol")
+                elif in_discard:
+                    primary_player.remove_card_from_game("Optimized Protocol")
+                    primary_player.remove_card_name_from_discard("Optimized Protocol")
         elif self.reactions_needing_resolving[0] == "Royal Phylactery":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
@@ -616,7 +632,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                             if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                                 self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                      (int(primary_player.get_number()), planet_pos, position_of_unit))
-                        if primary_player.search_hand_for_card("Optimized Protocol"):
+                        if primary_player.optimized_protocol_check():
                             self.create_reaction("Optimized Protocol", primary_player.name_player,
                                                  (int(primary_player.get_number()), planet_pos, position_of_unit))
                         del primary_player.discard[-1]

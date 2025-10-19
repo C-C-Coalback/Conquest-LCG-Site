@@ -1205,6 +1205,10 @@ class Player:
     def remove_card_from_discard(self, card_pos):
         del self.discard[card_pos]
 
+    def remove_card_name_from_discard(self, name):
+        if name in self.discard:
+            self.discard.remove(name)
+
     def remove_card_name_from_hand(self, name):
         if name in self.cards:
             self.cards.remove(name)
@@ -4607,6 +4611,22 @@ class Player:
                 area_effect += 2
         return area_effect
 
+    def optimized_protocol_check(self):
+        if self.search_hand_for_card("Optimized Protocol"):
+            return True
+        elif self.search_for_card_everywhere("Harbinger of Eternity") \
+                and self.search_discard_for_card("Optimized Protocol"):
+            return True
+        return False
+
+    def surrogate_host_check(self):
+        if self.search_hand_for_card("Surrogate Host"):
+            return True
+        elif self.search_for_card_everywhere("Harbinger of Eternity") \
+                and self.search_discard_for_card("Surrogate Host"):
+            return True
+        return False
+
     def get_resources(self):
         return self.resources
 
@@ -6523,7 +6543,7 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
                 self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
                                           (int(self.number), -1, -1))
-            if self.search_hand_for_card("Surrogate Host"):
+            if self.surrogate_host_check():
                 warlord_pla, warlord_pos = self.get_location_of_warlord()
                 if warlord_pla != planet_num:
                     self.valid_surrogate_host[planet_num] = True

@@ -594,7 +594,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.add_card_to_planet(card, chosen_planet)
             primary_player.aiming_reticle_coords_discard = None
             primary_player.discard.remove(self.misc_target_choice)
-            if primary_player.search_hand_for_card("Optimized Protocol") and primary_player.resources > 0:
+            if primary_player.optimized_protocol_check():
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), chosen_planet, -1))
             self.action_cleanup()
@@ -702,7 +702,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
                             self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                                  (int(primary_player.get_number()), chosen_planet, position_of_unit))
-                    if primary_player.search_hand_for_card("Optimized Protocol"):
+                    if primary_player.optimized_protocol_check():
                         self.create_reaction("Optimized Protocol", primary_player.name_player,
                                              (int(primary_player.get_number()), chosen_planet, position_of_unit))
                     self.action_cleanup()
