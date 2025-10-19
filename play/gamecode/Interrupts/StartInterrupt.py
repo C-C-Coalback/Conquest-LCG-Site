@@ -280,28 +280,45 @@ async def start_resolving_interrupt(self, name, game_update_string):
                     self.nullify_context = "Interrupt Event"
                 else:
                     if primary_player.spend_resources(1):
-                        primary_player.discard_card_name_from_hand("Necrodermis")
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                        if primary_player.played_necrodermis:
-                            await self.send_update_message(
-                                "----GAME END----"
-                                "Victory for " + secondary_player.name_player + "; "
-                                + primary_player.name_player + " played a second Necrodermis whilst "
-                                + primary_player.name_player + "already has one active."
-                                                               "----GAME END----"
-                            )
-                            await self.send_victory_proper(secondary_player.name_player, "Necrodermis")
-                        elif secondary_player.played_necrodermis:
-                            await self.send_update_message(
-                                "----GAME END----"
-                                "Victory for " + primary_player.name_player + "; "
-                                + primary_player.name_player + " played a second Necrodermis whilst "
-                                + secondary_player.name_player + "already has one active."
-                                                                 "----GAME END----"
-                            )
-                            await self.send_victory_proper(primary_player.name_player, "Necrodermis")
-                        primary_player.played_necrodermis = True
-                        self.delete_interrupt()
+                        in_hand = False
+                        in_discard = False
+                        if primary_player.search_hand_for_card("Necrodermis"):
+                            in_hand = True
+                        if primary_player.search_discard_for_card("Necrodermis") and \
+                                primary_player.search_for_card_everywhere("Harbinger of Eternity"):
+                            in_discard = True
+                        if in_hand and in_discard:
+                            self.choice_context = "Necrodermis from discard or hand?"
+                            self.choices_available = ["Discard", "Hand"]
+                            self.name_player_making_choices = primary_player.name_player
+                            self.resolving_search_box = True
+                        else:
+                            if in_hand:
+                                primary_player.discard_card_name_from_hand("Necrodermis")
+                            elif in_discard:
+                                primary_player.remove_card_from_game("Necrodermis")
+                                primary_player.remove_card_name_from_discard("Necrodermis")
+                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                            if primary_player.played_necrodermis:
+                                await self.send_update_message(
+                                    "----GAME END----"
+                                    "Victory for " + secondary_player.name_player + "; "
+                                    + primary_player.name_player + " played a second Necrodermis whilst "
+                                    + primary_player.name_player + "already has one active."
+                                                                   "----GAME END----"
+                                )
+                                await self.send_victory_proper(secondary_player.name_player, "Necrodermis")
+                            elif secondary_player.played_necrodermis:
+                                await self.send_update_message(
+                                    "----GAME END----"
+                                    "Victory for " + primary_player.name_player + "; "
+                                    + primary_player.name_player + " played a second Necrodermis whilst "
+                                    + secondary_player.name_player + "already has one active."
+                                                                     "----GAME END----"
+                                )
+                                await self.send_victory_proper(primary_player.name_player, "Necrodermis")
+                            primary_player.played_necrodermis = True
+                            self.delete_interrupt()
                     else:
                         self.delete_interrupt()
             else:

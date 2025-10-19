@@ -4627,6 +4627,14 @@ class Player:
             return True
         return False
 
+    def necrodermis_check(self):
+        if self.search_hand_for_card("Necrodermis"):
+            return True
+        elif self.search_for_card_everywhere("Harbinger of Eternity") \
+                and self.search_discard_for_card("Necrodermis"):
+            return True
+        return False
+
     def get_resources(self):
         return self.resources
 
@@ -6285,7 +6293,7 @@ class Player:
                             self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
                                                        (int(self.number), -2, i))
                         elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
-                            if self.search_hand_for_card("Necrodermis"):
+                            if self.necrodermis_check():
                                 self.game.create_interrupt("Necrodermis", self.name_player,
                                                            (int(self.number), -2, i))
                                 self.necrodermis_allowed = False
@@ -6310,7 +6318,7 @@ class Player:
                                 self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
                                                            (int(self.number), i, j))
                             elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
-                                if self.search_hand_for_card("Necrodermis"):
+                                if self.necrodermis_check():
                                     self.game.create_interrupt("Necrodermis", self.name_player,
                                                                (int(self.number), i, j))
                                     self.necrodermis_allowed = False

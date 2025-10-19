@@ -4123,6 +4123,36 @@ class Game:
                             primary_player.remove_card_name_from_hand("Optimized Protocol")
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                    elif self.choice_context == "Necrodermis from discard or hand?":
+                        if chosen_choice == "Discard":
+                            primary_player.remove_card_name_from_discard("Necrodermis")
+                            primary_player.remove_card_from_game("Necrodermis")
+                        else:
+                            primary_player.remove_card_name_from_hand("Necrodermis")
+                        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+                        if primary_player.played_necrodermis:
+                            await self.send_update_message(
+                                "----GAME END----"
+                                "Victory for " + secondary_player.name_player + "; "
+                                + primary_player.name_player + " played a second Necrodermis whilst "
+                                + primary_player.name_player + "already has one active."
+                                                               "----GAME END----"
+                            )
+                            await self.send_victory_proper(secondary_player.name_player, "Necrodermis")
+                        elif secondary_player.played_necrodermis:
+                            await self.send_update_message(
+                                "----GAME END----"
+                                "Victory for " + primary_player.name_player + "; "
+                                + primary_player.name_player + " played a second Necrodermis whilst "
+                                + secondary_player.name_player + "already has one active."
+                                                                 "----GAME END----"
+                            )
+                            await self.send_victory_proper(primary_player.name_player, "Necrodermis")
+                        primary_player.played_necrodermis = True
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_interrupt()
                     elif self.choice_context == "Surrogate Host from discard or hand?":
                         if chosen_choice == "Discard":
                             primary_player.remove_card_name_from_discard("Surrogate Host")
