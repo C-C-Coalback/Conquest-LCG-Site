@@ -601,6 +601,21 @@ class UnitCard(Card):
         self.retaliate_eop = 0
         self.sweep_eop = 0
         self.sweep_next = 0
+        self.area_effect_eop = 0
+        self.positive_hp_until_eop = 0
+        self.extra_command_eop = 0
+        self.negative_hp_until_eop = 0
+        self.armorbane_eop = False
+        self.brutal_eop = False
+        self.lost_ranged_eop = False
+        self.ranged_eop = False
+        self.mobile_eop = False
+        self.flying_eop = False
+        self.attack_set_eop = -1
+        self.health_set_eop = -1
+        self.extra_traits_eop = ""
+        self.cannot_ready_phase = False
+        self.lost_keywords_eop = False
 
     def get_retaliate(self):
         retaliate_value = self.retaliate

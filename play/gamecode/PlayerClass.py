@@ -4457,50 +4457,20 @@ class Player:
             if self.game.phase == "DEPLOY":
                 self.headquarters[i].cannot_ready_hq_phase = False
             if self.headquarters[i].get_is_unit():
-                self.headquarters[i].negative_hp_until_eop = 0
                 self.headquarters[i].hit_by_which_salamanders = []
                 self.headquarters[i].new_ability = ""
-                self.headquarters[i].extra_command_eop = 0
-                self.headquarters[i].positive_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
-                self.headquarters[i].area_effect_eop = 0
-                self.headquarters[i].sweep_eop = 0
-                self.headquarters[i].armorbane_eop = False
-                self.headquarters[i].lost_ranged_eop = False
-                self.headquarters[i].ranged_eop = False
-                self.headquarters[i].mobile_eop = False
-                self.headquarters[i].flying_eop = False
-                self.headquarters[i].attack_set_eop = -1
-                self.headquarters[i].health_set_eop = -1
-                self.headquarters[i].brutal_eop = False
-                self.headquarters[i].extra_traits_eop = ""
-                self.headquarters[i].lost_keywords_eop = False
-                self.headquarters[i].cannot_ready_phase = False
+                self.headquarters[i].reset_all_eop()
                 if self.game.phase == "COMBAT":
                     self.headquarters[i].command_until_combat = 0
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.game.phase == "DEPLOY":
                     self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_hq_phase = False
-                self.cards_in_play[planet_pos + 1][unit_pos].lost_keywords_eop = False
-                self.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop = 0
-                self.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
-                self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
-                self.cards_in_play[planet_pos + 1][unit_pos].sweep_eop = 0
-                self.cards_in_play[planet_pos + 1][unit_pos].extra_command_eop = 0
-                self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
+                self.cards_in_play[planet_pos + 1][unit_pos].reset_all_eop()
                 self.cards_in_play[planet_pos + 1][unit_pos].new_ability = ""
-                self.cards_in_play[planet_pos + 1][unit_pos].brutal_eop = False
-                self.cards_in_play[planet_pos + 1][unit_pos].lost_ranged_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders = []
-                self.cards_in_play[planet_pos + 1][unit_pos].ranged_eop = False
-                self.cards_in_play[planet_pos + 1][unit_pos].mobile_eop = False
-                self.cards_in_play[planet_pos + 1][unit_pos].flying_eop = False
-                self.cards_in_play[planet_pos + 1][unit_pos].attack_set_eop = -1
-                self.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = -1
-                self.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop = ""
-                self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = False
                 if self.game.phase == "COMBAT":
                     self.cards_in_play[planet_pos + 1][unit_pos].command_until_combat = 0
 
