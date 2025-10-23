@@ -7694,7 +7694,7 @@ class Game:
                                 await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
                                     self.positions_attackers_of_units_to_take_damage[0] and \
-                                    primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                                 self.retaliate_used = True
                                 retaliate_value = primary_player.get_retaliate_given_pos(planet_pos, unit_pos)
                                 shadow_field = False
