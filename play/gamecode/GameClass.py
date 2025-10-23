@@ -8604,16 +8604,14 @@ class Game:
                             self.create_reaction("Penitent Engine", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, i))
         else:
-            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
-            if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
-                if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
-                    self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
-                                         (int(secondary_player.number), planet_pos, unit_pos))
-                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                    if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
-                        self.create_reaction("Penitent Engine", secondary_player.name_player,
-                                             (int(secondary_player.number), planet_pos, i))
+            player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
+            if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
+                self.create_reaction("Shedding Hive Crone", secondary_player.name_player,
+                                     (int(secondary_player.number), planet_pos, unit_pos))
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
+                    self.create_reaction("Penitent Engine", secondary_player.name_player,
+                                         (int(secondary_player.number), planet_pos, i))
         if self.action_chosen == "Painboy Surjery":
             player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
