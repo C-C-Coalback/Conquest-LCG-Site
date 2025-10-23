@@ -10099,7 +10099,6 @@ class Game:
                     await winner.send_victory_display()
 
     async def check_stalemate(self, name):
-        self.combat_reset_eocr_values()
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
         p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
         if p1_has_units or p2_has_units:

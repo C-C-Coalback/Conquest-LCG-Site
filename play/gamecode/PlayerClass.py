@@ -4464,6 +4464,7 @@ class Player:
                 self.headquarters[i].positive_hp_until_eop = 0
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].area_effect_eop = 0
+                self.headquarters[i].sweep_eop = 0
                 self.headquarters[i].armorbane_eop = False
                 self.headquarters[i].lost_ranged_eop = False
                 self.headquarters[i].ranged_eop = False
@@ -4486,6 +4487,7 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_ranged()
                 self.cards_in_play[planet_pos + 1][unit_pos].area_effect_eop = 0
+                self.cards_in_play[planet_pos + 1][unit_pos].sweep_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].extra_command_eop = 0
                 self.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = False
                 self.cards_in_play[planet_pos + 1][unit_pos].new_ability = ""

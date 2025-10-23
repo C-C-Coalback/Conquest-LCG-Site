@@ -196,6 +196,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.p2.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
                             self.reset_combat_turn()
                             self.mode = "RETREAT"
+                            self.combat_reset_eocr_values()
                             if self.combat_round_number > 2:
                                 await self.check_stalemate(name)
                     elif self.mode == "RETREAT":
