@@ -3631,7 +3631,7 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
-                            elif self.reactions_needing_resolving[0] == "Counterblow":
+                            elif self.interrupts_waiting_on_resolution[0] == "Counterblow":
                                 self.allow_damage_abilities_defender = False
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
@@ -3639,7 +3639,6 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
-                            self.delete_reaction()
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Jain Zar?":

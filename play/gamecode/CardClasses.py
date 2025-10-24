@@ -616,6 +616,8 @@ class UnitCard(Card):
         self.extra_traits_eop = ""
         self.cannot_ready_phase = False
         self.lost_keywords_eop = False
+        for i in range(len(self.attachments)):
+            self.attachments[i].set_once_per_phase_used(False)
 
     def get_retaliate(self):
         retaliate_value = self.retaliate

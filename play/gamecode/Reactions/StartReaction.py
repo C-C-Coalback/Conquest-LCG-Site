@@ -920,7 +920,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "The Bloodrunna":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
-            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.set_once_per_phase_used_of_att_name(planet_pos, unit_pos, "The Bloodrunna", True)
             self.delete_reaction()
         elif current_reaction == "Mandrake Fearmonger":
             secondary_player.discard_card_at_random()

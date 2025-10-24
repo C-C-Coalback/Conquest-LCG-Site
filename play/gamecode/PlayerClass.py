@@ -2283,12 +2283,22 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].resolving_attack = False
 
+    def set_once_per_phase_used_of_att_name(self, planet_pos, unit_pos, name_attachment, value):
+        if planet_pos == -2:
+            for i in range(len(self.headquarters[unit_pos].get_attachments())):
+                if self.headquarters[unit_pos].get_attachments()[i].get_name() == name_attachment:
+                    self.headquarters[unit_pos].get_attachments()[i].set_once_per_phase_used(value)
+                    return True
+            return False
+        for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_name() == name_attachment:
+                self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].set_once_per_phase_used(value)
+                return True
+        return False
+
     def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos, def_pla, def_pos):
         print("\nGetting on kill effects\n")
-        if self.name_player == self.game.name_1:
-            other_player = self.game.p2
-        else:
-            other_player = self.game.p1
+        other_player = self.get_other_player()
         on_kill_effects = []
         if planet_pos == -2:
             return on_kill_effects
