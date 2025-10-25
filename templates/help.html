@@ -43,7 +43,10 @@
   <p><b>/force-quit-effects</b> - Forcefully quits all queued interrupts.</p>
   <p><b>/force-quit-damage</b> - Forcefully quits all queued instances of damage.</p>
   <p><b>/force-quit-moves</b> - Forcefully quits all queued moves.</p>
+  <p><b>/debug-reactions</b> - Shows the currently queued reactions of each player.</p>
+  <p><b>/debug-interrupts</b> - Shows the currently queued interrupts of each player.</p>
   <h3>Safe commands</h3>
+  <p><b>/shuffle-deck/{player_num}</b> - Shuffle a player's deck.</p>
   <p><b>/rearrange-deck/{player_num}/{num_cards}</b> - Allows you to rearrange the top {num_cards} of a player's deck.</p>
   <p><b>/stop-rearrange-deck</b> - Stops rearranging a deck.</p>
   <p><b>/set-resources/{player_num}/{amount}</b> - Set the resources of a player to {amount}.</p>
@@ -62,7 +65,5 @@
   <p><b>/set-faith/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Sets the faith on a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
   <p><b>/move-unit/{player_num}/{planet_pos}/{unit_pos}/{destination_planet_pos}</b> - Moves a unit at the given position to the destination planet. Use -2 for {planet_pos} or {destination_planet_pos} to target the HQ.</p>
   <p><b>/assign-damage/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Assigns damage, which allows shielding, a unit at the given position. Use -2 for {planet_pos} to target the HQ.</p>
-  <p><b>/debug-reactions</b> - Shows the currently queued reactions of each player.</p>
-  <p><b>/debug-interrupts</b> - Shows the currently queued interrupts of each player.</p>
 </div>
 {% endblock %}
