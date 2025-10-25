@@ -8,6 +8,7 @@ from .gamecode import Initfunctions, FindCard
 import threading
 import traceback
 import datetime
+import copy
 
 
 card_array = Initfunctions.init_player_cards()
@@ -515,19 +516,44 @@ class GameConsumer(AsyncWebsocketConsumer):
                         elif player_num == "2":
                             active_games[self.game_position].p2.resources = resources
                             await active_games[self.game_position].p2.send_resources()
-                    elif message[1] == "addcard" and len(message) > 3:
+                    elif message[1] == "add-to-hq" and len(message) > 3:
                         card_name = message[3]
-                        card = FindCard.find_card(card_name, active_games[self.game_position].card_array,
-                                                  active_games[self.game_position].cards_dict,
-                                                  active_games[self.game_position].apoka_errata_cards,
-                                                  active_games[self.game_position].cards_that_have_errata)
+                        card = active_games[self.game_position].preloaded_find_card(card_name)
                         if card.get_shields() != -1:
-                            if message[2] == "1":
-                                active_games[self.game_position].p1.cards.append(card.get_name())
-                                await active_games[self.game_position].p1.send_hand()
-                            elif message[2] == "2":
-                                active_games[self.game_position].p2.cards.append(card.get_name())
-                                await active_games[self.game_position].p2.send_hand()
+                            if card.get_card_type() in ["Army", "Token", "Synapse", "Support"]:
+                                if message[2] == "1":
+                                    active_games[self.game_position].p1.headquarters.append(copy.deepcopy(card))
+                                    await active_games[self.game_position].p1.send_hq()
+                                elif message[2] == "2":
+                                    active_games[self.game_position].p2.headquarters.append(copy.deepcopy(card))
+                                    await active_games[self.game_position].p2.send_hq()
+                    elif message[1] == "add-to-play" and len(message) > 4:
+                        planet_pos = int(message[3])
+                        if -1 < planet_pos < 7:
+                            if active_games[self.game_position].planets_in_play_array[planet_pos]:
+                                card_name = message[4]
+                                card = active_games[self.game_position].preloaded_find_card(card_name)
+                                if card.get_shields() != -1:
+                                    if card.get_card_type() in ["Army", "Token", "Synapse"]:
+                                        if message[2] == "1":
+                                            active_games[self.game_position].p1.cards_in_play[planet_pos + 1].append(
+                                                copy.deepcopy(card))
+                                            await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
+                                        elif message[2] == "2":
+                                            active_games[self.game_position].p2.cards_in_play[planet_pos + 1].append(
+                                                copy.deepcopy(card))
+                                            await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
+                    elif (message[1] == "addcard" or message[1] == "add-card") and len(message) > 3:
+                        card_name = message[3]
+                        card = active_games[self.game_position].preloaded_find_card(card_name)
+                        if card.get_shields() != -1:
+                            if card.get_card_type() in ["Army", "Event", "Support", "Attachment"]:
+                                if message[2] == "1":
+                                    active_games[self.game_position].p1.cards.append(card.get_name())
+                                    await active_games[self.game_position].p1.send_hand()
+                                elif message[2] == "2":
+                                    active_games[self.game_position].p2.cards.append(card.get_name())
+                                    await active_games[self.game_position].p2.send_hand()
                     elif message[1] == "draw" and len(message) > 2:
                         if message[2] == "1":
                             num_times = 1
