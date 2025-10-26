@@ -2489,15 +2489,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.number:
             if planet_pos == self.misc_target_planet and not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].techmarine_aspirant_available:
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].techmarine_aspirant_available = False
+                    og_pla, og_pos = self.position_of_actioned_card
+                    techmarine_id = primary_player.cards_in_play[og_pla + 1][og_pos].card_id
+                    if techmarine_id not in primary_player.cards_in_play[planet_pos + 1][unit_pos].used_techmarine_ids:
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].used_techmarine_ids.append(techmarine_id)
                         primary_player.spend_resources(1)
                         primary_player.ready_given_pos(planet_pos, unit_pos)
-                        og_pla, og_pos = self.position_of_actioned_card
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                         if secondary_player.search_card_at_planet(og_pla, "The Mask of Jain Zar"):
                             self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
-                                                 (int(primary_player.number), og_pla, og_pos))
+                                                 (int(primary_player.number), planet_pos, unit_pos))
                         self.action_cleanup()
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":

@@ -468,6 +468,7 @@ class Game:
         self.og_pos_xv805_target = (-1, -1)
         self.liatha_available = True
         self.liatha_active = False
+        self.current_card_id = 0
         self.current_flamers_id = 0
         self.current_librarian_id = 0
         self.flamers_damage_active = False
@@ -8449,9 +8450,9 @@ class Game:
                 num, pla, pos = self.positions_of_unit_triggering_reaction[0]
                 id_storm_lib = -1
                 if pla == -2:
-                    id_storm_lib = player.headquarters[pos].storming_librarian_id_number
+                    id_storm_lib = player.headquarters[pos].card_id
                 else:
-                    id_storm_lib = player.cards_in_play[pla + 1][pos].storming_librarian_id_number
+                    id_storm_lib = player.cards_in_play[pla + 1][pos].card_id
                 for i in range(7):
                     for j in range(len(self.p1.cards_in_play[i + 1])):
                         while id_storm_lib in self.p1.cards_in_play[i + 1][j].hit_by_which_storming_librarians:

@@ -928,7 +928,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Storming Librarian":
             if planet_pos != -2:
-                storm_lib_value = primary_player.cards_in_play[planet_pos + 1][unit_pos].storming_librarian_id_number
+                storm_lib_value = primary_player.cards_in_play[planet_pos + 1][unit_pos].card_id
                 for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                     if storm_lib_value in secondary_player.cards_in_play[planet_pos + 1][i].\
                             hit_by_which_storming_librarians:
@@ -1833,9 +1833,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             salamander_id = -1
             if planet_pos == -2:
-                salamander_id = primary_player.headquarters[unit_pos].salamanders_flamers_id_number
+                salamander_id = primary_player.headquarters[unit_pos].card_id
             else:
-                salamander_id = primary_player.cards_in_play[planet_pos + 1][unit_pos].salamanders_flamers_id_number
+                salamander_id = primary_player.cards_in_play[planet_pos + 1][unit_pos].card_id
             for i in range(len(secondary_player.headquarters)):
                 if salamander_id in secondary_player.headquarters[i].hit_by_which_salamanders:
                     secondary_player.assign_damage_to_pos(-2, i, 1, context="Salamander Flamer Squad")

@@ -60,9 +60,7 @@ class Card:
         self.attachments = []
         self.deepstrike = deepstrike
         self.immortal_loyalist_ok = True
-        self.salamanders_flamers_id_number = 0
         self.hit_by_which_salamanders = []
-        self.storming_librarian_id_number = 0
         self.hit_by_which_storming_librarians = []
         self.techmarine_aspirant_available = True
         self.lost_keywords_eop = False
@@ -96,6 +94,8 @@ class Card:
         self.quick_construct = False
         self.infection_lekor = 0
         self.blanked_eor_2 = False
+        self.card_id = -1
+        self.used_techmarine_ids = []
 
     def get_extra_info_string(self):
         string = ""
@@ -462,6 +462,30 @@ class UnitCard(Card):
 
     def get_extra_info_string(self):
         string = ""
+        if self.get_ability() == "Techmarine Aspirant" or self.get_ability() == "Salamander Flamer Squad" \
+                or self.get_ability() == "Storming Librarian":
+            string += "Card ID: " + str(self.card_id) + "\n"
+        if self.used_techmarine_ids:
+            string += "Used Techmarine Aspirant IDs:"
+            for tech_id in range(len(self.used_techmarine_ids)):
+                if tech_id != 0:
+                    string += ", "
+                string += str(self.used_techmarine_ids[tech_id])
+            string += "\n"
+        if self.hit_by_which_salamanders:
+            string += "Hit by Salamander Flamer Squads IDs:"
+            for tech_id in range(len(self.hit_by_which_salamanders)):
+                if tech_id != 0:
+                    string += ", "
+                string += str(self.hit_by_which_salamanders[tech_id])
+            string += "\n"
+        if self.hit_by_which_storming_librarians:
+            string += "Hit by Storming Librarian IDs:"
+            for tech_id in range(len(self.hit_by_which_storming_librarians)):
+                if tech_id != 0:
+                    string += ", "
+                string += str(self.hit_by_which_storming_librarians[tech_id])
+            string += "\n"
         if self.blanked_eop:
             string += "Blanked (EOP)\n"
         if self.blanked_eor:

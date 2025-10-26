@@ -1655,12 +1655,6 @@ class Player:
         elif self.get_ability_given_pos(-2, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), -2, last_element_index))
-        elif self.headquarters[last_element_index].get_ability() == "Salamander Flamer Squad":
-            self.headquarters[last_element_index].salamanders_flamers_id_number = self.game.current_flamers_id
-            self.game.current_flamers_id += 1
-        elif self.headquarters[last_element_index].get_ability() == "Storming Librarian":
-            self.headquarters[last_element_index].storming_librarian_id_number = self.game.current_librarian_id
-            self.game.current_librarian_id += 1
         elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
             enemy_name = self.game.name_1
             if self.name_player == self.game.name_1:
@@ -1677,19 +1671,13 @@ class Player:
             self.game.create_reaction("Inquisitor Caius Wroth", self.name_player,
                                       (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Coliseum Fighters":
-            i = len(self.discard) - 1
-            found = False
-            while i > -1 and not found:
-                card = FindCard.find_card(self.discard[i], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                if card.get_card_type() == "Event":
-                    self.cards.append(card.get_name())
-                    del self.discard[i]
-                    found = True
-                i = i - 1
+            self.game.create_reaction("Coliseum Fighters", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Earth Caste Technician":
             self.game.create_reaction("Earth Caste Technician", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        self.headquarters[last_element_index].card_id = self.game.current_card_id
+        self.game.current_card_id += 1
         return True
 
     def print_headquarters(self):
@@ -2019,6 +2007,8 @@ class Player:
         last_element_index = len(self.cards_in_play[position + 1]) - 1
         self.cards_in_play[position + 1][last_element_index].name_owner = self.name_player
         self.cards_in_play[position + 1][last_element_index].just_entered_play = True
+        self.cards_in_play[position + 1][last_element_index].card_id = self.game.current_card_id
+        self.game.current_card_id += 1
         other_player = self.get_other_player()
         if other_player.search_for_card_everywhere("Magus Harid", bloodied_relevant=True, limit_round_rel=True):
             if not other_player.check_if_already_have_reaction("Magus Harid"):
@@ -2125,14 +2115,6 @@ class Player:
                 if self.get_ability_given_pos(-2, i) == "Cult of Khorne":
                     self.game.create_reaction("Cult of Khorne", self.name_player,
                                               (int(self.number), -2, i))
-        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Salamander Flamer Squad":
-            self.cards_in_play[position + 1][last_element_index].salamanders_flamers_id_number =\
-                self.game.current_flamers_id
-            self.game.current_flamers_id += 1
-        if self.cards_in_play[position + 1][last_element_index].get_ability() == "Storming Librarian":
-            self.cards_in_play[position + 1][last_element_index].storming_librarian_id_number =\
-                self.game.current_librarian_id
-            self.game.current_librarian_id += 1
         if self.game.last_planet_checked_for_battle == position:
             if other_player.search_hand_for_card("Wrathful Retribution"):
                 if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
@@ -4277,7 +4259,7 @@ class Player:
         for i in range(len(self.headquarters)):
             self.headquarters[i].set_once_per_round_used(False)
             if self.headquarters[i].get_is_unit():
-                self.headquarters[i].techmarine_aspirant_available = True
+                self.headquarters[i].used_techmarine_ids = []
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
                 self.headquarters[i].area_effect_eor = 0
@@ -4298,7 +4280,7 @@ class Player:
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].set_once_per_round_used(False)
-                self.cards_in_play[i + 1][j].techmarine_aspirant_available = True
+                self.cards_in_play[i + 1][j].used_techmarine_ids = []
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     self.cards_in_play[i + 1][j].get_attachments()[k].set_once_per_round_used(False)
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
