@@ -148,6 +148,7 @@ h4 {
     right: 0%;
     height:30vh;
     width: min(15vw, 22.1vh);
+    z-index: 1000;
 }
 
 .Card-div {

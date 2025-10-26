@@ -80,7 +80,7 @@
             <p>P2P6</p>
         </div>
     </div>
-    <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard">
+    <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
     <fieldset id="current-hand-player-1">
         <legend>CARDS P1: 0 CARDS</legend>
     </fieldset>
@@ -192,6 +192,7 @@
         var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
         var mouse_x = 0;
         var mouse_y = 0;
+        var helper_is_large = "F";
 
         function playSound(url) {
             console.log(url);
@@ -888,6 +889,19 @@
             }));
             messageInputDom.value = '';
         };
+
+        function changeHelperSize() {
+            helperCard = document.getElementById("LargeHelperCard");
+            if (helper_is_large === "F") {
+                helperCard.style.width = "44.2vh";
+                helperCard.style.height = "60vh";
+                helper_is_large = "T";
+            } else {
+                helperCard.style.width = "min(15vw, 22.1vh)";
+                helperCard.style.height = "30vh";
+                helper_is_large = "F";
+            }
+        }
 
         function testImageButton(button_id) {
             gameSocket.send(JSON.stringify({
