@@ -1001,13 +1001,21 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.number_who_is_searching = primary_player.number
             self.delete_reaction()
         elif current_reaction == "Bork'an Sept":
-            primary_player.number_cards_to_search = 6
-            if primary_player.number_cards_to_search > len(primary_player.deck):
-                primary_player.number_cards_to_search = len(primary_player.deck)
-            self.choice_context = "Bork'an Sept Rally"
-            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
-            self.name_player_making_choices = primary_player.name_player
-            self.resolving_search_box = True
+            self.choices_available = []
+            for i in range(len(primary_player.deck)):
+                card_name = primary_player.deck[i]
+                card = self.preloaded_find_card(card_name)
+                if card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and \
+                        card.get_loyalty() != "Signature" and not card.check_for_a_trait("Hardpoint"):
+                    if card_name not in self.choices_available:
+                        self.choices_available.append(card_name)
+            if self.choices_available:
+                self.choice_context = "Bork'an Sept Rally"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                await self.send_update_message("No acceptable cards found!")
+                self.delete_reaction()
         elif current_reaction == "Followers of Asuryan":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()

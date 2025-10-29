@@ -4445,16 +4445,13 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Bork'an Sept Rally":
-                        card = self.preloaded_find_card(chosen_choice)
-                        if card.get_card_type() == "Attachment":
-                            if card.get_faction() == "Tau" and card.get_loyalty() != "Signature":
-                                if not card.check_for_a_trait("Hardpoint"):
-                                    primary_player.cards.append(card.get_name())
-                                    del primary_player.deck[int(game_update_string[1])]
-                                    self.delete_reaction()
-                                    self.reset_choices_available()
-                                    self.resolving_search_box = False
-                                    primary_player.shuffle_deck()
+                        primary_player.cards.append(chosen_choice)
+                        primary_player.deck.remove(chosen_choice)
+                        await self.send_update_message("A " + chosen_choice + " was revealed.")
+                        self.delete_reaction()
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        primary_player.shuffle_deck()
                     elif self.choice_context == "Sweep Attack: Search which area?":
                         if game_update_string[1] == "0":
                             self.choices_available = []
