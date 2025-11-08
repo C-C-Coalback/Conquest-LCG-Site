@@ -6516,11 +6516,15 @@ class Game:
                 i += 1
 
     async def change_phase(self, new_val, refresh_abilities=True):
+        last_phase = self.phase
+        self.phase = new_val
         if self.p1.command_struggles_won_this_phase < self.p2.command_struggles_won_this_phase:
             pla, pos = self.p1.get_location_of_warlord()
-            if self.p1.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston":
+            if self.p1.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston"\
+                    and last_phase == "COMMAND":
                 self.create_interrupt("Mephiston", self.name_1, (1, pla, pos))
-        elif self.p2.command_struggles_won_this_phase < self.p1.command_struggles_won_this_phase:
+        elif self.p2.command_struggles_won_this_phase < self.p1.command_struggles_won_this_phase \
+                and last_phase == "COMMAND":
             pla, pos = self.p2.get_location_of_warlord()
             if self.p2.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston":
                 self.create_interrupt("Mephiston", self.name_2, (2, pla, pos))
@@ -6534,8 +6538,6 @@ class Game:
         self.p1.contaminated_convoys = False
         self.p2.contaminated_convoys = False
         self.bloodrain_tempest_active = False
-        last_phase = self.phase
-        self.phase = new_val
         i = 0
         while i < len(self.p1.headquarters):
             if self.p1.check_is_unit_at_pos(-2, i):

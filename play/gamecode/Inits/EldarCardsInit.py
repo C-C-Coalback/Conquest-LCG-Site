@@ -504,6 +504,6 @@ def eldar_cards_init():
                                                       "Reaction: After a Harlequin unit is assigned damage at the same"
                                                       " planet as your warlord, exhaust this support to reassign 1 of "
                                                       "that damage to your warlord.",
-                                "Pledge.", 1, faction, "Loyal", False)
+                                "Pledge.", 0, faction, "Loyal", False)
     ]
     return eldar_cards_array
