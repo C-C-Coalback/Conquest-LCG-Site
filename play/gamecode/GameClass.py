@@ -523,9 +523,6 @@ class Game:
         if self.mode != "Normal":
             print("mode is not normal")
             return False
-        # if self.resolving_search_box:
-        #     print("search box active")
-        #     return False
         return True
 
     async def send_queued_sound(self):
@@ -3640,6 +3637,7 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
+                            self.resolving_search_box = False
                             self.delete_interrupt()
                         self.reset_choices_available()
                     elif self.choice_context == "Use Jain Zar?":
@@ -4611,6 +4609,7 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
+                            self.resolving_search_box = False
                             self.delete_reaction()
                         self.reset_choices_available()
                     elif self.asking_if_remove_infested_planet:
