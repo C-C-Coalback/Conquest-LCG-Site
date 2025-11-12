@@ -189,10 +189,11 @@ async def update_game_event_deploy_section(self, name, game_update_string):
         elif game_update_string[0] == "HQ":
             if name == self.player_with_deploy_turn:
                 if self.mode == "Normal":
-                    if game_update_string[1] == self.number_with_deploy_turn:
-                        await deploy_card_routine_attachment(self, name, game_update_string)
-                    else:
-                        await deploy_card_routine_attachment(self, name, game_update_string)
+                    if self.card_pos_to_deploy != -1:
+                        if game_update_string[1] == self.number_with_deploy_turn:
+                            await deploy_card_routine_attachment(self, name, game_update_string)
+                        else:
+                            await deploy_card_routine_attachment(self, name, game_update_string)
                 if self.mode == "DISCOUNT":
                     if game_update_string[1] == self.number_with_deploy_turn:
                         if self.number_with_deploy_turn == "1":
@@ -558,6 +559,9 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         player_gaining_attachment = self.p1
     else:
         player_gaining_attachment = self.p2
+    if player_gaining_attachment.get_card_type_given_pos(
+            int(game_update_string[2]), int(game_update_string[3])) == "Support":
+        return None
     card = None
     magus_harid = False
     is_reaction = False
