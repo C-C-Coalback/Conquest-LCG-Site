@@ -5,7 +5,7 @@ h4 {
 .box {
     position: relative;
     height: 98vh;
-    width: 97vw;
+    width: 99vw;
     border: 5px solid blue;
     overflow: hidden;
 }
