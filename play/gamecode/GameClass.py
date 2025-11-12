@@ -164,6 +164,8 @@ class Game:
         self.what_is_being_interrupted = ""
         self.damage_left_to_take = 0
         self.goliath_rockgrinder_value = 0
+        self.may_use_faith = True
+        self.may_use_retaliate = True
         self.positions_of_units_hq_to_take_damage = []
         self.positions_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos)
         self.positions_attackers_of_units_to_take_damage = []  # Format: (player_num, planet_num, unit_pos) or None
@@ -3041,6 +3043,17 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.delete_reaction()
+                    elif self.choice_context == "Use which effect? (shield-likes)":
+                        if chosen_choice == "Faith":
+                            self.may_use_retaliate = False
+                        if chosen_choice == "Retaliate":
+                            self.may_use_faith = False
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        await self.better_shield_card_resolution(
+                            primary_player.name_player, self.last_shield_string)
+                        self.may_use_faith = True
+                        self.may_use_retaliate = True
                     elif self.choice_context == "Nurgling Bomb Choice:":
                         planet, unit = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet, unit)
@@ -7633,6 +7646,15 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
+                            can_faith = False
+                            if primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0 and self.may_use_faith:
+                                can_faith = True
+                            can_retaliate = False
+                            if primary_player.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
+                                    self.positions_attackers_of_units_to_take_damage[0] and \
+                                    primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord" and \
+                                    self.may_use_retaliate:
+                                can_retaliate = True
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
                                     primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
                                     self.amount_that_can_be_removed_by_shield[0] > 1:
@@ -7669,7 +7691,13 @@ class Game:
                                                                       rickety_warbuggy=True,
                                                                       shadow_field_possible=True)
                                 primary_player.set_once_per_phase_used_given_pos(hurt_planet, hurt_pos, True)
-                            elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
+                            elif can_faith and can_retaliate:
+                                self.choices_available = ["Faith", "Retaliate"]
+                                self.choice_context = "Use which effect? (shield-likes)"
+                                self.name_player_making_choices = primary_player.name_player
+                                self.resolving_search_box = True
+                                self.last_shield_string = game_update_string
+                            elif can_faith:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
                                 if primary_player.get_ability_given_pos(
                                         hurt_planet, hurt_pos) == "Fanatical Sister Repentia":
@@ -7692,9 +7720,7 @@ class Game:
                                                                str(amount_to_remove) + " damage is being removed.")
                                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                            elif primary_player.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
-                                    self.positions_attackers_of_units_to_take_damage[0] and \
-                                    primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                            elif can_retaliate:
                                 self.retaliate_used = True
                                 retaliate_value = primary_player.get_retaliate_given_pos(planet_pos, unit_pos)
                                 shadow_field = False
