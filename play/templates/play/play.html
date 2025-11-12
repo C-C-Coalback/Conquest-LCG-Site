@@ -758,7 +758,7 @@
                         document.getElementById(target_headquarters).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    var full_string = `<details><summary>` + split_data[3] + `</summary>`;
+                    var full_string = `<details open=""><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);"><br>`
@@ -773,7 +773,7 @@
                 } else if (split_data[1] === "VICTORY_MESSAGE") {
                     displayVictoryMessage(split_data[2], split_data[3]);
                 } else if (split_data[1] === "SEARCH") {
-                    var full_string = `<details><summary>` + split_data[3] + `</summary>`;
+                    var full_string = `<details open=""><summary>` + split_data[3] + `</summary>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var card_name = split_data[i];
