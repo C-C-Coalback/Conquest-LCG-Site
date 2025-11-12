@@ -4826,13 +4826,15 @@ class Game:
                     elif self.choice_context == "Deploy into reserve?":
                         if self.choices_available[int(game_update_string[1])] == "Normal Deploy":
                             self.deepstrike_allowed = False
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                             await DeployPhase.update_game_event_deploy_section(self, name, self.stored_deploy_string)
                             self.deepstrike_allowed = True
                             self.stored_deploy_string = []
                         else:
                             self.deepstrike_deployment_active = True
-                        self.reset_choices_available()
-                        self.resolving_search_box = False
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Archon's Palace":
                         if game_update_string[1] == "0":
                             self.canceled_card_bonuses[self.misc_target_planet] = True
