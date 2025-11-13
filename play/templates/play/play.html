@@ -9,151 +9,159 @@
     <div id="helper-text-box">
 
     </div>
-    <div id="chat-log">Use "/loaddeck/{deck_name}" to load a deck<br></div><br>
-    <input id="chat-message-input" type="text"><br>
+    <div id="chat-log">Use "/loaddeck/{deck_name}" to load a deck<br></div>
+    <input id="chat-message-input" type="text">
     <input id="chat-message-submit" type="button" value="Send">
     <div id="info-box">
         <p class="info-box-sub">Test</p>
     </div>
-    <div id="in-play-box">
-        <div id="player-1-cards-planet-0" class="player-1-in-play">
-            <p>P1P0</p>
+    <div id="full-game-box">
+        <div id="in-play-box">
+            <div id="player-1-cards-planet-0" class="player-1-in-play">
+                <p>P1P0</p>
+            </div>
+            <div id="player-1-cards-planet-1" class="player-1-in-play">
+                <p>P1P1</p>
+            </div>
+            <div id="player-1-cards-planet-2" class="player-1-in-play">
+                <p>P1P2</p>
+            </div>
+            <div id="player-1-cards-planet-3" class="player-1-in-play">
+                <p>P1P3</p>
+            </div>
+            <div id="player-1-cards-planet-4" class="player-1-in-play">
+                <p>P1P4</p>
+            </div>
+            <div id="player-1-cards-planet-5" class="player-1-in-play">
+                <p>P1P5</p>
+            </div>
+            <div id="player-1-cards-planet-6" class="player-1-in-play">
+                <p>P1P6</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-0">
+                <p>PLANET0</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-1">
+                <p>PLANET1</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-2">
+                <p>PLANET2</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-3">
+                <p>PLANET3</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-4">
+                <p>PLANET4</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-5">
+                <p>PLANET5</p>
+            </div>
+            <div class="planet-div" id="div-PLANETS-6">
+                <p>PLANET6</p>
+            </div>
+            <div id="player-2-cards-planet-0" class="player-2-in-play">
+                <p>P2P0</p>
+            </div>
+            <div id="player-2-cards-planet-1" class="player-2-in-play">
+                <p>P2P1</p>
+            </div>
+            <div id="player-2-cards-planet-2" class="player-2-in-play">
+                <p>P2P2</p>
+            </div>
+            <div id="player-2-cards-planet-3" class="player-2-in-play">
+                <p>P2P3</p>
+            </div>
+            <div id="player-2-cards-planet-4" class="player-2-in-play">
+                <p>P2P4</p>
+            </div>
+            <div id="player-2-cards-planet-5" class="player-2-in-play">
+                <p>P2P5</p>
+            </div>
+            <div id="player-2-cards-planet-6" class="player-2-in-play">
+                <p>P2P6</p>
+            </div>
         </div>
-        <div id="player-1-cards-planet-1" class="player-1-in-play">
-            <p>P1P1</p>
+        <fieldset id="current-hand-player-1">
+            <legend>CARDS P1: 0 CARDS</legend>
+        </fieldset>
+        <fieldset id="current-hand-player-2">
+            <legend>CARDS P2: 0 CARDS</legend>
+        </fieldset>
+        <div id="current-deck-player-1">
+            <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
+            <div id="count-deck-p1">
+                <p>10</p>
+            </div>
         </div>
-        <div id="player-1-cards-planet-2" class="player-1-in-play">
-            <p>P1P2</p>
+        <div id="current-deck-player-2">
+            <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
+            <div id="count-deck-p2">
+                <p>10</p>
+            </div>
         </div>
-        <div id="player-1-cards-planet-3" class="player-1-in-play">
-            <p>P1P3</p>
+        <div id="headquarters-player-1">
+            <p>Test hq p1</p>
         </div>
-        <div id="player-1-cards-planet-4" class="player-1-in-play">
-            <p>P1P4</p>
+        <div id="headquarters-player-2">
+            <p>Test hq p2</p>
         </div>
-        <div id="player-1-cards-planet-5" class="player-1-in-play">
-            <p>P1P5</p>
+        <div id ="resources-player-1">
+            <p>Resources p1</p>
         </div>
-        <div id="player-1-cards-planet-6" class="player-1-in-play">
-            <p>P1P6</p>
+        <div id ="resources-player-2">
+            <p>Resources p2</p>
         </div>
-        <div class="planet-div" id="div-PLANETS-0">
-            <p>PLANET0</p>
+        <div id="victory-display-player-1">
+            <p></p>
         </div>
-        <div class="planet-div" id="div-PLANETS-1">
-            <p>PLANET1</p>
+        <div id="victory-display-player-2">
+            <p></p>
         </div>
-        <div class="planet-div" id="div-PLANETS-2">
-            <p>PLANET2</p>
+        <div id="current-discard-player-1">
+            <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
         </div>
-        <div class="planet-div" id="div-PLANETS-3">
-            <p>PLANET3</p>
+        <div id="current-removed-player-1">
+            <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p1" class="Card" onclick="showRemoved(this.id);">
         </div>
-        <div class="planet-div" id="div-PLANETS-4">
-            <p>PLANET4</p>
+        <div id="current-discard-player-2">
+            <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
         </div>
-        <div class="planet-div" id="div-PLANETS-5">
-            <p>PLANET5</p>
+        <div id="current-removed-player-2">
+            <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p2" class="Card" onclick="showRemoved(this.id);">
         </div>
-        <div class="planet-div" id="div-PLANETS-6">
-            <p>PLANET6</p>
+        <div id="expanded-DISCARD_PILE-1">
+            <div id="expanded-discard-1-settings">
+                <input type="image" id="IN_DISCARD/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            </div>
         </div>
-        <div id="player-2-cards-planet-0" class="player-2-in-play">
-            <p>P2P0</p>
+        <div id="expanded-REMOVED_PILE-1">
+            <div id="expanded-removed-1-settings">
+                <input type="image" id="REMOVED/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            </div>
         </div>
-        <div id="player-2-cards-planet-1" class="player-2-in-play">
-            <p>P2P1</p>
+        <div id="expanded-DISCARD_PILE-2">
+            <div id="expanded-discard-2-settings">
+                <input type="image" id="IN_DISCARD/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            </div>
         </div>
-        <div id="player-2-cards-planet-2" class="player-2-in-play">
-            <p>P2P2</p>
-        </div>
-        <div id="player-2-cards-planet-3" class="player-2-in-play">
-            <p>P2P3</p>
-        </div>
-        <div id="player-2-cards-planet-4" class="player-2-in-play">
-            <p>P2P4</p>
-        </div>
-        <div id="player-2-cards-planet-5" class="player-2-in-play">
-            <p>P2P5</p>
-        </div>
-        <div id="player-2-cards-planet-6" class="player-2-in-play">
-            <p>P2P6</p>
+        <div id="expanded-REMOVED_PILE-2">
+            <div id="expanded-removed-2-settings">
+                <input type="image" id="REMOVED/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
+            </div>
         </div>
     </div>
     <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
-    <fieldset id="current-hand-player-1">
-        <legend>CARDS P1: 0 CARDS</legend>
-    </fieldset>
-    <fieldset id="current-hand-player-2">
-        <legend>CARDS P2: 0 CARDS</legend>
-    </fieldset>
-    <div id="current-deck-player-1">
-        <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
+    <div id="increase-zoom-div">
+        <input id="inc-zoom" type="button" value="Zoom In" onclick="increaseZoom();">
     </div>
-    <div id="current-deck-player-2">
-        <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
+    <div id="decrease-zoom-div">
+        <input id="dec-zoom" type="button" value="Zoom Out" onclick="decreaseZoom();">
     </div>
-    <div id="count-deck-p1">
-        <p>10</p>
-    </div>
-    <div id="count-deck-p2">
-        <p>10</p>
-    </div>
-    <div id="headquarters-player-1">
-        <p>Test hq p1</p>
-    </div>
-    <div id="headquarters-player-2">
-        <p>Test hq p2</p>
-    </div>
-    <div id ="resources-player-1">
-        <p>Resources p1</p>
-    </div>
-    <div id ="resources-player-2">
-        <p>Resources p2</p>
-    </div>
-    <div id ="pass-player-1">
+    <div id="pass-player-1">
         <input id="pass-P1" type="button" value="PASS" onclick="testImageButton(this.id);">
     </div>
     <div id="request-action-div">
         <input id="action-button" type="button" value="ACTION" onclick="testImageButton(this.id);">
-    </div>
-    <div id="victory-display-player-1">
-        <p></p>
-    </div>
-    <div id="victory-display-player-2">
-        <p></p>
-    </div>
-    <div id="current-discard-player-1">
-        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
-    </div>
-    <div id="current-removed-player-1">
-        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p1" class="Card" onclick="showRemoved(this.id);">
-    </div>
-    <div id="current-discard-player-2">
-        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
-    </div>
-    <div id="current-removed-player-2">
-        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p2" class="Card" onclick="showRemoved(this.id);">
-    </div>
-    <div id="expanded-DISCARD_PILE-1">
-        <div id="expanded-discard-1-settings">
-            <input type="image" id="IN_DISCARD/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
-        </div>
-    </div>
-    <div id="expanded-REMOVED_PILE-1">
-        <div id="expanded-removed-1-settings">
-            <input type="image" id="REMOVED/1/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
-        </div>
-    </div>
-    <div id="expanded-DISCARD_PILE-2">
-        <div id="expanded-discard-2-settings">
-            <input type="image" id="IN_DISCARD/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
-        </div>
-    </div>
-    <div id="expanded-REMOVED_PILE-2">
-        <div id="expanded-removed-2-settings">
-            <input type="image" id="REMOVED/2/0" src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" class="Card" onclick="testImageButton(this.id);">
-        </div>
     </div>
     <div id="search-collapse" draggable="true" class="draggable">
         <details>
@@ -183,6 +191,134 @@
             + roomName
             + '/'
         );
+
+        var current_zoom = 1;
+
+        function applyZoom() {
+            elements = document.querySelectorAll('.Card-div');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+                elements[i].style.width = (6.63 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Exhausted-Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+                elements[i].style.width = (6.63 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Attachment-Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+                elements[i].style.width = (6.63 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Exhausted-Attachment-Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+                elements[i].style.width = (6.63 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Token-Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (6 * current_zoom).toString() + "vh";
+                elements[i].style.width = (4.42 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Exhausted-Token-Card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (6 * current_zoom).toString() + "vh";
+                elements[i].style.width = (4.42 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.Damage');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (30 * current_zoom).toString() + "px";
+                elements[i].style.width = (30 * current_zoom).toString() + "px";
+            }
+            elements = document.querySelectorAll('.Faith');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (30 * current_zoom).toString() + "px";
+                elements[i].style.width = (30 * current_zoom).toString() + "px";
+            }
+            elements = document.querySelectorAll('.infestation-token');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (4 * current_zoom).toString() + "vh";
+                elements[i].style.width = (4 * current_zoom).toString() + "vw";
+            }
+            elements = document.querySelectorAll('.aiming-reticle');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (9 * current_zoom).toString() + "vh";
+                elements[i].style.width = (6.63 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.large-aiming-reticle');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (10 * current_zoom).toString() + "vh";
+                elements[i].style.width = (10 * current_zoom).toString() + "vw";
+            }
+            elements = document.querySelectorAll('.planet');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (10 * current_zoom).toString() + "vh";
+                elements[i].style.width = (10 * current_zoom).toString() + "vw";
+            }
+            elements = document.querySelectorAll('.planet-div');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (10 * current_zoom).toString() + "vh";
+                elements[i].style.width = (10 * current_zoom).toString() + "vw";
+            }
+            elements = document.querySelectorAll('.player-2-in-play');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (18 * current_zoom).toString() + "vh";
+                elements[i].style.maxHeight = (18 * current_zoom).toString() + "vh";
+            }
+            elements = document.querySelectorAll('.player-1-in-play');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.height = (18 * current_zoom).toString() + "vh";
+                elements[i].style.maxHeight = (18 * current_zoom).toString() + "vh";
+            }
+
+            element = document.getElementById('headquarters-player-1');
+            element.style.minHeight = (9 * current_zoom).toString() + "vh";
+
+            element = document.getElementById('headquarters-player-2');
+            element.style.minHeight = (9 * current_zoom).toString() + "vh";
+
+            element = document.getElementById('current-hand-player-1');
+            element.style.minHeight = (9 * current_zoom).toString() + "vh";
+
+            element = document.getElementById('current-hand-player-2');
+            element.style.minHeight = (9 * current_zoom).toString() + "vh";
+
+            element = document.getElementById('in-play-box');
+            element.style.height = "calc(" + (48 * current_zoom).toString() + "vh + 10px)";
+            element.style.width = (75 * current_zoom).toString() + "vw";
+            var row_height_1 = (19 * current_zoom).toString() + "vh";
+            var row_height_2 = (10 * current_zoom).toString() + "vh";
+            var row_height_3 = "";
+            element.style.gridTemplateRows = row_height_1 + " " + row_height_2 + " " + row_height_1;
+
+            element = document.getElementById('full-game-box');
+            element.style.height = (98 * current_zoom).toString() + "vh";
+            row_height_1 = "calc(" + (10 * current_zoom).toString() + "vh + 15px)";
+            row_height_2 = (10 * current_zoom).toString() + "vh";
+            row_height_3 = "auto";
+            element.style.gridTemplateRows = row_height_1 + " " + row_height_2 + " " + row_height_3 + " " + row_height_2 + " " + row_height_1;
+            var column_width_1 = (6.63 * current_zoom).toString() + "vh";
+            var column_width_2 = "auto";
+            var column_width_3 = "calc(" + (10 * current_zoom).toString() + "vw + 10px)";
+            element.style.gridTemplateColumns = column_width_1 + " " + column_width_1 + " " + column_width_1 + " " + column_width_2 + " " + column_width_3;
+        }
+
+        function increaseZoom() {
+            current_zoom = current_zoom + 0.1;
+            applyZoom();
+        }
+
+        function decreaseZoom() {
+            current_zoom = current_zoom - 0.1;
+            if (current_zoom < 0.1) {
+                current_zoom = 0.1;
+            }
+            applyZoom();
+        }
 
         document.querySelector('#chat-log').value += ('Use \"/loaddeck/{deck_name}\" to load a deck\n');
 
@@ -446,11 +582,11 @@
                     if (card_name === "Cardback") {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)">`;
+                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     } else {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)">`;
+                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     }
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
@@ -853,6 +989,7 @@
                         }
                     }
                 }
+                applyZoom();
             } else {
                 var text = data.message;
                 var split_text = data.message.split(":");
