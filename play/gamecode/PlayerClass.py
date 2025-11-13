@@ -1554,6 +1554,38 @@ class Player:
                             i = i - 1
             i += 1
 
+    def sort_hand(self):
+        army_cards = []
+        army_costs = []
+        support_cards = []
+        support_costs = []
+        event_cards = []
+        event_costs = []
+        attachment_cards = []
+        attachment_costs = []
+        for i in range(len(self.cards)):
+            card = self.game.preloaded_find_card(self.cards[i])
+            card_type = card.get_card_type()
+            name = card.get_name()
+            cost = card.get_cost()
+            if card_type == "Army":
+                army_cards.append(name)
+                army_costs.append(cost)
+            if card_type == "Support":
+                support_cards.append(name)
+                support_costs.append(cost)
+            if card_type == "Event":
+                event_cards.append(name)
+                event_costs.append(cost)
+            if card_type == "Attachment":
+                attachment_cards.append(name)
+                attachment_costs.append(cost)
+        army_cards = [x for _, x in sorted(zip(army_costs, army_cards))]
+        support_cards = [x for _, x in sorted(zip(support_costs, support_cards))]
+        attachment_cards = [x for _, x in sorted(zip(attachment_costs, attachment_cards))]
+        event_cards = [x for _, x in sorted(zip(event_costs, event_cards))]
+        self.cards = army_cards + support_cards + event_cards + attachment_cards
+
     def idden_base_detransform(self, force=False):
         for i in range(7):
             j = 0
