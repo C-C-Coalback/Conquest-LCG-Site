@@ -101,6 +101,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         has_deepstrike = card.get_has_deepstrike()
                         if card.get_card_type() == "Attachment" and primary_player.farsight_relevant:
                             has_deepstrike = True
+                        if card.get_limited() and not primary_player.can_play_limited and not \
+                                self.paying_shrieking_exarch_cost:
+                            await self.send_update_message("You have already played a Limited card this round!")
+                            return None
                         self.faction_of_card_to_play = card.get_faction()
                         self.name_of_card_to_play = card.get_name()
                         self.traits_of_card_to_play = card.get_traits()

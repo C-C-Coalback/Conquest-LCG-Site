@@ -366,7 +366,7 @@ class UnitCard(Card):
                  lumbering=False, sweep=0, retaliate=0):
         super().__init__(name, text, traits, cost, faction, loyalty, 0,
                          card_type, unique, image_name, applies_discounts, action_in_hand, allowed_phases_in_hand,
-                         action_in_play, allowed_phases_in_play, limited, deepstrike=deepstrike)
+                         action_in_play, allowed_phases_in_play, limited=limited, deepstrike=deepstrike)
         self.attack = attack
         self.health = health
         self.damage = 0
