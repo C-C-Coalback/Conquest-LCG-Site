@@ -28,7 +28,7 @@ h4 {
 }
 
 #helper-text-box {
-    position: absolute;
+    position: fixed;
     display: none;
     z-index: 1000;
     border-width: 2px;
