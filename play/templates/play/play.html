@@ -1027,16 +1027,23 @@
             messageInputDom.value = '';
         };
 
+        var current_helper_width = "min(15vw, 22.1vh)";
+        var current_helper_height = "30vh";
+
         function changeHelperSize() {
             helperCard = document.getElementById("LargeHelperCard");
             if (helper_is_large === "F") {
                 helperCard.style.width = "44.2vh";
                 helperCard.style.height = "60vh";
                 helper_is_large = "T";
+                current_helper_width = "44.2vh";
+                current_helper_height = "60vh";
             } else {
                 helperCard.style.width = "min(15vw, 22.1vh)";
                 helperCard.style.height = "30vh";
                 helper_is_large = "F";
+                current_helper_width = "min(15vw, 22.1vh)";
+                current_helper_height = "30vh";
             }
         }
 
@@ -1072,12 +1079,18 @@
 
         function changeDef(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            document.getElementById("LargeHelperCard").src=og_image_src;
+            helperCard = document.getElementById("LargeHelperCard");
+            helperCard.src=og_image_src;
+            helperCard.style.width = current_helper_width;
+            helperCard.style.height = current_helper_height;
         }
 
         function changeDefDeck(image_src, card_count, user_num) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            document.getElementById("LargeHelperCard").src=og_image_src;
+            helperCard = document.getElementById("LargeHelperCard");
+            helperCard.src=og_image_src;
+            helperCard.style.width = current_helper_width;
+            helperCard.style.height = current_helper_height;
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.innerHTML = `<p>` + card_count + `</p>`;
@@ -1086,14 +1099,34 @@
 
         function changeDefRotate(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
-            document.getElementById("LargeHelperCard").src=og_image_src;
+            if (helper_is_large === "F") {
+                og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+            }
+            helperCard = document.getElementById("LargeHelperCard");
+            helperCard.src=og_image_src;
+            if (helper_is_large === "T") {
+                helperCard.style.width = current_helper_height;
+                helperCard.style.height = current_helper_width;
+            } else {
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
+            }
         }
 
         function changeDefRotateAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
-            document.getElementById("LargeHelperCard").src=og_image_src;
+            if (helper_is_large === "F") {
+                og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+            }
+            helperCard = document.getElementById("LargeHelperCard");
+            helperCard.src=og_image_src;
+            if (helper_is_large === "T") {
+                helperCard.style.width = current_helper_height;
+                helperCard.style.height = current_helper_width;
+            } else {
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
+            }
             help_text = help_text.replace("\n", "<br>")
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
