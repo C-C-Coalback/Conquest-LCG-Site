@@ -975,13 +975,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
     elif self.action_chosen == "Particle Whip":
-        if game_update_string[1] == "1":
-            player_being_hit = self.p1
-        else:
-            player_being_hit = self.p2
         unit_pos = int(game_update_string[2])
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
+        if player_owning_card.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
             if possible_interrupts:
                 can_continue = False
@@ -996,9 +992,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
         if can_continue:
-            if player_being_hit.headquarters[unit_pos].get_card_type() == "Army":
-                if player_being_hit.headquarters[unit_pos].check_for_a_trait("Elite"):
-                    player_being_hit.assign_damage_to_pos(-2, unit_pos, self.misc_counter, by_enemy_unit=False)
+            if player_owning_card.headquarters[unit_pos].get_card_type() == "Army":
+                if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    player_owning_card.assign_damage_to_pos(-2, unit_pos, self.misc_counter, by_enemy_unit=False)
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
@@ -1652,11 +1648,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if self.phase == "DEPLOY":
                     self.player_with_deploy_turn = secondary_player.name_player
                     self.number_with_deploy_turn = secondary_player.get_number()
-                self.action_chosen = ""
-                self.mode = "Normal"
-                self.player_with_action = ""
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
+                self.action_cleanup()
                 self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Hunting Grounds":
         if game_update_string[1] == primary_player.number:

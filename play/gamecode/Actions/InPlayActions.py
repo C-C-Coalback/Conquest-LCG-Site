@@ -986,10 +986,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.misc_counter = 0
                 self.action_cleanup()
     elif self.action_chosen == "Particle Whip":
-        if game_update_string[1] == "1":
-            player_being_hit = self.p1
-        else:
-            player_being_hit = self.p2
         can_continue = True
         possible_interrupts = []
         if player_owning_card.name_player == primary_player.name_player:
@@ -1013,9 +1009,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.first_player_nullified = primary_player.name_player
             self.nullify_context = "In Play Action"
         if can_continue:
-            if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
-                if not player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Elite"):
-                    player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
+            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter,
+                                                            by_enemy_unit=False)
                     self.misc_counter = 0
                     self.action_cleanup()
     elif self.action_chosen == "Doombolt":
@@ -2228,9 +2227,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.nullify_context = "In Play Action"
                 if can_continue:
                     primary_player.ready_given_pos(planet_pos, unit_pos)
-                    self.action_cleanup()
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
+                    self.action_cleanup()
                     self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Dark Cunning":
         if primary_player.get_number() == game_update_string[1]:

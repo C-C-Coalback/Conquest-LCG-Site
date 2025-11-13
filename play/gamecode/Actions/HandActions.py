@@ -1172,9 +1172,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         primary_player.discard_card_from_hand(int(game_update_string[2]))
         self.misc_counter += 1
         if self.misc_counter >= 2:
-            self.action_cleanup()
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                         self.position_of_actioned_card[1])
+            self.action_cleanup()
     elif self.action_chosen == "Death from Above":
         if card.get_is_unit():
             if card.get_mobile() and not card.check_for_a_trait("Elite"):
