@@ -32,8 +32,8 @@ def resolve_planet_battle_effect(p_win, p_lose, planet_id):
 async def manual_atrox_prime_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         planet_pos = int(game_update_string[1])
-        if self.last_planet_checked_for_battle + 1 == planet_pos or \
-                self.last_planet_checked_for_battle - 1 == planet_pos:
+        if self.atrox_origin + 1 == planet_pos or \
+                self.atrox_origin - 1 == planet_pos:
             if name == self.name_1:
                 print("Resolve AOE")
                 await self.aoe_routine(self.p1, self.p2, planet_pos, 1)
@@ -1328,6 +1328,7 @@ async def manual_carnath_ability(self, name, game_update_string, primary_player,
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = name
+            self.different_atrox_origin = int(game_update_string[1])
 
 
 async def manual_ferrin_ability(self, name, game_update_string, primary_player, secondary_player):

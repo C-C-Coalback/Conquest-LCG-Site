@@ -59,6 +59,7 @@ class Game:
         self.sector = sector
         self.cult_duplicity_available = True
         self.forced_battle_abilities = []
+        self.atrox_origin = -1
         if sector == "Traxis":
             for i in range(10):
                 self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -325,6 +326,7 @@ class Game:
         self.kaerux_erameas_active = False
         self.misc_misc = None
         self.misc_misc_2 = None
+        self.different_atrox_origin = -1
         self.valid_targets_for_dark_possession = [
             "Drop Pod Assault", "Exterminatus", "Preemptive Barrage", "Suppressive Fire",
             "Battle Cry", "Snotling Attack", "Squig Bombin'", "Infernal Gateway",
@@ -1707,6 +1709,7 @@ class Game:
         self.p1.cegorach_jesters_permitted = []
         self.p2.cegorach_jesters_active = False
         self.p2.cegorach_jesters_permitted = []
+        self.different_atrox_origin = -1
         if self.nectavus_actual_current_planet != -1:
             self.last_planet_checked_command_struggle = self.nectavus_actual_current_planet
         self.nectavus_actual_current_planet = -1
@@ -2607,6 +2610,10 @@ class Game:
         elif self.battle_ability_to_resolve == "Jaricho":
             if self.phase != "COMBAT":
                 await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Atrox Prime":
+            self.atrox_origin = self.last_planet_checked_for_battle
+            if self.different_atrox_origin != -1:
+                self.atrox_origin = self.different_atrox_origin
         elif self.battle_ability_to_resolve == "Immortal Sorrows":
             self.choices_available = ["Brutal", "Armorbane"]
             self.choice_context = "Immortal Sorrows Choice"
