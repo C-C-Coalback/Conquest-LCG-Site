@@ -722,7 +722,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
         elif current_reaction == "Shrieking Harpy":
             if self.apoka:
-                secondary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+                primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if (secondary_player.get_card_type_given_pos(planet_pos, i) == "Army" and not
                         secondary_player.check_for_trait_given_pos(planet_pos, i, "Elite")) or \
