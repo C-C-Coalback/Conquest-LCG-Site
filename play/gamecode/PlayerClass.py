@@ -232,6 +232,82 @@ class Player:
             return True
         return False
 
+    def setup_player_no_send(self, raw_deck, planet_array):
+        self.condition_player_main.acquire()
+        deck_list = clean_received_deck(raw_deck)
+        self.headquarters.append(copy.deepcopy(FindCard.find_card(deck_list[0], self.card_array, self.cards_dict,
+                                                                  self.apoka_errata_cards, self.cards_that_have_errata
+                                                                  )))
+        self.warlord_faction = self.headquarters[0].get_faction()
+        self.headquarters[0].name_owner = self.name_player
+        if self.headquarters[0].get_name() == "Urien Rakarth":
+            self.urien_relevant = True
+        if self.headquarters[0].get_name() == "Gorzod":
+            self.gorzod_relevant = True
+        if self.headquarters[0].get_name() == "Subject Omega-X62113":
+            self.subject_omega_relevant = True
+        if self.headquarters[0].get_name() == "Grigory Maksim":
+            self.grigory_maksim_relevant = True
+        if self.headquarters[0].get_name() == "Farsight":
+            self.farsight_relevant = True
+        if self.headquarters[0].get_name() == "Illuminor Szeras":
+            self.illuminor_szeras_relevant = True
+        if self.headquarters[0].get_name() == "Kaptin Bluddflagg":
+            self.bluddflagg_relevant = True
+        if self.headquarters[0].get_name() == "Castellan Crowe":
+            self.castellan_crowe_relevant = True
+            self.castellan_crowe_2_relevant = True
+        self.deck = deck_list[1:]
+        if self.headquarters[0].get_name() == "Vael the Gifted":
+            self.vael_relevent = True
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.ritual_cards:
+                    self.remove_card_from_game(self.deck[i])
+                    del self.deck[i]
+                    i = i - 1
+                i = i + 1
+        if self.warlord_faction == "Tyranids":
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.synapse_list:
+                    self.allowed_units_rsn.remove(self.deck[i])
+                    self.headquarters.append(copy.deepcopy(FindCard.find_card(self.deck[i], self.card_array,
+                                                                              self.cards_dict,
+                                                                              self.apoka_errata_cards,
+                                                                              self.cards_that_have_errata)))
+                    self.headquarters[1].name_owner = self.name_player
+                    del self.deck[i]
+                    i = i - 1
+                i = i + 1
+        self.shuffle_deck()
+        self.deck_loaded = True
+        self.cards_in_play[0] = planet_array
+        self.resources = self.headquarters[0].get_starting_resources()
+        preparation_cards_exist = False
+        for i in range(len(self.preparation_cards)):
+            if self.preparation_cards[i] in self.deck:
+                preparation_cards_exist = True
+        if not preparation_cards_exist:
+            for i in range(self.headquarters[0].get_starting_cards()):
+                self.draw_card()
+        else:
+            num_cards_left = self.headquarters[0].get_starting_cards()
+            i = 0
+            while i < len(self.deck):
+                if self.deck[i] in self.preparation_cards:
+                    self.cards.append(self.deck[i])
+                    del self.deck[i]
+                    num_cards_left = num_cards_left - 1
+                    i = i - 1
+                i = i + 1
+            for i in range(num_cards_left):
+                self.draw_card()
+        if self.game.p1.deck_loaded and self.game.p2.deck_loaded and not self.game.sent_setup_info_already:
+            self.game.sent_setup_info_already = True
+            self.game.phase = "DEPLOY"
+            self.game.start_mulligan()
+
     async def setup_player(self, raw_deck, planet_array):
         self.condition_player_main.acquire()
         deck_list = clean_received_deck(raw_deck)
@@ -267,7 +343,6 @@ class Player:
                     del self.deck[i]
                     i = i - 1
                 i = i + 1
-            await self.send_removed_cards()
         if self.warlord_faction == "Tyranids":
             i = 0
             while i < len(self.deck):
@@ -308,14 +383,21 @@ class Player:
         print(self.deck)
         print(self.cards)
         self.print_headquarters()
+        await self.conclude_setup_sends()
+        self.condition_player_main.notify_all()
+        self.condition_player_main.release()
+
+    async def conclude_setup_sends(self):
+        await self.send_removed_cards()
         await self.send_hand()
         for i in range(len(self.game.game_sockets)):
             await self.game.send_update_message("Setup of " + self.name_player + " finished.")
         await self.send_hq()
         await self.send_units_at_all_planets()
         await self.send_resources()
-        if self.game.p1.deck_loaded and self.game.p2.deck_loaded:
-            await self.game.start_mulligan()
+        if self.game.p1.deck_loaded and self.game.p2.deck_loaded and not self.game.sent_setup_info_already:
+            self.game.sent_setup_info_already = True
+            self.game.start_mulligan()
             await self.game.send_search()
             await self.game.send_info_box()
             self.game.phase = "DEPLOY"
@@ -326,8 +408,6 @@ class Player:
             await self.game.send_update_message("The " + self.game.sector + " sector is active")
             await self.game.send_update_message(
                 self.game.name_1 + " may mulligan their opening hand.")
-        self.condition_player_main.notify_all()
-        self.condition_player_main.release()
 
     def resolve_electro_whip(self, planet_pos, unit_pos):
         if planet_pos == -2:

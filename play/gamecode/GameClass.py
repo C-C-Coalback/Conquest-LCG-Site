@@ -12,6 +12,7 @@ from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQIn
     AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
 from . import CardClasses
+import os
 
 
 def create_planets(planet_array_objects):
@@ -28,7 +29,7 @@ def create_planets(planet_array_objects):
 
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka,
-                 apoka_errata_cards, sector="Traxis"):
+                 apoka_errata_cards, sector="Traxis", deck_1="", deck_2=""):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
@@ -498,7 +499,26 @@ class Game:
         self.grand_plan_active = False
         self.trium_count = 0
         self.trium_tracker = ("name", -1)
+        self.sent_setup_info_already = False
         self.reactions_on_destruction_permitted = True
+        if deck_1:
+            deck_name = deck_1
+            path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.name_1 + "/" + deck_name
+            if os.path.exists(path_to_player_decks):
+                print("Success")
+                with open(path_to_player_decks, 'r') as f:
+                    deck_content = f.read()
+                print(deck_content)
+                self.p1.setup_player_no_send(deck_content, self.planet_array)
+        if deck_2:
+            deck_name = deck_2
+            path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.name_2 + "/" + deck_name
+            if os.path.exists(path_to_player_decks):
+                print("Success")
+                with open(path_to_player_decks, 'r') as f:
+                    deck_content = f.read()
+                print(deck_content)
+                self.p2.setup_player_no_send(deck_content, self.planet_array)
 
     async def send_queued_message(self):
         if self.queued_message:
@@ -1543,7 +1563,7 @@ class Game:
                     return False
             return True
 
-    async def start_mulligan(self):
+    def start_mulligan(self):
         self.choices_available = ["Yes", "No"]
         self.choice_context = "Mulligan Opening Hand?"
         self.name_player_making_choices = self.name_1

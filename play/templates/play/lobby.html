@@ -5,7 +5,6 @@
 {% block content %}
 <style>
         .box {
-            width: 200px;
             height: 60px;
             background-color: lightblue;
             border: 2px solid blue;
@@ -17,9 +16,7 @@
             overflow-x:auto;
         }
         #lobby-container {
-            position:absolute;
-            top:20%;
-            left:20%;
+            position:relative;
             margin:auto;
             border-style: double;
             border-color: lightblue;
@@ -28,11 +25,10 @@
             width:300px;
             max-width:300px;
             min-height:10vh;
+            grid-area: lobbies;
         }
         #game-settings-container {
-            position:absolute;
-            top:20%;
-            left:calc(20% + 350px);
+            position:relative;
             margin:auto;
             border-style: double;
             border-color: lightblue;
@@ -41,57 +37,113 @@
             width:200px;
             max-width:200px;
             min-height:10vh;
+            grid-area: settings;
         }
         #add_to_me {
             position:relative;
-            top:20%;
-            left:20%;
             margin:auto;
         }
         #create-lobby-submit {
-            position:absolute;
-            left:20%;
+            position:relative;
             margin:auto;
+            grid-area: create-lobby;
         }
-        #available {
+        #decks-container {
+            position:relative;
+            margin:auto;
+            border-style: double;
+            border-color: lightblue;
+            border-width: 5px;
+            background: rgba(47, 40, 153, 0.3);
+            max-width:240px;
+            min-height:10vh;
+            grid-area: decks-area;
+        }
+        #available, #decks-header {
             position:relative;
             margin:auto;
         }
+        #whole-container {
+            position: relative;
+            display: grid;
+            grid-template-areas:
+            "create-lobby settings decks-area"
+            "lobbies settings decks-area";
+            text-align: center;
+            grid-template-rows: 10px auto;
+            gap: 20px;
+        }
+        #flex-container {
+            display: flex;
+            justify-content: center;
+        }
+        .saved-deck-box {
+            width: 200px;
+            height: 70px;
+            background-color: lightblue;
+            border: 2px solid blue;
+            margin: 10px;
+            display: flex;
+            flex-direction: row;
+            word-break: break-all;
+        }
+        .chosen-deck {
+            background-color: purple;
+            border: 2px solid yellow;
+        }
+        .Card-saved-box {
+            position: relative;
+            width: 50px;
+            height: 70px;
+        }
 </style>
 <h2>Lobby</h2>
-<input id="create-lobby-submit" type="button" value="Create lobby">
-<div id="lobby-container">
-    <h2 id="available">Available Lobbies</h2>
-    <div id="add_to_me">
-        <p></p>
-    </div>
-    <h2 id="active">Active Games</h2>
-    <div id="add_spec_to_me">
-        <p></p>
-    </div>
-</div>
-<div id="game-settings-container">
-    <h2>Game Settings</h2>
-    <input id="cb" type="checkbox" style="float: left; margin-top: 5px;">
-    <div style="margin-left: 25px;">
-     Private
-    </div>
-    <br>
-    <select id="sector" style="float: left; margin-top: 0px;">
-        <option value="Traxis" selected="selected">Traxis</option>
-        <option value="Gardis">Gardis</option>
-        <option value="Veros">Veros</option>
-        <option value="The Breach">The Breach</option>
-        <option value="Nepthis">Nepthis</option>
-        <option value="Sargos">Sargos</option>
-    </select>
-    <div style="margin-left: 25px;">
-     Sector
-    </div>
-    <br>
-    <input id="apokacb" type="checkbox" style="float: left; margin-top: 5px;">
-    <div style="margin-left: 25px;">
-     Apoka Errata
+<div id="flex-container">
+    <div id="whole-container">
+        <input id="create-lobby-submit" type="button" value="Create lobby">
+        <div id="lobby-container">
+            <h2 id="available">Available Lobbies</h2>
+            <div id="add_to_me">
+                <p></p>
+            </div>
+            <h2 id="active">Active Games</h2>
+            <div id="add_spec_to_me">
+                <p></p>
+            </div>
+        </div>
+        <div id="game-settings-container-container">
+            <div id="game-settings-container">
+                <h2>Game Settings</h2>
+                <input id="cb" type="checkbox" style="float: left; margin-top: 5px;">
+                <div style="margin-left: 25px; text-align: left;">
+                 Private
+                </div>
+                <br>
+                <select id="sector" style="float: left; margin-top: 0px;">
+                    <option value="Traxis" selected="selected">Traxis</option>
+                    <option value="Gardis">Gardis</option>
+                    <option value="Veros">Veros</option>
+                    <option value="The Breach">The Breach</option>
+                    <option value="Nepthis">Nepthis</option>
+                    <option value="Sargos">Sargos</option>
+                </select>
+                <div style="margin-left: 25px; text-align: left;">
+                 Sector
+                </div>
+                <br>
+                <input id="apokacb" type="checkbox" style="float: left; margin-top: 5px;">
+                <div style="margin-left: 25px; text-align: left;">
+                 Apoka Errata
+                </div>
+            </div>
+        </div>
+        <div id="decks-container-container">
+            <div id="decks-container">
+                <h2 id="decks-header">Decks</h2>
+                <h2>No Decks</h2>
+            </div>
+            <button id="load-more" onclick="loadMore()">Load More</button>
+        </div>
     </div>
 </div>
 <script>
@@ -103,7 +155,10 @@
             + '/ws/play/'
         );
 
+        var deck_name = "";
+
         var spec_count = 0;
+        var current_deck_amount = 0;
 
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
@@ -121,23 +176,62 @@
                 deleteSpec()
             } else if (split_string[0] == "Create spec") {
                 addSpec(split_string[1], split_string[2], split_string[3]);
+            } else if (split_string[0] == "Send Deck") {
+                addDeck(split_string[1], split_string[2], split_string[3]);
             } else {
                 addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5])
             }
         };
+
+        function addDeck(username, deck_name, cardName) {
+            if (username === "{{ user.username }}") {
+                if (current_deck_amount === 0) {
+                    document.getElementById("decks-container").innerHTML = `<h2 id="decks-header">Decks</h2>`;
+                }
+                current_deck_amount += 1;
+                var message = "";
+                var route_text = "/static/images/CardImages/" + cardName + ".jpg";
+                message = `<div id=` + deck_name + ` class="saved-deck-box" onclick="selectDeck(this.id)">`;
+                message += `<img src=` + route_text + ` alt=` + route_text + ` class="Card-saved-box" />`;
+                message += `<p>` + deck_name + `</p>`;
+                message += `</div>`;
+                document.getElementById("decks-container").innerHTML += message;
+            }
+        }
+
+        function selectDeck(elem_id) {
+            elements = document.querySelectorAll('.saved-deck-box');
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].classList.contains('chosen-deck') ) {
+                    elements[i].classList.remove('chosen-deck');
+                }
+            }
+            elem = document.getElementById(elem_id);
+            elem.classList.add("chosen-deck");
+            deck_name = elem_id;
+            lobbySocket.send(JSON.stringify({
+                'message': "Select Deck" + "/" + elem_id
+            }));
+        }
 
         document.querySelector('#create-lobby-submit').onclick = function(e) {
             const private = document.getElementById("cb").checked;
             const apoka = document.getElementById("apokacb").checked;
             const sector = document.getElementById("sector").value;
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString() + "/" + sector
+                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString() + "/" + sector + "/" + deck_name
             }));
         };
 
         function joinLobby(clicked_id) {
             lobbySocket.send(JSON.stringify({
-                'message': "Join lobby/" + clicked_id
+                'message': "Join lobby/" + clicked_id + "/" + deck_name
+            }));
+        }
+
+        function loadMore() {
+            lobbySocket.send(JSON.stringify({
+                'message': "Load More/" + current_deck_amount.toString()
             }));
         }
 
