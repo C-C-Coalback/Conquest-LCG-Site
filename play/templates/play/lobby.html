@@ -191,7 +191,7 @@
                 current_deck_amount += 1;
                 var message = "";
                 var route_text = "/static/images/CardImages/" + cardName + ".jpg";
-                message = `<div id=` + deck_name + ` class="saved-deck-box" onclick="selectDeck(this.id)">`;
+                message = `<div id="` + deck_name + `" class="saved-deck-box" onclick="selectDeck(this.id)">`;
                 message += `<img src=` + route_text + ` alt=` + route_text + ` class="Card-saved-box" />`;
                 message += `<p>` + deck_name + `</p>`;
                 message += `</div>`;
