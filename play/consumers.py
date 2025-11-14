@@ -442,11 +442,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update(
                             "Command prevented; game is in an unsafe state."
                         )
-                    elif message[1] == "sort-hand" and len(message) == 3:
-                        if message[2] == "1" and self.name == active_games[self.game_position].name_1:
+                    elif message[1] == "sort-hand" and len(message) == 2:
+                        if self.name == active_games[self.game_position].name_1:
                             active_games[self.game_position].p1.sort_hand()
                             await active_games[self.game_position].p1.send_hand()
-                        elif message[2] == "2" and self.name == active_games[self.game_position].name_2:
+                        elif self.name == active_games[self.game_position].name_2:
                             active_games[self.game_position].p2.sort_hand()
                             await active_games[self.game_position].p2.send_hand()
                     elif message[1] == "shuffle-deck" and len(message) == 3:
