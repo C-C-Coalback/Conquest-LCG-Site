@@ -6454,7 +6454,7 @@ class Game:
                                                                     "----GAME END----"
             )
             await self.send_victory_proper(self.name_2, "warlord destruction")
-        elif not self.p1.warlord_just_got_destroyed and self.p1.warlord_just_got_destroyed:
+        elif not self.p1.warlord_just_got_destroyed and self.p2.warlord_just_got_destroyed:
             await self.send_update_message(
                 "----GAME END----"
                 "Victory for " + self.name_1 + "; " + self.name_2 + "'s warlord was destroyed."
