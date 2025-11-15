@@ -7677,11 +7677,13 @@ class Game:
                             if primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0 and self.may_use_faith:
                                 can_faith = True
                             can_retaliate = False
+                            att_num, att_pla, att_pos = self.attacker_location
                             if primary_player.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
-                                    self.positions_attackers_of_units_to_take_damage[0] and \
                                     primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord" and \
                                     self.may_use_retaliate:
-                                can_retaliate = True
+                                if (att_pla != -1 and att_pos != -1) or \
+                                        self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                    can_retaliate = True
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
                                     primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
                                     self.amount_that_can_be_removed_by_shield[0] > 1:
@@ -7753,7 +7755,8 @@ class Game:
                                 shadow_field = False
                                 if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
                                     shadow_field = True
-                                att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                att_num, att_pla, att_pos = self.attacker_location
+                                self.positions_attackers_of_units_to_take_damage[0] = self.attacker_location
                                 secondary_player.assign_damage_to_pos(att_pla, att_pos, retaliate_value,
                                                                       rickety_warbuggy=True,
                                                                       shadow_field_possible=shadow_field)
@@ -7764,7 +7767,7 @@ class Game:
                             if planet_pos == hurt_planet:
                                 if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Elite"):
                                     if primary_player.cards_in_play[hurt_planet + 1][
-                                        hurt_pos].follower_of_gork_available:
+                                            hurt_pos].follower_of_gork_available:
                                         primary_player.cards_in_play[hurt_planet + 1][
                                             hurt_pos].follower_of_gork_available = False
                                         damage_to_remove = 2
