@@ -9836,6 +9836,10 @@ class Game:
         await self.update_interrupts(name, game_update_string)
         await self.update_reactions(name, game_update_string)
         await self.update_reactions(name, game_update_string)
+        if not self.p1.deck and self.phase != "SETUP":
+            self.p1.lost_due_to_deck = True
+        if not self.p2.deck and self.phase != "SETUP":
+            self.p2.lost_due_to_deck = True
         if self.p1.lost_due_to_deck and not self.p1.already_lost_due_to_deck:
             await self.send_update_message(
                 "----GAME END----"
