@@ -177,6 +177,8 @@
                 }
             } else if (split_data[0] === "Load deck") {
 
+            } else if (split_data[0] === "Delete deck") {
+
             } else if (split_data[0] === "saved_deck") {
                 if (numDecksLoaded === 0) {
                     document.getElementById("deck-lists").innerHTML = ``;
@@ -185,12 +187,15 @@
                 var message = "";
                 var cardName = split_data[2].split(' ').join('_');
                 var route_text = "/static/images/CardImages/" + cardName + ".jpg";
-                message = `<div class=saved-deck-box>`;
+                message = `<div class=saved-deck-box id="` + split_data[1] + `-container">`;
                 message += `<img src=` + route_text + ` alt=` + route_text + ` class="Card-saved-box" />`;
                 message += `<p>` + split_data[1] + `</p>`;
                 message += `</div>`;
-                message += `<button id=` + split_data[1].split(' ').join('-') + ` onclick="loadSavedDeck(this.id)">
+                message += `<button id="` + split_data[1] + `" onclick="loadSavedDeck(this.id)">
                 Load Deck
+                </button>`;
+                message += `<button id="` + split_data[1] + `-delete" onclick="deleteSavedDeck(this.id)">
+                Delete Deck
                 </button>`;
                 document.getElementById("deck-lists").innerHTML += message;
             } else if (split_data[0] === "Warlord") {
@@ -548,6 +553,20 @@
     function loadSavedDeck(deck_name) {
         decksSocket.send(JSON.stringify({
                 'message': ("LOAD DECK/" + deck_name.split('-').join(' '))
+        }));
+    }
+
+    function deleteSavedDeck(deck_name) {
+        var button_delete = document.getElementById(deck_name);
+        button_delete.style.display = "None";
+        deck_name = deck_name.replace("-delete", "");
+        var container_name = deck_name + "-container";
+        var container_deck = document.getElementById(container_name);
+        container_deck.style.display = "None";
+        var button_deck = document.getElementById(deck_name);
+        button_deck.style.display = "None";
+        decksSocket.send(JSON.stringify({
+                'message': ("DELETE DECK/" + deck_name.split('-').join(' '))
         }));
     }
 

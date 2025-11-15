@@ -335,6 +335,12 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         changed_ally = True
                 if changed_ally:
                     await self.send(text_data=json.dumps({"message": message}))
+            elif split_message[0] == "DELETE DECK":
+                deck_name = split_message[1]
+                if os.path.isdir("decks/DeckStorage/" + self.name):
+                    path_to_deck = os.getcwd() + "/decks/DeckStorage/" + self.name + "/" + deck_name
+                    if os.path.exists(path_to_deck):
+                        os.remove(path_to_deck)
             elif split_message[0] == "LOAD DECK":
                 deck_name = split_message[1]
                 if os.path.isdir("decks/DeckStorage/" + self.name):
