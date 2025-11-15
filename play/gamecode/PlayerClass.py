@@ -2716,7 +2716,8 @@ class Player:
                             if card.get_ability() == "The Webway Witch":
                                 self.game.create_reaction("The Webway Witch", self.name_player,
                                                           (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Scything Hormagaunts":
+                            if card.get_ability() == "Scything Hormagaunts"\
+                                    and not self.game.infested_planets[position]:
                                 self.game.create_reaction("Scything Hormagaunts", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Emergent Cultists":
