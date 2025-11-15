@@ -8068,6 +8068,21 @@ class Game:
                                 secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                       rickety_warbuggy=True)
                         self.misc_misc = None
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        primary_player.reset_all_aiming_reticles_play_hq()
+                    if self.reactions_needing_resolving[0] == "Fierce Purgator":
+                        if self.misc_misc_2 is not None:
+                            for i in range(len(self.misc_misc_2)):
+                                current_num, current_pla, current_pos = self.misc_misc_2[i]
+                                if current_num == 1:
+                                    self.p1.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
+                                                                 rickety_warbuggy=True)
+                                else:
+                                    self.p2.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
+                                                                 rickety_warbuggy=True)
+                        self.misc_misc = None
+                        self.misc_misc_2 = None
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         primary_player.reset_all_aiming_reticles_play_hq()
                     if self.reactions_needing_resolving[0] == "Heavy Flamer Retributor":
                         for i in range(len(self.misc_misc)):
