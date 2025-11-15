@@ -9493,15 +9493,6 @@ class Game:
                 if not self.p2.search_card_in_hq("'idden Base"):
                     self.p2.idden_base_detransform()
                     self.p2.idden_base_active = False
-        if self.choice_context == "Use Nullify?":
-            if self.name_player_making_choices == self.name_1:
-                if self.p1.castellan_crowe_relevant:
-                    self.choice_context = "Use Psychic Ward?"
-                    await self.send_update_message("Switched to offering Psychic Ward")
-            elif self.name_player_making_choices == self.name_2:
-                if self.p2.castellan_crowe_relevant:
-                    self.choice_context = "Use Psychic Ward?"
-                    await self.send_update_message("Switched to offering Psychic Ward")
         if self.resolving_kugath_nurglings:
             if self.check_end_kugath_nurglings():
                 await self.send_update_message("Leaving Ku'gath Nurglings")
@@ -9869,6 +9860,15 @@ class Game:
                 if self.p2.has_passed:
                     self.number_with_deploy_turn = "1"
                     self.player_with_deploy_turn = self.name_1
+        if self.choice_context == "Use Nullify?":
+            if self.name_player_making_choices == self.name_1:
+                if self.p1.castellan_crowe_relevant:
+                    self.choice_context = "Use Psychic Ward?"
+                    await self.send_update_message("Switched to offering Psychic Ward")
+            elif self.name_player_making_choices == self.name_2:
+                if self.p2.castellan_crowe_relevant:
+                    self.choice_context = "Use Psychic Ward?"
+                    await self.send_update_message("Switched to offering Psychic Ward")
         await self.send_search()
         await self.send_info_box()
         await self.send_decks()
