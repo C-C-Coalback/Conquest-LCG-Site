@@ -454,6 +454,22 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "debug-info":
+                        sent_string = "Debug Info: "
+                        if active_games[self.game_position].resolving_search_box:
+                            sent_string += "Search Box"
+                        else:
+                            sent_string += "Not Searching"
+                        sent_string += "."
+                        await self.receive_game_update(
+                            sent_string
+                        )
+                    elif message[1] == "toggle-search":
+                        active_games[self.game_position].resolving_search_box = \
+                            not active_games[self.game_position].resolving_search_box
+                        await self.receive_game_update(
+                            "Toggled Search"
+                        )
                     elif message[1] == "debug-reactions":
                         sent_string = "Current Reaction Info: "
                         sent_string += active_games[self.game_position].name_1
