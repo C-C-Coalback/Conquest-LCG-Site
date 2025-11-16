@@ -7648,6 +7648,8 @@ class Game:
                                         self.amount_that_can_be_removed_by_shield[0] - damage_to_remove
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
                                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                                    if planet_pos == hurt_planet and unit_pos < hurt_pos:
+                                        hurt_pos = hurt_pos - 1
                                     if self.amount_that_can_be_removed_by_shield[0] < 1:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
