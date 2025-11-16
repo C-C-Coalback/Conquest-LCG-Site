@@ -5890,10 +5890,11 @@ class Game:
                     elif self.choice_context == "Warlock Destructor: pay fee or discard?":
                         self.reset_choices_available()
                         self.resolving_search_box = False
+                        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                         if game_update_string[1] == "0":
-                            num, planet, unit = self.positions_of_unit_triggering_reaction[0]
-                            primary_player.add_card_in_play_to_discard(planet, unit)
+                            primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                         else:
+                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                             primary_player.spend_resources(1)
                         self.delete_reaction()
                     elif self.choice_context == "Sautekh Complex: Gain Card or Resource?":

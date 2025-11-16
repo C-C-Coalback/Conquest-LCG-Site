@@ -787,16 +787,16 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Zogwort's Hovel":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        elif current_reaction == "Zogwort's Hovel":
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Warlock Destructor":
+        elif current_reaction == "Warlock Destructor":
             self.resolving_search_box = True
             self.choices_available = ["Discard Card", "Lose Resource"]
             self.choice_context = "Warlock Destructor: pay fee or discard?"
             self.asking_if_reaction = False
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Kroot Guerrilla":
             primary_player.add_resources(1)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
