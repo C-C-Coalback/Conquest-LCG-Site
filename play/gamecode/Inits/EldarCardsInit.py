@@ -343,7 +343,7 @@ def eldar_cards_init():
         CardClasses.ArmyCard("Scorpion Striker", "Deep Strike (2).\n"
                                                  "Reaction: After you Deep Strike this unit, exhaust a target "
                                                  "non-Elite army unit at this planet.", "Warrior.",
-                             4, faction, "Common", 3, 3, 1, False, deepstrike=1),
+                             4, faction, "Common", 3, 3, 1, False, deepstrike=2),
         CardClasses.EventCard("Piercing Wail", "Deploy Action: Exhaust up to 2 units each with printed cost X or lower."
                                                " X is equal to the highest printed cost among units you control.",
                               "Power.", 4, faction, "Common", 1, False,
