@@ -27,6 +27,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 ability = card_chosen.get_ability()
+                self.position_of_actioned_card = (planet_pos, unit_pos)
                 print("ability:", ability)
                 if card_chosen.name_owner == self.player_with_action:
                     print("ok owner")
