@@ -5,7 +5,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
     unit_pos = int(game_update_string[4])
     attachment_pos = int(game_update_string[5])
     player_owning_card = self.p1
-    if game_update_string[1] == "2":
+    if game_update_string[2] == "2":
         player_owning_card = self.p2
     print("Check what player")
     print(self.player_who_resolves_reaction)
