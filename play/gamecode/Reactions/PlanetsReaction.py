@@ -338,6 +338,9 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     primary_player.cards_in_play[og_pla + 1][og_pos].extra_command_eop += 1
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                    if primary_player.search_card_in_hq("Raiding Portal", ready_relevant=True):
+                        self.create_reaction("Raiding Portal", primary_player.name_player,
+                                             (int(primary_player.get_number()), og_pla, -1))
                     self.delete_reaction()
     elif current_reaction == "Shadowed Thorns Venom":
         if self.chosen_first_card:

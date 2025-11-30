@@ -3946,15 +3946,16 @@ class Player:
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
             if current_name == name_of_card:
-                if not bloodied_relevant:
-                    if ready_relevant:
-                        return self.headquarters[i].get_ready()
-                    return True
-                if self.headquarters[i].get_bloodied():
-                    return False
+                if bloodied_relevant:
+                    if self.headquarters[i].get_bloodied():
+                        return False
+                    else:
+                        return True
                 if ready_relevant:
-                    return self.headquarters[i].get_ready()
-                return True
+                    if self.headquarters[i].get_ready():
+                        return True
+                else:
+                    return True
         return False
 
     def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None):
