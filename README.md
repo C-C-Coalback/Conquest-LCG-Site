@@ -22,21 +22,51 @@ https://docs.google.com/spreadsheets/d/19WVZDINaXXJkV-hodJnYNgk2xx7UQQGF9aBtdWPV
 
 I assume you already have some knowledge of git, python and docker.
 
-You will need Python 3.13.1 and docker installed.
+You will need Python 3.13.1 and docker installed. Please keep in mind that, depending on how you installed python, you may need to replace "py" in any given commands with "python", "python3" or similar.
 
-Git clone the repo and cd into it.
+Open up a command terminal. In it:
 
-Run "py -m pip install -r requirements.txt" to install dependencies.
+Git clone the repo and cd into it. To do this you can run
 
-In one console, run 'docker run --rm -p 6379:6379 redis:7' (while the docker app is open)
+~~~
+git clone https://github.com/C-C-Coalback/Conquest-LCG-Site ConquestSite
+cd ConquestSite
+~~~
 
-Then, you need to run "py manage.py makemigrations", followed by "py manage.py migrate" to create the user database.
+Run
+~~~
+py -m pip install -r requirements.txt
+~~~
+to install dependencies.
 
-To run tests, navigate to the all_tests.py file and run "py all_tests.py".
+Open up a second command terminal. Launch docker. In one terminal, run 
+~~~
+docker run --rm -p 6379:6379 redis:7
+~~~
+
+Then, run 
+~~~
+py manage.py makemigrations
+py manage.py migrate
+~~~
+to create the user database.
+
+To run tests, navigate to the all_tests.py file and run 
+~~~
+py all_tests.py
+~~~
+
 
 If you are wanting to run this for development purposes,
-navigate to the manage.py file, and simply run
-"py manage.py runserver", and it should work.
+navigate to the manage.py file, and run
+
+~~~
+daphne -b 127.0.0.1 -p 8000 conquest_site.asgi:application  
+~~~
+
+then navigate to 127.0.0.1:8000 in your internet browser.
+
+If you want to run this on your local network, replace 127.0.0.1 with your ip address.
 
 # Disclaimer
 
