@@ -516,6 +516,24 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update(
                             "Command prevented; game is in an unsafe state."
                         )
+                    elif message[1] == "unpass-deploy":
+                        if active_games[self.game_position].phase == "DEPLOY":
+                            active_games[self.game_position].p1.has_passed = False
+                            active_games[self.game_position].p2.has_passed = False
+                            await self.receive_game_update("Unpassed both players")
+                    elif message[1] == "skip-deploy":
+                        if active_games[self.game_position].phase == "DEPLOY":
+                            if active_games[self.game_position].player_with_deploy_turn == \
+                                    active_games[self.game_position].name_1:
+                                active_games[self.game_position].player_with_deploy_turn = \
+                                    active_games[self.game_position].name_2
+                                active_games[self.game_position].number_with_deploy_turn = "2"
+                            else:
+                                active_games[self.game_position].player_with_deploy_turn = \
+                                    active_games[self.game_position].name_1
+                                active_games[self.game_position].number_with_deploy_turn = "1"
+                            await self.receive_game_update("Skipped a deploy turn")
+                            await active_games[self.game_position].send_info_box()
                     elif message[1] == "sort-hand" and len(message) == 2:
                         if self.name == active_games[self.game_position].name_1:
                             active_games[self.game_position].p1.sort_hand()
