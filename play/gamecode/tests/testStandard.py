@@ -61,6 +61,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.cards = []
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         await test_game.update_game_event("P1", ["PLANETS", "3"])
+        # Test destroy
         test_game.p1.assign_damage_to_pos(3, 0, 3)
         await test_game.update_game_event("P2", [])
         await test_game.update_game_event("P1", ["pass-P1"])
@@ -72,6 +73,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.positions_attackers_of_units_to_take_damage), 0)
         self.assertEqual(len(test_game.card_names_triggering_damage), 0)
         self.assertEqual(len(test_game.amount_that_can_be_removed_by_shield), 0)
+        # Test damage but not destroy
         test_game.p1.assign_damage_to_pos(-2, 0, 3)
         await test_game.update_game_event("P2", [])
         await test_game.update_game_event("P1", ["pass-P1"])
@@ -84,6 +86,21 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.card_names_triggering_damage), 0)
         self.assertEqual(len(test_game.amount_that_can_be_removed_by_shield), 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 3)
+        # Test Bloody
+        test_game.p1.assign_damage_to_pos(-2, 0, 9)
+        await test_game.update_game_event("P2", [])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        self.assertEqual(len(test_game.p1.cards_in_play[4]), 0)
+        self.assertEqual(len(test_game.damage_on_units_list_before_new_damage), 0)
+        self.assertEqual(len(test_game.damage_is_preventable), 0)
+        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 0)
+        self.assertEqual(len(test_game.damage_can_be_shielded), 0)
+        self.assertEqual(len(test_game.positions_attackers_of_units_to_take_damage), 0)
+        self.assertEqual(len(test_game.card_names_triggering_damage), 0)
+        self.assertEqual(len(test_game.amount_that_can_be_removed_by_shield), 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 0)
+        self.assertEqual(test_game.p1.get_bloodied_given_pos(-2, 0), True)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
 
 
 if __name__ == "__main__":

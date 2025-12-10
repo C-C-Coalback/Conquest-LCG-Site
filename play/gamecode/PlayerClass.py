@@ -1411,7 +1411,12 @@ class Player:
 
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
-        self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
+        if planet_id != -2:
+            self.cards_in_play[planet_id + 1][unit_id].bloody_warlord()
+            self.cards_in_play[planet_id + 1][unit_id].ready = False
+        else:
+            self.headquarters[unit_id].bloody_warlord()
+            self.headquarters[unit_id].ready = False
         self.urien_relevant = False
         self.gorzod_relevant = False
         self.subject_omega_relevant = False
@@ -6116,15 +6121,7 @@ class Player:
                 self.add_card_in_hq_to_discard(card_pos)
                 self.warlord_just_got_destroyed = True
             elif not self.headquarters[card_pos].get_bloodied():
-                self.headquarters[card_pos].bloody_warlord()
-                self.urien_relevant = False
-                self.gorzod_relevant = False
-                self.subject_omega_relevant = False
-                self.grigory_maksim_relevant = False
-                self.illuminor_szeras_relevant = False
-                self.bluddflagg_relevant = False
-                self.vael_relevent = False
-                self.castellan_crowe_2_relevant = False
+                self.bloody_warlord_given_pos(-2, card_pos)
             else:
                 if self.get_ability_given_pos(-2, card_pos) == "Magus Harid" and not self.hit_by_gorgul:
                     self.game.create_interrupt("Magus Harid: Final Form", self.name_player,
