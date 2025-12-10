@@ -171,9 +171,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if adj_1_infested or adj_2_infested:
             self.infest_planet(chosen_planet, primary_player)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-            self.mode = "Normal"
-            self.action_chosen = ""
-            self.player_with_action = ""
+            self.action_cleanup()
             primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Hunter Gargoyles":
         if self.infested_planets[chosen_planet]:

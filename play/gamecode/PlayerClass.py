@@ -5563,6 +5563,8 @@ class Player:
             if ability == "Cultist":
                 if self.search_for_card_everywhere("Sivarla Soulbinder"):
                     health += 1
+            if ability == "Pyrrhian Eternals":
+                health += self.discard.count("Pyrrhian Eternals")
             if ability == "Shard of the Deceiver":
                 health += len(self.discard)
             for i in range(len(self.headquarters[unit_id].get_attachments())):
