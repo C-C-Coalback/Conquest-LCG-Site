@@ -16,6 +16,14 @@ def find_card(card_to_find, card_array, card_dict=None, card_errata=None, card_e
     return card_array[-1]
 
 
+def check_if_planet_exists(card_to_find, planet_array):
+    i = 0
+    for i in range(len(planet_array)):
+        if card_to_find.lower() == planet_array[i].get_name().lower():
+            return True
+    return False
+
+
 def find_planet_card(card_to_find, planet_array):
     i = 0
     for i in range(len(planet_array)):

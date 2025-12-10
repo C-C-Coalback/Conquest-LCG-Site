@@ -29,7 +29,7 @@ def create_planets(planet_array_objects):
 
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka,
-                 apoka_errata_cards, sector="Traxis", deck_1="", deck_2=""):
+                 apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
@@ -61,33 +61,47 @@ class Game:
         self.cult_duplicity_available = True
         self.forced_battle_abilities = []
         self.atrox_origin = -1
-        if sector == "Traxis":
-            for i in range(10):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        elif sector == "Gardis":
-            for i in range(10, 20):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        elif sector == "Veros":
-            for i in range(20, 30):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        elif sector == "The Breach":
-            for i in range(30, 40):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        elif sector == "Nepthis":
-            for i in range(40, 50):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        elif sector == "Sargos":
-            for i in range(50, 60):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
-        else:
-            for i in range(10):
-                self.planet_array.append(self.planet_cards_array[i].get_name())
+        regular_planets_setup = True
+        if forced_planet_array is not None:
+            if len(forced_planet_array) == 7:
+                for i in range(len(forced_planet_array)):
+                    planet_card_exists = FindCard.check_if_planet_exists(forced_planet_array[i], planet_array)
+                    if planet_card_exists:
+                        if forced_planet_array[i] not in self.planet_array:
+                            self.planet_array.append(forced_planet_array[i])
+            if len(self.planet_array) == 7:
+                regular_planets_setup = False
+            else:
+                self.planet_array = []
+        if regular_planets_setup:
+            if sector == "Traxis":
+                for i in range(10):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "Gardis":
+                for i in range(10, 20):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "Veros":
+                for i in range(20, 30):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "The Breach":
+                for i in range(30, 40):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "Nepthis":
+                for i in range(40, 50):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "Sargos":
+                for i in range(50, 60):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+            else:
+                for i in range(10):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
         for i in range(40, 50):
             self.forced_battle_abilities.append(self.planet_cards_array[i].get_name())
         self.available_breach_planets = []
         for i in range(30, 40):
             self.available_breach_planets.append(self.planet_cards_array[i].get_name())
-        random.shuffle(self.planet_array)
+        if not forced_planet_array:
+            random.shuffle(self.planet_array)
         self.planets_removed_from_game = copy.deepcopy(self.planet_array[-3:])
         self.planet_array = self.planet_array[:7]
         self.original_planet_array = copy.deepcopy(self.planet_array)

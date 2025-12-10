@@ -48,6 +48,56 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
 
+    async def test_deploy_unit(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.draw_card()
+        test_game.p2.draw_card()
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["10th Company Scout"]
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
+
+    async def test_deploy_support(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.draw_card()
+        test_game.p2.draw_card()
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Bigtoof Banna"]
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 1), "Bigtoof Banna")
+
+    async def test_deploy_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.draw_card()
+        test_game.p2.draw_card()
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["10th Company Scout", "Godwyn Pattern Bolter"]
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "3", "0"])
+        self.assertEqual(test_game.p1.search_attachments_at_pos(3, 0, "Godwyn Pattern Bolter"), True)
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertEqual(test_game.p1.cards, [])
+
     async def test_assign_damage(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
@@ -101,6 +151,36 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 0)
         self.assertEqual(test_game.p1.get_bloodied_given_pos(-2, 0), True)
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
+
+    async def test_pass_deploy(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        self.assertEqual(test_game.phase, "DEPLOY")
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        self.assertEqual(test_game.phase, "DEPLOY")
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertEqual(test_game.phase, "COMMAND")
+
+    async def test_force_planets(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [],
+                         forced_planet_array=["Ferrin", "Osus IV", "Y'varn", "Iridial", "Elouith",
+                                              "Atrox Prime", "Barlus"])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        self.assertEqual(test_game.get_planet_name(0), "Ferrin")
+        self.assertEqual(test_game.get_planet_name(1), "Osus IV")
+        self.assertEqual(test_game.get_planet_name(2), "Y'varn")
+        self.assertEqual(test_game.get_planet_name(3), "Iridial")
+        self.assertEqual(test_game.get_planet_name(4), "Elouith")
+        self.assertEqual(test_game.get_planet_name(5), "Atrox Prime")
+        self.assertEqual(test_game.get_planet_name(6), "Barlus")
 
 
 if __name__ == "__main__":

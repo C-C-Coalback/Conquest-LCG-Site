@@ -5,8 +5,8 @@ def space_marines_cards_init():
     faction = "Space Marines"
     space_marines_card_array = [
         CardClasses.WarlordCard("Captain Cato Sicarius",
-                                "Reaction: After an enemy unit at this planet"
-                                "is destoyed, gain 1 resource.", "Soldier. Ultramarines.",
+                                "Reaction: After an enemy unit at this planet "
+                                "is destroyed, gain 1 resource.", "Soldier. Ultramarines.",
                                 faction, 2, 6, 2, 5,
                                 "Bloodied.", 7, 7,
                                 ["1x Cato's Stronghold", "1x Tallassarian Tempest Blade",

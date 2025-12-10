@@ -53,7 +53,6 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_in_play[5]), 1)
         self.assertEqual(test_game.p1.get_name_given_pos(0, 0), "Snotlings")
 
-
     async def test_promise_of_glory(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, False, [])
