@@ -7246,6 +7246,18 @@ class Game:
                                         took_damage = True
                                         if self.amount_that_can_be_removed_by_shield[0] == 0:
                                             took_damage = False
+                                        if primary_player.get_ability_given_pos(planet_pos,
+                                                                                unit_pos) == "Sororitas Command Squad":
+                                            if self.positions_attackers_of_units_to_take_damage[0]:
+                                                if not primary_player.get_once_per_phase_used_given_pos(planet_pos,
+                                                                                                        unit_pos):
+                                                    self.sororitas_command_squad_value = shields
+                                                    primary_player.set_once_per_phase_used_given_pos(
+                                                        planet_pos, unit_pos, True)
+                                                    self.create_reaction(
+                                                        "Sororitas Command Squad", primary_player.name_player,
+                                                        self.positions_attackers_of_units_to_take_damage[0]
+                                                    )
                                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                             for j in range(len(secondary_player.cards_in_play[
                                                                    planet_pos + 1][i].attachments)):
