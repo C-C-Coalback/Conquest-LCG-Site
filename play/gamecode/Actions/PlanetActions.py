@@ -327,9 +327,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.p1.has_passed = False
                 self.p2.has_passed = False
                 self.begin_battle(chosen_planet)
-                self.begin_combat_round()
                 self.set_battle_initiative()
                 if not self.start_battle_deepstrike:
+                    self.begin_combat_round()
                     self.start_ranged_skirmish(chosen_planet)
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle

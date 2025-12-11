@@ -4154,7 +4154,7 @@ class Game:
                                 self.name_player_making_choices = secondary_player.name_player
                                 await self.send_update_message(secondary_player.name_player + " can deepstrike")
                             if primary_player.has_passed and secondary_player.has_passed:
-                                self.start_battle_deepstrike = False
+                                self.end_start_battle_deepstrike()
                                 self.resolving_search_box = False
                                 self.reset_choices_available()
                                 primary_player.has_passed = False
@@ -10499,8 +10499,8 @@ class Game:
             i = self.jaricho_target
             self.jaricho_target = -1
             self.begin_battle(i)
-            self.begin_combat_round()
             if not self.start_battle_deepstrike:
+                self.begin_combat_round()
                 self.start_ranged_skirmish(i)
             return True
         elif not self.bloodrain_tempest_active:
@@ -10517,8 +10517,8 @@ class Game:
                         p2_has_warlord = self.p2.check_yvraine_battle(i)
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
-                        self.begin_combat_round()
                         if not self.start_battle_deepstrike:
+                            self.begin_combat_round()
                             self.start_ranged_skirmish(i)
                         return True
                 i = i + 1
@@ -10536,12 +10536,16 @@ class Game:
                         p2_has_warlord = self.p2.check_yvraine_battle(i)
                     if p1_has_warlord or p2_has_warlord or i == self.round_number:
                         self.begin_battle(i)
-                        self.begin_combat_round()
                         if not self.start_battle_deepstrike:
+                            self.begin_combat_round()
                             self.start_ranged_skirmish(i)
                         return True
                 i = i - 1
         return False
+
+    def end_start_battle_deepstrike(self):
+        self.start_battle_deepstrike = False
+        self.begin_combat_round()
 
     def reset_combat_turn(self):
         self.player_with_combat_turn = self.player_reset_combat_turn

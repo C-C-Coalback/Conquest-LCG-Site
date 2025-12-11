@@ -1454,9 +1454,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Herald of the WAAGH!":
             self.herald_of_the_waagh_active = True
             self.begin_battle(planet_pos)
-            self.begin_combat_round()
             self.set_battle_initiative()
             if not self.start_battle_deepstrike:
+                self.begin_combat_round()
                 self.start_ranged_skirmish(planet_pos)
             self.planet_aiming_reticle_active = True
             self.planet_aiming_reticle_position = self.last_planet_checked_for_battle

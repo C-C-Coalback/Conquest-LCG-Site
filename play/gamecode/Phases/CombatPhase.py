@@ -87,7 +87,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             await self.send_update_message(
                                 other_player.name_player + " can deepstrike")
                         if player.has_passed and other_player.has_passed:
-                            self.start_battle_deepstrike = False
+                            self.end_start_battle_deepstrike()
                             self.resolving_search_box = False
                             self.reset_choices_available()
                             player.has_passed = False
@@ -109,7 +109,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.resolving_search_box = True
                             await self.send_update_message(other_player.name_player + " can deepstrike")
                         if player.has_passed and other_player.has_passed:
-                            self.start_battle_deepstrike = False
+                            self.end_start_battle_deepstrike()
                             self.resolving_search_box = False
                             self.reset_choices_available()
                             player.has_passed = False
@@ -358,7 +358,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             await self.send_update_message(
                                                 other_player.name_player + " can deepstrike")
                                         if player.has_passed and other_player.has_passed:
-                                            self.start_battle_deepstrike = False
+                                            self.end_start_battle_deepstrike()
                                             self.resolving_search_box = False
                                             self.reset_choices_available()
                                             player.has_passed = False
@@ -381,7 +381,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 await self.send_update_message(
                                                     other_player.name_player + " can deepstrike")
                                             if player.has_passed and other_player.has_passed:
-                                                self.start_battle_deepstrike = False
+                                                self.end_start_battle_deepstrike()
                                                 self.resolving_search_box = False
                                                 self.reset_choices_available()
                                                 player.has_passed = False
@@ -440,7 +440,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     await self.send_update_message(
                                         other_player.name_player + " can deepstrike")
                                 if player.has_passed and other_player.has_passed:
-                                    self.start_battle_deepstrike = False
+                                    self.end_start_battle_deepstrike()
                                     self.resolving_search_box = False
                                     self.reset_choices_available()
                                     player.has_passed = False
@@ -480,7 +480,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                     await self.send_update_message(
                                                         other_player.name_player + " can deepstrike")
                                                 if player.has_passed and other_player.has_passed:
-                                                    self.start_battle_deepstrike = False
+                                                    self.end_start_battle_deepstrike()
                                                     self.resolving_search_box = False
                                                     self.reset_choices_available()
                                                     player.has_passed = False
@@ -507,7 +507,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                         await self.send_update_message(
                                                             other_player.name_player + " can deepstrike")
                                                     if player.has_passed and other_player.has_passed:
-                                                        self.start_battle_deepstrike = False
+                                                        self.end_start_battle_deepstrike()
                                                         self.resolving_search_box = False
                                                         self.reset_choices_available()
                                                         player.has_passed = False
