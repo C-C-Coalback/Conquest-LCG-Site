@@ -18,7 +18,7 @@ for key in range(len(card_array)):
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
-active_lobbies = [[], [], [], [], [], [], []]
+active_lobbies = [[], [], [], [], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
 
@@ -74,7 +74,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.accept()
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
+                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] +\
+                      "/" + active_lobbies[7][i]
             await self.chat_message({"type": "chat.message", "message": message})
         i = 0
         print("CURRENT SPEC")
@@ -150,11 +151,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             active_lobbies[4].append(split_message[3])
             active_lobbies[5].append(split_message[4])
             active_lobbies[6].append("")
+            active_lobbies[7].append(datetime.datetime.today().strftime("%I:%M%p, %B %d, %Y"))
             print(active_lobbies)
             le = len(active_lobbies[0]) - 1
             split_message[0] += "/" + active_lobbies[0][le] + "/" + active_lobbies[1][le] + \
                                 "/" + active_lobbies[2][le] + "/" + active_lobbies[3][le] + \
-                                "/" + active_lobbies[4][le]
+                                "/" + active_lobbies[4][le] + "/" + active_lobbies[7][le]
             print(split_message[0])
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "chat.message", "message": split_message[0]}
@@ -170,6 +172,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     del active_lobbies[4][i]
                     del active_lobbies[5][i]
                     del active_lobbies[6][i]
+                    del active_lobbies[7][i]
                     i += -1
                 i += 1
             print(active_lobbies)
@@ -179,7 +182,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             )
             for i in range(len(active_lobbies[0])):
                 message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/"\
-                          + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
+                          + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
+                          "/" + active_lobbies[7][i]
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
@@ -196,7 +200,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 )
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
+                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
+                              "/" + active_lobbies[7][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
@@ -255,11 +260,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         del active_lobbies[4][i]
                         del active_lobbies[5][i]
                         del active_lobbies[6][i]
+                        del active_lobbies[7][i]
                         i += -1
                     i += 1
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i]
+                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
+                              "/" + active_lobbies[7][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )

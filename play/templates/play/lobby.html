@@ -181,7 +181,7 @@
             } else if (split_string[0] == "Send Deck") {
                 addDeck(split_string[1], split_string[2], split_string[3]);
             } else {
-                addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5])
+                addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5], split_string[6])
             }
         };
 
@@ -287,7 +287,7 @@
             document.body.appendChild(ourAudio);
         }
 
-        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka, sector) {
+        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka, sector, time) {
             var stringToAdd = "";
             stringToAdd = `<div class="box">` + nameOfPlayerOne + `<br>VS<br>`+ nameOfPlayerTwo + `
                 </div><details><summary>Settings</summary>`;
@@ -304,6 +304,8 @@
             }
             stringToAdd += "<br>";
             stringToAdd += sector + " Sector";
+            stringToAdd += "<br>";
+            stringToAdd += "Time Created:<br>" + time;
             stringToAdd += "</details>";
             document.getElementById("add_to_me").innerHTML += stringToAdd;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
