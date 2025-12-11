@@ -27,6 +27,10 @@ condition_lobby = threading.Condition()
 condition_games = threading.Condition()
 
 
+def get_lobbies():
+    return active_lobbies, spectator_games
+
+
 def convert_name_to_img_src(card_name):
     card_name = card_name.replace("\"", "")
     card_name = card_name.replace(" ", "_")
