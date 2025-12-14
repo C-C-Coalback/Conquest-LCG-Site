@@ -171,6 +171,13 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.card_to_deploy = card
                         self.chosen_first_card = True
                         primary_player.aiming_reticle_coords_discard = pos_discard
+    elif self.action_chosen == "Spore Burst":
+        if not self.chosen_first_card:
+            if chosen_discard == int(primary_player.number):
+                card = self.preloaded_find_card(primary_player.discard[pos_discard])
+                if card.get_card_type() == "Army" and card.get_cost() < 4:
+                    self.chosen_first_card = True
+                    primary_player.aiming_reticle_coords_discard = pos_discard
     elif self.action_chosen == "Evolutionary Adaptation":
         if chosen_discard == int(secondary_player.get_number()):
             if not self.chosen_first_card:

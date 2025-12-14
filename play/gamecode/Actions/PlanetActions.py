@@ -319,6 +319,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+    elif self.action_chosen == "Spore Burst":
+        if self.chosen_first_card:
+            if self.infested_planets[chosen_planet]:
+                card = self.preloaded_find_card(primary_player.discard[primary_player.aiming_reticle_coords_discard])
+                primary_player.add_card_to_planet(card, chosen_planet)
+                del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+                primary_player.aiming_reticle_coords_discard = None
+                self.action_cleanup()
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \

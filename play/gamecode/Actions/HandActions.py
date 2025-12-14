@@ -722,25 +722,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if self.infested_planets and self.planets_in_play_array:
                                 any_infested = True
                         if any_infested:
-                            choices = []
-                            for i in range(len(primary_player.discard)):
-                                c = FindCard.find_card(primary_player.discard[i], primary_player.card_array,
-                                                       self.cards_dict,
-                                                       self.apoka_errata_cards, self.cards_that_have_errata)
-                                if c.get_cost() < 4 and c.get_card_type() == "Army":
-                                    choices.append(c.get_name())
-                            if choices:
-                                self.action_chosen = ability
-                                primary_player.aiming_reticle_color = "blue"
-                                primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                                self.choices_available = choices
-                                self.choice_context = "Spore Burst"
-                                self.name_player_making_choices = primary_player.name_player
-                            else:
-                                primary_player.add_resources(2, refund=True)
-                                await self.send_update_message(
-                                    "No valid targets in discard for spore burst."
-                                )
+                            self.chosen_first_card = False
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            self.action_chosen = ability
                         else:
                             primary_player.add_resources(2, refund=True)
                             await self.send_update_message(
