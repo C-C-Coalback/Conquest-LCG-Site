@@ -462,6 +462,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_first_card = False
+                            self.chosen_second_card = False
                             await self.send_update_message("Please pay 1 faith")
                     elif ability == "Techmarine Aspirant":
                         if primary_player.resources > 0:
@@ -2758,11 +2759,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 del primary_player.deck[0]
                                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
     elif self.action_chosen == "Evangelizing Ships":
-        if game_update_string[1] == primary_player.get_number():
-            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                await self.send_update_message("Faith paid, please continue.")
-                self.chosen_first_card = True
-                self.chosen_second_card = False
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    await self.send_update_message("Faith paid, please continue.")
+                    self.chosen_first_card = True
+                    self.chosen_second_card = False
     elif self.action_chosen == "Squadron Redeployment":
         if self.unit_to_move_position == [-1, -1]:
             if game_update_string[1] == primary_player.get_number():

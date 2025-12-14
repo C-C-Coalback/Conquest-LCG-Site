@@ -123,6 +123,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_first_card = False
+                            self.chosen_second_card = False
                             await self.send_update_message("Please pay 1 faith")
                     elif ability == "Twisted Laboratory":
                         if card.get_ready():
@@ -1195,11 +1196,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_owning_card.headquarters[unit_pos].infection_lekor = 0
             self.action_cleanup()
     elif self.action_chosen == "Evangelizing Ships":
-        if game_update_string[1] == primary_player.get_number():
-            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                await self.send_update_message("Faith paid, please continue.")
-                self.chosen_first_card = True
-                self.chosen_second_card = False
+        if not self.chosen_first_card:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    await self.send_update_message("Faith paid, please continue.")
+                    self.chosen_first_card = True
+                    self.chosen_second_card = False
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

@@ -72,12 +72,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.theater_of_war_active = True
     elif self.action_chosen == "Evangelizing Ships":
         if not self.chosen_second_card:
-            if not self.get_green_icon(chosen_planet):
-                primary_player.summon_token_at_planet("Guardsman", chosen_planet)
-                self.chosen_second_card = True
-                self.player_with_action = secondary_player.name_player
-                await self.send_update_message(secondary_player.name_player +
-                                               " must move the Evangelizing Ships to a planet.")
+            if self.chosen_first_card:
+                if not self.get_green_icon(chosen_planet):
+                    primary_player.summon_token_at_planet("Guardsman", chosen_planet)
+                    self.chosen_second_card = True
+                    self.player_with_action = secondary_player.name_player
+                    await self.send_update_message(secondary_player.name_player +
+                                                   " must move the Evangelizing Ships to a planet.")
         else:
             og_pla, og_pos = self.position_of_actioned_card
             if chosen_planet != og_pla:
