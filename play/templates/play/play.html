@@ -181,6 +181,36 @@
 </div>
 {{ game_id|json_script:"game-id" }}
 <script>
+    const pledges_array = ["/static/images/CardImages/Anvil_Strike_Force.jpg",
+                           "/static/images/CardImages/Gladius_Strike_Force.jpg",
+                           "/static/images/CardImages/Talon_Strike_Force.jpg",
+                           "/static/images/CardImages/Holy_Crusade.jpg",
+                           "/static/images/CardImages/Munitorum_Support.jpg",
+                           "/static/images/CardImages/Senatorum_Directives.jpg",
+                           "/static/images/CardImages/WAAAGH!_Arbuttz.jpg",
+                           "/static/images/CardImages/WAAAGH!_Zanzag.jpg",
+                           "/static/images/CardImages/WAAAGH!_Ungskar.jpg",
+                           "/static/images/CardImages/Dark_Allegiance.jpg",
+                           "/static/images/CardImages/Myriad_Excesses.jpg",
+                           "/static/images/CardImages/Unstoppable_Tide.jpg",
+                           "/static/images/CardImages/Prophets_of_Flesh.jpg",
+                           "/static/images/CardImages/The_Broken_Sigil.jpg",
+                           "/static/images/CardImages/The_Flayed_Mask.jpg",
+                           "/static/images/CardImages/Children_of_the_Stars.jpg",
+                           "/static/images/CardImages/Followers_of_Asuryan.jpg",
+                           "/static/images/CardImages/Ghosts_of_Cegorach.jpg",
+                           "/static/images/CardImages/Bork'an_Sept.jpg",
+                           "/static/images/CardImages/Dal'yth_Sept.jpg",
+                           "/static/images/CardImages/Vior'la_Sept.jpg",
+                           "/static/images/CardImages/Hive_Fleet_Behemoth.jpg",
+                           "/static/images/CardImages/Hive_Fleet_Kraken.jpg",
+                           "/static/images/CardImages/Hive_Fleet_Leviathan.jpg",
+                           "/static/images/CardImages/Maynarkh_Dynasty.jpg",
+                           "/static/images/CardImages/Novokh_Dynasty.jpg",
+                           "/static/images/CardImages/Sautekh_Dynasty.jpg"];
+
+
+
     const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         const gameSocket = new WebSocket(
@@ -1078,11 +1108,23 @@
         }
 
         function changeDef(image_src) {
-            var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            helperCard = document.getElementById("LargeHelperCard");
-            helperCard.src=og_image_src;
-            helperCard.style.width = current_helper_width;
-            helperCard.style.height = current_helper_height;
+            var current_image_src = image_src;
+            if (current_image_src.includes("http")) {
+                var split_img_src = current_image_src.split("/");
+                split_img_src = split_img_src.slice(3);
+                current_image_src = split_img_src.join("/");
+                current_image_src = "/" + current_image_src;
+            }
+            console.log(current_image_src);
+            if (!(pledges_array.includes(current_image_src))) {
+                var og_image_src = image_src.replace("CroppedImages", "CardImages");
+                helperCard = document.getElementById("LargeHelperCard");
+                helperCard.src=og_image_src;
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
+            } else {
+                changeDefRotate(image_src);
+            }
         }
 
         function changeDefDeck(image_src, card_count, user_num) {
@@ -1101,6 +1143,8 @@
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             if (helper_is_large === "F") {
                 og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+            } else {
+                og_image_src = image_src.replace("CardImages", "RotatedCardImages");
             }
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
@@ -1139,7 +1183,7 @@
 
         function changeDefAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            document.getElementById("LargeHelperCard").src=og_image_src;
+            changeDef(og_image_src);
             help_text = help_text.replaceAll("\n", "<br>")
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
