@@ -306,38 +306,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 self.delete_interrupt()
-    elif current_interrupt == "Glorious Intervention":
-        if game_update_string[1] == primary_player.get_number():
-            pos_holder = self.positions_of_units_to_take_damage[0]
-            player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
-            sac_planet_pos = int(game_update_string[2])
-            sac_unit_pos = int(game_update_string[3])
-            if sac_planet_pos == planet_pos:
-                if sac_unit_pos != unit_pos:
-                    if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
-                            get_card_type() != "Warlord":
-                        if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
-                                primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
-                                .check_for_a_trait("Soldier", primary_player.etekh_trait):
-                            primary_player.aiming_reticle_coords_hand = None
-                            primary_player.discard_card_from_hand(self.pos_shield_card)
-                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                            self.pos_shield_card = -1
-                            printed_atk = primary_player.cards_in_play[
-                                sac_planet_pos + 1][sac_unit_pos].attack
-                            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                            if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                    self.damage_on_units_list_before_new_damage[0]:
-                                primary_player.set_damage_given_pos(
-                                    planet_pos, unit_pos,
-                                    self.damage_on_units_list_before_new_damage[0])
-                            primary_player.sacrifice_card_in_play(sac_planet_pos, sac_unit_pos)
-                            att_num, att_pla, att_pos = \
-                                self.positions_attackers_of_units_to_take_damage[0]
-                            secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk, by_enemy_unit=False)
-                            self.delete_interrupt()
-                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif current_interrupt == "Savage Parasite":
         can_continue = True
         possible_interrupts = []

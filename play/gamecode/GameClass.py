@@ -1885,8 +1885,13 @@ class Game:
             elif self.nullify_context == "Glorious Intervention":
                 primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                 primary_player.aiming_reticle_color = "blue"
-                self.create_interrupt("Glorious Intervention", primary_player.name_player,
-                                      (int(primary_player.number), -1, -1))
+                self.alt_shield_name = self.nullify_context
+                self.alt_shield_mode_active = True
+            elif self.nullify_context == "Faith Denies Death":
+                primary_player.aiming_reticle_coords_hand = self.pos_shield_card
+                primary_player.aiming_reticle_color = "blue"
+                self.alt_shield_name = self.nullify_context
+                self.alt_shield_mode_active = True
             elif self.nullify_context == "Bigga Is Betta" or self.nullify_context == "Optimized Landing":
                 self.nullify_enabled = False
                 new_string_list = self.nullify_string.split(sep="/")
@@ -2083,7 +2088,8 @@ class Game:
                         self.name_player_making_choices = valid_players[0]
                     else:
                         self.auto_card_destruction = True
-                elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention":
+                elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention" or\
+                        self.nullify_context == "Faith Denies Death":
                     self.pos_shield_card = -1
                 elif self.nullify_context == "Reaction Event":
                     if self.nullified_card_name == "Cry of the Wind":
@@ -5828,10 +5834,10 @@ class Game:
                                     self.name_player_making_choices = secondary_player.name_player
                                     self.choice_context = "Use Nullify?"
                                     self.nullified_card_pos = self.pos_shield_card
-                                    self.nullified_card_name = "Glorious Intervention"
-                                    self.cost_card_nullified = 1
+                                    self.nullified_card_name = "Faith Denies Death"
+                                    self.cost_card_nullified = 0
                                     self.first_player_nullified = primary_player.name_player
-                                    self.nullify_context = "Glorious Intervention"
+                                    self.nullify_context = "Faith Denies Death"
                                 else:
                                     primary_player.aiming_reticle_coords_hand = self.pos_shield_card
                                     primary_player.aiming_reticle_color = "blue"
