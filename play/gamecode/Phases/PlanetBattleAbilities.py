@@ -52,14 +52,6 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
             player.suffer_area_effect_at_hq(1)
             self.player_who_is_shielding = str(player.name_player)
             self.number_who_is_shielding = str(player.number)
-            first_one = True
-            for i in range(len(player.headquarters)):
-                if player.headquarters[i].get_card_type() != "Support":
-                    if first_one:
-                        player.set_aiming_reticle_in_play(-2, i, "red")
-                        first_one = False
-                    else:
-                        player.set_aiming_reticle_in_play(-2, i, "blue")
 
 
 async def manual_plannum_ability(self, name, game_update_string, primary_player, secondary_player):
