@@ -5900,7 +5900,7 @@ class Player:
         if self.search_hand_for_card("Hunter's Ploy"):
             if phase == "HEADQUARTERS":
                 self.game.create_reaction("Hunter's Ploy", self.name_player, (int(self.number), -1, -1))
-        if self.search_hand_for_card("Contaminated Convoys"):
+        if self.search_hand_for_card("Contaminated Convoys") and self.resources > 0:
             self.game.create_reaction("Contaminated Convoys", self.name_player, (int(self.number), -1, -1))
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Spore Chimney":
