@@ -225,6 +225,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             faction = primary_player.get_faction_given_pos(self.attacker_planet,
                                                                            self.attacker_position)
                             if amount_aoe > 0:
+                                self.unit_will_move_after_attack = False
+                                primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                                    ethereal_movement_active = False
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
