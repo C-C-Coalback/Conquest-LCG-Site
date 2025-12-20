@@ -7,7 +7,7 @@ def dark_eldar_cards_init():
         CardClasses.WarlordCard("Packmaster Kith", "Reaction: After this warlord commits "
                                                    "to a planet, put a Khymera token into "
                                                    "play at this planet.",
-                                "Warrior. Succubus. Witch.", faction, 2, 6, 1, 5,
+                                "Warrior. Succubus. Wych.", faction, 2, 6, 1, 5,
                                 "Bloodied.", 7, 7,
                                 ["4x Kith's Khymeramasters", "1x Khymera Den",
                                  "2x Pact of the Haemonculi", "1x Agonizer of Bren"]),
