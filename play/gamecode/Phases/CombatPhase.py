@@ -1126,7 +1126,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                           self.defender_position,
                                                                                           "Elite"):
                                             if secondary_player.search_attachments_at_pos(warlord_pla, warlord_pos,
-                                                                                          "Kaptin's Hook"):
+                                                                                          "Kaptin's Hook",
+                                                                                          ready_relevant=True):
                                                 can_continue = False
                                                 await self.send_update_message(
                                                     "Kaptin's Hook can be used to cancel the attack"
