@@ -186,7 +186,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             for i in range(len(primary_player.headquarters)):
                                 if primary_player.check_is_unit_at_pos(-2, i):
-                                    primary_player.headquarters[unit_id].health_eocr += 2
+                                    primary_player.headquarters[i].health_eocr += 2
                             for i in range(7):
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     primary_player.cards_in_play[i + 1][j].health_eocr += 2
