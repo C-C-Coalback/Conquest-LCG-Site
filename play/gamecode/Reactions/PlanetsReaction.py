@@ -374,11 +374,11 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
         if abs(warlord_pla - chosen_planet) == 1:
             if primary_player.headquarters[unit_pos].get_ability() == "Gravid Tervigon":
-                self.create_reaction("Gravid Tervigon", self.name_player,
-                                     (int(self.number), chosen_planet, -1))
+                self.create_reaction("Gravid Tervigon", primary_player.name_player,
+                                     (int(primary_player.number), chosen_planet, -1))
             if primary_player.headquarters[unit_pos].get_ability() == "Venomthrope Polluter":
-                self.create_reaction("Venomthrope Polluter", self.name_player,
-                                     (int(self.number), chosen_planet, -1))
+                self.create_reaction("Venomthrope Polluter", primary_player.name_player,
+                                     (int(primary_player.number), chosen_planet, -1))
             primary_player.move_unit_to_planet(-2, unit_pos, chosen_planet)
             for j in range(len(primary_player.headquarters)):
                 if primary_player.headquarters[j].get_ability() == "Synaptic Link":
