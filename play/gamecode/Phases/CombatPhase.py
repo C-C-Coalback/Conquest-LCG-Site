@@ -711,9 +711,14 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 other_player = self.p1
                             player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
-                            if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) != "Army":
+                            if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) == "Army":
                                 for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
                                     if other_player.attachments_at_planet[self.attacker_planet][i] \
+                                            .get_ability() == "Repulsor Minefield":
+                                        player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
+                                                                    by_enemy_unit=False)
+                                for i in range(len(player.attachments_at_planet[self.attacker_planet])):
+                                    if player.attachments_at_planet[self.attacker_planet][i] \
                                             .get_ability() == "Repulsor Minefield":
                                         player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
                                                                     by_enemy_unit=False)
