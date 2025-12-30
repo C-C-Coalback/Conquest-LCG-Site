@@ -5970,10 +5970,10 @@ class Player:
                             self.headquarters[i].get_attachments()[j].from_magus_harid:
                         name_owner = self.headquarters[i].get_attachments()[j].name_owner
                         self.game.create_reaction("Savage Parasite", name_owner, (int(self.number), -2, i))
-                    if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
-                        if self.headquarters[i].get_damage() > 0:
-                            owner = self.headquarters[i].get_attachments()[j].name_owner
-                            self.game.create_reaction("Royal Phylactery", owner, (int(self.number), -2, i))
+                if self.headquarters[i].get_attachments()[j].get_ability() == "Royal Phylactery":
+                    if self.headquarters[i].get_damage() > 0:
+                        owner = self.headquarters[i].get_attachments()[j].name_owner
+                        self.game.create_reaction("Royal Phylactery", owner, (int(self.number), -2, i))
         for i in range(7):
             for j in range(len(self.attachments_at_planet[i])):
                 if self.attachments_at_planet[i][j].get_ability() == "Supreme Strategist":
