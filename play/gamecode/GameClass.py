@@ -514,6 +514,7 @@ class Game:
         self.trium_tracker = ("name", -1)
         self.sent_setup_info_already = False
         self.reactions_on_destruction_permitted = True
+        self.last_initiative_string = ""
         if deck_1:
             deck_name = deck_1
             path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.name_1 + "/" + deck_name
@@ -684,6 +685,7 @@ class Game:
         await self.p1.send_victory_display()
         await self.p2.send_victory_display()
         await self.send_planet_array(force=True)
+        await self.send_initiative(force=True)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -724,6 +726,22 @@ class Game:
         if card_string != self.last_search_string or force:
             self.last_search_string = card_string
             await self.send_update_message(card_string)
+
+    async def send_initiative(self, force=False):
+        initiative_string = "GAME_INFO/INITIATIVE/"
+        if self.last_planet_checked_for_battle != -1:
+            if self.p1.has_initiative_for_battle:
+                initiative_string += "1"
+            else:
+                initiative_string += "2"
+        else:
+            if self.p1.has_initiative:
+                initiative_string += "1"
+            else:
+                initiative_string += "2"
+        if initiative_string != self.last_initiative_string or force:
+            self.last_initiative_string = initiative_string
+            await self.send_update_message(initiative_string)
 
     async def send_info_box(self, force=False):
         info_string = "GAME_INFO/INFO_BOX/"
@@ -9913,6 +9931,7 @@ class Game:
         await self.p2.send_removed_cards()
         await self.p2.send_resources()
         await self.send_planet_array()
+        await self.send_initiative()
         await self.send_queued_sound()
         await self.send_queued_message()
         if not same_thread:

@@ -117,6 +117,12 @@
         <div id="victory-display-player-2">
             <p></p>
         </div>
+        <div id="initiative-player-1">
+            <img src="/static/images/Initiative.png" class="initiative">
+        </div>
+        <div id="initiative-player-2">
+            <img src="/static/images/Initiative.png" class="initiative">
+        </div>
         <div id="current-discard-player-1">
             <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
         </div>
@@ -936,6 +942,16 @@
                     console.log("trying to play sound")
                     var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
                     playSound(soundUrl);
+                } else if (split_data[1] === "INITIATIVE") {
+                    var e_1 = document.getElementById("initiative-player-1");
+                    var e_2 = document.getElementById("initiative-player-2");
+                    if (split_data[2] === "1") {
+                        e_1.style.display = "block";
+                        e_2.style.display = "none";
+                    } else {
+                        e_2.style.display = "block";
+                        e_1.style.display = "none";
+                    }
                 } else if (split_data[1] === "VICTORY_MESSAGE") {
                     displayVictoryMessage(split_data[2], split_data[3]);
                 } else if (split_data[1] === "SEARCH") {
