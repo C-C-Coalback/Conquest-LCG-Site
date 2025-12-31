@@ -1690,7 +1690,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         planet_pos = -2
         unit_pos = int(game_update_string[2])
         if primary_player.get_number() == game_update_string[1]:
-            if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Termagant"):
                 primary_player.sacrifice_card_in_hq(unit_pos)
                 self.misc_counter += 1
             elif primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":

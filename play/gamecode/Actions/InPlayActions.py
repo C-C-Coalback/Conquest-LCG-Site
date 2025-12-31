@@ -2365,7 +2365,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_cleanup()
     elif self.action_chosen == "Clogged with Corpses":
         if primary_player.get_number() == game_update_string[1]:
-            if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Termagant":
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Termagant"):
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                 self.misc_counter += 1
     elif self.action_chosen == "Ferocious Strength":
