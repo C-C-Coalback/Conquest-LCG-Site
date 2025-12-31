@@ -3957,7 +3957,11 @@ class Player:
                     else:
                         return True
                 if ready_relevant:
-                    if self.headquarters[i].get_ready():
+                    if current_name == "Holding Cell":
+                        if self.headquarters[i].get_ready():
+                            if len(self.headquarters[i].get_attachments()) == 0:
+                                return True
+                    elif self.headquarters[i].get_ready():
                         return True
                 else:
                     return True
