@@ -1451,6 +1451,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Alaitoc Shrine":
+            if not primary_player.exhaust_card_in_hq_given_name(current_reaction):
+                self.delete_reaction()
         elif current_reaction == "Herald of the WAAGH!":
             self.herald_of_the_waagh_active = True
             self.begin_battle(planet_pos)

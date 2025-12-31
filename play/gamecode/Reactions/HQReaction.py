@@ -56,12 +56,6 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 primary_player.ready_given_pos(-2, unit_pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
-        if not self.alaitoc_shrine_activated:
-            if primary_player.get_ability_given_pos(-2, unit_pos) == "Alaitoc Shrine":
-                if primary_player.get_ready_given_pos(-2, unit_pos):
-                    primary_player.exhaust_given_pos(-2, unit_pos)
-                    self.alaitoc_shrine_activated = True
     elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
         if not self.cato_stronghold_activated:
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":

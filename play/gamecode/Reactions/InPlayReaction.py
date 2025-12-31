@@ -1967,19 +1967,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
-                if self.alaitoc_shrine_activated:
-                    player_num = int(primary_player.get_number())
-                    planet_pos = int(game_update_string[2])
-                    unit_pos = int(game_update_string[3])
-                    full_position = [player_num, planet_pos, unit_pos]
-                    if full_position in self.allowed_units_alaitoc_shrine:
-                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            primary_player.ready_given_pos(planet_pos, unit_pos)
-                            self.delete_reaction()
-                            self.alaitoc_shrine_activated = False
-                            self.allowed_units_alaitoc_shrine = []
-                        else:
-                            await self.send_update_message("Unit already ready")
+                player_num = int(primary_player.get_number())
+                full_position = [player_num, planet_pos, unit_pos]
+                if full_position in self.allowed_units_alaitoc_shrine:
+                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.delete_reaction()
+                        self.allowed_units_alaitoc_shrine = []
+                    else:
+                        await self.send_update_message("Unit already ready")
         elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):

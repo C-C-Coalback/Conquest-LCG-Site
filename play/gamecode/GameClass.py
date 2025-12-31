@@ -246,7 +246,6 @@ class Game:
         self.allowed_planets_cato_stronghold = []
         self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
-        self.alaitoc_shrine_activated = False
         self.resolving_search_box = False
         self.banshee_power_sword_extra_attack = 0
         self.may_move_defender = True
@@ -8004,7 +8003,6 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
                         self.allowed_units_alaitoc_shrine = []
-                        self.alaitoc_shrine_activated = False
                     if self.reactions_needing_resolving[0] == "The Blood Pits":
                         if self.misc_misc:
                             for i in range(len(self.misc_misc)):
