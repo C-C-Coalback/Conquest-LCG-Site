@@ -215,6 +215,8 @@ h4 {
     height: 30px;
     top: 0;
     left: 0;
+    color: red;
+    font-size: 30px;
 }
 
 .Faith {
@@ -224,6 +226,8 @@ h4 {
     height: 30px;
     top: 30px;
     left: 0;
+    color: white;
+    font-size: 30px;
 }
 
 .Attachment-Card {
