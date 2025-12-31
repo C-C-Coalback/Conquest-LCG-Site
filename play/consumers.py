@@ -440,6 +440,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                                         if not active_games[i].p2.deck_loaded:
                                             await active_games[i].p2.setup_player(deck_content,
                                                                                   active_games[i].planet_array)
+                    elif message[1] == "concede" or message[1] == "resign":
+                        if self.name == active_games[self.game_position].name_1:
+                            await active_games[self.game_position].send_victory_proper(
+                                active_games[self.game_position].name_2, "concession")
+                        elif self.name == active_games[self.game_position].name_2:
+                            await active_games[self.game_position].send_victory_proper(
+                                active_games[self.game_position].name_1, "concession")
                     elif message[1] == "Error":
                         raise ValueError
                     elif message[1] == "force-quit-reactions":
