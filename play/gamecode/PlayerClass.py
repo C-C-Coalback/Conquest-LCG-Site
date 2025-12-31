@@ -6803,6 +6803,8 @@ class Player:
                     self.cards.append(temp_card_name)
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Interrogator Acolyte":
             self.game.create_interrupt("Interrogator Acolyte", self.name_player, (int(self.number), planet_num, -1))
+        if self.get_ability_given_pos(planet_num, card_pos) == "Kabalite Halfborn":
+            self.game.create_reaction("Kabalite Halfborn", self.name_player, (int(self.number), -1, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "The Sun Prince":
             self.game.create_interrupt("The Sun Prince", self.name_player, (int(self.number), planet_num, -1))
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Vanguard Soldiers":
