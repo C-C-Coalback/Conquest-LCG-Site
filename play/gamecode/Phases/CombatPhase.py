@@ -1083,8 +1083,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                           card.get_traits())
                                     hq_dis = secondary_player.search_hq_for_discounts(card.get_faction(),
                                                                                       card.get_traits())
-                                    in_play_dis = secondary_player.search_all_planets_for_discounts(card.get_traits(),
-                                                                                                    card.get_faction())
+                                    in_play_dis = secondary_player.search_all_planets_for_discounts(
+                                        card.get_traits())
                                     same_planet_dis, same_planet_auto_dis = \
                                         secondary_player.search_same_planet_for_discounts(
                                             card.get_faction(), self.defender_planet)
