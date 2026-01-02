@@ -4628,7 +4628,7 @@ class Game:
                         self.choices_available = []
                         for i in range(len(self.p1.cards)):
                             if len(self.choices_available) < 4:
-                                self.choices_available.append(str(i))
+                                self.choices_available.append(str(i + 1))
                         self.choice_context = "How Many Cards? (Slake the Thirst):"
                     elif self.choice_context == "Overrun: Followup Rout?":
                         self.reset_choices_available()
@@ -6916,7 +6916,7 @@ class Game:
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Solarite Avetys":
             if not secondary_player.get_flying_given_pos(att_pla, att_pos):
                 self.create_reaction("Solarite Avetys", primary_player.name_player,
-                                     (int(secondary_player.number), planet_pos, unit_pos))
+                                     (int(secondary_player.number), att_pla, att_pos))
         cost_diff = secondary_player.get_cost_given_pos(att_pla, att_pos) - \
                     primary_player.get_cost_given_pos(planet_pos, unit_pos)
         if cost_diff > 0:
