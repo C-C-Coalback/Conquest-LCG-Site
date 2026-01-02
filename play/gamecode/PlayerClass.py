@@ -3781,7 +3781,8 @@ class Player:
             if self.search_card_in_hq("Kustomisation Station"):
                 return "Orks"
         if planet_id == -2:
-            return self.headquarters[unit_id].get_faction()
+            if self.search_card_in_hq("Kustomisation Station"):
+                return self.headquarters[unit_id].get_faction()
         return self.cards_in_play[planet_id + 1][unit_id].get_faction()
 
     def get_name_given_pos(self, planet_id, unit_id):
