@@ -4601,8 +4601,7 @@ class Player:
     def refresh_once_per_phase_abilities(self):
         self.webway_witch = -1
         for i in range(len(self.headquarters)):
-            if self.headquarters[i].get_is_unit():
-                self.headquarters[i].set_once_per_phase_used(False)
+            self.headquarters[i].set_once_per_phase_used(False)
             self.headquarters[i].world_engine_owner = False
             self.headquarters[i].world_engine_enemy = False
         for planet_pos in range(7):
