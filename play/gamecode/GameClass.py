@@ -2973,7 +2973,8 @@ class Game:
                         self.name_player_making_choices = ""
                         self.choices_available = []
                         self.resolving_search_box = False
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        if not primary_player.harbinger_of_eternity_active:
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.shuffle_deck()
                         self.action_cleanup()
@@ -5890,7 +5891,8 @@ class Game:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
                             self.resolving_search_box = False
-                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                            if not primary_player.harbinger_of_eternity_active:
+                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                             primary_player.aiming_reticle_coords_hand = None
                             await self.send_update_message(
                                 "No valid targets for Awake the Sleepers"
