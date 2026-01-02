@@ -735,7 +735,7 @@ class Game:
             else:
                 initiative_string += "2"
         else:
-            if self.p1.has_initiative:
+            if self.player_with_initiative == self.name_1:
                 initiative_string += "1"
             else:
                 initiative_string += "2"
