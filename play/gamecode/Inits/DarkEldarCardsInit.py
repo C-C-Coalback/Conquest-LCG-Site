@@ -318,7 +318,7 @@ def dark_eldar_cards_init():
         CardClasses.EventCard("Run Down", "Deep Strike (0).\n"
                                           "Reaction: After you Deep Strike this event, target a non-Elite army unit "
                                           "in your opponent's HQ. Move the targeted unit to this planet.", "Tactic.",
-                              0, faction, "Common", 1, False, deepstrike=1),
+                              0, faction, "Common", 1, False, deepstrike=0),
         CardClasses.ArmyCard("Kabalite Blackguard", "Reaction: After you win a battle at this planet, "
                                                     "take up to 2 resources from your opponent.", "Warrior. Kabalite.",
                              2, faction, "Loyal", 2, 3, 0, False),
