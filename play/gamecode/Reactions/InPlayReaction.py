@@ -2014,7 +2014,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
-                if self.attacker_planet == int(game_update_string[2]):
+                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
