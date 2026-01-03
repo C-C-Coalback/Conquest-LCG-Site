@@ -536,7 +536,8 @@ def space_marines_cards_init():
                                                            "shielded unit gets +1 ATK until the end of the phase.",
                                    "Hardpoint.", 0, faction, "Common", 1, False, extra_health=1,
                                    limit_one_per_unit=True,
-                                   type_of_units_allowed_for_attachment="Army/Token/Synapse/Warlord"),
+                                   type_of_units_allowed_for_attachment="Army/Token/Synapse/Warlord",
+                                   required_traits="Vehicle"),
         CardClasses.WarlordCard("Castellan Crowe", "Each unit you control is considered to have faith.\n"
                                                    "Reaction: After an army unit damages an enemy army unit by an "
                                                    "attack, pay X faith to deal X damage to that enemy unit.",
