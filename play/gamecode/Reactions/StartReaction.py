@@ -306,6 +306,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Neophyte Apprentice":
+            primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "PLAY TO BATTLE"
             self.traits_of_searched_card = "Black Templars"

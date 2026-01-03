@@ -6889,10 +6889,8 @@ class Game:
                 self.create_reaction("Castellan Crowe", secondary_player.name_player,
                                      (int(primary_player.number), planet_pos, unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Neophyte Apprentice":
-            secondary_player.sacrifice_card_in_play(att_pla, att_pos)
             self.create_reaction("Neophyte Apprentice", secondary_player.name_player,
-                                 (int(secondary_player.number), -1, -1))
-            return None
+                                 (int(secondary_player.number), att_pla, att_pos))
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Corrupted Clawed Fiend":
             if secondary_player.get_card_type_given_pos(att_pla, att_pos) == "Army":
                 if secondary_player.get_cost_given_pos(att_pla, att_pos) < 3:
