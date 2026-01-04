@@ -4549,6 +4549,11 @@ class Player:
                     sacrificed_locations[0] = True
                     i = i - 1
                     self.draw_card()
+            elif self.headquarters[i].saint_celestine_active:
+                if self.sacrifice_card_in_hq(i):
+                    sacrificed_locations[0] = True
+                    i = i - 1
+                    self.draw_card()
             i = i + 1
         for planet_pos in range(7):
             unit_pos = 0
@@ -4557,6 +4562,11 @@ class Player:
                     if self.sacrifice_card_in_play(planet_pos, unit_pos):
                         sacrificed_locations[planet_pos + 1] = True
                         unit_pos = unit_pos - 1
+                elif self.cards_in_play[planet_pos + 1][unit_pos].saint_celestine_active:
+                    if self.sacrifice_card_in_play(planet_pos, unit_pos):
+                        sacrificed_locations[planet_pos + 1] = True
+                        unit_pos = unit_pos - 1
+                        self.draw_card()
                 unit_pos += 1
         return sacrificed_locations
 
