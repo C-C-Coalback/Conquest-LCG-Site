@@ -1783,6 +1783,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     del primary_player.cards[primary_player.aiming_reticle_coords_hand]
                     target_planet = self.position_of_actioned_card[0]
                     primary_player.add_card_to_planet(card, target_planet)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
                     primary_player.aiming_reticle_coords_hand = None
                     self.action_cleanup()
     elif self.action_chosen == "Death Korps Engineers":

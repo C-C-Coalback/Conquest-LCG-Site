@@ -1043,6 +1043,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     del primary_player.cards[hand_pos]
                     primary_player.add_card_to_planet(card, target_planet)
                     primary_player.aiming_reticle_coords_hand = None
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
                     self.action_cleanup()
                 else:
                     await self.send_update_message("Please pay " + str(self.misc_counter) + " faith.")
