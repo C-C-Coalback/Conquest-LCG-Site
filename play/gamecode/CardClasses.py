@@ -136,6 +136,8 @@ class Card:
             string += "Hit by The Emperor's Champion\n"
         if self.sacrifice_end_of_phase:
             string += "Sacrifice EOP\n"
+        if self.saint_celestine_active:
+            string += "Discard (Celestine) EOP\n"
         if self.return_to_hand_eor:
             string += "Return to hand EOR\n"
         if not string:
@@ -530,6 +532,8 @@ class UnitCard(Card):
             string += "Hit by The Emperor's Champion\n"
         if self.sacrifice_end_of_phase:
             string += "Sacrifice EOP\n"
+        if self.saint_celestine_active:
+            string += "Discard (Celestine) EOP\n"
         if self.return_to_hand_eor:
             string += "Return to hand EOR\n"
         if self.brutal_eocr:
