@@ -217,6 +217,7 @@ h4 {
     left: 0;
     color: red;
     font-size: 30px;
+    pointer-events: none;
 }
 
 .Faith {
@@ -228,6 +229,7 @@ h4 {
     left: 0;
     color: white;
     font-size: 30px;
+    pointer-events: none;
 }
 
 .Attachment-Card {
