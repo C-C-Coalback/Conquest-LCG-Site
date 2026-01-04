@@ -8696,7 +8696,7 @@ class Game:
                 num, def_pla, def_pos = self.positions_of_units_to_take_damage[0]
                 if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                     warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
-                    if primary_player.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn":
+                    if primary_player.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Chapter Champion Varn":
                         if primary_player.check_if_support_exists():
                             health = primary_player.get_health_given_pos(def_pla, def_pos)
                             damage = primary_player.get_damage_given_pos(def_pla, def_pos)
