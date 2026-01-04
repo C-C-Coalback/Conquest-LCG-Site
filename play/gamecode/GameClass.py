@@ -6333,7 +6333,7 @@ class Game:
 
                     if primary_player.search_hand_for_card("Vengeance!"):
                         self.create_reaction("Vengeance!", primary_player.name_player,
-                                             (int(primary_player.number), planet, pos))
+                                             (int(primary_player.number), planet, -1))
 
     def toggle_combat_turn_values(self):
         if self.player_with_combat_turn == self.name_1:
