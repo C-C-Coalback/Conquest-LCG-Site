@@ -3920,6 +3920,8 @@ class Player:
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Deathwing Terminators":
             if self.get_dw_term_active(planet_pos, unit_pos):
                 return True
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "23rd Mechanised Battalion":
+            return True
         if planet_pos != -2:
             if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
                 for i in range(len(self.cards_in_play[planet_pos + 1])):
