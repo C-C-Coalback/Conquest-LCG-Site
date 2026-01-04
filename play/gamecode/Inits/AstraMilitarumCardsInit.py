@@ -64,7 +64,7 @@ def astra_militarum_cards_init():
                                                  "unit takes half damage from non-Flying "
                                                  "units.", "Vehicle. Transport.",
                              4, faction, "Common", 4, 4, 1, False,
-                             wargear_attachments_permitted=False),
+                             wargear_attachments_permitted=False, flying=True),
         CardClasses.ArmyCard("Stalwart Ogryn", "Immune to enemy events.",
                              "Warrior. Abhuman.", 2, faction, "Common",
                              2, 2, 1, False),
