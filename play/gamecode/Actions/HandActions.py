@@ -769,10 +769,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Drop Pod Assault":
                         if self.last_planet_checked_for_battle != -1:
-                            self.action_chosen = "Drop Pod Assault"
-                            self.choice_context = "Drop Pod Assault"
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.action_chosen = ability
+                            self.choice_context = ability
+                            primary_player.discard_card_from_hand(hand_pos)
                             primary_player.number_cards_to_search = 6
                             for i in range(len(primary_player.headquarters)):
                                 if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":

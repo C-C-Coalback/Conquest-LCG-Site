@@ -1617,6 +1617,8 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.number_who_is_searching == "1":
                         self.p1.bottom_remaining_cards()
+                        if self.action_chosen == "Drop Pod Assault":
+                            self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
                                 if self.reactions_needing_resolving[0] == "Endless Legions":
@@ -1625,6 +1627,8 @@ class Game:
                                     self.delete_reaction()
                     else:
                         self.p2.bottom_remaining_cards()
+                        if self.action_chosen == "Drop Pod Assault":
+                            self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
                                 if self.reactions_needing_resolving[0] == "Endless Legions":
@@ -1671,11 +1675,7 @@ class Game:
                                 self.p1.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                              int(game_update_string[1]), card_chosen)
                                 if self.action_chosen == "Drop Pod Assault":
-                                    self.p1.discard_card_from_hand(self.p1.aiming_reticle_coords_hand)
-                                    self.p1.aiming_reticle_coords_hand = None
-                                    self.mode = "Normal"
-                                    self.player_with_action = ""
-                                    self.action_chosen = ""
+                                    self.action_cleanup()
                             elif self.what_to_do_with_searched_card == "STORE":
                                 self.misc_target_choice = self.p1.deck[int(game_update_string[1])]
                                 del self.p1.deck[int(game_update_string[1])]
@@ -1712,11 +1712,7 @@ class Game:
                                 self.p2.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                              int(game_update_string[1]), card_chosen)
                                 if self.action_chosen == "Drop Pod Assault":
-                                    self.p2.discard_card_from_hand(self.p2.aiming_reticle_coords_hand)
-                                    self.p2.aiming_reticle_coords_hand = None
-                                    self.mode = "Normal"
-                                    self.player_with_action = ""
-                                    self.action_chosen = ""
+                                    self.action_cleanup()
                             elif self.what_to_do_with_searched_card == "STORE":
                                 self.misc_target_choice = self.p2.deck[int(game_update_string[1])]
                                 del self.p2.deck[int(game_update_string[1])]
