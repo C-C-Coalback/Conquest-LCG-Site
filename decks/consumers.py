@@ -405,8 +405,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 split_message[1] = split_message[1].replace("\"Subject: &Omega;-X62113\"", "")
                 split_message[1] = split_message[1].replace("idden Base", "'idden Base")
                 split_message[1] = split_message[1].replace("\"", "")
+                true_split_message = split_message[1].split(sep="\n")
+                while true_split_message:
+                    if true_split_message[0].strip():
+                        break
+                    del true_split_message[0]
+                split_message[1] = "\n".join(true_split_message)
                 deck = clean_sent_deck(split_message[1])
-                print(deck)
                 deck_name = deck[0]
                 if len(deck) > 5:
                     if "{AUTOMAIN}" in deck[2]:
