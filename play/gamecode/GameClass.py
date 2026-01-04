@@ -778,7 +778,7 @@ class Game:
         elif self.reactions_needing_resolving:
             info_string += self.player_who_resolves_reaction[0] + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-            info_string += "Unspecified/" + "Mobile"
+            info_string += "Unspecified/" + "Mobile/"
         elif self.battle_ability_to_resolve:
             info_string += self.player_resolving_battle_ability + "/"
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
