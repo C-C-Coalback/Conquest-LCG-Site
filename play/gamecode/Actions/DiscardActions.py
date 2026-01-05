@@ -88,6 +88,8 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             primary_player.harbinger_of_eternity_active = True
                             primary_player.remove_card_from_game(ability)
                             self.chosen_first_card = False
+                    else:
+                        await self.send_update_message("Already played a Limited card!")
             elif ability == "Recycle":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):

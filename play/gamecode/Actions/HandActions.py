@@ -621,6 +621,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.action_chosen = ability
                             primary_player.discard_card_from_hand(hand_pos)
                             self.chosen_first_card = False
+                        else:
+                            primary_player.add_resources(2, refund=True)
+                            await self.send_update_message("Already played a Limited card!")
                     elif ability == "Dark Possession":
                         primary_player.dark_possession_active = True
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
