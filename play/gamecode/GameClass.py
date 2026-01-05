@@ -1750,6 +1750,7 @@ class Game:
     async def resolve_battle_conclusion(self, name, game_string):
         self.p1.foretell_permitted = True
         self.p2.foretell_permitted = True
+        self.ranged_skirmish_active = False
         self.cult_duplicity_available = True
         self.p1.rok_bombardment_active = []
         self.p2.rok_bombardment_active = []
