@@ -49,9 +49,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p1.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
-                        if self.p2.search_hand_for_card("The Emperor's Retribution"):
+                        if self.p2.search_hand_for_card("The Emperor's Retribution") and self.p2.get_resources() > 0:
                             self.create_reaction("The Emperor's Retribution", self.name_2, (2, -1, -1))
-                        if self.p2.search_hand_for_card("Shadow Hunt"):
+                        if self.p2.search_hand_for_card("Shadow Hunt") and self.p2.get_resources() > 0:
                             self.create_reaction("Shadow Hunt", self.name_2, (2, -1, -1))
                         await self.send_update_message(self.name_1 + " passes their deploy turn.")
                     else:
@@ -60,9 +60,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p2.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
-                        if self.p1.search_hand_for_card("The Emperor's Retribution"):
+                        if self.p1.search_hand_for_card("The Emperor's Retribution") and self.p1.get_resources() > 0:
                             self.create_reaction("The Emperor's Retribution", self.name_1, (1, -1, -1))
-                        if self.p1.search_hand_for_card("Shadow Hunt"):
+                        if self.p1.search_hand_for_card("Shadow Hunt") and self.p1.get_resources() > 0:
                             self.create_reaction("Shadow Hunt", self.name_1, (1, -1, -1))
                         await self.send_update_message(self.name_2 + " passes their deploy turn.")
                 elif self.mode == "DISCOUNT":
