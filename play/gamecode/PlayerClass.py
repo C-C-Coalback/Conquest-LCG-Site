@@ -1618,6 +1618,20 @@ class Player:
                             del self.game.positions_of_unit_triggering_reaction[i]
                             i = i - 1
             i += 1
+        i = 0
+        while i < len(self.game.delayed_reactions_needing_resolving):
+            num, pla, pos = self.game.delayed_positions_of_unit_triggering_reaction[i]
+            if num == int(self.number):
+                if pla == planet_pos:
+                    if pos > unit_pos:
+                        pos -= 1
+                        self.game.delayed_positions_of_unit_triggering_reaction[i] = (num, pla, pos)
+                    elif pos == unit_pos:
+                        del self.game.delayed_reactions_needing_resolving[i]
+                        del self.game.delayed_player_who_resolves_reaction[i]
+                        del self.game.delayed_positions_of_unit_triggering_reaction[i]
+                        i = i - 1
+            i += 1
 
     def adjust_own_interrupts(self, planet_pos, unit_pos):
         i = 0
@@ -2394,42 +2408,6 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].set_once_per_phase_used(value)
                 return True
         return False
-
-    def get_on_kill_effects_of_attacker(self, planet_pos, unit_pos, def_pla, def_pos):
-        print("\nGetting on kill effects\n")
-        other_player = self.get_other_player()
-        on_kill_effects = []
-        if planet_pos == -2:
-            return on_kill_effects
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Patrolling Wraith":
-            on_kill_effects.append("Patrolling Wraith")
-        if self.get_ability_given_pos(planet_pos, unit_pos) == "Salvaged Battlewagon":
-            on_kill_effects.append("Salvaged Battlewagon")
-        if self.get_ability_given_pos(planet_pos, unit_pos) == "Goliath Rockgrinder":
-            if not self.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
-                on_kill_effects.append("Goliath Rockgrinder")
-                self.game.goliath_rockgrinder_value = other_player.cards_in_play[def_pla + 1][def_pos].health
-        for i in range(len(self.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
-            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Bone Sabres":
-                on_kill_effects.append("Bone Sabres")
-            if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Kroot Hunting Rifle":
-                on_kill_effects.append("Kroot Hunting Rifle")
-        if other_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-            if self.search_card_in_hq("Holding Cell"):
-                on_kill_effects.append("Holding Cell")
-            if self.check_for_trait_given_pos(planet_pos, unit_pos, "Genestealer"):
-                if other_player.get_cost_given_pos(def_pla, def_pos) < 4:
-                    if self.resources > 1 and self.search_hand_for_card("Gene Implantation"):
-                        on_kill_effects.append("Gene Implantation")
-            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Ravenous Haruspex":
-                if not self.cards_in_play[planet_pos + 1][unit_pos].get_once_per_phase_used():
-                    on_kill_effects.append("Ravenous Haruspex")
-                    self.game.ravenous_haruspex_gain = other_player.get_cost_given_pos(def_pla, def_pos)
-            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Striking Ravener":
-                on_kill_effects.append("Striking Ravener")
-            if self.get_ability_given_pos(planet_pos, unit_pos) == "Fire Prism":
-                on_kill_effects.append("Fire Prism")
-        return on_kill_effects
 
     async def reveal_hand(self):
         string_sent = "; ".join(self.cards)
@@ -3957,19 +3935,20 @@ class Player:
         for i in range(len(self.headquarters)):
             current_name = self.headquarters[i].get_ability()
             if current_name == name_of_card:
-                if bloodied_relevant:
-                    if self.headquarters[i].get_bloodied():
-                        return False
-                    else:
-                        return True
-                if ready_relevant:
-                    if self.headquarters[i].get_ready():
-                        if current_name == "Holding Cell":
-                            if len(self.headquarters[i].get_attachments()) == 0:
-                                return True
+                if current_name == "Holding Cell":
+                    if len(self.headquarters[i].get_attachments()) == 0:
                         return True
                 else:
-                    return True
+                    if bloodied_relevant:
+                        if self.headquarters[i].get_bloodied():
+                            return False
+                        else:
+                            return True
+                    if ready_relevant:
+                        if self.headquarters[i].get_ready():
+                            return True
+                    else:
+                        return True
         return False
 
     def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None):
