@@ -110,7 +110,7 @@ def necrons_cards_init():
                                                     "Reaction: After you deploy this unit, put a non-Elite Vehicle"
                                                     " unit into play from your discard pile at this planet.",
                              "Vehicle. Sautekh. Elite.", 6, faction, "Common", 4, 4, 2, False,
-                             wargear_attachments_permitted=False),
+                             wargear_attachments_permitted=False, flying=True),
         CardClasses.ArmyCard("Doomsday Ark", "Area Effect (X).\n"
                                              "No Wargear Attachments.\n"
                                              "X is the number of non- factions among units you control.",
