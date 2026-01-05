@@ -16,9 +16,9 @@ h4 {
     grid-template-rows: calc(10vh + 15px) 10vh auto 10vh calc(10vh + 15px);
     grid-template-areas:
     "removed2 discard2 deck2 hand2 victory2"
-    "resources2 headquarters2 headquarters2 headquarters2 initiative2"
+    "resources2 initiative2 headquarters2 headquarters2 victory2"
     "inplay inplay inplay inplay inplay"
-    "resources1 headquarters1 headquarters1 headquarters1 initiative1"
+    "resources1 initiative1 headquarters1 headquarters1 victory1"
     "removed1 discard1 deck1 hand1 victory1";
     border-right: dashed 1px aliceblue;
     height: 98vh;
@@ -322,20 +322,19 @@ h4 {
 }
 
 #initiative-player-2 {
-    position:absolute;
-    top: calc(10vh + 10px);
+    position:relative;
     right: 0;
     height: 4.4vw;
     width: 10vw;
+    grid-area: initiative2;
 }
 
 #initiative-player-1 {
-    position:absolute;
-    bottom: calc(10vh + 10px);
+    position:relative;
     right: 0;
     height: 4.4vw;
     width: 10vw;
-    grid-area: initiative1-end;
+    grid-area: initiative1;
 }
 
 .initiative {
@@ -350,7 +349,7 @@ h4 {
     top: 0;
     right: 0;
     min-height: 10vh;
-    max-height: 10vh;
+    max-height: 16vh;
     overflow-y: auto;
     overflow-x: hidden;
     width: 10vw;
@@ -373,7 +372,7 @@ h4 {
     bottom: 0;
     right: 0;
     min-height: 10vh;
-    max-height: 10vh;
+    max-height: 16vh;
     overflow-y: auto;
     overflow-x: hidden;
     width: 10vw;
