@@ -394,6 +394,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.add_card_to_planet(card, chosen_planet)
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
     elif current_reaction == "Hive Ship Tendrils":
         if self.chosen_first_card:

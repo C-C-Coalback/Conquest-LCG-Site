@@ -489,7 +489,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Patrolling Wraith":
+        elif current_reaction == "Patrolling Wraith":
             await secondary_player.reveal_hand()
             i = 0
             while i < len(secondary_player.cards):
@@ -1945,6 +1945,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 num_termagants = 4
             for i in range(num_termagants):
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif self.reactions_needing_resolving[0] == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
