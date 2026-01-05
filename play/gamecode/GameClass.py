@@ -6888,7 +6888,7 @@ class Game:
         att_num, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
         if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and \
                 secondary_player.get_card_type_given_pos(att_pla, att_pos) == "Army":
-            if secondary_player.castellan_crowe_relevant:
+            if secondary_player.castellan_crowe_2_relevant:
                 self.create_reaction("Castellan Crowe", secondary_player.name_player,
                                      (int(primary_player.number), planet_pos, unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Neophyte Apprentice":
