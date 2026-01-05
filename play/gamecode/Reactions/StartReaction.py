@@ -1887,7 +1887,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Miraculous Intervention":
             if "Miraculous Intervention" in primary_player.cards and primary_player.resources > 0:
                 primary_player.spend_resources(1)
-                primary_player.add_card_to_discard("Miraculous Intervention")
+                primary_player.discard_card_name_from_hand("Miraculous Intervention")
                 warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
                 primary_player.increase_faith_given_pos(warlord_pla, warlord_pos, 2)
                 primary_player.commit_warlord_to_planet_from_planet(warlord_pla, self.last_planet_checked_for_battle)
