@@ -1782,9 +1782,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
                     del primary_player.cards[primary_player.aiming_reticle_coords_hand]
                     target_planet = self.position_of_actioned_card[0]
-                    primary_player.add_card_to_planet(card, target_planet)
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
+                    final_pos = primary_player.add_card_to_planet(card, target_planet)
+                    if final_pos != -1:
+                        primary_player.cards_in_play[target_planet + 1][final_pos].saint_celestine_active = True
                     primary_player.aiming_reticle_coords_hand = None
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
                     self.action_cleanup()
     elif self.action_chosen == "Death Korps Engineers":
         if game_update_string[1] == "1":
