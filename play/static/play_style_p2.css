@@ -700,7 +700,6 @@ summary:focus {
     position:relative;
     bottom:0;
     grid-area: deck1;
-    align-self: center;
 }
 
 #current-discard-player-1 {
