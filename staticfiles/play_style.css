@@ -580,12 +580,6 @@ h4 {
     grid-area: hand2;
 }
 
-#current-deck-player-2 {
-    position:relative;
-    top:0;
-    grid-area: deck2;
-}
-
 #search-collapse {
     position: absolute;
     right: 0;
@@ -631,6 +625,12 @@ summary:focus {
     overflow-y:hidden;
     bottom:0%;
     right:0;
+}
+
+#current-deck-player-2 {
+    position:relative;
+    top:0;
+    grid-area: deck2;
 }
 
 #current-discard-player-2 {
@@ -697,19 +697,21 @@ summary:focus {
     position:relative;
     bottom:0;
     grid-area: deck1;
-    align-self: center;
+    align-self: end;
 }
 
 #current-discard-player-1 {
     position:relative;
     bottom:0;
     grid-area: discard1;
+    align-self: end;
 }
 
 #current-removed-player-1 {
     position:relative;
     bottom:0;
     grid-area: removed1;
+    align-self: end;
 }
 
 #expanded-DISCARD_PILE-2 {

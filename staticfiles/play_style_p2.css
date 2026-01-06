@@ -580,12 +580,6 @@ h4 {
     grid-area: hand2;
 }
 
-#current-deck-player-2 {
-    position:relative;
-    top:0;
-    grid-area: deck2;
-}
-
 #search-collapse {
     position: absolute;
     right: 0;
@@ -633,16 +627,25 @@ summary:focus {
     right:0;
 }
 
+#current-deck-player-2 {
+    position:relative;
+    top:0;
+    grid-area: deck2;
+    align-self: end;
+}
+
 #current-discard-player-2 {
     position:relative;
     top:0;
     grid-area: discard2;
+    align-self: end;
 }
 
 #current-removed-player-2 {
     position:relative;
     top:0;
     grid-area: removed2;
+    align-self: end;
 }
 
 #current-hand-player-1 {
@@ -712,40 +715,9 @@ summary:focus {
     grid-area: removed1;
 }
 
-#expanded-DISCARD_PILE-2 {
-    position: absolute;
-    top: 8vh;
-    left: 5vw;
-    display:none;
-    border: 5px solid blue;
-    background-color: lightblue;
-}
-
-#expanded-discard-2-settings {
-    max-width: 30vw;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-}
-
-#expanded-REMOVED_PILE-2 {
-    position: absolute;
-    top: 8vh;
-    display:none;
-    border: 5px solid blue;
-    background-color: lightblue;
-}
-
-#expanded-removed-2-settings {
-    max-width: 30vw;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-}
-
 #expanded-DISCARD_PILE-1 {
-    position:absolute;
-    bottom: 8vh;
+    position: absolute;
+    top: 8vh;
     left: 5vw;
     display:none;
     border: 5px solid blue;
@@ -760,6 +732,37 @@ summary:focus {
 }
 
 #expanded-REMOVED_PILE-1 {
+    position: absolute;
+    top: 8vh;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-removed-1-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-DISCARD_PILE-2 {
+    position:absolute;
+    bottom: 8vh;
+    left: 5vw;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-discard-2-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-REMOVED_PILE-2 {
     position:absolute;
     bottom: 8vh;
     display:none;
@@ -767,7 +770,7 @@ summary:focus {
     background-color: lightblue;
 }
 
-#expanded-removed-1-settings {
+#expanded-removed-2-settings {
     max-width: 30vw;
     display: flex;
     flex-wrap: wrap;
