@@ -8,7 +8,13 @@ def lobby(request):
 
 
 def game(request, game_id):
-    return render(request, "play/play.html", {"game_id": game_id})
+    _, spec_lobbies = get_lobbies()
+    is_second_player = False
+    for i in range(len(spec_lobbies)):
+        if spec_lobbies[i][2] == game_id:
+            if request.user.username == spec_lobbies[i][1]:
+                is_second_player = True
+    return render(request, "play/play.html", {"game_id": game_id, "is_p2": is_second_player})
 
 
 def discord_bot(request):

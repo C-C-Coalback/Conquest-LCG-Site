@@ -1,0 +1,824 @@
+h4 {
+    color: blue;
+}
+
+.box {
+    position: relative;
+    height: auto;
+    width: 99vw;
+    border: 5px solid blue;
+    overflow: scroll;
+}
+
+#full-game-box {
+    display: grid;
+    grid-template-columns: 6.63vh 6.63vh 6.63vh auto calc(10vw + 10px);
+    grid-template-rows: calc(10vh + 15px) 10vh auto 10vh calc(10vh + 15px);
+    grid-template-areas:
+    "removed1 discard1 deck1 hand1 victory1"
+    "resources1 initiative1 headquarters1 headquarters1 victory1"
+    "inplay inplay inplay inplay inplay"
+    "resources2 initiative2 headquarters2 headquarters2 victory2"
+    "removed2 discard2 deck2 hand2 victory2";
+    border-right: dashed 1px aliceblue;
+    height: 98vh;
+    position: relative;
+    width: 81vw;
+    overflow: scroll;
+}
+
+#helper-text-box {
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    border-width: 2px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+}
+
+#in-play-box {
+    position: relative;
+    height: calc(48vh + 10px);
+    width: 75vw;
+    border-width: 10px;
+    border-style: dashed;
+    border-color: green;
+    grid-area: inplay;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 19vh 10vh 19vh;
+    grid-template-areas:
+    "play10 play11 play12 play13 play14 play15 play16"
+    "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
+    "play20 play21 play22 play23 play24 play25 play26";
+    overflow-x: scroll;
+    overflow-y: scroll;
+    justify-self: center;
+    align-self: center;
+}
+
+.small-sep {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+#victory-message-box {
+    position: absolute;
+    left: 35vw;
+    top: 40vh;
+    max-width: 50vw;
+    border-width: 2px;
+    border-style: double;
+    border-color: yellow;
+    background: rgba(102, 151, 163, 0.8);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+
+#player-1-cards-planet-0 {
+    grid-area:play10;
+}
+
+#player-1-cards-planet-1 {
+    grid-area:play11;
+}
+
+#player-1-cards-planet-2 {
+    grid-area:play12;
+}
+
+#player-1-cards-planet-3 {
+    grid-area:play13;
+}
+
+#player-1-cards-planet-4 {
+    grid-area:play14;
+}
+
+#player-1-cards-planet-5 {
+    grid-area:play15;
+}
+
+#player-1-cards-planet-6 {
+    grid-area:play16;
+}
+
+#player-2-cards-planet-0 {
+    grid-area:play20;
+}
+
+#player-2-cards-planet-1 {
+    grid-area:play21;
+}
+
+#player-2-cards-planet-2 {
+    grid-area:play22;
+}
+
+#player-2-cards-planet-3 {
+    grid-area:play23;
+}
+
+#player-2-cards-planet-4 {
+    grid-area:play24;
+}
+
+#player-2-cards-planet-5 {
+    grid-area:play25;
+}
+
+#player-2-cards-planet-6 {
+    grid-area:play26;
+}
+
+#div-PLANETS-0 {
+    grid-area:planet0;
+}
+
+#div-PLANETS-1 {
+    grid-area:planet1;
+}
+
+#div-PLANETS-2 {
+    grid-area:planet2;
+}
+
+#div-PLANETS-3 {
+    grid-area:planet3;
+}
+
+#div-PLANETS-4 {
+    grid-area:planet4;
+}
+
+#div-PLANETS-5 {
+    grid-area:planet5;
+}
+
+#div-PLANETS-6 {
+    grid-area:planet6;
+}
+
+#LargeHelperCard {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    height:30vh;
+    width: min(15vw, 22.1vh);
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.Card-div {
+    position: relative;
+    height:9vh;
+    width:auto;
+}
+
+.Card-div + .Card-div {
+    margin-left:0vw;
+}
+
+.Card {
+    position: relative;
+    height:9vh;
+    width:6.63vh;
+}
+
+.Token-Card {
+    position: relative;
+    height:6vh;
+    width:4.42vh;
+}
+
+.Exhausted-Token-Card {
+    position: relative;
+    top:-1vh;
+    height:6vh;
+    width:4.42vh;
+}
+
+.Exhausted-Card {
+    position: relative;
+    top:-1vh;
+    height:9vh;
+    width:6.63vh;
+}
+
+.Damage {
+    position: absolute;
+    opacity: 0.7;
+    width: 30px;
+    height: 30px;
+    top: 0;
+    left: 0;
+    color: red;
+    font-size: 30px;
+    pointer-events: none;
+}
+
+.Faith {
+    position: absolute;
+    opacity: 0.7;
+    width: 30px;
+    height: 30px;
+    top: 30px;
+    left: 0;
+    color: white;
+    font-size: 30px;
+    pointer-events: none;
+}
+
+.Attachment-Card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 9vh;
+    width:6.63vh;
+}
+
+.Exhausted-Attachment-Card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height:9vh;
+    width:6.63vh;
+}
+
+.Planet-Attachment-Card {
+    position: absolute;
+    pointer-events:auto;
+    height: 4vh;
+    width: 2.6vw;
+}
+
+.Exhausted-Planet-Attachment-Card {
+    position: absolute;
+    pointer-events:auto;
+    height: 4vh;
+    width: 2.6vw;
+}
+
+.Planet-Attachment-Card + .Planet-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Planet-Attachment-Card + .Exhausted-Planet-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Planet-Attachment-Card + .Planet-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.Exhausted-Planet-Attachment-Card + .Exhausted-Planet-Attachment-Card {
+    margin-left: 1vw;
+}
+
+.aiming-reticle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 9vh;
+    width: 6.63vh;
+    pointer-events: none;
+}
+
+.large-aiming-reticle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 10vh;
+    width: 10vw;
+    pointer-events: none;
+}
+
+.infestation-token {
+    position: absolute;
+    top: 3vh;
+    left: 3vw;
+    height: 4vh;
+    width: 4vw;
+    pointer-events: none;
+}
+
+.planet {
+    position: relative;
+    height: 10vh;
+    width: 10vw;
+}
+
+.planet-div {
+    position: relative;
+    margin-left:1vw;
+    margin:auto;
+    float:left;
+    pointer-events: auto;
+    height: 10vh;
+    width: 10vw;
+}
+
+#initiative-player-2 {
+    position:relative;
+    right: 0;
+    height: 4.4vw;
+    width: 10vw;
+    grid-area: initiative2;
+}
+
+#initiative-player-1 {
+    position:relative;
+    right: 0;
+    height: 4.4vw;
+    width: 10vw;
+    grid-area: initiative1;
+}
+
+.initiative {
+    height: 4.4vw;
+    width: 10vw;
+}
+
+#victory-display-player-2 {
+    display:flex;
+    flex-direction:column;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    min-height: 10vh;
+    max-height: 16vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 10vw;
+    border: 5px solid yellow;
+    grid-area: victory2;
+}
+
+#victory-display-player-1 > :first-child {
+    margin-top:0;
+}
+
+#victory-display-player-2 > :first-child {
+    margin-top:0;
+}
+
+#victory-display-player-1 {
+    display:flex;
+    flex-direction:column;
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-height: 10vh;
+    max-height: 16vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 10vw;
+    border: 5px solid yellow;
+    grid-area: victory1;
+}
+
+.planet-in-victory-display-2 {
+    pointer-events: auto;
+    height: 10vh;
+    margin-top:-8vh;
+    width: 10vw;
+}
+
+.planet-in-victory-display-1 {
+    pointer-events: auto;
+    height: 10vh;
+    margin-top:-8vh;
+    width: 10vw;
+}
+
+.player-2-in-play {
+    margin-left:1vw;
+    margin:auto;
+    float:left;
+    max-width:10vw;
+    min-width:10vw;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+    height:18vh;
+    max-height: 18vh;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    pointer-events: auto;
+}
+
+.player-1-in-play {
+    margin-left:1vw;
+    margin:auto;
+    float:left;
+    max-width:10vw;
+    min-width:10vw;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+    height:18vh;
+    max-height: 18vh;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    pointer-events: auto;
+}
+
+#headquarters-player-1 {
+    position:relative;
+    border: 5px solid red;
+    overflow-y:hidden;
+    overflow-x:auto;
+    background: rgba(47, 40, 153, 0.3);
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    left: 100px;
+    pointer-events: auto;
+    max-width: calc(50vw - 15vh);
+    min-width: 20vw;
+    min-height: 9vh;
+    grid-area: headquarters1;
+    justify-self: center;
+}
+
+#headquarters-player-2 {
+    position:relative;
+    border: 5px solid green;
+    overflow-y:hidden;
+    overflow-x:auto;
+    background: rgba(47, 40, 153, 0.3);
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    left: 100px;
+    pointer-events: auto;
+    max-width: calc(50vw - 15vh);
+    min-width: 20vw;
+    min-height: 9vh;
+    grid-area: headquarters2;
+    justify-self: center;
+}
+
+#resources-player-1 {
+    position:relative;
+    grid-area: resources1;
+    align-self: center;
+    justify-self: center;
+}
+
+#resources-player-2 {
+    position:relative;
+    grid-area: resources2;
+    align-self: center;
+    justify-self: center;
+}
+
+#pass-P1 {
+    width: calc(10vw + 30px);
+    height: 35px;
+}
+
+#pass-player-1 {
+    position:absolute;
+    right:10px;
+    bottom:calc(95px + 20vh);
+    width: auto;
+    height: 35px;
+}
+
+#increase-zoom-div {
+    position:absolute;
+    right:70px;
+    bottom:calc(125px + 20vh);
+    width: auto;
+    height: 35px;
+    width: 70px;
+}
+
+#decrease-zoom-div {
+    position:absolute;
+    right:10px;
+    bottom:calc(125px + 20vh);
+    height: 35px;
+    width: 70px;
+}
+
+#request-action-div {
+    position: absolute;
+    right:10px;
+    bottom: calc(55px + 20vh);
+    width: auto;
+    height: 35px;
+}
+
+#action-button {
+    width: calc(10vw + 30px);
+    height: 35px;
+}
+
+#chat-message-submit {
+    position:absolute;
+    bottom:13px;
+    right:10px;
+}
+
+#chat-message-input {
+    position:absolute;
+    bottom:13px;
+    right:50px;
+    height: 15px;
+    width: calc(10vw - 10px);
+}
+
+.avatar-chat {
+    position:relative;
+    width: 40px;
+    height: 40px;
+}
+
+#chat-log {
+    position:absolute;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    overflow-y:auto;
+    background: rgba(47, 40, 153, 0.3);
+    bottom:40px;
+    right:10px;
+    width: calc(10vw + 30px);
+    height: 20vh;
+}
+
+#current-hand-player-2 {
+    position:relative;
+    top:0;
+    margin: auto;
+    border: 5px solid green;
+    max-width: 55vw;
+    overflow-x:auto;
+    overflow-y:hidden;
+    background: rgba(47, 40, 153, 0.3);
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+    min-width: 20vw;
+    min-height: 9vh;
+    grid-area: hand2;
+}
+
+#current-deck-player-2 {
+    position:relative;
+    top:0;
+    grid-area: deck2;
+}
+
+#search-collapse {
+    position: absolute;
+    right: 0;
+    top: 30vh;
+    border: 5px solid red;
+    max-width: 20vw;
+    max-height: 20vh;
+    overflow-y:auto;
+    overflow-x:auto;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+summary::-webkit-details-marker {
+  color: blue;
+}
+
+summary:focus {
+  outline-style: none;
+}
+
+.attachments-planet-2 {
+    position:absolute;
+    height:calc(4vh + 15px);
+    width:3vw;
+    pointer-events:none;
+    max-width:5vw;
+    overflow-x:auto;
+    overflow-y:hidden;
+    top:0%;
+    left:0;
+}
+
+.attachments-planet-1 {
+    position:absolute;
+    height:calc(4vh + 15px);
+    width:3vw;
+    pointer-events:none;
+    max-width:5vw;
+    overflow-x:auto;
+    overflow-y:hidden;
+    bottom:0%;
+    right:0;
+}
+
+#current-discard-player-2 {
+    position:relative;
+    top:0;
+    grid-area: discard2;
+}
+
+#current-removed-player-2 {
+    position:relative;
+    top:0;
+    grid-area: removed2;
+}
+
+#current-hand-player-1 {
+    position:relative;
+    bottom:0;
+    margin: auto;
+    border: 5px solid red;
+    max-width: 55vw;
+    overflow-x:auto;
+    overflow-y:hidden;
+    background: rgba(47, 40, 153, 0.3);
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+    min-width: 20vw;
+    min-height: 9vh;
+    grid-area: hand1;
+}
+
+#count-deck-p1 > p {
+    text-align: center;
+    font-size: 6vh;
+    color: yellow;
+}
+
+#count-deck-p2 > p {
+    text-align: center;
+    font-size: 6vh;
+    color: yellow;
+}
+
+#count-deck-p1 {
+    position:absolute;
+    bottom:6vh;
+    height:9vh;
+    width:6.63vh;
+    display: none;
+    pointer-events: none;
+}
+
+#count-deck-p2 {
+    position:absolute;
+    top:-5vh;
+    height:9vh;
+    width:6.63vh;
+    display: none;
+    pointer-events: none;
+}
+
+#current-deck-player-1 {
+    position:relative;
+    bottom:0;
+    grid-area: deck1;
+    align-self: center;
+}
+
+#current-discard-player-1 {
+    position:relative;
+    bottom:0;
+    grid-area: discard1;
+}
+
+#current-removed-player-1 {
+    position:relative;
+    bottom:0;
+    grid-area: removed1;
+}
+
+#expanded-DISCARD_PILE-2 {
+    position: absolute;
+    top: 8vh;
+    left: 5vw;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-discard-2-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-REMOVED_PILE-2 {
+    position: absolute;
+    top: 8vh;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-removed-2-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-DISCARD_PILE-1 {
+    position:absolute;
+    bottom: 8vh;
+    left: 5vw;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-discard-1-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#expanded-REMOVED_PILE-1 {
+    position:absolute;
+    bottom: 8vh;
+    display:none;
+    border: 5px solid blue;
+    background-color: lightblue;
+}
+
+#expanded-removed-1-settings {
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#planets-in-play {
+    position:absolute;
+    width: 80vw;
+    max-width: 80vw;
+    top:43%;
+    border: 5px solid blue;
+    margin: auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+    background: transparent;
+}
+
+fieldset {
+    padding: 0px;
+    margin: 0px;
+    min-width: 0px;
+}
+
+legend {
+    padding: 0px;
+    margin: 0px;
+    min-width: 0px;
+}
+
+#info-box {
+    position: absolute;
+    width: 14vw;
+    max-width: 14vw;
+    min-height: 4vh;
+    max-height: 20vh;
+    top: 40%;
+    border: 5px solid blue;
+    right: 0;
+    margin: auto;
+    overflow-x:hidden;
+    overflow-y:auto;
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    background: transparent;
+}
+
+.info-box-sub {
+    margin-bottom: -5px;
+}

@@ -4,7 +4,11 @@
 
 {% block content %}
 {% load static %}
+{% if is_p2 %}
+<link rel="stylesheet" href="{% static 'play_style_p2.css' %}">
+{% else %}
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
+{% endif %}
 <div class="box" onmousemove="getCursor(event)">
     <div id="helper-text-box">
 
