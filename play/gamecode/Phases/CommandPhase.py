@@ -664,7 +664,7 @@ def try_entire_command(self, planet_pos):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
             auto_interrupts = False
-            if self.p2.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
+            if self.p2.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Shaper Agnok":
                 if self.p2.check_for_trait_at_planet(planet_pos, "Kroot"):
                     self.create_interrupt("Shaper Agnok", self.name_2, (2, -1, -1))
                     auto_interrupts = True
@@ -690,7 +690,7 @@ def try_entire_command(self, planet_pos):
                 return "INTERRUPT DURING STRUGGLE"
             warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
             auto_interrupts = False
-            if self.p1.get_ability_given_pos(warlord_pla, warlord_pos) == "Shaper Agnok":
+            if self.p1.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Shaper Agnok":
                 if self.p1.check_for_trait_at_planet(planet_pos, "Kroot"):
                     self.create_interrupt("Shaper Agnok", self.name_1, (1, -1, -1))
                     auto_interrupts = True
