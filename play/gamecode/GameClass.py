@@ -8047,7 +8047,7 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                    elif self.reactions_needing_resolving[0] == "Adaptative Thorax Swarm":
+                    if self.reactions_needing_resolving[0] == "Adaptative Thorax Swarm":
                         i = 0
                         names_list = []
                         while i < len(self.misc_player_storage):
@@ -8147,6 +8147,12 @@ class Game:
                             self.delete_reaction()
                         else:
                             await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+                    elif self.reactions_needing_resolving[0] == "Scavenging Kroot Rider":
+                        if not self.chosen_first_card:
+                            self.chosen_first_card = True
+                            await self.send_update_message("Skipping enemy support exhaustion.")
+                        else:
+                            self.delete_reaction()
                     elif self.reactions_needing_resolving[0] != "Warlock Destructor":
                         self.delete_reaction()
             elif len(game_update_string) == 2:
