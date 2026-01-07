@@ -1388,7 +1388,7 @@ class Player:
             if name_card == "Vael the Gifted":
                 self.vael_relevent = True
             if name_card == "Castellan Crowe":
-                castellan_crowe_2_relevant = True
+                self.castellan_crowe_2_relevant = True
             return None
         self.cards_in_play[planet_id + 1][unit_id].hale_warlord()
         name_card = self.cards_in_play[planet_id + 1][unit_id].get_name()
@@ -1407,7 +1407,7 @@ class Player:
         if name_card == "Vael the Gifted":
             self.vael_relevent = True
         if name_card == "Castellan Crowe":
-            castellan_crowe_2_relevant = True
+            self.castellan_crowe_2_relevant = True
 
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
