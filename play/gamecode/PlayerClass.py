@@ -2553,9 +2553,15 @@ class Player:
                             if card.get_ability() == "Mobilize the Chapter":
                                 self.game.create_reaction("Mobilize the Chapter Initiation", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Shadowed Thorns Venom":
+                                self.game.create_reaction("Shadowed Thorns Venom", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Munitorum Support":
                                 self.game.create_reaction("Munitorum Support", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Triarch Stalkers Procession":
+                                other_player.draw_card()
+                                other_player.draw_card()
                             if card.check_for_a_trait("Torture"):
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):
