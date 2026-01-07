@@ -37,20 +37,20 @@ def resize_files():
         os.rename(filename, new_file_name)
 
 
-def make_jpg():
+def make_jpg_all():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     path = dir_path + '/staticfiles/images/CardImages/'
-    for filename in glob.glob(path+"*.jpg"):
+    for filename in glob.glob(path+"*.png"):
         base_name = os.path.basename(filename)
         current_image, ext = os.path.splitext(base_name)
         card_name = current_image.replace("_", " ")
-        with Image.open(path + current_image + ".jpg") as im:
+        with Image.open(path + current_image + ".png") as im:
             print("Convert to jpg format: " + card_name)
             im = im.convert("RGB")
             im.save(path + current_image + ".jpg")
             # im = im.convert("RGB")
             # im.save(path + filename)
+        os.remove(path + current_image + ".png")
 
 
-resize_files()
-make_jpg()
+make_jpg_all()
