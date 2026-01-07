@@ -5,11 +5,19 @@ import os
 import copy
 
 cards_array = Initfunctions.init_player_cards()
+blackstone_array = Initfunctions.init_blackstone_player_cards()
 card_names = "CARD_NAMES"
+card_names_with_bp = "CARD_NAMES"
+authorised_blackstone_users = ["Coalback", "alex", "Echo"]
 cards_dict = {}
+blackstone_dict = {}
+for key in range(len(blackstone_array)):
+    blackstone_dict[blackstone_array[key].name] = blackstone_array[key]
 for key in range(len(cards_array)):
     cards_dict[cards_array[key].name] = cards_array[key]
-    card_names += "/" + cards_array[key].name
+    card_names_with_bp += "/" + cards_array[key].name
+    if cards_array[key].name not in blackstone_dict:
+        card_names += "/" + cards_array[key].name
 planet_cards_array = Initfunctions.init_planet_cards()
 
 
@@ -207,6 +215,8 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print(self.name)
         await self.send_stored_decks()
         message = card_names
+        if self.user.username in authorised_blackstone_users:
+            message = card_names_with_bp
         await self.send(text_data=json.dumps({"message": message}))
 
     async def send_stored_decks(self):

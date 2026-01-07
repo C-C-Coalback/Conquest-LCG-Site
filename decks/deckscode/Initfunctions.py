@@ -1,6 +1,6 @@
 from play.gamecode.Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     SpaceMarinesCardsInit, EldarCardsInit, AstraMilitarumCardsInit, TauCardsInit, DarkEldarCardsInit, \
-    TyranidsCardsInit, NecronsCardsInit
+    TyranidsCardsInit, NecronsCardsInit, BlackstoneProjectCardsInit
 
 
 def init_player_cards():
@@ -14,13 +14,19 @@ def init_player_cards():
     tyranids_card_array = TyranidsCardsInit.tyranids_cards_init()
     necrons_card_array = NecronsCardsInit.necrons_cards_init()
     neutral_card_array = NeutralCardsInit.neutral_cards_init()
+    blackstone_card_array = BlackstoneProjectCardsInit.blackstone_project_cards_init()
     final_card_array = FinalCardInit.final_card_init()
     card_array = space_marines_card_array + astra_militarum_card_array + orks_card_array + chaos_card_array + \
         dark_eldar_card_array + eldar_card_array + tau_card_array + tyranids_card_array + \
-        necrons_card_array + neutral_card_array + final_card_array
+        necrons_card_array + neutral_card_array + blackstone_card_array + final_card_array
     return card_array
 
 
 def init_planet_cards():
     planet_cards_array = PlanetCardsInit.planet_cards_init()
     return planet_cards_array
+
+
+def init_blackstone_player_cards():
+    blackstone_card_array = BlackstoneProjectCardsInit.blackstone_project_cards_init()
+    return blackstone_card_array

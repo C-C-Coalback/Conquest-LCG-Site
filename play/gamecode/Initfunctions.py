@@ -1,6 +1,6 @@
 from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     DarkEldarCardsInit, EldarCardsInit, TauCardsInit, SpaceMarinesCardsInit, AstraMilitarumCardsInit, \
-    TyranidsCardsInit, NecronsCardsInit, TokensCardsInit, ApokaErrataCardsInit
+    TyranidsCardsInit, NecronsCardsInit, TokensCardsInit, ApokaErrataCardsInit, BlackstoneProjectCardsInit
 
 
 def init_player_cards():
@@ -15,11 +15,17 @@ def init_player_cards():
     necrons_card_array = NecronsCardsInit.necrons_cards_init()
     neutral_card_array = NeutralCardsInit.neutral_cards_init()
     tokens_card_array = TokensCardsInit.tokens_cards_init()
+    blackstone_card_array = BlackstoneProjectCardsInit.blackstone_project_cards_init()
     final_card_array = FinalCardInit.final_card_init()
     card_array = space_marines_card_array + astra_militarum_card_array + orks_card_array + chaos_card_array + \
         dark_eldar_card_array + eldar_card_array + tau_card_array + tyranids_card_array + \
-        necrons_card_array + neutral_card_array + tokens_card_array + final_card_array
+        necrons_card_array + neutral_card_array + tokens_card_array + blackstone_card_array + final_card_array
     return card_array
+
+
+def init_blackstone_player_cards():
+    blackstone_card_array = BlackstoneProjectCardsInit.blackstone_project_cards_init()
+    return blackstone_card_array
 
 
 def init_planet_cards():
