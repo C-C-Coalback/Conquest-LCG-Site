@@ -819,7 +819,7 @@ class Game:
             info_string += "Searching: " + self.what_to_do_with_searched_card + "/"
             info_string += "User: " + self.name_player_who_is_searching + "/"
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
-            info_string += "Indirect damage " + str(self.p1.total_indirect_damage) + \
+            info_string += "Indirect damage: P1: " + str(self.p1.total_indirect_damage) + " P2: " + \
                            str(self.p2.total_indirect_damage) + "/"
         elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
             info_string += "Ambush discounts/God help you/"
