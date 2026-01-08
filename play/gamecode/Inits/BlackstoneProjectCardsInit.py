@@ -54,5 +54,10 @@ def blackstone_project_cards_init():
                                                               " planet.",
                                    "Fortification.", 3, "Astra Militarum", "Common", 1, False,
                                    planet_attachment=True),
+        CardClasses.ArmyCard("Mars Pattern Hellhound", "While you control a token unit at this planet, "
+                                                       "this unit cannot be routed. \n"
+                                                       "Reaction: After an enemy unit moves to an adjacent planet, "
+                                                       "move this unit to that planet.", "Vehicle. Tank. Vostroya.",
+                             4, "Astra Militarum", "Common", 3, 5, 1, False),
     ]
     return blackstone_project_cards

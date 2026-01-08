@@ -385,6 +385,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     primary_player.create_reaction("Synaptic Link", primary_player.name_player,
                                                    (int(primary_player.number), -1, -1))
         self.delete_reaction()
+    elif current_reaction == "Mars Pattern Hellhound":
+        if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+            unit_moved_there = False
+            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                if secondary_player.cards_in_play[chosen_planet + 1][i].card_moved_recently:
+                    unit_moved_there = True
+            if unit_moved_there:
+                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.delete_reaction()
     elif current_reaction == "Salvaged Battlewagon":
         if self.chosen_first_card:
             if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:

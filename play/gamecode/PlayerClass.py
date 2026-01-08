@@ -3011,6 +3011,14 @@ class Player:
             pos = random.randint(0, len(self.cards) - 1)
             self.discard_card_from_hand(pos)
 
+    def reset_movement_trackers(self):
+        self.reset_defense_batteries()
+        for i in range(len(self.headquarters)):
+            self.headquarters[i].card_moved_recently = False
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                self.cards_in_play[i + 1][j].card_moved_recently = False
+
     def reset_defense_batteries(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].valid_defense_battery_target = False
@@ -3033,6 +3041,7 @@ class Player:
                     else:
                         self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
                                                    " resources were spent due to Imperial Blockade."
+            self.headquarters[origin_position].card_moved_recently = True
             if self.headquarters[origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(destination):
                     self.headquarters[origin_position].valid_defense_battery_target = True
@@ -3070,6 +3079,20 @@ class Player:
                         if not already_reacted:
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
+            if destination != 0:
+                for i in range(len(other_player.cards_in_play[destination])):
+                    if other_player.get_ability_given_pos(destination - 1, i) == "Mars Pattern Hellhound":
+                        if not other_player.check_if_already_have_reaction_of_position("Mars Pattern Hellhound",
+                                                                                       destination - 1, i):
+                            self.game.create_reaction("Mars Pattern Hellhound", other_player.name_player,
+                                                      (int(other_player.number), destination - 1, i))
+            if destination != 6:
+                for i in range(len(other_player.cards_in_play[destination + 2])):
+                    if other_player.get_ability_given_pos(destination + 1, i) == "Mars Pattern Hellhound":
+                        if not other_player.check_if_already_have_reaction_of_position("Mars Pattern Hellhound",
+                                                                                       destination + 1, i):
+                            self.game.create_reaction("Mars Pattern Hellhound", other_player.name_player,
+                                                      (int(other_player.number), destination + 1, i))
             self.cards_in_play[destination + 1].append(copy.deepcopy(headquarters_list[origin_position]))
             new_pos = len(self.cards_in_play[destination + 1]) - 1
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
@@ -3143,6 +3166,7 @@ class Player:
                     else:
                         self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
                                                    " resources were spent due to Imperial Blockade."
+            self.cards_in_play[origin_planet + 1][origin_position].card_moved_recently = True
             if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() == "Army":
                 if self.defense_battery_check(origin_planet) or self.defense_battery_check(destination):
                     self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
@@ -3160,6 +3184,20 @@ class Player:
                         if not already_reacted:
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
+            if destination != 0:
+                for i in range(len(other_player.cards_in_play[destination])):
+                    if other_player.get_ability_given_pos(destination - 1, i) == "Mars Pattern Hellhound":
+                        if not other_player.check_if_already_have_reaction_of_position("Mars Pattern Hellhound",
+                                                                                       destination - 1, i):
+                            self.game.create_reaction("Mars Pattern Hellhound", other_player.name_player,
+                                                      (int(other_player.number), destination - 1, i))
+            if destination != 6:
+                for i in range(len(other_player.cards_in_play[destination + 2])):
+                    if other_player.get_ability_given_pos(destination + 1, i) == "Mars Pattern Hellhound":
+                        if not other_player.check_if_already_have_reaction_of_position("Mars Pattern Hellhound",
+                                                                                       destination + 1, i):
+                            self.game.create_reaction("Mars Pattern Hellhound", other_player.name_player,
+                                                      (int(other_player.number), destination + 1, i))
             for i in range(len(other_player.cards_in_play[origin_planet + 1])):
                 if other_player.get_ability_given_pos(origin_planet, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(origin_planet, i):
@@ -7187,11 +7225,22 @@ class Player:
                 return True
         return False
 
+    def search_card_type_at_planet(self, planet_id, card_type):
+        if planet_id == -2:
+            return False
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if self.get_card_type_given_pos(planet_id, i) == card_type:
+                return True
+        return False
+
     def rout_unit(self, planet_id, unit_id):
         if planet_id == -2:
             return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                return False
+        if self.get_ability_given_pos(planet_id, unit_id) == "Mars Pattern Hellhound":
+            if self.search_card_type_at_planet(planet_id, "Token"):
                 return False
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, "Disciple of Excess"):

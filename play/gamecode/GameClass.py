@@ -8610,8 +8610,8 @@ class Game:
                 for j in range(len(self.p2.cards_in_play[i + 1])):
                     self.p2.cards_in_play[i + 1][j].valid_target_ashen_banner = False
                     self.p2.cards_in_play[i + 1][j].valid_target_magus_harid = False
-            self.p1.reset_defense_batteries()
-            self.p2.reset_defense_batteries()
+            self.p1.reset_movement_trackers()
+            self.p2.reset_movement_trackers()
 
     def delete_interrupt(self):
         if self.interrupts_waiting_on_resolution:

@@ -99,6 +99,7 @@ class Card:
         self.blanked_eor_2 = False
         self.card_id = -1
         self.used_techmarine_ids = []
+        self.card_moved_recently = False
 
     def get_extra_info_string(self):
         string = ""
