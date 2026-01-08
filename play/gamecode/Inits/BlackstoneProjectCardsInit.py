@@ -65,6 +65,10 @@ def blackstone_project_cards_init():
                                                          "with 0 ATK, 1 HP and \"Action: Exhaust this unit to ready an"
                                                          " attachment at this planet.\"", "Drone.",
                                    1, "Astra Militarum", "Loyal", 2, False, required_traits="Tech-Priest",
-                                   action_in_play=True, allowed_phases_in_play="ALL", extra_command=1)
+                                   action_in_play=True, allowed_phases_in_play="ALL", extra_command=1),
+        CardClasses.EventCard("Sudden Reinforcements", "Action: Exhaust a Transport unit you control to put into play "
+                                                       "2 Guardsman tokens at the same planet.", "Tactic.",
+                              1, "Astra Militarum", "Common", 1, False, action_in_hand=True,
+                              allowed_phases_in_hand="ALL")
     ]
     return blackstone_project_cards

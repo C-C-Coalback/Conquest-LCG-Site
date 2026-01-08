@@ -630,6 +630,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
+                    elif ability == "Sudden Reinforcements":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Hate":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

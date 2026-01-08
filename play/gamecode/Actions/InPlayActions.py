@@ -2601,6 +2601,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if player_being_hit.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                 player_being_hit.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                 self.action_cleanup()
+    elif self.action_chosen == "Sudden Reinforcements":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Transport"):
+                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    primary_player.summon_token_at_planet("Guardsman", planet_pos)
+                    primary_player.summon_token_at_planet("Guardsman", planet_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
