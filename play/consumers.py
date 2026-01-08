@@ -534,6 +534,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await self.receive_game_update(
                             "Command prevented; game is in an unsafe state."
                         )
+                    elif message[1] == "unpass-combat":
+                        if active_games[self.game_position].phase == "COMBAT":
+                            active_games[self.game_position].p1.has_passed = False
+                            active_games[self.game_position].p2.has_passed = False
+                            active_games[self.game_position].reset_combat_positions()
+                            await self.receive_game_update("Unpassed both players")
                     elif message[1] == "unpass-deploy":
                         if active_games[self.game_position].phase == "DEPLOY":
                             active_games[self.game_position].p1.has_passed = False
@@ -706,6 +712,15 @@ class GameConsumer(AsyncWebsocketConsumer):
                             await active_games[self.game_position].p1.send_discard()
                         elif message[2] == "2":
                             active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
+                            await active_games[self.game_position].p2.send_hand()
+                            await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "discard-name" and len(message) > 3:
+                        if message[2] == "1":
+                            active_games[self.game_position].p1.discard_card_name_from_hand(message[3])
+                            await active_games[self.game_position].p1.send_hand()
+                            await active_games[self.game_position].p1.send_discard()
+                        elif message[2] == "2":
+                            active_games[self.game_position].p2.discard_card_name_from_hand(message[3])
                             await active_games[self.game_position].p2.send_hand()
                             await active_games[self.game_position].p2.send_discard()
                     elif message[1] == "fully-remove" and len(message) > 3:

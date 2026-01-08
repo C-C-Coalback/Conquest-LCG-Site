@@ -165,7 +165,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     for planet in range(7):
                         for j in range(len(self.p1.cards_in_play[planet + 1])):
                             self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
-                    await self.send_update_message(self.name_1 + " passes their combat/retreat turn.")
+                    if self.mode == "Normal":
+                        await self.send_update_message(self.name_1 + " passes their combat turn.")
+                    else:
+                        await self.send_update_message(self.name_1 + " passes their retreat turn.")
                 else:
                     self.number_with_combat_turn = "1"
                     self.player_with_combat_turn = self.name_1
@@ -174,7 +177,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     for planet in range(7):
                         for j in range(len(self.p2.cards_in_play[planet + 1])):
                             self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
-                    await self.send_update_message(self.name_2 + " passes their combat/retreat turn.")
+                    if self.mode == "Normal":
+                        await self.send_update_message(self.name_2 + " passes their combat turn.")
+                    else:
+                        await self.send_update_message(self.name_2 + " passes their retreat turn.")
                 if self.p1.has_passed and self.p2.has_passed:
                     if self.mode == "Normal":
                         if self.ranged_skirmish_active:
