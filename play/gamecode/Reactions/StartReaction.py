@@ -508,6 +508,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Mars Pattern Hellhound":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+        elif current_reaction == "Spray and Pray":
+            if self.spray_and_pray_amounts:
+                primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.spray_and_pray_amounts[0],
+                                                    by_enemy_unit=False)
+                del self.spray_and_pray_amounts[0]
+            self.delete_reaction()
         elif current_reaction == "Servo-Harness":
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             for i in range(len(primary_player.headquarters)):

@@ -305,6 +305,7 @@ class Game:
         self.asking_if_interrupt = False
         self.already_resolving_reaction = False
         self.already_resolving_interrupt = False
+        self.spray_and_pray_amounts = []
         self.last_search_string = ""
         self.last_deck_string_1 = ""
         self.last_deck_string_2 = ""
@@ -378,7 +379,8 @@ class Game:
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
-                                 "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD"]
+                                 "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
+                                 "Spray and Pray"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -7266,8 +7268,8 @@ class Game:
                                         took_damage = True
                                         if self.amount_that_can_be_removed_by_shield[0] == 0:
                                             took_damage = False
-                                        if primary_player.get_ability_given_pos(planet_pos,
-                                                                                unit_pos) == "Sororitas Command Squad":
+                                        if primary_player.get_ability_given_pos(
+                                                planet_pos, unit_pos) == "Sororitas Command Squad":
                                             if self.positions_attackers_of_units_to_take_damage[0]:
                                                 if not primary_player.get_once_per_phase_used_given_pos(planet_pos,
                                                                                                         unit_pos):
@@ -7278,6 +7280,18 @@ class Game:
                                                         "Sororitas Command Squad", primary_player.name_player,
                                                         self.positions_attackers_of_units_to_take_damage[0]
                                                     )
+                                        if self.positions_attackers_of_units_to_take_damage[0]:
+                                            num_atk, pla_atk, pos_atk = self.positions_attackers_of_units_to_take_damage[0]
+                                            for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
+                                                                        ][pos_atk].get_attachments())):
+                                                if secondary_player.cards_in_play[pla_atk + 1][
+                                                    pos_atk].get_attachments()[attach_pos
+                                                ].get_ability() == "Spray and Pray":
+                                                    self.create_reaction(
+                                                        "Spray and Pray", secondary_player.name_player,
+                                                        (num_atk, pla_atk,
+                                                         pos_atk))
+                                                    self.spray_and_pray_amounts.append(shields)
                                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                             for j in range(len(secondary_player.cards_in_play[
                                                                    planet_pos + 1][i].attachments)):
@@ -7788,6 +7802,20 @@ class Game:
                                             self.sororitas_command_squad_value = amount_to_remove
                                             self.create_reaction("Sororitas Command Squad", primary_player.name_player,
                                                                  self.positions_attackers_of_units_to_take_damage[0])
+                                print("pre-spray")
+                                if self.positions_attackers_of_units_to_take_damage[0]:
+                                    print("Spray check")
+                                    num_atk, pla_atk, pos_atk = self.positions_attackers_of_units_to_take_damage[0]
+                                    for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
+                                                                ][pos_atk].get_attachments())):
+                                        if secondary_player.cards_in_play[pla_atk + 1][
+                                            pos_atk].get_attachments()[attach_pos
+                                        ].get_ability() == "Spray and Pray":
+                                            self.create_reaction(
+                                                "Spray and Pray", secondary_player.name_player,
+                                                (num_atk, pla_atk,
+                                                 pos_atk))
+                                            self.spray_and_pray_amounts.append(amount_to_remove)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
                                 self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)

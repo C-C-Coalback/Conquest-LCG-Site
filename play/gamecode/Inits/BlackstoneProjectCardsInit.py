@@ -78,6 +78,13 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Sicarian Infiltrator", "Deep Strike (2). You may Deep Strike this card as an Action "
                                                      "during the combat phase. \n"
                                                      "Reaction: After you Deep Strike this unit, place 2 faith on it.",
-                             "Soldier. Skitarii.", 3, "Astra Militarum", "Loyal", 3, 2, 1, False, deepstrike=2)
+                             "Soldier. Skitarii.", 3, "Astra Militarum", "Loyal", 3, 2, 1, False, deepstrike=2),
+        CardClasses.AttachmentCard("Spray and Pray", "Attach to a Soldier army unit. \n"
+                                                     "Attached unit gains Sweep (X), where X is equal to its"
+                                                     " printed ATK. \n"
+                                                     "Forced Reaction: After damage assigned by this unit is prevented,"
+                                                     " deal damage to this unit equal to the amount prevented.",
+                                   "Tactic.", 1, "Astra Militarum", "Common", 1, False, required_traits="Soldier",
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return blackstone_project_cards
