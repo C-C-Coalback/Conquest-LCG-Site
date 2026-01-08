@@ -7430,23 +7430,26 @@ class Player:
         while self.cards_in_play[planet_id + 1]:
             self.move_unit_at_planet_to_hq(planet_id, 0)
 
+    def discard_planet_attachments(self, planet_id):
+        while self.attachments_at_planet[planet_id]:
+            ability = self.attachments_at_planet[planet_id][0].get_ability()
+            del self.attachments_at_planet[planet_id][0]
+            self.add_card_to_discard(ability)
+
     def capture_planet(self, planet_id, planet_cards):
         planet_name = self.game.original_planet_array[planet_id]
         print("Attempting to capture planet.")
         print("Planet to capture:", planet_name)
         other_player = self.get_other_player()
+        self.discard_planet_attachments(planet_id)
+        other_player.discard_planet_attachments(planet_id)
         print(planet_id)
-        print(self.broken_sigil_planet)
         if self.broken_sigil_planet == planet_id:
-            print("Broken sigil planet ok")
             if self.broken_sigil_effect:
-                print("Broken sigil effect ok")
                 self.game.create_interrupt("The Broken Sigil " + self.broken_sigil_effect, self.name_player,
                                            (int(self.number), -1, -1))
         if other_player.broken_sigil_planet == planet_id:
-            print("Broken sigil planet ok")
             if other_player.broken_sigil_effect:
-                print("Broken sigil effect ok")
                 self.game.create_interrupt("The Broken Sigil " + other_player.broken_sigil_effect, self.name_player,
                                            (int(self.number), -1, -1))
         if other_player.search_hand_for_card("Erupting Aberrants"):

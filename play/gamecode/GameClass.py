@@ -10292,6 +10292,8 @@ class Game:
         else:
             if not p1_has_units and not p2_has_units:
                 if self.round_number == self.last_planet_checked_for_battle:
+                    self.p1.discard_planet_attachments(self.last_planet_checked_for_battle)
+                    self.p2.discard_planet_attachments(self.last_planet_checked_for_battle)
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                     self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
