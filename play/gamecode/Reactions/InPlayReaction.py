@@ -1999,7 +1999,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.cato_stronghold_activated = False
                         else:
                             await self.send_update_message("Unit already ready")
-        elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
+        elif current_reaction == "Beasthunter Wyches":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
                 planet_pos = int(game_update_string[2])
@@ -2012,7 +2012,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.summon_token_at_hq("Khymera", 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Spiritseer Erathal":
+        elif current_reaction == "Devoted Enginseer":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
+                        player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Tech-Priest"):
+                    player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                    self.misc_counter = self.misc_counter - 1
+                    if self.misc_counter < 1:
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
+        elif current_reaction == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     can_continue = True

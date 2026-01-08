@@ -1774,6 +1774,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                    "gained the Embarked Squads effect!")
                     primary_player.reset_all_aiming_reticles_play_hq()
                     self.action_cleanup()
+    elif self.action_chosen == "Omnissiah's Blessing":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
+                    primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tech-Priest"):
+                if primary_player.get_has_faith_given_pos(planet_pos, unit_pos):
+                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                        self.action_cleanup()
     elif self.action_chosen == "Saint Celestine":
         if self.chosen_first_card:
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):

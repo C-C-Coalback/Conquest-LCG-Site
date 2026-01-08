@@ -1873,10 +1873,12 @@ class Player:
     def remove_all_faith_in_play(self):
         for i in range(len(self.headquarters)):
             if self.check_is_unit_at_pos(-2, i):
-                self.remove_faith_given_pos(-2, i)
+                if not self.search_attachments_at_pos(-2, i, "Servo-Harness"):
+                    self.remove_faith_given_pos(-2, i)
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
-                self.remove_faith_given_pos(i, j)
+                if not self.search_attachments_at_pos(i, j, "Servo-Harness"):
+                    self.remove_faith_given_pos(i, j)
 
     def get_sweep_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
@@ -1885,6 +1887,9 @@ class Player:
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Raiding Kabal":
             if planet_pos != self.game.round_number:
                 sweep_value += 1
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Kastelan Crusher":
+            if self.get_has_faith_given_pos(planet_pos, unit_pos):
+                sweep_value += 3
         return sweep_value
 
     def get_card_in_hand(self, position_hand):
@@ -2547,6 +2552,17 @@ class Player:
                         if self.add_to_hq(card):
                             location_of_unit = len(self.headquarters) - 1
                             print("Played card to HQ")
+                            if self.check_for_trait_given_pos(position, location_of_unit, "Vehicle"):
+                                if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
+                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED",
+                                                                     bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
+                                if self.search_card_in_hq("Dominus' Forge"):
+                                    self.game.create_reaction("Dominus' Forge", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -2670,6 +2686,17 @@ class Player:
                             if card.get_ability() == "Murder of Razorwings":
                                 self.game.create_reaction("Murder of Razorwings", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if self.check_for_trait_given_pos(position, location_of_unit, "Vehicle"):
+                                if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
+                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED",
+                                                                     bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
+                                if self.search_card_in_hq("Dominus' Forge"):
+                                    self.game.create_reaction("Dominus' Forge", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -3787,6 +3814,11 @@ class Player:
             return self.headquarters[unit_id].get_ability(bloodied_relevant=bloodied_relevant)
         return self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=bloodied_relevant)
 
+    def get_traits_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].get_traits()
+        return self.cards_in_play[planet_id + 1][unit_id].get_traits()
+
     def get_ready_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_ready()
@@ -4815,6 +4847,9 @@ class Player:
             if card.get_ability() == "Cultist":
                 if self.search_for_card_everywhere("Sivarla Soulbinder"):
                     attack_value += 1
+            if card.get_ability() == "BLANKED" and card.get_traits() == "":
+                if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
+                    attack_value += 1
             if card.get_ability() == "Neurotic Obliterator":
                 attack_value += len(card.get_attachments())
             if card.get_ability() == "Pyrrhian Eternals":
@@ -4864,6 +4899,9 @@ class Player:
             attack_value += len(self.discard)
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
+                attack_value += 1
+        if ability == "BLANKED" and card.get_traits() == "":
+            if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
                 attack_value += 1
         if ability == "Ireful Vanguard":
             warlord_pla, warlord_pos = self.get_location_of_warlord()
@@ -4966,6 +5004,11 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 attack_value += 1
+        if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum" and \
+                self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+            if self.get_has_faith_given_pos(planet_id, unit_id):
+                if self.search_card_in_hq("Dominus' Forge"):
+                    attack_value += 1
         if ability == "Gorzod's Wagons":
             if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                 attack_value += 2
@@ -5533,6 +5576,9 @@ class Player:
                 if self.search_card_in_hq("Ghosts of Cegorach"):
                     if self.check_if_all_units_have_trait("Harlequin"):
                         health += 3
+            if ability == "BLANKED" and self.get_traits_given_pos(planet_id, unit_id) == "":
+                if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
+                    health += 1
             if self.headquarters[unit_id].health_set_eop != -1:
                 return self.headquarters[unit_id].health_set_eop
             if self.get_faction_given_pos(-2, unit_id) == "Orks":
@@ -5609,6 +5655,9 @@ class Player:
                             health += 1
                         elif self.search_synapse_at_planet(planet_id):
                             health += 1
+        if ability == "BLANKED" and self.get_traits_given_pos(planet_id, unit_id) == "":
+            if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
+                health += 1
         if ability == "Ireful Vanguard":
             warlord_pla, warlord_pos = self.get_location_of_warlord()
             if self.get_bloodied_given_pos(warlord_pla, warlord_pos):
@@ -5892,6 +5941,10 @@ class Player:
                 i = i + 1
         if self.unstoppable_tide_value > 0:
             self.game.create_reaction("Unstoppable Tide", self.name_player, (int(self.number), -1, -1))
+        if phase == "HEADQUARTERS":
+            warlord_pla, warlord_pos = self.get_location_of_warlord()
+            if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Servo-Harness"):
+                self.game.create_reaction("Servo-Harness", self.name_player, (int(self.number), -1, -1))
         if phase == "DEPLOY":
             if self.erekiels_queued > 0:
                 for i in range(self.erekiels_queued):
@@ -6321,6 +6374,10 @@ class Player:
             if self.get_ability_given_pos(planet_num, i) == "Sathariel the Invokator":
                 self.game.create_reaction("Sathariel the Invokator", self.name_player,
                                           (int(self.number), planet_num, i))
+            if self.get_ability_given_pos(planet_num, i) == "Devoted Enginseer":
+                if self.get_ready_given_pos(planet_num, i):
+                    self.game.create_reaction("Devoted Enginseer", self.name_player,
+                                              (int(self.number), planet_num, i))
             for j in range(len(self.cards_in_play[planet_num + 1][i].get_attachments())):
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Royal Phylactery":
                     if self.cards_in_play[planet_num + 1][i].get_damage() > 0:

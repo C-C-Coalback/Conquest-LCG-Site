@@ -489,6 +489,36 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Forge Master Dominus":
+            primary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOG")
+            primary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOG Traits")
+            self.delete_reaction()
+        elif current_reaction == "Devoted Enginseer":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.misc_counter = 3
+        elif current_reaction == "Dominus' Forge":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
+        elif current_reaction == "Servo-Harness":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            for i in range(len(primary_player.headquarters)):
+                if warlord_pla != -2 or warlord_pos != i:
+                    if primary_player.check_for_trait_given_pos(-2, i, "Vehicle"):
+                        faith = primary_player.get_faith_given_pos(-2, i)
+                        primary_player.remove_faith_given_pos(-2, i)
+                        primary_player.increase_faith_given_pos(warlord_pla, warlord_pos, faith)
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if warlord_pla != i or warlord_pos != j:
+                        if primary_player.check_for_trait_given_pos(i, j, "Vehicle"):
+                            faith = primary_player.get_faith_given_pos(i, j)
+                            primary_player.remove_faith_given_pos(i, j)
+                            primary_player.increase_faith_given_pos(warlord_pla, warlord_pos, faith)
+            self.delete_reaction()
+        elif current_reaction == "Forge Master Dominus BLD":
+            primary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOG")
+            primary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOG Traits")
+            self.delete_reaction()
         elif current_reaction == "Patrolling Wraith":
             await secondary_player.reveal_hand()
             i = 0

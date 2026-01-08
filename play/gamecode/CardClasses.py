@@ -86,6 +86,8 @@ class Card:
         self.just_entered_play = False
         self.misc_string = ""
         self.damage = 0
+        self.blanked_traits_eog = False
+        self.blanked_eog = False
         self.actually_a_deepstrike = False
         self.deepstrike_card_name = ""
         self.not_idden_base_src = False
@@ -105,7 +107,11 @@ class Card:
         if self.blanked_eor:
             string += "Blanked (EOR)\n"
         if self.blanked_eor_2:
-            string += "BLANKED (EOR 2)\n"
+            string += "Blanked (EOR 2)\n"
+        if self.blanked_eog:
+            string += "Blanked (EOG)\n"
+        if self.blanked_traits_eog:
+            string += "Blanked Traits (EOG)\n"
         if self.extra_traits_eop:
             string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
         if self.extra_traits_eor:
@@ -234,6 +240,8 @@ class Card:
             return "BLANKED"
         if self.blanked_eor_2:
             return "BLANKED"
+        if self.blanked_eog:
+            return "BLANKED"
         if self.new_ability:
             return self.new_ability
         if bloodied_relevant:
@@ -248,6 +256,10 @@ class Card:
             self.blanked_eor = new_val
         if exp == "EOR2":
             self.blanked_eor_2 = new_val
+        if exp == "EOG":
+            self.blanked_eog = new_val
+        if exp == "EOG Traits":
+            self.blanked_traits_eog = new_val
 
     def reset_blanked_eop(self):
         self.blanked_eop = False
@@ -260,6 +272,10 @@ class Card:
         self.blanked_eor_2 = False
 
     def get_blanked(self):
+        if self.blanked_eor:
+            return self.blanked_eor
+        if self.blanked_eog:
+            return self.blanked_eog
         return self.blanked_eop
 
     def get_is_faction_limited_unique_discounter(self):
@@ -300,10 +316,14 @@ class Card:
         return self.text
 
     def get_traits(self):
+        if self.blanked_traits_eog:
+            return ""
         return self.traits
 
     def check_for_a_trait(self, trait_to_find, etekh_trait=""):
         extra_traits = ""
+        if self.blanked_traits_eog:
+            return False
         if self.get_card_type() == "Army":
             extra_traits = etekh_trait
         for i in range(len(self.attachments)):
@@ -496,7 +516,11 @@ class UnitCard(Card):
         if self.blanked_eor:
             string += "Blanked (EOR)\n"
         if self.blanked_eor_2:
-            string += "BLANKED (EOR 2)\n"
+            string += "Blanked (EOR 2)\n"
+        if self.blanked_eog:
+            string += "Blanked (EOG)\n"
+        if self.blanked_traits_eog:
+            string += "Blanked Traits (EOG)\n"
         if self.extra_traits_eop:
             string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
         if self.extra_traits_eor:
@@ -654,7 +678,7 @@ class UnitCard(Card):
 
     def get_retaliate(self):
         retaliate_value = self.retaliate
-        if self.blanked_eop:
+        if self.get_blanked():
             retaliate_value = 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Vitarus, the Sanguine Sword":
@@ -689,7 +713,7 @@ class UnitCard(Card):
         sweep = self.sweep
         if self.new_ability:
             sweep = self.new_sweep
-        if self.blanked_eop:
+        if self.get_blanked():
             sweep = 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Crown of Control":
@@ -704,7 +728,7 @@ class UnitCard(Card):
         return sweep
 
     def get_lumbering(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Traumatophobia":
@@ -725,7 +749,7 @@ class UnitCard(Card):
         return self.damage + self.not_yet_assigned_damage
 
     def get_unstoppable(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -734,7 +758,7 @@ class UnitCard(Card):
         return self.unstoppable
 
     def get_has_hive_mind(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -756,6 +780,8 @@ class UnitCard(Card):
         self.not_yet_assigned_damage = 0
 
     def get_ambush(self):
+        if self.get_blanked():
+            return False
         if self.lost_keywords_eop:
             return False
         if self.new_ability:
@@ -796,7 +822,7 @@ class UnitCard(Card):
         return self.by_base_mobile
 
     def get_mobile(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -817,23 +843,27 @@ class UnitCard(Card):
         return self.mobile
 
     def get_additional_resources_command_struggle(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return 0
         if self.new_ability:
             return self.new_additional_resources_command_struggle
         return self.additional_resources_command_struggle
 
     def get_additional_cards_command_struggle(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return 0
         if self.new_ability:
             return self.new_additional_cards_command_struggle
         return self.additional_cards_command_struggle
 
     def get_no_attachments(self):
+        if self.get_blanked():
+            return False
         return self.no_attachments
 
     def get_wargear_attachments_permitted(self):
+        if self.get_blanked():
+            return True
         return self.wargear_attachments_permitted
 
     def get_attachments(self):
@@ -848,7 +878,7 @@ class UnitCard(Card):
         self.ranged = new_val
 
     def get_ranged(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -869,8 +899,8 @@ class UnitCard(Card):
         return self.ranged
 
     def get_ignores_flying(self):
-        if self.blanked_eop:
-            return False
+        # if self.get_blanked():
+        #     return False
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Godwyn Pattern Bolter":
                 return True
@@ -883,7 +913,7 @@ class UnitCard(Card):
         return self.by_base_armorbane
 
     def get_armorbane(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -913,7 +943,7 @@ class UnitCard(Card):
         return self.by_base_area_effect
 
     def get_area_effect(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return 0
         if self.lost_keywords_eop:
             return 0
@@ -937,7 +967,7 @@ class UnitCard(Card):
         return self.by_base_flying
 
     def get_flying(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False
@@ -987,7 +1017,7 @@ class UnitCard(Card):
         self.attack = self.actual_attack
 
     def get_brutal(self):
-        if self.blanked_eop:
+        if self.get_blanked():
             return False
         if self.lost_keywords_eop:
             return False

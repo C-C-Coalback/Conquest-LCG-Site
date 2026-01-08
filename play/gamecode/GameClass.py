@@ -378,7 +378,7 @@ class Game:
                                  "Mobilize the Chapter Initiation", "Trapped Objective", "Kabal of the Ebon Law",
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
-                                 "Tras the Corrupter", "Unstoppable Tide"]
+                                 "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1

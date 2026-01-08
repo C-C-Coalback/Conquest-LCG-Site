@@ -2290,6 +2290,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
                     self.action_cleanup()
+    elif self.action_chosen == "Omnissiah's Blessing":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
+                    primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tech-Priest"):
+                if primary_player.get_has_faith_given_pos(planet_pos, unit_pos):
+                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                        self.action_cleanup()
     elif self.action_chosen == "Rally the Charge":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
