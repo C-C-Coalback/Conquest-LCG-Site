@@ -59,5 +59,12 @@ def blackstone_project_cards_init():
                                                        "Reaction: After an enemy unit moves to an adjacent planet, "
                                                        "move this unit to that planet.", "Vehicle. Tank. Vostroya.",
                              4, "Astra Militarum", "Common", 3, 5, 1, False),
+        CardClasses.AttachmentCard("Scribe Servo-Skull", "Attach to a Tech-Priest unit. \n"
+                                                         "Attached unit gains 1 command icon.\n"
+                                                         "Action: Detach this card to have it become a Drone army unit "
+                                                         "with 0 ATK, 1 HP and \"Action: Exhaust this unit to ready an"
+                                                         " attachment at this planet.\"", "Drone.",
+                                   1, "Astra Militarum", "Loyal", 2, False, required_traits="Tech-Priest",
+                                   action_in_play=True, allowed_phases_in_play="ALL", extra_command=1)
     ]
     return blackstone_project_cards

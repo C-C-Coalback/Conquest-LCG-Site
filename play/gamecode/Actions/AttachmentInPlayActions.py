@@ -95,6 +95,14 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                         action_in_play=True, allowed_phases_in_play="ALL")
                         primary_player.add_card_to_planet(card, planet_pos, triggered_card_effect=False)
                         self.action_cleanup()
+                    elif ability == "Scribe Servo-Skull":
+                        player_owning_card.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                        card = ArmyCard("Scribe Servo-Skull", "Action: Exhaust this unit to ready an"
+                                                              " attachment at this planet.", "Drone.",
+                                        1, "Astra Militarum", "Loyal", 0, 1, 0, False,
+                                        action_in_play=True, allowed_phases_in_play="ALL")
+                        primary_player.add_card_to_planet(card, planet_pos, triggered_card_effect=False)
+                        self.action_cleanup()
                     elif ability == "Pulsating Carapace":
                         if card_chosen.get_ready():
                             if primary_player.get_name_player() == self.player_with_action:
@@ -303,6 +311,13 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                 primary_player.add_resources(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_cost())
                 primary_player.cards.append(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_name())
                 del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos]
+                self.action_cleanup()
+    elif self.action_chosen == "Scribe Servo-Skull":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_ready():
+                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].ready_card()
+                self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                primary_player.clear_aiming_reticle_actioned_card()
                 self.action_cleanup()
     elif self.action_chosen == "Accelerated Gestation":
         if card_chosen.from_magus_harid and card_chosen.name_owner == primary_player.get_name_player():

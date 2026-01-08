@@ -3019,6 +3019,10 @@ class Player:
             for j in range(len(self.cards_in_play[i + 1])):
                 self.cards_in_play[i + 1][j].card_moved_recently = False
 
+    def clear_aiming_reticle_actioned_card(self):
+        pla, pos = self.game.position_of_actioned_card
+        self.reset_aiming_reticle_in_play(pla, pos)
+
     def reset_defense_batteries(self):
         for i in range(len(self.headquarters)):
             self.headquarters[i].valid_defense_battery_target = False
