@@ -1101,6 +1101,7 @@
 
         gameSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
+            document.querySelector('#chat-log').innerHTML += (`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
         };
 
         document.querySelector('#chat-message-input').focus();
