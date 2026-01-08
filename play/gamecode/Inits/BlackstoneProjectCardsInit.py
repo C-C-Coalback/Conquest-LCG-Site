@@ -42,5 +42,9 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Administratum Office", "Each unit you control with no printed command icons gains "
                                                         "1 command icon.",
                                 "Location.", 2, "Astra Militarum", "Loyal", True),
+        CardClasses.ArmyCard("Amalgamated Devotee", "This unit gets +1 ATK and +2 HP for each attachment on it. \n"
+                                                    "While this unit has 2 or more attachments it gains"
+                                                    " \"Immune to enemy events.\"", "Tech-Priest.",
+                             4, "Astra Militarum", "Loyal", 2, 3, 2, False)
     ]
     return blackstone_project_cards

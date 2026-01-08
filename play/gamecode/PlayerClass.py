@@ -3964,6 +3964,9 @@ class Player:
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster" and power:
             return True
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Amalgamated Devotee":
+            if len(self.get_all_attachments_at_pos(planet_pos, unit_pos)) > 1:
+                return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Champion of Khorne":
             if self.game.bloodthirst_active[planet_pos]:
                 return True
@@ -4855,6 +4858,8 @@ class Player:
                     attack_value += 1
             if card.get_ability() == "Neurotic Obliterator":
                 attack_value += len(card.get_attachments())
+            if card.get_ability() == "Amalgamated Devotee":
+                attack_value += len(card.get_attachments())
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
             if self.get_ability_given_pos(planet_id, unit_id) == "Tenacious Novice Squad":
@@ -4922,6 +4927,8 @@ class Player:
             if self.search_for_card_everywhere("Sivarla Soulbinder"):
                 attack_value += 1
         if ability == "Neurotic Obliterator":
+            attack_value += len(card.get_attachments())
+        if ability == "Amalgamated Devotee":
             attack_value += len(card.get_attachments())
         if ability == "Kabal of the Ebon Law":
             if planet_id != self.game.round_number:
@@ -5596,6 +5603,8 @@ class Player:
                     health += 4
             if ability == "Neurotic Obliterator":
                 health += len(self.headquarters[unit_id].get_attachments())
+            if ability == "Amalgamated Devotee":
+                health += 2 * len(self.headquarters[unit_id].get_attachments())
             if ability == "Improbable Runt Machine":
                 health += min(len(self.headquarters[unit_id].get_attachments()), 3)
             if ability == "Tenacious Novice Squad":
@@ -5696,6 +5705,8 @@ class Player:
                     health += 2
         if ability == "Neurotic Obliterator":
             health += len(card.get_attachments())
+        if ability == "Amalgamated Devotee":
+            health += 2 * len(card.get_attachments())
         if ability == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health = health - 2
