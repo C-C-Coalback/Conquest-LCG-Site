@@ -1345,9 +1345,18 @@ class Player:
                         highest_cost = cost
         return highest_cost
 
+    def search_planet_attachments(self, planet_id, ability):
+        for i in range(len(self.attachments_at_planet[planet_id])):
+            if self.attachments_at_planet[planet_id][i].get_ability() == ability:
+                return True
+        return False
+
     def get_ranged_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_ranged()
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Guardsman":
+            if self.search_planet_attachments(planet_id, "Planetary Defence Force"):
+                return True
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Termagant Spikers":
@@ -7156,6 +7165,8 @@ class Player:
         if can_forward_barracks:
             if self.search_card_in_hq("Forward Barracks"):
                 self.game.create_reaction("Forward Barracks", self.name_player, (int(self.number), planet_id, -1))
+        if self.search_planet_attachments(planet_id, "Planetary Defence Force"):
+            self.game.create_reaction("Planetary Defence Force", self.name_player, (int(self.number), planet_id, -1))
         if self.game.get_green_icon(planet_id):
             for i in range(7):
                 if i != planet_id:

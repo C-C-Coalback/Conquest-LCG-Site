@@ -45,6 +45,14 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Amalgamated Devotee", "This unit gets +1 ATK and +2 HP for each attachment on it. \n"
                                                     "While this unit has 2 or more attachments it gains"
                                                     " \"Immune to enemy events.\"", "Tech-Priest.",
-                             4, "Astra Militarum", "Loyal", 2, 3, 2, False)
+                             4, "Astra Militarum", "Loyal", 2, 3, 2, False),
+        CardClasses.AttachmentCard("Planetary Defence Force", "Attach to a planet.\n"
+                                                              "Each Guardsman token you control at this planet gains"
+                                                              " the Ranged keyword.\n"
+                                                              "Reaction: After a combat round ends at this planet, put"
+                                                              " a Guardsman token into play under your control at this"
+                                                              " planet.",
+                                   "Fortification.", 3, "Astra Militarum", "Common", 1, False,
+                                   planet_attachment=True),
     ]
     return blackstone_project_cards
