@@ -69,6 +69,11 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Sudden Reinforcements", "Action: Exhaust a Transport unit you control to put into play "
                                                        "2 Guardsman tokens at the same planet.", "Tactic.",
                               1, "Astra Militarum", "Common", 1, False, action_in_hand=True,
-                              allowed_phases_in_hand="ALL")
+                              allowed_phases_in_hand="ALL"),
+        CardClasses.EventCard("Unending Barrage", "Headquarters Action: Exhaust any number of Artillery cards you "
+                                                  "control. For each card exhausted, deal 1 damage to a target "
+                                                  "non-warlord unit in a player's headquarters.", "Tactic.",
+                              1, "Astra Militarum", "Loyal", 2, False, action_in_hand=True,
+                              allowed_phases_in_hand="HEADQUARTERS")
     ]
     return blackstone_project_cards

@@ -1763,6 +1763,22 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
                     if primary_player.sacrifice_card_in_hq(unit_pos):
                         self.chosen_first_card = True
+    elif self.action_chosen == "Unending Barrage":
+        if primary_player.get_number() == game_update_string[1]:
+            if not self.chosen_first_card:
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Artillery"):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.misc_counter += 1
+                        await self.send_update_message("Total artillery: " + str(self.misc_counter))
+        else:
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                if secondary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    if not secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                        self.misc_counter = self.misc_counter - 1
+                        if self.misc_counter < 1:
+                            self.action_cleanup()
     elif self.action_chosen == "Embarked Squads":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):

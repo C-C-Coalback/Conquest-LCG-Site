@@ -2609,6 +2609,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.summon_token_at_planet("Guardsman", planet_pos)
                     primary_player.summon_token_at_planet("Guardsman", planet_pos)
                     self.action_cleanup()
+    elif self.action_chosen == "Unending Barrage":
+        if primary_player.get_number() == game_update_string[1]:
+            if not self.chosen_first_card:
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Artillery"):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.misc_counter += 1
+                        await self.send_update_message("Total artillery: " + str(self.misc_counter))
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
