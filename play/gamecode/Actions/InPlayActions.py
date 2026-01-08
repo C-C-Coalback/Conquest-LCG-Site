@@ -2617,6 +2617,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.misc_counter += 1
                         await self.send_update_message("Total artillery: " + str(self.misc_counter))
+    elif self.action_chosen == "Lucky Shot":
+        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+            if player_owning_card.get_ranged_given_pos(planet_pos, unit_pos):
+                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = True
+                self.action_cleanup()
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(

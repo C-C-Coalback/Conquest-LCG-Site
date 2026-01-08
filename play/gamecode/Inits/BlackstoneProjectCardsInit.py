@@ -85,6 +85,9 @@ def blackstone_project_cards_init():
                                                      "Forced Reaction: After damage assigned by this unit is prevented,"
                                                      " deal damage to this unit equal to the amount prevented.",
                                    "Tactic.", 1, "Astra Militarum", "Common", 1, False, required_traits="Soldier",
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Lucky Shot", "Action: Until the end of the phase, a target Ranged unit gets +1 "
+                                            "ATK and Armorbane.", "Tactic.", 1, "Astra Militarum", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return blackstone_project_cards

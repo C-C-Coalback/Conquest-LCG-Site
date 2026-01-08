@@ -1790,6 +1790,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                    "gained the Embarked Squads effect!")
                     primary_player.reset_all_aiming_reticles_play_hq()
                     self.action_cleanup()
+    elif self.action_chosen == "Lucky Shot":
+        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
+            if player_owning_card.get_ranged_given_pos(planet_pos, unit_pos):
+                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+                player_owning_card.headquarters[unit_pos].armorbane_eop = True
+                self.action_cleanup()
     elif self.action_chosen == "Omnissiah's Blessing":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
