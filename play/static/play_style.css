@@ -258,24 +258,30 @@ h4 {
 .Exhausted-Planet-Attachment-Card {
     position: absolute;
     pointer-events:auto;
-    height: 4vh;
-    width: 2.6vw;
+    width: 4vh;
+    height: 2.6vw;
 }
 
-.Planet-Attachment-Card + .Planet-Attachment-Card {
-    margin-left: 1vw;
+.attachments-planet-2 {
+    position:absolute;
+    height:calc(4vh + 15px);
+    width:10vw;
+    pointer-events:none;
+    overflow-x:auto;
+    overflow-y:hidden;
+    top:0%;
+    left:0;
 }
 
-.Planet-Attachment-Card + .Exhausted-Planet-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Planet-Attachment-Card + .Planet-Attachment-Card {
-    margin-left: 1vw;
-}
-
-.Exhausted-Planet-Attachment-Card + .Exhausted-Planet-Attachment-Card {
-    margin-left: 1vw;
+.attachments-planet-1 {
+    position:absolute;
+    height:calc(4vh + 15px);
+    width:10vw;
+    pointer-events:none;
+    overflow-x:auto;
+    overflow-y:hidden;
+    bottom:0%;
+    right:0;
 }
 
 .aiming-reticle {
@@ -601,30 +607,6 @@ summary::-webkit-details-marker {
 
 summary:focus {
   outline-style: none;
-}
-
-.attachments-planet-2 {
-    position:absolute;
-    height:calc(4vh + 15px);
-    width:3vw;
-    pointer-events:none;
-    max-width:5vw;
-    overflow-x:auto;
-    overflow-y:hidden;
-    top:0%;
-    left:0;
-}
-
-.attachments-planet-1 {
-    position:absolute;
-    height:calc(4vh + 15px);
-    width:3vw;
-    pointer-events:none;
-    max-width:5vw;
-    overflow-x:auto;
-    overflow-y:hidden;
-    bottom:0%;
-    right:0;
 }
 
 #current-deck-player-2 {

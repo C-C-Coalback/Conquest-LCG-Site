@@ -437,12 +437,15 @@
                                     var attachment_class = "Planet-Attachment-Card";
                                     attachment_string_id = "ATTACHMENT/PLANETS/1/" + (i-2).toString() + "/" + attachment_string_id;
                                     var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
-                                    var attachment_rotation = "";
+                                    var attachment_style = " style='";
                                     if (attachment_ready === "E") {
                                         attachment_class = "Exhausted-Planet-Attachment-Card";
-                                        attachment_rotation = " style='transform:rotate(90deg);'"
+                                        attachment_style += "transform:rotate(90deg); ";
                                     }
-                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                    attachment_style += "margin-left:";
+                                    attachment_style += (8.4 - (attachments_p1_data.length - j)).toString();
+                                    attachment_style += "vw; '";
+                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                                 }
                             }
                             full_string += `</div><div class="attachments-planet-2">`;
@@ -457,12 +460,15 @@
                                     var attachment_class = "Planet-Attachment-Card";
                                     attachment_string_id = "ATTACHMENT/PLANETS/2/" + (i-2).toString() + "/" + attachment_string_id;
                                     var attachment_route_text = "/static/images/CardImages/" + attachment_name.split(' ').join('_') + ".jpg";
-                                    var attachment_rotation = "";
+                                    var attachment_style = " style='";
                                     if (attachment_ready === "E") {
                                         attachment_class = "Exhausted-Planet-Attachment-Card";
-                                        attachment_rotation = " style='transform:rotate(90deg);'"
+                                        attachment_style += "transform:rotate(90deg); ";
                                     }
-                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_rotation + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                    attachment_style += "margin-left:";
+                                    attachment_style += (j).toString();
+                                    attachment_style += "vw; '";
+                                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                                 }
                             }
                             full_string += `</div></div>`;
