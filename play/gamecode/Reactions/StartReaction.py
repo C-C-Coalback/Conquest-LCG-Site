@@ -502,6 +502,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Planetary Defence Force":
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Sicarian Infiltrator":
+            primary_player.increase_faith_given_pos(planet_pos, unit_pos, 2)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Mars Pattern Hellhound":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Servo-Harness":

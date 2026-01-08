@@ -796,6 +796,9 @@ class Player:
             if ability == "Slavering Mawloc":
                 self.game.create_reaction("Slavering Mawloc", self.name_player,
                                           (int(self.number), planet_id, last_element_index))
+            if ability == "Sicarian Infiltrator":
+                self.game.create_reaction("Sicarian Infiltrator", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
             if ability == "Scorpion Striker":
                 self.game.create_reaction("Scorpion Striker", self.name_player,
                                           (int(self.number), planet_id, last_element_index))

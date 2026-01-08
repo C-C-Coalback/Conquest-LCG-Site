@@ -74,6 +74,10 @@ def blackstone_project_cards_init():
                                                   "control. For each card exhausted, deal 1 damage to a target "
                                                   "non-warlord unit in a player's headquarters.", "Tactic.",
                               1, "Astra Militarum", "Loyal", 2, False, action_in_hand=True,
-                              allowed_phases_in_hand="HEADQUARTERS")
+                              allowed_phases_in_hand="HEADQUARTERS"),
+        CardClasses.ArmyCard("Sicarian Infiltrator", "Deep Strike (2). You may Deep Strike this card as an Action "
+                                                     "during the combat phase. \n"
+                                                     "Reaction: After you Deep Strike this unit, place 2 faith on it.",
+                             "Soldier. Skitarii.", 3, "Astra Militarum", "Loyal", 3, 2, 1, False, deepstrike=2)
     ]
     return blackstone_project_cards
