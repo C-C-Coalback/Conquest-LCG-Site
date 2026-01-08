@@ -603,7 +603,7 @@ summary:focus {
   outline-style: none;
 }
 
-.attachments-planet-2 {
+.attachments-planet-1 {
     position:absolute;
     height:calc(4vh + 15px);
     width:3vw;
@@ -615,7 +615,7 @@ summary:focus {
     left:0;
 }
 
-.attachments-planet-1 {
+.attachments-planet-2 {
     position:absolute;
     height:calc(4vh + 15px);
     width:3vw;
