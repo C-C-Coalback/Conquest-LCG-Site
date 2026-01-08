@@ -918,8 +918,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.misc_counter = 4
                     elif ability == "Preemptive Barrage":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.misc_target_planet = -1
                         self.misc_counter = 3
                     elif ability == "Promise of Glory":

@@ -1570,23 +1570,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.action_cleanup()
     elif self.action_chosen == "Preemptive Barrage":
         if game_update_string[1] == primary_player.get_number():
-            if self.misc_target_planet == -1:
+            if self.misc_target_planet == -1 or self.misc_target_planet == planet_pos:
                 if card_chosen.get_faction() == "Astra Militarum":
                     card_chosen.ranged_eop = True
                     self.misc_target_planet = planet_pos
                     self.misc_counter -= 1
                     await self.send_update_message(str(self.misc_counter) + " uses left")
-            elif self.misc_target_planet == planet_pos:
-                if card_chosen.get_faction() == "Astra Militarum":
-                    card_chosen.ranged_eop = True
-                    self.misc_counter -= 1
-                    await self.send_update_message(str(self.misc_counter) + " uses left")
                     if self.misc_counter == 0:
-                        self.action_chosen = ""
-                        self.player_with_action = ""
-                        self.mode = "Normal"
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
+                        self.action_cleanup()
     elif self.action_chosen == "Gauss Flayer":
         if secondary_player.get_number() == game_update_string[1]:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
