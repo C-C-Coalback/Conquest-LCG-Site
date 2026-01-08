@@ -39,5 +39,8 @@ def blackstone_project_cards_init():
                                                   "Reaction: After you deploy a Vehicle unit, place 1 Faith "
                                                   "token on it.",
                                 "Location.", 2, "Astra Militarum", "Signature", False),
+        CardClasses.SupportCard("Administratum Office", "Each unit you control with no printed command icons gains "
+                                                        "1 command icon.",
+                                "Location.", 2, "Astra Militarum", "Loyal", True),
     ]
     return blackstone_project_cards

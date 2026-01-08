@@ -3546,6 +3546,9 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_command()
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
+        if self.cards_in_play[planet_id + 1][unit_id].command == 0:
+            if self.search_card_in_hq("Administratum Office"):
+                command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.check_for_trait_given_pos(planet_id, i, "Ethereal"):
