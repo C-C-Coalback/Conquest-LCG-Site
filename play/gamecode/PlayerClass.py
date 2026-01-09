@@ -4999,6 +4999,11 @@ class Player:
             attack_value = self.get_health_given_pos(planet_id, unit_id) - \
                            self.get_damage_given_pos(planet_id, unit_id)
             return attack_value
+        if ability == "Immature Squig":
+            for j in range(len(self.cards_in_play[planet_id + 1])):
+                if j != unit_id:
+                    if self.check_for_trait_given_pos(planet_id, j, "Squig"):
+                        attack_value += 1
         if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
         if ability != "Knight Paladin Voris":

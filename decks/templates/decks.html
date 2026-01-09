@@ -121,7 +121,11 @@
         var e = document.getElementById(countName);
         if (typeof(e) != 'undefined' && e != null) {
             var str = e.innerHTML;
-            if (str[2] !== "3") {
+            var max_copies = "3";
+            if (idName === "Immature_Squig") {
+                max_copies = "6";
+            }
+            if (str[2] !== max_copies) {
                 str = incrementString(str);
                 e.innerHTML = str;
             }
@@ -247,9 +251,13 @@
                 var countName = idName + "-Count";
                 var holderName = idName + "-Holder";
                 var e = document.getElementById(countName);
+                var max_copies = "3";
+                if (idName === "Immature_Squig") {
+                    max_copies = "6";
+                }
                 if (typeof(e) != 'undefined' && e != null) {
                     var str = e.innerHTML;
-                    if (str[2] !== "3") {
+                    if (str[2] !== max_copies) {
                         str = incrementString(str);
                         e.innerHTML = str;
                     }

@@ -134,7 +134,10 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
             current_amount = deck[current_index][0]
             try:
                 card_count += int(current_amount)
-                if int(current_amount) > 3:
+                max_copies = 3
+                if current_name == "Immature Squig":
+                    max_copies = 6
+                if int(current_amount) > max_copies:
                     print("Too many copies")
                     return "Too many copies: " + current_name
             except ValueError:

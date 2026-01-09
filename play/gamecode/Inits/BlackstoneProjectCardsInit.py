@@ -165,6 +165,10 @@ def blackstone_project_cards_init():
                              "Creature. Squig.", 4, "Orks", "Loyal", 0, 6, 0, False, no_attachments=True),
         CardClasses.ArmyCard("Abrasive Squigherder", "Action: Exhaust this unit to Rally 6 a card with the Squig "
                                                      "trait, add it to your hand.", "Oddboy.",
-                             2, "Orks", "Common", 1, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL")
+                             2, "Orks", "Common", 1, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Immature Squig", "No Attachments.\n"
+                                               "You may include up to 6 copies of this card in your deck. \n"
+                                               "This unit gets +1 ATK for every other Squig unit at this planet.",
+                             "Creature. Squig.", 2, "Orks", "Common", 1, 3, 0, False)
     ]
     return blackstone_project_cards
