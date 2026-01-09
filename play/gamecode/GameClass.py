@@ -6979,12 +6979,6 @@ class Game:
                                          (int(primary_player.number), planet_pos, unit_pos))
                 if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
                     self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
-            if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound"):
-                    self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                         (int(primary_player.number), planet_pos, unit_pos))
-                    if not primary_player.hit_by_gorgul:
-                        self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
             if primary_player.get_card_type_given_pos(
                     planet_pos, unit_pos) == "Army":
                 if secondary_player.search_attachments_at_pos(
@@ -7076,13 +7070,6 @@ class Game:
                                     if not primary_player.check_if_already_have_reaction("Vow of Honor"):
                                         self.create_reaction("Vow of Honor", primary_player.name_player,
                                                              (int(primary_player.number), -1, -1))
-                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                            if primary_player.search_card_at_planet(planet_pos, "Ba'ar Zul the Hate-Bound",
-                                                                    bloodied_relevant=True):
-                                self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                     (int(primary_player.number), planet_pos, unit_pos))
-                                if not primary_player.hit_by_gorgul:
-                                    self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif not self.damage_is_preventable[0]:
                 await self.send_update_message("Damage is not preventable; you must pass")
@@ -7409,19 +7396,6 @@ class Game:
                                                                                      primary_player.name_player,
                                                                                      (int(primary_player.number),
                                                                                       -1, -1))
-                                                if primary_player.get_ability_given_pos(
-                                                        planet_pos, unit_pos) != "Ba'ar Zul the Hate-Bound":
-                                                    if primary_player.search_card_at_planet(
-                                                            planet_pos, "Ba'ar Zul the Hate-Bound",
-                                                            bloodied_relevant=True):
-                                                        self.create_reaction("Ba'ar Zul the Hate-Bound",
-                                                                             primary_player.name_player,
-                                                                             (
-                                                                                 int(primary_player.number), planet_pos,
-                                                                                 unit_pos))
-                                                        if not primary_player.hit_by_gorgul:
-                                                            self.damage_amounts_baarzul.append(
-                                                                self.amount_that_can_be_removed_by_shield[0])
                                             if primary_player.get_ability_given_pos(
                                                     planet_pos, unit_pos) == "Zogwort's Runtherders":
                                                 self.create_reaction("Zogwort's Runtherders",
@@ -8769,6 +8743,13 @@ class Game:
                                 primary_player.remove_damage_from_pos(def_pla, def_pos, 1)
                                 self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
                                                       (int(primary_player.number), -1, -1))
+                if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
+                    if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
+                                                            bloodied_relevant=True):
+                        if not primary_player.hit_by_gorgul:
+                            self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                 (int(primary_player.number), def_pla, def_pos))
+                            self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                 player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
                 secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
