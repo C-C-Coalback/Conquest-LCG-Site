@@ -517,6 +517,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Imperial Fists Apothecary":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Grey Hunters":
             if int(num) == 1:
                 self.p1.destroy_card_in_play(planet_pos, unit_pos)

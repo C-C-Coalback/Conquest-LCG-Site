@@ -122,6 +122,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Aurora Predator", "No Wargear Attachments.\n"
                                                 "While this unit has faith it gets +3 ATK.",
                              "Vehicle. Grey Knights. Elite.", 5, "Space Marines", "Common", 4, 6, 1, False,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Imperial Fists Apothecary", "Reaction: After a Space Marines unit you control at this "
+                                                          "planet is destroyed, gain 1 resource. "
+                                                          "(Limit once per phase)", "Scholar. Imperial Fists.",
+                             2, "Space Marines", "Loyal", 1, 2, 2, False)
     ]
     return blackstone_project_cards
