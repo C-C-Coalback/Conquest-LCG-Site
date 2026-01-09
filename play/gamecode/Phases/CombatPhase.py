@@ -1406,6 +1406,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 secondary_player.cards_in_play[self.defender_planet + 1][
                                     self.defender_position].valid_sweep_target = False
                                 print("unit is no longer a valid sweep target")
+                                self.card_type_defender = secondary_player.get_card_type_given_pos(
+                                    self.defender_planet, self.defender_position)
+                                self.defender_is_also_warlord = \
+                                    primary_player.name_player in \
+                                    secondary_player.cards_in_play[self.defender_planet + 1
+                                    ][self.defender_position].hit_by_frenzied_wulfen_names
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position)
                                 if primary_player.get_ability_given_pos(self.attacker_planet,

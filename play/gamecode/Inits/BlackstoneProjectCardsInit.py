@@ -144,5 +144,10 @@ def blackstone_project_cards_init():
                                                         "at this planet has -1 ATK.", "Skill.",
                                    1, "Space Marines", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
                                    required_traits="Soldier", limit_one_per_unit=True),
+        CardClasses.ArmyCard("Ravenwing Dark Talons", "No Wargear Attachments. Flying.\n"
+                                                      "Reaction: After this unit resolves an attack against a warlord "
+                                                      "unit, this unit gets +1 ATK and +1 HP until the end of the"
+                                                      " game.", "Vehicle. Raven Guard.", 2, "Space Marines",
+                             "Loyal", 1, 2, 1, False, wargear_attachments_permitted=False, flying=True)
     ]
     return blackstone_project_cards

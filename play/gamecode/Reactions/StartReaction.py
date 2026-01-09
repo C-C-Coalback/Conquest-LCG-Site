@@ -513,6 +513,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Ravenwing Dark Talons":
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Fenrisian Wolf Pack":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

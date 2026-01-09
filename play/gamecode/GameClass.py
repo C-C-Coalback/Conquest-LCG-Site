@@ -422,6 +422,8 @@ class Game:
         self.resolving_nurgling_bomb = False
         self.player_resolving_nurgling_bomb = ""
         self.auto_card_destruction = True
+        self.card_type_defender = ""
+        self.defender_is_also_warlord = False
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
         self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia",
@@ -9876,6 +9878,9 @@ class Game:
                                 self.create_reaction("Rail Rifle", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Fierce Purgator":
                                 self.create_reaction("Fierce Purgator", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Ravenwing Dark Talons":
+                                if self.card_type_defender == "Warlord" or self.defender_is_also_warlord:
+                                    self.create_reaction("Ravenwing Dark Talons", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Furious Wraithblade":
                                 if not self.p1.get_once_per_phase_used_given_pos(planet, i):
                                     self.create_reaction("Furious Wraithblade", self.name_1, (1, planet, i))
@@ -9959,6 +9964,9 @@ class Game:
                                 self.create_reaction("Heavy Flamer Retributor", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "The Masque":
                                 self.create_reaction("The Masque", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Ravenwing Dark Talons":
+                                if self.card_type_defender == "Warlord" or self.defender_is_also_warlord:
+                                    self.create_reaction("Ravenwing Dark Talons", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Junk Chucka Kommando":
                                 self.create_reaction("Junk Chucka Kommando", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Morkanaut Rekuperator":
@@ -9990,6 +9998,8 @@ class Game:
                 self.sweep_active = False
                 self.p1.reset_resolving_attacks_everywhere()
                 self.p2.reset_resolving_attacks_everywhere()
+                self.card_type_defender = ""
+                self.defender_is_also_warlord = False
                 self.need_to_move_to_hq = False
                 self.unit_will_move_after_attack = False
             if not self.attack_being_resolved and not self.reactions_needing_resolving and not \
