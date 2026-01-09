@@ -8,7 +8,7 @@ cards_array = Initfunctions.init_player_cards()
 blackstone_array = Initfunctions.init_blackstone_player_cards()
 card_names = "CARD_NAMES"
 card_names_with_bp = "CARD_NAMES"
-authorised_blackstone_users = ["Coalback", "alex", "Echo"]
+authorised_blackstone_users = ["Coalback", "alex", "Echo", "i0Predator0i"]
 cards_dict = {}
 blackstone_dict = {}
 for key in range(len(blackstone_array)):
