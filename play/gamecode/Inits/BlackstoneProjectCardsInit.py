@@ -99,6 +99,8 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Launch Pads", "Combat Action: Exhaust this support to deploy a Space Marines unit"
                                                " with a printed cost of exactly 3 from your hand at a planet.",
                                 "Upgrade.", 2, "Space Marines", "Common", False, action_in_play=True,
-                                allowed_phases_in_play="COMBAT")
+                                allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Orbital Relay", "Interrupt: When you deploy a support card, reduce its cost by 1.",
+                                "Upgrade.", 2, "Space Marines", "Common", False)
     ]
     return blackstone_project_cards

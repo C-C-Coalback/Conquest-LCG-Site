@@ -2534,6 +2534,11 @@ class Player:
             if position == -2:
                 print("Play card to HQ")
                 print(card.get_limited(), self.can_play_limited)
+                if card.get_card_type() == "Support":
+                    for i in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, i) == "Orbital Relay":
+                            cost = cost - 1
+                cost = max(cost, 0)
                 if card.get_limited():
                     if self.can_play_limited:
                         if self.spend_resources(cost):
