@@ -138,6 +138,11 @@ def blackstone_project_cards_init():
                                                "It has shield icons equal to 2 + the number of tokens on it.\n"
                                                "Reaction: After your opponent places a planet in their victory display,"
                                                " place 1 resource on this support.", "Location. Imperial Fists.",
-                                1, "Space Marines", "Loyal", True)
+                                1, "Space Marines", "Loyal", True),
+        CardClasses.AttachmentCard("Imposing Presence", "Attach to a Soldier army unit. Limit 1 per unit.\n"
+                                                        "While attached unit is ready, each enemy army and token unit "
+                                                        "at this planet has -1 ATK.", "Skill.",
+                                   1, "Space Marines", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   required_traits="Soldier", limit_one_per_unit=True),
     ]
     return blackstone_project_cards

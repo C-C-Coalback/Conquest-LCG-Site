@@ -4986,6 +4986,11 @@ class Player:
                     found_praetorian_shadow = True
             if found_praetorian_shadow:
                 attack_value += 1
+        elif card.get_card_type() in ["Army", "Token"]:
+            for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                if other_player.get_ready_given_pos(planet_id, i):
+                    if other_player.search_attachments_at_pos(planet_id, i, "Imposing Presence"):
+                        attack_value = attack_value - 1
         if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
         if ability != "Knight Paladin Voris":
