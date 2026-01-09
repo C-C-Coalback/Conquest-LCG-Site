@@ -159,6 +159,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Shok Troopa", "Retaliate (1).\n"
                                             "Forced Interrupt: When this unit leaves play, deal 1 damage to "
                                             "each unit at this planet.", "Scout. Boyz. Ally.",
-                             1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1)
+                             1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1),
+        CardClasses.ArmyCard("Cowardly Squig", "No Attachments. \n"
+                                               "This unit's ATK is equal to its remaining HP.",
+                             "Creature. Squig.", 4, "Orks", "Loyal", 0, 6, 0, False, no_attachments=True)
     ]
     return blackstone_project_cards

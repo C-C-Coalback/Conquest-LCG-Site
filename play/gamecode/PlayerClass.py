@@ -4930,6 +4930,10 @@ class Player:
             if card.get_ability() == "Praetorian Ancient":
                 if self.count_units_in_discard() > 5:
                     attack_value += 2
+            if card.get_ability() == "Cowardly Squig":
+                attack_value = self.get_health_given_pos(planet_id, unit_id) -\
+                               self.get_damage_given_pos(planet_id, unit_id)
+                return attack_value
             if card.get_ability() == "Eloquent Confessor":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     attack_value += 1
@@ -4991,6 +4995,10 @@ class Player:
                 if other_player.get_ready_given_pos(planet_id, i):
                     if other_player.search_attachments_at_pos(planet_id, i, "Imposing Presence"):
                         attack_value = attack_value - 1
+        if ability == "Cowardly Squig":
+            attack_value = self.get_health_given_pos(planet_id, unit_id) - \
+                           self.get_damage_given_pos(planet_id, unit_id)
+            return attack_value
         if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
         if ability != "Knight Paladin Voris":
