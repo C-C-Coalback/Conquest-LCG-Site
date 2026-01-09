@@ -162,6 +162,9 @@ def blackstone_project_cards_init():
                              1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1),
         CardClasses.ArmyCard("Cowardly Squig", "No Attachments. \n"
                                                "This unit's ATK is equal to its remaining HP.",
-                             "Creature. Squig.", 4, "Orks", "Loyal", 0, 6, 0, False, no_attachments=True)
+                             "Creature. Squig.", 4, "Orks", "Loyal", 0, 6, 0, False, no_attachments=True),
+        CardClasses.ArmyCard("Abrasive Squigherder", "Action: Exhaust this unit to Rally 6 a card with the Squig "
+                                                     "trait, add it to your hand.", "Oddboy.",
+                             2, "Orks", "Common", 1, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return blackstone_project_cards
