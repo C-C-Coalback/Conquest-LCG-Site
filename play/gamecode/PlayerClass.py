@@ -86,6 +86,7 @@ class Player:
         self.aiming_reticle_color_discard = "blue"
         self.can_play_limited = True
         self.number_cards_to_search = 0
+        self.phalanx_shield_value = 0
         self.mobile_resolved = True
         self.indirect_damage_applied = 0
         self.total_indirect_damage = 0
@@ -542,6 +543,8 @@ class Player:
                 elif current_card.get_name() == "Hive Ship Tendrils":
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Promethium Mine":
+                    single_card_string += str(current_card.counter)
+                elif current_card.get_name() == "The Phalanx":
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "World Engine Beam":
                     single_card_string += str(current_card.counter)
@@ -1314,6 +1317,8 @@ class Player:
                     shields = 2
         if card_object.get_name() == "Humanity's Shield":
             shields = 2
+        if card_object.get_name() == "The Phalanx":
+            shields = self.phalanx_shield_value
         if card_object.get_name() == "Dal'yth Sept":
             if self.dalyth_sept_active:
                 shields = 4
@@ -7566,6 +7571,9 @@ class Player:
         for i in range(len(other_player.headquarters)):
             if other_player.get_ability_given_pos(-2, i) == "Dal'yth Sept":
                 self.game.create_reaction("Dal'yth Sept", other_player.name_player,
+                                          (int(other_player.number), -2, i))
+            if other_player.get_ability_given_pos(-2, i) == "The Phalanx":
+                self.game.create_reaction("The Phalanx", other_player.name_player,
                                           (int(other_player.number), -2, i))
         for letter in planet_name:
             if letter == "_":

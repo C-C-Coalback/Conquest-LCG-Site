@@ -7514,6 +7514,12 @@ class Game:
                             if self.damage_can_be_shielded[0]:
                                 primary_player.cards.append("Humanity's Shield")
                                 del primary_player.headquarters[hq_pos]
+                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "The Phalanx":
+                            if self.damage_can_be_shielded[0]:
+                                card_phalanx = primary_player.headquarters[hq_pos]
+                                primary_player.phalanx_shield_value = card_phalanx.damage + card_phalanx.counter + 2
+                                primary_player.cards.append("The Phalanx")
+                                del primary_player.headquarters[hq_pos]
                         elif primary_player.get_ability_given_pos(-2, hq_pos) == "Dal'yth Sept":
                             if primary_player.dalyth_sept_active and self.damage_can_be_shielded[0]:
                                 primary_player.cards.append("Dal'yth Sept")
@@ -8724,6 +8730,8 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
         primary_player.reset_card_name_misc_ability("Noble Shining Spears")
         secondary_player.reset_card_name_misc_ability("Noble Shining Spears")
+        primary_player.phalanx_shield_value = 0
+        secondary_player.phalanx_shield_value = 0
         if not self.retaliate_used:
             if self.amount_that_can_be_removed_by_shield[0] > 2:
                 player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]

@@ -519,6 +519,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Bladeguard Veteran Squad":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+        elif current_reaction == "The Phalanx":
+            primary_player.headquarters[unit_pos].increment_counter()
+            self.delete_reaction()
         elif current_reaction == "Iron Hands Platoon":
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
             self.delete_reaction()

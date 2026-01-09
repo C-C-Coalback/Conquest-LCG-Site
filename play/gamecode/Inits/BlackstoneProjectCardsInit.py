@@ -133,6 +133,11 @@ def blackstone_project_cards_init():
                              "Soldier. Ultramarines.", 3, "Space Marines", "Common", 3, 3, 1, False),
         CardClasses.ArmyCard("Iron Hands Platoon", "Reaction: After an enemy army unit with 2 or more printed command "
                                                    "icons enters play at this planet, deal 1 damage to that unit.",
-                             "Soldier. Iron Hands.", 2, "Space Marines", "Common", 2, 3, 1, False)
+                             "Soldier. Iron Hands.", 2, "Space Marines", "Common", 2, 3, 1, False),
+        CardClasses.SupportCard("The Phalanx", "This support can be used as a shield card while it is in play. "
+                                               "It has shield icons equal to 2 + the number of tokens on it.\n"
+                                               "Reaction: After your opponent places a planet in their victory display,"
+                                               " place 1 resource on this support.", "Location. Imperial Fists.",
+                                1, "Space Marines", "Loyal", True)
     ]
     return blackstone_project_cards
