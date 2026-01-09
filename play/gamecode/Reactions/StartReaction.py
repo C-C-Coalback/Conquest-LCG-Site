@@ -508,6 +508,17 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Mars Pattern Hellhound":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+        elif current_reaction == "Righteous Reprisal":
+            if planet_pos != -2:
+                primary_player.spend_resources(1)
+                primary_player.discard_card_name_from_hand("Righteous Reprisal")
+                primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                ATK = primary_player.cards_in_play[planet_pos + 1][unit_pos].attack
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if secondary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
+                        if not secondary_player.get_immune_to_enemy_events(planet_pos, i, power=True):
+                            secondary_player.assign_damage_to_pos(planet_pos, i, 2 * ATK, by_enemy_unit=False)
+            self.delete_reaction()
         elif current_reaction == "Spray and Pray":
             if self.spray_and_pray_amounts:
                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, self.spray_and_pray_amounts[0],

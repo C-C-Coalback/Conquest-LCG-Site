@@ -8756,6 +8756,13 @@ class Game:
                         if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                             self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, i))
+                    if self.amount_that_can_be_removed_by_shield[0] > 0:
+                        if primary_player.search_hand_for_card("Righteous Reprisal") and \
+                                primary_player.get_resources() > 0:
+                            if primary_player.get_faction_given_pos(def_pla, def_pos) == "Space Marines" and \
+                                    primary_player.get_ready_given_pos(def_pla, def_pos):
+                                self.create_reaction("Righteous Reprisal", primary_player.name_player,
+                                                     (num, def_pla, def_pos))
                 else:
                     if primary_player.get_card_type_given_pos(def_pla, def_pos) != "Warlord":
                         if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Patrolling Wraith":

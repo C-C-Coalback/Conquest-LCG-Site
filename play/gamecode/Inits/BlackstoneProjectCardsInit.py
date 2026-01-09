@@ -91,6 +91,10 @@ def blackstone_project_cards_init():
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Imperial Fists Legion", "Reaction: After this unit is declared as an attacker, remove 1 "
                                                       "damage from a target support card.", "Soldier. Imperial Fists.",
-                             1, "Space Marines", "Common", 1, 2, 1, False)
+                             1, "Space Marines", "Common", 1, 2, 1, False),
+        CardClasses.EventCard("Righteous Reprisal", "Reaction: After a Space Marines unit you control is damaged by an"
+                                                    " attack, exhaust that unit to deal damage equal to twice the"
+                                                    " unit's printed ATK to the attacker.", "Power.",
+                              1, "Space Marines", "Loyal", 2, False)
     ]
     return blackstone_project_cards
