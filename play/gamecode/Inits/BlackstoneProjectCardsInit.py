@@ -111,6 +111,13 @@ def blackstone_project_cards_init():
                              "Soldier. Dark Angels.", 3, "Space Marines", "Common", 3, 3, 1, False, deepstrike=2),
         CardClasses.ArmyCard("Parched Neophyte", "Bloodthirst - During a combat round in which 1 or more units have"
                                                  " been destroyed at this planet, this unit gains Retaliate (3).",
-                             "Scout. Blood Angels.", 1, "Space Marines", "Loyal", 2, 1, 0, False)
+                             "Scout. Blood Angels.", 1, "Space Marines", "Loyal", 2, 1, 0, False),
+        CardClasses.ArmyCard("Grey Hunters", "Forced Reaction: After a token unit at this planet resolves an attack,"
+                                             " destroy that unit.",
+                             "Soldier. Space Wolves.", 4, "Space Marines", "Loyal", 4, 3, 2, False),
+        CardClasses.ArmyCard("Fenrisian Wolf Pack", "No Attachments.\n"
+                                                    "Reaction: After this unit deals damage by an attack, remove 1 "
+                                                    "damage from it.", "Creature. Space Wolves.",
+                             2, "Space Marines", "Common", 3, 3, 0, False, no_attachments=True)
     ]
     return blackstone_project_cards

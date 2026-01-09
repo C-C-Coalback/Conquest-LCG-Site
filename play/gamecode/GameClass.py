@@ -380,7 +380,7 @@ class Game:
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
-                                 "Spray and Pray"]
+                                 "Spray and Pray", "Grey Hunters"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -9843,6 +9843,15 @@ class Game:
                                         if not self.p2.cards_in_play[planet + 1][j].misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_2,
                                                                  (1, planet, i))
+                            if self.p1.get_card_type_given_pos(planet, i) == "Token":
+                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                    if self.p1.get_ability_given_pos(planet, j) == "Grey Hunters":
+                                        if not self.p1.does_own_reaction_exist("Grey Hunters"):
+                                            self.create_reaction("Grey Hunters", self.name_1, (1, planet, i))
+                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                    if self.p2.get_ability_given_pos(planet, j) == "Grey Hunters":
+                                        if not self.p2.does_own_reaction_exist("Grey Hunters"):
+                                            self.create_reaction("Grey Hunters", self.name_2, (1, planet, i))
                             sweep = self.p1.get_sweep_given_pos(planet, i)
                             if sweep > 0 and not self.sweep_active:
                                 self.create_reaction("Sweep", self.name_1, (1, planet, i))
@@ -9900,6 +9909,15 @@ class Game:
                                         if not self.p1.cards_in_play[planet + 1][j].misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_1,
                                                                  (2, planet, i))
+                            if self.p2.get_card_type_given_pos(planet, i) == "Token":
+                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                    if self.p1.get_ability_given_pos(planet, j) == "Grey Hunters":
+                                        if not self.p1.does_own_reaction_exist("Grey Hunters"):
+                                            self.create_reaction("Grey Hunters", self.name_1, (2, planet, i))
+                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                    if self.p2.get_ability_given_pos(planet, j) == "Grey Hunters":
+                                        if not self.p2.does_own_reaction_exist("Grey Hunters"):
+                                            self.create_reaction("Grey Hunters", self.name_2, (2, planet, i))
                             sweep = self.p2.get_sweep_given_pos(planet, i)
                             if sweep > 0 and not self.sweep_active:
                                 self.create_reaction("Sweep", self.name_2, (2, planet, i))

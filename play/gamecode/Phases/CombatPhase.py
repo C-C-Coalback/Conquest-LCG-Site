@@ -1414,6 +1414,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.create_reaction("Burna Boyz", primary_player.name_player,
                                                          (int(primary_player.number), self.attacker_planet,
                                                           self.attacker_position))
+                                if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                        self.attacker_position) \
+                                        == "Fenrisian Wolf Pack":
+                                    if attack_value > 0:
+                                        self.create_reaction("Fenrisian Wolf Pack", primary_player.name_player,
+                                                             (int(primary_player.number), self.attacker_planet,
+                                                              self.attacker_position))
                                 self.last_defender_position = (secondary_player.number,
                                                                self.defender_planet, self.defender_position)
                                 if primary_player.get_ability_given_pos(self.attacker_planet,
