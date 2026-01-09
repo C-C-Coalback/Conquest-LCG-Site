@@ -5831,6 +5831,8 @@ class Game:
                                     primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
                                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reclusiam Templars":
                                     primary_player.ready_given_pos(planet_pos, unit_pos)
+                                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Brotherhood Justicar":
+                                    primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
                                 if self.amount_that_can_be_removed_by_shield[0] < 1:
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
