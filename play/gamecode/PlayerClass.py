@@ -948,12 +948,18 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].increase_retaliate_eop(value)
         return None
 
+    def check_bloodthirst(self, planet_id):
+        return self.game.bloodthirst_active[planet_id]
+
     def get_retaliate_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_retaliate()
         retaliate = self.cards_in_play[planet_id + 1][unit_id].get_retaliate()
         if self.get_ability_given_pos(planet_id, unit_id) == "Fierce Purgator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                retaliate += 3
+        if self.get_ability_given_pos(planet_id, unit_id) == "Parched Neophyte":
+            if self.check_bloodthirst(planet_id):
                 retaliate += 3
         warlord_pla, warlord_pos = self.get_location_of_warlord()
         if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Mephiston":

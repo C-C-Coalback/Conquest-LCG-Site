@@ -108,6 +108,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Dark Angels Purifier", "Deep Strike (2).\n"
                                                      "Interrupt: When this unit is destroyed, Deep Strike a Dark "
                                                      "Angels unit you control in reserve at the same planet.",
-                             "Soldier. Dark Angels.", 3, "Space Marines", "Common", 3, 3, 1, False, deepstrike=2)
+                             "Soldier. Dark Angels.", 3, "Space Marines", "Common", 3, 3, 1, False, deepstrike=2),
+        CardClasses.ArmyCard("Parched Neophyte", "Bloodthirst - During a combat round in which 1 or more units have"
+                                                 " been destroyed at this planet, this unit gains Retaliate (3).",
+                             "Scout. Blood Angels.", 1, "Space Marines", "Loyal", 2, 1, 0, False)
     ]
     return blackstone_project_cards
