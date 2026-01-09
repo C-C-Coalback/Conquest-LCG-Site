@@ -36,6 +36,15 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         self.misc_player_storage = card.get_name()
                         self.chosen_first_card = True
                         self.misc_counter = 1
+        elif current_reaction == "Klan Totem":
+            if not self.chosen_first_card:
+                if chosen_discard == int(primary_player.number):
+                    card = primary_player.get_card_in_discard(pos_discard)
+                    if card.get_name() in primary_player.cards_recently_destroyed:
+                        if card.get_has_deepstrike():
+                            primary_player.aiming_reticle_coords_discard = pos_discard
+                            self.misc_player_storage = card.get_name()
+                            self.chosen_first_card = True
         elif current_reaction == "Ghost Ark of Orikan":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

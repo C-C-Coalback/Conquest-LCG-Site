@@ -6720,6 +6720,10 @@ class Player:
                 if self.search_card_in_hq("Standard of Devastation"):
                     self.game.create_reaction("Standard of Devastation", self.name_player,
                                               (int(self.number), -1, -1))
+            if self.cards_in_play[planet_num + 1][card_pos].get_has_deepstrike():
+                if self.search_card_in_hq("Klan Totem", ready_relevant=True):
+                    if not self.check_if_already_have_reaction("Klan Totem"):
+                        self.game.create_reaction("Klan Totem", self.name_player, (int(self.number), -1, -1))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Vehicle"):
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):

@@ -396,6 +396,14 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.delete_reaction()
+    elif current_reaction == "Klan Totem":
+        if self.chosen_first_card:
+            if chosen_planet != self.round_number:
+                card = self.preloaded_find_card(self.misc_player_storage)
+                primary_player.put_card_into_reserve(card, chosen_planet, payment=False)
+                del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+                primary_player.aiming_reticle_coords_discard = None
+                self.delete_reaction()
     elif current_reaction == "Salvaged Battlewagon":
         if self.chosen_first_card:
             if abs(chosen_planet - self.positions_of_unit_triggering_reaction[0][1]) == 1:

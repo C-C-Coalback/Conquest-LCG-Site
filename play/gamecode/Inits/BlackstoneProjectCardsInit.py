@@ -148,6 +148,10 @@ def blackstone_project_cards_init():
                                                       "Reaction: After this unit resolves an attack against a warlord "
                                                       "unit, this unit gets +1 ATK and +1 HP until the end of the"
                                                       " game.", "Vehicle. Raven Guard.", 2, "Space Marines",
-                             "Loyal", 1, 2, 1, False, wargear_attachments_permitted=False, flying=True)
+                             "Loyal", 1, 2, 1, False, wargear_attachments_permitted=False, flying=True),
+        CardClasses.SupportCard("Klan Totem", "Reaction: After a unit with the Deep Strike keyword is destroyed, "
+                                              "exhaust this support to put that unit into reserve at a non-first "
+                                              "planet from your discard pile.", "Upgrade. Relic.",
+                                2, "Orks", "Loyal", True)
     ]
     return blackstone_project_cards
