@@ -126,6 +126,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Imperial Fists Apothecary", "Reaction: After a Space Marines unit you control at this "
                                                           "planet is destroyed, gain 1 resource. "
                                                           "(Limit once per phase)", "Scholar. Imperial Fists.",
-                             2, "Space Marines", "Loyal", 1, 2, 2, False)
+                             2, "Space Marines", "Loyal", 1, 2, 2, False),
+        CardClasses.ArmyCard("Bladeguard Veteran Squad", "Reaction: After an attack by this unit against an army unit "
+                                                         "doesn't destroy the defender, ready a target Space Marines "
+                                                         "unit you control. (Limit once per phase)",
+                             "Soldier. Ultramarines.", 3, "Space Marines", "Common", 3, 3, 1, False)
     ]
     return blackstone_project_cards

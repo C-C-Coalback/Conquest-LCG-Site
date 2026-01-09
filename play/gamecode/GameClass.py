@@ -8768,6 +8768,11 @@ class Game:
                         if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                             self.create_delayed_reaction("Shedding Hive Crone", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
+                    if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Bladeguard Veteran Squad":
+                        if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
+                            if not secondary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                                self.create_delayed_reaction("Bladeguard Veteran Squad", secondary_player.name_player,
+                                                             (int(secondary_player.number), planet_pos, unit_pos))
                     for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                         if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                             self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
