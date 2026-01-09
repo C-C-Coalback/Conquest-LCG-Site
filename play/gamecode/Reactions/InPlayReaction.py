@@ -2012,12 +2012,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Bladeguard Veteran Squad":
             if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
-                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
-                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            primary_player.ready_given_pos(planet_pos, unit_pos)
-                            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                            self.delete_reaction()
+                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Devoted Enginseer":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \

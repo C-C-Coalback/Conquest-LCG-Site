@@ -130,6 +130,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Bladeguard Veteran Squad", "Reaction: After an attack by this unit against an army unit "
                                                          "doesn't destroy the defender, ready a target Space Marines "
                                                          "unit you control. (Limit once per phase)",
-                             "Soldier. Ultramarines.", 3, "Space Marines", "Common", 3, 3, 1, False)
+                             "Soldier. Ultramarines.", 3, "Space Marines", "Common", 3, 3, 1, False),
+        CardClasses.ArmyCard("Iron Hands Platoon", "Reaction: After an enemy army unit with 2 or more printed command "
+                                                   "icons enters play at this planet, deal 1 damage to that unit.",
+                             "Soldier. Iron Hands.", 2, "Space Marines", "Common", 2, 3, 1, False)
     ]
     return blackstone_project_cards

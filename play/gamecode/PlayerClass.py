@@ -2184,6 +2184,10 @@ class Player:
                     self.game.create_reaction("Catatonic Pain", other_player.name_player,
                                               (int(self.number), position, last_element_index))
             for i in range(len(other_player.cards_in_play[position + 1])):
+                if card.command > 1:
+                    if other_player.get_ability_given_pos(position, i) == "Iron Hands Platoon":
+                        self.game.create_reaction("Iron Hands Platoon", other_player.name_player,
+                                                  (int(self.number), position, last_element_index))
                 if other_player.resources > 0:
                     if other_player.get_unique_given_pos(position, i):
                         if not other_player.check_if_already_have_reaction("The Inevitable Decay"):
