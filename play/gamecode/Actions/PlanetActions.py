@@ -827,7 +827,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             else:
                 await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
-    elif self.action_chosen == "Staging Ground":
+    elif self.action_chosen == "Staging Ground" or self.action_chosen == "Launch Pads":
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)

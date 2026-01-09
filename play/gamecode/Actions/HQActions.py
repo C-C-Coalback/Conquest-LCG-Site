@@ -510,6 +510,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             primary_player.exhaust_given_pos(-2, unit_pos)
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                    elif ability == "Launch Pads":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, unit_pos)
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
                     elif ability == "The Glovodan Eagle":
                         primary_player.return_card_to_hand(-2, unit_pos)
                         self.action_cleanup()

@@ -95,6 +95,10 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Righteous Reprisal", "Reaction: After a Space Marines unit you control is damaged by an"
                                                     " attack, exhaust that unit to deal damage equal to twice the"
                                                     " unit's printed ATK to the attacker.", "Power.",
-                              1, "Space Marines", "Loyal", 2, False)
+                              1, "Space Marines", "Loyal", 2, False),
+        CardClasses.SupportCard("Launch Pads", "Combat Action: Exhaust this support to deploy a Space Marines unit"
+                                               " with a printed cost of exactly 3 from your hand at a planet.",
+                                "Upgrade.", 2, "Space Marines", "Common", False, action_in_play=True,
+                                allowed_phases_in_play="COMBAT")
     ]
     return blackstone_project_cards
