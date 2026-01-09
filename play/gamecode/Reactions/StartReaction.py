@@ -508,6 +508,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Mars Pattern Hellhound":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+        elif current_reaction == "Raven Guard Legion":
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Righteous Reprisal":
             if planet_pos != -2:
                 primary_player.spend_resources(1)

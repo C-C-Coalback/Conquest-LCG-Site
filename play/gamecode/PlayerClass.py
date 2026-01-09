@@ -1742,6 +1742,7 @@ class Player:
             if self.search_for_unique_card(card_object.name):
                 return False
         self.headquarters.append(copy.deepcopy(card_object))
+        position = -2
         last_element_index = len(self.headquarters) - 1
         self.headquarters[last_element_index].name_owner = self.name_player
         other_player = self.get_other_player()
@@ -1768,6 +1769,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), -2,
                                                                                    last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Raven Guard Legion":
+            self.game.create_reaction("Raven Guard Legion", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(-2, last_element_index) == "Elusive Escort":
             self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), -2,
                                                                            last_element_index))
@@ -2136,6 +2140,8 @@ class Player:
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True, triggered_card_effect=True):
+        if position == -2:
+            return self.add_to_hq(card)
         if card.get_unique():
             if self.search_for_unique_card(card.name):
                 return -1
@@ -2253,6 +2259,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Elusive Escort":
             self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), position,
                                                                            last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Raven Guard Legion":
+            self.game.create_reaction("Raven Guard Legion", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Herald of the WAAGH!":
             if self.game.phase == "DEPLOY":
                 self.game.create_reaction("Herald of the WAAGH!", self.name_player, (int(self.number), position,

@@ -101,6 +101,9 @@ def blackstone_project_cards_init():
                                 "Upgrade.", 2, "Space Marines", "Common", False, action_in_play=True,
                                 allowed_phases_in_play="COMBAT"),
         CardClasses.SupportCard("Orbital Relay", "Interrupt: When you deploy a support card, reduce its cost by 1.",
-                                "Upgrade.", 2, "Space Marines", "Common", False)
+                                "Upgrade.", 2, "Space Marines", "Common", False),
+        CardClasses.ArmyCard("Raven Guard Legion", "Reaction: After this unit enters play, it gets +1 ATK and +1 HP"
+                                                   " until the end of the phase.", "Soldier. Raven Guard.",
+                             2, "Space Marines", "Common", 2, 3, 1, False)
     ]
     return blackstone_project_cards
