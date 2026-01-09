@@ -8526,6 +8526,22 @@ class Game:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayInterrupts.resolve_in_play_interrupt(self, name, game_update_string,
                                                                      primary_player, secondary_player)
+                elif game_update_string[0] == "RESERVE":
+                    planet_pos = int(game_update_string[2])
+                    unit_pos = int(game_update_string[3])
+                    if game_update_string[1] == primary_player.number:
+                        player_owning_card = primary_player
+                    else:
+                        player_owning_card = secondary_player
+                    current_interrupt = self.interrupts_waiting_on_resolution[0]
+                    if current_interrupt == "Dark Angels Purifier":
+                        if self.positions_of_units_interrupting[0][1] == planet_pos:
+                            if game_update_string[1] == primary_player.number:
+                                card_in_reserve = primary_player.cards_in_reserve[planet_pos][unit_pos]
+                                if card_in_reserve.check_for_a_trait("Dark Angels") and card_in_reserve.get_card_type() == "Army":
+                                    if primary_player.spend_resources(card_in_reserve.get_deepstrike_value()):
+                                        primary_player.deepstrike_unit(planet_pos, unit_pos)
+                                        self.delete_interrupt()
             if len(game_update_string) == 3:
                 if game_update_string[0] == "HQ":
                     await HQInterrupts.resolve_hq_interrupt(self, name, game_update_string,

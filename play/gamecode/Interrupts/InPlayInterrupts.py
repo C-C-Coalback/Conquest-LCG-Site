@@ -12,8 +12,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         player_owning_card = primary_player
     else:
         player_owning_card = secondary_player
-    print("Check what player")
-    print(self.player_who_resolves_reaction)
     current_interrupt = self.interrupts_waiting_on_resolution[0]
     if current_interrupt == "Prudent Fire Warriors":
         og_num, og_pla, og_pos = self.positions_of_units_interrupting[0]

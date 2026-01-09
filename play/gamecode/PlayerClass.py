@@ -6761,6 +6761,9 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Big Shoota Battlewagon":
                 self.game.create_reaction("Big Shoota Battlewagon", self.name_player,
                                           (int(self.number), planet_num, -1))
+            if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Dark Angels Purifier":
+                self.game.create_interrupt("Dark Angels Purifier", self.name_player,
+                                           (int(self.number), planet_num, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Shrouded Harlequin":
                 self.game.create_reaction("Shrouded Harlequin", self.name_player,
                                           (int(self.number), -1, -1))

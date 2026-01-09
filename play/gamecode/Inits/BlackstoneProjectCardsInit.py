@@ -104,6 +104,10 @@ def blackstone_project_cards_init():
                                 "Upgrade.", 2, "Space Marines", "Common", False),
         CardClasses.ArmyCard("Raven Guard Legion", "Reaction: After this unit enters play, it gets +1 ATK and +1 HP"
                                                    " until the end of the phase.", "Soldier. Raven Guard.",
-                             2, "Space Marines", "Common", 2, 3, 1, False)
+                             2, "Space Marines", "Common", 2, 3, 1, False),
+        CardClasses.ArmyCard("Dark Angels Purifier", "Deep Strike (2).\n"
+                                                     "Interrupt: When this unit is destroyed, Deep Strike a Dark "
+                                                     "Angels unit you control in reserve at the same planet.",
+                             "Soldier. Dark Angels.", 3, "Space Marines", "Common", 3, 3, 1, False, deepstrike=2)
     ]
     return blackstone_project_cards
