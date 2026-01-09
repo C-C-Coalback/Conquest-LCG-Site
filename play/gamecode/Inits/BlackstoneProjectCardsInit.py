@@ -118,6 +118,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Fenrisian Wolf Pack", "No Attachments.\n"
                                                     "Reaction: After this unit deals damage by an attack, remove 1 "
                                                     "damage from it.", "Creature. Space Wolves.",
-                             2, "Space Marines", "Common", 3, 3, 0, False, no_attachments=True)
+                             2, "Space Marines", "Common", 3, 3, 0, False, no_attachments=True),
+        CardClasses.ArmyCard("Aurora Predator", "No Wargear Attachments.\n"
+                                                "While this unit has faith it gets +3 ATK.",
+                             "Vehicle. Grey Knights. Elite.", 5, "Space Marines", "Common", 4, 6, 1, False,
+                             wargear_attachments_permitted=False)
     ]
     return blackstone_project_cards

@@ -5010,6 +5010,9 @@ class Player:
         if ability == "Tenacious Novice Squad":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
+        if ability == "Aurora Predator":
+            if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                attack_value += 3
         if ability == "Eloquent Confessor":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
