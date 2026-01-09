@@ -7051,6 +7051,8 @@ class Player:
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "3rd Company Tactical Squad":
             self.game.create_interrupt("3rd Company Tactical Squad", self.name_player, (int(self.number), -1, -1))
+        if card.get_ability() == "Shok Troopa":
+            self.game.create_interrupt("Shok Troopa", self.name_player, (int(self.number), planet_num, -1))
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.add_card_to_discard(card_name)

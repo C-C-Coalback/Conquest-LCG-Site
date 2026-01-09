@@ -55,6 +55,12 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if "Escort Drone" in primary_player.discard:
                 primary_player.discard.remove("Escort Drone")
             self.delete_interrupt()
+        elif current_interrupt == "Shok Troopa":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                primary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+            self.delete_interrupt()
         elif current_interrupt == "Truck Wreck Launcha":
             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)

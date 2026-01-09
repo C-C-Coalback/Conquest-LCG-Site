@@ -427,7 +427,7 @@ class Game:
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
         self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia",
-                                  "The Broken Sigil Sacrifice Unit"]
+                                  "The Broken Sigil Sacrifice Unit", "Shok Troopa"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.ebon_chalice_value = 0

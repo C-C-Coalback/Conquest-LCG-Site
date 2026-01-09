@@ -155,6 +155,10 @@ def blackstone_project_cards_init():
                                 2, "Orks", "Loyal", True),
         CardClasses.ArmyCard("Baddfrag", "Deep Strike (2).\n"
                                          "Each Vehicle unit you control at this planet gets +1 ATK.",
-                             "Warrior. Blood Axe.", 3, "Orks", "Common", 3, 3, 0, True, deepstrike=2)
+                             "Warrior. Blood Axe.", 3, "Orks", "Common", 3, 3, 0, True, deepstrike=2),
+        CardClasses.ArmyCard("Shok Troopa", "Retaliate (1).\n"
+                                            "Forced Interrupt: When this unit leaves play, deal 1 damage to "
+                                            "each unit at this planet.", "Scout. Boyz. Ally.",
+                             1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1)
     ]
     return blackstone_project_cards
