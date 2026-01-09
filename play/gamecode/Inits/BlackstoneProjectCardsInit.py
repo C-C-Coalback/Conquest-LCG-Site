@@ -152,6 +152,9 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Klan Totem", "Reaction: After a unit with the Deep Strike keyword is destroyed, "
                                               "exhaust this support to put that unit into reserve at a non-first "
                                               "planet from your discard pile.", "Upgrade. Relic.",
-                                2, "Orks", "Loyal", True)
+                                2, "Orks", "Loyal", True),
+        CardClasses.ArmyCard("Baddfrag", "Deep Strike (2).\n"
+                                         "Each Vehicle unit you control at this planet gets +1 ATK.",
+                             "Warrior. Blood Axe.", 3, "Orks", "Common", 3, 3, 0, True, deepstrike=2)
     ]
     return blackstone_project_cards

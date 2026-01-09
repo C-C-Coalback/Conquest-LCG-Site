@@ -5105,6 +5105,9 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 attack_value += 1
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+            if self.search_card_at_planet(planet_id, "Baddfrag"):
+                attack_value += 1
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.get_has_faith_given_pos(planet_id, unit_id):
