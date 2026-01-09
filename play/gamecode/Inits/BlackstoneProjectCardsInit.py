@@ -88,6 +88,9 @@ def blackstone_project_cards_init():
                                    type_of_units_allowed_for_attachment="Army"),
         CardClasses.EventCard("Lucky Shot", "Action: Until the end of the phase, a target Ranged unit gets +1 "
                                             "ATK and Armorbane.", "Tactic.", 1, "Astra Militarum", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Imperial Fists Legion", "Reaction: After this unit is declared as an attacker, remove 1 "
+                                                      "damage from a target support card.", "Soldier. Imperial Fists.",
+                             1, "Space Marines", "Common", 1, 2, 1, False)
     ]
     return blackstone_project_cards

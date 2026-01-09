@@ -151,6 +151,9 @@ class Card:
             return "None"
         return string
 
+    def remove_damage(self, amount):
+        self.damage = self.damage - amount
+
     def get_once_per_game_used(self):
         return self.once_per_game_used
 

@@ -779,6 +779,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
+                                    == "Imperial Fists Legion":
+                                self.create_reaction("Imperial Fists Legion", player.name_player,
+                                                     (int(player.number), self.attacker_planet,
+                                                      self.attacker_position))
+                            if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Salamander Flamer Squad":
                                 self.flamers_damage_active = True
                                 self.id_of_the_active_flamer = \

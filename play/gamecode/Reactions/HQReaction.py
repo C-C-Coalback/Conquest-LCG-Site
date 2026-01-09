@@ -67,6 +67,12 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if card_type == "Warlord" or card_type == "Synapse":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
             self.delete_reaction()
+    elif current_reaction == "Imperial Fists Legion":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+            if player_owning_card.headquarters[unit_pos].damage > 0:
+                player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
     elif current_reaction == "Tunneling Mawloc":
         card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
         if card_type == "Army":
