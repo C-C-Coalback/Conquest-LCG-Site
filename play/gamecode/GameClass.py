@@ -9874,6 +9874,9 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            for j in range(len(self.p1.get_all_attachments_at_pos(planet, i))):
+                                if self.p1.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
+                                    self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                             if self.p1.search_attachments_at_pos(planet, i, "Rail Rifle"):
                                 self.create_reaction("Rail Rifle", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Fierce Purgator":
@@ -9943,6 +9946,9 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            for j in range(len(self.p2.get_all_attachments_at_pos(planet, i))):
+                                if self.p2.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
+                                    self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                             if self.p2.search_attachments_at_pos(planet, i, "Rail Rifle"):
                                 self.create_reaction("Rail Rifle", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Fierce Purgator":
@@ -10090,6 +10096,8 @@ class Game:
         await self.send_initiative()
         await self.send_queued_sound()
         await self.send_queued_message()
+        if not same_thread:
+            await self.update_game_event("", [], same_thread=True)
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()

@@ -169,6 +169,13 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Immature Squig", "No Attachments.\n"
                                                "You may include up to 6 copies of this card in your deck. \n"
                                                "This unit gets +1 ATK for every other Squig unit at this planet.",
-                             "Creature. Squig.", 2, "Orks", "Common", 1, 3, 0, False)
+                             "Creature. Squig.", 2, "Orks", "Common", 1, 3, 0, False),
+        CardClasses.AttachmentCard("Unstable Runtgun", "Ambush.\n"
+                                                       "Attach to a Runt unit. \n"
+                                                       "Attached unit gets +3 ATK. \n"
+                                                       "Forced Reaction: After attached unit resolves an attack, "
+                                                       "deal 1 damage to it.",
+                                   "Wargear. Weapon.", 1, "Orks", "Common", 1, False, action_in_hand=True,
+                                   allowed_phases_in_hand=True, extra_attack=3, required_traits="Runt", ambush=True)
     ]
     return blackstone_project_cards
