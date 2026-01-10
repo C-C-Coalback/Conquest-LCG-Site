@@ -6092,6 +6092,12 @@ class Player:
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
                     self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Palace of Slaanesh":
+                if phase == "HEADQUARTERS":
+                    self.game.create_reaction("Palace of Slaanesh", self.name_player, (int(self.number), -2, i))
+            if self.headquarters[i].get_ability() == "Promethium Mine":
+                if phase == "DEPLOY" and self.headquarters[i].counter:
+                    self.game.create_reaction("Promethium Mine", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))

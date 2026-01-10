@@ -516,6 +516,13 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Fungal Infestation":
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Promethium Mine":
+            primary_player.add_resources(1)
+            primary_player.headquarters[unit_pos].decrement_counter()
+            self.delete_reaction()
+        elif current_reaction == "Palace of Slaanesh":
+            primary_player.summon_token_at_hq("Cultist")
+            self.delete_reaction()
         elif current_reaction == "Necklace of Teef":
             found_necklace = False
             for i in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):

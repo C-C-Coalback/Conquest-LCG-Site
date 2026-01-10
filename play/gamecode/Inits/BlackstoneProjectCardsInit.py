@@ -223,6 +223,10 @@ def blackstone_project_cards_init():
                                                        "planet. Then deal X damage to this unit. X is equal to the "
                                                        "number of cards in your hand. (Limit once per combat round)",
                              "Psyker. Oddboy.", 3, "Orks", "Common", 1, 4, 2, False,
-                             action_in_play=True, allowed_phases_in_play="COMBAT")
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.SupportCard("Palace of Slaanesh", "Limited.\n"
+                                                      "Reaction: After the headquarters phase begins, put a "
+                                                      "Cultist token into play at your HQ.",
+                                "Location.", 1, "Chaos", "Common", False, limited=True)
     ]
     return blackstone_project_cards
