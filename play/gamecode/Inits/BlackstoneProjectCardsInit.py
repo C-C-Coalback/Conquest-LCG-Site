@@ -200,6 +200,12 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Mob Up!", "Action: Exhaust each Snotlings token you control to deal X damage to a target"
                                          " army unit, where X is the number of Snotlings tokens exhausted by this"
                                          " effect.", "Tactic.", 1, "Orks", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL")
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Necklace of Teef", "Attach to an army unit.\n"
+                                                       "Attached unit gets +1 ATK for each Resource on this"
+                                                       " attachment.\n"
+                                                       "Reaction: After a combat round begins at this planet, place"
+                                                       " 1 Resource on this attachment.", "Wargear.",
+                                   1, "Orks", "Common", 1, False, type_of_units_allowed_for_attachment="Army")
     ]
     return blackstone_project_cards

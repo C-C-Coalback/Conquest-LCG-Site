@@ -516,6 +516,14 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Fungal Infestation":
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
+        elif current_reaction == "Necklace of Teef":
+            found_necklace = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Necklace of Teef":
+                    if not found_necklace:
+                        found_necklace = True
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].counter += 1
+            self.delete_reaction()
         elif current_reaction == "Klan Totem":
             primary_player.exhaust_card_in_hq_given_name("Klan Totem")
             self.chosen_first_card = False

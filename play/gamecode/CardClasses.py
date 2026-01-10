@@ -650,6 +650,9 @@ class UnitCard(Card):
             string += "Extra Health (EOG): " + str(self.positive_hp_until_eog) + "\n"
         if self.negative_hp_until_eop != 0:
             string += "Negative Health (EOP): " + str(self.negative_hp_until_eop) + "\n"
+        for i in range(len(self.attachments)):
+            if self.attachments[i].get_ability() == "Necklace of Teef":
+                string += "Necklace of Teef: " + str(self.attachments[i].get_counter()) + " resources\n"
         if not string:
             return "None"
         return string
@@ -1084,6 +1087,8 @@ class UnitCard(Card):
                 attack += 2
             elif self.attachments[i].get_ability() == "Escort Drone":
                 attack += 2
+            elif self.attachments[i].get_ability() == "Necklace of Teef":
+                attack += self.attachments[i].misc_counter
         if self.get_ability() == "Fire Warrior Strike Team":
             attack += len(self.attachments)
         return attack

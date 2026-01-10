@@ -5160,6 +5160,8 @@ class Player:
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
+            if attachments[i].get_ability() == "Necklace of Teef":
+                attack_value += attachments[i].get_counter()
             if attachments[i].get_ability() == "Speed Freakz Warpaint":
                 if self.get_enemy_has_init_for_cards(planet_id, unit_id):
                     attack_value += 3
@@ -6515,6 +6517,9 @@ class Player:
                                               (int(self.number), planet_num, i))
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Cloud of Flies":
                     self.game.create_reaction("Cloud of Flies", self.name_player,
+                                              (int(self.number), planet_num, i))
+                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Necklace of Teef":
+                    self.game.create_reaction("Necklace of Teef", self.name_player,
                                               (int(self.number), planet_num, i))
 
     def add_card_to_discard(self, card_name):
