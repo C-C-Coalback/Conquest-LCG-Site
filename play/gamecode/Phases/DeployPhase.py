@@ -205,10 +205,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         else:
                             player = self.p2
                         if self.card_type_of_selected_card_in_hand == "Army":
-                            discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
-                                                                                  self.faction_of_card_to_play,
-                                                                                  self.traits_of_card_to_play,
-                                                                                  self.planet_aiming_reticle_position)
+                            discount_received = player.perform_discount_at_pos_hq(
+                                int(game_update_string[2]), self.faction_of_card_to_play, self.traits_of_card_to_play,
+                                self.planet_aiming_reticle_position, name_of_card=self.name_of_card_to_play)
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
@@ -324,9 +323,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     else:
                         player = self.p2
                     if self.card_type_of_selected_card_in_hand == "Army":
-                        discount_received = player.perform_discount_at_pos_in_play(int(game_update_string[2]),
-                                                                                   int(game_update_string[3]),
-                                                                                   self.traits_of_card_to_play)
+                        discount_received = player.perform_discount_at_pos_in_play(
+                            int(game_update_string[2]), int(game_update_string[3]), self.traits_of_card_to_play,
+                            name_of_card=self.name_of_card_to_play)
                         if discount_received > 0:
                             self.discounts_applied += discount_received
                         if self.discounts_applied >= self.available_discounts:

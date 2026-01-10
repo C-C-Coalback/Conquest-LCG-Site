@@ -4083,7 +4083,7 @@ class Player:
                         return True
         return False
 
-    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None):
+    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None, name_of_card=""):
         discounts_available = 0
         if is_attachment:
             for i in range(len(self.headquarters)):
@@ -4124,6 +4124,8 @@ class Player:
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
+                    if name_of_card == "Venomcrawler":
+                        discounts_available += 1
                     self.set_aiming_reticle_in_play(-2, i, "green")
                     if "Elite" in traits:
                         discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
@@ -4148,7 +4150,7 @@ class Player:
                     self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
-    def search_planet_for_discounts(self, planet_pos, traits, faction_of_card):
+    def search_planet_for_discounts(self, planet_pos, traits, faction_of_card, name_of_card=""):
         discounts_available = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if "Ecclesiarchy" in traits:
@@ -4160,6 +4162,8 @@ class Player:
             if "Daemon" in traits:
                 if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
                     discounts_available += 1
+                    if name_of_card == "Venomcrawler":
+                        discounts_available += 1
                     self.set_aiming_reticle_in_play(planet_pos, i, "green")
                     if "Elite" in traits:
                         discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
@@ -4179,10 +4183,11 @@ class Player:
             for i in range(len(self.cards_in_play[j + 1])):
                 self.reset_aiming_reticle_in_play(j, i)
 
-    def search_all_planets_for_discounts(self, traits, faction_of_card):
+    def search_all_planets_for_discounts(self, traits, faction_of_card, name_of_card=""):
         discounts_available = 0
         for i in range(7):
-            discounts_available += self.search_planet_for_discounts(i, traits, faction_of_card)
+            discounts_available += self.search_planet_for_discounts(i, traits, faction_of_card,
+                                                                    name_of_card=name_of_card)
         return discounts_available
 
     def search_same_planet_for_discounts(self, faction_of_card, planet_pos):
@@ -4420,7 +4425,7 @@ class Player:
                         discount += icons[2] + 1
         return discount
 
-    def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None):
+    def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None, name_of_card=""):
         discount = 0
         if self.headquarters[pos].get_applies_discounts():
             if self.headquarters[pos].get_is_faction_limited_unique_discounter():
@@ -4471,6 +4476,8 @@ class Player:
             if self.headquarters[pos].get_ability() == "Cultist":
                 if self.sacrifice_card_in_hq(pos):
                     discount += 1
+                    if name_of_card == "Venomcrawler":
+                        discount += 1
             elif self.headquarters[pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
                 self.sacrifice_card_in_hq(pos)
@@ -4752,7 +4759,7 @@ class Player:
                     discount += min(2, self.count_attachments_controlled())
         return discount, damage
 
-    def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits):
+    def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits, name_of_card=""):
         discount = 0
         if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Crushface":
             if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
@@ -4773,6 +4780,8 @@ class Player:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
                 if self.sacrifice_card_in_play(planet_pos, unit_pos):
                     discount += 1
+                    if name_of_card == "Venomcrawler":
+                        discount += 1
             elif self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
                 self.sacrifice_card_in_play(planet_pos, unit_pos)

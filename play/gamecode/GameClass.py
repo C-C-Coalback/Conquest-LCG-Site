@@ -994,10 +994,10 @@ class Game:
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == player.get_number():
-                            discount_received = player.perform_discount_at_pos_hq(int(game_update_string[2]),
-                                                                                  self.card_to_deploy.get_faction(),
-                                                                                  self.card_to_deploy.get_traits(),
-                                                                                  self.planet_aiming_reticle_position)
+                            discount_received = player.perform_discount_at_pos_hq(
+                                int(game_update_string[2]), self.card_to_deploy.get_faction(),
+                                self.card_to_deploy.get_traits(), self.planet_aiming_reticle_position,
+                                name_of_card=self.card_to_deploy.get_name())
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
@@ -1041,9 +1041,9 @@ class Game:
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
                         if self.card_to_deploy.get_card_type() == "Army":
-                            discount_received = player.perform_discount_at_pos_in_play(int(game_update_string[2]),
-                                                                                       int(game_update_string[3]),
-                                                                                       self.card_to_deploy.get_traits())
+                            discount_received = player.perform_discount_at_pos_in_play(
+                                int(game_update_string[2]), int(game_update_string[3]),
+                                self.card_to_deploy.get_traits(), name_of_card=self.card_to_deploy.get_name())
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
@@ -6831,7 +6831,8 @@ class Game:
             other_player = self.p2
         self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
                                                                   card.get_traits(),
-                                                                  planet_chosen=planet_chosen)
+                                                                  planet_chosen=planet_chosen,
+                                                                  name_of_card=card.get_name())
         if card.check_for_a_trait("Haemonculus"):
             for i in range(len(player.cards_in_play[planet_chosen + 1])):
                 if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
@@ -6899,7 +6900,8 @@ class Game:
         if slaanesh_temptation:
             self.available_discounts -= 1
         self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play,
-                                                                            card.get_faction())
+                                                                            card.get_faction(),
+                                                                            name_of_card=card.get_name())
         self.available_discounts += temp_av_disc
 
     def create_reactions_phase_begins(self):

@@ -237,6 +237,9 @@ def blackstone_project_cards_init():
                                                   " unit. Replace this unit's textbox with the discarded unit's until "
                                                   "the end of the phase. Discard that unit, and shuffle the remaining "
                                                   "cards into your deck.", "Daemon. Tzeentch. Elite.",
-                             5, "Chaos", "Loyal", 4, 5, 3, True, action_in_play=True, allowed_phases_in_play="ALL")
+                             5, "Chaos", "Loyal", 4, 5, 3, True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Venomcrawler", "Reduce the cost of this unit by 1 for each Cultist token "
+                                             "sacrificed while paying its cost.", "Daemon. Elite.",
+                             7, "Chaos", "Common", 6, 6, 1, True)
     ]
     return blackstone_project_cards

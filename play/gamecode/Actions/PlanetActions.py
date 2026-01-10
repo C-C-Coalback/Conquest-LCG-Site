@@ -31,8 +31,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
             hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits(),
-                                                            planet_chosen=chosen_planet)
-            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+                                                            planet_chosen=chosen_planet, name_of_card=card.get_name())
+            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction(),
+                                                                          name_of_card=card.get_name())
             same_planet_dis, same_planet_auto_dis = \
                 primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
             num_termagants = 0
