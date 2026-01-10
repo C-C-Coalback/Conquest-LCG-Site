@@ -268,6 +268,10 @@ def blackstone_project_cards_init():
                                                   "Reaction: After a unit whose faction matches your enslavement dial "
                                                   "is destroyed at this planet, ready this unit. "
                                                   "(Limit once per phase)", "Warrior.",
-                             3, "Necrons", "Common", 3, 3, 1, False, wargear_attachments_permitted=False)
+                             3, "Necrons", "Common", 3, 3, 1, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Overseer Drone", "Reaction: After a unit you control at either this planet or an "
+                                               "adjacent planet is declared as an attacker, exhaust this unit to"
+                                               " give the attacker +2 ATK for the duration of the attack.",
+                             "Drone.", 2, "Necrons", "Common", 1, 2, 1, False)
     ]
     return blackstone_project_cards

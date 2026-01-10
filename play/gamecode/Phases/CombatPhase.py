@@ -756,6 +756,19 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         del other_player.attachments_at_planet[self.attacker_planet][i]
                                         i = i - 1
                                     i = i + 1
+                            valid_adjacent_and_self_planets = []
+                            if self.attacker_planet != 0:
+                                valid_adjacent_and_self_planets.append(self.attacker_planet - 1)
+                            valid_adjacent_and_self_planets.append(self.attacker_planet)
+                            if self.attacker_planet != 6:
+                                valid_adjacent_and_self_planets.append(self.attacker_planet + 1)
+                            for overseer_planet in valid_adjacent_and_self_planets:
+                                for i in range(len(player.cards_in_play[overseer_planet + 1])):
+                                    if player.get_ability_given_pos(overseer_planet, i) == "Overseer Drone":
+                                        if player.get_ready_given_pos(overseer_planet, i):
+                                            self.create_reaction("Overseer Drone", player.name_player,
+                                                                 (int(player.number), overseer_planet, i),
+                                                                 (self.attacker_planet, self.attacker_position))
                             if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                                     == "Biel-Tan Warp Spiders":
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,

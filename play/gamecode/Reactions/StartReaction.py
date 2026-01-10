@@ -5,6 +5,7 @@ import copy
 
 async def start_resolving_reaction(self, name, game_update_string):
     num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+    extra_info = self.additional_reactions_info[0]
     if self.player_who_resolves_reaction[0] == self.name_1:
         primary_player = self.p1
         secondary_player = self.p2
@@ -2600,6 +2601,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
+            self.delete_reaction()
+        elif current_reaction == "Overseer Drone":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            pla, pos = extra_info
+            primary_player.increase_attack_of_unit_at_pos(pla, pos, 2, expiration="NEXT")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Lokhust Destroyer":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
