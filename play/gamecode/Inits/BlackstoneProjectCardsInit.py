@@ -276,6 +276,9 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("I Do Not Serve", "Reaction: After a Sautekh or Novokh unit you control is assigned "
                                                 "damage by an attack from a unit matching your enslaved faction, "
                                                 "prevent all of that damage.", "Power.",
-                              0, "Necrons", "Common", 1, False)
+                              0, "Necrons", "Common", 1, False),
+        CardClasses.ArmyCard("Awakened Geomancer", "Reaction: After this unit enters play, discard up to three cards in"
+                                                   " your hand to gain 1 resource for each card discarded.", "Scholar.",
+                             4, "Necrons", "Common", 3, 4, 2, False)
     ]
     return blackstone_project_cards

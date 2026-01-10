@@ -29,6 +29,13 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.location_hand_attachment_shadowsun = hand_pos
                     primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
+        elif current_reaction == "Awakened Geomancer":
+            primary_player.discard_card_from_hand(hand_pos)
+            primary_player.add_resources(1)
+            self.misc_counter = self.misc_counter - 1
+            if self.misc_counter < 1:
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Adaptative Thorax Swarm":
             if hand_pos not in self.misc_player_storage:
                 primary_player.aiming_reticle_coords_hand_2 = hand_pos

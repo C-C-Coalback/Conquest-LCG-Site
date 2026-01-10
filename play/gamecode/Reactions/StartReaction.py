@@ -437,7 +437,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             await self.send_update_message("You will need to press pass when you "
                                            "are done resolving Tomb Blade Squadrons")
         elif current_reaction == "Omega Zero Command":
-            primary_player.summon_token_at_planet("Guardsman", planet_id)
+            primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_reaction()
         elif current_reaction == "Caustic Tyrannofex":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
@@ -2602,6 +2602,8 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Awakened Geomancer":
+            self.misc_counter = 3
         elif current_reaction == "Overseer Drone":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             pla, pos = extra_info

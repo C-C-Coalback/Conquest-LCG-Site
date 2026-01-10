@@ -8235,6 +8235,8 @@ class Game:
                         secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
                         self.infest_planet(self.misc_target_planet, primary_player)
+                    if self.reactions_needing_resolving[0] == "Awakened Geomancer":
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if self.reactions_needing_resolving[0] == "Dark Lance Raider":
                         if self.misc_misc is not None:
                             for i in range(len(self.misc_misc)):

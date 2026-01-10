@@ -1842,6 +1842,9 @@ class Player:
         elif self.get_ability_given_pos(-2, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), -2, last_element_index))
+        elif self.get_ability_given_pos(position, last_element_index) == "Awakened Geomancer":
+            self.game.create_reaction("Awakened Geomancer", self.name_player, (int(self.number), position,
+                                                                               last_element_index))
         elif self.headquarters[last_element_index].get_ability() == "Heretek Inventor":
             enemy_name = self.game.name_1
             if self.name_player == self.game.name_1:
@@ -2310,6 +2313,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
             self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
                                                                               last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Awakened Geomancer":
+            self.game.create_reaction("Awakened Geomancer", self.name_player, (int(self.number), position,
+                                                                               last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Goff Shokboyz":
             self.game.create_reaction("Goff Shokboyz", self.name_player, (int(self.number), position,
                                                                           last_element_index))
