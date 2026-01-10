@@ -174,6 +174,7 @@ class Player:
         self.cards_in_reserve_hq = []
         self.the_princes_might_active = [False, False, False, False, False, False, False]
         self.hit_by_gorgul = False
+        self.mork_blessings_count = 0
         self.concealing_darkness_active = False
         self.defensive_protocols_active = False
         self.counterblow_used = False
@@ -7280,6 +7281,7 @@ class Player:
 
     def resolve_combat_round_ends_effects(self, planet_id):
         can_forward_barracks = False
+        self.mork_blessings_count = 0
         self.defensive_protocols_active = False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.get_ability_given_pos(planet_id, i) == "Anxious Infantry Platoon":

@@ -923,6 +923,10 @@ class Game:
                 info_string += self.name_1 + ": " + str(len(self.p1.rok_bombardment_active)) + " Rok Bombardments.\n"
             if self.p2.rok_bombardment_active and i == self.last_planet_checked_for_battle:
                 info_string += self.name_2 + ": " + str(len(self.p2.rok_bombardment_active)) + " Rok Bombardments.\n"
+            if self.p1.mork_blessings_count and i == self.last_planet_checked_for_battle:
+                info_string += self.name_1 + ": " + str(self.p1.mork_blessings_count) + " Blessings of Mork.\n"
+            if self.p2.mork_blessings_count and i == self.last_planet_checked_for_battle:
+                info_string += self.name_2 + ": " + str(self.p2.mork_blessings_count) + " Blessings of Mork.\n"
             if self.bloodthirst_active[i]:
                 info_string += "Bloodthirst is active.\n"
             if self.wounded_scream_blanked and self.get_planet_name(i) == "Wounded Scream":
@@ -8780,6 +8784,10 @@ class Game:
                                                      (num, def_pla, def_pos))
                 else:
                     if primary_player.get_card_type_given_pos(def_pla, def_pos) != "Warlord":
+                        if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                            for _ in range(secondary_player.mork_blessings_count):
+                                self.create_delayed_reaction("Blessing of Mork", secondary_player.name_player,
+                                                             (int(secondary_player.number), planet_pos, unit_pos))
                         if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Patrolling Wraith":
                             self.create_delayed_reaction("Patrolling Wraith", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))

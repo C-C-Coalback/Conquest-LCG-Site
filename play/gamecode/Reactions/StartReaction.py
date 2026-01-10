@@ -524,6 +524,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                         found_necklace = True
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].counter += 1
             self.delete_reaction()
+        elif current_reaction == "Blessing of Mork":
+            if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
+                await self.send_update_message("No damage to move!")
+                self.delete_reaction()
         elif current_reaction == "Klan Totem":
             primary_player.exhaust_card_in_hq_given_name("Klan Totem")
             self.chosen_first_card = False

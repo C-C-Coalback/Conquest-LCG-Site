@@ -206,6 +206,12 @@ def blackstone_project_cards_init():
                                                        " attachment.\n"
                                                        "Reaction: After a combat round begins at this planet, place"
                                                        " 1 Resource on this attachment.", "Wargear.",
-                                   1, "Orks", "Common", 1, False, type_of_units_allowed_for_attachment="Army")
+                                   1, "Orks", "Common", 1, False, type_of_units_allowed_for_attachment="Army"),
+        CardClasses.EventCard("Blessing of Mork", "Play only during a battle.\n"
+                                                  "Combat Action: For the remainder of the combat round, after an Ork "
+                                                  "unit you control destroys an army unit by an attack, move 1 damage "
+                                                  "from the attacker to a target unit at the same planet.", "Power.",
+                              2, "Orks", "Loyal", 2, False, action_in_hand=True,
+                              allowed_phases_in_hand="COMBAT")
     ]
     return blackstone_project_cards

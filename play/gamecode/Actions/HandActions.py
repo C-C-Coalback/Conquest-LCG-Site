@@ -633,6 +633,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Sudden Reinforcements":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
+                    elif ability == "Blessing of Mork":
+                        if self.last_planet_checked_for_battle != -1:
+                            primary_player.discard_card_from_hand(hand_pos)
+                            primary_player.mork_blessings_count += 1
+                            self.action_cleanup()
                     elif ability == "Mob Up!":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
