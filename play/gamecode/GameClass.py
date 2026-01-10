@@ -3250,6 +3250,30 @@ class Game:
                                 if not self.choices_available:
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
+                    elif self.choice_context == "Putrescent Corpulence 1":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Attachment":
+                            if card.check_for_a_trait("Blessing") or card.check_for_a_trait("Curse"):
+                                self.choice_context = "Putrescent Corpulence 2"
+                                self.misc_target_choice = card.get_name()
+                                primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                del primary_player.deck[int(game_update_string[1])]
+                                primary_player.cards.append(card.get_name())
+                                self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                                if not self.choices_available:
+                                    self.reset_choices_available()
+                                    self.resolving_search_box = False
+                    elif self.choice_context == "Putrescent Corpulence 2":
+                        card = self.preloaded_find_card(chosen_choice)
+                        if card.get_card_type() == "Attachment":
+                            if card.check_for_a_trait("Blessing") or card.check_for_a_trait("Curse"):
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
+                                primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
+                                del primary_player.deck[int(game_update_string[1])]
+                                primary_player.cards.append(card.get_name())
+                                primary_player.bottom_remaining_cards()
+                                self.action_cleanup()
                     elif self.choice_context == "Eldritch Council: Choose Card":
                         choice_pos = int(game_update_string[1])
                         if choice_pos == 0:

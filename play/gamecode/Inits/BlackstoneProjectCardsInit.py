@@ -240,6 +240,9 @@ def blackstone_project_cards_init():
                              5, "Chaos", "Loyal", 4, 5, 3, True, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Venomcrawler", "Reduce the cost of this unit by 1 for each Cultist token "
                                              "sacrificed while paying its cost.", "Daemon. Elite.",
-                             7, "Chaos", "Common", 6, 6, 1, True)
+                             7, "Chaos", "Common", 6, 6, 1, True),
+        CardClasses.EventCard("Putrescent Corpulence", "Action: Rally 12 up to 2 Blessing or Curse attachments, "
+                                                          "add them to your hand.", "Power. Nurgle.",
+                              1, "Chaos", "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return blackstone_project_cards
