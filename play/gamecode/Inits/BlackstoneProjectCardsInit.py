@@ -218,6 +218,11 @@ def blackstone_project_cards_init():
                                            "Reaction: After this unit is assigned damage by an attack, you may deal "
                                            "2 damage to this unit to deal 3 damage to the attacker.",
                              "Vehicle. Elite.", 7, "Orks", "Loyal", 4, 7, 3, False, brutal=True,
-                             wargear_attachments_permitted=False)
+                             wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Inexperienced Weirdboy", "Combat Action: Deal X damage to a target army unit at this "
+                                                       "planet. Then deal X damage to this unit. X is equal to the "
+                                                       "number of cards in your hand. (Limit once per combat round)",
+                             "Psyker. Oddboy.", 3, "Orks", "Common", 1, 4, 2, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return blackstone_project_cards

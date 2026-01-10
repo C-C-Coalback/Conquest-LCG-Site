@@ -271,6 +271,14 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
                         self.misc_target_planet = planet_pos
+                    elif ability == "Inexperienced Weirdboy":
+                        if not card_chosen.once_per_combat_round_used:
+                            if planet_pos == self.last_planet_checked_for_battle:
+                                card_chosen.once_per_combat_round_used = True
+                                self.action_chosen = ability
+                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                                self.position_of_actioned_card = (planet_pos, unit_pos)
+                                self.misc_target_planet = planet_pos
                     elif ability == "Aun'Len BLOODIED":
                         if self.planet_array[planet_pos] != "Jaricho" and \
                                 (self.planet_array[
@@ -891,6 +899,41 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+    elif self.action_chosen == "Inexperienced Weirdboy":
+        if self.position_of_actioned_card[0] == planet_pos:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    cards_in_hand = len(primary_player.cards)
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, cards_in_hand)
+                    primary_player.assign_damage_to_pos(self.position_of_actioned_card[0],
+                                                        self.position_of_actioned_card[1], cards_in_hand,
+                                                        by_enemy_unit=False)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                    self.action_cleanup()
     elif self.action_chosen == "The Strength of the Enemy":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
