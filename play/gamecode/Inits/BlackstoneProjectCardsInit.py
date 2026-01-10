@@ -272,6 +272,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Overseer Drone", "Reaction: After a unit you control at either this planet or an "
                                                "adjacent planet is declared as an attacker, exhaust this unit to"
                                                " give the attacker +2 ATK for the duration of the attack.",
-                             "Drone.", 2, "Necrons", "Common", 1, 2, 1, False)
+                             "Drone.", 2, "Necrons", "Common", 1, 2, 1, False),
+        CardClasses.EventCard("I Do Not Serve", "Reaction: After a Sautekh or Novokh unit you control is assigned "
+                                                "damage by an attack from a unit matching your enslaved faction, "
+                                                "prevent all of that damage.", "Power.",
+                              0, "Necrons", "Common", 1, False)
     ]
     return blackstone_project_cards

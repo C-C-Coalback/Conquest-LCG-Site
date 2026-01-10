@@ -274,7 +274,7 @@ class Game:
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
         self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death", "Uphold His Honor",
-                                    "Back to the Shadows"]
+                                    "Back to the Shadows", "I Do Not Serve"]
         self.last_shield_string = []
         self.pos_shield_card = -1
         self.recently_damaged_units = []
@@ -1930,6 +1930,8 @@ class Game:
                 await self.resolve_crushing_blow(primary_player, secondary_player)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
+            elif self.nullify_context == "I Do Not Serve":
+                await self.resolve_i_do_not_serve(primary_player, secondary_player)
             elif self.nullify_context == "Back to the Shadows":
                 await self.resolve_back_to_the_shadows(primary_player, secondary_player)
             elif self.nullify_context == "Foretell":
@@ -2145,8 +2147,7 @@ class Game:
                         self.name_player_making_choices = valid_players[0]
                     else:
                         self.auto_card_destruction = True
-                elif self.nullify_context == "Indomitable" or self.nullify_context == "Glorious Intervention" or \
-                        self.nullify_context == "Faith Denies Death":
+                elif self.nullify_context in self.alternative_shields:
                     self.pos_shield_card = -1
                 elif self.nullify_context == "Reaction Event":
                     if self.nullified_card_name == "Cry of the Wind":
@@ -2257,6 +2258,19 @@ class Game:
         self.retaliate_used = True
         primary_player.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
         primary_player.draw_card()
+        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+
+    async def resolve_i_do_not_serve(self, primary_player, secondary_player):
+        pos_holder = self.positions_of_units_to_take_damage[0]
+        player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
+        primary_player.discard_card_from_hand(self.pos_shield_card)
+        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+        self.pos_shield_card = -1
+        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
+        if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
+                self.damage_on_units_list_before_new_damage[0]:
+            primary_player.set_damage_given_pos(planet_pos, unit_pos,
+                                                self.damage_on_units_list_before_new_damage[0])
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def resolve_indomitable(self, primary_player, secondary_player):
@@ -5856,6 +5870,21 @@ class Game:
                                     self.nullify_context = "Indomitable"
                                 elif primary_player.spend_resources(1):
                                     await self.resolve_indomitable(primary_player, secondary_player)
+                            elif primary_player.cards[self.pos_shield_card] == "I Do Not Serve":
+                                if secondary_player.nullify_check():
+                                    await self.send_update_message(
+                                        primary_player.name_player + " wants to play I Do Not Serve; "
+                                                                     "Nullify window offered.")
+                                    self.choices_available = ["Yes", "No"]
+                                    self.name_player_making_choices = secondary_player.name_player
+                                    self.choice_context = "Use Nullify?"
+                                    self.nullified_card_pos = self.pos_shield_card
+                                    self.nullified_card_name = "I Do Not Serve"
+                                    self.cost_card_nullified = 1
+                                    self.first_player_nullified = primary_player.name_player
+                                    self.nullify_context = "I Do Not Serve"
+                                else:
+                                    await self.resolve_i_do_not_serve(primary_player, secondary_player)
                             elif primary_player.cards[self.pos_shield_card] == "Back to the Shadows":
                                 if secondary_player.nullify_check():
                                     await self.send_update_message(
@@ -7184,6 +7213,21 @@ class Game:
                                                 self.name_player_making_choices = name
                                                 self.choice_context = "Use alternative shield effect?"
                                                 self.last_shield_string = game_update_string
+                                elif primary_player.cards[hand_pos] == "I Do Not Serve":
+                                    if primary_player.resources > 0:
+                                        if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                                            _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                            if secondary_player.get_faction_given_pos(att_pla, att_pos) ==\
+                                                    primary_player.enslaved_faction:
+                                                if primary_player.check_for_trait_given_pos(att_pla, att_pos,
+                                                                                            "Sautekh") or \
+                                                        primary_player.check_for_trait_given_pos(att_pla, att_pos,
+                                                                                                 "Novokh"):
+                                                    alt_shield_check = True
+                                                    self.choices_available = ["Shield", "Effect"]
+                                                    self.name_player_making_choices = name
+                                                    self.choice_context = "Use alternative shield effect?"
+                                                    self.last_shield_string = game_update_string
                                 elif primary_player.cards[hand_pos] == "Back to the Shadows":
                                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                                         alt_shield_check = True
