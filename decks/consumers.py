@@ -9,6 +9,7 @@ blackstone_array = Initfunctions.init_blackstone_player_cards()
 card_names = "CARD_NAMES"
 card_names_with_bp = "CARD_NAMES"
 authorised_blackstone_users = ["Coalback", "alex", "Echo", "i0Predator0i"]
+non_signature_rituals = []
 cards_dict = {}
 blackstone_dict = {}
 for key in range(len(blackstone_array)):
@@ -16,6 +17,8 @@ for key in range(len(blackstone_array)):
 for key in range(len(cards_array)):
     cards_dict[cards_array[key].name] = cards_array[key]
     card_names_with_bp += "/" + cards_array[key].name
+    if cards_array[key].check_for_a_trait("Ritual") and cards_array[key].get_loyalty() != "Signature":
+        non_signature_rituals.append(cards_array[key].name)
     if cards_array[key].name not in blackstone_dict:
         card_names += "/" + cards_array[key].name
 planet_cards_array = Initfunctions.init_planet_cards()
@@ -95,6 +98,7 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
     if len(factions) == 1:
         factions.append("")
     holy_crusade_relevant = False
+    has_non_sig_ritual = False
     if deck[3] != "Signature Squad":
         current_name = deck[3]
         card_result = FindCard.find_card(current_name, cards_array, cards_dict)
@@ -137,9 +141,14 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
                 max_copies = 3
                 if current_name == "Immature Squig":
                     max_copies = 6
+                if current_name in non_signature_rituals:
+                    max_copies = 1
+                    if has_non_sig_ritual:
+                        return "Too many non-signature Ritual cards."
+                    has_non_sig_ritual = True
                 if int(current_amount) > max_copies:
                     print("Too many copies")
-                    return "Too many copies: " + current_name
+                    return "Too many copies: " + current_name + " (max " + str(current_amount) + ")"
             except ValueError:
                 return "Number missing"
             card_result = FindCard.find_card(current_name, cards_array, cards_dict)

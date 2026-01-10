@@ -227,6 +227,11 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Palace of Slaanesh", "Limited.\n"
                                                       "Reaction: After the headquarters phase begins, put a "
                                                       "Cultist token into play at your HQ.",
-                                "Location.", 1, "Chaos", "Common", False, limited=True)
+                                "Location.", 1, "Chaos", "Common", False, limited=True),
+        CardClasses.EventCard("Test of Faith", "Limit one non-signature Ritual per deck. \n"
+                                               "Action: Sacrifice a Cultist token at a planet with a unique unit you "
+                                               "control to place 2 Faith tokens on each Cultist and Ritualist unit you "
+                                               "control at the same planet.", "Ritual. Chaos Undivided.",
+                              1, "Chaos", "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return blackstone_project_cards

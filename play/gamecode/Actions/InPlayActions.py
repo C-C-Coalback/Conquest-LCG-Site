@@ -934,6 +934,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+    elif self.action_chosen == "Test of Faith":
+        if game_update_string[1] == primary_player.number:
+            unique_found = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_unique_given_pos(planet_pos, i):
+                    unique_found = True
+            if unique_found:
+                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Cultist":
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                            if primary_player.check_for_trait_given_pos(planet_pos, i, "Cultist") or\
+                                    primary_player.check_for_trait_given_pos(planet_pos, i, "Ritualist"):
+                                primary_player.increase_faith_given_pos(planet_pos, i, 2)
+                        primary_player.drammask_nane_check()
+                        self.action_cleanup()
     elif self.action_chosen == "The Strength of the Enemy":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.number:

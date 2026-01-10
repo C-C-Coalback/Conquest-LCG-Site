@@ -1258,6 +1258,31 @@ class Game:
                                                 self.name_player_making_choices = primary_player.name_player
                                                 self.resolving_search_box = True
                                                 self.action_chosen = ability
+                            elif ability == "Test of Faith":
+                                vael_relevant = False
+                                vael_bloodied = False
+                                warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                                if primary_player.get_ability_given_pos(
+                                        warlord_pla, warlord_pos) == "Vael the Gifted" and not \
+                                        primary_player.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
+                                    vael_relevant = True
+                                elif primary_player.get_ability_given_pos(
+                                        warlord_pla, warlord_pos) == "Vael the Gifted BLOODIED" \
+                                        and not primary_player.get_once_per_game_used_given_pos(warlord_pla,
+                                                                                                warlord_pos):
+                                    vael_relevant = True
+                                    vael_bloodied = True
+                                if vael_relevant:
+                                    if primary_player.spend_resources(1):
+                                        primary_player.add_card_to_discard(ability)
+                                        primary_player.cards_removed_from_game.remove(ability)
+                                        if vael_bloodied:
+                                            primary_player.set_once_per_game_used_given_pos(warlord_pla,
+                                                                                            warlord_pos, True)
+                                        else:
+                                            primary_player.set_once_per_round_used_given_pos(warlord_pla,
+                                                                                             warlord_pos, True)
+                                        self.action_chosen = ability
                     elif self.action_chosen == "Reveal The Blade":
                         if not self.chosen_first_card:
                             if chosen_removed == int(primary_player.number):

@@ -209,7 +209,8 @@ class Player:
         self.looted_skrap_planet = -1
         self.cards_removed_from_game = []
         self.cards_removed_from_game_hidden = []
-        self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast"]
+        self.ritual_cards = ["The Blood Pits", "The Grand Plan", "The Inevitable Decay", "The Orgiastic Feast",
+                             "Test of Faith"]
         self.last_removed_string = ""
         self.broken_sigil_planet = -1
         self.broken_sigil_effect = ""
