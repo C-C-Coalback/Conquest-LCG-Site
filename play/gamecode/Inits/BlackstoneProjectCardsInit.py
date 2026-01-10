@@ -232,6 +232,11 @@ def blackstone_project_cards_init():
                                                "Action: Sacrifice a Cultist token at a planet with a unique unit you "
                                                "control to place 2 Faith tokens on each Cultist and Ritualist unit you "
                                                "control at the same planet.", "Ritual. Chaos Undivided.",
-                              1, "Chaos", "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                              1, "Chaos", "Loyal", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Kairos Fateweaver", "Action: Reveal cards from the top of your deck until you reveal a"
+                                                  " unit. Replace this unit's textbox with the discarded unit's until "
+                                                  "the end of the phase. Discard that unit, and shuffle the remaining "
+                                                  "cards into your deck.", "Daemon. Tzeentch. Elite.",
+                             5, "Chaos", "Loyal", 4, 5, 3, True, action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return blackstone_project_cards

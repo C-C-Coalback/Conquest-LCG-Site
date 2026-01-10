@@ -260,6 +260,40 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Kairos Fateweaver":
+                        final_card_name = ""
+                        for i in range(len(primary_player.deck)):
+                            card_name = primary_player.deck[i]
+                            card = self.preloaded_find_card(card_name)
+                            await self.send_update_message("Revealed a " + card_name)
+                            if card.get_card_type() == "Army":
+                                final_card_name = card_name
+                                primary_player.discard_card_from_deck(i)
+                                break
+                        if final_card_name:
+                            og_card = self.preloaded_find_card(final_card_name)
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_armorbane = og_card.armorbane
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ambush = og_card.ambush
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_mobile = og_card.mobile
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_brutal = og_card.brutal
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_sweep = og_card.sweep
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_area_effect = og_card.area_effect
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ranged = og_card.ranged
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_limited = og_card.limited
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_lumbering = og_card.lumbering
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_unstoppable = og_card.unstoppable
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_flying = og_card.flying
+                            primary_player.cards_in_play[planet_pos + 1][
+                                unit_pos].new_additional_resources_command_struggle = \
+                                og_card.additional_resources_command_struggle
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_additional_cards_command_struggle = \
+                                og_card.additional_cards_command_struggle
+                            primary_player.cards_in_play[planet_pos + 1][unit_pos].new_ability = final_card_name
+                            self.action_cleanup()
+                            await self.send_update_message("Kairos Fateweaver gained " +
+                                                           final_card_name + "'s text box!")
+                        else:
+                            await self.send_update_message("Failed to reveal a unit.")
                     elif ability == "Rotten Plaguebearers":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
