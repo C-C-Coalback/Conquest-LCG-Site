@@ -47,7 +47,7 @@ def make_jpg_all():
         with Image.open(path + current_image + ".png") as im:
             print("Convert to jpg format: " + card_name)
             im = im.convert("RGB")
-            im.save(path + current_image + ".jpg")
+            im.save(path + current_image.replace("_1", "") + ".jpg")
             # im = im.convert("RGB")
             # im.save(path + filename)
         os.remove(path + current_image + ".png")
