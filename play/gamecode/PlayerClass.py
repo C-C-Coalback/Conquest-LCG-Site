@@ -788,6 +788,9 @@ class Player:
             if ability == "Kamouflage Expert":
                 self.game.create_reaction("Kamouflage Expert", self.name_player,
                                           (int(self.number), planet_id, last_element_index))
+            if ability == "Thundering Wraith":
+                self.game.create_reaction("Thundering Wraith", self.name_player,
+                                          (int(self.number), planet_id, last_element_index))
             if ability == "Patient Infiltrator":
                 if self.get_damage_given_pos(planet_id, last_element_index) > 0:
                     if not self.get_ready_given_pos(planet_id, last_element_index):

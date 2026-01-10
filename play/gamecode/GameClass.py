@@ -407,7 +407,7 @@ class Game:
                                  "Pinning Razorback", "Wrathful Dreadnought", "Junk Chucka Kommando",
                                  "Patient Infiltrator", "Slave-powered Wagons", "Lekor Blight-Tongue",
                                  "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows",
-                                 "Goff Shokboyz", "Inexperienced Weirdboy"]
+                                 "Goff Shokboyz", "Inexperienced Weirdboy", "Thundering Wraith"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
@@ -3420,6 +3420,16 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         await self.resolve_battle_conclusion(name, game_update_string)
+                    elif self.choice_context == "Thundering Wraith Choice":
+                        pla, pos = self.misc_target_unit
+                        if chosen_choice == "Rout Unit":
+                            primary_player.rout_unit(pla, pos)
+                        else:
+                            primary_player.assign_damage_to_pos(pla, pos, 4)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.mask_jain_zar_check_reactions(secondary_player, primary_player)
+                        self.delete_reaction()
                     elif self.choice_context == "Mephiston Gains":
                         if chosen_choice == "Draw Card":
                             primary_player.draw_card()

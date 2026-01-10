@@ -258,6 +258,11 @@ def blackstone_project_cards_init():
                              3, "Necrons", "Common", 2, 3, 1, False),
         CardClasses.SupportCard("Unearthed Crypt", "Interrupt: When an army unit enters your discard pile, exhaust "
                                                    "this support to draw 1 card.", "Location.",
-                                1, "Necrons", "Common", False)
+                                1, "Necrons", "Common", False),
+        CardClasses.ArmyCard("Thundering Wraith", "Deep Strike (3).\n"
+                                                  "Reaction: After you deep strike this unit, target an enemy army "
+                                                  "unit. Your opponent must either deal 4 damage to that unit or "
+                                                  "rout it.", "Drone. Elite.",
+                             5, "Necrons", "Common", 4, 5, 1, False, deepstrike=3)
     ]
     return blackstone_project_cards
