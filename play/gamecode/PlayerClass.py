@@ -2271,6 +2271,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
             self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
                                                                               last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Goff Shokboyz":
+            self.game.create_reaction("Goff Shokboyz", self.name_player, (int(self.number), position,
+                                                                          last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Elusive Escort":
             self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), position,
                                                                            last_element_index))

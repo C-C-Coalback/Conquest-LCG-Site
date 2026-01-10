@@ -192,6 +192,10 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Convincing Cutouts", "Action: Exhaust this support to move a target non-warlord unit "
                                                       "you control at a planet without an enemy warlord to your HQ.",
                                 "Upgrade.", 1, "Orks", "Common", False, action_in_play=True,
-                                allowed_phases_in_play="ALL")
+                                allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Goff Shokboyz", "Reaction: After this unit enters play, treat the printed text box of a"
+                                              " target army unit at this planet as if it were blank (except for Traits)"
+                                              " until the end of the round.", "Warrior. Boyz. Ally.",
+                             1, "Orks", "Common", 2, 1, 0, False)
     ]
     return blackstone_project_cards

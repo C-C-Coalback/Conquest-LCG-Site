@@ -404,7 +404,8 @@ class Game:
                                  "Hydrae Stalker", "Dutiful Castellan", "Frenzied Wulfen", "Inspiring Sergeant",
                                  "Pinning Razorback", "Wrathful Dreadnought", "Junk Chucka Kommando",
                                  "Patient Infiltrator", "Slave-powered Wagons", "Lekor Blight-Tongue",
-                                 "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows"]
+                                 "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows",
+                                 "Goff Shokboyz"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
