@@ -176,6 +176,11 @@ def blackstone_project_cards_init():
                                                        "Forced Reaction: After attached unit resolves an attack, "
                                                        "deal 1 damage to it.",
                                    "Wargear. Weapon.", 1, "Orks", "Common", 1, False, action_in_hand=True,
-                                   allowed_phases_in_hand=True, extra_attack=3, required_traits="Runt", ambush=True)
+                                   allowed_phases_in_hand=True, extra_attack=3, required_traits="Runt", ambush=True),
+        CardClasses.AttachmentCard("Fungal Infestation", "Attach to a planet. Limit 1 per planet. \n"
+                                                         "Reaction: After a non-token unit you control leaves play "
+                                                         "from this planet, put a Snotlings token into play under "
+                                                         "your control at this planet. ", "Upgrade.",
+                                   3, "Orks", "Loyal", 2, False, planet_attachment=True, limit_one_per_unit=True)
     ]
     return blackstone_project_cards

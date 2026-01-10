@@ -6951,6 +6951,9 @@ class Player:
                     if not self.check_if_already_have_reaction("The Dance Without End"):
                         self.game.create_reaction("The Dance Without End", self.name_player,
                                                   (int(self.number), planet_num, -1))
+        if card.get_card_type() != "Token":
+            if self.search_planet_attachments(planet_num, "Fungal Infestation"):
+                self.game.create_reaction("Fungal Infestation", self.name_player, (int(self.number), planet_num, -1))
         for i in range(len(card.get_attachments())):
             owner = card.get_attachments()[i].name_owner
             if card.get_attachments()[i].get_ability() == "Straken's Cunning":

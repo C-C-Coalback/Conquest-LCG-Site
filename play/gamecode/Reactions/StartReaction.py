@@ -513,6 +513,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Fungal Infestation":
+            primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.delete_reaction()
         elif current_reaction == "Klan Totem":
             primary_player.exhaust_card_in_hq_given_name("Klan Totem")
             self.chosen_first_card = False
