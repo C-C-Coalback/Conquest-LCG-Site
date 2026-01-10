@@ -242,7 +242,10 @@ def blackstone_project_cards_init():
                                              "sacrificed while paying its cost.", "Daemon. Elite.",
                              7, "Chaos", "Common", 6, 6, 1, True),
         CardClasses.EventCard("Putrescent Corpulence", "Action: Rally 12 up to 2 Blessing or Curse attachments, "
-                                                          "add them to your hand.", "Power. Nurgle.",
-                              1, "Chaos", "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="ALL")
+                                                       "add them to your hand.", "Power. Nurgle.",
+                              1, "Chaos", "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Great Unclean One", "Lumbering.\n"
+                                                  "Each army unit you control at this planet gains Sweep (2).",
+                             "Daemon. Nurgle. Elite.", 7, "Chaos", "Loyal", 2, 9, 4, False, lumbering=True)
     ]
     return blackstone_project_cards

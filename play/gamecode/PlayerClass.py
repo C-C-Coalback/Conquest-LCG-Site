@@ -1919,6 +1919,9 @@ class Player:
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Kastelan Crusher":
             if self.get_has_faith_given_pos(planet_pos, unit_pos):
                 sweep_value += 3
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.get_ability_given_pos(planet_pos, i) == "Great Unclean One":
+                sweep_value += 2
         return sweep_value
 
     def get_card_in_hand(self, position_hand):
