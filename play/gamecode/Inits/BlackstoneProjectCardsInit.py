@@ -181,6 +181,13 @@ def blackstone_project_cards_init():
                                                          "Reaction: After a non-token unit you control leaves play "
                                                          "from this planet, put a Snotlings token into play under "
                                                          "your control at this planet. ", "Upgrade.",
-                                   3, "Orks", "Loyal", 2, False, planet_attachment=True, limit_one_per_unit=True)
+                                   3, "Orks", "Loyal", 2, False, planet_attachment=True, limit_one_per_unit=True),
+        CardClasses.AttachmentCard("Speed Freakz Warpaint", "Deep Strike (1). \n"
+                                                            "Attach to an Orks army unit.\n"
+                                                            "Attached unit gains the Red trait. \n"
+                                                            "Attached unit gains \"Goes Fasta - This unit gets +3 ATK"
+                                                            " while your opponent has the initiative.\"", "Upgrade.",
+                                   1, "Orks", "Common", 1, False, unit_must_match_faction=True,
+                                   type_of_units_allowed_for_attachment="Army", deepstrike=1)
     ]
     return blackstone_project_cards

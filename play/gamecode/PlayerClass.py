@@ -5157,6 +5157,9 @@ class Player:
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
+            if attachments[i].get_ability() == "Speed Freakz Warpaint":
+                if self.get_enemy_has_init_for_cards(planet_id, unit_id):
+                    attack_value += 3
             if attachments[i].get_ability() == "Medallion of Betrayal":
                 if self.check_for_trait_given_pos(planet_id, unit_id, "Cultist"):
                     attack_value += 1
