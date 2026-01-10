@@ -2412,11 +2412,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.action_cleanup()
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+    elif self.action_chosen == "Convincing Cutouts":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if not primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":
+                    if not secondary_player.check_for_warlord(planet_pos):
+                        primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
+                        self.action_cleanup()
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = int(game_update_string[2])
-            unit_pos = int(game_update_string[3])
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
                 can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:

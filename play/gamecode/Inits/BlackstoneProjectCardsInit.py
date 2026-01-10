@@ -188,6 +188,10 @@ def blackstone_project_cards_init():
                                                             "Attached unit gains \"Goes Fasta - This unit gets +3 ATK"
                                                             " while your opponent has the initiative.\"", "Upgrade.",
                                    1, "Orks", "Common", 1, False, unit_must_match_faction=True,
-                                   type_of_units_allowed_for_attachment="Army", deepstrike=1)
+                                   type_of_units_allowed_for_attachment="Army", deepstrike=1),
+        CardClasses.SupportCard("Convincing Cutouts", "Action: Exhaust this support to move a target non-warlord unit "
+                                                      "you control at a planet without an enemy warlord to your HQ.",
+                                "Upgrade.", 1, "Orks", "Common", False, action_in_play=True,
+                                allowed_phases_in_play="ALL")
     ]
     return blackstone_project_cards
