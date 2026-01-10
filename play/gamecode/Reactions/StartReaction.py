@@ -2601,6 +2601,11 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Kroot Hunting Rifle":
             primary_player.add_resources(1)
             self.delete_reaction()
+        elif current_reaction == "Lokhust Destroyer":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Prognosticator":
             primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
         elif current_reaction == "Interceptor Squad":

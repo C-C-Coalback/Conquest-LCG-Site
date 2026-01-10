@@ -263,6 +263,11 @@ def blackstone_project_cards_init():
                                                   "Reaction: After you deep strike this unit, target an enemy army "
                                                   "unit. Your opponent must either deal 4 damage to that unit or "
                                                   "rout it.", "Drone. Elite.",
-                             5, "Necrons", "Common", 4, 5, 1, False, deepstrike=3)
+                             5, "Necrons", "Common", 4, 5, 1, False, deepstrike=3),
+        CardClasses.ArmyCard("Lokhust Destroyer", "No Wargear Attachments.\n"
+                                                  "Reaction: After a unit whose faction matches your enslavement dial "
+                                                  "is destroyed at this planet, ready this unit. "
+                                                  "(Limit once per phase)", "Warrior.",
+                             3, "Necrons", "Common", 3, 3, 1, False, wargear_attachments_permitted=False)
     ]
     return blackstone_project_cards

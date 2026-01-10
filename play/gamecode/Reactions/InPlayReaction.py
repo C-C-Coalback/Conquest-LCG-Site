@@ -781,6 +781,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.misc_target_unit = (planet_pos, unit_pos)
                             self.choices_available = ["Deal 4 Damage", "Rout Unit"]
                             self.choice_context = "Thundering Wraith Choice"
+                            secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.name_player_making_choices = secondary_player.name_player
                             self.resolving_search_box = True
         elif current_reaction == "Blazing Zoanthrope":

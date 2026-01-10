@@ -3422,6 +3422,7 @@ class Game:
                         await self.resolve_battle_conclusion(name, game_update_string)
                     elif self.choice_context == "Thundering Wraith Choice":
                         pla, pos = self.misc_target_unit
+                        primary_player.reset_aiming_reticle_in_play(pla, pos)
                         if chosen_choice == "Rout Unit":
                             primary_player.rout_unit(pla, pos)
                         else:
