@@ -212,6 +212,12 @@ def blackstone_project_cards_init():
                                                   "unit you control destroys an army unit by an attack, move 1 damage "
                                                   "from the attacker to a target unit at the same planet.", "Power.",
                               2, "Orks", "Loyal", 2, False, action_in_hand=True,
-                              allowed_phases_in_hand="COMBAT")
+                              allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Deff Dread", "No Wargear Attachments.\n"
+                                           "Brutal.\n"
+                                           "Reaction: After this unit is assigned damage by an attack, you may deal "
+                                           "2 damage to this unit to deal 3 damage to the attacker.",
+                             "Vehicle. Elite.", 7, "Orks", "Loyal", 4, 7, 3, False, brutal=True,
+                             wargear_attachments_permitted=False)
     ]
     return blackstone_project_cards

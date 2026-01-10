@@ -7754,21 +7754,33 @@ class Game:
                                 if self.amount_that_can_be_removed_by_shield[0] == 0:
                                     primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                            elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Deff Dread" and not \
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                if self.positions_attackers_of_units_to_take_damage[0]:
+                                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, preventable=False,
+                                                                        by_enemy_unit=False)
+                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                    if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
+                                        self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
+                                                             (int(primary_player.number), planet_pos, unit_pos))
+                                    _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                    secondary_player.assign_damage_to_pos(att_pla, att_pos, 3, rickety_warbuggy=True)
                             elif primary_player.get_ability_given_pos(
                                     hurt_planet, hurt_pos) == "Evanescent Players" and not \
                                     primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos) and \
                                     self.amount_that_can_be_removed_by_shield[0] > 2 and \
-                                    secondary_player.special_get_card_type_given_pos(
-                                        self.positions_attackers_of_units_to_take_damage[0]
-                                    ) == "Army":
-                                damage_prevented = self.amount_that_can_be_removed_by_shield[0] - 2
-                                self.amount_that_can_be_removed_by_shield[0] = 2
-                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_prevented)
-                                _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
-                                secondary_player.assign_damage_to_pos(att_pla, att_pos, damage_prevented,
-                                                                      rickety_warbuggy=True,
-                                                                      shadow_field_possible=True)
-                                primary_player.set_once_per_phase_used_given_pos(hurt_planet, hurt_pos, True)
+                                    self.positions_attackers_of_units_to_take_damage[0]:
+                                if secondary_player.special_get_card_type_given_pos(
+                                    self.positions_attackers_of_units_to_take_damage[0]
+                                ) == "Army":
+                                    damage_prevented = self.amount_that_can_be_removed_by_shield[0] - 2
+                                    self.amount_that_can_be_removed_by_shield[0] = 2
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_prevented)
+                                    _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
+                                    secondary_player.assign_damage_to_pos(att_pla, att_pos, damage_prevented,
+                                                                          rickety_warbuggy=True,
+                                                                          shadow_field_possible=True)
+                                    primary_player.set_once_per_phase_used_given_pos(hurt_planet, hurt_pos, True)
                             elif can_faith and can_retaliate:
                                 self.choices_available = ["Faith", "Retaliate"]
                                 self.choice_context = "Use which effect? (shield-likes)"
@@ -8713,6 +8725,8 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Follower of Gork")
         primary_player.reset_card_name_misc_ability("Noble Shining Spears")
         secondary_player.reset_card_name_misc_ability("Noble Shining Spears")
+        primary_player.reset_card_name_misc_ability("Deff Dread")
+        secondary_player.reset_card_name_misc_ability("Deff Dread")
         primary_player.phalanx_shield_value = 0
         secondary_player.phalanx_shield_value = 0
         if not self.retaliate_used:
