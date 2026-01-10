@@ -6598,6 +6598,11 @@ class Player:
                                     if self.cards_in_play[i + 1][j].deepstrike_card_name == "Impulsive Loota":
                                         self.game.create_reaction("Impulsive Loota In Play", self.name_player,
                                                                   (int(self.number), -1, -1))
+            if card.get_card_type() == "Army":
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Unearthed Crypt":
+                        if self.get_ready_given_pos(-2, i):
+                            self.game.create_interrupt("Unearthed Crypt", self.name_player, (int(self.number), -2, i))
             if card_name == "Cardinal Agra Decree":
                 self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
             if card_name == "Medallion of Betrayal":

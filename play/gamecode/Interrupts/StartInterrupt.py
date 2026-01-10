@@ -338,7 +338,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "World Engine Beam":
             primary_player.sacrifice_card_in_hq(unit_pos)
         elif current_interrupt == "Quantum Shielding":
-            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             card = FindCard.find_card("Quantum Shielding", self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             primary_player.attach_card(card, planet_pos, unit_pos)
@@ -346,7 +345,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.discard.remove("Quantum Shielding")
             self.delete_interrupt()
         elif current_interrupt == "Growing Tide":
-            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             if self.round_number != 6:
                 if planet_pos != 6 and unit_pos != -1:
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
@@ -401,8 +399,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
                                                           discounts=self.discounts_applied)
             else:
                 pass
+        elif current_interrupt == "Unearthed Crypt":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            primary_player.draw_card()
+            self.delete_interrupt()
         elif current_interrupt == "Icy Trygon":
-            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = False
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
             primary_player.discard_attachments_from_card(planet_pos, unit_pos)

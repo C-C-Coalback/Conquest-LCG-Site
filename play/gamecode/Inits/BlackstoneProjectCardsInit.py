@@ -255,6 +255,9 @@ def blackstone_project_cards_init():
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
                                                   "exhaust it. (Limit once per phase)", "Soldier. Novokh.",
-                             3, "Necrons", "Common", 2, 3, 1, False)
+                             3, "Necrons", "Common", 2, 3, 1, False),
+        CardClasses.SupportCard("Unearthed Crypt", "Interrupt: When an army unit enters your discard pile, exhaust "
+                                                   "this support to draw 1 card.", "Location.",
+                                1, "Necrons", "Common", False)
     ]
     return blackstone_project_cards
