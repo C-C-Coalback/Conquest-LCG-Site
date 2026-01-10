@@ -35,6 +35,7 @@
         </select>
         <input id="update-ally" type="button" value="Update Factions" onclick="sendAlly();">
         <p id="ok-ally">Ally OK</p>
+        <div id="card-count-div">Card Count: <p id="card-count">0</p></div>
     </div>
     <div id="signature-squad-cards" class="db-section">Signature Squad
 
@@ -107,6 +108,8 @@
                 var x = document.getElementById(holderName);
                 x.remove();
             }
+            cardCount = cardCount - 1;
+            updateCardCount();
         }
     }
 
@@ -128,8 +131,15 @@
             if (str[2] !== max_copies) {
                 str = incrementString(str);
                 e.innerHTML = str;
+                cardCount = cardCount + 1;
+                updateCardCount();
             }
         }
+    }
+
+    function updateCardCount() {
+        var e = document.getElementById("card-count");
+        e.innerHTML = cardCount.toString();
     }
 
     function notCheckedAlly() {
@@ -214,6 +224,8 @@
                 document.getElementById('warlord-card').innerHTML = `<img id=` + warlordName.split(' ').join('_') + ` src=` + route + ` class="db-image">`
                 document.getElementById('synapse-card').innerHTML = `<img id="Cardback" src="/static/images/CardImages/Cardback.jpg" class="db-image">`
                 document.getElementById('pledge-card').innerHTML = `<img id="EmptyPledge" src="/static/images/CardImages/Cardback.jpg" class="db-image">`
+                cardCount = 8;
+                updateCardCount();
             } else if (split_data[0] === "SS") {
                 var cardName = split_data[1];
                 var idName = split_data[1].split(' ').join('_');
@@ -260,6 +272,8 @@
                     if (str[2] !== max_copies) {
                         str = incrementString(str);
                         e.innerHTML = str;
+                        cardCount = cardCount + 1;
+                        updateCardCount();
                     }
                 } else {
                     var newPart = `<div class="card-name-and-count" id=`;
@@ -277,6 +291,8 @@
                     newPart += ` type="button" value="-" onclick="decreaseCount(this.id);">`
                     newPart += `</div>`
                     document.getElementById("army-cards").innerHTML += newPart;
+                    cardCount = cardCount + 1;
+                    updateCardCount();
                 }
             } else if (split_data[0] === "Support"){
                 var cardName = split_data[1];
@@ -293,6 +309,8 @@
                     if (str[2] !== "3") {
                         str = incrementString(str);
                         e.innerHTML = str;
+                        cardCount = cardCount + 1;
+                        updateCardCount();
                     }
                 } else {
                     var newPart = `<div class="card-name-and-count" id=`;
@@ -310,6 +328,8 @@
                     newPart += ` type="button" value="-" onclick="decreaseCount(this.id);">`
                     newPart += `</div>`
                     document.getElementById("support-cards").innerHTML += newPart;
+                    cardCount = cardCount + 1;
+                    updateCardCount();
                 }
             } else if (split_data[0] === "Attachment") {
                 var cardName = split_data[1];
@@ -322,6 +342,8 @@
                     if (str[2] !== "3") {
                         str = incrementString(str);
                         e.innerHTML = str;
+                        cardCount = cardCount + 1;
+                        updateCardCount();
                     }
                 } else {
                     var newPart = `<div class="card-name-and-count" id=`;
@@ -339,6 +361,8 @@
                     newPart += ` type="button" value="-" onclick="decreaseCount(this.id);">`
                     newPart += `</div>`
                     document.getElementById("attachment-cards").innerHTML += newPart;
+                    cardCount = cardCount + 1;
+                    updateCardCount();
                 }
             } else if (split_data[0] === "Event"){
                 var cardName = split_data[1];
@@ -351,6 +375,8 @@
                     if (str[2] !== "3") {
                         str = incrementString(str);
                         e.innerHTML = str;
+                        cardCount = cardCount + 1;
+                        updateCardCount();
                     }
                 } else {
                     var newPart = `<div class="card-name-and-count" id=`;
@@ -368,6 +394,8 @@
                     newPart += ` type="button" value="-" onclick="decreaseCount(this.id);">`
                     newPart += `</div>`
                     document.getElementById("event-cards").innerHTML += newPart;
+                    cardCount = cardCount + 1;
+                    updateCardCount();
                 }
             } else {
                 // document.querySelector('#chat-log').value += (data.message + '\n');
@@ -427,6 +455,7 @@
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Army\n\n";
         var elements = document.getElementById("army-cards").children;
+        cardCount = 8;
         var text = "";
         for (i = 0; i < elements.length; i++) {
             var collection = elements[i].children;
@@ -454,6 +483,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
+            cardCount = cardCount + Number(count);
         }
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Support\n\n";
@@ -485,6 +515,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
+            cardCount = cardCount + Number(count);
         }
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Synapse\n\n";
@@ -522,6 +553,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
+            cardCount = cardCount + Number(count);
         }
         document.getElementById("chat-log").value += "\n----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Event\n\n";
@@ -553,7 +585,9 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
+            cardCount = cardCount + Number(count);
         }
+        updateCardCount();
         document.getElementById("chat-log").value += "\n----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Planet\n\n";
     }

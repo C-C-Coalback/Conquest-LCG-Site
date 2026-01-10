@@ -17,16 +17,25 @@
 .db-image {
     width: 75px;
     height: 100px;
+    align-self: center;
+}
+
+#card-count {
+    display: inline;
+}
+
+.poster-card {
+    display: flex;
 }
 
 .auto-deck-build {
     background: rgba(47, 40, 153, 0.3);
     width: 525px;
-    height: 500px;
+    height: auto;
     border: 5px solid green;
     display: grid;
     grid-template-columns: 75px 75px 25px 50px 50px 75px 50px 125px;
-    grid-template-rows: 100px 200px 200px;
+    grid-template-rows: 150px 200px 200px;
     grid-template-areas:
     "warlord-card synapse-card pledge-card pledge-card details details details details"
     "signature-squad-cards signature-squad-cards signature-squad-cards army-cards army-cards army-cards army-cards army-cards"
