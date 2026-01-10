@@ -13,7 +13,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
     print(self.player_who_resolves_reaction)
     current_reaction = self.reactions_needing_resolving[0]
     if name == self.player_who_resolves_reaction[0]:
-        if self.reactions_needing_resolving[0] == "Power from Pain":
+        if current_reaction == "Power from Pain":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
                 planet_pos = int(game_update_string[2])
@@ -23,7 +23,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
                     await secondary_player.dark_eldar_event_played()
                     secondary_player.torture_event_played("Power from Pain")
-        elif self.reactions_needing_resolving[0] == "Nullify":
+        elif current_reaction == "Nullify":
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
             if primary_player.valid_nullify_unit(planet_pos, unit_pos):
@@ -41,7 +41,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     await self.complete_nullify()
                 self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
+        elif current_reaction == "Commander Shadowsun hand":
             if self.location_hand_attachment_shadowsun != -1:
                 if planet_pos == primary_player.warlord_commit_location:
                     if game_update_string[1] == primary_player.number:
@@ -68,7 +68,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
                     else:
                         await self.send_update_message("Invalid target")
-        elif self.reactions_needing_resolving[0] == "Commander Shadowsun discard":
+        elif current_reaction == "Commander Shadowsun discard":
             if planet_pos == primary_player.warlord_commit_location:
                 if game_update_string[1] == primary_player.number:
                     player_receiving_attachment = primary_player
@@ -96,7 +96,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
                 else:
                     await self.send_update_message("Invalid target")
-        elif self.reactions_needing_resolving[0] == "Ku'gath Plaguefather":
+        elif current_reaction == "Ku'gath Plaguefather":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:
                     if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
@@ -130,7 +130,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "The Plaguefather's Banner":
+        elif current_reaction == "The Plaguefather's Banner":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:
                     if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
@@ -206,7 +206,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -246,7 +246,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -278,7 +278,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Klaivex Warleader":
+        elif current_reaction == "Klaivex Warleader":
             att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
             if att_pla == planet_pos:
                 if game_update_string[1] == "1":
@@ -306,7 +306,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.choices_available.insert(0, "No Interrupt")
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Interrupt Effect?"
-                                self.nullified_card_name = self.reactions_needing_resolving[0]
+                                self.nullified_card_name = current_reaction
                                 self.cost_card_nullified = 0
                                 self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
@@ -320,7 +320,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Prodigal Sons Disciple":
+        elif current_reaction == "Prodigal Sons Disciple":
             if game_update_string[1] == secondary_player.number:
                 att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
                 if att_pla == planet_pos:
@@ -342,7 +342,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -375,7 +375,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -409,7 +409,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -453,7 +453,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.choices_available.insert(0, "No Interrupt")
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Interrupt Effect?"
-                                self.nullified_card_name = self.reactions_needing_resolving[0]
+                                self.nullified_card_name = current_reaction
                                 self.cost_card_nullified = 0
                                 self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
@@ -463,7 +463,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                       rickety_warbuggy=True, shadow_field_possible=True)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Fenrisian Wolf":
+        elif current_reaction == "Fenrisian Wolf":
             att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
             if att_pla == planet_pos:
                 if game_update_string[1] == "1":
@@ -488,7 +488,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -498,7 +498,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Vengeance!":
+        elif current_reaction == "Vengeance!":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines" \
@@ -520,7 +520,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 1
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -530,7 +530,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.discard_card_name_from_hand("Vengeance!")
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Commander Starblaze":
+        elif current_reaction == "Commander Starblaze":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
                     war_num, war_pla, war_pos = self.positions_of_unit_triggering_reaction[0]
@@ -654,7 +654,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -679,7 +679,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):
                     self.create_reaction("Vow of Honor", primary_player.name_player,
                                          (int(primary_player.number), -1, -1))
-        elif self.reactions_needing_resolving[0] == "Kabalite Harriers":
+        elif current_reaction == "Kabalite Harriers":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
@@ -703,7 +703,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -712,7 +712,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Veteran Barbrus":
+        elif current_reaction == "Veteran Barbrus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
@@ -737,7 +737,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -751,7 +751,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     await self.send_update_message(
                         "Forbidden faction for Veteran Barbrus.")
-        elif self.reactions_needing_resolving[0] == "Blazing Zoanthrope":
+        elif current_reaction == "Blazing Zoanthrope":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -772,7 +772,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -784,7 +784,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Fire Prism":
+        elif current_reaction == "Fire Prism":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -805,7 +805,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -836,7 +836,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.choices_available.insert(0, "No Interrupt")
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Interrupt Effect?"
-                                self.nullified_card_name = self.reactions_needing_resolving[0]
+                                self.nullified_card_name = current_reaction
                                 self.cost_card_nullified = 0
                                 self.nullify_string = "/".join(game_update_string)
                                 self.first_player_nullified = primary_player.name_player
@@ -845,7 +845,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Obedience":
+        elif current_reaction == "Obedience":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) != "Necrons":
@@ -877,7 +877,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -907,7 +907,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -917,7 +917,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Invasive Genestealers":
+        elif current_reaction == "Invasive Genestealers":
             if game_update_string[1] == secondary_player.get_number():
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     can_continue = True
@@ -937,7 +937,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -948,7 +948,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Soul Grinder":
+        elif current_reaction == "Soul Grinder":
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
                 unit_pos_sg = self.positions_of_unit_triggering_reaction[0][2]
@@ -980,7 +980,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -1015,7 +1015,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
                         else:
                             await self.send_update_message("PROBLEM: NO UNIT FOR THUNDERWOLF CAVALRY TO SWITCH WITH!")
-        elif self.reactions_needing_resolving[0] == "Fire Warrior Elite":
+        elif current_reaction == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
                 _, current_planet, current_unit = self.last_defender_position
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
@@ -1028,7 +1028,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self, secondary_player.name_player, game_update_string)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+        elif current_reaction == "Tomb Blade Squadron":
             if not self.chosen_first_card and not self.chosen_second_card:
                 if game_update_string[1] == primary_player.get_number():
                     if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Tomb Blade Squadron":
@@ -1061,7 +1061,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -1084,7 +1084,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.misc_target_unit = (planet_pos, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                                 self.chosen_first_card = True
-        elif self.reactions_needing_resolving[0] == "Made Ta Fight":
+        elif current_reaction == "Made Ta Fight":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
@@ -1111,7 +1111,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 2
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -1122,7 +1122,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter,
                                                               by_enemy_unit=False)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Eldorath Starbane":
+        elif current_reaction == "Eldorath Starbane":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
                     player_exhausting_unit = self.p1
@@ -1145,7 +1145,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -1251,14 +1251,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             else:
                                 await self.send_update_message(
                                     "Could not pay the cost for the Impulsive Loota! Cancelling...")
-        elif self.reactions_needing_resolving[0] == "Blackmane Sentinel":
+        elif current_reaction == "Blackmane Sentinel":
             if game_update_string[1] == primary_player.get_number():
                 warlord_pla = primary_player.find_warlord_planet()
                 if warlord_pla != planet_pos and warlord_pla != -1:
                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blackmane Sentinel":
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Ragnar Blackmane":
+        elif current_reaction == "Ragnar Blackmane":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == secondary_player.get_number():
                     can_continue = True
@@ -1278,7 +1278,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -1313,7 +1313,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -1359,7 +1359,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -1443,7 +1443,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -1531,7 +1531,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -1563,7 +1563,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -1608,7 +1608,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -1775,7 +1775,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -1803,7 +1803,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Shrouded Harlequin":
+        elif current_reaction == "Shrouded Harlequin":
             if game_update_string[1] != primary_player.get_number():
                 can_continue = True
                 possible_interrupts = []
@@ -1822,7 +1822,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -1853,7 +1853,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               self.sweep_value, can_shield=can_shield,
                                                               rickety_warbuggy=True, shadow_field_possible=shadow)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Imperial Fists Siege Force":
+        elif current_reaction == "Imperial Fists Siege Force":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
@@ -1875,14 +1875,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.rout_unit(planet_pos, unit_pos)
-        elif self.reactions_needing_resolving[0] == "Superiority":
+        elif current_reaction == "Superiority":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
@@ -1907,7 +1907,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 self.choices_available.insert(0, "No Interrupt")
                 self.name_player_making_choices = secondary_player.name_player
                 self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.reactions_needing_resolving[0]
+                self.nullified_card_name = current_reaction
                 self.cost_card_nullified = 0
                 self.nullify_string = "/".join(game_update_string)
                 self.first_player_nullified = primary_player.name_player
@@ -1922,7 +1922,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Venomthrope Polluter":
+        elif current_reaction == "Venomthrope Polluter":
             if game_update_string[1] == primary_player.number:
                 if primary_player.check_for_warlord(planet_pos):
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -1930,7 +1930,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Commissarial Bolt Pistol":
+        elif current_reaction == "Commissarial Bolt Pistol":
             og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos == og_pla:
                 can_continue = True
@@ -1964,7 +1964,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Alaitoc Shrine":
+        elif current_reaction == "Alaitoc Shrine":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
                 player_num = int(primary_player.get_number())
@@ -1976,7 +1976,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.allowed_units_alaitoc_shrine = []
                     else:
                         await self.send_update_message("Unit already ready")
-        elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
+        elif current_reaction == "Cato's Stronghold":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
                 if self.cato_stronghold_activated:
@@ -2130,7 +2130,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -2146,14 +2146,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if card_type == "Warlord" or card_type == "Synapse":
                     primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
                     self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Standard Bearer":
+        elif current_reaction == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Nocturne-Ultima Storm Bolter":
+        elif current_reaction == "Nocturne-Ultima Storm Bolter":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
             else:
@@ -2183,7 +2183,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -2193,7 +2193,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack,
                                                               by_enemy_unit=False)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Burna Boyz":
+        elif current_reaction == "Burna Boyz":
             if primary_player.get_number() != game_update_string[1]:
                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]
                 if int(game_update_string[2]) == origin_planet:
@@ -2269,7 +2269,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOR")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Venomous Fiend":
+        elif current_reaction == "Venomous Fiend":
             if primary_player.get_number() != game_update_string[1]:
                 origin_planet = self.positions_of_unit_triggering_reaction[0][1]
                 if int(game_update_string[2]) == origin_planet:
@@ -2292,7 +2292,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player
@@ -2303,14 +2303,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                   rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Treacherous Lhamaean":
+        elif current_reaction == "Treacherous Lhamaean":
             num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
             if primary_player.number == game_update_string[1]:
                 if origin_planet == planet_pos and origin_pos != unit_pos:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Defense Battery":
+        elif current_reaction == "Defense Battery":
             if self.chosen_first_card:
                 if game_update_string[1] == secondary_player.get_number():
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2366,7 +2366,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -2395,7 +2395,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Interrupt Effect?"
-                        self.nullified_card_name = self.reactions_needing_resolving[0]
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 0
                         self.nullify_string = "/".join(game_update_string)
                         self.first_player_nullified = primary_player.name_player
@@ -2493,7 +2493,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.choices_available.insert(0, "No Interrupt")
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.reactions_needing_resolving[0]
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 0
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player
@@ -2560,7 +2560,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Banner of the Ashen Sky":
+        elif current_reaction == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
                     primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
@@ -2573,7 +2573,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             shadow_field_possible=True)
                     self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Cry of the Wind":
+        elif current_reaction == "Cry of the Wind":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
                     if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
@@ -2605,7 +2605,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         secondary_player.reset_all_aiming_reticles_play_hq()
                         self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Sicarius's Chosen":
+        elif current_reaction == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
             origin_planet = self.positions_of_unit_triggering_reaction[0][1]
             target_planet = int(game_update_string[2])
@@ -2631,7 +2631,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.choices_available.insert(0, "No Interrupt")
                             self.name_player_making_choices = secondary_player.name_player
                             self.choice_context = "Interrupt Effect?"
-                            self.nullified_card_name = self.reactions_needing_resolving[0]
+                            self.nullified_card_name = current_reaction
                             self.cost_card_nullified = 0
                             self.nullify_string = "/".join(game_update_string)
                             self.first_player_nullified = primary_player.name_player

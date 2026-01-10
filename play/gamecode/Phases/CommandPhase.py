@@ -298,10 +298,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_context = "Foresight"
                         elif primary_player.spend_resources(1):
                             warlord_planet = primary_player.warlord_commit_location
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
-                                                                               warlord_planet, -1])
-                            self.reactions_needing_resolving.append("Foresight")
-                            self.player_who_resolves_reaction.append(primary_player.name_player)
+                            self.create_reaction("Foresight", primary_player.name_player,
+                                                 (int(primary_player.get_number()),
+                                                  warlord_planet, -1))
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif primary_player.cards[hand_pos] == "Sweep Attack":
@@ -320,10 +319,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_context = "Sweep Attack"
                         else:
                             warlord_planet = primary_player.warlord_commit_location
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
-                                                                               warlord_planet, -1])
-                            self.reactions_needing_resolving.append("Sweep Attack")
-                            self.player_who_resolves_reaction.append(primary_player.name_player)
+                            self.create_reaction("Sweep Attack", primary_player.name_player,
+                                                 (int(primary_player.get_number()),
+                                                  warlord_planet, -1))
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif primary_player.cards[hand_pos] == "Blackmane's Hunt":
@@ -342,10 +340,9 @@ async def update_game_event_command_section(self, name, game_update_string):
                             self.nullify_context = "Blackmane's Hunt"
                         else:
                             warlord_planet = primary_player.warlord_commit_location
-                            self.positions_of_unit_triggering_reaction.append([int(primary_player.get_number()),
-                                                                               warlord_planet, -1])
-                            self.reactions_needing_resolving.append("Blackmane's Hunt")
-                            self.player_who_resolves_reaction.append(primary_player.name_player)
+                            self.create_reaction("Blackmane's Hunt", primary_player.name_player,
+                                                 (int(primary_player.get_number()),
+                                                  warlord_planet, -1))
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
     elif self.during_command_struggle:

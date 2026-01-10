@@ -8,7 +8,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     chosen_planet = int(game_update_string[1])
     current_reaction = self.reactions_needing_resolving[0]
     num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-    if self.reactions_needing_resolving[0] == "Blackmane's Hunt":
+    if current_reaction == "Blackmane's Hunt":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])
         if abs(warlord_planet - new_planet) == 1:
@@ -238,7 +238,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.misc_target_planet = chosen_planet
             else:
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Luring Troupe":
+    elif current_reaction == "Luring Troupe":
         if self.chosen_first_card:
             planet_pos, unit_pos = self.misc_target_unit
             if abs(planet_pos - chosen_planet) == 1:
@@ -262,7 +262,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = primary_player.name_player
             self.tense_negotiations_active = True
-    elif self.reactions_needing_resolving[0] == "Foresight":
+    elif current_reaction == "Foresight":
         warlord_planet = primary_player.warlord_commit_location
         new_planet = int(game_update_string[1])
         if warlord_planet != new_planet:
@@ -270,7 +270,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.delete_reaction()
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
-    elif self.reactions_needing_resolving[0] == "Wyrdboy Stikk":
+    elif current_reaction == "Wyrdboy Stikk":
         primary_player.summon_token_at_planet("Snotlings", chosen_planet)
         self.delete_reaction()
     elif current_reaction == "Blood Axe Strategist":
@@ -293,26 +293,26 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.chosen_first_card = True
                 planet_name = self.planet_array[chosen_planet]
                 await self.send_update_message("You may now move units to " + planet_name + ".")
-    elif self.reactions_needing_resolving[0] == "Cry of the Wind":
+    elif current_reaction == "Cry of the Wind":
         if self.chosen_first_card:
             origin_planet, origin_pos = self.misc_target_unit
             if abs(origin_planet - chosen_planet) == 1:
                 primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                 primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Heretek Inventor":
+    elif current_reaction == "Heretek Inventor":
         p_num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
         if origin_planet != chosen_planet:
             secondary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Obedience":
+    elif current_reaction == "Obedience":
         if self.chosen_first_card:
             origin_planet, origin_pos = self.misc_target_unit
             new_planet = int(game_update_string[1])
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, new_planet)
             self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+    elif current_reaction == "Tomb Blade Squadron":
         if self.chosen_first_card and not self.chosen_second_card:
             current_planet, current_position = self.misc_target_unit
             if current_planet != chosen_planet:

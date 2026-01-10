@@ -500,6 +500,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                         sent_string += ". "
                         sent_string += active_games[self.game_position].name_2
                         sent_string += ": "
+                        print(active_games[self.game_position].additional_reactions_info)
                         for i in range(len(active_games[self.game_position].reactions_needing_resolving)):
                             if active_games[self.game_position].player_who_resolves_reaction[i] \
                                     == active_games[self.game_position].name_2:

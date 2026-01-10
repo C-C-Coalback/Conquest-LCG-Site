@@ -10,13 +10,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     if game_update_string[1] == "2":
         player_owning_card = self.p2
     print('hq reaction')
-    if self.reactions_needing_resolving[0] == "Power from Pain":
+    if current_reaction == "Power from Pain":
         if primary_player.headquarters[unit_pos].get_card_type() == "Army":
             primary_player.sacrifice_card_in_hq(unit_pos)
             self.delete_reaction()
             await secondary_player.dark_eldar_event_played()
             secondary_player.torture_event_played("Power from Pain")
-    elif self.reactions_needing_resolving[0] == "Nullify":
+    elif current_reaction == "Nullify":
         if primary_player.valid_nullify_unit(-2, unit_pos):
             primary_player.exhaust_given_pos(-2, unit_pos)
             if primary_player.urien_relevant:
@@ -32,14 +32,14 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             else:
                 await self.complete_nullify()
             self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Obedience":
+    elif current_reaction == "Obedience":
         if game_update_string[1] == primary_player.number:
             if primary_player.headquarters[unit_pos].get_is_unit():
                 if primary_player.get_faction_given_pos(-2, unit_pos) != "Necrons":
                     self.chosen_first_card = True
                     self.misc_target_unit = (-2, unit_pos)
                     primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
-    elif self.reactions_needing_resolving[0] == "Shrieking Basilisk":
+    elif current_reaction == "Shrieking Basilisk":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                 primary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
@@ -50,13 +50,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 secondary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Seraphim Superior Allegra":
+    elif current_reaction == "Seraphim Superior Allegra":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                 primary_player.ready_given_pos(-2, unit_pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Cato's Stronghold":
+    elif current_reaction == "Cato's Stronghold":
         if not self.cato_stronghold_activated:
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":
                 if primary_player.get_ready_given_pos(-2, unit_pos):
@@ -94,7 +94,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.misc_counter = self.misc_counter - 1
                 if self.misc_counter < 1:
                     self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Murder Cogitator":
+    elif current_reaction == "Murder Cogitator":
         if primary_player.get_ability_given_pos(-2, unit_pos) == "Murder Cogitator":
             if primary_player.headquarters[unit_pos].get_ready():
                 primary_player.exhaust_given_pos(-2, unit_pos)
@@ -231,7 +231,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                                 secondary_player.exhaust_given_pos(-2, unit_pos)
                                 self.chosen_first_card = True
                                 await self.send_update_message("Choose attachment.")
-    elif self.reactions_needing_resolving[0] == "Imperial Fists Devastators":
+    elif current_reaction == "Imperial Fists Devastators":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
@@ -295,7 +295,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     self.delete_reaction()
             else:
                 self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+    elif current_reaction == "Tomb Blade Squadron":
         if not self.chosen_first_card and not self.chosen_second_card:
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.headquarters[unit_pos].get_ability() == "Tomb Blade Squadron":
@@ -304,14 +304,14 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                         self.chosen_first_card = True
                         self.misc_target_unit = (-2, unit_pos)
                         primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
-    elif self.reactions_needing_resolving[0] == "Defense Battery":
+    elif current_reaction == "Defense Battery":
         if self.chosen_first_card:
             if game_update_string[1] == secondary_player.get_number():
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                     if secondary_player.headquarters[unit_pos].valid_defense_battery_target:
                         secondary_player.assign_damage_to_pos(-2, unit_pos, 2, by_enemy_unit=False)
                         self.delete_reaction()
-    elif self.reactions_needing_resolving[0] == "Beasthunter Wyches":
+    elif current_reaction == "Beasthunter Wyches":
         if primary_player.get_ability_given_pos(-2, unit_pos) == "Beasthunter Wyches":
             if primary_player.headquarters[unit_pos].get_reaction_available():
                 if primary_player.spend_resources(1):

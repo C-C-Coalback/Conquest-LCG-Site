@@ -246,6 +246,10 @@ def blackstone_project_cards_init():
                               1, "Chaos", "Loyal", 2, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Great Unclean One", "Lumbering.\n"
                                                   "Each army unit you control at this planet gains Sweep (2).",
-                             "Daemon. Nurgle. Elite.", 7, "Chaos", "Loyal", 2, 9, 4, False, lumbering=True)
+                             "Daemon. Nurgle. Elite.", 7, "Chaos", "Loyal", 2, 9, 4, False, lumbering=True),
+        CardClasses.ArmyCard("Seekers of Pleasure", "Reaction: After a Slaanesh unit you control takes damage, move "
+                                                    "this unit to that planet to have this unit gain Sweep (1) "
+                                                    "until the end of the round.", "Cultist. Slaanesh.",
+                             2, "Chaos", "Common", 1, 3, 1, False)
     ]
     return blackstone_project_cards

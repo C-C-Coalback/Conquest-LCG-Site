@@ -946,6 +946,20 @@ class Player:
                         self.assign_damage_to_pos(i, j, damage, by_enemy_unit=False)
                         self.cards_in_play[i + 1][j].reset_indirect_damage()
 
+    def increase_sweep_given_pos_eor(self, planet_id, unit_id, value):
+        if planet_id == -2:
+            self.headquarters[unit_ud].sweep_eor += value
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].sweep_eor += value
+        return None
+
+    def increase_sweep_given_pos_eop(self, planet_id, unit_id, value):
+        if planet_id == -2:
+            self.headquarters[unit_ud].sweep_eop += value
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].sweep_eop += value
+        return None
+
     def increase_retaliate_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
             self.headquarters[unit_ud].increase_retaliate_eop(value)
@@ -1636,11 +1650,13 @@ class Player:
                                 del self.game.reactions_needing_resolving[i]
                                 del self.game.player_who_resolves_reaction[i]
                                 del self.game.positions_of_unit_triggering_reaction[i]
+                                del self.game.additional_reactions_info[i]
                                 i = i - 1
                         else:
                             del self.game.reactions_needing_resolving[i]
                             del self.game.player_who_resolves_reaction[i]
                             del self.game.positions_of_unit_triggering_reaction[i]
+                            del self.game.additional_reactions_info[i]
                             i = i - 1
             i += 1
         i = 0
@@ -1655,6 +1671,7 @@ class Player:
                         del self.game.delayed_reactions_needing_resolving[i]
                         del self.game.delayed_player_who_resolves_reaction[i]
                         del self.game.delayed_positions_of_unit_triggering_reaction[i]
+                        del self.game.delayed_additional_reactions_info[i]
                         i = i - 1
             i += 1
 

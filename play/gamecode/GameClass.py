@@ -219,9 +219,11 @@ class Game:
         self.reactions_needing_resolving = []
         self.positions_of_unit_triggering_reaction = []
         self.player_who_resolves_reaction = []
+        self.additional_reactions_info = []
         self.delayed_reactions_needing_resolving = []
         self.delayed_positions_of_unit_triggering_reaction = []
         self.delayed_player_who_resolves_reaction = []
+        self.delayed_additional_reactions_info = []
         self.misc_counter = 0
         self.wounded_scream_blanked = False
         self.khymera_to_move_positions = []
@@ -650,6 +652,7 @@ class Game:
         self.reactions_needing_resolving = []
         self.player_who_resolves_reaction = []
         self.positions_of_unit_triggering_reaction = []
+        self.additional_reactions_info = []
         self.already_resolving_reaction = False
 
     def get_actions_allowed(self):
@@ -2674,6 +2677,9 @@ class Game:
         self.positions_of_unit_triggering_reaction.insert(
             0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
         )
+        self.additional_reactions_info.insert(
+            0, self.additional_reactions_info.pop(reaction_pos)
+        )
 
         print(self.reactions_needing_resolving)
         self.asking_if_reaction = True
@@ -4506,6 +4512,7 @@ class Game:
                                             del self.reactions_needing_resolving[i]
                                             del self.player_who_resolves_reaction[i]
                                             del self.positions_of_unit_triggering_reaction[i]
+                                            del self.additional_reactions_info[i]
                                             i = i - 1
                                 i = i + 1
                             primary_player.sacrifice_card_in_hq_given_name("Convent Prioris Advisor")
@@ -8691,6 +8698,7 @@ class Game:
             del self.reactions_needing_resolving[0]
             del self.player_who_resolves_reaction[0]
             del self.positions_of_unit_triggering_reaction[0]
+            del self.additional_reactions_info[0]
         if not self.reactions_needing_resolving:
             for i in range(len(self.p1.headquarters)):
                 if self.p1.check_is_unit_at_pos(-2, i):
@@ -8815,13 +8823,22 @@ class Game:
                                 primary_player.remove_damage_from_pos(def_pla, def_pos, 1)
                                 self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
                                                       (int(primary_player.number), -1, -1))
-                if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
-                    if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
-                                                            bloodied_relevant=True):
-                        if not primary_player.hit_by_gorgul:
-                            self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                 (int(primary_player.number), def_pla, def_pos))
-                            self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+                    if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
+                        if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
+                                                                bloodied_relevant=True):
+                            if not primary_player.hit_by_gorgul:
+                                self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                     (int(primary_player.number), def_pla, def_pos))
+                                self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                    if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh"):
+                        for i in range(7):
+                            if i != def_pla:
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
+                                        self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                             (int(primary_player.number), i, j),
+                                                             additional_info=def_pla)
             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                 player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
                 secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -9059,9 +9076,11 @@ class Game:
             self.reactions_needing_resolving.append(self.delayed_reactions_needing_resolving[i])
             self.player_who_resolves_reaction.append(self.delayed_player_who_resolves_reaction[i])
             self.positions_of_unit_triggering_reaction.append(self.delayed_positions_of_unit_triggering_reaction[i])
+            self.additional_reactions_info.append(self.delayed_additional_reactions_info[i])
         self.delayed_player_who_resolves_reaction = []
         self.delayed_reactions_needing_resolving = []
         self.delayed_positions_of_unit_triggering_reaction = []
+        self.delayed_additional_reactions_info = []
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
@@ -10474,7 +10493,7 @@ class Game:
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                 await self.resolve_battle_conclusion(name, ["", ""])
 
-    def create_delayed_reaction(self, reaction_name, player_name, unit_tuple):
+    def create_delayed_reaction(self, reaction_name, player_name, unit_tuple, additional_info=None):
         if player_name == self.name_1:
             player = self.p1
         else:
@@ -10483,8 +10502,9 @@ class Game:
             self.delayed_reactions_needing_resolving.append(reaction_name)
             self.delayed_player_who_resolves_reaction.append(player_name)
             self.delayed_positions_of_unit_triggering_reaction.append(unit_tuple)
+            self.delayed_additional_reactions_info.append(additional_info)
 
-    def create_reaction(self, reaction_name, player_name, unit_tuple):
+    def create_reaction(self, reaction_name, player_name, unit_tuple, additional_info=None):
         if player_name == self.name_1:
             player = self.p1
         else:
@@ -10493,6 +10513,7 @@ class Game:
             self.reactions_needing_resolving.append(reaction_name)
             self.player_who_resolves_reaction.append(player_name)
             self.positions_of_unit_triggering_reaction.append(unit_tuple)
+            self.additional_reactions_info.append(additional_info)
 
     def begin_combat_round(self):
         self.bloodthirst_active = [False, False, False, False, False, False, False]
