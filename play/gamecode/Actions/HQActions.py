@@ -1443,7 +1443,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        unit_pos = int(game_update_string[2])
         can_continue = True
         if player_being_hit.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
@@ -1469,12 +1468,31 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     + ", located at HQ, position " + str(unit_pos))
                 self.position_of_actioned_card = (-1, -1)
                 self.action_cleanup()
+    elif self.action_chosen == "Mob Up!":
+        can_continue = True
+        if player_owning_card.headquarters[unit_pos].get_card_type() == "Army":
+            if player_owning_card.name_player == secondary_player.name_player:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos)
+                if possible_interrupts:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            if can_continue:
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
+                self.action_cleanup()
     elif self.action_chosen == "Squiggify":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        unit_pos = int(game_update_string[2])
         can_continue = True
         if not player_being_hit.headquarters[unit_pos].check_for_a_trait("Vehicle", player_being_hit.etekh_trait) and \
                 player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Army":

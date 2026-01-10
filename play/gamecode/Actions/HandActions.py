@@ -626,13 +626,29 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_update_message("Already played a Limited card!")
                     elif ability == "Dark Possession":
                         primary_player.dark_possession_active = True
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
                     elif ability == "Sudden Reinforcements":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
+                    elif ability == "Mob Up!":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
+                        snotlings_total = 0
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_ability_given_pos(-2, i) == "Snotlings":
+                                if primary_player.get_ready_given_pos(-2, i):
+                                    primary_player.exhaust_given_pos(-2, i, card_effect=True)
+                                    snotlings_total += 1
+                        for i in range(7):
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                if primary_player.get_ability_given_pos(i, j) == "Snotlings":
+                                    if primary_player.get_ready_given_pos(i, j):
+                                        primary_player.exhaust_given_pos(i, j, card_effect=True)
+                                        snotlings_total += 1
+                        self.misc_counter = snotlings_total
                     elif ability == "Unending Barrage":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)

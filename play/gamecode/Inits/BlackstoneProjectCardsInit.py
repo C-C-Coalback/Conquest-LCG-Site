@@ -196,6 +196,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Goff Shokboyz", "Reaction: After this unit enters play, treat the printed text box of a"
                                               " target army unit at this planet as if it were blank (except for Traits)"
                                               " until the end of the round.", "Warrior. Boyz. Ally.",
-                             1, "Orks", "Common", 2, 1, 0, False)
+                             1, "Orks", "Common", 2, 1, 0, False),
+        CardClasses.EventCard("Mob Up!", "Action: Exhaust each Snotlings token you control to deal X damage to a target"
+                                         " army unit, where X is the number of Snotlings tokens exhausted by this"
+                                         " effect.", "Tactic.", 1, "Orks", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL")
     ]
     return blackstone_project_cards
