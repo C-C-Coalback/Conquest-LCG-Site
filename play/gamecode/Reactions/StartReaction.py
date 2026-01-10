@@ -2588,6 +2588,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Shadowsun plays attachment from hand or discard?"
             self.name_player_making_choices = self.player_who_resolves_reaction[0]
             self.misc_target_planet = self.positions_of_unit_triggering_reaction[0][1]
+        elif current_reaction == "Repurposed Pariah":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
+            enemy_pla, enemy_pos = self.additional_reactions_info[0]
+            secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Sickening Helbrute":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)

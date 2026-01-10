@@ -478,15 +478,22 @@ class Player:
             self.last_hand_string = card_string
             await self.game.send_update_message(card_string)
 
+    def count_units_with_trait_at_planet(self, trait, i):
+        copies = 0
+        if i == -2:
+            return copies
+        for j in range(len(self.cards_in_play[i + 1])):
+            if self.check_for_trait_given_pos(i, j, trait):
+                copies += 1
+        return copies
+
     def count_units_with_trait(self, trait):
         copies = 0
         for i in range(len(self.headquarters)):
             if self.check_for_trait_given_pos(-2, i, trait):
                 copies += 1
         for i in range(7):
-            for j in range(len(self.cards_in_play[i + 1])):
-                if self.check_for_trait_given_pos(i, j, trait):
-                    copies += 1
+            copies += self.count_units_with_trait_at_planet(trait, i)
         return copies
 
     def search_triggered_interrupts_enemy_discard(self):
@@ -2276,6 +2283,13 @@ class Player:
             if enemy_player.contaminated_convoys:
                 self.game.infest_planet(position, enemy_player)
                 enemy_player.summon_token_at_planet("Termagant", position)
+            if self.check_for_trait_given_pos(position, last_element_index, "Psyker"):
+                for i in range(len(other_player.cards_in_play[position + 1])):
+                    if other_player.get_ability_given_pos(position, i) == "Repurposed Pariah":
+                        if not other_player.get_once_per_phase_used_given_pos(position, i):
+                            self.game.create_reaction("Repurposed Pariah", other_player.name_player,
+                                                      (int(other_player.number), position, i),
+                                                      additional_info=(position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
             self.assign_damage_to_pos(position, last_element_index, 2, preventable=False, by_enemy_unit=False)
         if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
@@ -5035,6 +5049,8 @@ class Player:
             attack_value = self.get_health_given_pos(planet_id, unit_id) - \
                            self.get_damage_given_pos(planet_id, unit_id)
             return attack_value
+        if ability == "Repurposed Pariah":
+            attack_value += self.count_units_with_trait_at_planet("Psyker", planet_id)
         if ability == "Immature Squig":
             for j in range(len(self.cards_in_play[planet_id + 1])):
                 if j != unit_id:
@@ -5830,6 +5846,8 @@ class Player:
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
+        if ability == "Repurposed Pariah":
+            health += self.count_units_with_trait_at_planet("Psyker", planet_id)
         if ability == "Galvax the Bloated":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.check_for_trait_given_pos(planet_id, i, "Cultist"):
