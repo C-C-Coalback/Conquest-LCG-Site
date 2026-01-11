@@ -221,6 +221,8 @@ class Player:
         self.cegorach_jesters_active = False
         self.cegorach_jesters_permitted = []
         self.dalyth_sept_active = False
+        self.ability_recursion_count = 0
+        self.max_ability_recursion = 10
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -1404,6 +1406,8 @@ class Player:
         if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
             if self.check_for_enemy_warlord(planet_id):
                 return True
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
             if self.count_supports() > 2:
                 return True
@@ -3824,6 +3828,8 @@ class Player:
         rokkitboy_present = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id, "Rokkitboy")
         if rokkitboy_present:
             return False
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Air Caste Courier":
             if self.warlord_faction != "Tau":
                 return True
@@ -3878,6 +3884,8 @@ class Player:
         return False
 
     def get_armorbane_given_pos(self, planet_id, unit_id, enemy_unit_damage=0):
+        if planet_id == -2:
+            return False
         warlord_pla, warlord_pos = self.get_location_of_warlord()
         if warlord_pla == planet_id:
             if self.search_attachments_at_pos(warlord_pla, warlord_pos, "Cloak of Shade"):
@@ -3887,6 +3895,8 @@ class Player:
         if warlord_pla == planet_id:
             if other_player.search_attachments_at_pos(warlord_pla, warlord_pos, "Cloak of Shade"):
                 return False
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            return False
         if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 return True
@@ -3941,11 +3951,37 @@ class Player:
     def get_has_hive_mind_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             return self.headquarters[unit_id].get_has_hive_mind()
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            return False
         return self.cards_in_play[planet_id + 1][unit_id].get_has_hive_mind()
 
-    def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
+    def get_blanked_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
+            return self.headquarters[unit_id].get_blanked()
+        other_player = self.get_other_player()
+        if self.get_damage_given_pos(planet_id, unit_id) > 0:
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+                for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                    if other_player.search_attachments_at_pos(planet_id, i, "Disruption Field"):
+                        return True
+        return self.cards_in_play[planet_id + 1][unit_id].get_blanked()
+
+    def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
+        self.ability_recursion_count += 1
+        if self.ability_recursion_count > self.max_ability_recursion:
+            self.game.queued_message = "DEBUG: Ability Recursion Fail-Safe Hit."
+            if planet_id == -2:
+                self.ability_recursion_count = 0
+                return self.headquarters[unit_id].get_ability(bloodied_relevant=bloodied_relevant)
+            self.ability_recursion_count = 0
+            return self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=bloodied_relevant)
+        if planet_id == -2:
+            self.ability_recursion_count = 0
             return self.headquarters[unit_id].get_ability(bloodied_relevant=bloodied_relevant)
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            self.ability_recursion_count = 0
+            return "BLANKED"
+        self.ability_recursion_count = 0
         return self.cards_in_play[planet_id + 1][unit_id].get_ability(bloodied_relevant=bloodied_relevant)
 
     def get_traits_given_pos(self, planet_id, unit_id):
@@ -4968,6 +5004,8 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 return True
+        if self.get_blanked_given_pos(planet_id, unit_id):
+            return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
             if self.game.bloodthirst_active[planet_id]:
                 return True

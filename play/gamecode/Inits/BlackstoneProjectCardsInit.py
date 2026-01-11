@@ -305,6 +305,11 @@ def blackstone_project_cards_init():
                                                          " Soldier unit with a printed cost exactly 1 greater than the"
                                                          " discarded unit from your discard pile at a planet, reducing"
                                                          " the cost of that unit by 1.", "Upgrade.",
-                                1, "Necrons", "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY")
+                                1, "Necrons", "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
+        CardClasses.AttachmentCard("Disruption Field", "Attach to a Necrons Vehicle unit you control.\n"
+                                                       "Treat the printed text box of each damaged enemy army unit at "
+                                                       "this planet as if it were blank (except for Traits).",
+                                   "Hardpoint.", 1, "Necrons", "Common", 2, False, required_traits="Vehicle",
+                                   unit_must_match_faction=True, must_be_own_unit=True)
     ]
     return blackstone_project_cards
