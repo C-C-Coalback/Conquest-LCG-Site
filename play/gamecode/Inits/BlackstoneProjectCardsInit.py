@@ -284,6 +284,11 @@ def blackstone_project_cards_init():
                                                        "Attached unit gains Sweep (1) and Ranged.",
                                    "Daemon. Tzeentch.", 2, "Chaos", "Common", 1, False, deepstrike=0,
                                    type_of_units_allowed_for_attachment="Army", required_traits="Psyker"),
+        CardClasses.EventCard("Core Destabilization", "Combat Action: Target a non-first planet. Deal 3 damage to "
+                                                      "each unit with printed cost 3 or higher at that planet, "
+                                                      "and deal 1 damage to each unit at each adjacent planet.",
+                              "Power.", 4, "Chaos", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="COMBAT"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -956,6 +956,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(hand_pos)
                         self.misc_target_planet = -1
                         self.misc_counter = 3
+                    elif ability == "Core Destabilization":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)

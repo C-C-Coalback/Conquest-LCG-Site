@@ -655,6 +655,37 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.action_cleanup()
         else:
             await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
+    elif self.action_chosen == "Core Destabilization":
+        if chosen_planet != self.round_number:
+            additional_tax = secondary_player.get_additional_costs_target_planet(chosen_planet)
+            if primary_player.spend_resources(additional_tax):
+                for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                    if primary_player.cards_in_play[chosen_planet + 1][i].get_card_type() == "Army":
+                        if primary_player.get_cost_given_pos(chosen_planet, i) > 2:
+                            if primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
+                                primary_player.assign_damage_to_pos(chosen_planet, i, 3, by_enemy_unit=False)
+                for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                    if secondary_player.cards_in_play[chosen_planet + 1][i].get_card_type() == "Army":
+                        if secondary_player.get_cost_given_pos(chosen_planet, i) > 2:
+                            if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
+                                secondary_player.assign_damage_to_pos(chosen_planet, i, 3, by_enemy_unit=False)
+                if chosen_planet != 0:
+                    for i in range(len(primary_player.cards_in_play[chosen_planet])):
+                        if primary_player.get_ability_given_pos(chosen_planet - 1, i) != "Frenzied Bloodthirster":
+                            primary_player.assign_damage_to_pos(chosen_planet - 1, i, 1, by_enemy_unit=False)
+                    for i in range(len(secondary_player.cards_in_play[chosen_planet])):
+                        if not secondary_player.get_immune_to_enemy_events(chosen_planet - 1, i, power=True):
+                            secondary_player.assign_damage_to_pos(chosen_planet - 1, i, 1, by_enemy_unit=False)
+                if chosen_planet != 6:
+                    for i in range(len(primary_player.cards_in_play[chosen_planet + 2])):
+                        if primary_player.get_ability_given_pos(chosen_planet + 1, i) != "Frenzied Bloodthirster":
+                            primary_player.assign_damage_to_pos(chosen_planet + 1, i, 1, by_enemy_unit=False)
+                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 2])):
+                        if not secondary_player.get_immune_to_enemy_events(chosen_planet + 1, i, power=True):
+                            secondary_player.assign_damage_to_pos(chosen_planet + 1, i, 1, by_enemy_unit=False)
+                self.action_cleanup()
+            else:
+                await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
     elif self.action_chosen == "Squadron Redeployment":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
