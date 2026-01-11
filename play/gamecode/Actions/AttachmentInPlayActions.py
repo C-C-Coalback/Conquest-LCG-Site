@@ -277,6 +277,15 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 card_chosen.exhaust_card()
                                 await self.create_necrons_wheel_choice(primary_player)
                                 self.action_cleanup()
+                    elif ability == "Gauntlet of Fire":
+                        if card_chosen.get_ready():
+                            if primary_player.get_name_player() == self.player_with_action:
+                                card_chosen.exhaust_card()
+                                self.choices_available = ["Change Enslavement", "Deal 2 Damage"]
+                                self.choice_context = "Gauntlet of Fire"
+                                self.name_player_making_choices = primary_player.get_name_player()
+                                self.resolving_search_box = True
+                                self.action_chosen = ability
                     elif ability == "Regeneration":
                         if card_chosen.get_ready():
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)

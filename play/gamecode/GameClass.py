@@ -3124,6 +3124,15 @@ class Game:
                         self.reset_choices_available()
                         self.resolving_search_box = False
                         self.action_cleanup()
+                    elif self.choice_context == "Gauntlet of Fire":
+                        if chosen_choice == "Change Enslavement":
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
+                            await self.create_necrons_wheel_choice(primary_player)
+                            self.action_cleanup()
+                        else:
+                            self.reset_choices_available()
+                            self.resolving_search_box = False
                     elif self.choice_context == "Beckel Gain":
                         if chosen_choice == "Yes":
                             primary_player.add_resources(1)

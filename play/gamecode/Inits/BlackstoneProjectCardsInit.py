@@ -289,6 +289,13 @@ def blackstone_project_cards_init():
                                                         "controller deals damage equal to its ATK to another unit "
                                                         "they control at the same planet.", "Tactic. Flaw.",
                                    2, "Necrons", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
-                                   deepstrike=1)
+                                   deepstrike=1),
+        CardClasses.AttachmentCard("Gauntlet of Fire", "Attach to your warlord.\n"
+                                                       "Action: Exhaust this attachment to either deal 2 damage to a "
+                                                       "target army unit at the same planet as your warlord, or set "
+                                                       "your enslavement dial to another faction.",
+                                   "Wargear. Weapon. Relic.", 2, "Necrons", "Common", 2, True,
+                                   type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True,
+                                   action_in_play=True, allowed_phases_in_play="ALL")
     ]
     return blackstone_project_cards

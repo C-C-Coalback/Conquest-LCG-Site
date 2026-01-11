@@ -20,12 +20,12 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             if card_chosen.get_allowed_phases_while_in_play() == self.phase or \
                     card_chosen.get_allowed_phases_while_in_play() == "ALL":
                 ability = card_chosen.get_ability()
+                self.position_of_actioned_card = (planet_pos, unit_pos)
                 if ability == "Command-link Drone":
                     if primary_player.get_name_player() == self.player_with_action:
                         if primary_player.spend_resources(1):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.send_update_message(ability + " activated")
                 elif ability == "The Dawn Blade":
@@ -55,6 +55,12 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         self.action_chosen = ability
                         await self.send_update_message(ability + " activated")
                 elif ability == "The Staff of Command":
+                    if card_chosen.get_ready():
+                        if primary_player.get_name_player() == self.player_with_action:
+                            card_chosen.exhaust_card()
+                            await self.create_necrons_wheel_choice(primary_player)
+                            self.action_cleanup()
+                elif ability == "Gauntlet of Fire":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
                             card_chosen.exhaust_card()
