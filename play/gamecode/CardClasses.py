@@ -100,6 +100,7 @@ class Card:
         self.card_id = -1
         self.used_techmarine_ids = []
         self.card_moved_recently = False
+        self.cannot_remove_damage_eor = False
 
     def get_extra_info_string(self):
         string = ""
@@ -147,6 +148,8 @@ class Card:
             string += "Discard (Celestine) EOP\n"
         if self.return_to_hand_eor:
             string += "Return to hand EOR\n"
+        if self.cannot_remove_damage_eor:
+            string += "Cannont remove damage (EOR)\n"
         if not string:
             return "None"
         return string
@@ -650,6 +653,8 @@ class UnitCard(Card):
             string += "Extra Health (EOG): " + str(self.positive_hp_until_eog) + "\n"
         if self.negative_hp_until_eop != 0:
             string += "Negative Health (EOP): " + str(self.negative_hp_until_eop) + "\n"
+        if self.cannot_remove_damage_eor:
+            string += "Cannont remove damage (EOR)\n"
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Necklace of Teef":
                 string += "Necklace of Teef: " + str(self.attachments[i].get_counter()) + " resources\n"

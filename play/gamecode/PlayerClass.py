@@ -4611,6 +4611,7 @@ class Player:
                 self.headquarters[i].mobile_eor = False
                 self.headquarters[i].ranged_eor = False
                 self.headquarters[i].extra_traits_eor = ""
+                self.headquarters[i].cannot_remove_damage_eor = False
                 self.headquarters[i].embarked_squads_active = False
                 if self.get_name_given_pos(-2, i) == "Caustic Tyrannofex":
                     self.headquarters[i].misc_ability_used = False
@@ -4633,6 +4634,7 @@ class Player:
                 self.cards_in_play[i + 1][j].ranged_eor = False
                 self.cards_in_play[i + 1][j].extra_traits_eor = ""
                 self.cards_in_play[i + 1][j].embarked_squads_active = False
+                self.cards_in_play[i + 1][j].cannot_remove_damage_eor = False
                 if self.get_name_given_pos(i, j) == "Caustic Tyrannofex":
                     self.cards_in_play[i + 1][j].misc_ability_used = False
 
@@ -6107,6 +6109,12 @@ class Player:
                 enemy_player = self.game.p2
             if enemy_player.search_card_at_planet(planet_id, "Hot-Shot Laspistol"):
                 return None
+            if planet_id == -2:
+                if self.headquarters[unit_id].cannot_remove_damage_eor:
+                    return None
+            else:
+                if self.cards_in_play[planet_id + 1][unit_id].cannot_remove_damage_eor:
+                    return None
             if self.search_attachments_at_pos(planet_id, unit_id, "Great Scything Talons"):
                 self.game.create_reaction("Great Scything Talons", self.name_player,
                                           (int(self.number), planet_id, unit_id))

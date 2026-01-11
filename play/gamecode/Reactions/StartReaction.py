@@ -2595,6 +2595,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Chaos Maulerfiend":
+            target_pla, target_pos = extra_info
+            secondary_player.cards_in_play[target_pla + 1][target_pos].cannot_remove_damage_eor = True
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Sickening Helbrute":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)

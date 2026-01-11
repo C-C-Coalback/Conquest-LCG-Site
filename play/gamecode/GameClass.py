@@ -8943,6 +8943,10 @@ class Game:
                                     primary_player.get_ready_given_pos(def_pla, def_pos):
                                 self.create_reaction("Righteous Reprisal", primary_player.name_player,
                                                      (num, def_pla, def_pos))
+                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Chaos Maulerfiend":
+                            self.create_reaction("Chaos Maulerfiend", secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, unit_pos),
+                                                 (def_pla, def_pos))
                 else:
                     if primary_player.get_card_type_given_pos(def_pla, def_pos) != "Warlord":
                         if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
