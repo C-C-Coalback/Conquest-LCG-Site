@@ -310,6 +310,10 @@ def blackstone_project_cards_init():
                                                        "Treat the printed text box of each damaged enemy army unit at "
                                                        "this planet as if it were blank (except for Traits).",
                                    "Hardpoint.", 1, "Necrons", "Common", 2, False, required_traits="Vehicle",
-                                   unit_must_match_faction=True, must_be_own_unit=True)
+                                   unit_must_match_faction=True, must_be_own_unit=True),
+        CardClasses.ArmyCard("Harbinger of the Storm", "As an additional cost for your opponent to target either this "
+                                                       "planet or a unit at this planet with an event, they must pay"
+                                                       " 2 resources.", "Scholar. Elite.",
+                             5, "Necrons", "Common", 3, 5, 3, True)
     ]
     return blackstone_project_cards

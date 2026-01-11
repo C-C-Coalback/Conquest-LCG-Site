@@ -852,10 +852,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Warpstorm":
-                        print("Resolve Warpstorm")
                         self.action_chosen = "Warpstorm"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Tzeentch's Firestorm":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

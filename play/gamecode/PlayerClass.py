@@ -4102,6 +4102,11 @@ class Player:
             return self.headquarters[unit_pos].misc_ability_used
         return self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used
 
+    def get_additional_costs_target_planet(self, planet_pos):
+        if self.search_card_at_planet(planet_pos, "Harbinger of the Storm"):
+            return 2
+        return 0
+
     def get_immune_to_enemy_card_abilities(self, planet_pos, unit_pos):
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Deathwing Terminators":
             if self.get_dw_term_active(planet_pos, unit_pos):
@@ -4113,6 +4118,13 @@ class Player:
                 for i in range(len(self.cards_in_play[planet_pos + 1])):
                     if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
                         return True
+            if self.search_card_at_planet(planet_pos, "Harbinger of the Storm"):
+                other_player = self.get_other_player()
+                if other_player.spend_resources(2):
+                    self.game.queued_message = "Important info: Harbinger of the Storm made " + \
+                                               other_player.name_player + " spend 2 resource!"
+                else:
+                    return True
             if self.search_card_at_planet(planet_pos, "Shas'el Lyst", ready_relevant=True):
                 other_player = self.get_other_player()
                 if other_player.spend_resources(1):

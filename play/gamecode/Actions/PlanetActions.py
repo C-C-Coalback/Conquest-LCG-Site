@@ -634,21 +634,21 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                      (int(primary_player.get_number()), chosen_planet, -1))
             self.action_cleanup()
     elif self.action_chosen == "Warpstorm":
-        first_unit_damaged = True
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments() and \
-                        primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
-                    primary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
-                    if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
-                        secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-        self.mode = "Normal"
-        primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-        primary_player.aiming_reticle_color = None
-        primary_player.aiming_reticle_coords_hand = None
+        additional_tax = secondary_player.get_additional_costs_target_planet(chosen_planet)
+        if primary_player.spend_resources(additional_tax):
+            for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+                    if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments() and \
+                            primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
+                        primary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
+            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+                    if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
+                        if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
+                            secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
+            self.action_cleanup()
+        else:
+            await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
     elif self.action_chosen == "Squadron Redeployment":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
