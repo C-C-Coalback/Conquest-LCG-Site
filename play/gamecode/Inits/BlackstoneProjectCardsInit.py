@@ -296,6 +296,9 @@ def blackstone_project_cards_init():
                                                        "your enslavement dial to another faction.",
                                    "Wargear. Weapon. Relic.", 2, "Necrons", "Common", 2, True,
                                    type_of_units_allowed_for_attachment="Warlord", must_be_own_unit=True,
-                                   action_in_play=True, allowed_phases_in_play="ALL")
+                                   action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.SupportCard("Null Shield Matrix", "Reaction: After an exhausted Necrons unit you control is "
+                                                      "assigned damage, prevent 1 of that damage.", "Location.",
+                                2, "Necrons", "Common", True)
     ]
     return blackstone_project_cards

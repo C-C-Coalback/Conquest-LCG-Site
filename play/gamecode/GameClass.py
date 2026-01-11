@@ -7650,6 +7650,17 @@ class Game:
                                         if self.amount_that_can_be_removed_by_shield[0] == 0:
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                        elif primary_player.headquarters[hq_pos].get_ability() == "Null Shield Matrix":
+                            if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                                if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                    if not primary_player.headquarters[hq_pos].misc_ability_used:
+                                        primary_player.headquarters[hq_pos].misc_ability_used = True
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                        self.amount_that_can_be_removed_by_shield[0] = \
+                                            self.amount_that_can_be_removed_by_shield[0] - 1
+                                        if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Kustom Field Generator":
                             if primary_player.headquarters[hq_pos].get_ready():
                                 hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
@@ -8852,6 +8863,8 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Noble Shining Spears")
         primary_player.reset_card_name_misc_ability("Deff Dread")
         secondary_player.reset_card_name_misc_ability("Deff Dread")
+        primary_player.reset_card_name_misc_ability("Null Shield Matrix")
+        secondary_player.reset_card_name_misc_ability("Null Shield Matrix")
         primary_player.phalanx_shield_value = 0
         secondary_player.phalanx_shield_value = 0
         if not self.retaliate_used:
