@@ -1760,6 +1760,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.action_cleanup()
+    elif self.action_chosen == "Fabricator Claw Array":
+        if planet_pos == self.misc_target_planet:
+            if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, self.misc_counter, healing=True)
+                    self.action_cleanup()
     elif self.action_chosen == "Korporal Snagbrat":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():

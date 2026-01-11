@@ -319,6 +319,12 @@ def blackstone_project_cards_init():
                                                        "While attached unit is exhausted, each non-warlord unit at "
                                                        "this planet gets -1 ATK.", "Wargear.",
                                    2, "Necrons", "Common", 2, True, unit_must_match_faction=True,
-                                   limit_one_per_unit=True, required_traits="Scholar")
+                                   limit_one_per_unit=True, required_traits="Scholar"),
+        CardClasses.AttachmentCard("Fabricator Claw Array", "Attach to a Necrotic Drone unit you control.\n"
+                                                            "Combat Action: Exhaust attached unit to remove X damage "
+                                                            "from a target Necrotic unit at the same planet. X is "
+                                                            "equal to the ATK of the attached unit.",
+                                   "Wargear.", 1, "Necrons", "Common", 1, False, unit_must_match_faction=True,
+                                   required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT")
     ]
     return blackstone_project_cards
