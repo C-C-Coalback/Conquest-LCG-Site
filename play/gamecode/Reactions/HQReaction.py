@@ -62,6 +62,10 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 if primary_player.get_ready_given_pos(-2, unit_pos):
                     primary_player.exhaust_given_pos(-2, unit_pos)
                     self.cato_stronghold_activated = True
+    elif current_reaction == "Decayed Gardens":
+        if player_owning_card.get_lumbering_given_pos(planet_pos, unit_pos):
+            player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
+            self.delete_reaction()
     elif current_reaction == "Burst Forth":
         card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
         if card_type == "Warlord" or card_type == "Synapse":

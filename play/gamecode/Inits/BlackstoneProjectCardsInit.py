@@ -296,6 +296,10 @@ def blackstone_project_cards_init():
                                                   "Reaction: After you win a battle at this planet, destroy a "
                                                   "target enemy army unit.", "Daemon. Khorne. Elite.",
                              8, "Chaos", "Loyal", 7, 5, 2, False, flying=True, wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Decayed Gardens", "Reaction: After the combat phase begins, exhaust this support to "
+                                                   "give a target Lumbering unit +3 ATK for its next attack "
+                                                   "this phase.", "Location. Nurgle.",
+                                1, "Chaos", "Loyal", False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -6242,6 +6242,9 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Decayed Gardens":
+                if phase == "COMBAT" and self.get_ready_given_pos(-2, i):
+                    self.game.create_reaction("Decayed Gardens", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Myriad Excesses":
                 if phase == "COMMAND":
                     self.game.create_reaction("Myriad Excesses", self.name_player, (int(self.number), -2, i))
