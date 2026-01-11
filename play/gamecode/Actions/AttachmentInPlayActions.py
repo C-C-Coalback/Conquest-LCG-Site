@@ -263,6 +263,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             self.action_chosen = ability
                             self.misc_target_planet = planet_pos
                             self.misc_counter = primary_player.get_attack_given_pos(planet_pos, unit_pos)
+                    elif ability == "Steed of Slaanesh":
+                        if card_chosen.get_ready():
+                            card_chosen.exhaust_card()
+                            self.action_chosen = ability
                     elif ability == "Mind Shackle Scarab":
                         if card_chosen.get_ready():
                             if primary_player.get_number() != player_owning_card.get_number():

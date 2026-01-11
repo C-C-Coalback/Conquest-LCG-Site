@@ -38,6 +38,10 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.choices_available = ["Deepstrike", "Move"]
                             self.choice_context = "The Dawn Blade Choice"
                             self.name_player_making_choices = primary_player.get_name_player()
+                elif ability == "Steed of Slaanesh":
+                    if card_chosen.get_ready():
+                        card_chosen.exhaust_card()
+                        self.action_chosen = ability
                 elif ability == "Searchlight":
                     if primary_player.get_name_player() == player_owning_card.name_player:
                         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()

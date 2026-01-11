@@ -633,6 +633,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), chosen_planet, -1))
             self.action_cleanup()
+    elif self.action_chosen == "Steed of Slaanesh":
+        if not secondary_player.check_for_warlord(chosen_planet):
+            if self.position_of_actioned_card[0] != chosen_planet:
+                primary_player.move_unit_to_planet(self.position_of_actioned_card[0], self.position_of_actioned_card[1],
+                                                   chosen_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Warpstorm":
         additional_tax = secondary_player.get_additional_costs_target_planet(chosen_planet)
         if primary_player.spend_resources(additional_tax):

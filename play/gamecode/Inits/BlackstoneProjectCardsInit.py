@@ -255,6 +255,13 @@ def blackstone_project_cards_init():
                                                       " Khorne, Nurgle, and Slaanesh among units you control at "
                                                       "this planet.", "Soldier. Chaos Undivided.",
                              3, "Chaos", "Common", 1, 4, 1, False),
+        CardClasses.AttachmentCard("Steed of Slaanesh", "Attach to a Slaanesh army unit you control. \n"
+                                                        "Action: Exhaust this attachment to move attached unit to a "
+                                                        "planet without an enemy warlord.",
+                                   "Wargear. Daemon. Slaanesh.", 1, "Chaos", "Loyal", 2, False,
+                                   action_in_play=True, allowed_phases_in_play="ALL",
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Slaanesh",
+                                   must_be_own_unit=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
