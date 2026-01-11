@@ -448,7 +448,6 @@
                 //console.log(card_name);
                 //console.log(collection[j].id);
             }
-
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
         }
@@ -483,7 +482,8 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
-            cardCount = cardCount + Number(count);
+            cardCount = cardCount + Number(count.charAt(0));
+            console.log(count)
         }
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Support\n\n";
@@ -515,7 +515,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
-            cardCount = cardCount + Number(count);
+            cardCount = cardCount + Number(count.charAt(0));
         }
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Synapse\n\n";
@@ -553,7 +553,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
-            cardCount = cardCount + Number(count);
+            cardCount = cardCount + Number(count.charAt(0));
         }
         document.getElementById("chat-log").value += "\n----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Event\n\n";
@@ -585,7 +585,7 @@
 
             card_name = count + card_name.split('_').join(' ');
             document.getElementById("chat-log").value += card_name + "\n";
-            cardCount = cardCount + Number(count);
+            cardCount = cardCount + Number(count.charAt(0));
         }
         updateCardCount();
         document.getElementById("chat-log").value += "\n----------------------------------------------------------------------\n";
