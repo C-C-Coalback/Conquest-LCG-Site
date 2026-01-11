@@ -1416,6 +1416,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             == "Roghrax Bloodhand":
                                         if self.bloodthirst_active[self.attacker_planet]:
                                             attack_value = attack_value * 2
+                                if secondary_player.get_damage_given_pos(self.defender_planet,
+                                                                         self.defender_position) > 0:
+                                    if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                            self.attacker_position) \
+                                            == "Havocs of Khorne":
+                                        attack_value = attack_value * 2
                                 secondary_player.cards_in_play[self.defender_planet + 1][
                                     self.defender_position].valid_sweep_target = False
                                 print("unit is no longer a valid sweep target")

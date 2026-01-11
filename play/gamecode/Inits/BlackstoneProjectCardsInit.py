@@ -289,6 +289,9 @@ def blackstone_project_cards_init():
                                                       "and deal 1 damage to each unit at each adjacent planet.",
                               "Power.", 4, "Chaos", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="COMBAT"),
+        CardClasses.ArmyCard("Havocs of Khorne", "Sweep (1).\n"
+                                                 "This unit deals double damage while attacking a damaged unit.",
+                             "Warrior. Khorne.", 3, "Chaos", "Common", 2, 3, 1, False, sweep=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
