@@ -792,6 +792,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         atk = primary_player.get_attack_given_pos(og_pla, og_pos)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
                         self.delete_reaction()
+        elif current_reaction == "Explosive Scarabs":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if unit_pos != self.positions_of_unit_triggering_reaction[0][1] or primary_player.get_number() != game_update_string[1]:
+                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    atk = primary_player.get_health_given_pos(og_pla, og_pos) - primary_player.get_damage_given_pos(og_pla, og_pos)
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, atk)
+                    primary_player.sacrifice_card_in_play(og_pla, og_pos)
+                    self.delete_reaction()
         elif current_reaction == "Blazing Zoanthrope":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:

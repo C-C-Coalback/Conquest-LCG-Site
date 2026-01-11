@@ -10031,6 +10031,8 @@ class Game:
                                                              by_enemy_unit=False)
                             if self.p1.get_ability_given_pos(planet, i) == "Shambling Revenant":
                                 self.create_reaction("Shambling Revenant", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Explosive Scarabs":
+                                self.create_reaction("Explosive Scarabs", self.name_1, (1, planet, i))
                             for j in range(len(self.p1.get_all_attachments_at_pos(planet, i))):
                                 if self.p1.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
@@ -10107,6 +10109,8 @@ class Game:
                                                              by_enemy_unit=False)
                             if self.p2.get_ability_given_pos(planet, i) == "Shambling Revenant":
                                 self.create_reaction("Shambling Revenant", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Explosive Scarabs":
+                                self.create_reaction("Explosive Scarabs", self.name_2, (2, planet, i))
                             for j in range(len(self.p2.get_all_attachments_at_pos(planet, i))):
                                 if self.p2.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
                                     self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)

@@ -325,6 +325,9 @@ def blackstone_project_cards_init():
                                                             "from a target Necrotic unit at the same planet. X is "
                                                             "equal to the ATK of the attached unit.",
                                    "Wargear.", 1, "Necrons", "Common", 1, False, unit_must_match_faction=True,
-                                   required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT")
+                                   required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
+                                                  "damage equal to it's remaining HP to a target unit at this planet.",
+                             "Drone.", 2, "Necrons", "Common", 1, 4, 0, False)
     ]
     return blackstone_project_cards
