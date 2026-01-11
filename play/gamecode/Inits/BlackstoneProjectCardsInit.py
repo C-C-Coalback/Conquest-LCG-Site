@@ -279,6 +279,11 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Screamers", "No Wargear Attachments.\n"
                                           "Flying.", "Daemon. Tzeentch.",
                              1, "Chaos", "Loyal", 2, 1, 0, False, wargear_attachments_permitted=False, flying=True),
+        CardClasses.AttachmentCard("Disc of Tzeentch", "Deep Strike (0).\n"
+                                                       "Attach to a Psyker army unit.\n"
+                                                       "Attached unit gains Sweep (1) and Ranged.",
+                                   "Daemon. Tzeentch.", 2, "Chaos", "Common", 1, False, deepstrike=0,
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Psyker"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

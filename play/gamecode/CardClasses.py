@@ -734,6 +734,8 @@ class UnitCard(Card):
                 sweep += 1
             if self.attachments[i].get_ability() == "The Dawn Blade":
                 sweep += 1
+            if self.attachments[i].get_ability() == "Disc of Tzeentch":
+                sweep += 1
             if self.attachments[i].get_ability() == "Spray and Pray":
                 sweep += self.attack
         sweep += self.sweep_eor
@@ -906,6 +908,8 @@ class UnitCard(Card):
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Rokkit Launcha":
+                return True
+            if self.attachments[i].get_ability() == "Disc of Tzeentch":
                 return True
             if self.attachments[i].get_ability() == "Bladed Lotus Rifle":
                 if self.check_for_a_trait("Kabalite"):
