@@ -1760,6 +1760,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.action_cleanup()
+    elif self.action_chosen == "Soul Furnace":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if game_update_string[1] == primary_player.get_number():
+                og_pla, og_pos = self.position_of_actioned_card
+                if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Cultist"):
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        if unit_pos < og_pos:
+                            og_pos = og_pos - 1
+                        primary_player.increase_attack_of_unit_at_pos(og_pla, og_pos, 2, expiration="EOP")
+                        primary_player.increase_health_of_unit_at_pos(og_pla, og_pos, 2, expiration="EOP")
+                        primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                        self.action_cleanup()
     elif self.action_chosen == "Fabricator Claw Array":
         if planet_pos == self.misc_target_planet:
             if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":

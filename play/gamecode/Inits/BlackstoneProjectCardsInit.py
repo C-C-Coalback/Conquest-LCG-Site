@@ -262,6 +262,15 @@ def blackstone_project_cards_init():
                                    action_in_play=True, allowed_phases_in_play="ALL",
                                    type_of_units_allowed_for_attachment="Army", required_traits="Slaanesh",
                                    must_be_own_unit=True),
+        CardClasses.AttachmentCard("Soul Furnace", "Attach to a Daemon army unit. \n"
+                                                   "Attached unit gets +1 ATK and +1 HP.\n"
+                                                   "Combat Action: Sacrifice a Cultist unit at this planet to give "
+                                                   "attached unit +2 ATK and +2 HP until the end of the phase. "
+                                                   "(Limit twice per phase)", "War Engine.",
+                                   2, "Chaos", "Common", 1, False,
+                                   action_in_play=True, allowed_phases_in_play="COMBAT",
+                                   type_of_units_allowed_for_attachment="Army", required_traits="Daemon",
+                                   extra_attack=1, extra_health=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
