@@ -10427,49 +10427,66 @@ class Game:
         return reactions
 
     def check_reactions_from_winning_combat(self, winner, planet_id):
-        reactions = []
+        reactions_exist = False
         if self.reactions_on_winning_combat_permitted:
             if self.round_number > 0:
                 if winner.search_card_in_hq("WAAAGH! Ungskar"):
                     for i in range(len(winner.cards_in_reserve[planet_id])):
                         if winner.cards_in_reserve[planet_id][i].get_ability() == "Squiggoth Brute":
-                            reactions.append("WAAAGH! Ungskar Deepstrike")
+                            self.create_reaction("WAAAGH! Ungskar Deepstrike", winner.name_player,
+                                                 (int(winner.number), -1, -1))
+                            reactions_exist = True
             if winner.search_card_in_hq("Novokh Dynasty"):
                 for i in range(len(winner.cards_in_reserve[planet_id])):
                     if winner.get_deepstrike_value_given_pos(planet_id, i, in_play_card=False) > 50:
-                        reactions.append("Novokh Dynasty Deepstrike")
+                        self.create_reaction("Novokh Dynasty Deepstrike", winner.name_player,
+                                             (int(winner.number), -1, -1))
+                        reactions_exist = True
             for i in range(len(winner.attachments_at_planet[planet_id])):
                 if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
-                    reactions.append("Close Quarters Doctrine")
+                    self.create_reaction("Close Quarters Doctrine", winner.name_player, (int(winner.number), -1, -1))
+                    reactions_exist = True
             for i in range(len(winner.cards_in_play[planet_id + 1])):
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
-                    reactions.append("Kabalite Blackguard")
+                    self.create_reaction("Kabalite Blackguard", winner.name_player, (int(winner.number), planet_id, i))
+                    reactions_exist = True
+                if winner.get_ability_given_pos(planet_id, i) == "Khornate Heldrake":
+                    self.create_reaction("Khornate Heldrake", winner.name_player, (int(winner.number), planet_id, i))
+                    reactions_exist = True
                 if winner.get_ability_given_pos(planet_id, i) == "Sanguinary Guard":
-                    reactions.append("Sanguinary Guard")
+                    self.create_reaction("Sanguinary Guard", winner.name_player, (int(winner.number), planet_id, i))
+                    reactions_exist = True
                 if winner.get_ability_given_pos(planet_id, i) == "Raiding Kabal":
-                    reactions.append("Raiding Kabal")
+                    self.create_reaction("Raiding Kabal", winner.name_player, (int(winner.number), planet_id, i))
+                    reactions_exist = True
             if winner.search_card_in_hq("Clearing the Path"):
                 if winner.check_for_warlord(planet_id, True, winner.name_player):
-                    reactions.append("Clearing the Path")
+                    self.create_reaction("Clearing the Path", winner.name_player, (int(winner.number), -1, -1))
+                    reactions_exist = True
             if winner.search_card_in_hq("Anvil Strike Force"):
                 if planet_id == self.round_number:
                     if winner.check_for_warlord(planet_id, True, winner.name_player):
-                        reactions.append("Anvil Strike Force")
+                        self.create_reaction("Anvil Strike Force", winner.name_player, (int(winner.number), -1, -1))
+                        reactions_exist = True
             if self.get_blue_icon(planet_id):
                 if winner.resources > 0:
                     if not winner.accept_any_challenge_used:
                         if winner.search_hand_for_card("Accept Any Challenge"):
-                            reactions.append("Accept Any Challenge")
+                            self.create_reaction("Accept Any Challenge", winner.name_player, (int(winner.number), -1, -1))
+                            reactions_exist = True
                 if winner.resources > 1:
                     if winner.search_hand_for_card("Declare the Crusade"):
-                        reactions.append("Declare the Crusade")
+                        self.create_reaction("Declare the Crusade", winner.name_player, (int(winner.number), -1, -1))
+                        reactions_exist = True
             if self.get_green_icon(planet_id):
                 if winner.resources > 0:
                     if winner.search_hand_for_card("Inspirational Fervor"):
-                        reactions.append("Inspirational Fervor")
+                        self.create_reaction("Inspirational Fervor", winner.name_player, (int(winner.number), -1, -1))
+                        reactions_exist = True
                 if planet_id != self.round_number and not self.sacaellums_finest_active:
                     if winner.search_hand_for_card("Sacaellum's Finest"):
-                        reactions.append("Sacaellum's Finest")
+                        self.create_reaction("Sacaellum's Finest", winner.name_player, (int(winner.number), -1, -1))
+                        reactions_exist = True
             if self.get_red_icon(planet_id):
                 cost = 0
                 if winner.urien_relevant:
@@ -10477,10 +10494,12 @@ class Game:
                 if winner.resources >= cost:
                     if not winner.gut_and_pillage_used:
                         if winner.search_hand_for_card("Gut and Pillage"):
-                            reactions.append("Gut and Pillage")
+                            self.create_reaction("Gut and Pillageg", winner.name_player, (int(winner.number), -1, -1))
+                            reactions_exist = True
             if winner.resources > 0 and planet_id == self.round_number:
                 if winner.search_hand_for_card("The Grand Plan"):
-                    reactions.append("The Grand Plan")
+                    self.create_reaction("The Grand Plan", winner.name_player, (int(winner.number), -1, -1))
+                    reactions_exist = True
                 elif "The Grand Plan" in winner.cards_removed_from_game:
                     warlord_pla, warlord_pos = winner.get_location_of_warlord()
                     vael_relevant = False
@@ -10491,8 +10510,9 @@ class Game:
                             and not winner.get_once_per_game_used_given_pos(warlord_pla, warlord_pos):
                         vael_relevant = True
                     if vael_relevant:
-                        reactions.append("The Grand Plan")
-        return reactions
+                        self.create_reaction("The Grand Plan", winner.name_player, (int(winner.number), -1, -1))
+                        reactions_exist = True
+        return reactions_exist
 
     def infest_planet(self, planet, player_doing_infesting):
         if not self.infested_planets[planet]:
@@ -10509,7 +10529,6 @@ class Game:
     async def resolve_winning_combat(self, winner, loser):
         self.name_player_who_won_combat = winner.name_player
         planet_name = self.planet_array[self.last_planet_checked_for_battle]
-        reactions_win = self.check_reactions_from_winning_combat(winner, self.last_planet_checked_for_battle)
         reactions_lose = self.check_reactions_from_losing_combat(winner, loser, self.last_planet_checked_for_battle)
         if self.infested_planets[self.last_planet_checked_for_battle] and \
                 self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation \
@@ -10520,40 +10539,40 @@ class Game:
             self.name_player_making_choices = winner.name_player
             await self.send_update_message(
                 winner.name_player + " has the right to clear infestation from " + planet_name)
-        elif reactions_win or reactions_lose:
-            await self.send_update_message("Reactions on winning combat detected.")
-            self.reactions_on_winning_combat_being_executed = True
-            self.reactions_on_winning_combat_permitted = False
-            for i in range(len(reactions_win)):
-                self.create_reaction(reactions_win[i], winner.name_player, (int(winner.number), -1, -1))
-            for i in range(len(reactions_lose)):
-                self.create_reaction(reactions_lose[i], loser.name_player, (int(loser.number), -1, -1))
         else:
-            self.already_asked_remove_infestation = False
-            print("Resolve battle ability of:", planet_name)
-            self.need_to_resolve_battle_ability = True
-            self.reactions_on_winning_combat_being_executed = False
-            self.reactions_on_winning_combat_permitted = True
-            self.battle_ability_to_resolve = planet_name
-            self.player_resolving_battle_ability = winner.name_player
-            self.number_resolving_battle_ability = str(winner.number)
-            self.choices_available = ["Yes", "No"]
-            if self.sacaellums_finest_active:
-                self.choices_available = ["No", "No"]
-                self.sacaellums_finest_active = False
-            self.choice_context = "Resolve Battle Ability?"
-            self.name_player_making_choices = winner.name_player
-            await self.send_update_message(winner.name_player + " has the right to use"
-                                                                " the battle ability of " + planet_name)
-            if not self.need_to_resolve_battle_ability:
-                if self.round_number == self.last_planet_checked_for_battle:
-                    winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
-                    winner.capture_planet(self.last_planet_checked_for_battle,
-                                          self.planet_cards_array)
-                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
-                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
-                    await winner.send_victory_display()
+            reactions_win = self.check_reactions_from_winning_combat(winner, self.last_planet_checked_for_battle)
+            if reactions_win or reactions_lose:
+                await self.send_update_message("Reactions on winning combat detected.")
+                self.reactions_on_winning_combat_being_executed = True
+                self.reactions_on_winning_combat_permitted = False
+                for i in range(len(reactions_lose)):
+                    self.create_reaction(reactions_lose[i], loser.name_player, (int(loser.number), -1, -1))
+            else:
+                self.already_asked_remove_infestation = False
+                print("Resolve battle ability of:", planet_name)
+                self.need_to_resolve_battle_ability = True
+                self.reactions_on_winning_combat_being_executed = False
+                self.reactions_on_winning_combat_permitted = True
+                self.battle_ability_to_resolve = planet_name
+                self.player_resolving_battle_ability = winner.name_player
+                self.number_resolving_battle_ability = str(winner.number)
+                self.choices_available = ["Yes", "No"]
+                if self.sacaellums_finest_active:
+                    self.choices_available = ["No", "No"]
+                    self.sacaellums_finest_active = False
+                self.choice_context = "Resolve Battle Ability?"
+                self.name_player_making_choices = winner.name_player
+                await self.send_update_message(winner.name_player + " has the right to use"
+                                                                    " the battle ability of " + planet_name)
+                if not self.need_to_resolve_battle_ability:
+                    if self.round_number == self.last_planet_checked_for_battle:
+                        winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
+                        winner.capture_planet(self.last_planet_checked_for_battle,
+                                              self.planet_cards_array)
+                        self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                        self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                        self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                        await winner.send_victory_display()
 
     async def check_stalemate(self, name):
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)

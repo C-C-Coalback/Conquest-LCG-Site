@@ -292,6 +292,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Havocs of Khorne", "Sweep (1).\n"
                                                  "This unit deals double damage while attacking a damaged unit.",
                              "Warrior. Khorne.", 3, "Chaos", "Common", 2, 3, 1, False, sweep=1),
+        CardClasses.ArmyCard("Khornate Heldrake", "No Wargear Attachments. Flying.\n"
+                                                  "Reaction: After you win a battle at this planet, destroy a "
+                                                  "target enemy army unit.", "Daemon. Khorne. Elite.",
+                             8, "Chaos", "Loyal", 7, 5, 2, False, flying=True, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

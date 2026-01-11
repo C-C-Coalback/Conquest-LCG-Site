@@ -792,6 +792,41 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         atk = primary_player.get_attack_given_pos(og_pla, og_pos)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
                         self.delete_reaction()
+        elif current_reaction == "Khornate Heldrake":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                if player_owning_card.number == secondary_player.number:
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
+                        can_continue = False
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction"
+                if can_continue:
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        if secondary_player.get_ability_given_pos(
+                                planet_pos, unit_pos) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, -1))
+                    player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
+                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    self.delete_reaction()
         elif current_reaction == "Explosive Scarabs":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if unit_pos != self.positions_of_unit_triggering_reaction[0][1] or primary_player.get_number() != game_update_string[1]:
