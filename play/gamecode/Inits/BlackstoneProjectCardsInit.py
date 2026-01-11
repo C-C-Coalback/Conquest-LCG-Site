@@ -300,6 +300,11 @@ def blackstone_project_cards_init():
                                                    "give a target Lumbering unit +3 ATK for its next attack "
                                                    "this phase.", "Location. Nurgle.",
                                 1, "Chaos", "Loyal", False),
+        CardClasses.AttachmentCard("Necrotoxin Missile", "Attach to a Vehicle unit.\n"
+                                                         "Attached unit gets +1 ATK.\n"
+                                                         "Enemy non-Elite army units at this planet cannot retreat.",
+                                   "Hardpoint.", 1, "Dark Eldar", "Common", 1, False,
+                                   required_traits="Vehicle", extra_attack=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

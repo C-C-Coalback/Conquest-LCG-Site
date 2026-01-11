@@ -7626,6 +7626,11 @@ class Player:
             if own_worr_check or enemy_worr_check:
                 self.destroy_card_in_play(planet_id, unit_id)
                 return False
+            if not self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
+                other_player = self.get_other_player()
+                for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                    if other_player.search_attachments_at_pos(planet_id, i, "Necrotoxin Missile"):
+                        return False
         if not self.cards_in_play[planet_id + 1][unit_id].can_retreat:
             return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
