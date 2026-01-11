@@ -276,6 +276,9 @@ def blackstone_project_cards_init():
                                                   "damage cannot be removed from that unit until the end of the "
                                                   "round.", "Daemon. War Engine.",
                              4, "Chaos", "Common", 3, 6, 0, False, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Screamers", "No Wargear Attachments.\n"
+                                          "Flying.", "Daemon. Tzeentch.",
+                             1, "Chaos", "Loyal", 2, 1, 0, False, wargear_attachments_permitted=False, flying=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
