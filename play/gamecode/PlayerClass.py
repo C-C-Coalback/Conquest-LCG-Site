@@ -5104,6 +5104,15 @@ class Player:
                 if other_player.get_ready_given_pos(planet_id, i):
                     if other_player.search_attachments_at_pos(planet_id, i, "Imposing Presence"):
                         attack_value = attack_value - 1
+        if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+            for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                if not other_player.get_ready_given_pos(planet_id, i):
+                    if other_player.search_attachments_at_pos(planet_id, i, "Nightmare Shroud"):
+                        attack_value = attack_value - 1
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if not self.get_ready_given_pos(planet_id, i):
+                    if self.search_attachments_at_pos(planet_id, i, "Nightmare Shroud"):
+                        attack_value = attack_value - 1
         if ability == "Cowardly Squig":
             attack_value = self.get_health_given_pos(planet_id, unit_id) - \
                            self.get_damage_given_pos(planet_id, unit_id)

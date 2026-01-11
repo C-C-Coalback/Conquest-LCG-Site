@@ -314,6 +314,11 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Harbinger of the Storm", "As an additional cost for your opponent to target either this "
                                                        "planet or a unit at this planet with an event, they must pay"
                                                        " 2 resources.", "Scholar. Elite.",
-                             5, "Necrons", "Common", 3, 5, 3, True)
+                             5, "Necrons", "Common", 3, 5, 3, True),
+        CardClasses.AttachmentCard("Nightmare Shroud", "Attach to a Necrotic Scholar unit. Limit 1 per unit.\n"
+                                                       "While attached unit is exhausted, each non-warlord unit at "
+                                                       "this planet gets -1 ATK.", "Wargear.",
+                                   2, "Necrons", "Common", 2, True, unit_must_match_faction=True,
+                                   limit_one_per_unit=True, required_traits="Scholar")
     ]
     return blackstone_project_cards
