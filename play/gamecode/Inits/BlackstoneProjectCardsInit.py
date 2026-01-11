@@ -279,6 +279,9 @@ def blackstone_project_cards_init():
                               0, "Necrons", "Common", 1, False),
         CardClasses.ArmyCard("Awakened Geomancer", "Reaction: After this unit enters play, discard up to three cards in"
                                                    " your hand to gain 1 resource for each card discarded.", "Scholar.",
-                             4, "Necrons", "Common", 3, 4, 2, False)
+                             4, "Necrons", "Common", 3, 4, 2, False),
+        CardClasses.ArmyCard("Shambling Revenant",
+                             "Forced Reaction: After this unit resolves its attack, sacrifice it.", "Warrior.",
+                             0, "Necrons", "Common", 3, 1, 0, False)
     ]
     return blackstone_project_cards

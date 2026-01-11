@@ -2604,6 +2604,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Awakened Geomancer":
             self.misc_counter = 3
+        elif current_reaction == "Shambling Revenant":
+            primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+            self.delete_reaction()
         elif current_reaction == "Overseer Drone":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             pla, pos = extra_info

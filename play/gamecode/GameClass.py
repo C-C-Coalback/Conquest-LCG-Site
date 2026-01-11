@@ -382,7 +382,7 @@ class Game:
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
-                                 "Spray and Pray", "Grey Hunters"]
+                                 "Spray and Pray", "Grey Hunters", "Shambling Revenant"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -10007,6 +10007,8 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p1.get_ability_given_pos(planet, i) == "Shambling Revenant":
+                                self.create_reaction("Shambling Revenant", self.name_1, (1, planet, i))
                             for j in range(len(self.p1.get_all_attachments_at_pos(planet, i))):
                                 if self.p1.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
@@ -10079,6 +10081,8 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p2.get_ability_given_pos(planet, i) == "Shambling Revenant":
+                                self.create_reaction("Shambling Revenant", self.name_2, (2, planet, i))
                             for j in range(len(self.p2.get_all_attachments_at_pos(planet, i))):
                                 if self.p2.get_attachment_at_pos(planet, i, j).get_ability() == "Unstable Runtgun":
                                     self.p2.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
