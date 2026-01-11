@@ -299,6 +299,12 @@ def blackstone_project_cards_init():
                                    action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.SupportCard("Null Shield Matrix", "Reaction: After an exhausted Necrons unit you control is "
                                                       "assigned damage, prevent 1 of that damage.", "Location.",
-                                2, "Necrons", "Common", True)
+                                2, "Necrons", "Common", True),
+        CardClasses.SupportCard("Merciless Reclamation", "Deploy Action: Discard a Necrotic Warrior or Necrotic Soldier"
+                                                         " unit from your hand to deploy a Necrotic Warrior or Necrotic"
+                                                         " Soldier unit with a printed cost exactly 1 greater than the"
+                                                         " discarded unit from your discard pile at a planet, reducing"
+                                                         " the cost of that unit by 1.", "Upgrade.",
+                                1, "Necrons", "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY")
     ]
     return blackstone_project_cards

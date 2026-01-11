@@ -164,6 +164,17 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.chosen_first_card = True
                         secondary_player.aiming_reticle_coords_discard = pos_discard
                         self.anrakyr_unit_position = pos_discard
+    elif self.action_chosen == "Merciless Reclamation":
+        if self.chosen_first_card and not self.chosen_second_card:
+            if chosen_discard == int(primary_player.number):
+                card = self.preloaded_find_card(primary_player.discard[pos_discard])
+                if card.get_card_type() == "Army" and card.get_faction() == "Necrons":
+                    if card.check_for_a_trait("Soldier", primary_player.etekh_trait) or \
+                            card.check_for_a_trait("Warrior", primary_player.etekh_trait):
+                        if card.get_cost() == self.misc_counter + 1:
+                            self.chosen_second_card = True
+                            primary_player.aiming_reticle_coords_discard = pos_discard
+                            self.anrakyr_unit_position = pos_discard
     elif self.action_chosen == "Triumvirate of Ynnead":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):

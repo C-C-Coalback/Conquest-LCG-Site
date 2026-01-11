@@ -307,6 +307,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                         "Ork Landa missed"
                                     )
                             self.action_cleanup()
+                    elif ability == "Merciless Reclamation":
+                        if card.get_ready():
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.action_chosen = ability
+                            self.chosen_first_card = False
+                            self.chosen_second_card = False
                     elif ability == "Throne of Vainglory":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))

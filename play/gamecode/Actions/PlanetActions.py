@@ -117,10 +117,36 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+    elif self.action_chosen == "Merciless Reclamation":
+        if self.chosen_first_card and self.chosen_second_card:
+            self.planet_pos_to_deploy = int(game_update_string[1])
+            card = self.preloaded_find_card(primary_player.discard[self.anrakyr_unit_position])
+            self.card_to_deploy = card
+            self.traits_of_card_to_play = card.get_traits()
+            self.faction_of_card_to_play = card.get_faction()
+            self.name_of_card_to_play = card.get_name()
+            print("Trying to discount: ", card.get_name())
+            self.discounts_applied = 1
+            hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
+            hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits())
+            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+            same_planet_dis, same_planet_auto_dis = \
+                primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+            self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis + 1
+            if self.available_discounts > self.discounts_applied:
+                self.stored_mode = self.mode
+                self.mode = "DISCOUNT"
+                self.planet_aiming_reticle_position = int(game_update_string[1])
+                self.planet_aiming_reticle_active = True
+            else:
+                await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                      discounts=self.discounts_applied)
+                self.action_cleanup()
+                self.card_pos_to_deploy = -1
+                self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Decaying Warrior Squad":
         self.planet_pos_to_deploy = int(game_update_string[1])
-        card = FindCard.find_card("Decaying Warrior Squad", self.card_array, self.cards_dict,
-                                  self.apoka_errata_cards, self.cards_that_have_errata)
+        card = self.preloaded_find_card("Decaying Warrior Squad")
         self.card_to_deploy = card
         self.traits_of_card_to_play = card.get_traits()
         self.faction_of_card_to_play = card.get_faction()
@@ -677,6 +703,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.card_pos_to_deploy = -1
     elif self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_unit_position != -1:
+            self.planet_pos_to_deploy = int(game_update_string[1])
             if self.anrakyr_deck_choice == primary_player.name_player:
                 card = FindCard.find_card(primary_player.discard[self.anrakyr_unit_position], self.card_array,
                                           self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
@@ -684,14 +711,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
                                           self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
             self.card_to_deploy = card
-            await self.calculate_available_discounts_unit(
-                planet_chosen=chosen_planet, card=card, player=primary_player
-            )
-            await self.calculate_automatic_discounts_unit(
-                planet_chosen=chosen_planet, card=card, player=primary_player
-            )
-            if card.check_for_a_trait("Elite"):
-                primary_player.master_warpsmith_count = 0
+            self.traits_of_card_to_play = card.get_traits()
+            self.faction_of_card_to_play = card.get_faction()
+            self.name_of_card_to_play = card.get_name()
+            print("Trying to discount: ", card.get_name())
+            self.discounts_applied = 0
+            hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
+            hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits())
+            in_play_dis = primary_player.search_all_planets_for_discounts(card.get_traits(), card.get_faction())
+            same_planet_dis, same_planet_auto_dis = \
+                primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
+            self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
             if self.discounts_applied >= self.available_discounts:
                 added_card_to_planet = False
                 own_card = True
@@ -720,8 +750,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     else:
                         del secondary_player.discard[self.anrakyr_unit_position]
             else:
+                self.stored_mode = self.mode
                 self.mode = "DISCOUNT"
                 self.planet_aiming_reticle_position = int(game_update_string[1])
+                self.planet_aiming_reticle_active = True
     elif self.action_chosen == "Warp Rift":
         if not self.chosen_first_card:
             self.chosen_first_card = True

@@ -1145,6 +1145,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.add_card_to_planet(card, self.misc_target_planet)
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
                     self.action_cleanup()
+    elif self.action_chosen == "Merciless Reclamation":
+        if not self.chosen_first_card:
+            card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card.get_card_type() == "Army" and card.get_faction() == "Necrons":
+                if card.check_for_a_trait("Soldier", primary_player.etekh_trait) or \
+                        card.check_for_a_trait("Warrior", primary_player.etekh_trait):
+                    self.misc_counter = card.get_cost()
+                    primary_player.discard_card_from_hand(hand_pos)
+                    self.chosen_first_card = True
     elif self.action_chosen == "Abomination Workshop":
         primary_player.discard_card_from_hand(hand_pos)
         if self.misc_counter >= len(primary_player.cards):
