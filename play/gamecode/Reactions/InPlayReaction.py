@@ -784,6 +784,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.name_player_making_choices = secondary_player.name_player
                             self.resolving_search_box = True
+        elif current_reaction == "Flayer Affliction":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.get_number() == game_update_string[1]:
+                    if unit_pos != self.positions_of_unit_triggering_reaction[0][1]:
+                        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                        atk = primary_player.get_attack_given_pos(og_pla, og_pos)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
+                        self.delete_reaction()
         elif current_reaction == "Blazing Zoanthrope":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if secondary_player.get_number() == game_update_string[1]:

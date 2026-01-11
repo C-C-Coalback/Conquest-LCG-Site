@@ -282,6 +282,13 @@ def blackstone_project_cards_init():
                              4, "Necrons", "Common", 3, 4, 2, False),
         CardClasses.ArmyCard("Shambling Revenant",
                              "Forced Reaction: After this unit resolves its attack, sacrifice it.", "Warrior.",
-                             0, "Necrons", "Common", 3, 1, 0, False)
+                             0, "Necrons", "Common", 3, 1, 0, False),
+        CardClasses.AttachmentCard("Flayer Affliction", "Attach to an army unit.\n"
+                                                        "Deep Strike (1).\n"
+                                                        "Forced Reaction: After attached unit resolves an attack, its "
+                                                        "controller deals damage equal to its ATK to another unit "
+                                                        "they control at the same planet.", "Tactic. Flaw.",
+                                   2, "Necrons", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   deepstrike=1)
     ]
     return blackstone_project_cards
