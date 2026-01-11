@@ -5032,6 +5032,12 @@ class Player:
                 return True
         return card.get_brutal()
 
+    def search_trait_at_planet(self, planet_id, trait):
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if self.check_for_trait_given_pos(planet_id, i, trait):
+                return True
+        return False
+
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             card = self.headquarters[unit_id]
@@ -5126,6 +5132,15 @@ class Player:
                         attack_value += 1
         if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if ability == "Word Bearers Chaplain":
+            if self.search_trait_at_planet(planet_id, "Tzeentch"):
+                attack_value += 1
+            if self.search_trait_at_planet(planet_id, "Nurgle"):
+                attack_value += 1
+            if self.search_trait_at_planet(planet_id, "Khorne"):
+                attack_value += 1
+            if self.search_trait_at_planet(planet_id, "Tzeentch"):
+                attack_value += 1
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 attack_value += 1

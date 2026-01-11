@@ -251,6 +251,10 @@ def blackstone_project_cards_init():
                                                     "this unit to that planet to have this unit gain Sweep (1) "
                                                     "until the end of the round.", "Cultist. Slaanesh.",
                              2, "Chaos", "Common", 1, 3, 1, False),
+        CardClasses.ArmyCard("Word Bearers Chaplain", "This unit gets +1 ATK for each different trait among Tzeentch,"
+                                                      " Khorne, Nurgle, and Slaanesh among units you control at "
+                                                      "this planet.", "Soldier. Chaos Undivided.",
+                             3, "Chaos", "Common", 1, 4, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
