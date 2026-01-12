@@ -355,9 +355,10 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if self.misc_counter > 1:
                 self.delete_reaction()
     elif current_reaction == "Castellan Crowe":
-        if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-            self.misc_counter += 1
-            await self.send_update_message("Total faith spent: " + str(self.misc_counter))
+        if game_update_string[1] == primary_player.number:
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                self.misc_counter += 1
+                await self.send_update_message("Total faith spent: " + str(self.misc_counter))
     elif current_reaction == "The Emperor's Retribution":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:

@@ -2563,9 +2563,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if not self.misc_misc:
                         self.delete_reaction()
         elif current_reaction == "Castellan Crowe":
-            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                self.misc_counter += 1
-                await self.send_update_message("Total faith spent: " + str(self.misc_counter))
+            if game_update_string[1] == primary_player.number:
+                if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                    self.misc_counter += 1
+                    await self.send_update_message("Total faith spent: " + str(self.misc_counter))
         elif current_reaction == "Interceptor Squad":
             if planet_pos == self.misc_target_planet:
                 if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
