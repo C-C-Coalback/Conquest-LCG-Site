@@ -2623,12 +2623,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                         else:
                             secondary_player.discard_card_at_random()
                             secondary_player.discard_card_at_random()
-                            self.delete_reaction()
-                        for j in range(len(primary_player.cards_in_reserve[battle_planet])):
-                            if primary_player.cards_in_reserve[battle_planet][
+                            for j in range(len(primary_player.cards_in_reserve[battle_planet])):
+                                if primary_player.cards_in_reserve[battle_planet][
                                     j].get_ability() == "The Price of Success":
-                                self.create_reaction("The Price of Success", primary_player.name_player,
-                                                     (int(primary_player.number), -1, -1))
+                                    self.create_reaction("The Price of Success", primary_player.name_player,
+                                                         (int(primary_player.number), -1, -1))
+                            self.delete_reaction()
                         break
         elif current_reaction == "Liatha's Loyal Hound":
             if primary_player.cards_removed_from_game:
