@@ -353,6 +353,11 @@ def blackstone_project_cards_init():
                                                      "you removed from the game face-up to put this unit into play "
                                                      "at the last planet.", "Creature. Abomination.",
                              4, "Dark Eldar", "Loyal", 3, 3, 2, True, no_attachments=True),
+        CardClasses.EventCard("The Price of Success", "Deep Strike (1).\n"
+                                                      "Reaction: After your opponent wins a battle at this planet, "
+                                                      "you may Deep Strike this event to discard two cards at random "
+                                                      "from their hand.", "Tactic.",
+                              -1, "Dark Eldar", "Common", 1, False, deepstrike=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

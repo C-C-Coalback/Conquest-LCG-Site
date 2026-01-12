@@ -1038,9 +1038,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.set_once_per_phase_used_of_att_name(planet_pos, unit_pos, "The Bloodrunna", True)
             self.delete_reaction()
         elif current_reaction == "Mandrake Fearmonger":
-            secondary_player.discard_card_at_random()
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
+            interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
+            if interrupts:
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Enemy Discard Effect?"
+                self.resolving_search_box = True
+                self.stored_discard_and_target.append((current_reaction, primary_player.number))
+            else:
+                secondary_player.discard_card_at_random()
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Storming Librarian":
             if planet_pos != -2:
                 storm_lib_value = primary_player.cards_in_play[planet_pos + 1][unit_pos].card_id
@@ -2595,6 +2605,31 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "The Price of Success":
+            battle_planet = self.last_planet_checked_for_battle
+            for i in range(len(primary_player.cards_in_reserve[battle_planet])):
+                if primary_player.cards_in_reserve[battle_planet][i].get_ability() == "The Price of Success":
+                    if primary_player.spend_resources(primary_player.get_deepstrike_value_given_pos(battle_planet, i)):
+                        primary_player.deepstrike_event(battle_planet, i)
+                        interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
+                        if interrupts:
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Enemy Discard Effect?"
+                            self.resolving_search_box = True
+                            self.stored_discard_and_target.append((current_reaction, primary_player.number))
+                        else:
+                            secondary_player.discard_card_at_random()
+                            secondary_player.discard_card_at_random()
+                            self.delete_reaction()
+                        for j in range(len(primary_player.cards_in_reserve[battle_planet])):
+                            if primary_player.cards_in_reserve[battle_planet][
+                                    j].get_ability() == "The Price of Success":
+                                self.create_reaction("The Price of Success", primary_player.name_player,
+                                                     (int(primary_player.number), -1, -1))
+                        break
         elif current_reaction == "Liatha's Loyal Hound":
             if primary_player.cards_removed_from_game:
                 primary_player.cards_removed_from_game_hidden[-1] = "N"

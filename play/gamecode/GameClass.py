@@ -6197,6 +6197,17 @@ class Game:
                 secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif effect == "Mandrake Fearmonger":
+            if not self.discard_fully_prevented:
+                secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif effect == "The Price of Success":
+            if not self.discard_fully_prevented:
+                secondary_player.discard_card_at_random()
+                secondary_player.discard_card_at_random()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif effect == "Pact of the Haemonculi":
             if not self.discard_fully_prevented:
                 secondary_player.discard_card_at_random()
@@ -10475,6 +10486,11 @@ class Game:
             for i in range(len(loser.attachments_at_planet[planet_id])):
                 if loser.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     reactions.append("Close Quarters Doctrine")
+            for i in range(len(loser.cards_in_reserve[planet_id])):
+                if loser.cards_in_reserve[planet_id][i].get_ability() == "The Price of Success":
+                    if loser.get_resources() >= loser.get_deepstrike_value_given_pos(planet_id, i):
+                        if "The Price of Success" not in reactions:
+                            reactions.append("The Price of Success")
             if loser.search_card_in_hq("Agra's Preachings", ready_relevant=True):
                 reactions.append("Agra's Preachings")
             if loser.search_card_in_hq("Order of the Crimson Oath"):
