@@ -1164,6 +1164,8 @@ class Game:
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.misc_counter = 0
                         self.action_cleanup()
+                    elif self.action_chosen == "Daring Assault" and not self.chosen_first_card:
+                        self.action_cleaup()
                     elif self.action_chosen == "Indiscriminate Bombing":
                         if not self.chosen_second_card:
                             self.chosen_second_card = True
