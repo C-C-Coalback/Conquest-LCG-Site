@@ -6408,6 +6408,8 @@ class Player:
                                 self.master_warpsmith_count += 1
                         else:
                             self.master_warpsmith_count += 1
+        if self.get_ability_given_pos(-2, card_pos) == "Desperate Captives":
+            self.game.create_interrupt("Desperate Captives", self.name_player, (int(self.number), -1, -1))
         self.add_card_in_hq_to_discard(card_pos)
         return True
 
@@ -6445,6 +6447,8 @@ class Player:
                                 self.master_warpsmith_count += 1
                         else:
                             self.master_warpsmith_count += 1
+        if self.get_ability_given_pos(planet_num, card_pos) == "Desperate Captives":
+            self.game.create_interrupt("Desperate Captives", self.name_player, (int(self.number), -1, -1))
         self.add_card_in_play_to_discard(planet_num, card_pos)
         return True
 

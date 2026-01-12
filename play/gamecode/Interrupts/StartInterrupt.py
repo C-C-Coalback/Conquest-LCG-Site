@@ -268,6 +268,16 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 elif in_discard:
                     primary_player.remove_card_from_game("Surrogate Host")
                     primary_player.remove_card_name_from_discard("Surrogate Host")
+        elif current_interrupt == "Desperate Captives":
+            dmg = 0
+            for i in range(len(secondary_player.headquarters)):
+                if secondary_player.check_is_unit_at_pos(-2, unit_pos):
+                    dmg += 2
+            self.location_of_indirect = "HQ"
+            self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+            secondary_player.indirect_damage_applied = 0
+            secondary_player.total_indirect_damage = dmg
+            self.delete_interrupt()
         elif current_interrupt == "Necrodermis":
             if primary_player.resources > 0:
                 if secondary_player.nullify_check() and self.nullify_enabled:

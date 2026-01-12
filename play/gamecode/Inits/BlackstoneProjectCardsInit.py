@@ -313,6 +313,11 @@ def blackstone_project_cards_init():
                                                        "Action: If this unit is in your HQ, add it to your hand.",
                              "Warrior. Kabalite.", 3, "Dark Eldar", "Common", 3, 4, 1, False,
                              action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
+                                                   "Interrupt: When you sacrifice this unit, your opponent deals X "
+                                                   "indirect damage among units they control in their HQ. X "
+                                                   "is equal to twice the number of units in their HQ.",
+                             "Ally.", 0, "Dark Eldar", "Common", 0, 1, 0, False, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
