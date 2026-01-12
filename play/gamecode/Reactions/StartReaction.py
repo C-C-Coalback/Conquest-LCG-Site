@@ -2388,7 +2388,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if secondary_player.nullify_check() and self.nullify_enabled:
                     can_continue = False
                     await self.send_update_message(
-                        primary_player.name_player + " wants to play Accept Any Challenge; "
+                        primary_player.name_player + " wants to play Contaminated Convoys; "
                                                      "Nullify window offered.")
                     self.choices_available = ["Yes", "No"]
                     self.name_player_making_choices = secondary_player.name_player
@@ -2404,6 +2404,50 @@ async def start_resolving_reaction(self, name, game_update_string):
                         primary_player.discard_card_name_from_hand("Contaminated Convoys")
                         primary_player.contaminated_convoys = True
                     self.delete_reaction()
+        elif current_reaction == "Unconquerable Fear":
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Unconquerable Fear; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Unconquerable Fear"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                if can_continue:
+                    cost = 3
+                    if primary_player.urien_relevant:
+                        cost = cost - 1
+                    if primary_player.spend_resources(cost):
+                        primary_player.discard_card_name_from_hand("Unconquerable Fear")
+                        primary_player.unconquerable_fear_used = True
+                        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                        primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
+                        interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
+                        if interrupts:
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Enemy Discard Effect?"
+                            self.resolving_search_box = True
+                            self.stored_discard_and_target.append((current_reaction, primary_player.number))
+                        else:
+                            secondary_player.discard_card_at_random()
+                            secondary_player.discard_card_at_random()
+                            await primary_player.dark_eldar_event_played()
+                            primary_player.torture_event_played()
+                            secondary_player.create_enemy_played_event_reactions()
+                            self.delete_reaction()
+                    else:
+                        self.delete_reaction()
         elif current_reaction == "Drifting Spore Mines":
             if planet_pos != 6 or self.planets_in_play_array[5]:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -2628,6 +2672,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                                     j].get_ability() == "The Price of Success":
                                     self.create_reaction("The Price of Success", primary_player.name_player,
                                                          (int(primary_player.number), -1, -1))
+                            await primary_player.dark_eldar_event_played()
                             self.delete_reaction()
                         break
         elif current_reaction == "Liatha's Loyal Hound":

@@ -767,6 +767,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if self.misc_target_unit == (-1, -1) or self.misc_target_unit == (planet_pos, unit_pos):
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                     if not primary_player.deck:
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                     else:
                         card_name = primary_player.deck[0]
@@ -777,6 +778,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             if not card.planet_attachment:
                                 if primary_player.attach_card(card, planet_pos, unit_pos):
                                     del primary_player.deck[0]
+                                    secondary_player.create_enemy_played_event_reactions()
                                     self.action_cleanup()
                                 else:
                                     primary_player.deck.append(primary_player.deck[0])
@@ -850,6 +852,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 del primary_player.headquarters[other_pos]
                             else:
                                 del primary_player.cards_in_play[other_pla + 1][other_pos]
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Lost in the Webway Opponent":
         if game_update_string[1] == primary_player.get_number():
@@ -880,6 +883,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             del primary_player.headquarters[other_pos]
                         else:
                             del primary_player.cards_in_play[other_pla + 1][other_pos]
+                    primary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "World Engine Beam":
         if game_update_string[1] == primary_player.number:
@@ -937,6 +941,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
                         self.name_player_who_is_searching = primary_player.name_player
                         self.number_who_is_searching = primary_player.number
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Evolutionary Adaptation":
         if self.chosen_first_card:
@@ -1032,6 +1037,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, dmg, by_enemy_unit=False)
                     primary_player.torture_event_played(name=self.action_chosen)
                     await primary_player.dark_eldar_event_played()
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
@@ -1131,6 +1137,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.player_with_action = secondary_player.name_player
                     primary_player.sacced_card_for_despise = True
                     if primary_player.sacced_card_for_despise and secondary_player.sacced_card_for_despise:
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                         await secondary_player.dark_eldar_event_played()
     elif self.action_chosen == "Fetid Haze":
@@ -1139,6 +1146,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if primary_player.headquarters[unit_pos].check_for_a_trait("Nurgle", primary_player.etekh_trait):
                     damage = primary_player.get_damage_given_pos(-2, unit_pos)
                     primary_player.remove_damage_from_pos(-2, unit_pos, 999, healing=True)
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Know No Fear":
         if not self.chosen_first_card:
@@ -1156,6 +1164,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if target_player.get_card_type_given_pos(-2, unit_pos) == "Support":
             if not target_player.get_ready_given_pos(-2, unit_pos):
                 target_player.ready_given_pos(-2, unit_pos)
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Doombolt":
         if game_update_string[1] == secondary_player.number:
@@ -1182,6 +1191,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     secondary_player.assign_damage_to_pos(-2, unit_pos, damage, by_enemy_unit=False)
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Big Mek Kagdrak":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1199,6 +1209,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if primary_player.sacrifice_card_in_hq(unit_pos):
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
                     await secondary_player.dark_eldar_event_played()
                     secondary_player.torture_event_played("Power from Pain")
@@ -1234,12 +1245,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played("A Thousand Cuts")
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Keep Firing!":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank"):
                 if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                     primary_player.ready_given_pos(planet_pos, unit_pos)
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Missile Pod":
         resolved_something = False
@@ -1337,6 +1350,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.amount_spend_for_tzeentch_firestorm = -1
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Castellan Crowe BLOODIED":
         if game_update_string[1] == primary_player.get_number():
@@ -1393,6 +1407,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 primary_player.discard_card_name_from_hand("Overrun")
                 primary_player.aiming_reticle_coords_hand = None
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Reveal The Blade":
         if self.chosen_first_card:
@@ -1417,6 +1432,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if primary_player.sacrifice_card_in_hq(unit_pos):
                 og_pla, og_pos = self.misc_target_unit
                 secondary_player.rout_unit(og_pla, og_pos)
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Naval Surgeon":
         if game_update_string[1] == primary_player.get_number():
@@ -1477,6 +1493,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if not primary_player.harbinger_of_eternity_active:
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+            secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
     elif self.action_chosen == "Kaptin Bluddflagg":
         if not self.chosen_first_card:
@@ -1560,6 +1577,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.nullify_context = "Event Action"
             if can_continue:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Squiggify":
         if game_update_string[1] == "1":
@@ -1596,6 +1614,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 await self.send_update_message(
                     name_card + " got Squiggified!"
                 )
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Cenobyte Servitor":
         if self.chosen_first_card:
@@ -1641,6 +1660,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_being_hit.destroy_card_in_hq(unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Master Program":
         if primary_player.get_number() == game_update_string[1]:
@@ -1715,6 +1735,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(-2, unit_pos, "Warrior"):
                 primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 1, expiration="EOP")
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Holy Chapel":
         if game_update_string[1] == "1":
@@ -1760,6 +1781,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if can_continue:
                 target_player.deck.insert(0, target_player.get_name_given_pos(planet_pos, unit_pos))
                 target_player.remove_card_from_hq(unit_pos)
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
@@ -1818,6 +1840,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             elif primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
                 if primary_player.get_cost_given_pos(planet_pos, unit_pos) <= self.misc_counter:
                     primary_player.destroy_card_in_hq(unit_pos)
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
@@ -1846,6 +1869,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                     if can_continue:
                         secondary_player.destroy_card_in_hq(unit_pos)
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
@@ -1866,6 +1890,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     if not self.chosen_first_card:
                         self.chosen_first_card = True
                     else:
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
@@ -1900,6 +1925,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.misc_counter = self.misc_counter - 1
                         if self.misc_counter < 1:
+                            secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
     elif self.action_chosen == "Embarked Squads":
         if game_update_string[1] == primary_player.number:
@@ -1917,6 +1943,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if player_owning_card.get_ranged_given_pos(planet_pos, unit_pos):
                 player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
                 player_owning_card.headquarters[unit_pos].armorbane_eop = True
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Omnissiah's Blessing":
         if primary_player.get_number() == game_update_string[1]:
@@ -1926,6 +1953,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Saint Celestine":
         if self.chosen_first_card:
@@ -1982,6 +2010,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove, healing=True)
                         primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, x_value,
                                                                       expiration="NEXT")
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Sivarla Soulbinder":
         if not self.chosen_first_card:
@@ -2028,6 +2057,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if not primary_player.harbinger_of_eternity_active:
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Ethereal Wisdom":
         if primary_player.get_number() == game_update_string[1]:
@@ -2037,6 +2067,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.headquarters[unit_pos].extra_attack_until_end_of_phase += 1
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
+                    secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
     elif self.action_chosen == "Kauyon Strike":
         if primary_player.get_number() == game_update_string[1]:
@@ -2083,6 +2114,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         secondary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk2, by_enemy_unit=False)
                         secondary_player.assign_damage_to_pos(other_pla, other_pos, atk1, by_enemy_unit=False)
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
     elif self.action_chosen == "Ancient Keeper of Secrets":
         if primary_player.get_number() == game_update_string[1]:
@@ -2214,6 +2246,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 player_destroying_support.destroy_card_in_hq(unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Supply Line Incursion":
         if player_owning_card.headquarters[unit_pos].get_card_type() == "Support":
@@ -2243,6 +2276,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.draw_card()
                     primary_player.add_resources(1)
                 await primary_player.dark_eldar_event_played()
+                secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
     elif self.action_chosen == "Consumed by the Kindred":
         if game_update_string[1] == primary_player.get_number():
@@ -2258,6 +2292,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         cost = primary_player.get_cost_given_pos(planet_pos, unit_pos)
                         if primary_player.sacrifice_card_in_hq(unit_pos):
                             primary_player.add_resources(cost)
+                            secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
     elif self.action_chosen == "Ambush Platform":
         if game_update_string[1] == "1":

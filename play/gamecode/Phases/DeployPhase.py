@@ -501,6 +501,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             primary_player.set_aiming_reticle_in_play(planet_pos, position_of_unit, "red")
     if self.action_chosen == "Triumvirate of Ynnead":
         if self.trium_count > 1:
+            secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
     elif self.action_chosen == "Behind Enemy Lines":
         self.chosen_second_card = True

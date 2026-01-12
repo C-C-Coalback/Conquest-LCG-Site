@@ -59,6 +59,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             await self.send_update_message(
                                 "No valid targets for Awake the Sleepers"
                             )
+                            secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
                         else:
                             await self.send_update_message(

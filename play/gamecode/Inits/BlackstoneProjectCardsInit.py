@@ -353,6 +353,12 @@ def blackstone_project_cards_init():
                                                      "you removed from the game face-up to put this unit into play "
                                                      "at the last planet.", "Creature. Abomination.",
                              4, "Dark Eldar", "Loyal", 3, 3, 2, True, no_attachments=True),
+        CardClasses.ArmyCard("Stalking Scourge", "Flying.", "Warrior.", 2, "Dark Eldar", "Loyal",
+                             1, 2, 2, False, flying=True),
+        CardClasses.EventCard("Unconquerable Fear", "Reaction: After your opponent plays an event card, exhaust your "
+                                                    "warlord to discard two cards at random from their hand. "
+                                                    "Max 1 per round.", "Power. Torture. Maneuver.",
+                              3, "Dark Eldar", "Loyal", 2, False),
         CardClasses.EventCard("The Price of Success", "Deep Strike (1).\n"
                                                       "Reaction: After your opponent wins a battle at this planet, "
                                                       "you may Deep Strike this event to discard two cards at random "

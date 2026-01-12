@@ -166,6 +166,7 @@ class Player:
         self.accept_any_challenge_used = False
         self.rok_bombardment_active = []
         self.bloodied_host_used = False
+        self.unconquerable_fear_used = False
         self.master_warpsmith_count = 0
         self.gut_and_pillage_used = False
         self.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]
@@ -972,6 +973,17 @@ class Player:
             return None
         self.cards_in_play[planet_id + 1][unit_id].sweep_eor += value
         return None
+
+    def create_enemy_played_event_reactions(self, planet_pos=-1):
+        if self.search_hand_for_card("Unconquerable Fear"):
+            warlord_pla, warlord_pos = self.get_location_of_warlord()
+            if self.get_ready_given_pos(warlord_pla, warlord_pos):
+                cost = 3
+                if self.urien_relevant:
+                    cost = cost - 1
+                if self.resources > cost:
+                    if not self.unconquerable_fear_used:
+                        self.game.create_reaction("Unconquerable Fear", self.name_player, (int(self.number), -1, -1))
 
     def increase_sweep_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
