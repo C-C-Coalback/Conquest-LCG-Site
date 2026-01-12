@@ -334,6 +334,13 @@ def blackstone_project_cards_init():
                                                    "indirect damage among units they control in their HQ. X "
                                                    "is equal to twice the number of units in their HQ.",
                              "Ally.", 0, "Dark Eldar", "Common", 0, 1, 0, False, wargear_attachments_permitted=False),
+        CardClasses.AttachmentCard("Beastmaster's Whip", "Attach to a Beastmaster army unit.\n"
+                                                         "Attached unit gets +1 ATK.\n"
+                                                         "Reaction: After attached unit is declared as an attacker, "
+                                                         "ready a non-Elite Creature unit you control at this planet.",
+                                   "Weapon. Wargear.", 1, "Dark Eldar", "Common", 1, False,
+                                   required_traits="Beastmaster", type_of_units_allowed_for_attachment="Army",
+                                   extra_attack=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

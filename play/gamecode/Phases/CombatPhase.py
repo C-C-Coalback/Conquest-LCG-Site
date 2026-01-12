@@ -885,6 +885,12 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("The Plaguefather's Banner", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
+                            attachments = player.get_all_attachments_at_pos(self.attacker_planet, self.attacker_position)
+                            for i in range(len(attachments)):
+                                if attachments[i].get_ability() == "Beastmaster's Whip":
+                                    self.create_reaction("Beastmaster's Whip", player.name_player,
+                                                         (int(player.number), self.attacker_planet,
+                                                          self.attacker_position))
                             if player.search_card_at_planet(self.attacker_planet, "Gorgul Da Slaya"):
                                 self.create_interrupt("Gorgul Da Slaya", player.name_player,
                                                       (int(player.number), self.attacker_planet, -1))

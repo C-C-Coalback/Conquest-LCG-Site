@@ -826,6 +826,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Beastmaster's Whip":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.get_number() == game_update_string[1]:
+                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Creature"):
+                        if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                            if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                                primary_player.ready_given_pos(planet_pos, unit_pos)
+                                self.delete_reaction()
         elif current_reaction == "Decayed Gardens":
             if player_owning_card.get_lumbering_given_pos(planet_pos, unit_pos):
                 can_continue = True
