@@ -6656,6 +6656,9 @@ class Player:
                 self.game.create_reaction("Cegorach's Jesters", self.name_player, (int(self.number), planet_num, i))
 
     def get_lumbering_given_pos(self, planet_id, unit_id):
+        if self.get_ability_given_pos(planet_id, unit_id) == "Looming Grotesque":
+            if self.count_tortures_in_discard() < 6:
+                return True
         if planet_id == -2:
             return self.headquarters[unit_id].get_lumbering()
         if self.search_attachments_at_pos(planet_id, unit_id, "Centurion Warsuit"):
