@@ -6845,6 +6845,17 @@ class Player:
                                     if not other_player.get_ready_given_pos(planet_num, i):
                                         self.game.create_reaction("Lokhust Destroyer", other_player.name_player,
                                                                   (int(other_player.number), planet_num, i))
+            if self.get_card_type_given_pos(planet_num, card_pos) == "Army":
+                if self.get_cost_given_pos(planet_num, card_pos) < 2:
+                    for i in range(len(other_player.cards_in_play[planet_num + 1])):
+                        if other_player.get_ability_given_pos(planet_num, i) == "Bloodied Kabal":
+                            self.game.create_reaction("Bloodied Kabal", other_player.name_player,
+                                                      (int(other_player.number), planet_num, i))
+            if self.get_card_type_given_pos(planet_num, card_pos) == "Token":
+                for i in range(len(other_player.cards_in_play[planet_num + 1])):
+                    if other_player.get_ability_given_pos(planet_num, i) == "Bloodied Kabal":
+                        self.game.create_reaction("Bloodied Kabal", other_player.name_player,
+                                                  (int(other_player.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":

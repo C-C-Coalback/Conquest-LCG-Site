@@ -36,6 +36,15 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         self.misc_player_storage = card.get_name()
                         self.chosen_first_card = True
                         self.misc_counter = 1
+        elif current_reaction == "Bloodied Kabal":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_card_type() == "Army":
+                    if card.check_for_a_trait("Kabalite"):
+                        primary_player.cards.append(card.get_name())
+                        del primary_player.discard[pos_discard]
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Klan Totem":
             if not self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

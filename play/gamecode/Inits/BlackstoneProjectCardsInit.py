@@ -305,6 +305,10 @@ def blackstone_project_cards_init():
                                                          "Enemy non-Elite army units at this planet cannot retreat.",
                                    "Hardpoint.", 1, "Dark Eldar", "Common", 1, False,
                                    required_traits="Vehicle", extra_attack=1),
+        CardClasses.ArmyCard("Bloodied Kabal", "Reaction: After an enemy token unit or an enemy army unit with "
+                                               "printed cost 1 or lower is destroyed at this planet, add a "
+                                               "Kabalite card in your discard pile to your hand.",
+                             "Warrior. Kabalite.", 1, "Dark Eldar", "Loyal", 1, 2, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
