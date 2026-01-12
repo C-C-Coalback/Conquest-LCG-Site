@@ -313,6 +313,10 @@ def blackstone_project_cards_init():
                                                        "Action: If this unit is in your HQ, add it to your hand.",
                              "Warrior. Kabalite.", 3, "Dark Eldar", "Common", 3, 4, 1, False,
                              action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Final Expiration", "Action: Deal X damage to a target non-warlord unit. X is equal to "
+                                                  "the number of Torture cards in your discard pile.",
+                              "Torture. Power.", 3, "Dark Eldar", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
                                                    "Interrupt: When you sacrifice this unit, your opponent deals X "
                                                    "indirect damage among units they control in their HQ. X "
