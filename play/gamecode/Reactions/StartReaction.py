@@ -1343,7 +1343,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if can_continue:
                     if primary_player.spend_resources(1):
                         primary_player.discard_card_name_from_hand("Gene Implantation")
-                        name_card = self.name_of_attacked_unit
+                        name_card = extra_info
                         planet = self.last_planet_checked_for_battle
                         if name_card in secondary_player.discard:
                             card = FindCard.find_card(name_card, self.card_array, self.cards_dict,
