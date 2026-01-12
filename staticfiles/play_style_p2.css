@@ -794,7 +794,7 @@ legend {
     top: 40%;
     border: 5px solid blue;
     right: 0;
-    margin: auto;
+    z-index: 1000;
     overflow-x:hidden;
     overflow-y:auto;
     display: flex;
