@@ -341,6 +341,12 @@ def blackstone_project_cards_init():
                                    "Weapon. Wargear.", 1, "Dark Eldar", "Common", 1, False,
                                    required_traits="Beastmaster", type_of_units_allowed_for_attachment="Army",
                                    extra_attack=1),
+        CardClasses.ArmyCard("Razorwing Jetfighter", "No Wargear Attachments. Flying.\n"
+                                                     "Reaction: After this unit resolves an attack against a unit with "
+                                                     "the Flying or Mobile keyword, ready this unit. "
+                                                     "(Limit twice per phase)", "Vehicle. Elite.",
+                             6, "Dark Eldar", "Loyal", 3, 5, 2, False, flying=True,
+                             wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

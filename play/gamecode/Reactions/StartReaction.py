@@ -2595,6 +2595,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Razorwing Jetfighter":
+            primary_player.set_once_per_phase_used_given_pos(
+                planet_pos, unit_pos, primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos) + 1)
+            primary_player.ready_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Chaos Maulerfiend":
             target_pla, target_pos = extra_info
             secondary_player.cards_in_play[target_pla + 1][target_pos].cannot_remove_damage_eor = True

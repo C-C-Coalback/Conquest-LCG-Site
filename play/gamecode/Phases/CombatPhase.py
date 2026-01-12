@@ -1433,6 +1433,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 print("unit is no longer a valid sweep target")
                                 self.card_type_defender = secondary_player.get_card_type_given_pos(
                                     self.defender_planet, self.defender_position)
+                                self.defender_is_flying_or_mobile = secondary_player.get_flying_given_pos(
+                                    self.defender_planet, self.defender_position) or \
+                                                                    secondary_player.get_mobile_given_pos(
+                                    self.defender_planet, self.defender_position)
                                 self.defender_is_also_warlord = \
                                     primary_player.name_player in \
                                     secondary_player.cards_in_play[self.defender_planet + 1
