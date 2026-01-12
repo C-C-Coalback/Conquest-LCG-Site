@@ -125,6 +125,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Final Expiration":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
+                    elif ability == "Medusae Pact":
+                        self.chosen_first_card = False
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.action_chosen = ability
+                        if len(primary_player.cards) < 6:
+                            self.chosen_first_card = True
+                            if len(secondary_player.cards) < 6:
+                                primary_player.torture_event_played(ability)
+                                await primary_player.dark_eldar_event_played()
+                                self.action_cleanup()
+                            else:
+                                self.player_with_action = secondary_player.name_player
+                                await self.send_update_message("Please discard down to 5 cards.")
                     elif ability == "Access to the Black Library":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
@@ -1066,6 +1079,22 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+    elif self.action_chosen == "Medusae Pact":
+        primary_player.discard_card_from_hand(hand_pos)
+        if len(primary_player.cards) < 6:
+            if not self.chosen_first_card:
+                self.chosen_first_card = True
+                if len(secondary_player.cards) > 5:
+                    self.player_with_action = secondary_player.name_player
+                    await self.send_update_message("Please discard down to 5 cards.")
+                else:
+                    await primary_player.dark_eldar_event_played()
+                    primary_player.torture_event_played(self.action_chosen)
+                    self.action_cleanup()
+            else:
+                await secondary_player.dark_eldar_event_played()
+                secondary_player.torture_event_played(self.action_chosen)
+                self.action_cleanup()
     elif self.action_chosen == "Rapid Evolution":
         if card.get_card_type() == "Army":
             if self.misc_counter[0] < 2:

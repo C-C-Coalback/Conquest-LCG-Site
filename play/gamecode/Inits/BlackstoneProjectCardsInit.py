@@ -326,6 +326,9 @@ def blackstone_project_cards_init():
                                                  "attack or the Area Effect keyword, instead deal that damage to "
                                                  "another target unit at the same planet. (Limit once per phase)",
                              "Assassin. Warrior.", 3, "Dark Eldar", "Loyal", 3, 1, 1, False),
+        CardClasses.EventCard("Medusae Pact", "Action: Each player must discard down to 5 cards in hand.",
+                              "Torture. Power.", 1, "Dark Eldar", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
                                                    "Interrupt: When you sacrifice this unit, your opponent deals X "
                                                    "indirect damage among units they control in their HQ. X "
