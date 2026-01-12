@@ -607,7 +607,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             await secondary_player.reveal_hand()
             i = 0
             while i < len(secondary_player.cards):
-                if secondary_player.cards[i] == self.name_of_attacked_unit:
+                if secondary_player.cards[i] == extra_info:
                     secondary_player.discard_card_from_hand(i)
                     i = i - 1
                 i = i + 1

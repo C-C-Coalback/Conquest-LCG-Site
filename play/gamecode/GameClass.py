@@ -9078,6 +9078,10 @@ class Game:
                                                              (int(secondary_player.number), planet_pos, unit_pos))
                         if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Patrolling Wraith":
                             self.create_delayed_reaction("Patrolling Wraith", secondary_player.name_player,
+                                                         (int(secondary_player.number), planet_pos, unit_pos),
+                                                         primary_player.get_name_given_pos(def_pla, def_pos))
+                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Draining Cronos":
+                            self.create_delayed_reaction("Draining Cronos", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
                         if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Salvaged Battlewagon":
                             self.create_delayed_reaction("Salvaged Battlewagon", secondary_player.name_player,

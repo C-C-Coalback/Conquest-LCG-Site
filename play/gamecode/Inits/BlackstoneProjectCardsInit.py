@@ -359,6 +359,15 @@ def blackstone_project_cards_init():
                                                     "warlord to discard two cards at random from their hand. "
                                                     "Max 1 per round.", "Power. Torture. Maneuver.",
                               3, "Dark Eldar", "Loyal", 2, False),
+        CardClasses.ArmyCard("Draining Cronos", "No Attachments.\n"
+                                                "Reaction: After this unit destroys an enemy unit by an attack, "
+                                                "a target unit you control at the same planet gets +1 ATK and "
+                                                "+2 HP until the end of the phase.", "Creature. Abomination. Elite.",
+                             5, "Dark Eldar", "Common", 5, 5, 1, False, no_attachments=True),
+        CardClasses.ArmyCard("Looming Grotesque", "No Wargear Attachments.\n"
+                                                  "While there are 5 or fewer Torture cards in your discard pile, "
+                                                  "this unit gains Lumbering.", "Creature. Abomination.",
+                             4, "Dark Eldar", "Common", 5, 6, 1, False, wargear_attachments_permitted=False),
         CardClasses.EventCard("The Price of Success", "Deep Strike (1).\n"
                                                       "Reaction: After your opponent wins a battle at this planet, "
                                                       "you may Deep Strike this event to discard two cards at random "
