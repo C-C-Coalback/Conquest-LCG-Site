@@ -1688,19 +1688,41 @@ class Game:
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HQ":
                     if self.number_who_is_searching == game_update_string[1]:
+                        unit_pos = int(game_update_string[2])
                         if self.number_who_is_searching == "1":
                             player = self.p1
                         else:
                             player = self.p2
-                        if player.get_ability_given_pos(-2, int(game_update_string[2])) == "Dome of Crystal Seers":
-                            if player.get_ready_given_pos(-2, int(game_update_string[2])):
+                        if player.get_ability_given_pos(-2, unit_pos) == "Dome of Crystal Seers":
+                            if player.get_ready_given_pos(-2, unit_pos):
                                 if not self.searching_enemy_deck:
-                                    player.exhaust_given_pos(-2, int(game_update_string[2]))
+                                    player.exhaust_given_pos(-2, unit_pos)
                                     player.number_cards_to_search += 3
                                     if len(player.deck) >= player.number_cards_to_search:
                                         self.cards_in_search_box = player.deck[:player.number_cards_to_search]
                                     else:
                                         self.cards_in_search_box = player.deck[:player.deck]
+                        if self.choice_context == "Tower of Despair":
+                            if player.check_is_unit_at_pos(-2, unit_pos):
+                                if player.check_for_trait_given_pos(-2, unit_pos, "Haemonculus"):
+                                    if player.get_ready_given_pos(-2, unit_pos):
+                                        player.exhaust_given_pos(-2, unit_pos)
+                                        self.misc_counter += 1
+            elif len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    if self.number_who_is_searching == game_update_string[1]:
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        if self.number_who_is_searching == "1":
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        if self.choice_context == "Tower of Despair":
+                            if player.check_is_unit_at_pos(planet_pos, unit_pos):
+                                if player.check_for_trait_given_pos(planet_pos, unit_pos, "Haemonculus"):
+                                    if player.get_ready_given_pos(planet_pos, unit_pos):
+                                        player.exhaust_given_pos(planet_pos, unit_pos)
+                                        self.misc_counter += 1
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
@@ -1732,14 +1754,22 @@ class Game:
                                 else:
                                     self.p1.discard_card_from_deck(int(game_update_string[1]))
                             self.p1.number_cards_to_search -= 1
-                            self.p1.bottom_remaining_cards()
-                            self.reset_search_values()
-                            if self.resolving_search_box:
-                                self.resolving_search_box = False
-                            if self.battle_ability_to_resolve == "Elouith" or \
-                                    self.battle_ability_to_resolve == "Anshan":
-                                await self.resolve_battle_conclusion(name, game_update_string)
-                                self.reset_battle_resolve_attributes()
+                            if self.choice_context == "Tower of Despair" and \
+                                    self.what_to_do_with_searched_card == "DRAW" and \
+                                    self.misc_counter > 0:
+                                del self.cards_in_search_box[int(game_update_string[1])]
+                                self.misc_counter = self.misc_counter - 1
+                            else:
+                                if self.choice_context == "Tower of Despair":
+                                    self.choice_context = ""
+                                self.p1.bottom_remaining_cards()
+                                self.reset_search_values()
+                                if self.resolving_search_box:
+                                    self.resolving_search_box = False
+                                if self.battle_ability_to_resolve == "Elouith" or \
+                                        self.battle_ability_to_resolve == "Anshan":
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    self.reset_battle_resolve_attributes()
                     else:
                         valid_card = True
                         if not self.no_restrictions_on_chosen_card:
@@ -1769,13 +1799,21 @@ class Game:
                                 else:
                                     self.p2.discard_card_from_deck(int(game_update_string[1]))
                             self.p2.number_cards_to_search -= 1
-                            self.p2.bottom_remaining_cards()
-                            self.reset_search_values()
-                            if self.resolving_search_box:
-                                self.resolving_search_box = False
-                            if self.battle_ability_to_resolve == "Elouith":
-                                await self.resolve_battle_conclusion(name, game_update_string)
-                                self.reset_battle_resolve_attributes()
+                            if self.choice_context == "Tower of Despair" and \
+                                    self.what_to_do_with_searched_card == "DRAW" and \
+                                    self.misc_counter > 0:
+                                del self.cards_in_search_box[int(game_update_string[1])]
+                                self.misc_counter = self.misc_counter - 1
+                            else:
+                                if self.choice_context == "Tower of Despair":
+                                    self.choice_context = ""
+                                self.p2.bottom_remaining_cards()
+                                self.reset_search_values()
+                                if self.resolving_search_box:
+                                    self.resolving_search_box = False
+                                if self.battle_ability_to_resolve == "Elouith":
+                                    await self.resolve_battle_conclusion(name, game_update_string)
+                                    self.reset_battle_resolve_attributes()
 
     def reset_choices_available(self):
         self.choices_available = []
@@ -7230,7 +7268,7 @@ class Game:
                                     if primary_player.resources > 0:
                                         if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                             _, att_pla, att_pos = self.positions_attackers_of_units_to_take_damage[0]
-                                            if secondary_player.get_faction_given_pos(att_pla, att_pos) ==\
+                                            if secondary_player.get_faction_given_pos(att_pla, att_pos) == \
                                                     primary_player.enslaved_faction:
                                                 if primary_player.check_for_trait_given_pos(att_pla, att_pos,
                                                                                             "Sautekh") or \
@@ -7403,7 +7441,8 @@ class Game:
                                                         self.positions_attackers_of_units_to_take_damage[0]
                                                     )
                                         if self.positions_attackers_of_units_to_take_damage[0]:
-                                            num_atk, pla_atk, pos_atk = self.positions_attackers_of_units_to_take_damage[0]
+                                            num_atk, pla_atk, pos_atk = \
+                                            self.positions_attackers_of_units_to_take_damage[0]
                                             for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
                                                                         ][pos_atk].get_attachments())):
                                                 if secondary_player.cards_in_play[pla_atk + 1][
@@ -7908,7 +7947,7 @@ class Game:
                                     self.amount_that_can_be_removed_by_shield[0] > 2 and \
                                     self.positions_attackers_of_units_to_take_damage[0]:
                                 if secondary_player.special_get_card_type_given_pos(
-                                    self.positions_attackers_of_units_to_take_damage[0]
+                                        self.positions_attackers_of_units_to_take_damage[0]
                                 ) == "Army":
                                     damage_prevented = self.amount_that_can_be_removed_by_shield[0] - 2
                                     self.amount_that_can_be_removed_by_shield[0] = 2
@@ -8678,7 +8717,8 @@ class Game:
                         if self.positions_of_units_interrupting[0][1] == planet_pos:
                             if game_update_string[1] == primary_player.number:
                                 card_in_reserve = primary_player.cards_in_reserve[planet_pos][unit_pos]
-                                if card_in_reserve.check_for_a_trait("Dark Angels") and card_in_reserve.get_card_type() == "Army":
+                                if card_in_reserve.check_for_a_trait(
+                                        "Dark Angels") and card_in_reserve.get_card_type() == "Army":
                                     if primary_player.spend_resources(card_in_reserve.get_deepstrike_value()):
                                         primary_player.deepstrike_unit(planet_pos, unit_pos)
                                         self.delete_interrupt()
@@ -10476,7 +10516,8 @@ class Game:
                 if winner.resources > 0:
                     if not winner.accept_any_challenge_used:
                         if winner.search_hand_for_card("Accept Any Challenge"):
-                            self.create_reaction("Accept Any Challenge", winner.name_player, (int(winner.number), -1, -1))
+                            self.create_reaction("Accept Any Challenge", winner.name_player,
+                                                 (int(winner.number), -1, -1))
                             reactions_exist = True
                 if winner.resources > 1:
                     if winner.search_hand_for_card("Declare the Crusade"):

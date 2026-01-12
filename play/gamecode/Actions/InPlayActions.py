@@ -1207,6 +1207,30 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.torture_event_played(name=self.action_chosen)
                     await primary_player.dark_eldar_event_played()
                     self.action_cleanup()
+    elif self.action_chosen == "Tower of Despair":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.misc_counter = 0
+                    self.choice_context = "Tower of Despair"
+                    self.resolving_search_box = True
+                    self.what_to_do_with_searched_card = "DRAW"
+                    self.traits_of_searched_card = "Torture"
+                    self.card_type_of_searched_card = None
+                    self.faction_of_searched_card = None
+                    self.max_cost_of_searched_card = 99
+                    self.all_conditions_searched_card_required = True
+                    self.no_restrictions_on_chosen_card = False
+                    primary_player.number_cards_to_search = 6
+                    if len(primary_player.deck) > 5:
+                        self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                    else:
+                        self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
+                    self.name_player_who_is_searching = primary_player.name_player
+                    self.number_who_is_searching = str(primary_player.number)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_cleanup()
     elif self.action_chosen == "Searing Brand":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

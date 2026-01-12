@@ -599,6 +599,7 @@ h4 {
     display: flex;
     flex-direction: row;
     pointer-events: auto;
+    z-index: 1001;
 }
 
 summary::-webkit-details-marker {

@@ -479,9 +479,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if card.get_ready():
                             card.exhaust_card()
                             self.action_chosen = ability
+                    elif ability == "Tower of Despair":
+                        self.action_chosen = ability
+                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif ability == "Immortal Legion":
-                        planet_pos = -2
-                        unit_pos = int(game_update_string[2])
                         if card.get_ready():
                             if secondary_player.warlord_faction == primary_player.enslaved_faction:
                                 target_planet = secondary_player.get_planet_of_warlord()
@@ -1989,6 +1990,30 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+    elif self.action_chosen == "Tower of Despair":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.sacrifice_card_in_hq(unit_pos):
+                    self.misc_counter = 0
+                    self.choice_context = "Tower of Despair"
+                    self.resolving_search_box = True
+                    self.what_to_do_with_searched_card = "DRAW"
+                    self.traits_of_searched_card = "Torture"
+                    self.card_type_of_searched_card = None
+                    self.faction_of_searched_card = None
+                    self.max_cost_of_searched_card = 99
+                    self.all_conditions_searched_card_required = True
+                    self.no_restrictions_on_chosen_card = False
+                    primary_player.number_cards_to_search = 6
+                    if len(primary_player.deck) > 5:
+                        self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                    else:
+                        self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
+                    self.name_player_who_is_searching = primary_player.name_player
+                    self.number_who_is_searching = str(primary_player.number)
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    self.action_cleanup()
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.headquarters[unit_pos].get_is_unit():

@@ -317,6 +317,11 @@ def blackstone_project_cards_init():
                                                   "the number of Torture cards in your discard pile.",
                               "Torture. Power.", 3, "Dark Eldar", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.SupportCard("Tower of Despair", "Action: Sacrifice a unit to Rally 6 a Torture card, add it to your"
+                                                    " hand. You may exhaust any number of Haemonculus units you control"
+                                                    " to add an equal number of other Torture cards from the remaining"
+                                                    " cards to your hand.", "Location.",
+                                0, "Dark Eldar", "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
                                                    "Interrupt: When you sacrifice this unit, your opponent deals X "
                                                    "indirect damage among units they control in their HQ. X "
