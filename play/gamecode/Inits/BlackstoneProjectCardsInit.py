@@ -347,6 +347,12 @@ def blackstone_project_cards_init():
                                                      "(Limit twice per phase)", "Vehicle. Elite.",
                              6, "Dark Eldar", "Loyal", 3, 5, 2, False, flying=True,
                              wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Liatha's Loyal Hound", "No Attachments.\n"
+                                                     "Reaction: After this card is removed from the game face-down, "
+                                                     "flip it and another facedown card with no printed shield icons "
+                                                     "you removed from the game face-up to put this unit into play "
+                                                     "at the last planet.", "Creature. Abomination.",
+                             4, "Dark Eldar", "Loyal", 3, 3, 2, True, no_attachments=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -422,8 +422,16 @@ class Player:
         return None
 
     def remove_card_from_game(self, card_name, hidden="N"):
+        can_hound = False
+        for i in range(len(self.cards_removed_from_game_hidden)):
+            if self.cards_removed_from_game_hidden[i] == "H":
+                card = self.game.preloaded_find_card((self.cards_removed_from_game[i]))
+                if card.get_shields() == 0:
+                    can_hound = True
         self.cards_removed_from_game.append(card_name)
         self.cards_removed_from_game_hidden.append(hidden)
+        if card_name == "Liatha's Loyal Hound" and hidden == "H" and can_hound:
+            self.game.create_reaction("Liatha's Loyal Hound", self.name_player, (int(self.number), -1, -1))
 
     def search_synapse_in_hq(self):
         for i in range(len(self.headquarters)):

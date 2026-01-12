@@ -8401,6 +8401,25 @@ class Game:
                                                 )
                                             self.chosen_first_card = True
                                             self.misc_counter = pos_removed
+                    elif current_reaction == "Liatha's Loyal Hound":
+                        if chosen_removed == int(primary_player.get_number()):
+                            if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
+                                card_name = primary_player.cards_removed_from_game[pos_removed]
+                                card = self.preloaded_find_card(card_name)
+                                if card.get_shields() == 0:
+                                    primary_player.cards_removed_from_game_hidden[pos_removed] = "N"
+                                    last_planet = 0
+                                    for i in range(7):
+                                        if self.planets_in_play_array[i]:
+                                            last_planet = i
+                                    primary_player.add_card_to_planet(self.preloaded_find_card("Liatha's Loyal Hound"),
+                                                                      last_planet)
+                                    del primary_player.cards_removed_from_game[-1]
+                                    del primary_player.cards_removed_from_game_hidden[-1]
+                                    if card_name == "Liatha's Retinue" or card_name == "Connoisseur of Terror":
+                                        self.create_reaction(card_name, primary_player.name_player,
+                                                             (int(primary_player.number), -1, -1))
+                                    self.delete_reaction()
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,

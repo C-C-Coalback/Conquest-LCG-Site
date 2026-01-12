@@ -2595,6 +2595,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Liatha's Loyal Hound":
+            if primary_player.cards_removed_from_game:
+                primary_player.cards_removed_from_game_hidden[-1] = "N"
+            else:
+                self.delete_reaction()
         elif current_reaction == "Razorwing Jetfighter":
             primary_player.set_once_per_phase_used_given_pos(
                 planet_pos, unit_pos, primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos) + 1)
