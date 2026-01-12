@@ -313,6 +313,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.chosen_second_card = False
+                    elif ability == "Incubus of the Severed":
+                        card_name = primary_player.get_name_given_pos(-2, unit_pos)
+                        primary_player.cards.append(card_name)
+                        primary_player.remove_card_from_play(-2, unit_pos)
+                        self.action_cleanup()
                     elif ability == "Throne of Vainglory":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))

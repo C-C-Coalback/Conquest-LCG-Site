@@ -309,6 +309,10 @@ def blackstone_project_cards_init():
                                                "printed cost 1 or lower is destroyed at this planet, add a "
                                                "Kabalite card in your discard pile to your hand.",
                              "Warrior. Kabalite.", 1, "Dark Eldar", "Loyal", 1, 2, 1, False),
+        CardClasses.ArmyCard("Incubus of the Severed", "This unit cannot be damaged by Area Effect.\n"
+                                                       "Action: If this unit is in your HQ, add it to your hand.",
+                             "Warrior. Kabalite.", 3, "Dark Eldar", "Common", 3, 4, 1, False,
+                             action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

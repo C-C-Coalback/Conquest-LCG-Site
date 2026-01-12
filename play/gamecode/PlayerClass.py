@@ -7092,11 +7092,15 @@ class Player:
                     self.add_to_hq(card)
 
     def remove_card_from_play(self, planet_num, card_pos):
+        if planet_num == -2:
+            self.remove_card_from_hq(card_pos)
+            return None
         del self.cards_in_play[planet_num + 1][card_pos]
         self.adjust_own_reactions(planet_num, card_pos)
         self.adjust_own_interrupts(planet_num, card_pos)
         self.adjust_last_def_pos(planet_num, card_pos)
         self.adjust_own_damage(planet_num, card_pos)
+        return None
 
     def remove_card_from_hq(self, card_pos):
         del self.headquarters[card_pos]
