@@ -268,6 +268,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 elif in_discard:
                     primary_player.remove_card_from_game("Surrogate Host")
                     primary_player.remove_card_name_from_discard("Surrogate Host")
+        elif current_interrupt == "Incubus Cleavers":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
         elif current_interrupt == "Desperate Captives":
             dmg = 0
             for i in range(len(secondary_player.headquarters)):

@@ -5404,7 +5404,7 @@ class Player:
 
     def assign_damage_to_pos(self, planet_id, unit_id, damage, can_shield=True, att_pos=None, is_reassign=False,
                              context="", preventable=True, shadow_field_possible=False, rickety_warbuggy=False,
-                             by_enemy_unit=True):
+                             by_enemy_unit=True, is_area_effect=False):
         other_player = self.get_other_player()
         if planet_id == -2:
             return self.assign_damage_to_pos_hq(unit_id, damage, can_shield=can_shield)
@@ -5417,6 +5417,13 @@ class Player:
         if att_pos is None:
             if self.get_ability_given_pos(planet_id, unit_id) == "Exalted Celestians":
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                    return False, 0
+        if is_area_effect or att_pos is not None and damage > 0:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Incubus Cleavers":
+                if not self.get_once_per_phase_used_given_pos(planet_id, unit_id):
+                    self.cards_in_play[planet_id + 1][unit_id].counter = damage
+                    self.game.create_interrupt("Incubus Cleavers", self.name_player,
+                                               (int(self.number), planet_id, unit_id))
                     return False, 0
         if rickety_warbuggy:
             if self.get_ability_given_pos(planet_id, unit_id) == "Rickety Warbuggy":
@@ -5780,7 +5787,7 @@ class Player:
                 if self.get_ability_given_pos(planet_id, i) not in self.game.units_immune_to_aoe:
                     self.assign_damage_to_pos(planet_id, i, amount, context=faction,
                                               shadow_field_possible=shadow_field_possible,
-                                              rickety_warbuggy=rickety_warbuggy)
+                                              rickety_warbuggy=rickety_warbuggy, is_area_effect=True)
 
     def suffer_area_effect_at_hq(self, amount):
         for i in range(len(self.headquarters)):

@@ -409,7 +409,7 @@ class Game:
                                  "Patient Infiltrator", "Slave-powered Wagons", "Lekor Blight-Tongue",
                                  "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows",
                                  "Goff Shokboyz", "Inexperienced Weirdboy", "Thundering Wraith",
-                                 "Khornate Heldrake"]
+                                 "Khornate Heldrake", "Incubus Cleavers"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
@@ -432,7 +432,7 @@ class Game:
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
                                              "Ragnar Blackmane", "Morkai Rune Priest"]
         self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia",
-                                  "The Broken Sigil Sacrifice Unit", "Shok Troopa"]
+                                  "The Broken Sigil Sacrifice Unit", "Shok Troopa", "Incubus Cleavers"]
         self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
         self.player_using_battle_ability = ""
         self.ebon_chalice_value = 0

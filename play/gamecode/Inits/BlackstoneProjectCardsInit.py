@@ -322,6 +322,10 @@ def blackstone_project_cards_init():
                                                     " to add an equal number of other Torture cards from the remaining"
                                                     " cards to your hand.", "Location.",
                                 0, "Dark Eldar", "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Incubus Cleavers", "Forced Interrupt: When this unit would be assigned damage by an "
+                                                 "attack or the Area Effect keyword, instead deal that damage to "
+                                                 "another target unit at the same planet. (Limit once per phase)",
+                             "Assassin. Warrior.", 3, "Dark Eldar", "Loyal", 3, 1, 1, False),
         CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
                                                    "Interrupt: When you sacrifice this unit, your opponent deals X "
                                                    "indirect damage among units they control in their HQ. X "

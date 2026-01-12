@@ -163,6 +163,36 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             if can_continue:
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
+    elif current_interrupt == "Incubus Cleavers":
+        if self.positions_of_units_interrupting[0][1] == planet_pos:
+            can_continue = True
+            possible_interrupts = []
+            if game_update_string[1] == primary_player.number:
+                possible_interrupts = secondary_player.intercept_check()
+            else:
+                possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                    planet_pos, unit_pos, intercept_possible=True)
+                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                    can_continue = False
+                    await self.send_update_message("Immune to enemy card abilities.")
+            if possible_interrupts and can_continue:
+                can_continue = False
+                await self.send_update_message("Some sort of interrupt may be used.")
+                self.choices_available = possible_interrupts
+                self.choices_available.insert(0, "No Interrupt")
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Interrupt Effect?"
+                self.nullified_card_name = current_interrupt
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Interrupt"
+            if can_continue:
+                dmg = primary_player.cards_in_play[self.positions_of_units_interrupting[0][1] + 1][
+                    self.positions_of_units_interrupting[0][2]].counter
+                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, dmg, rickety_warbuggy=True)
+                self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
+                self.delete_interrupt()
     elif current_interrupt == "Prognosticator":
         valid_planet = False
         for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
