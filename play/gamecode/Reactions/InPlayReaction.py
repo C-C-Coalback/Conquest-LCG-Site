@@ -2174,6 +2174,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Crushing Blow":
+            if game_update_string[1] == secondary_player.get_number():
+                if not secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
+                                                          by_enemy_unit=False)
+                    self.delete_reaction()
         elif current_reaction == "Draining Cronos":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:

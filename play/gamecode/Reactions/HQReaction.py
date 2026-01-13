@@ -56,6 +56,12 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 primary_player.ready_given_pos(-2, unit_pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+    elif current_reaction == "Crushing Blow":
+        if game_update_string[1] == secondary_player.get_number():
+            if not secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
+                                                      by_enemy_unit=False)
+                self.delete_reaction()
     elif current_reaction == "Cato's Stronghold":
         if not self.cato_stronghold_activated:
             if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":

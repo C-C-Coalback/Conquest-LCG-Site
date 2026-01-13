@@ -6655,6 +6655,13 @@ class Player:
             if self.get_ability_given_pos(planet_num, i) == "Cegorach's Jesters":
                 self.game.create_reaction("Cegorach's Jesters", self.name_player, (int(self.number), planet_num, i))
 
+    def set_valid_crushing_blow_given_pos(self, planet_id, unit_id, val=False):
+        if planet_id == -2:
+            self.headquarters[unit_id].can_be_crushing_blowed = val
+            return None
+        self.cards_in_play[planet_id + 1][unit_id].can_be_crushing_blowed = val
+        return None
+
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if self.get_ability_given_pos(planet_id, unit_id) == "Looming Grotesque":
             if self.count_tortures_in_discard() < 6:

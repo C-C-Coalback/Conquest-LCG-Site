@@ -36,6 +36,7 @@ class Card:
         self.allowed_phases_while_in_hand = allowed_phases_in_hand
         self.has_action_while_in_play = action_in_play
         self.saint_celestine_active = False
+        self.can_be_crushing_blowed = False
         self.allowed_phases_while_in_play = allowed_phases_in_play
         self.once_per_phase_used = False
         self.once_per_round_used = False

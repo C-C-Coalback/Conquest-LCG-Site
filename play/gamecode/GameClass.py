@@ -1988,10 +1988,6 @@ class Game:
                 string = ["HAND", num_player, str(self.nullified_card_pos)]
                 await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
                                                                 may_nullify=False)
-            elif self.nullify_context == "The Fury of Sicarius":
-                await self.resolve_fury_sicarius(primary_player, secondary_player)
-            elif self.nullify_context == "Crushing Blow":
-                await self.resolve_crushing_blow(primary_player, secondary_player)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
             elif self.nullify_context == "I Do Not Serve":
@@ -2191,27 +2187,7 @@ class Game:
                 elif self.nullified_card_name != "":
                     primary_player.discard_card_name_from_hand(self.nullified_card_name)
                 primary_player.spend_resources(self.cost_card_nullified)
-                if self.nullify_context == "The Fury of Sicarius":
-                    sources, valid_players = self.extra_damage_possible()
-                    if sources:
-                        sources.append("None")
-                        self.choices_available = sources
-                        self.auto_card_destruction = False
-                        self.choice_context = "Use an extra source of damage?"
-                        self.name_player_making_choices = valid_players[0]
-                    else:
-                        self.auto_card_destruction = True
-                elif self.nullify_context == "Crushing Blow":
-                    sources, valid_players = self.extra_damage_possible()
-                    if sources:
-                        sources.append("None")
-                        self.choices_available = sources
-                        self.auto_card_destruction = False
-                        self.choice_context = "Use an extra source of damage?"
-                        self.name_player_making_choices = valid_players[0]
-                    else:
-                        self.auto_card_destruction = True
-                elif self.nullify_context in self.alternative_shields:
+                if self.nullify_context in self.alternative_shields:
                     self.pos_shield_card = -1
                 elif self.nullify_context == "Reaction Event":
                     if self.nullified_card_name == "Cry of the Wind":
@@ -2289,31 +2265,6 @@ class Game:
             self.first_player_nullified = ""
         self.p1.num_nullify_played = 0
         self.p2.num_nullify_played = 0
-
-    async def resolve_fury_sicarius(self, primary_player, secondary_player):
-        primary_player.spend_resources(2)
-        primary_player.discard_card_name_from_hand("The Fury of Sicarius")
-        planet_pos, unit_pos = self.furiable_unit_position
-        secondary_player.set_damage_given_pos(planet_pos, unit_pos, 999)
-        self.auto_card_destruction = True
-        await self.destroy_check_all_cards()
-
-    async def resolve_crushing_blow(self, primary_player, secondary_player):
-        primary_player.discard_card_name_from_hand("Crushing Blow")
-        planet_pos, unit_pos = self.furiable_unit_position
-        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False, by_enemy_unit=False)
-        if not secondary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-            sources, valid_players = self.extra_damage_possible()
-            if sources:
-                sources.append("None")
-                self.choices_available = sources
-                self.auto_card_destruction = False
-                self.choice_context = "Use an extra source of damage?"
-                self.name_player_making_choices = valid_players[0]
-            else:
-                self.auto_card_destruction = True
-        else:
-            self.auto_card_destruction = True
 
     async def resolve_back_to_the_shadows(self, primary_player, secondary_player):
         pos_holder = self.positions_of_units_to_take_damage[0]
@@ -5839,20 +5790,6 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            if secondary_player.nullify_check():
-                                await self.send_update_message(
-                                    primary_player.name_player + " wants to play Crushing Blow; "
-                                                                 "Nullify window offered.")
-                                self.choices_available = ["Yes", "No"]
-                                self.name_player_making_choices = secondary_player.name_player
-                                self.choice_context = "Use Nullify?"
-                                self.nullified_card_pos = -1
-                                self.nullified_card_name = "Crushing Blow"
-                                self.cost_card_nullified = 0
-                                self.first_player_nullified = primary_player.name_player
-                                self.nullify_context = "Crushing Blow"
-                            else:
-                                await self.resolve_crushing_blow(primary_player, secondary_player)
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -5870,20 +5807,6 @@ class Game:
                             self.choices_available = []
                             self.choice_context = ""
                             self.name_player_making_choices = ""
-                            if secondary_player.nullify_check():
-                                await self.send_update_message(
-                                    primary_player.name_player + " wants to play The Fury of Sicarius; "
-                                                                 "Nullify window offered.")
-                                self.choices_available = ["Yes", "No"]
-                                self.name_player_making_choices = secondary_player.name_player
-                                self.choice_context = "Use Nullify?"
-                                self.nullified_card_pos = -1
-                                self.nullified_card_name = "The Fury of Sicarius"
-                                self.cost_card_nullified = 2
-                                self.first_player_nullified = primary_player.name_player
-                                self.nullify_context = "The Fury of Sicarius"
-                            else:
-                                await self.resolve_fury_sicarius(primary_player, secondary_player)
                         elif game_update_string[1] == "1":
                             self.choices_available = []
                             self.choice_context = ""
@@ -8836,25 +8759,6 @@ class Game:
                             self, name, game_update_string, primary_player, secondary_player
                         )
 
-    def fury_search(self, player_with_cato, player_without_cato):
-        if player_with_cato.search_hand_for_card("The Fury of Sicarius"):
-            print("Has fury")
-            if player_with_cato.resources > 1:
-                print("Has resources")
-                if player_without_cato.get_card_type_given_pos(
-                        self.recently_damaged_units[0][1],
-                        self.recently_damaged_units[0][2]) != "Warlord":
-                    print("Not warlord")
-                    """
-                    self.choice_context = "Use The Fury of Sicarius?"
-                    self.choices_available = ["Yes", "No"]
-                    self.name_player_making_choices = player_with_cato.name_player
-                    """
-                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
-                                                   self.recently_damaged_units[0][2])
-                    return True
-        return False
-
     def delete_reaction(self):
         if self.reactions_needing_resolving:
             if self.reactions_needing_resolving[0] == "Ba'ar Zul the Hate-Bound":
@@ -9041,6 +8945,27 @@ class Game:
                                         self.create_reaction("Seekers of Pleasure", primary_player.name_player,
                                                              (int(primary_player.number), i, j),
                                                              additional_info=def_pla)
+                    if self.card_names_triggering_damage[0] in self.valid_crushing_blow_triggers:
+                        if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
+                            if secondary_player.search_hand_for_card("Crushing Blow"):
+                                self.create_reaction("Crushing Blow", secondary_player.name_player,
+                                                     (int(primary_player.number), -1, -1))
+                                primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
+                    if self.positions_attackers_of_units_to_take_damage[0] is not None:
+                        player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
+                        if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
+                            if secondary_player.search_hand_for_card("Crushing Blow"):
+                                if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                                    self.create_reaction("Crushing Blow", secondary_player.name_player,
+                                                         (int(primary_player.number), -1, -1))
+                                    primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
+                        if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
+                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                if secondary_player.search_hand_for_card("The Fury of Sicarius"):
+                                    if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                                        self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
+                                                             (int(primary_player.number), def_pla, def_pos))
+
             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                 player_num, planet_pos, unit_pos = self.positions_attackers_of_units_to_take_damage[0]
                 secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -9159,50 +9084,6 @@ class Game:
             print(self.positions_of_attacker_of_unit_that_took_damage)
             print(self.faction_of_attacker)
             print(self.on_kill_effects_of_attacker)
-            sources_extra_on_damage, player_names = self.extra_damage_possible()
-            if sources_extra_on_damage:
-                sources_extra_on_damage.append("None")
-                self.choices_available = sources_extra_on_damage
-                self.auto_card_destruction = False
-                self.choice_context = "Use an extra source of damage?"
-                self.name_player_making_choices = player_names[0]
-            else:
-                await self.destroy_check_all_cards()
-
-    def extra_damage_possible(self):
-        print("\nCALLING EXTRA DAMAGE\n")
-        sources = []
-        valid_players = []
-        for i in range(len(self.recently_damaged_units)):
-            if self.damage_taken_was_from_attack[i]:
-                print("Damage was from attack")
-                if self.faction_of_attacker[i] == "Space Marines":
-                    print("Attacker was a space marines unit")
-                    if self.recently_damaged_units[0][0] == 1:
-                        player_with_cato = self.p2
-                        player_without_cato = self.p1
-                    else:
-                        player_with_cato = self.p1
-                        player_without_cato = self.p2
-                    if self.fury_search(player_with_cato, player_without_cato):
-                        if "The Fury of Sicarius" not in sources:
-                            sources.append("The Fury of Sicarius")
-                            self.furiable_unit_position = (self.recently_damaged_units[0][1],
-                                                           self.recently_damaged_units[0][2])
-                            valid_players.append(player_with_cato.name_player)
-            if self.faction_of_attacker[i] == "Space Marines" or \
-                    self.card_names_that_caused_damage[i] in self.valid_crushing_blow_triggers:
-                if self.recently_damaged_units[0][0] == 1:
-                    crushing_player = self.p2
-                else:
-                    crushing_player = self.p1
-                if crushing_player.search_hand_for_card("Crushing Blow"):
-                    self.furiable_unit_position = (self.recently_damaged_units[0][1],
-                                                   self.recently_damaged_units[0][2])
-                    if "Crushing Blow" not in sources:
-                        sources.append("Crushing Blow")
-                        valid_players.append(crushing_player.name_player)
-        return sources, valid_players
 
     async def update_interrupts(self, name, game_update_string, count=0):
         print("updating")
@@ -10321,21 +10202,23 @@ class Game:
             if not self.attack_being_resolved and not self.reactions_needing_resolving and not \
                     self.damage_abilities_defender_active and not self.positions_of_units_to_take_damage:
                 for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].can_be_crushing_blowed = False
                     self.p1.headquarters[i].valid_target_vow_of_honor = False
-                for i in range(len(self.p2.headquarters)):
-                    self.p2.headquarters[i].valid_target_vow_of_honor = False
-                for i in range(len(self.p1.headquarters)):
                     self.p1.headquarters[i].valid_sweep_target = True
                     self.p1.headquarters[i].recently_assigned_damage = False
                 for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].can_be_crushing_blowed = False
+                    self.p2.headquarters[i].valid_target_vow_of_honor = False
                     self.p2.headquarters[i].valid_sweep_target = True
                     self.p2.headquarters[i].recently_assigned_damage = False
                 for i in range(7):
                     for j in range(len(self.p1.cards_in_play[i + 1])):
+                        self.p1.cards_in_play[i + 1][j].can_be_crushing_blowed = False
                         self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
                         self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
                     for j in range(len(self.p2.cards_in_play[i + 1])):
+                        self.p2.cards_in_play[i + 1][j].can_be_crushing_blowed = False
                         self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
                         self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
                         self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
