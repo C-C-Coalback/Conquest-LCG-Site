@@ -1396,6 +1396,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                                 self.attacker_position) \
                                                 == "Tankbusta Bommaz":
                                             attack_value = attack_value * 2
+                                        if primary_player.get_ability_given_pos(self.attacker_planet,
+                                                                                self.attacker_position) \
+                                                == "Fire Dragons":
+                                            attack_value = attack_value * 2
                                     if primary_player.get_ability_given_pos(self.attacker_planet,
                                                                             self.attacker_position) \
                                             == "Hydra Flak Tank":

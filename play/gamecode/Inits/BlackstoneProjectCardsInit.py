@@ -390,6 +390,8 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Shadowseer", "Reaction: After an enemy army unit enters play at this planet, "
                                            "exhaust an attachment on this unit to deal 2 damage to that unit.",
                              "Psyker. Harlequin.", 3, "Eldar", "Loyal", 2, 3, 1, False),
+        CardClasses.ArmyCard("Fire Dragons", "This unit deals double damage to enemy Vehicle units.", "Warrior.",
+                             3, "Eldar", "Common", 3, 4, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
