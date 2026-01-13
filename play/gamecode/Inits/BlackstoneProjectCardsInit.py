@@ -385,6 +385,8 @@ def blackstone_project_cards_init():
                                                  "Forced Reaction: After a combat round at this planet ends, discard a "
                                                  "card from your hand. If you cannot, sacrifice this unit.",
                              "Elite. Alaitoc.", 6, "Eldar", "Loyal", 0, 7, 1, True),
+        CardClasses.ArmyCard("Storm Guardians", "This unit gets +2 ATK while attacking a Soldier or Warrior unit.",
+                             "Warrior. Alaitoc.", 2, "Eldar", "Common", 2, 2, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
