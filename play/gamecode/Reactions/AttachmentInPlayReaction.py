@@ -4,6 +4,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
     planet_pos = int(game_update_string[3])
     unit_pos = int(game_update_string[4])
     attachment_pos = int(game_update_string[5])
+    extra_info = self.additional_reactions_info[0]
     player_owning_card = self.p1
     if game_update_string[2] == "2":
         player_owning_card = self.p2
@@ -29,6 +30,16 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
+                    self.delete_reaction()
+    elif current_reaction == "Shadowseer":
+        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        if game_update_string[2] == primary_player.get_number():
+            if og_pla == planet_pos and og_pos == unit_pos:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
+                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
+                    primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                    _, ext_pla, ext_pos = extra_info
+                    secondary_player.assign_damage_to_pos(ext_pla, ext_pos, 2)
                     self.delete_reaction()
     elif current_reaction == "Farsight Vanguard":
         if game_update_string[2] == primary_player.get_number():

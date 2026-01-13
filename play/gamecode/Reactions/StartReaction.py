@@ -1352,6 +1352,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Swordwind Wave Serpent":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+        elif current_reaction == "Shadowseer":
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+            extra_num, extra_pla, extra_pos = extra_info
+            secondary_player.set_aiming_reticle_in_play(extra_pla, extra_pos, "red")
         elif current_reaction == "The Fury of Sicarius":
             if primary_player.resources > 1:
                 can_continue = True

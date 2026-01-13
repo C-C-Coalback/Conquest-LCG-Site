@@ -2252,6 +2252,16 @@ class Player:
                     if other_player.get_ability_given_pos(position, i) == "Iron Hands Platoon":
                         self.game.create_reaction("Iron Hands Platoon", other_player.name_player,
                                                   (int(self.number), position, last_element_index))
+                if other_player.get_ability_given_pos(position, i) == "Shadowseer":
+                    ready_att_present = False
+                    enemy_attachments = other_player.get_all_attachments_at_pos(position, i)
+                    for j in range(len(enemy_attachments)):
+                        if enemy_attachments[j].get_ready():
+                            ready_att_present = True
+                    if ready_att_present:
+                        self.game.create_reaction("Shadowseer", other_player.name_player,
+                                                  (int(other_player.number), position, i),
+                                                  (int(self.number), position, last_element_index))
                 if other_player.resources > 0:
                     if other_player.get_unique_given_pos(position, i):
                         if not other_player.check_if_already_have_reaction("The Inevitable Decay"):
