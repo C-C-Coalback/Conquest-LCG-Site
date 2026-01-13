@@ -381,6 +381,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Swordwind Wave Serpent", "Reaction: After this unit resolves an attack,"
                                                        " move it to an adjacent planet.", "Vehicle. Biel-Tan.",
                              4, "Eldar", "Common", 4, 3, 2, False),
+        CardClasses.ArmyCard("Avatar of Khaine", "X is equal to the number of exhausted units at this planet.\n"
+                                                 "Forced Reaction: After a combat round at this planet ends, discard a "
+                                                 "card from your hand. If you cannot, sacrifice this unit.",
+                             "Elite. Alaitoc.", 6, "Eldar", "Loyal", 0, 7, 1, True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

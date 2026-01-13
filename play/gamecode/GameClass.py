@@ -383,7 +383,8 @@ class Game:
                                  "Erida Commit", "Jaricho Commit", "Beckel Commit", "Willing Submission",
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
-                                 "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction"]
+                                 "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
+                                 "Avatar of Khaine"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1

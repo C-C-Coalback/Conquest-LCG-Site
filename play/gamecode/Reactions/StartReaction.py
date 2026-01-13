@@ -2818,6 +2818,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                 self.delete_reaction()
+        elif current_reaction == "Avatar of Khaine":
+            if not primary_player.cards:
+                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
+                self.delete_reaction()
         elif current_reaction == "Flayed Ones Revenants":
             primary_player.draw_card()
             primary_player.draw_card()

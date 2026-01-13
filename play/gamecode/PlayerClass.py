@@ -5066,6 +5066,13 @@ class Player:
                 return True
         return False
 
+    def count_exhausted_units_at_planet(self, planet_id):
+        count = 0
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            if not self.get_ready_given_pos(planet_id, i):
+                count += 1
+        return count
+
     def get_attack_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             card = self.headquarters[unit_id]
@@ -5110,11 +5117,12 @@ class Player:
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.attack_set_eop != -1:
             return card.attack_set_eop
-        other_player = self.game.p1
-        if other_player.name_player == self.name_player:
-            other_player = self.game.p2
+        other_player = self.get_other_player()
         attack_value = card.get_attack()
         ability = self.get_ability_given_pos(planet_id, unit_id)
+        if ability == "Avatar of Khaine":
+            attack_value += self.count_exhausted_units_at_planet(planet_id) + \
+                            other_player.count_exhausted_units_at_planet(planet_id)
         if card.get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
@@ -7518,6 +7526,9 @@ class Player:
                 if self.game.combat_round_number == 3:
                     self.game.create_reaction("23rd Mechanised Battalion", self.name_player,
                                               (int(self.number), planet_id, i))
+            if self.get_ability_given_pos(planet_id, i) == "Avatar of Khaine":
+                self.game.create_reaction("Avatar of Khaine", self.name_player,
+                                          (int(self.number), planet_id, i))
             if self.get_faction_given_pos(planet_id, i) == "Astra Militarum":
                 can_forward_barracks = True
         if can_forward_barracks:

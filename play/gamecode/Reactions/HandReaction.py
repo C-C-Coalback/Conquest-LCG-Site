@@ -147,6 +147,9 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                 num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
             self.delete_reaction()
+        elif current_reaction == "Avatar of Khaine":
+            primary_player.discard_card_from_hand(int(game_update_string[2]))
+            self.delete_reaction()
         elif current_reaction == "Salvaged Battlewagon":
             if not self.chosen_first_card:
                 card = primary_player.get_card_in_hand(int(game_update_string[2]))
