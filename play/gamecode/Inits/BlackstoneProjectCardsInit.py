@@ -378,6 +378,9 @@ def blackstone_project_cards_init():
                                                       "you may Deep Strike this event to discard two cards at random "
                                                       "from their hand.", "Tactic.",
                               -1, "Dark Eldar", "Common", 1, False, deepstrike=1),
+        CardClasses.ArmyCard("Swordwind Wave Serpent", "Reaction: After this unit resolves an attack,"
+                                                       " move it to an adjacent planet.", "Vehicle. Biel-Tan.",
+                             4, "Eldar", "Common", 4, 3, 2, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

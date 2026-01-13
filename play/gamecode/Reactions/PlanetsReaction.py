@@ -305,6 +305,11 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if origin_planet != chosen_planet:
             secondary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.delete_reaction()
+    elif current_reaction == "Swordwind Wave Serpent":
+        if abs(planet_pos - chosen_planet) == 1:
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet, card_effect=True)
+            self.delete_reaction()
     elif current_reaction == "Obedience":
         if self.chosen_first_card:
             origin_planet, origin_pos = self.misc_target_unit
@@ -316,7 +321,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if self.chosen_first_card and not self.chosen_second_card:
             current_planet, current_position = self.misc_target_unit
             if current_planet != chosen_planet:
-                primary_player.move_unit_to_planet(current_planet, current_position, chosen_planet)
+                primary_player.move_unit_to_planet(current_planet, current_position, chosen_planet, card_effect=True)
                 self.chosen_second_card = True
                 new_pos = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
                 self.misc_target_unit = (chosen_planet, new_pos)

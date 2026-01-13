@@ -10072,6 +10072,8 @@ class Game:
                                     self.create_reaction("Sacred Rose Immolator", self.name_1, (1, planet, i))
                                 elif self.p1.get_once_per_round_used_given_pos(planet, i) < 2:
                                     self.create_reaction("Sacred Rose Immolator", self.name_1, (1, planet, i))
+                            if self.p1.get_ability_given_pos(planet, i) == "Swordwind Wave Serpent":
+                                self.create_reaction("Swordwind Wave Serpent", self.name_1, (1, planet, i))
                             if self.p1.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p1.search_card_at_planet(planet, "Blood Axe Strategist"):
                                     self.create_reaction("Blood Axe Strategist", self.name_1, (1, planet, i))
@@ -10147,6 +10149,8 @@ class Game:
                                     self.create_reaction("Sacred Rose Immolator", self.name_2, (2, planet, i))
                                 elif self.p2.get_once_per_round_used_given_pos(planet, i) < 2:
                                     self.create_reaction("Sacred Rose Immolator", self.name_2, (2, planet, i))
+                            if self.p2.get_ability_given_pos(planet, i) == "Swordwind Wave Serpent":
+                                self.create_reaction("Swordwind Wave Serpent", self.name_2, (2, planet, i))
                             if self.p2.get_faction_given_pos(planet, i) == "Orks":
                                 if self.p2.search_card_at_planet(planet, "Blood Axe Strategist"):
                                     self.create_reaction("Blood Axe Strategist", self.name_2, (2, planet, i))

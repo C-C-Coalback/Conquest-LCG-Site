@@ -1350,6 +1350,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                             primary_player.ready_given_pos(planet_pos, i)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Swordwind Wave Serpent":
+            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "The Fury of Sicarius":
             if primary_player.resources > 1:
                 can_continue = True
