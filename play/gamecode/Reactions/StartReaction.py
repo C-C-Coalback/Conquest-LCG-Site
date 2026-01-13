@@ -1342,6 +1342,14 @@ async def start_resolving_reaction(self, name, game_update_string):
             if can_continue:
                 primary_player.discard_card_name_from_hand(current_reaction)
                 await self.send_update_message("Select unit to damage")
+        elif current_reaction == "Rallying Thunderbolt":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if not primary_player.get_ready_given_pos(planet_pos, i):
+                    if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                        if primary_player.get_cost_given_pos(planet_pos, i) > 2:
+                            primary_player.ready_given_pos(planet_pos, i)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "The Fury of Sicarius":
             if primary_player.resources > 1:
                 can_continue = True

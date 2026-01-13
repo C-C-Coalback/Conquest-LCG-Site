@@ -3224,6 +3224,9 @@ class Player:
                 elif self.get_once_per_round_used_given_pos(destination, new_pos) < 2:
                     self.game.create_reaction("Sacred Rose Immolator", self.name_player,
                                               (int(self.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Rallying Thunderbolt":
+                self.game.create_reaction("Rallying Thunderbolt", self.name_player,
+                                          (int(self.number), destination, new_pos))
             if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
                 if self.get_damage_given_pos(destination, new_pos) > 0:
                     self.game.create_reaction("Quartermasters", self.name_player,
@@ -3415,6 +3418,9 @@ class Player:
                 elif self.get_once_per_round_used_given_pos(destination, new_pos) < 2:
                     self.game.create_reaction("Sacred Rose Immolator", self.name_player,
                                               (int(self.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Rallying Thunderbolt":
+                self.game.create_reaction("Rallying Thunderbolt", self.name_player,
+                                          (int(self.number), destination, new_pos))
             for i in range(len(self.cards_in_play[origin_planet + 1])):
                 if self.get_ability_given_pos(origin_planet, i) == "Wildrider Vyper":
                     self.game.create_reaction("Wildrider Vyper", self.name_player,

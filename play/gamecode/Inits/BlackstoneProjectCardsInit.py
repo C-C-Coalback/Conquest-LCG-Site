@@ -89,6 +89,11 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Lucky Shot", "Action: Until the end of the phase, a target Ranged unit gets +1 "
                                             "ATK and Armorbane.", "Tactic.", 1, "Astra Militarum", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Rallying Thunderbolt", "Flying. No Wargear attachments.\n"
+                                                     "Reaction: After this unit moves to a planet, ready each unit "
+                                                     "with printed cost 3 or greater you control at that planet.",
+                             "Vehicle. Elite.", 7, "Astra Militarum", "Common", 3, 5, 3, False,
+                             flying=True, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Imperial Fists Legion", "Reaction: After this unit is declared as an attacker, remove 1 "
                                                       "damage from a target support card.", "Soldier. Imperial Fists.",
                              1, "Space Marines", "Common", 1, 2, 1, False),
