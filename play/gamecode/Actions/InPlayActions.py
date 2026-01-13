@@ -1805,6 +1805,31 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (-1, -1)
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.action_cleanup()
+    elif self.action_chosen == "Counteroffensive":
+        if primary_player.get_number() == game_update_string[1]:
+            if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.search_trait_at_planet(planet_pos, "Psyker") or \
+                            secondary_player.search_trait_at_planet(planet_pos, "Psyker"):
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = self.action_chosen
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Event Action"
+                        if can_continue:
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.action_cleanup()
     elif self.action_chosen == "Ambush":
         if not self.omega_ambush_active or self.infested_planets[planet_pos]:
             if self.card_type_of_selected_card_in_hand == "Attachment":

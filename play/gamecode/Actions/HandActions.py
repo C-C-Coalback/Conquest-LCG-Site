@@ -513,6 +513,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Counteroffensive":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Kommando Cunning":
                         self.action_chosen = ability
                         self.chosen_first_card = False

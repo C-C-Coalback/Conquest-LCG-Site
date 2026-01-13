@@ -401,6 +401,9 @@ def blackstone_project_cards_init():
                                                "move a target army unit you control at an adjacent planet to that "
                                                "planet.", "Tactic.",
                               1, "Eldar", "Loyal", 2, False),
+        CardClasses.EventCard("Counteroffensive",
+                              "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
+                              2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
