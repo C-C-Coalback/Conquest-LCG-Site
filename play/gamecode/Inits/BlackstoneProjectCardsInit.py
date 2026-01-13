@@ -392,6 +392,10 @@ def blackstone_project_cards_init():
                              "Psyker. Harlequin.", 3, "Eldar", "Loyal", 2, 3, 1, False),
         CardClasses.ArmyCard("Fire Dragons", "This unit deals double damage to enemy Vehicle units.", "Warrior.",
                              3, "Eldar", "Common", 3, 4, 1, False),
+        CardClasses.ArmyCard("Voidscarred Corsair", "Sweep (1).\n"
+                                                    "Reaction: After this unit enters play, a target army unit at this"
+                                                    " planet cannot ready until the end of the phase.",
+                             "Warrior.", 2, "Eldar", "Common", 2, 1, 1, False, sweep=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -2347,6 +2347,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
             self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
                                                                               last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Voidscarred Corsair":
+            self.game.create_reaction("Voidscarred Corsair", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Awakened Geomancer":
             self.game.create_reaction("Awakened Geomancer", self.name_player, (int(self.number), position,
                                                                                last_element_index))
