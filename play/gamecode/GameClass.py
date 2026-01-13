@@ -9967,19 +9967,19 @@ class Game:
                     self.need_to_reset_tomb_blade_squadron = False
                     self.p1.reset_card_name_misc_ability("Tomb Blade Squadron")
                     self.p2.reset_card_name_misc_ability("Tomb Blade Squadron")
-                    for i in range(len(self.p1.headquarters)):
-                        self.p1.headquarters[i].valid_target_dynastic_weaponry = False
-                        self.p1.headquarters[i].just_entered_play = False
-                    for i in range(len(self.p2.headquarters)):
-                        self.p2.headquarters[i].valid_target_dynastic_weaponry = False
-                        self.p2.headquarters[i].just_entered_play = False
-                    for i in range(7):
-                        for j in range(len(self.p1.cards_in_play[i + 1])):
-                            self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
-                            self.p1.cards_in_play[i + 1][j].just_entered_play = False
-                        for j in range(len(self.p2.cards_in_play[i + 1])):
-                            self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
-                            self.p2.cards_in_play[i + 1][j].just_entered_play = False
+                for i in range(len(self.p1.headquarters)):
+                    self.p1.headquarters[i].valid_target_dynastic_weaponry = False
+                    self.p1.headquarters[i].just_entered_play = False
+                for i in range(len(self.p2.headquarters)):
+                    self.p2.headquarters[i].valid_target_dynastic_weaponry = False
+                    self.p2.headquarters[i].just_entered_play = False
+                for i in range(7):
+                    for j in range(len(self.p1.cards_in_play[i + 1])):
+                        self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+                        self.p1.cards_in_play[i + 1][j].just_entered_play = False
+                    for j in range(len(self.p2.cards_in_play[i + 1])):
+                        self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
+                        self.p2.cards_in_play[i + 1][j].just_entered_play = False
             if self.attack_resolution_cleanup and not self.attack_being_resolved:
                 self.attack_resolution_cleanup = False
                 if self.damage_abilities_defender_active:
