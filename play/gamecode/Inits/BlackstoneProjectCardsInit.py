@@ -396,6 +396,11 @@ def blackstone_project_cards_init():
                                                     "Reaction: After this unit enters play, a target army unit at this"
                                                     " planet cannot ready until the end of the phase.",
                              "Warrior.", 2, "Eldar", "Common", 2, 1, 1, False, sweep=1),
+        CardClasses.EventCard("Rapid Ingress", "Reaction: After a unit you control is declared as an attacker at a "
+                                               "Strongpoint planet, if it is the only unit you control at that planet, "
+                                               "move a target army unit you control at an adjacent planet to that "
+                                               "planet.", "Tactic.",
+                              1, "Eldar", "Loyal", 2, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

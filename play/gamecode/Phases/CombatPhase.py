@@ -774,6 +774,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.create_reaction("Biel-Tan Warp Spiders", player.name_player,
                                                      (int(player.number), self.attacker_planet,
                                                       self.attacker_position))
+                            if player.search_hand_for_card("Rapid Ingress") and player.get_resources() > 0:
+                                if self.get_green_icon(self.attacker_planet):
+                                    if len(player.cards_in_play[self.attacker_planet + 1]) == 1:
+                                        self.create_reaction("Rapid Ingress", player.name_player,
+                                                             (int(player.number), self.attacker_planet, -1))
                             if player.check_for_trait_given_pos(
                                     self.attacker_planet, self.attacker_position, "Ecclesiarchy"):
                                 if player.get_faction_given_pos(

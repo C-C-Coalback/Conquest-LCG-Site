@@ -1379,6 +1379,27 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Rapid Ingress":
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       current_reaction + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand(current_reaction)
+            else:
+                self.delete_reaction()
         elif current_reaction == "Gene Implantation":
             if primary_player.resources > 0:
                 can_continue = True

@@ -1725,6 +1725,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = True
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Rapid Ingress":
+            if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+                if game_update_string[1] == primary_player.get_number():
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        primary_player.move_unit_to_planet(
+                            planet_pos, unit_pos, self.positions_of_unit_triggering_reaction[0][1])
+                        self.delete_reaction()
         elif current_reaction == "Dynastic Weaponry":
             if "Dynastic Weaponry" not in primary_player.discard:
                 self.delete_reaction()
