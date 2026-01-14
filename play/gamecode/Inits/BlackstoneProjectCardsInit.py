@@ -401,6 +401,10 @@ def blackstone_project_cards_init():
                                                "move a target army unit you control at an adjacent planet to that "
                                                "planet.", "Tactic.",
                               1, "Eldar", "Loyal", 2, False),
+        CardClasses.EventCard("Unshrouded Truth", "Action: Your opponent may reveal any number of cards in their hand."
+                                                  " For each card that was not revealed, gain 1 resource.",
+                              "Power. Harlequin.", 2, "Eldar", "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),

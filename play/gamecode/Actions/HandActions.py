@@ -509,6 +509,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                    elif ability == "Unshrouded Truth":
+                        self.action_chosen = ability
+                        self.player_with_action = secondary_player.name_player
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.misc_misc = []
+                        await self.send_update_message(secondary_player.name_player +
+                                                       ", choose which cards in hand to reveal. Press pass to stop.")
                     elif ability == "Calculated Strike":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -1213,6 +1220,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     self.misc_counter = card.get_cost()
                     primary_player.discard_card_from_hand(hand_pos)
                     self.chosen_first_card = True
+    elif self.action_chosen == "Unshrouded Truth":
+        if hand_pos not in self.misc_misc:
+            self.misc_misc.append(hand_pos)
+            await self.send_update_message(primary_player.name_player + " reveals a " + primary_player.cards[hand_pos])
+            if len(self.misc_misc) == len(primary_player.cards):
+                await self.send_update_message("Revealed everything. Ending.")
+                self.misc_misc = None
+                self.action_cleanup()
     elif self.action_chosen == "Abomination Workshop":
         primary_player.discard_card_from_hand(hand_pos)
         if self.misc_counter >= len(primary_player.cards):

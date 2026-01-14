@@ -1206,6 +1206,14 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Iridescent Wand":
                         self.action_cleanup()
+                    elif self.action_chosen == "Unshrouded Truth":
+                        num_revealed = len(self.misc_misc)
+                        num_cards = len(primary_player.cards)
+                        resources = num_cards - num_revealed
+                        secondary_player.add_resources(resources)
+                        await self.send_update_message("Gained " + str(resources) + " resources for unrevealed cards.")
+                        self.misc_misc = None
+                        self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
