@@ -472,6 +472,34 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "cancel-attack":
+                        if active_games[self.game_position].attacker_planet != -1:
+                            if active_games[self.game_position].number_with_combat_turn == "1":
+                                active_games[self.game_position].p1.reset_aiming_reticle_in_play(
+                                    active_games[self.game_position].attacker_planet,
+                                    active_games[self.game_position].attacker_position
+                                )
+                                active_games[self.game_position].p1.ready_given_pos(
+                                    active_games[self.game_position].attacker_planet,
+                                    active_games[self.game_position].attacker_position
+                                )
+                                await active_games[self.game_position].p1.send_units_at_planet(
+                                    active_games[self.game_position].attacker_planet)
+                                active_games[self.game_position].attacker_planet = -1
+                                active_games[self.game_position].attacker_position = -1
+                            else:
+                                active_games[self.game_position].p2.reset_aiming_reticle_in_play(
+                                    active_games[self.game_position].attacker_planet,
+                                    active_games[self.game_position].attacker_position
+                                )
+                                active_games[self.game_position].p2.ready_given_pos(
+                                    active_games[self.game_position].attacker_planet,
+                                    active_games[self.game_position].attacker_position
+                                )
+                                await active_games[self.game_position].p2.send_units_at_planet(
+                                    active_games[self.game_position].attacker_planet)
+                                active_games[self.game_position].attacker_planet = -1
+                                active_games[self.game_position].attacker_position = -1
                     elif message[1] == "debug-info":
                         sent_string = "Debug Info: "
                         if active_games[self.game_position].resolving_search_box:

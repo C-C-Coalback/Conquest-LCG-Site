@@ -1254,6 +1254,7 @@
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             changeDef(og_image_src);
             help_text = help_text.replaceAll("\n", "<br>")
+            help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
             var helper = document.getElementById("helper-text-box")
