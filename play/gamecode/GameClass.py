@@ -8961,8 +8961,8 @@ class Game:
                                                          (int(primary_player.number), -1, -1))
                                     primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
                         if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
-                            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                                if secondary_player.search_hand_for_card("The Fury of Sicarius"):
+                            if secondary_player.search_hand_for_card("The Fury of Sicarius"):
+                                if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                                     if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
                                         self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
                                                              (int(primary_player.number), def_pla, def_pos))
