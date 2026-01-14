@@ -236,6 +236,7 @@ class Player:
         self.dalyth_sept_active = False
         self.ability_recursion_count = 0
         self.max_ability_recursion = 10
+        self.misc_counter = 0
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:

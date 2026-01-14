@@ -1218,6 +1218,9 @@ class Game:
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
+                    elif self.action_chosen == "Whirling Death":
+                        await self.send_update_message("Stopping Whirling Death")
+                        self.action_cleanup()
                     elif self.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
                         self.action_cleanup()

@@ -1881,6 +1881,21 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
                         self.misc_counter = 0
+    elif self.action_chosen == "Whirling Death":
+        if player_owning_card.misc_counter < 5:
+            if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
+                can_continue = True
+                if player_owning_card.name_player == secondary_player.name_player:
+                    if player_owning_card.get_immune_to_enemy_events(planet_pos, unit_pos, power=True):
+                        can_continue = False
+                else:
+                    if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster":
+                        can_continue = False
+                if can_continue:
+                    player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
+                    player_owning_card.misc_counter += 1
+                    if primary_player.misc_counter == 5 and secondary_player.misc_counter == 5:
+                        self.action_cleanup()
     elif self.action_chosen == "Piercing Wail":
         if game_update_string[1] == "1":
             player_being_hit = self.p1

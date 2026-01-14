@@ -123,6 +123,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choices_available = ["Army", "Support", "Attachment", "Event"]
                         self.choice_context = "Rakarth's Experimentations card type"
                         self.name_player_making_choices = primary_player.name_player
+                    elif ability == "Whirling Death":
+                        self.action_chosen = ability
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
+                        primary_player.misc_counter = 0
+                        secondary_player.misc_counter = 0
                     elif ability == "Final Expiration":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

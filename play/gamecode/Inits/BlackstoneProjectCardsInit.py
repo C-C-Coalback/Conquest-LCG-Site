@@ -424,6 +424,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Howling Exarch", "Reaction: After you cancel a card effect, deal 1 damage to up to "
                                                "two units at this planet.", "Warrior.",
                              3, "Eldar", "Loyal", 2, 3, 1, False),
+        CardClasses.EventCard("Whirling Death", "Deploy Action: Destroy five non-unique units or supports "
+                                                "at each player's HQ.", "Power.",
+                              5, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
