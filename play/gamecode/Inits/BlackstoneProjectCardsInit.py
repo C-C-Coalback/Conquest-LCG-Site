@@ -414,6 +414,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Death Jesters", "Reaction: After this unit enters play, it gets +3 ATK for its next "
                                               "attack for this phase.", "Warrior. Harlequin.",
                              2, "Eldar", "Common", 1, 3, 1, False),
+        CardClasses.AttachmentCard("Ghostglaive", "Attach to a Spirit army unit.\n"
+                                                  "Attached unit gains Sweep (2).", "Wargear. Weapon.",
+                                   1, "Eldar", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
+                                   required_traits="Spirit"),
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),

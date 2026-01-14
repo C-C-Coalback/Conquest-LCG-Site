@@ -739,6 +739,8 @@ class UnitCard(Card):
                 sweep += 1
             if self.attachments[i].get_ability() == "Spray and Pray":
                 sweep += self.attack
+            if self.attachments[i].get_ability() == "Ghostglaive":
+                sweep += 2
         sweep += self.sweep_eor
         sweep += self.sweep_eop
         sweep += self.sweep_next
