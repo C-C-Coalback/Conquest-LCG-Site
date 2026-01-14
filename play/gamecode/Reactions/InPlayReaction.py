@@ -1743,6 +1743,24 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, unit_pos))
                     self.delete_reaction()
+        elif current_reaction == "Howling Exarch":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if (int(game_update_string[1]), planet_pos, unit_pos) not in self.misc_misc:
+                    self.misc_misc.append((int(game_update_string[1]), planet_pos, unit_pos))
+                    player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    if len(self.misc_misc) > 1:
+                        primary_player.reset_all_aiming_reticles_play_hq()
+                        for i in range(len(self.misc_misc)):
+                            num, planet_pos, unit_pos = self.misc_misc[i]
+                            if num == 1:
+                                self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                            else:
+                                self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
+                        self.misc_misc = None
         elif current_reaction == "Arrogant Haemonculus":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":

@@ -4507,8 +4507,15 @@ class Player:
         self.discard_card_name_from_hand("Foretell")
         if self.urien_relevant:
             self.spend_resources(1)
+        primary_player.resolve_reactions_on_cancelling_enemy_effect()
+
+    def resolve_reactions_on_cancelling_enemy_effect(self):
         if self.search_hand_for_card("Banshee Assault Squad"):
             self.game.create_reaction("Banshee Assault Squad", self.name_player, (int(self.number), -1, -1))
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ability_given_pos(i, j) == "Howling Exarch":
+                    self.game.create_reaction("Howling Exarch", self.name_player, (int(self.number), i, j))
 
     def search_hand_for_card(self, card_name):
         for i in range(len(self.cards)):

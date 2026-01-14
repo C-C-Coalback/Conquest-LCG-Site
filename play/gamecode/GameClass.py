@@ -1983,9 +1983,7 @@ class Game:
                 secondary_player = self.p1
         if self.nullify_count % 2 == 0:
             if self.nullify_count > 0:
-                if primary_player.search_hand_for_card("Banshee Assault Squad"):
-                    self.create_reaction("Banshee Assault Squad", primary_player.name_player,
-                                         (int(primary_player.number), -1, -1))
+                primary_player.resolve_reactions_on_cancelling_enemy_effect()
             if self.nullifying_storm_of_silence:
                 self.nullifying_storm_of_silence = False
                 await self.complete_storm_of_silence(primary_player, secondary_player)
@@ -2098,9 +2096,7 @@ class Game:
                 )
                 primary_player.discard_card_name_from_hand("Launch da Snots")
         else:
-            if secondary_player.search_hand_for_card("Banshee Assault Squad"):
-                self.create_reaction("Banshee Assault Squad", secondary_player.name_player,
-                                     (int(secondary_player.number), -1, -1))
+            secondary_player.resolve_reactions_on_cancelling_enemy_effect()
             if self.nullifying_storm_of_silence:
                 print("got to correct SoS Nullify")
                 primary_player.discard_card_name_from_hand("Storm of Silence")
@@ -2318,9 +2314,7 @@ class Game:
         self.reset_choices_available()
         primary_player.spend_resources(2)
         primary_player.discard_card_name_from_hand("Storm of Silence")
-        if primary_player.search_hand_for_card("Banshee Assault Squad"):
-            self.create_reaction("Banshee Assault Squad", primary_player.name_player,
-                                 (int(primary_player.number), -1, -1))
+        primary_player.resolve_reactions_on_cancelling_enemy_effect()
         if self.storm_of_silence_friendly_unit:
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             if not primary_player.get_ready_given_pos(warlord_pla, warlord_pos):
@@ -2361,9 +2355,7 @@ class Game:
             primary_player.spend_resources(1)
         print(self.nullified_card_name)
         print(self.nullify_context)
-        if primary_player.search_hand_for_card("Banshee Assault Squad"):
-            self.create_reaction("Banshee Assault Squad", primary_player.name_player,
-                                 (int(primary_player.number), -1, -1))
+        primary_player.resolve_reactions_on_cancelling_enemy_effect()
         if self.nullify_context == "Event Action":
             if self.nullified_card_name == "Overrun":
                 secondary_player.draw_card()
@@ -2568,9 +2560,7 @@ class Game:
         if game_update_string[1] == "0":
             self.reset_choices_available()
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
-            if primary_player.search_hand_for_card("Banshee Assault Squad"):
-                self.create_reaction("Banshee Assault Squad", primary_player.name_player,
-                                     (int(primary_player.number), -1, -1))
+            primary_player.resolve_reactions_on_cancelling_enemy_effect()
             if warlord_pla != -2:
                 primary_player.cards_in_play[warlord_pla + 1][warlord_pos].once_per_round_used = True
             if self.nullify_context == "Event Action":
@@ -8347,6 +8337,17 @@ class Game:
                                                                   rickety_warbuggy=True)
                         self.misc_misc = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                    if self.reactions_needing_resolving[0] == "Howling Exarch":
+                        primary_player.reset_all_aiming_reticles_play_hq()
+                        if self.misc_misc is not None:
+                            for i in range(len(self.misc_misc)):
+                                num, planet_pos, unit_pos = self.misc_misc[i]
+                                if num == 1:
+                                    self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
+                                else:
+                                    self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
                     if self.reactions_needing_resolving[0] == "Nullify":
                         await self.complete_nullify()
 

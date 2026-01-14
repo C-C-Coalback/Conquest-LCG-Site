@@ -421,6 +421,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Ulthwé Night Spinner", "No Wargear Attachments.\n"
                                                      "Area Effect (2).", "Vehicle. Ulthwé.",
                              4, "Eldar", "Loyal", 3, 5, 0, False, area_effect=2, wargear_attachments_permitted=False),
+        CardClasses.ArmyCard("Howling Exarch", "Reaction: After you cancel a card effect, deal 1 damage to up to "
+                                               "two units at this planet.", "Warrior.",
+                             3, "Eldar", "Loyal", 2, 3, 1, False),
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
