@@ -2344,6 +2344,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "The Blinded Princess":
             self.game.create_reaction("The Blinded Princess", self.name_player, (int(self.number), position,
                                                                                  last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Death Jesters":
+            self.game.create_reaction("Death Jesters", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
             self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
                                                                                    last_element_index))

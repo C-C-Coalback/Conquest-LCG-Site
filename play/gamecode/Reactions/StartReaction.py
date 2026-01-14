@@ -1379,6 +1379,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Death Jesters":
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Rapid Ingress":
             if primary_player.resources > 0:
                 can_continue = True
