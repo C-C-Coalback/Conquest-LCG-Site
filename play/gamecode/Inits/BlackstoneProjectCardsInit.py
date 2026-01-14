@@ -405,6 +405,9 @@ def blackstone_project_cards_init():
                                                   " For each card that was not revealed, gain 1 resource.",
                               "Power. Harlequin.", 2, "Eldar", "Loyal", 2, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Iyanden Farseer", "While a battle is being resolved at this planet, your opponent cannot "
+                                                "play events.",
+                             "Psyker. Iyanden.", 3, "Eldar", "Loyal", 2, 4, 1, False),
         CardClasses.ArmyCard("Death Jesters", "Reaction: After this unit enters play, it gets +3 ATK for its next "
                                               "attack for this phase.", "Warrior. Harlequin.",
                              2, "Eldar", "Common", 1, 3, 1, False),

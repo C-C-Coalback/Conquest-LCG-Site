@@ -2211,6 +2211,13 @@ class Player:
             return self.headquarters[unit_pos]
         return self.cards_in_play[planet_pos + 1][unit_pos]
 
+    def iyanden_farseer_check(self):
+        if self.game.battle_in_progress and self.game.last_planet_checked_for_battle != -1:
+            for i in range(len(self.cards_in_play[self.game.last_planet_checked_for_battle + 1])):
+                if self.get_ability_given_pos(self.game.last_planet_checked_for_battle, i) == "Iyanden Farseer":
+                    return True
+        return False
+
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True, triggered_card_effect=True):
         if position == -2:

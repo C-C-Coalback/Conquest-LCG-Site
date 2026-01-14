@@ -39,6 +39,7 @@ class Game:
             self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())
         self.planet_cards_array = planet_array
         self.apoka = apoka
+        self.battle_in_progress = False
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
@@ -1858,6 +1859,7 @@ class Game:
         self.number_resolving_battle_ability = -1
 
     async def resolve_battle_conclusion(self, name, game_string):
+        self.battle_in_progress = False
         self.p1.foretell_permitted = True
         self.p2.foretell_permitted = True
         self.ranged_skirmish_active = False
@@ -10882,6 +10884,7 @@ class Game:
             self.number_with_initiative = "1"
 
     def begin_battle(self, planet_pos):
+        self.battle_in_progress = True
         self.combat_round_number = 1
         self.last_planet_checked_for_battle = planet_pos
         self.p1.resolve_battle_begins(planet_pos)
