@@ -418,6 +418,9 @@ def blackstone_project_cards_init():
                                                   "Attached unit gains Sweep (2).", "Wargear. Weapon.",
                                    1, "Eldar", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
                                    required_traits="Spirit"),
+        CardClasses.ArmyCard("Ulthwé Night Spinner", "No Wargear Attachments.\n"
+                                                     "Area Effect (2).", "Vehicle. Ulthwé.",
+                             4, "Eldar", "Loyal", 3, 5, 0, False, area_effect=2, wargear_attachments_permitted=False),
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
