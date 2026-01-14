@@ -408,6 +408,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Iyanden Farseer", "While a battle is being resolved at this planet, your opponent cannot "
                                                 "play events.",
                              "Psyker. Iyanden.", 3, "Eldar", "Loyal", 2, 4, 1, False),
+        CardClasses.SupportCard("Garden of Solitude", "Action: Exhaust this card to look at the top card of your deck. "
+                                                      "You may put that card on the bottom of your deck.", "Location.",
+                                0, "Eldar", "Loyal", False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Death Jesters", "Reaction: After this unit enters play, it gets +3 ATK for its next "
                                               "attack for this phase.", "Warrior. Harlequin.",
                              2, "Eldar", "Common", 1, 3, 1, False),

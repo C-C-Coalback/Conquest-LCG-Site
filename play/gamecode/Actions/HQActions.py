@@ -512,6 +512,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.jungle_trench_count += 1
                             await self.send_update_message("Jungle Trenches active: " + str(self.jungle_trench_count))
                             self.action_cleanup()
+                    elif ability == "Garden of Solitude":
+                        if card.get_ready() and primary_player.deck:
+                            primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
+                            self.choices_available = ["Leave on top: " + primary_player.deck[0],
+                                                      "Put on bottom: " + primary_player.deck[0]]
+                            self.choice_context = "Garden of Solitude"
+                            self.name_player_making_choices = primary_player.name_player
                     elif ability == "Fungal Turf":
                         primary_player.sacrifice_card_in_hq(unit_pos)
                         self.action_chosen = ability

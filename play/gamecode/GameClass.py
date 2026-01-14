@@ -3337,6 +3337,16 @@ class Game:
                                 primary_player.bottom_remaining_cards()
                                 secondary_player.create_enemy_played_event_reactions()
                                 self.action_cleanup()
+                    elif self.choice_context == "Garden of Solitude":
+                        choice_pos = int(game_update_string[1])
+                        if choice_pos == 0:
+                            pass
+                        else:
+                            card_name = primary_player.deck[0]
+                            primary_player.deck.append(card_name)
+                            del primary_player.deck[0]
+                        self.reset_choices_available()
+                        self.action_cleanup()
                     elif self.choice_context == "Eldritch Council: Choose Card":
                         choice_pos = int(game_update_string[1])
                         if choice_pos == 0:
