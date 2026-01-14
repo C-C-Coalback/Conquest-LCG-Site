@@ -4508,7 +4508,7 @@ class Player:
         self.discard_card_name_from_hand("Foretell")
         if self.urien_relevant:
             self.spend_resources(1)
-        primary_player.resolve_reactions_on_cancelling_enemy_effect()
+        self.resolve_reactions_on_cancelling_enemy_effect()
 
     def resolve_reactions_on_cancelling_enemy_effect(self):
         if self.search_hand_for_card("Banshee Assault Squad"):
