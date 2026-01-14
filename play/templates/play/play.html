@@ -219,7 +219,33 @@
                            "/static/images/CardImages/Novokh_Dynasty.jpg",
                            "/static/images/CardImages/Sautekh_Dynasty.jpg"];
 
+    const cardback_1 = "{{cardback_1|escapejs}}";
+    const cardback_2 = "{{cardback_2|escapejs}}";
 
+    console.log(cardback_1);
+    console.log(cardback_2);
+
+    function replaceCardbacksText_1(original_string) {
+        var result = original_string.replaceAll("Cardback", cardback_1);
+        return result;
+    }
+
+    function replaceCardbacksText_2(original_string) {
+        var result = original_string.replaceAll("Cardback", cardback_2);
+        return result;
+    }
+
+    function replaceCardback(original_string, p_num) {
+        var result = "Cardback";
+        if (original_string === "Cardback") {
+            if (p_num === "1") {
+                result = replaceCardbacksText_1(original_string);
+            } else {
+                result = replaceCardbacksText_2(original_string);
+            }
+        }
+        return result;
+    }
 
     const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
@@ -669,7 +695,7 @@
                     var card_count = split_data[4];
                     if (card_name === "Cardback") {
                         document.getElementById(target_deck_id).innerHTML =
-                        `<img src="/static/images/CardImages/` + card_name + `.jpg"
+                        `<img src="/static/images/CardImages/` + replaceCardback(card_name, split_data[2]) + `.jpg"
                         alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     } else {
                         document.getElementById(target_deck_id).innerHTML =
@@ -722,7 +748,7 @@
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                             if (hidden == "H") {
-                                route_text = "/static/images/CardImages/Cardback.jpg";
+                                route_text = "/static/images/CardImages/" + replaceCardback(card_name, split_data[3]) + ".jpg";
                                 if (target_user === "{{ user.username }}") {
                                     enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
                                 }
@@ -739,7 +765,7 @@
                         var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                         var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                         if (hidden == "H") {
-                            route_text = "/static/images/CardImages/Cardback.jpg";
+                            route_text = "/static/images/CardImages/" + replaceCardback(card_name, split_data[3]) + ".jpg";
                             if (target_user === "{{ user.username }}") {
                                 enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
                             }
@@ -777,7 +803,7 @@
                                     original_text = "/static/images/CardImages/" + card_name + ".jpg";
                                     enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
                                 }
-                                card_name = "Cardback";
+                                card_name = replaceCardback("Cardback", split_data[2]);
                                 deepstrike = "True";
                             }
                             var string_id = (i-5).toString();
@@ -890,7 +916,7 @@
                                 original_text = "/static/images/CardImages/" + card_name + ".jpg";
                                 enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
                             }
-                            card_name = "Cardback";
+                            card_name = replaceCardback("Cardback", split_data[2]);
                             deepstrike = "True";
                         }
                         string_id = "HQ/" + split_data[2] + "/" + string_id;
@@ -928,7 +954,7 @@
                                     attachment_original_text = "/static/images/CardImages/" + attachment_name + ".jpg";
                                     attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
                                 }
-                                attachment_name = "Cardback";
+                                attachment_name = replaceCardback("Cardback", split_data[2]);
                                 att_deepstrike = "True";
                             }
                             attachment_string_id = "ATTACHMENT/HQ/" + split_data[2] + "/" + (i-4).toString() + "/" + attachment_string_id;
@@ -1051,7 +1077,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/1/" + string_id;
-                                var route_text = "/static/images/CardImages/Cardback.jpg";
+                                var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
                                 `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
@@ -1080,7 +1106,7 @@
                             for (var i = 4; i < split_data.length; i++) {
                                 var string_id = (i-4).toString();
                                 string_id = "HAND/2/" + string_id;
-                                var route_text = "/static/images/CardImages/Cardback.jpg";
+                                var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
                                 `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }

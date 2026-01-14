@@ -31,6 +31,10 @@ def get_lobbies():
     return active_lobbies, spectator_games
 
 
+def get_active_games():
+    return active_games
+
+
 def convert_name_to_img_src(card_name):
     card_name = card_name.replace("\"", "")
     card_name = card_name.replace(" ", "_")

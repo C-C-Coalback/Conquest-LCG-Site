@@ -33,7 +33,7 @@ urlpatterns = [
     path('simple_upload/', views.simple_upload, name='simple_upload'),
     path('settings/simple_upload/', views.simple_upload, name='simple_upload'),
     path('help/', TemplateView.as_view(template_name="help.html"), name="help"),
-    path('settings/', TemplateView.as_view(template_name="settings.html"), name="settings"),
+    path('settings/', views.settings_page, name="settings"),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     # path('favicon.ico/', RedirectView.as_view(url='/media/images/favicon.png')),

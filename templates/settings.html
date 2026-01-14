@@ -40,15 +40,39 @@
     <button type="submit">Log Out</button>
     </form>
     <div class="profile-pic-entry-box">
-    <div>Change your profile picture by uploading a file here.</div>
-    <div>Please note that it could take several minutes for your profile picture to update.</div>
-    <div class="profile-pic-entry">
-    <form method="post" enctype="multipart/form-data" action="simple_upload/">
-      {% csrf_token %}
-      <input type="file" name="file">
-      <button type="submit">Upload</button>
-    </form>
+        <div>Change your profile picture by uploading a file here.</div>
+        <div>Please note that it could take several minutes for your profile picture to update.</div>
+        <div class="profile-pic-entry">
+        <form method="post" enctype="multipart/form-data" action="simple_upload/">
+          {% csrf_token %}
+          <input type="file" name="file">
+          <button type="submit">Upload</button>
+        </form>
+        </div>
     </div>
+    <div class="game-appearance">
+        <h2>Game Settings</h2>
+        <div>Change the appearance of some aspects of the game here.</div>
+        <div>Changes should be applied immediately. Your cardback will not be updated in your active games.</div>
+        <form method="post" action="/accounts/update_settings/">
+          {% csrf_token %}
+            <div>Cardback:</div>
+            <select id="Cardback" name="Cardback">
+                <option></option>
+                <option>Default</option>
+                <option>Space Marines</option>
+            </select>
+            <div>Background:</div>
+            <select id="Background" name="Background">
+                <option></option>
+                <option>Imperial Aquila</option>
+            </select>
+            <br>
+          <button type="submit">Save Settings</button>
+        </form>
+        <div>You current settings are:</div>
+        <div>Cardback: {{ cardback }}</div>
+        <div>Background: {{ background }}</div>
     </div>
     {% else %}
     <h2>You are not logged in.</h2>

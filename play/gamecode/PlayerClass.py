@@ -4,6 +4,7 @@ from random import shuffle
 import copy
 import threading
 from . import CardClasses
+import os
 
 
 def clean_received_deck(raw_deck):
@@ -77,6 +78,17 @@ class Player:
         self.synapse_commit_location = -1
         self.idden_base_active = False
         self.warlord_just_got_bloodied = False
+        self.cardback_name = "Cardback"
+        cwd = os.getcwd()
+        settings_file = os.path.join(cwd, "user_preferences_storage/" + self.name_player + ".txt")
+        if os.path.exists(settings_file):
+            try:
+                with open(settings_file, "r") as f:
+                    extracted_text = f.read()
+                    split_text = extracted_text.split(sep="\n")
+                    self.cardback_name = split_text[1]
+            except:
+                pass
         self.condition_player_main = threading.Condition()
         self.condition_player_sub = threading.Condition()
         self.aiming_reticle_color = "blue"

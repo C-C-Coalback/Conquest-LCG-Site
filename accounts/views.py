@@ -8,6 +8,41 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate, get_user_model, password_validation
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
+import os
+
+
+valid_cardbacks = ["Cardback", "Space_Marines_Cardback"]
+valid_backgrounds = ["Imperial Aquila"]
+if not os.path.exists(os.path.join(os.getcwd(), "user_preferences_storage/")):
+    os.mkdir(os.path.join(os.getcwd(), "user_preferences_storage/"))
+
+
+def change_settings(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            username = request.user.username
+            cwd = os.getcwd()
+            settings_file = os.path.join(cwd, "user_preferences_storage/" + username + ".txt")
+            zoom = str(1.0)
+            cardback = request.POST["Cardback"]
+            if cardback == "Default":
+                cardback = "Cardback"
+            else:
+                cardback = cardback.replace(" ", "_") + "_Cardback"
+            if cardback not in valid_cardbacks:
+                cardback = "Cardback"
+            else:
+                cardback = cardback
+            background = request.POST["Background"]
+            if background not in valid_backgrounds:
+                background = "Imperial Aquila"
+            print(cardback)
+            print(background)
+            full_string = zoom + "\n" + cardback + "\n" + background + "\n"
+            with open(settings_file, "w") as f:
+                f.write(full_string)
+    return redirect("/settings/")
 
 
 class CustomBaseUserCreationForm(forms.ModelForm):
