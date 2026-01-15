@@ -2527,7 +2527,7 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].set_once_per_phase_used(new_val)
         return None
 
-    def set_once_per_round_used_given_pos(self, planet_id, unit_id, new_val):
+    def set_once_per_round_used_given_pos(self, planet_id, unit_id, new_val=True):
         if planet_id == -2:
             self.headquarters[unit_id].set_once_per_round_used(new_val)
             return None

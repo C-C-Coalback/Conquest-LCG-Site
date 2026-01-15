@@ -427,6 +427,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
+                    elif ability == "Fire Caste Cadre":
+                        if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
                     elif ability == "Scribe Servo-Skull":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)

@@ -154,20 +154,23 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                 primary_player.cards.append(player_owning_card.headquarters[unit_pos].attachments[attachment_pos].get_name())
                 del player_owning_card.headquarters[unit_pos].attachments[attachment_pos]
                 self.action_cleanup()
+    elif self.action_chosen == "Fire Caste Cadre":
+        if self.position_of_actioned_card[0] == planet_pos and self.position_of_actioned_card[1] == unit_pos:
+            if card_chosen.name_owner == primary_player.get_name_player():
+                if game_update_string[2] == primary_player.get_number():
+                    primary_player.cards.append(card_chosen.get_name())
+                    del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
+                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Subdual":
         if card_chosen.name_owner == self.name_1:
             self.p1.deck.insert(0, card_chosen.get_name())
         else:
             self.p2.deck.insert(0, card_chosen.get_name())
         del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.mode = "Normal"
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
-        if self.phase == "DEPLOY":
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.number
+        self.action_cleanup()
     elif self.action_chosen == "Pathfinder Shi Or'es":
         if game_update_string[2] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:
@@ -176,26 +179,10 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                     del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
                     player_owning_card.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     player_owning_card.ready_given_pos(planet_pos, unit_pos)
-                    self.position_of_actioned_card = (-1, -1)
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
-                    if self.phase == "DEPLOY":
-                        self.player_with_deploy_turn = secondary_player.name_player
-                        self.number_with_deploy_turn = secondary_player.number
+                    self.action_cleanup()
     elif self.action_chosen == "Calculated Strike":
-        if game_update_string[1] == "1":
-            player_being_hit = self.p1
-        else:
-            player_being_hit = self.p2
-        if player_being_hit.headquarters[unit_pos].get_attachments()[attachment_pos].get_limited():
-            player_being_hit.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+        if player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos].get_limited():
+            player_owning_card.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            if self.phase == "DEPLOY":
-                if not secondary_player.has_passed:
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
+            self.action_cleanup()

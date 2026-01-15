@@ -490,6 +490,11 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                    elif ability == "Fire Caste Cadre":
+                        if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
                     elif ability == "Lone Wolf":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])
