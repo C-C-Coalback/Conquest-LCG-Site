@@ -3750,7 +3750,7 @@ class Player:
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
         ability = self.get_ability_given_pos(planet_id, unit_id)
         if not self.check_for_trait_given_pos(planet_id, unit_id, "Ethereal"):
-            if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
                         command += 1
@@ -6104,7 +6104,7 @@ class Player:
                 if self.get_ability_given_pos(planet_id, i) == "Immortal Vanguard":
                     health += 1
         if not self.check_for_trait_given_pos(planet_id, unit_id, "Ethereal"):
-            if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
                         health += 1
