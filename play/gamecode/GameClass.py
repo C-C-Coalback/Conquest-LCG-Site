@@ -940,6 +940,8 @@ class Game:
                 info_string += "Bloodthirst is active.\n"
             if self.wounded_scream_blanked and self.get_planet_name(i) == "Wounded Scream":
                 info_string += "Blanked.\n"
+            if self.replaced_planets[i]:
+                info_string += "Original Planet: " + self.original_planet_array[i] + "\n"
             if self.additional_icons_planets_eob[i]:
                 info_string += "Additional Icons (EOB)\n"
                 if "blue" in self.additional_icons_planets_eob[i]:
