@@ -43,7 +43,7 @@ def convert_name_to_img_src(card_name):
     return card_name
 
 
-def get_decks_user(username, start_index, end_index):
+def get_decks_user(username, start_index, end_index, required_faction=""):
     if not username:
         return []
     decks_stored = []
@@ -55,7 +55,10 @@ def get_decks_user(username, start_index, end_index):
                 content = f.read()
                 split_content = content.split(sep="\n")
                 warlord_name = split_content[2]
-                decks_stored.append((deck_name, convert_name_to_img_src(warlord_name)))
+                faction = split_content[3]
+                faction = faction.split(sep=" (")[0]
+                if not required_faction or faction == required_faction:
+                    decks_stored.append((deck_name, convert_name_to_img_src(warlord_name), faction))
     decks_stored = sorted(decks_stored, key=lambda x: x[0])
     end_index = min(end_index, len(decks_stored))
     start_index = min(start_index, len(decks_stored))
@@ -129,7 +132,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     active_lobbies[6][i] = split_message[1]
         if split_message[0] == "Load More":
             value = int(split_message[1])
-            decks_user = get_decks_user(self.user.username, value, value + 5)
+            required_faction = split_message[2]
+            decks_user = get_decks_user(self.user.username, value, value + 5, required_faction)
             for i in range(len(decks_user)):
                 deck_name = decks_user[i][0]
                 warlord_name = decks_user[i][1]

@@ -140,6 +140,20 @@
             </div>
         </div>
         <div id="decks-container-container">
+            <div>Faction Filter</div>
+            <label for="faction-filter"></label>
+            <select id="faction-filter" name="faction-filter" onchange="clearUpdateLoad()">
+                <option value=""></option>
+                <option value="Space Marines">Space Marines</option>
+                <option value="Astra Militarum">Astra Militarum</option>
+                <option value="Orks">Orks</option>
+                <option value="Chaos">Chaos</option>
+                <option value="Dark Eldar">Dark Eldar</option>
+                <option value="Eldar">Eldar</option>
+                <option value="Tau">Tau</option>
+                <option value="Tyranids">Tyranids</option>
+                <option value="Necrons">Necrons</option>
+            </select>
             <div id="decks-container">
                 <h2 id="decks-header">Decks</h2>
                 <h2>No Decks</h2>
@@ -161,6 +175,23 @@
 
         var spec_count = 0;
         var current_deck_amount = 0;
+        var preferred_faction = "";
+
+        function clearUpdateLoad() {
+            clearDecks();
+            updatePreference();
+            loadMore();
+        }
+
+        function updatePreference() {
+            var e = document.getElementById("faction-filter");
+            preferred_faction = e.value;
+        }
+
+        function clearDecks() {
+            document.getElementById("decks-container").innerHTML = `<h2 id="decks-header">Decks</h2>`;
+            current_deck_amount = 0;
+        }
 
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
@@ -233,7 +264,7 @@
 
         function loadMore() {
             lobbySocket.send(JSON.stringify({
-                'message': "Load More/" + current_deck_amount.toString()
+                'message': "Load More/" + current_deck_amount.toString() + "/" + preferred_faction
             }));
         }
 
