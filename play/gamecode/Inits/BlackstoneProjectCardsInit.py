@@ -430,6 +430,12 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Peacekeeper Drone", "Reaction: After a battle begins at a planet, "
+                                                  "move this unit to that planet. \n"
+                                                  "Combat Action: A target non-warlord unit at this planet gets "
+                                                  "-1 ATK until the end of the phase. (Limit once per phase)",
+                             "Drone.", 1, "Tau", "Common", 0, 3, 0, False,
+                             action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

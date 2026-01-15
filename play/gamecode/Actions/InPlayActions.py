@@ -421,8 +421,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Zarathur's Flamers":
                         self.action_chosen = ability
-                        player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                    elif ability == "Peacekeeper Drone":
+                        if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
                     elif ability == "Scribe Servo-Skull":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -2692,9 +2696,39 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "In Play Action"
                 if can_continue:
-                    primary_player.return_card_to_hand(planet_pos, unit_pos)
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
+                    primary_player.return_card_to_hand(planet_pos, unit_pos)
+                    self.action_cleanup()
+    elif self.action_chosen == "Peacekeeper Drone":
+        if planet_pos == self.position_of_actioned_card[0]:
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                self.position_of_actioned_card[1])
+                    player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, -1, "EOP")
                     self.action_cleanup()
     elif self.action_chosen == "World Engine Beam":
         if game_update_string[1] == primary_player.number:

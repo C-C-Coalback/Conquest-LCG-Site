@@ -6714,6 +6714,14 @@ class Player:
                 self.game.create_reaction("Yvraine's Entourage", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Cegorach's Jesters":
                 self.game.create_reaction("Cegorach's Jesters", self.name_player, (int(self.number), planet_num, i))
+        for i in range(7):
+            if i != planet_num:
+                for j in range(len(self.cards_in_play[i + 1])):
+                    if self.get_ability_given_pos(i, j) == "Peacekeeper Drone":
+                        self.game.create_reaction("Peacekeeper Drone", self.name_player, (int(self.number), i, j))
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == "Peacekeeper Drone":
+                self.game.create_reaction("Peacekeeper Drone", self.name_player, (int(self.number), -2, i))
 
     def set_valid_crushing_blow_given_pos(self, planet_id, unit_id, val=False):
         if planet_id == -2:
