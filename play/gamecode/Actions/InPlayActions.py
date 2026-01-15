@@ -2675,6 +2675,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.check_for_warlord(planet_pos):
                         primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
                         self.action_cleanup()
+    elif self.action_chosen == "Force Reallocation":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    primary_player.add_resources(1)
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):

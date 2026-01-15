@@ -1122,6 +1122,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.misc_counter = 0
                     self.action_cleanup()
+    elif self.action_chosen == "Force Reallocation":
+        if game_update_string[1] == primary_player.get_number():
+            if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                    primary_player.add_resources(1)
     elif self.action_chosen == "Plagueburst Crawler":
         if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)

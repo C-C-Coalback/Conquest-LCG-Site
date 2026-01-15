@@ -465,6 +465,10 @@ def blackstone_project_cards_init():
                                                "Forced Reaction: After this unit resolves its attack, move it "
                                                "to your HQ.", "Drone. Ethereal.",
                              2, "Tau", "Loyal", 0, 3, 1, False),
+        CardClasses.EventCard("Force Reallocation", "Deploy Action: Exhaust any number of units you control. "
+                                                    "Gain 1 resource for each unit exhausted by this effect.",
+                              "Tactic.", 1, "Tau", "Loyal", 2, False,
+                              action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
