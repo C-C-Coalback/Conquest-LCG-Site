@@ -774,6 +774,13 @@ summary:focus {
     background: transparent;
 }
 
+.hand-card {
+    margin-left: 2px;
+    margin-right: 2px;
+    border: 2px solid aqua;
+    border-radius: 5px;
+}
+
 fieldset {
     padding: 0px;
     margin: 0px;

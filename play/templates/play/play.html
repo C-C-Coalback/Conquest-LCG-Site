@@ -1065,7 +1065,7 @@
                                 string_id = "HAND/1/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                                 if (card_data_split.length === 1) {
                                     full_string += `</div>`
                                 } else {
@@ -1079,7 +1079,7 @@
                                 string_id = "HAND/1/" + string_id;
                                 var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                                 document.getElementById('current-hand-player-1').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
                         }
                     } else if (split_data[2] === "2") {
@@ -1094,7 +1094,7 @@
                                 string_id = "HAND/2/" + string_id;
                                 card_name = card_name.split(' ').join('_');
                                 var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                                 if (card_data_split.length === 1) {
                                     full_string += `</div>`
                                 } else {
@@ -1108,7 +1108,7 @@
                                 string_id = "HAND/2/" + string_id;
                                 var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                                 document.getElementById('current-hand-player-2').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
                         }
                     }
