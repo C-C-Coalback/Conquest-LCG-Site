@@ -424,6 +424,9 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card == "SUCCESS":
         primary_player.webway_witch = -1
         self.queued_sound = "onplay"
+        for i in range(primary_player.guardsman_tracker_apf):
+            if planet_pos != -2:
+                primary_player.summon_token_at_planet("Guardsman", planet_pos)
         if self.action_chosen == "Ambush":
             for i in range(len(primary_player.headquarters)):
                 if primary_player.get_ability_given_pos(-2, i) == "Followers of Asuryan":
@@ -538,6 +541,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     self.damage_for_unit_to_take_on_play = []
     self.card_pos_to_deploy = -1
     self.card_to_deploy = None
+    primary_player.guardsman_tracker_apf = 0
     primary_player.aiming_reticle_color = None
     primary_player.aiming_reticle_coords_hand = None
     self.planet_aiming_reticle_active = False

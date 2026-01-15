@@ -441,6 +441,12 @@ def blackstone_project_cards_init():
                                               "Forced Reaction: After this unit resolves its attack, move it "
                                               "to your HQ.", "Soldier. Ethereal.",
                              2, "Tau", "Loyal", 2, 3, 1, False),
+        CardClasses.SupportCard("Air Protection Fleet", "Limited.\n"
+                                                        "Interrupt: When you deploy a Soldier or Scout unit, exhaust "
+                                                        "this support to reduce the cost of that unit by 1. If that "
+                                                        "unit is an Astra Militarum unit, put a Guardsman token into "
+                                                        "play at that planet.", "Upgrade. Fleet.",
+                                2, "Tau", "Common", False, limited=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

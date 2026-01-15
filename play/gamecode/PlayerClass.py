@@ -210,6 +210,7 @@ class Player:
                 self.preparation_cards.append(self.card_array[i].get_name())
         self.played_necrodermis = False
         self.necrodermis_allowed = True
+        self.guardsman_tracker_apf = 0
         self.etekh_trait = ""
         self.sautekh_royal_crypt = -1
         self.command_struggles_won_this_phase = 0
@@ -4294,6 +4295,11 @@ class Player:
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 2
                         self.set_aiming_reticle_in_play(-2, i, "green")
+            if self.get_ability_given_pos(-2, i) == "Air Protection Fleet":
+                if "Soldier" in traits or "Scout" in traits:
+                    if self.get_ready_given_pos(-2, i):
+                        discounts_available += 1
+                        self.set_aiming_reticle_in_play(-2, i, "green")
             if self.headquarters[i].get_ability() == "Prophets of Flesh":
                 if "Abomination" in traits or "Scholar" in traits:
                     if self.get_ready_given_pos(-2, i):
@@ -4624,6 +4630,13 @@ class Player:
                 self.exhaust_given_pos(-2, pos)
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
+        if self.headquarters[pos].get_ability() == "Air Protection Fleet":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.exhaust_given_pos(-2, pos)
+                discount += 1
+                self.reset_aiming_reticle_in_play(-2, pos)
+                if faction_of_card == "Astra Militarum":
+                    self.guardsman_tracker_apf += 1
         if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
                 if self.headquarters[pos].get_ready():
