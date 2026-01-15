@@ -115,6 +115,11 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 self.resolving_search_box = True
                                 card_chosen.exhaust_card()
                                 self.action_cleanup()
+                    elif ability == "Riptide Battlesuit":
+                        if card_chosen.get_ready():
+                            card_chosen.exhaust_card()
+                            player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, "EOP")
+                            self.action_cleanup()
                     elif ability == "Soot-Blackened Axe":
                         card_chosen.aiming_reticle_color = None
                         primary_player.cards_in_reserve[planet_pos].append(card_chosen)

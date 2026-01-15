@@ -42,6 +42,11 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                     if card_chosen.get_ready():
                         card_chosen.exhaust_card()
                         self.action_chosen = ability
+                elif ability == "Riptide Battlesuit":
+                    if card_chosen.get_ready():
+                        card_chosen.exhaust_card()
+                        player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, "EOP")
+                        self.action_cleanup()
                 elif ability == "Searchlight":
                     if primary_player.get_name_player() == player_owning_card.name_player:
                         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()

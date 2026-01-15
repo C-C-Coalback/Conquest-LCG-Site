@@ -447,6 +447,13 @@ def blackstone_project_cards_init():
                                                         "unit is an Astra Militarum unit, put a Guardsman token into "
                                                         "play at that planet.", "Upgrade. Fleet.",
                                 2, "Tau", "Common", False, limited=True),
+        CardClasses.AttachmentCard("Riptide Battlesuit", "Attach to an army unit.\n"
+                                                         "Attached unit gets +2 HP.\n"
+                                                         "Action: Exhaust this attachment to give attached unit +2 HP "
+                                                         "until the end of the phase.",
+                                   "Wargear. Armor.", 1, "Tau", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army",
+                                   extra_health=2, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
