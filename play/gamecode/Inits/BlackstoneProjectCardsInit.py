@@ -446,7 +446,7 @@ def blackstone_project_cards_init():
                                                         "this support to reduce the cost of that unit by 1. If that "
                                                         "unit is an Astra Militarum unit, put a Guardsman token into "
                                                         "play at that planet.", "Upgrade. Fleet.",
-                                2, "Tau", "Common", False, limited=True),
+                                2, "Tau", "Common", False),
         CardClasses.AttachmentCard("Riptide Battlesuit", "Attach to an army unit.\n"
                                                          "Attached unit gets +2 HP.\n"
                                                          "Action: Exhaust this attachment to give attached unit +2 HP "
