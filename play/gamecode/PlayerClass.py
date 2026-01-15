@@ -3748,19 +3748,25 @@ class Player:
         if planet_id == -2:
             return self.headquarters[unit_id].get_command()
         command = self.cards_in_play[planet_id + 1][unit_id].get_command()
+        ability = self.get_ability_given_pos(planet_id, unit_id)
+        if not self.check_for_trait_given_pos(planet_id, unit_id, "Ethereal"):
+            if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+                for i in range(len(self.cards_in_play[planet_id + 1])):
+                    if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
+                        command += 1
         if self.cards_in_play[planet_id + 1][unit_id].command == 0:
             if self.search_card_in_hq("Administratum Office"):
                 command += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Fire Warrior Grenadiers":
+        if ability == "Fire Warrior Grenadiers":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.check_for_trait_given_pos(planet_id, i, "Ethereal"):
                     command += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Iron Hands Techmarine":
+        if ability == "Iron Hands Techmarine":
             command += self.game.request_number_of_enemy_units_at_planet(self.number, planet_id)
-        if self.get_ability_given_pos(planet_id, unit_id) == "Prognosticator":
+        if ability == "Prognosticator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 command += 1
-        if self.get_ability_given_pos(planet_id, unit_id) == "Advocator of Blood":
+        if ability == "Advocator of Blood":
             warlord_bloodied = False
             warlord_pla, warlord_pos = self.get_location_of_warlord()
             if warlord_pla == -2:
@@ -3783,16 +3789,16 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "3rd Company Tactical Squad":
             if not self.check_if_support_exists():
                 command += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Improbable Runt Machine":
+        if ability == "Improbable Runt Machine":
             command += min(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments()), 3)
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Goff Brawlers":
+        if ability == "Goff Brawlers":
             if self.warlord_faction != "Orks":
                 command += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].get_ability() == "Brood Warriors":
+                if self.get_ability_given_pos(planet_id, i) == "Brood Warriors":
                     command += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Warriors of Gidrim":
+        if ability == "Warriors of Gidrim":
             if self.count_non_necron_factions() > 1:
                 command += 1
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks":
@@ -6095,11 +6101,16 @@ class Player:
                 health += 2
         if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
+                if self.get_ability_given_pos(planet_id, i) == "Immortal Vanguard":
                     health += 1
+        if not self.check_for_trait_given_pos(planet_id, unit_id, "Ethereal"):
+            if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
+                for i in range(len(self.cards_in_play[planet_id + 1])):
+                    if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
+                        health += 1
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].get_ability() == "Swarm Guard":
+                if self.get_ability_given_pos(planet_id, i) == "Swarm Guard":
                     health += 2
         if ability == "Pyrrhian Eternals":
             health += self.discard.count("Pyrrhian Eternals")

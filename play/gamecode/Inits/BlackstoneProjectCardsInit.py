@@ -460,6 +460,11 @@ def blackstone_project_cards_init():
                                                  "(Limit once per round)", "Soldier. Shas'la.",
                              3, "Tau", "Common", 2, 3, 1, False,
                              action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Exertion Drone", "Each non-Ethereal army unit you control at this planet gets +1 HP "
+                                               "and gains 1 command icon.\n"
+                                               "Forced Reaction: After this unit resolves its attack, move it "
+                                               "to your HQ.", "Drone. Ethereal.",
+                             2, "Tau", "Loyal", 0, 3, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
