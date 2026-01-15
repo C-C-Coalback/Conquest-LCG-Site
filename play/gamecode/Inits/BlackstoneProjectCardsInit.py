@@ -454,6 +454,8 @@ def blackstone_project_cards_init():
                                    "Wargear. Armor.", 1, "Tau", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army",
                                    extra_health=2, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.ArmyCard("Kroot Infiltrator", "Deep Strike (1).", "Soldier. Kroot.",
+                             2, "Tau", "Common", 2, 4, 0, False, deepstrike=1),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
