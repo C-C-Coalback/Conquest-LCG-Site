@@ -385,7 +385,7 @@ class Game:
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
                                  "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
-                                 "Avatar of Khaine"]
+                                 "Avatar of Khaine", "Aun'la Prince"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -421,7 +421,7 @@ class Game:
         self.canceled_card_bonuses = [False, False, False, False, False, False, False]
         self.canceled_resource_bonuses = [False, False, False, False, False, False, False]
         self.units_move_hq_attack = ["Aun'ui Prelate", "Aun'shi", "Ethereal Envoy", "Herald of the Tau'va",
-                                     "Frontline Counsellor"]
+                                     "Frontline Counsellor", "Aun'la Prince", "Exertion Drone"]
         self.unit_will_move_after_attack = False
         self.need_to_move_to_hq = False
         self.just_moved_units = False

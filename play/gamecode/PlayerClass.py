@@ -3376,6 +3376,7 @@ class Player:
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
+            self.aunla_prince_check(destination, new_pos, origin_planet)
             for i in range(len(self.headquarters)):
                 if i != last_element_index:
                     if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
@@ -7511,6 +7512,20 @@ class Player:
                     j = j + 1
         return None
 
+    def aunla_prince_check(self, planet_pos, unit_pos, og_pla):
+        if og_pla == -2:
+            return None
+        if self.check_for_trait_given_pos(planet_pos, unit_pos, "Ethereal"):
+            return None
+        for i in range(len(self.cards_in_play[og_pla + 1])):
+            if self.get_ability_given_pos(og_pla, i) == "Aun'la Prince":
+                self.game.create_reaction("Aun'la Prince", self.name_player, (int(self.number), planet_pos, unit_pos))
+        other_player = self.get_other_player()
+        for i in range(len(other_player.cards_in_play[og_pla + 1])):
+            if other_player.get_ability_given_pos(og_pla, i) == "Aun'la Prince":
+                self.game.create_reaction("Aun'la Prince", self.name_player, (int(self.number), planet_pos, unit_pos))
+        return None
+
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
         print("calling move unit to planet")
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
@@ -7544,6 +7559,7 @@ class Player:
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.remove_card_from_play(planet_id, unit_id)
         last_element_index = len(self.headquarters) - 1
+        self.aunla_prince_check(-2, last_element_index, planet_id)
         for i in range(len(self.headquarters)):
             if i != last_element_index:
                 if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":

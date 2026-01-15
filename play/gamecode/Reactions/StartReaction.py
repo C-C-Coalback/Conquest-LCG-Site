@@ -1386,6 +1386,9 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Peacekeeper Drone":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.last_planet_checked_for_battle)
             self.delete_reaction()
+        elif current_reaction == "Aun'la Prince":
+            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
+            self.delete_reaction()
         elif current_reaction == "Howling Exarch":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
             self.misc_misc = []

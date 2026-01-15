@@ -436,6 +436,11 @@ def blackstone_project_cards_init():
                                                   "-1 ATK until the end of the phase. (Limit once per phase)",
                              "Drone.", 1, "Tau", "Common", 0, 3, 0, False,
                              action_in_play=True, allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Aun'la Prince", "Forced Reaction: After a non-Ethereal unit moves from this planet, "
+                                              "deal it 1 damage.\n"
+                                              "Forced Reaction: After this unit resolves its attack, move it "
+                                              "to your HQ.", "Soldier. Ethereal.",
+                             2, "Tau", "Loyal", 2, 3, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
