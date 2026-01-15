@@ -629,7 +629,7 @@ def try_entire_command(self, planet_pos):
             if self.p1.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
         elif self.p1.search_hand_for_card("War of Ideas"):
-            for i in range(len(self.p1.cards_in_play[planet_pos])):
+            for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
                 if not self.p1.get_ready_given_pos(planet_pos, i):
                     return "INTERRUPT PRE STRUGGLE"
         elif self.p2.search_hand_for_card("Superiority") and self.p1.count_command_at_planet(planet_pos) > 0:
@@ -639,7 +639,7 @@ def try_entire_command(self, planet_pos):
             if self.p2.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
         elif self.p2.search_hand_for_card("War of Ideas"):
-            for i in range(len(self.p2.cards_in_play[planet_pos])):
+            for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
                 if not self.p2.get_ready_given_pos(planet_pos, i):
                     return "INTERRUPT PRE STRUGGLE"
     name_winner = determine_winner_command_struggle(self, planet_pos)
