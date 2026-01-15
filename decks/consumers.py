@@ -23,6 +23,33 @@ for key in range(len(cards_array)):
         card_names += "/" + cards_array[key].name
 planet_cards_array = Initfunctions.init_planet_cards()
 
+def convert_name_to_img_src(card_name):
+    card_name = card_name.replace("\"", "")
+    card_name = card_name.replace(" ", "_")
+    card_name = card_name.replace(":", "")
+    card_name = card_name.replace("'idden_Base", "idden_Base")
+    return card_name
+
+
+def get_decks_user(username, start_index, end_index):
+    if not username:
+        return []
+    decks_stored = []
+    path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + username + "/"
+    if os.path.isdir(path_to_player_decks):
+        for deck_name in os.listdir(path_to_player_decks):
+            content_file = path_to_player_decks + deck_name
+            with open(content_file, "r") as f:
+                content = f.read()
+                split_content = content.split(sep="\n")
+                warlord_name = split_content[2]
+                decks_stored.append((deck_name, convert_name_to_img_src(warlord_name)))
+    decks_stored = sorted(decks_stored, key=lambda x: x[0])
+    end_index = min(end_index, len(decks_stored))
+    start_index = min(start_index, len(decks_stored))
+    decks_stored = decks_stored[start_index: end_index]
+    return decks_stored
+
 
 def clean_sent_deck(deck_message):
     print("Code to test if deck is ok")
@@ -237,8 +264,9 @@ class DecksConsumer(AsyncWebsocketConsumer):
         elif self.name == "":
             print("Not logged in")
         else:
-            for filename in os.listdir("decks/DeckStorage/" + self.name):
-                await self.send_deck(filename)
+            decks_user = get_decks_user(self.user.username, 0, 999)
+            for i in range(len(decks_user)):
+                await self.send_deck(decks_user[i][0])
 
     async def send_deck(self, filename):
         username = self.name
