@@ -5,5 +5,5 @@ from . import views
 
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="decks.html"), name="decks"),
+    path("", views.decks, name="decks"),
 ]

@@ -6,7 +6,9 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'decks_style.css' %}">
 <datalist id="card_list">
-
+    {% for card_name in auto_complete %}
+        <option value="{{ card_name }}"></option>
+    {% endfor %}
 </datalist>
 <input id="toggle-manual" type="button" value="Show/Hide Manual" onclick="showDeckImport();">
 <div id="manual-deck-import">
@@ -222,13 +224,6 @@
                 document.getElementById("add_to_me")
                 .innerHTML =
                 `<h3>` + split_data[1] + `</h3>`;
-            } else if (split_data[0] === "CARD_NAMES") {
-                var e = document.getElementById('card_list');
-                var new_val = "";
-                for (var i = 1; i < split_data.length; i++) {
-                    new_val = `<option value="` + split_data[i] + `"></option>`;
-                    e.innerHTML += new_val;
-                }
             } else if (split_data[0] === "Load deck") {
 
             } else if (split_data[0] === "Delete deck") {

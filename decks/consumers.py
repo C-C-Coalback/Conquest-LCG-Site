@@ -6,8 +6,8 @@ import copy
 
 cards_array = Initfunctions.init_player_cards()
 blackstone_array = Initfunctions.init_blackstone_player_cards()
-card_names = "CARD_NAMES"
-card_names_with_bp = "CARD_NAMES"
+card_names = []
+card_names_with_bp = []
 authorised_blackstone_users = ["Coalback", "alex", "Echo", "i0Predator0i"]
 non_signature_rituals = []
 cards_dict = {}
@@ -16,12 +16,19 @@ for key in range(len(blackstone_array)):
     blackstone_dict[blackstone_array[key].name] = blackstone_array[key]
 for key in range(len(cards_array)):
     cards_dict[cards_array[key].name] = cards_array[key]
-    card_names_with_bp += "/" + cards_array[key].name
+    card_names_with_bp.append(cards_array[key].name)
     if cards_array[key].check_for_a_trait("Ritual") and cards_array[key].get_loyalty() != "Signature":
         non_signature_rituals.append(cards_array[key].name)
     if cards_array[key].name not in blackstone_dict:
-        card_names += "/" + cards_array[key].name
+        card_names.append(cards_array[key].name)
 planet_cards_array = Initfunctions.init_planet_cards()
+
+
+def get_card_names(username):
+    if username in authorised_blackstone_users:
+        return card_names_with_bp
+    return card_names
+
 
 def convert_name_to_img_src(card_name):
     card_name = card_name.replace("\"", "")
@@ -256,10 +263,6 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print(self.room_name)
         print(self.name)
         await self.send_stored_decks()
-        message = card_names
-        if self.user.username in authorised_blackstone_users:
-            message = card_names_with_bp
-        await self.send(text_data=json.dumps({"message": message}))
 
     async def send_stored_decks(self, value=0, required_faction=""):
         if not os.path.isdir("decks/DeckStorage/" + self.name):
