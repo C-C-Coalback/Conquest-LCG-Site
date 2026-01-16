@@ -482,6 +482,31 @@ class Player:
     def set_can_play_limited(self, new_val):
         self.can_play_limited = new_val
 
+    def determine_playability(self, card_name):
+        try:
+            card = self.game.preloaded_find_card(card_name)
+            if card.get_name() != "FINAL CARD":
+                if card.get_limited():
+                    if not self.can_play_limited:
+                        return "unplayable"
+                if card.check_for_a_trait("Pledge"):
+                    if not self.can_play_pledge:
+                        return "unplayable"
+                if card.get_has_action_while_in_hand():
+                    if card.allowed_phases_while_in_hand == "ALL" or \
+                            card.allowed_phases_while_in_hand == self.game.phase:
+                        return "playable"
+                    else:
+                        return "unplayable"
+                if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
+                    if card.get_cost() <= self.get_resources():
+                        return "playable"
+                    else:
+                        return ""
+        except:
+            pass
+        return ""
+
     async def send_hand(self, force=False):
         card_string = ""
         if self.cards:
@@ -494,14 +519,7 @@ class Player:
                     if self.aiming_reticle_coords_hand == i or self.aiming_reticle_coords_hand_2 == i:
                         card_array[i] = card_array[i] + self.aiming_reticle_color
                 card_array[i] = card_array[i] + "|"
-                card = self.game.preloaded_find_card(self.cards[i])
-                if card.get_name() != "FINAL CARD":
-                    if card.get_has_action_while_in_hand():
-                        if card.allowed_phases_while_in_hand == "ALL" or \
-                                card.allowed_phases_while_in_hand == self.game.phase:
-                            card_array[i] = card_array[i] + "playable"
-                        else:
-                            card_array[i] = card_array[i] + "unplayable"
+                card_array[i] = card_array[i] + self.determine_playability(self.cards[i])
             card_string = "/".join(card_array)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
         else:
