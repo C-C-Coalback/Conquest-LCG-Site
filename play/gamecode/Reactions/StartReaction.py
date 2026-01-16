@@ -2437,6 +2437,31 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Scavenging Run":
+            if primary_player.resources > 0:
+                can_continue = True
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    can_continue = False
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Scavenging Run; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Scavenging Run"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Win Battle Reaction Event"
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand("Scavenging Run")
+                        self.chosen_first_card = False
+                    else:
+                        self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Earth Caste Technician":
             if self.player_who_resolves_reaction[0] == self.name_1:
                 self.p1.number_cards_to_search = 6

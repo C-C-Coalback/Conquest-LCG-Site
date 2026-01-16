@@ -45,6 +45,16 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         del primary_player.discard[pos_discard]
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+        elif current_reaction == "Scavenging Run":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_card_type() == "Attachment":
+                    primary_player.cards.append(card.get_name())
+                    del primary_player.discard[pos_discard]
+                    if not self.chosen_first_card:
+                        self.chosen_first_card = True
+                    else:
+                        self.delete_reaction()
         elif current_reaction == "Klan Totem":
             if not self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

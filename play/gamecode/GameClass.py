@@ -481,7 +481,7 @@ class Game:
         self.sacaellums_finest_active = False
         self.eldritch_council_value = 0
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
-                                                 "Declare the Crusade", "Gut and Pillage"]
+                                                 "Declare the Crusade", "Gut and Pillage", "Scavenging Run"]
         self.queued_sound = ""
         self.queued_message = ""
         self.energy_weapon_sounds = ["Space Marines", "Tau", "Eldar", "Necrons", "Chaos"]
@@ -10554,7 +10554,12 @@ class Game:
                 if winner.resources >= cost:
                     if not winner.gut_and_pillage_used:
                         if winner.search_hand_for_card("Gut and Pillage"):
-                            self.create_reaction("Gut and Pillageg", winner.name_player, (int(winner.number), -1, -1))
+                            self.create_reaction("Gut and Pillage", winner.name_player, (int(winner.number), -1, -1))
+                            reactions_exist = True
+                if winner.search_hand_for_card("Scavenging Run"):
+                    if winner.get_resources() > 0:
+                        if winner.search_trait_at_planet(planet_id, "Kroot"):
+                            self.create_reaction("Scavenging Run", winner.name_player, (int(winner.number), -1, -1))
                             reactions_exist = True
             if winner.resources > 0 and planet_id == self.round_number:
                 if winner.search_hand_for_card("The Grand Plan"):

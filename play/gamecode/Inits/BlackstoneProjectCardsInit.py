@@ -487,6 +487,10 @@ def blackstone_project_cards_init():
                                                       "attached planet, they draw 1 card and gain 1 resource.",
                                    "Negotiation.", 1, "Tau", "Common", 1, False, planet_attachment=True,
                                    limit_one_per_unit=True),
+        CardClasses.EventCard("Scavenging Run", "Reaction: After you win a battle at a Material planet where you "
+                                                "control a Kroot unit, return up to 2 attachments from your discard "
+                                                "pile to your hand.", "Tactic.",
+                              1, "Tau", "Common", 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
