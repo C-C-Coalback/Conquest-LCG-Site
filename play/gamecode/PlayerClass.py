@@ -495,7 +495,9 @@ class Player:
                 if card.get_has_action_while_in_hand():
                     if card.allowed_phases_while_in_hand == "ALL" or \
                             card.allowed_phases_while_in_hand == self.game.phase:
-                        return "playable"
+                        if card.get_cost() <= self.get_resources():
+                            return "playable"
+                        return ""
                     else:
                         return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
@@ -2121,10 +2123,8 @@ class Player:
             if card.get_faction() != target_card.get_faction():
                 return False
         if card.required_traits not in target_card.get_traits():
-            if card.get_name() == "Drone Defense System":
-                if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
-                    return False
-            elif card.get_name() == "Missile Pod":
+            if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
+                    card.get_name() == "Missile Pod":
                 if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
                     return False
             else:
@@ -5330,10 +5330,15 @@ class Player:
             if self.search_card_in_hq("Cardinal Agra Decree"):
                 if self.check_if_control_faith():
                     attack_value += 1
-        if card.get_faction() != "Necrons" and card.check_for_a_trait("Warrior"):
+        if card.get_faction() != "Necrons" and self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
             for i in range(len(self.cards_in_play[planet_id + 1])):
-                if self.cards_in_play[planet_id + 1][i].get_ability() == "Immortal Vanguard":
+                if self.get_ability_given_pos(planet_id, i) == "Immortal Vanguard":
                     attack_value += 1
+        if self.check_for_trait_given_pos(planet_id, unit_id, "Soldier") and self.get_faction_given_pos(planet_id, unit_id) == "Tau":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                for j in range(len(self.get_all_attachments_at_pos(planet_id, i))):
+                    if self.get_attachment_at_pos(planet_id, i, j).get_ability() == "DX-4 Technical Drone":
+                        attack_value += 1
         if ability == "Improbable Runt Machine":
             attack_value += min(len(card.get_attachments()), 3)
         if ability == "Praetorian Ancient":
@@ -6822,6 +6827,10 @@ class Player:
                     if self.cards_in_play[planet_num + 1][i].get_damage() > 0:
                         owner = self.cards_in_play[planet_num + 1][i].get_attachments()[j].name_owner
                         self.game.create_reaction("Royal Phylactery", owner, (int(self.number), planet_num, i))
+                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "DX-4 Technical Drone":
+                    if self.cards_in_play[planet_num + 1][i].get_damage() > 0:
+                        owner = self.cards_in_play[planet_num + 1][i].get_attachments()[j].name_owner
+                        self.game.create_reaction("DX-4 Technical Drone", owner, (int(self.number), planet_num, i))
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Resurrection Orb":
                     self.game.create_reaction("Resurrection Orb", self.name_player,
                                               (int(self.number), planet_num, i))

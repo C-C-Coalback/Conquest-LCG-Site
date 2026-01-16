@@ -469,6 +469,13 @@ def blackstone_project_cards_init():
                                                     "Gain 1 resource for each unit exhausted by this effect.",
                               "Tactic.", 1, "Tau", "Loyal", 2, False,
                               action_in_hand=True, allowed_phases_in_hand="DEPLOY"),
+        CardClasses.AttachmentCard("DX-4 Technical Drone", "Attach to a Vehicle or Pilot army unit.\n"
+                                                           "Each Tau Soldier unit you control at this planet "
+                                                           "gets +1 ATK.\n"
+                                                           "Reaction: After a combat round begins at this planet, "
+                                                           "remove 1 damage from attached unit.",
+                                   "Drone.", 1, "Tau", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

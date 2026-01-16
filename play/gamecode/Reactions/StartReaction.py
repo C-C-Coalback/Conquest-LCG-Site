@@ -1383,6 +1383,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "DX-4 Technical Drone":
+            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            if num == 1:
+                self.p1.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            else:
+                self.p2.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            self.delete_reaction()
         elif current_reaction == "Peacekeeper Drone":
             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.last_planet_checked_for_battle)
             self.delete_reaction()
