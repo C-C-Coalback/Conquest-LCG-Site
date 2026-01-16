@@ -491,6 +491,9 @@ def blackstone_project_cards_init():
                                                 "control a Kroot unit, return up to 2 attachments from your discard "
                                                 "pile to your hand.", "Tactic.",
                               1, "Tau", "Common", 1, False),
+        CardClasses.ArmyCard("Broadside Shas'vre", "Action: Exhaust this unit to deal damage equal to this unit's ATK "
+                                                   "to a target enemy army unit.", "Soldier. Pilot.",
+                             4, "Tau", "Common", 4, 4, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

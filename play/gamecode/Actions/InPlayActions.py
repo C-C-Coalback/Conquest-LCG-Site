@@ -300,6 +300,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Broadside Shas'vre":
+                        if card_chosen.get_ready():
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.misc_counter = primary_player.get_attack_given_pos(planet_pos, unit_pos)
                     elif ability == "Seekers of Slaanesh":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -1929,9 +1936,42 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                         rickety_warbuggy=True)
                 if self.position_of_actioned_card != (-1, -1):
                     primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                self.position_of_actioned_card = (-1, -1)
                 self.action_cleanup()
+    elif self.action_chosen == "Broadside Shas'vre":
+        if game_update_string[1] == secondary_player.get_number():
+            if planet_pos == self.position_of_actioned_card[0]:
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "In Play Action"
+                if can_continue:
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter,
+                                                            shadow_field_possible=True, rickety_warbuggy=True)
+                    if self.position_of_actioned_card != (-1, -1):
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
+                    self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                    self.position_of_actioned_card = (-1, -1)
+                    self.action_cleanup()
     elif self.action_chosen == "Conjuring Warmaster":
         if game_update_string[1] == primary_player.number:
             if planet_pos != self.position_of_actioned_card[0]:

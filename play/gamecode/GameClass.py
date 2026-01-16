@@ -412,7 +412,7 @@ class Game:
                                  "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows",
                                  "Goff Shokboyz", "Inexperienced Weirdboy", "Thundering Wraith",
                                  "Khornate Heldrake", "Incubus Cleavers", "Voidscarred Corsair",
-                                 "Peacekeeper Drone"]
+                                 "Peacekeeper Drone", "Broadside Shas'vre"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
         self.choosing_unit_for_nullify = False
