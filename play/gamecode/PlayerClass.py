@@ -5263,6 +5263,10 @@ class Player:
                         attack_value += 1
         if ability == "Shard of the Deceiver":
             attack_value += len(self.discard)
+        if ability == "Winged Vespid Cadre":
+            if other_player.count_exhausted_units_at_planet(planet_id) == \
+                    len(other_player.cards_in_play[planet_id + 1]):
+                attack_value += 2
         if ability == "Word Bearers Chaplain":
             if self.search_trait_at_planet(planet_id, "Tzeentch"):
                 attack_value += 1

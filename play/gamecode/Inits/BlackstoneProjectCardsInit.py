@@ -498,6 +498,10 @@ def blackstone_project_cards_init():
                                              "you control gains Ranged until the end of the round.",
                               "Tactic.", 1, "Tau", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.ArmyCard("Winged Vespid Cadre", "Flying.\n"
+                                                    "This unit gets +2 ATK while your opponent does not control a "
+                                                    "ready unit at this planet.", "Soldier. Vespid.",
+                             2, "Tau", "Common", 1, 3, 1, False, flying=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
