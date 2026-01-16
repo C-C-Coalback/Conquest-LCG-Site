@@ -111,6 +111,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 5, by_enemy_unit=False)
             primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
             self.delete_interrupt()
+        elif current_interrupt == "Industrial Boom":
+            primary_player.draw_card()
+            primary_player.add_resources(1)
+            self.delete_interrupt()
         elif current_interrupt == "Embarked Squads":
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             primary_player.summon_token_at_planet("Guardsman", planet_pos)

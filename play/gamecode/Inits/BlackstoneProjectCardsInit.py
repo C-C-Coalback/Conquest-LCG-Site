@@ -482,6 +482,11 @@ def blackstone_project_cards_init():
                                    "Negotiation.", 1, "Tau", "Loyal", 2, False,
                                    type_of_units_allowed_for_attachment="Army", must_be_own_unit=True,
                                    extra_command=2),
+        CardClasses.AttachmentCard("Industrial Boom", "Attach to a planet. Limit 1 per planet.\n"
+                                                      "Forced Interrupt: When a player wins a command struggle at "
+                                                      "attached planet, they draw 1 card and gain 1 resource.",
+                                   "Negotiation.", 1, "Tau", "Common", 1, False, planet_attachment=True,
+                                   limit_one_per_unit=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
