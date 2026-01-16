@@ -476,6 +476,12 @@ def blackstone_project_cards_init():
                                                            "remove 1 damage from attached unit.",
                                    "Drone.", 1, "Tau", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army"),
+        CardClasses.AttachmentCard("Reeducation Protocol", "Attach to an army unit you control.\n"
+                                                           "Attached unit gains 2 command icons.\n"
+                                                           "Attached unit's ATK and HP are set to 1.",
+                                   "Negotiation.", 1, "Tau", "Loyal", 2, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True,
+                                   extra_command=2),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

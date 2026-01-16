@@ -5168,6 +5168,8 @@ class Player:
         if planet_id == -2:
             card = self.headquarters[unit_id]
             attack_value = card.get_attack()
+            if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
+                return 1
             if card.get_ability() == "Praetorian Ancient":
                 if self.count_units_in_discard() > 5:
                     attack_value += 2
@@ -5206,6 +5208,8 @@ class Player:
                 attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
             return attack_value
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
+            return 1
         if card.attack_set_eop != -1:
             return card.attack_set_eop
         other_player = self.get_other_player()
@@ -5961,6 +5965,8 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
+            if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
+                return 1
             if self.headquarters[unit_id].attack == 0:
                 if self.search_card_in_hq("Wraithbone Armour"):
                     health += 1
@@ -6027,6 +6033,8 @@ class Player:
                         health += 1
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
+        if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
+            return 1
         if self.cards_in_play[planet_id + 1][unit_id].attack == 0:
             if self.search_card_in_hq("Wraithbone Armour"):
                 health += 1
