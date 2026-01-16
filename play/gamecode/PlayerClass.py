@@ -3930,6 +3930,17 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_ready()
 
     def get_flying_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Air Caste Courier":
+                if self.warlord_faction != "Tau":
+                    return True
+            if self.get_ability_given_pos(planet_id, unit_id) == "Vengeful Seraphim":
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                    return True
+            if self.get_ability_given_pos(planet_id, unit_id) == "Blitza-Bommer":
+                if self.get_ready_given_pos(planet_id, unit_id):
+                    return True
+            return self.headquarters[unit_id].get_flying()
         rokkitboy_present = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id, "Rokkitboy")
         if rokkitboy_present:
             return False
@@ -4124,6 +4135,20 @@ class Player:
         return count
 
     def get_mobile_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            if self.get_ability_given_pos(planet_id, unit_id) == "Ravenwing Escort":
+                if self.warlord_faction != "Space Marines":
+                    return True
+            if self.get_ability_given_pos(planet_id, unit_id) == "Venomous Fiend":
+                if self.warlord_faction != "Chaos":
+                    return True
+            if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
+                if self.count_supports() > 2:
+                    return True
+            if self.get_ability_given_pos(planet_id, unit_id) == "Interceptor Squad":
+                if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                    return True
+            return self.headquarters[unit_id].get_mobile()
         if self.get_ability_given_pos(planet_id, unit_id) == "Ravenwing Escort":
             if self.warlord_faction != "Space Marines":
                 return True
@@ -4142,8 +4167,6 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Conjuring Warmaster":
             if self.check_for_warlord(planet_id, card_effect=True, searching_name=self.name_player):
                 return True
-        if planet_id == -2:
-            return self.headquarters[unit_id].get_mobile()
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()
 
     def get_available_mobile_given_pos(self, planet_id, unit_id):
