@@ -489,12 +489,19 @@ class Player:
             for i in range(len(card_array)):
                 if card_array[i] in self.cards_that_have_errata:
                     card_array[i] = card_array[i] + "_apoka"
-            if self.aiming_reticle_color is None:
-                pass
-            else:
-                for i in range(len(card_array)):
+                card_array[i] = card_array[i] + "|"
+                if self.aiming_reticle_color is not None:
                     if self.aiming_reticle_coords_hand == i or self.aiming_reticle_coords_hand_2 == i:
-                        card_array[i] = card_array[i] + "|" + self.aiming_reticle_color
+                        card_array[i] = card_array[i] + self.aiming_reticle_color
+                card_array[i] = card_array[i] + "|"
+                card = self.game.preloaded_find_card(self.cards[i])
+                if card.get_name() != "FINAL CARD":
+                    if card.get_has_action_while_in_hand():
+                        if card.allowed_phases_while_in_hand == "ALL" or \
+                                card.allowed_phases_while_in_hand == self.game.phase:
+                            card_array[i] = card_array[i] + "playable"
+                        else:
+                            card_array[i] = card_array[i] + "unplayable"
             card_string = "/".join(card_array)
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player + "/" + card_string
         else:

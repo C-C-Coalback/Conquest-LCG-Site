@@ -1061,12 +1061,20 @@
                         for (var i = 4; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
+                            var card_class = "Card hand-card";
+                            if (card_data_split[2] !== "") {
+                                if (card_data_split[2] === "playable") {
+                                    card_class = card_class + " playable-hand-card";
+                                } else if (card_data_split[2] === "unplayable") {
+                                    card_class = card_class + " unplayable-hand-card";
+                                }
+                            }
                             var string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
-                            if (card_data_split.length === 1) {
+                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                            if (card_data_split[1] === "") {
                                 full_string += `</div>`
                             } else {
                                 full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;

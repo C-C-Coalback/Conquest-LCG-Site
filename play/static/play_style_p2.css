@@ -774,6 +774,14 @@ summary:focus {
     background: transparent;
 }
 
+.playable-hand-card {
+    border: 2px solid gold !important;
+}
+
+.unplayable-hand-card {
+    border: 2px solid gray !important;
+}
+
 .hand-card {
     margin-left: 2px;
     margin-right: 2px;
