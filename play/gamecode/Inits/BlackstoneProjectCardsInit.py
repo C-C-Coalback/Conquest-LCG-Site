@@ -502,6 +502,11 @@ def blackstone_project_cards_init():
                                                     "This unit gets +2 ATK while your opponent does not control a "
                                                     "ready unit at this planet.", "Soldier. Vespid.",
                              2, "Tau", "Common", 1, 3, 1, False, flying=True),
+        CardClasses.ArmyCard("Water Caste Bureaucrat", "Reaction: After this unit enters play at a planet with an "
+                                                       "enemy unit, you may give your opponent 1 of your resources "
+                                                       "to search your deck for a card, add it to your hand. "
+                                                       "Then shuffle your deck.", "Scout.",
+                             1, "Tau", "Common", 1, 1, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -115,6 +115,25 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
+        elif current_reaction == "Water Caste Bureaucrat":
+            if primary_player.spend_resources(1):
+                secondary_player.add_resources(1)
+                self.resolving_search_box = True
+                self.what_to_do_with_searched_card = "DRAW"
+                self.shuffle_after = True
+                self.traits_of_searched_card = None
+                self.card_type_of_searched_card = None
+                self.faction_of_searched_card = None
+                self.max_cost_of_searched_card = 99
+                self.all_conditions_searched_card_required = True
+                self.no_restrictions_on_chosen_card = True
+                primary_player.number_cards_to_search = 999
+                if primary_player.number_cards_to_search > len(primary_player.deck):
+                    primary_player.number_cards_to_search = len(primary_player.deck)
+                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+                self.name_player_who_is_searching = primary_player.name_player
+                self.number_who_is_searching = primary_player.number
+            self.delete_reaction()
         elif current_reaction == "WAAAGH! Zanzag":
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.increase_attack_of_unit_at_pos(warlord_pla, warlord_pos, 1, expiration="EOR")

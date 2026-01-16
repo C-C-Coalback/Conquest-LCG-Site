@@ -196,6 +196,7 @@ class Game:
         self.name_player_who_is_searching = ""
         self.number_who_is_searching = "1"
         self.what_to_do_with_searched_card = "DRAW"
+        self.shuffle_after = False
         self.traits_of_searched_card = None
         self.card_type_of_searched_card = None
         self.faction_of_searched_card = None
@@ -1806,6 +1807,9 @@ class Game:
                                 self.reset_search_values()
                                 if self.resolving_search_box:
                                     self.resolving_search_box = False
+                                if self.shuffle_after:
+                                    self.p1.shuffle_deck()
+                                    self.shuffle_after = False
                                 if self.battle_ability_to_resolve == "Elouith" or \
                                         self.battle_ability_to_resolve == "Anshan":
                                     await self.resolve_battle_conclusion(name, game_update_string)
@@ -1852,6 +1856,9 @@ class Game:
                                 self.reset_search_values()
                                 if self.resolving_search_box:
                                     self.resolving_search_box = False
+                                if self.shuffle_after:
+                                    self.p2.shuffle_deck()
+                                    self.shuffle_after = False
                                 if self.battle_ability_to_resolve == "Elouith":
                                     await self.resolve_battle_conclusion(name, game_update_string)
                                     self.reset_battle_resolve_attributes()
