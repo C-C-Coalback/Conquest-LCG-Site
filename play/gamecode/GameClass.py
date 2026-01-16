@@ -5006,10 +5006,9 @@ class Game:
                         self.choices_available.insert(0, self.choices_available.pop(int(game_update_string[1])))
                     elif self.choice_context == "Retreat Warlord?":
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
+                            self.attack_being_resolved = False
                             primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                 resolving_attack = False
                             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
@@ -5018,9 +5017,7 @@ class Game:
                             self.number_with_combat_turn = secondary_player.get_number()
                             self.player_with_combat_turn = secondary_player.get_name_player()
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                     elif self.choice_context == "Absorb a planet:":
                         chosen_choice = self.choices_available[int(game_update_string[1])]

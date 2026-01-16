@@ -708,6 +708,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.attacker_position = chosen_unit
                             self.may_move_defender = True
                             self.shadow_thorns_body_allowed = True
+                            self.attack_being_resolved = True
                             print("Attacker:", self.attacker_planet, self.attacker_position)
                             if self.number_with_combat_turn == "1":
                                 player = self.p1
@@ -736,7 +737,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if player.get_card_type_given_pos(self.attacker_planet,
                                                               self.attacker_position) != "Warlord":
                                 i = 0
-                                self.attack_being_resolved = True
                                 while i < len(player.attachments_at_planet[self.attacker_planet]):
                                     if player.attachments_at_planet[self.attacker_planet][i] \
                                             .get_ability() == "Improvised Minefield":
