@@ -2394,6 +2394,9 @@ class Player:
             if other_player.cards_in_play[position + 1]:
                 self.game.create_reaction("Water Caste Bureaucrat", self.name_player, (int(self.number), position,
                                                                                        last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Angel Shark Bomber":
+            self.game.create_reaction("Angel Shark Bomber", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Death Jesters":
             self.game.create_reaction("Death Jesters", self.name_player,
                                       (int(self.number), position, last_element_index))

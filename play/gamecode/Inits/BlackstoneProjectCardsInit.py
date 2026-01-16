@@ -507,6 +507,12 @@ def blackstone_project_cards_init():
                                                        "to search your deck for a card, add it to your hand. "
                                                        "Then shuffle your deck.", "Scout.",
                              1, "Tau", "Common", 1, 1, 1, False),
+        CardClasses.ArmyCard("Angel Shark Bomber", "No Wargear attachments.\n"
+                                                   "Area Effect (1). Sweep (3).\n"
+                                                   "Reaction: After this unit enters play, exhaust each unit with "
+                                                   "printed cost 2 or lower at this planet.", "Vehicle. Elite.",
+                             6, "Tau", "Common", 4, 4, 2, False, area_effect=1, sweep=3,
+                             wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

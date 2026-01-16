@@ -448,6 +448,19 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             await self.create_necrons_wheel_choice(primary_player)
             self.delete_reaction()
+        elif current_reaction == "Angel Shark Bomber":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_ready_given_pos(planet_pos, i):
+                    if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                        if primary_player.get_cost_given_pos(planet_pos, i) < 3:
+                            primary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_ready_given_pos(planet_pos, i):
+                    if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                        if secondary_player.get_cost_given_pos(planet_pos, i) < 3:
+                            secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Tomb Blade Squadron":
             self.chosen_first_card = False
             self.chosen_second_card = False
