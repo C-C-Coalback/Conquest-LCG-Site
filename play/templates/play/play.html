@@ -1053,63 +1053,33 @@
                     full_string += `</details>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "HAND") {
-                    if (split_data[2] === "1") {
-                        document.getElementById('current-hand-player-1').innerHTML = ``;
-                        var current_card_count = `<legend>CARDS P1: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
-                        document.getElementById('current-hand-player-1').innerHTML = current_card_count;
-                        if (split_data[3] === "{{ user.username }}") {
-                            for (var i = 4; i < split_data.length; i++) {
-                                var card_data_split = split_data[i].split("|");
-                                var card_name = card_data_split[0];
-                                var string_id = (i-4).toString();
-                                string_id = "HAND/1/" + string_id;
-                                card_name = card_name.split(' ').join('_');
-                                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
-                                if (card_data_split.length === 1) {
-                                    full_string += `</div>`
-                                } else {
-                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
-                                }
-                                document.getElementById('current-hand-player-1').innerHTML += full_string;
+                    var target_id = 'current-hand-player-' + split_data[2];
+                    document.getElementById(target_id).innerHTML = ``;
+                    var current_card_count = `<legend>CARDS P` + split_data[2] + `: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
+                    document.getElementById(target_id).innerHTML = current_card_count;
+                    if (split_data[3] === "{{ user.username }}") {
+                        for (var i = 4; i < split_data.length; i++) {
+                            var card_data_split = split_data[i].split("|");
+                            var card_name = card_data_split[0];
+                            var string_id = (i-4).toString();
+                            string_id = "HAND/" + split_data[2] + "/" + string_id;
+                            card_name = card_name.split(' ').join('_');
+                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                            if (card_data_split.length === 1) {
+                                full_string += `</div>`
+                            } else {
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
                             }
-                        } else {
-                            for (var i = 4; i < split_data.length; i++) {
-                                var string_id = (i-4).toString();
-                                string_id = "HAND/1/" + string_id;
-                                var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
-                                document.getElementById('current-hand-player-1').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            }
+                            document.getElementById(target_id).innerHTML += full_string;
                         }
-                    } else if (split_data[2] === "2") {
-                        document.getElementById('current-hand-player-2').innerHTML = ``;
-                        var current_card_count = `<legend>CARDS P2: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
-                        document.getElementById('current-hand-player-2').innerHTML = current_card_count;
-                        if (split_data[3] === "{{ user.username }}") {
-                            for (var i = 4; i < split_data.length; i++) {
-                                var card_data_split = split_data[i].split("|");
-                                var card_name = card_data_split[0];
-                                var string_id = (i-4).toString();
-                                string_id = "HAND/2/" + string_id;
-                                card_name = card_name.split(' ').join('_');
-                                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
-                                if (card_data_split.length === 1) {
-                                    full_string += `</div>`
-                                } else {
-                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
-                                }
-                                document.getElementById('current-hand-player-2').innerHTML += full_string;
-                            }
-                        } else {
-                            for (var i = 4; i < split_data.length; i++) {
-                                var string_id = (i-4).toString();
-                                string_id = "HAND/2/" + string_id;
-                                var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
-                                document.getElementById('current-hand-player-2').innerHTML +=
-                                `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
-                            }
+                    } else {
+                        for (var i = 4; i < split_data.length; i++) {
+                            var string_id = (i-4).toString();
+                            string_id = "HAND/" + split_data[2] + "/" + string_id;
+                            var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
+                            document.getElementById(target_id).innerHTML +=
+                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     }
                 }
