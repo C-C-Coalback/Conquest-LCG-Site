@@ -494,6 +494,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Broadside Shas'vre", "Action: Exhaust this unit to deal damage equal to this unit's ATK "
                                                    "to a target enemy army unit.", "Soldier. Pilot.",
                              4, "Tau", "Common", 4, 4, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.EventCard("Guided Fire", "Action: A target non-Kroot army unit at a planet with a Shas'la unit "
+                                             "you control gains Ranged until the end of the round.",
+                              "Tactic.", 1, "Tau", "Common", 1, False,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
