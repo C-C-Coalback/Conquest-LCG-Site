@@ -14,6 +14,20 @@
     display: inline;
 }
 
+#deck-lists {
+    position:relative;
+    margin:auto;
+    border-style: double;
+    border-color: lightblue;
+    border-width: 5px;
+    background: rgba(47, 40, 153, 0.3);
+    max-width:240px;
+    min-height:10vh;
+    grid-area: decks-area;
+    max-height: 60vh;
+    overflow-y: scroll;
+}
+
 .db-image {
     width: 75px;
     height: 100px;

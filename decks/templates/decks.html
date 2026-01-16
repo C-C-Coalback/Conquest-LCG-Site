@@ -58,6 +58,21 @@
     <p></p>
 </div>
 <div id="existing-decks">
+    <div>Faction Filter</div>
+    <label for="faction-filter"></label>
+    <select id="faction-filter" name="faction-filter" onchange="clearUpdateLoad()">
+        <option value=""></option>
+        <option value="Space Marines">Space Marines</option>
+        <option value="Astra Militarum">Astra Militarum</option>
+        <option value="Orks">Orks</option>
+        <option value="Chaos">Chaos</option>
+        <option value="Dark Eldar">Dark Eldar</option>
+        <option value="Eldar">Eldar</option>
+        <option value="Tau">Tau</option>
+        <option value="Tyranids">Tyranids</option>
+        <option value="Necrons">Necrons</option>
+    </select>
+    <button id="load-more" onclick="loadMore()">Load More</button>
     <p>Your current decks:</p>
     <div id="deck-lists">
         <p>You have no saved decks</p>
@@ -85,12 +100,37 @@
         document.querySelector('#chat-log').value += 'Planet\n\n----------------------------------------------------------------------\n'
     }
 
+    var current_deck_amount = 0;
+    var preferred_faction = "";
+
+    function clearUpdateLoad() {
+        clearDecks();
+        updatePreference();
+        loadMore();
+    }
+
+    function updatePreference() {
+        var e = document.getElementById("faction-filter");
+        preferred_faction = e.value;
+    }
+
+    function clearDecks() {
+        document.getElementById("deck-lists").innerHTML = ``;
+        current_deck_amount = 0;
+    }
+
     function sendAlly() {
         var e = document.getElementById("ally");
         var text = e.options[e.selectedIndex].text;
         var message = "Ally/" + text;
         decksSocket.send(JSON.stringify({
             'message': message
+        }));
+    }
+
+    function loadMore() {
+        decksSocket.send(JSON.stringify({
+            'message': "Load More/" + current_deck_amount.toString() + "/" + preferred_faction
         }));
     }
 
@@ -198,6 +238,7 @@
                     document.getElementById("deck-lists").innerHTML = ``;
                 }
                 numDecksLoaded = 1;
+                current_deck_amount += 1;
                 var message = "";
                 var cardName = split_data[2].split(' ').join('_');
                 var route_text = "/static/images/CardImages/" + cardName + ".jpg";

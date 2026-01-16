@@ -31,7 +31,7 @@ def convert_name_to_img_src(card_name):
     return card_name
 
 
-def get_decks_user(username, start_index, end_index):
+def get_decks_user(username, start_index, end_index, required_faction=""):
     if not username:
         return []
     decks_stored = []
@@ -43,7 +43,10 @@ def get_decks_user(username, start_index, end_index):
                 content = f.read()
                 split_content = content.split(sep="\n")
                 warlord_name = split_content[2]
-                decks_stored.append((deck_name, convert_name_to_img_src(warlord_name)))
+                faction = split_content[3]
+                faction = faction.split(sep=" (")[0]
+                if not required_faction or faction == required_faction:
+                    decks_stored.append((deck_name, convert_name_to_img_src(warlord_name), faction))
     decks_stored = sorted(decks_stored, key=lambda x: x[0])
     end_index = min(end_index, len(decks_stored))
     start_index = min(start_index, len(decks_stored))
@@ -258,13 +261,13 @@ class DecksConsumer(AsyncWebsocketConsumer):
             message = card_names_with_bp
         await self.send(text_data=json.dumps({"message": message}))
 
-    async def send_stored_decks(self):
+    async def send_stored_decks(self, value=0, required_faction=""):
         if not os.path.isdir("decks/DeckStorage/" + self.name):
             print("Path does not exist")
         elif self.name == "":
             print("Not logged in")
         else:
-            decks_user = get_decks_user(self.user.username, 0, 999)
+            decks_user = get_decks_user(self.user.username, value, value + 5, required_faction=required_faction)
             for i in range(len(decks_user)):
                 await self.send_deck(decks_user[i][0])
 
@@ -494,6 +497,11 @@ class DecksConsumer(AsyncWebsocketConsumer):
                 message_to_send = "Feedback/" + message_to_send
                 message = message_to_send
                 await self.send(text_data=json.dumps({"message": message}))
+        elif len(split_message) == 3:
+            if split_message[0] == "Load More":
+                value = int(split_message[1])
+                required_faction = split_message[2]
+                await self.send_stored_decks(value, required_faction)
 
     async def chat_message(self, event):
         message = event["message"]
