@@ -3791,6 +3791,9 @@ class Player:
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
                         command += 1
+        if self.search_attachments_at_pos(planet_id, unit_id, "Catalyst of the Hive Mind"):
+            if self.search_synapse_at_planet(planet_id):
+                command += 1
         if self.cards_in_play[planet_id + 1][unit_id].command == 0:
             if self.search_card_in_hq("Administratum Office"):
                 command += 1
@@ -5275,6 +5278,9 @@ class Player:
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
+        if self.search_attachments_at_pos(planet_id, unit_id, "Catalyst of the Hive Mind"):
+            if self.search_synapse_at_planet(planet_id):
+                attack_value += 2
         if card.get_card_type() == "Warlord":
             found_praetorian_shadow = False
             if self.game.planet_array[planet_id] == "Chiros The Great Bazaar":
@@ -6106,6 +6112,9 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].health_set_eop != -1:
             return self.cards_in_play[planet_id + 1][unit_id].health_set_eop
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if self.search_attachments_at_pos(planet_id, unit_id, "Catalyst of the Hive Mind"):
+            if self.search_synapse_at_planet(planet_id):
+                health += 2
         if self.get_faction_given_pos(planet_id, unit_id) == "Orks" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):

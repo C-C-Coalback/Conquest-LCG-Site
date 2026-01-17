@@ -561,6 +561,13 @@ def blackstone_project_cards_init():
                                                "Hive Mind - Each Termagant token you control at this planet gains "
                                                "Retaliate (1).", "Creature. Leviathan.",
                              2, "Tyranids", "Common", 2, 3, 0, False, retaliate=1, hive_mind=True),
+        CardClasses.AttachmentCard("Catalyst of the Hive Mind", "Attach to an army unit you control. \n"
+                                                                "Limit 1 per unit. \n"
+                                                                "While at a planet with a synapse unit you control, "
+                                                                "attached unit gains a command icon, +2 ATK and +2 HP.",
+                                   "Biomorph.", 1, "Tyranids", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True,
+                                   limit_one_per_unit=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
