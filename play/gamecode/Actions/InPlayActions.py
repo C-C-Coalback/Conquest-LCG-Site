@@ -524,7 +524,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 if primary_player.spend_resources(ds_value):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos, in_play_card=True)
                                     self.action_cleanup()
-                            elif actual_ability == "XV25 Stealth Squad":
+                            elif actual_ability == "XV25 Stealth Squad" or actual_ability == "Deathleaper":
                                 ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos,
                                                                                          in_play_card=True)
                                 if primary_player.spend_resources(ds_value):

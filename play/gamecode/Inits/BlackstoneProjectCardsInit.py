@@ -582,6 +582,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Hybrid Metamorph", "Reaction: After this unit enters play, Rally 6 an attachment, deploy "
                                                  "it to this unit, reducing the cost of that attachment by 1.",
                              "Creature. Genestealer.", 4, "Tyranids", "Common", 3, 4, 2, False),
+        CardClasses.ArmyCard("Deathleaper", "Deep Strike (5). Armorbane.\n"
+                                            "You may Deep Strike this card as an action during the combat phase.",
+                             "Creature. Leviathan. Elite.", 6, "Tyranids", "Common", 6, 4, 3, False,
+                             deepstrike=5, armorbane=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
