@@ -1114,7 +1114,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                         primary_player.add_resources(2)
                         if primary_player.search_card_in_hq(current_reaction, ready_relevant=True):
-                            self.create_reaction(current_reaction, self.name_player,
+                            self.create_reaction(current_reaction, primary_player.name_player,
                                                  (int(primary_player.number), planet_pos, -1))
                         self.delete_reaction()
         elif current_reaction == "Psychic Zoanthrope":
