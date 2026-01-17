@@ -572,6 +572,10 @@ def blackstone_project_cards_init():
                                          " destroyed at this planet, this unit gains Armorbane.\n"
                                          "Forced Reaction: After this unit enters play, exhaust it.",
                              "Creature. Behemoth. Elite.", 5, "Tyranids", "Common", 7, 7, 1, False),
+        CardClasses.SynapseCard("Ravenous Horror", "Action: Sacrifice an army unit at this planet to give this unit "
+                                                   "+1 ATK and +1 HP until the end of the game. (Limit once per round)",
+                                "Creature. Behemoth. Elite.", 1, 4, 1, True,
+                                action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

@@ -116,7 +116,7 @@ class Player:
         self.synapse_list = ["Savage Warrior Prime", "Blazing Zoanthrope", "Gravid Tervigon",
                              "Stalking Lictor", "Venomthrope Polluter", "Keening Maleceptor",
                              "Aberrant Alpha", "Vanguarding Horror", "Praetorian Shadow",
-                             "Ardaci-strain Broodlord"]
+                             "Ardaci-strain Broodlord", "Ravenous Horror"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord", "Subject Omega-X62113",
                                      "Parasite of Mortrex", "Magus Harid", "Red Terror"]
         self.synapse_name = ""

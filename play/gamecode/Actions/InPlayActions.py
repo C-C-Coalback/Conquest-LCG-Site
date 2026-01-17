@@ -260,6 +260,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.position_of_actioned_card = (planet_pos, unit_pos)
+                    elif ability == "Ravenous Horror":
+                        if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Kairos Fateweaver":
                         final_card_name = ""
                         for i in range(len(primary_player.deck)):
@@ -1988,6 +1994,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                             self.position_of_actioned_card[1])
                                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                 self.action_cleanup()
+    elif self.action_chosen == "Ravenous Horror":
+        og_pla, og_pos = self.position_of_actioned_card
+        if planet_pos == og_pla:
+            if og_pos != unit_pos:
+                if primary_player.get_number() == player_owning_card.get_number():
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                        if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                            if og_pos > unit_pos:
+                                og_pos = og_pos - 1
+                            primary_player.increase_attack_of_unit_at_pos(og_pla, og_pos, 1, expiration="EOG")
+                            primary_player.increase_health_of_unit_at_pos(og_pla, og_pos, 1, expiration="EOG")
+                            primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                            self.position_of_actioned_card = (og_pla, og_pos)
+                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
+                            self.action_cleanup()
     elif self.action_chosen == "Guided Fire":
         if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
             if primary_player.search_trait_at_planet(planet_pos, "Shas'la"):
