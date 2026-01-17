@@ -1558,6 +1558,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Carnifex":
+            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Death Guard Preachers":
             self.chosen_first_card = False
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)

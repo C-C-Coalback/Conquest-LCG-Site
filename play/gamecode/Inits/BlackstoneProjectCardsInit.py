@@ -568,6 +568,10 @@ def blackstone_project_cards_init():
                                    "Biomorph.", 1, "Tyranids", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army", must_be_own_unit=True,
                                    limit_one_per_unit=True),
+        CardClasses.ArmyCard("Carnifex", "Bloodthirst - During a combat round in which 1 or more units have been"
+                                         " destroyed at this planet, this unit gains Armorbane.\n"
+                                         "Forced Reaction: After this unit enters play, exhaust it.",
+                             "Creature. Behemoth. Elite.", 5, "Tyranids", "Common", 7, 7, 1, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

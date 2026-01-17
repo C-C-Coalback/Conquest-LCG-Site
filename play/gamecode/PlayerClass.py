@@ -2402,6 +2402,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Angel Shark Bomber":
             self.game.create_reaction("Angel Shark Bomber", self.name_player,
                                       (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Carnifex":
+            self.game.create_reaction("Carnifex", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Death Jesters":
             self.game.create_reaction("Death Jesters", self.name_player,
                                       (int(self.number), position, last_element_index))
@@ -4032,6 +4035,9 @@ class Player:
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+            if self.game.bloodthirst_active[planet_id]:
+                return True
+        if self.get_ability_given_pos(planet_id, unit_id) == "Carnifex":
             if self.game.bloodthirst_active[planet_id]:
                 return True
         if planet_id != -2:
