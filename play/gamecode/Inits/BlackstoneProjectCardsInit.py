@@ -529,6 +529,11 @@ def blackstone_project_cards_init():
                                                        "an attack, exhaust this support to remove up to 3 damage "
                                                        "tokens from the attacker.", "Location.",
                                 1, "Tyranids", "Signature", False),
+        CardClasses.ArmyCard("Manipulative Venomthrope", "While you are the only player to control a unit named "
+                                                         "\"Manipulative Venomthrope\" at this planet, the printed "
+                                                         "textbox of each damaged enemy army unit at this planet "
+                                                         "is treated as blank (except for Traits).",
+                             "Creature. Psyker. Elite.", 5, "Tyranids", "Common", 3, 6, 3, False),
         CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
                                                        "Attached unit gets +2 HP.\n"
                                                        "Reaction: After attached unit is declared as a defender, "

@@ -4080,6 +4080,12 @@ class Player:
                 for i in range(len(other_player.cards_in_play[planet_id + 1])):
                     if other_player.search_attachments_at_pos(planet_id, i, "Disruption Field"):
                         return True
+        if self.get_damage_given_pos(planet_id, unit_id) > 0:
+            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+                if other_player.search_card_at_planet(planet_id, "Manipulative Venomthrope", ability_checking=False):
+                    if not self.search_card_at_planet(planet_id, "Manipulative Venomthrope", ability_checking=False):
+                        if other_player.search_card_at_planet(planet_id, "Manipulative Venomthrope"):
+                            return True
         return self.cards_in_play[planet_id + 1][unit_id].get_blanked()
 
     def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
