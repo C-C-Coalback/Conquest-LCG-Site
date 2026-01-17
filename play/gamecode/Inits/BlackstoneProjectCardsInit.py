@@ -668,6 +668,9 @@ def blackstone_project_cards_init():
                                    required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
                                                   "damage equal to it's remaining HP to a target unit at this planet.",
-                             "Drone.", 2, "Necrons", "Common", 1, 4, 0, False)
+                             "Drone.", 2, "Necrons", "Common", 1, 4, 0, False),
+        CardClasses.EventCard("Excavated Minerals", "Reaction: After this card is discarded from your deck, "
+                                                    "gain 1 Resource.", "Fortune.",
+                              0, "Neutral", "Common", 1, False)
     ]
     return blackstone_project_cards

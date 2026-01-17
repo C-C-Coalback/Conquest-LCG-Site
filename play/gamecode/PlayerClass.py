@@ -1282,6 +1282,9 @@ class Player:
         else:
             if len(self.deck) > deck_pos:
                 self.add_card_to_discard(self.deck[deck_pos])
+                if self.deck[deck_pos] == "Excavated Minerals":
+                    self.game.create_reaction("Excavated Minerals", self.name_player,
+                                              (int(self.number), -1, -1))
                 del self.deck[deck_pos]
 
     def bottom_remaining_cards(self):
@@ -6813,8 +6816,7 @@ class Player:
 
     def discard_top_card_deck(self):
         if self.deck:
-            self.add_card_to_discard(self.deck[0])
-            del self.deck[0]
+            self.discard_card_from_deck(0)
             return True
         return False
 
