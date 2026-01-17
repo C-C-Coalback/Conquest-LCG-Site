@@ -2096,6 +2096,22 @@ class Player:
             return self.headquarters[position].get_attachments()[attachment_position]
         return self.cards_in_play[planet + 1][position].get_attachments()[attachment_position]
 
+    def deploy_attachment(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False,
+                          extra_discounts=0):
+        if card.get_limited() and not self.can_play_limited:
+            return False
+        discounts = extra_discounts
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == "Ambush Platform":
+                discounts += 1
+        if self.spend_resources(card.get_cost() - extra_discounts):
+            if self.attach_card(card, planet, position, not_own_attachment=not_own_attachment,
+                                army_unit_as_attachment=army_unit_as_attachment):
+                return True
+            else:
+                self.add_resources(card.get_cost() - extra_discounts, refund=True)
+        return False
+
     def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False):
         if planet == -2:
             target_card = self.headquarters[position]
@@ -2393,6 +2409,9 @@ class Player:
         if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), position, last_element_index))
+        if self.get_ability_given_pos(position, last_element_index) == "Hybrid Metamorph":
+            self.game.create_reaction("Hybrid Metamorph", self.name_player,
+                                      (int(self.number), position, last_element_index))
         if self.get_ability_given_pos(position, last_element_index) == "Frenzied Wulfen":
             self.game.create_reaction("Frenzied Wulfen", self.name_player, (int(self.number), position,
                                                                             last_element_index))

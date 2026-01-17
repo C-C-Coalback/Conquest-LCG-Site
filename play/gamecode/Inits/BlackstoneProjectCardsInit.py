@@ -579,6 +579,9 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Psychic Zoanthrope", "Reaction: After your opponent plays an event card, deal 2 damage"
                                                    " to a target unit at this planet.", "Creature. Kraken. Psyker.",
                              3, "Tyranids", "Common", 3, 2, 2, False),
+        CardClasses.ArmyCard("Hybrid Metamorph", "Reaction: After this unit enters play, Rally 6 an attachment, deploy "
+                                                 "it to this unit, reducing the cost of that attachment by 1.",
+                             "Creature. Genestealer.", 4, "Tyranids", "Common", 3, 4, 2, False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

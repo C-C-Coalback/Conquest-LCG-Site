@@ -1558,6 +1558,25 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Hybrid Metamorph":
+            self.misc_target_unit = (planet_pos, unit_pos)
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "Hybrid Metamorph"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Attachment"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 99
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            primary_player.number_cards_to_search = 6
+            if len(primary_player.deck) > 5:
+                self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+            else:
+                self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Carnifex":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

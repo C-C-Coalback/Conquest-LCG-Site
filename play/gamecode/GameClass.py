@@ -180,6 +180,7 @@ class Game:
         self.ranged_skirmish_active = False
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
+        self.attachment_deployed_flag = False
         self.damage_left_to_take = 0
         self.goliath_rockgrinder_value = 0
         self.may_use_faith = True
@@ -1768,102 +1769,68 @@ class Game:
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "SEARCH":
                     if self.number_who_is_searching == "1":
-                        valid_card = True
-                        if not self.no_restrictions_on_chosen_card:
-                            card_chosen = FindCard.find_card(self.p1.deck[int(game_update_string[1])],
-                                                             self.card_array, self.cards_dict,
-                                                             self.apoka_errata_cards, self.cards_that_have_errata)
-                            valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
-                        if valid_card:
-                            if self.what_to_do_with_searched_card == "DRAW":
-                                self.p1.draw_card_at_location_deck(int(game_update_string[1]))
-                            elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
-                                self.p1.add_to_hq(card_chosen)
-                                del self.p1.deck[int(game_update_string[1])]
-                                if self.resolving_search_box:
-                                    self.resolving_search_box = False
-                            elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
-                                self.p1.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
-                                                                             int(game_update_string[1]), card_chosen)
-                                if self.action_chosen == "Drop Pod Assault":
-                                    self.p2.create_enemy_played_event_reactions()
-                                    self.action_cleanup()
-                            elif self.what_to_do_with_searched_card == "STORE":
-                                self.misc_target_choice = self.p1.deck[int(game_update_string[1])]
-                                del self.p1.deck[int(game_update_string[1])]
-                            elif self.what_to_do_with_searched_card == "DISCARD":
-                                if self.searching_enemy_deck:
-                                    self.p2.discard_card_from_deck(int(game_update_string[1]))
-                                else:
-                                    self.p1.discard_card_from_deck(int(game_update_string[1]))
-                            self.p1.number_cards_to_search -= 1
-                            if self.choice_context == "Tower of Despair" and \
-                                    self.what_to_do_with_searched_card == "DRAW" and \
-                                    self.misc_counter > 0:
-                                del self.cards_in_search_box[int(game_update_string[1])]
-                                self.misc_counter = self.misc_counter - 1
-                            else:
-                                if self.choice_context == "Tower of Despair":
-                                    self.choice_context = ""
-                                self.p1.bottom_remaining_cards()
-                                self.reset_search_values()
-                                if self.resolving_search_box:
-                                    self.resolving_search_box = False
-                                if self.shuffle_after:
-                                    self.p1.shuffle_deck()
-                                    self.shuffle_after = False
-                                if self.battle_ability_to_resolve == "Elouith" or \
-                                        self.battle_ability_to_resolve == "Anshan":
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                                    self.reset_battle_resolve_attributes()
+                        primary_player = self.p1
+                        secondary_player = self.p2
                     else:
-                        valid_card = True
-                        if not self.no_restrictions_on_chosen_card:
-                            card_chosen = FindCard.find_card(self.p2.deck[int(game_update_string[1])],
-                                                             self.card_array, self.cards_dict,
-                                                             self.apoka_errata_cards, self.cards_that_have_errata)
-                            valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
-                        if valid_card:
-                            if self.what_to_do_with_searched_card == "DRAW":
-                                self.p2.draw_card_at_location_deck(int(game_update_string[1]))
-                            elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
-                                self.p2.add_to_hq(card_chosen)
-                                del self.p2.deck[int(game_update_string[1])]
-                                if self.resolving_search_box:
-                                    self.resolving_search_box = False
-                            elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
-                                self.p2.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
-                                                                             int(game_update_string[1]), card_chosen)
-                                if self.action_chosen == "Drop Pod Assault":
-                                    self.p1.create_enemy_played_event_reactions()
-                                    self.action_cleanup()
-                            elif self.what_to_do_with_searched_card == "STORE":
-                                self.misc_target_choice = self.p2.deck[int(game_update_string[1])]
-                                del self.p2.deck[int(game_update_string[1])]
-                            elif self.what_to_do_with_searched_card == "DISCARD":
-                                if self.searching_enemy_deck:
-                                    self.p1.discard_card_from_deck(int(game_update_string[1]))
-                                else:
-                                    self.p2.discard_card_from_deck(int(game_update_string[1]))
-                            self.p2.number_cards_to_search -= 1
-                            if self.choice_context == "Tower of Despair" and \
-                                    self.what_to_do_with_searched_card == "DRAW" and \
-                                    self.misc_counter > 0:
-                                del self.cards_in_search_box[int(game_update_string[1])]
-                                self.misc_counter = self.misc_counter - 1
+                        primary_player = self.p2
+                        secondary_player = self.p1
+                    valid_card = True
+                    if not self.no_restrictions_on_chosen_card:
+                        card_chosen = FindCard.find_card(primary_player.deck[int(game_update_string[1])],
+                                                         self.card_array, self.cards_dict,
+                                                         self.apoka_errata_cards, self.cards_that_have_errata)
+                        valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                    if valid_card:
+                        if self.what_to_do_with_searched_card == "DRAW":
+                            primary_player.draw_card_at_location_deck(int(game_update_string[1]))
+                        elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
+                            primary_player.add_to_hq(card_chosen)
+                            del primary_player.deck[int(game_update_string[1])]
+                            if self.resolving_search_box:
+                                self.resolving_search_box = False
+                        elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
+                            primary_player.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
+                                                                                int(game_update_string[1]), card_chosen)
+                            if self.action_chosen == "Drop Pod Assault":
+                                secondary_player.create_enemy_played_event_reactions()
+                                self.action_cleanup()
+                        elif self.what_to_do_with_searched_card == "STORE":
+                            self.misc_target_choice = primary_player.deck[int(game_update_string[1])]
+                            del primary_player.deck[int(game_update_string[1])]
+                        elif self.what_to_do_with_searched_card == "Hybrid Metamorph":
+                            pla, pos = self.misc_target_unit
+                            card_name = primary_player.deck[int(game_update_string[1])]
+                            card = self.preloaded_find_card(card_name)
+                            self.misc_target_choice = ""
+                            if primary_player.deploy_attachment(card, pla, pos, extra_discounts=1):
+                                del primary_player.deck[int(game_update_string[1])]
                             else:
-                                if self.choice_context == "Tower of Despair":
-                                    self.choice_context = ""
-                                self.p2.bottom_remaining_cards()
-                                self.reset_search_values()
-                                if self.resolving_search_box:
-                                    self.resolving_search_box = False
-                                if self.shuffle_after:
-                                    self.p2.shuffle_deck()
-                                    self.shuffle_after = False
-                                if self.battle_ability_to_resolve == "Elouith":
-                                    await self.resolve_battle_conclusion(name, game_update_string)
-                                    self.reset_battle_resolve_attributes()
+                                primary_player.number_cards_to_search += 1
+                        elif self.what_to_do_with_searched_card == "DISCARD":
+                            if self.searching_enemy_deck:
+                                secondary_player.discard_card_from_deck(int(game_update_string[1]))
+                            else:
+                                primary_player.discard_card_from_deck(int(game_update_string[1]))
+                        primary_player.number_cards_to_search -= 1
+                        if self.choice_context == "Tower of Despair" and \
+                                self.what_to_do_with_searched_card == "DRAW" and \
+                                self.misc_counter > 0:
+                            del self.cards_in_search_box[int(game_update_string[1])]
+                            self.misc_counter = self.misc_counter - 1
+                        else:
+                            if self.choice_context == "Tower of Despair":
+                                self.choice_context = ""
+                            primary_player.bottom_remaining_cards()
+                            self.reset_search_values()
+                            if self.resolving_search_box:
+                                self.resolving_search_box = False
+                            if self.shuffle_after:
+                                primary_player.shuffle_deck()
+                                self.shuffle_after = False
+                            if self.battle_ability_to_resolve == "Elouith" or \
+                                    self.battle_ability_to_resolve == "Anshan":
+                                await self.resolve_battle_conclusion(name, game_update_string)
+                                self.reset_battle_resolve_attributes()
 
     def reset_choices_available(self):
         self.choices_available = []
