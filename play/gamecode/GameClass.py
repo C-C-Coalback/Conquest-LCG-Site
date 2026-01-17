@@ -49,7 +49,7 @@ class Game:
         self.stored_deck_1 = None
         self.stored_deck_2 = None
         self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor",
-                                    "Incubus of the Severed"]
+                                    "Incubus of the Severed", "Lurking Termagant"]
         self.attack_being_resolved = False
         self.attack_resolution_cleanup = False
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)

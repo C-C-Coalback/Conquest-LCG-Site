@@ -1463,7 +1463,8 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Guardsman":
             if self.search_planet_attachments(planet_id, "Planetary Defence Force"):
                 return True
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant" or \
+                self.get_ability_given_pos(planet_id, unit_id) == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Termagant Spikers":
                     return True
@@ -3826,7 +3827,7 @@ class Player:
         if ability == "Goff Brawlers":
             if self.warlord_faction != "Orks":
                 command += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant" or ability == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_ability_given_pos(planet_id, i) == "Brood Warriors":
                     command += 1
@@ -3952,7 +3953,8 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Vengeful Seraphim":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
-        if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant" or \
+                self.get_ability_given_pos(planet_id, unit_id) == "Lurking Termagant":
             if self.search_card_at_planet(planet_id, "Soaring Gargoyles"):
                 return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
@@ -4032,7 +4034,8 @@ class Player:
             if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
                 if self.check_for_enemy_warlord(planet_id):
                     return True
-        if self.get_name_given_pos(planet_id, unit_id) == "Termagant":
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant" or \
+                self.get_ability_given_pos(planet_id, unit_id) == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_ability_given_pos(planet_id, i) == "Caustic Tyrannofex":
                     if self.cards_in_play[planet_id + 1][i].misc_ability_used:
@@ -5074,7 +5077,8 @@ class Player:
             if other_player.search_card_at_planet(planet_id, "Zen Xi Aonia"):
                 return 0
         area_effect = self.cards_in_play[planet_id + 1][unit_id].get_area_effect()
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant" or \
+                self.get_ability_given_pos(planet_id, unit_id) == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Biovore Spore Launcher":
                     area_effect += 1
@@ -5142,7 +5146,6 @@ class Player:
                         if not self.check_if_already_have_reaction("Thunderwolf Cavalry"):
                             self.game.create_reaction("Thunderwolf Cavalry", self.name_player,
                                                       (int(self.number), planet_pos, -1))
-
 
     def does_own_interrupt_exist(self, reaction_name):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
@@ -5264,7 +5267,7 @@ class Player:
         if ability == "Avatar of Khaine":
             attack_value += self.count_exhausted_units_at_planet(planet_id) + \
                             other_player.count_exhausted_units_at_planet(planet_id)
-        if card.get_name() == "Termagant":
+        if card.get_name() == "Termagant" or ability == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
@@ -6196,7 +6199,7 @@ class Player:
                 for i in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, i) == "Exertion Drone":
                         health += 1
-        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant":
+        if self.cards_in_play[planet_id + 1][unit_id].get_name() == "Termagant" or ability == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_ability_given_pos(planet_id, i) == "Swarm Guard":
                     health += 2

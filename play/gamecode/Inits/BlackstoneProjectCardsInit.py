@@ -539,6 +539,11 @@ def blackstone_project_cards_init():
                                                     "gain 1 Resource for each token removed.", "Tactic.",
                               1, "Tyranids", "Common", 1, False, action_in_hand=True,
                               allowed_phases_in_hand="ALL", limited=True),
+        CardClasses.ArmyCard("Lurking Termagant", "Deep Strike (1).\n"
+                                                  "Cannot be damaged by Area Effect. \n"
+                                                  "This unit is considered to be a Termagant token for the purpose of "
+                                                  "the Hive Mind specialization.", "Creature. Termagant.",
+                             1, "Tyranids", "Common", 1, 1, 1, False, deepstrike=1),
         CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
                                                        "Attached unit gets +2 HP.\n"
                                                        "Reaction: After attached unit is declared as a defender, "
