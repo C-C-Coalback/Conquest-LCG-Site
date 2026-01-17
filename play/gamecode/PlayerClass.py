@@ -6618,13 +6618,10 @@ class Player:
                         if self.nahumekh_value > 0:
                             self.game.create_reaction("Nahumekh", self.name_player,
                                                       (int(self.number), i, j))
-                if self.cards_in_play[i + 1][j].get_ability() == "Gleeful Plague Beast":
+                if self.get_ability_given_pos(i, j) == "Gleeful Plague Beast":
                     if phase == "COMBAT":
-                        self.suffer_area_effect(i, 1)
-                        if self.name_player == self.game.name_1:
-                            self.game.p2.suffer_area_effect(i, 1, rickety_warbuggy=True)
-                        else:
-                            self.game.p1.suffer_area_effect(i, 1, rickety_warbuggy=True)
+                        self.game.create_reaction("Gleeful Plague Beast", self.name_player,
+                                                  (int(self.number), i, j))
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     if phase == "COMBAT":
                         if self.cards_in_play[i + 1][j].get_attachments()[k].get_ability() == "Parasitic Infection" \

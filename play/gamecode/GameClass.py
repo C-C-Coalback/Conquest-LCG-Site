@@ -388,7 +388,7 @@ class Game:
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
                                  "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
-                                 "Avatar of Khaine", "Aun'la Prince", "Carnifex"]
+                                 "Avatar of Khaine", "Aun'la Prince", "Carnifex", "Gleeful Plague Beast"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1

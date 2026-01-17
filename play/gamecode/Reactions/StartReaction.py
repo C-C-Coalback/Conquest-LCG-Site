@@ -1543,6 +1543,13 @@ async def start_resolving_reaction(self, name, game_update_string):
                     break
             primary_player.cards_in_play[planet_pos + 1][unit_pos].attack_set_next = 5
             self.delete_reaction()
+        elif current_reaction == "Gleeful Plague Beast":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                primary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                secondary_player.assign_damage_to_pos(planet_pos, i, 1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Bodysuit":
             primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Shadowed Thorns Bodysuit")
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
