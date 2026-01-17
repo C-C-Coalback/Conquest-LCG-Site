@@ -1028,6 +1028,10 @@ class Player:
                 if self.resources > cost:
                     if not self.unconquerable_fear_used:
                         self.game.create_reaction("Unconquerable Fear", self.name_player, (int(self.number), -1, -1))
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ability_given_pos(i, j) == "Psychic Zoanthrope":
+                    self.game.create_reaction("Psychic Zoanthrope", self.name_player, (int(self.number), i, j))
 
     def increase_sweep_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
