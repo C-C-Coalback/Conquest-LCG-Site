@@ -258,6 +258,7 @@ class Game:
         self.resolving_search_box = False
         self.banshee_power_sword_extra_attack = 0
         self.may_move_defender = True
+        self.additional_attack_effects_allowed = True
         self.fire_warrior_elite_active = False
         self.before_command_struggle = False
         self.after_command_struggle = True
@@ -8243,6 +8244,7 @@ class Game:
                             self.reactions_needing_resolving[0] == "Deathwing Interceders" or \
                             self.reactions_needing_resolving[0] == "Runts to the Front":
                         self.may_move_defender = False
+                        self.additional_attack_effects_allowed = False
                         _, current_planet, current_unit = self.last_defender_position
                         last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
                                                    str(current_unit)]

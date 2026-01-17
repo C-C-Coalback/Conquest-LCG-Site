@@ -1536,6 +1536,13 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.misc_counter = 0
             else:
                 self.delete_reaction()
+        elif current_reaction == "Krak Grenade":
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments)):
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments[i].get_ability() == "Krak Grenade":
+                    primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, i)
+                    break
+            primary_player.cards_in_play[planet_pos + 1][unit_pos].attack_set_next = 5
+            self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Bodysuit":
             primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Shadowed Thorns Bodysuit")
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

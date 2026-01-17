@@ -480,6 +480,7 @@ class UnitCard(Card):
         self.flying_eor = False
         self.sweep_eor = 0
         self.retaliate_eor = 0
+        self.attack_set_next = None
         self.positive_hp_until_eor = 0
         self.flying_eocr = False
         self.actual_attack = attack
@@ -635,6 +636,8 @@ class UnitCard(Card):
             string += "Attack Set (EOP): " + str(self.attack_set_eop) + "\n"
         if self.extra_attack_until_next_attack != 0:
             string += "Extra Attack (NEXT): " + str(self.extra_attack_until_next_attack) + "\n"
+        if self.attack_set_next is not None:
+            string += "Attack Set (NEXT): " + str(self.attack_set_next) + "\n"
         if self.extra_attack_until_end_of_battle != 0:
             string += "Extra Attack (EOB): " + str(self.extra_attack_until_end_of_battle) + "\n"
         if self.extra_attack_until_end_of_phase != 0:

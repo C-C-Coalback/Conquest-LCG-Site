@@ -680,5 +680,11 @@ def blackstone_project_cards_init():
                                                    "sacrifice a unit. Gain 2 Resources and draw 1 card if your "
                                                    "opponent declines.", "Gambit.",
                               0, "Neutral", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Krak Grenade", "Attach to a Soldier or Warrior army unit.\n"
+                                                   "Reaction: After attached unit is declared as an attacker against "
+                                                   "an Elite unit, sacrifice this attachment to set attached unit's "
+                                                   "attack to 5 for the remainder of the attack.",
+                                   "Wargear. Weapon.", 0, "Neutral", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army")
     ]
     return blackstone_project_cards

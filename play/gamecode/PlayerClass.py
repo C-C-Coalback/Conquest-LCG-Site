@@ -2150,14 +2150,17 @@ class Player:
         if card.unit_must_match_faction:
             if card.get_faction() != target_card.get_faction():
                 return False
-        if card.required_traits not in target_card.get_traits():
-            if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
-                    card.get_name() == "Missile Pod":
-                if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
-                    return False
-            else:
-                print("Wrong traits.")
+        if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
+                card.get_name() == "Missile Pod":
+            if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
                 return False
+        elif card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
+                card.get_name() == "Missile Pod":
+            if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+                return False
+        elif card.required_traits not in target_card.get_traits():
+            print("Wrong traits.")
+            return False
         if card.get_ability() == "Raging Daemonhost":
             if "Vehicle" in target_card.get_traits() or "Daemon" in target_card.get_traits():
                 return False
@@ -4941,10 +4944,12 @@ class Player:
             if self.headquarters[unit_pos].get_is_unit():
                 self.headquarters[unit_pos].armorbane_next = False
                 self.headquarters[unit_pos].reset_extra_attack_until_next_attack()
+                self.headquarters[unit_pos].attack_set_next = None
             return None
         if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
             self.cards_in_play[planet_pos + 1][unit_pos].armorbane_next = False
             self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
+            self.cards_in_play[planet_pos + 1][unit_pos].attack_set_next = None
         return None
 
     def sacrifice_check_eop(self):
@@ -5296,6 +5301,8 @@ class Player:
                 attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
             return attack_value
         card = self.cards_in_play[planet_id + 1][unit_id]
+        if card.attack_set_next is not None:
+            return card.attack_set_next
         if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
             return 1
         if card.attack_set_eop != -1:

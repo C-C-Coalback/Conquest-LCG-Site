@@ -707,6 +707,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.attacker_planet = chosen_planet
                             self.attacker_position = chosen_unit
                             self.may_move_defender = True
+                            self.additional_attack_effects_allowed = True
                             self.shadow_thorns_body_allowed = True
                             self.attack_being_resolved = True
                             print("Attacker:", self.attacker_planet, self.attacker_position)
@@ -1052,6 +1053,26 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 secondary_player.set_aiming_reticle_in_play(self.defender_planet,
                                                                                             self.defender_position,
                                                                                             "red")
+                            if can_continue and self.additional_attack_effects_allowed:
+                                if secondary_player.check_for_trait_given_pos(self.defender_planet, self.defender_position, "Elite"):
+                                    if not primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position].attack_set_next is not None:
+                                        if primary_player.search_attachments_at_pos(self.attacker_planet, self.attacker_position, "Krak Grenade"):
+                                            can_continue = False
+                                            self.additional_attack_effects_allowed = False
+                                            await self.send_update_message(
+                                                "Krak Grenade can be used."
+                                            )
+                                            secondary_player.set_aiming_reticle_in_play(
+                                                self.defender_planet, self.defender_position, "blue"
+                                            )
+                                            self.create_reaction(
+                                                "Krak Grenade", primary_player.name_player,
+                                                (int(primary_player.number), self.attacker_planet,
+                                                 self.attacker_position)
+                                            )
+                                            self.last_defender_position = (secondary_player.number,
+                                                                           self.defender_planet,
+                                                                           self.defender_position)
                             if can_continue and self.shadow_thorns_body_allowed:
                                 if secondary_player.search_attachments_at_pos(
                                         self.defender_planet, self.defender_position,
