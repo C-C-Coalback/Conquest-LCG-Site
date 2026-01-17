@@ -4831,7 +4831,8 @@ class Game:
                             if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit" or \
                                     self.reactions_needing_resolving[0] == "War Walker Squadron" or \
                                     self.reactions_needing_resolving[0] == "Fake Ooman Base" or \
-                                    self.reactions_needing_resolving[0] == "Kaptin's Hook":
+                                    self.reactions_needing_resolving[0] == "Kaptin's Hook" or \
+                                    self.reactions_needing_resolving[0] == "Dripping Scythes":
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
@@ -4933,9 +4934,14 @@ class Game:
                         print(self.choices_available[int(game_update_string[1])])
                         if primary_player.spend_resources(int(game_update_string[1])):
                             self.amount_spend_for_tzeentch_firestorm = int(game_update_string[1])
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
+                    elif self.choice_context == "RT: Amount to Remove":
+                        damage = int(chosen_choice)
+                        _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage, healing=True)
+                        self.reset_choices_available()
+                        self.resolving_search_box = False
+                        self.delete_reaction()
                     elif self.choice_context == "Mulligan Opening Hand?":
                         if game_update_string[1] == "0":
                             primary_player.mulligan_done = True
@@ -9050,6 +9056,10 @@ class Game:
                             self.create_delayed_reaction("Goliath Rockgrinder", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
                             self.goliath_rockgrinder_value = primary_player.cards_in_play[def_pla + 1][def_pos].health
+                        if secondary_player.search_card_in_hq("Restorative Tunnels", ready_relevant=True):
+                            if secondary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
+                                self.create_delayed_reaction("Restorative Tunnels", secondary_player.name_player,
+                                                             (int(secondary_player.number), planet_pos, unit_pos))
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
                             if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                                 if secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[

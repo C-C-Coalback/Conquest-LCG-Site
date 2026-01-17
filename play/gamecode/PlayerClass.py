@@ -118,7 +118,7 @@ class Player:
                              "Aberrant Alpha", "Vanguarding Horror", "Praetorian Shadow",
                              "Ardaci-strain Broodlord"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord", "Subject Omega-X62113",
-                                     "Parasite of Mortrex", "Magus Harid"]
+                                     "Parasite of Mortrex", "Magus Harid", "Red Terror"]
         self.synapse_name = ""
         self.warlord_faction = ""
         self.consumption_sacs_list = [True, True, True, True, True, True, True]
@@ -4242,6 +4242,9 @@ class Player:
         if self.get_ability_given_pos(planet_pos, unit_pos) == "23rd Mechanised Battalion":
             return True
         if planet_pos != -2:
+            if self.get_ability_given_pos(planet_pos, unit_pos) == "Formless Leaper":
+                if len(self.cards_in_play[planet_pos + 1]) == 1:
+                    return True
             if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
                 for i in range(len(self.cards_in_play[planet_pos + 1])):
                     if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
@@ -4888,9 +4891,11 @@ class Player:
     def reset_extra_attack_until_next_attack_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
             if self.headquarters[unit_pos].get_is_unit():
+                self.headquarters[unit_pos].armorbane_next = False
                 self.headquarters[unit_pos].reset_extra_attack_until_next_attack()
             return None
         if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+            self.cards_in_play[planet_pos + 1][unit_pos].armorbane_next = False
             self.cards_in_play[planet_pos + 1][unit_pos].reset_extra_attack_until_next_attack()
         return None
 
@@ -5165,6 +5170,11 @@ class Player:
             nazdreg_check = self.search_card_at_planet(planet_id, "Nazdreg", bloodied_relevant=True)
             if nazdreg_check:
                 return True
+        if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
+            if self.get_damage_given_pos(planet_id, unit_id) < 4:
+                warlord_pla, warlord_pos = self.get_location_of_warlord()
+                if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Red Terror":
+                    return True
         if self.get_blanked_given_pos(planet_id, unit_id):
             return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":

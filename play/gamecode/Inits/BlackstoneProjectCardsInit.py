@@ -513,6 +513,28 @@ def blackstone_project_cards_init():
                                                    "printed cost 2 or lower at this planet.", "Vehicle. Elite.",
                              6, "Tau", "Common", 4, 4, 2, False, area_effect=1, sweep=3,
                              wargear_attachments_permitted=False),
+        CardClasses.WarlordCard("Red Terror", "Each army unit you control with 3 or fewer damage tokens on it gains"
+                                              " brutal.", "Creature. Behemoth.",
+                                "Tyranids", 2, 6, 0, 6, "Bloodied. Brutal.", 6, 6,
+                                ["1x Restorative Tunnels", "2x Unexpected Ferocity",
+                                 "1x Dripping Scythes", "4x Formless Leaper"]),
+        CardClasses.ArmyCard("Formless Leaper", "This unit cannot be targeted by enemy card effects while it is the "
+                                                "only unit you control at this planet.", "Creature. Behemoth.",
+                             2, "Tyranids", "Signature", 1, 4, 1, False),
+        CardClasses.EventCard("Unexpected Ferocity", "Reaction: After a unit you control is declared as an attacker,"
+                                                     " deal 1 damage to it to have that unit gain Armorbane "
+                                                     "for the duration of the attack.", "Tactic.",
+                              1, "Tyranids", "Signature", 1, False),
+        CardClasses.SupportCard("Restorative Tunnels", "Reaction: After a unit you control destroys an enemy unit by "
+                                                       "an attack, exhaust this support to remove up to 3 damage "
+                                                       "tokens from the attacker.", "Location.",
+                                1, "Tyranids", "Signature", False),
+        CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
+                                                       "Attached unit gets +2 HP.\n"
+                                                       "Reaction: After attached unit is declared as a defender, "
+                                                       "discard this attachment to cancel the attack.", "Biomorph.",
+                                   1, "Tyranids", "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True, extra_health=2),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

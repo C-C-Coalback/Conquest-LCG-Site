@@ -494,6 +494,7 @@ class UnitCard(Card):
         self.retaliate_eog = False
         self.move_to_planet_end_of_phase_planet = -1
         self.move_to_planet_end_of_phase_phase = ""
+        self.armorbane_next = False
 
     def get_extra_info_string(self):
         string = ""
@@ -578,6 +579,8 @@ class UnitCard(Card):
             string += "Brutal (EOR)\n"
         if self.brutal_eog:
             string += "Brutal (EOG)\n"
+        if self.armorbane_next:
+            string += "Armorbane (NEXT)\n"
         if self.armorbane_eop:
             string += "Armorbane (EOP)\n"
         if self.armorbane_eor:
@@ -688,6 +691,7 @@ class UnitCard(Card):
         self.extra_traits_eop = ""
         self.cannot_ready_phase = False
         self.lost_keywords_eop = False
+        self.armorbane_next = False
         for i in range(len(self.attachments)):
             self.attachments[i].set_once_per_phase_used(False)
 
@@ -899,12 +903,6 @@ class UnitCard(Card):
         self.ranged = new_val
 
     def get_ranged(self):
-        if self.get_blanked():
-            return False
-        if self.lost_keywords_eop:
-            return False
-        if self.lost_ranged_eop:
-            return False
         if self.ranged_eop:
             return True
         if self.ranged_eor:
@@ -917,6 +915,12 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "Bladed Lotus Rifle":
                 if self.check_for_a_trait("Kabalite"):
                     return True
+        if self.get_blanked():
+            return False
+        if self.lost_keywords_eop:
+            return False
+        if self.lost_ranged_eop:
+            return False
         if self.new_ability:
             return self.new_ranged
         return self.ranged
@@ -936,15 +940,13 @@ class UnitCard(Card):
         return self.by_base_armorbane
 
     def get_armorbane(self):
-        if self.get_blanked():
-            return False
-        if self.lost_keywords_eop:
-            return False
         if self.armorbane_eog:
             return True
         if self.armorbane_eop:
             return True
         if self.armorbane_eor:
+            return True
+        if self.armorbane_next:
             return True
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Tallassarian Tempest Blade":
@@ -958,6 +960,10 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "The Butcher's Nails":
                 if self.bloodied:
                     return True
+        if self.get_blanked():
+            return False
+        if self.lost_keywords_eop:
+            return False
         if self.new_ability:
             return self.new_armorbane
         return self.armorbane
@@ -990,10 +996,6 @@ class UnitCard(Card):
         return self.by_base_flying
 
     def get_flying(self):
-        if self.get_blanked():
-            return False
-        if self.lost_keywords_eop:
-            return False
         if self.flying_eop:
             return True
         if self.flying_eor:
@@ -1005,6 +1007,10 @@ class UnitCard(Card):
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Valkyris Pattern Jump Pack":
                 return True
+        if self.get_blanked():
+            return False
+        if self.lost_keywords_eop:
+            return False
         if self.new_ability:
             return self.new_flying
         return self.flying
@@ -1040,10 +1046,6 @@ class UnitCard(Card):
         self.attack = self.actual_attack
 
     def get_brutal(self):
-        if self.get_blanked():
-            return False
-        if self.lost_keywords_eop:
-            return False
         if self.brutal_eog:
             return True
         if self.brutal_eocr:
@@ -1056,8 +1058,15 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "The Butcher's Nails":
                 if not self.bloodied:
                     return True
+        if self.get_blanked():
+            return False
+        if self.lost_keywords_eop:
+            return False
         if self.new_ability:
             return self.new_brutal
+        if self.get_ability() == "Red Terror":
+            if self.bloodied:
+                return True
         return self.brutal
 
     def set_brutal(self, new_val):

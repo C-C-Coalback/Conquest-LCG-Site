@@ -461,6 +461,18 @@ async def start_resolving_reaction(self, name, game_update_string):
                             secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Restorative Tunnels":
+            primary_player.exhaust_card_in_hq_given_name(current_reaction)
+            damage_on_unit = primary_player.get_damage_given_pos(planet_pos, unit_pos)
+            self.choices_available = []
+            for i in range(min(damage_on_unit, 3)):
+                self.choices_available.append(str(i + 1))
+            if not self.choices_available:
+                self.delete_reaction()
+            else:
+                self.choice_context = "RT: Amount to Remove"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
         elif current_reaction == "Tomb Blade Squadron":
             self.chosen_first_card = False
             self.chosen_second_card = False
@@ -1411,6 +1423,30 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.delete_reaction()
             else:
                 self.delete_reaction()
+        elif current_reaction == "Unexpected Ferocity":
+            if primary_player.resources > 0:
+                can_continue = True
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " +
+                                                       current_reaction + "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = 1
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    if primary_player.spend_resources(1):
+                        primary_player.discard_card_name_from_hand(current_reaction)
+                        primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False)
+                        primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_next = True
+                        self.delete_reaction()
+            else:
+                self.delete_reaction()
         elif current_reaction == "Death Jesters":
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -1501,8 +1537,18 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Bodysuit":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Shadowed Thorns Bodysuit")
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+            self.reset_combat_positions()
+            self.shining_blade_active = False
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            self.delete_reaction()
+        elif current_reaction == "Dripping Scythes":
+            primary_player.discard_attachment_name_from_card(planet_pos, unit_pos, "Dripping Scythes")
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
             self.reset_combat_positions()

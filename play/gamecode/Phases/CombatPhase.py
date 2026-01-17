@@ -779,6 +779,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if len(player.cards_in_play[self.attacker_planet + 1]) == 1:
                                         self.create_reaction("Rapid Ingress", player.name_player,
                                                              (int(player.number), self.attacker_planet, -1))
+                            if player.search_hand_for_card("Unexpected Ferocity") and player.get_resources() > 0:
+                                self.create_reaction("Unexpected Ferocity", player.name_player,
+                                                     (int(player.number), self.attacker_planet, self.attacker_position))
                             if player.check_for_trait_given_pos(
                                     self.attacker_planet, self.attacker_position, "Ecclesiarchy"):
                                 if player.get_faction_given_pos(
@@ -1063,6 +1066,24 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     )
                                     self.create_reaction(
                                         "Shadowed Thorns Bodysuit", secondary_player.name_player,
+                                        (int(secondary_player.number), self.defender_planet, self.defender_position)
+                                    )
+                                    self.last_defender_position = (secondary_player.number,
+                                                                   self.defender_planet,
+                                                                   self.defender_position)
+                                elif secondary_player.search_attachments_at_pos(
+                                        self.defender_planet, self.defender_position,
+                                        "Dripping Scythes", must_match_name=True
+                                ):
+                                    can_continue = False
+                                    await self.send_update_message(
+                                        "Dripping Scythes can be used to cancel the attack"
+                                    )
+                                    secondary_player.set_aiming_reticle_in_play(
+                                        self.defender_planet, self.defender_position, "blue"
+                                    )
+                                    self.create_reaction(
+                                        "Dripping Scythes", secondary_player.name_player,
                                         (int(secondary_player.number), self.defender_planet, self.defender_position)
                                     )
                                     self.last_defender_position = (secondary_player.number,
@@ -1380,9 +1401,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     secondary_player.get_damage_given_pos(self.defender_planet,
                                                                           self.defender_position)
                                 if not self.sweep_active:
-                                    primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
-                                                                                                  self.attacker_position
-                                                                                                  )
                                     if primary_player.check_for_trait_given_pos(self.attacker_planet,
                                                                                 self.attacker_position, "Space Wolves"):
                                         if primary_player.search_card_in_hq("Ragnar's Warcamp"):
@@ -1496,6 +1514,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 if preventable and primary_player.get_card_type_given_pos(
                                         self.attacker_planet, self.attacker_position) != "Warlord":
                                     attack_value = attack_value - self.jungle_trench_count
+                                primary_player.reset_extra_attack_until_next_attack_given_pos(self.attacker_planet,
+                                                                                              self.attacker_position
+                                                                                              )
                                 took_damage, bodyguards = secondary_player.assign_damage_to_pos(
                                     self.defender_planet, self.defender_position, damage=attack_value,
                                     att_pos=self.attacker_location, can_shield=can_shield,
