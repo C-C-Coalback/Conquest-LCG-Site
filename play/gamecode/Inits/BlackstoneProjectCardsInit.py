@@ -534,6 +534,11 @@ def blackstone_project_cards_init():
                                                          "textbox of each damaged enemy army unit at this planet "
                                                          "is treated as blank (except for Traits).",
                              "Creature. Psyker. Elite.", 5, "Tyranids", "Common", 3, 6, 3, False),
+        CardClasses.EventCard("Biomass Extraction", "Limited.\n"
+                                                    "Action: Remove any number of infestation tokens from planets to "
+                                                    "gain 1 Resource for each token removed.", "Tactic.",
+                              1, "Tyranids", "Common", 1, False, action_in_hand=True,
+                              allowed_phases_in_hand="ALL", limited=True),
         CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
                                                        "Attached unit gets +2 HP.\n"
                                                        "Reaction: After attached unit is declared as a defender, "

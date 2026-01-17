@@ -132,6 +132,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         primary_player.misc_counter = 0
                         secondary_player.misc_counter = 0
+                    elif ability == "Biomass Extraction":
+                        if primary_player.can_play_limited:
+                            primary_player.can_play_limited = True
+                            self.action_chosen = ability
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Guided Fire":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))

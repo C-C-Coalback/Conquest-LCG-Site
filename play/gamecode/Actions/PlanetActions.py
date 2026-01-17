@@ -296,6 +296,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
             primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
             self.action_cleanup()
+    elif self.action_chosen == "Biomass Extraction":
+        if self.infested_planets[chosen_planet]:
+            self.infested_planets[chosen_planet] = False
+            primary_player.add_resources(1)
     elif self.action_chosen == "Vivisection":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
