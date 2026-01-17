@@ -586,6 +586,11 @@ def blackstone_project_cards_init():
                                             "You may Deep Strike this card as an action during the combat phase.",
                              "Creature. Leviathan. Elite.", 6, "Tyranids", "Common", 6, 4, 3, False,
                              deepstrike=5, armorbane=True),
+        CardClasses.SupportCard("Reclamation Pool", "Limited.\n"
+                                                    "Reaction: After you win a battle at a planet, you may exhaust "
+                                                    "this support and sacrifice a unit at that planet to gain 2 "
+                                                    "Resources.", "Location.",
+                                1, "Tyranids", "Common", False),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

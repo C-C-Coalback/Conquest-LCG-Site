@@ -1108,6 +1108,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+        elif current_reaction == "Reclamation Pool":
+            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if primary_player.get_number() == game_update_string[1]:
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                        primary_player.add_resources(2)
+                        if primary_player.search_card_in_hq(current_reaction, ready_relevant=True):
+                            self.create_reaction(current_reaction, self.name_player,
+                                                 (int(primary_player.number), planet_pos, -1))
+                        self.delete_reaction()
         elif current_reaction == "Psychic Zoanthrope":
             can_continue = True
             possible_interrupts = []

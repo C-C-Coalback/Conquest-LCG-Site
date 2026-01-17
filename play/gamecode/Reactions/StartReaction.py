@@ -1558,6 +1558,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
             self.delete_reaction()
+        elif current_reaction == "Reclamation Pool":
+            primary_player.exhaust_card_in_hq_given_name(current_reaction)
         elif current_reaction == "Hybrid Metamorph":
             self.misc_target_unit = (planet_pos, unit_pos)
             self.resolving_search_box = True

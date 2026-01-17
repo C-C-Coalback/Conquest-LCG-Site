@@ -10493,6 +10493,10 @@ class Game:
                         self.create_reaction("Novokh Dynasty Deepstrike", winner.name_player,
                                              (int(winner.number), -1, -1))
                         reactions_exist = True
+            if winner.search_card_in_hq("Reclamation Pool", ready_relevant=True):
+                self.create_reaction("Reclamation Pool", winner.name_player,
+                                     (int(winner.number), planet_id, -1))
+                reactions_exist = True
             for i in range(len(winner.attachments_at_planet[planet_id])):
                 if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     self.create_reaction("Close Quarters Doctrine", winner.name_player, (int(winner.number), -1, -1))
