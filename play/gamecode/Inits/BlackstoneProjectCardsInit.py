@@ -671,6 +671,9 @@ def blackstone_project_cards_init():
                              "Drone.", 2, "Necrons", "Common", 1, 4, 0, False),
         CardClasses.EventCard("Excavated Minerals", "Reaction: After this card is discarded from your deck, "
                                                     "gain 1 Resource.", "Fortune.",
-                              0, "Neutral", "Common", 1, False)
+                              0, "Neutral", "Common", 1, False),
+        CardClasses.ArmyCard("Scavenger Corps", "This planet has +1 Resource and +1 Card bonuses.",
+                             "Ally. Scavenger.", 3, "Neutral", "Common", 1, 3, 1, False,
+                             additional_cards_command_struggle=1, additional_resources_command_struggle=1)
     ]
     return blackstone_project_cards
