@@ -1053,6 +1053,10 @@ class Player:
         if self.get_ability_given_pos(planet_id, unit_id) == "Fierce Purgator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 retaliate += 3
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant" or self.get_ability_given_pos(planet_id, unit_id) == "Gargoyle Swarm":
+            for i in range(len(self.cards_in_play[planet_id + 1])):
+                if self.get_ability_given_pos(planet_id, i) == "Gargoyle Swarm":
+                    retaliate += 1
         if self.get_ability_given_pos(planet_id, unit_id) == "Parched Neophyte":
             if self.check_bloodthirst(planet_id):
                 retaliate += 3
@@ -5268,7 +5272,6 @@ class Player:
             attack_value += self.count_exhausted_units_at_planet(planet_id) + \
                             other_player.count_exhausted_units_at_planet(planet_id)
         if card.get_name() == "Termagant" or ability == "Lurking Termagant":
-            self.get_attachment_at_pos()
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1

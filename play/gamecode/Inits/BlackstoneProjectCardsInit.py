@@ -557,6 +557,10 @@ def blackstone_project_cards_init():
                                                           "non-warlord unit, discard an attachment from the defender.",
                                    "Wargear. Biomorph.", 1, "Tyranids", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
+        CardClasses.ArmyCard("Gargoyle Swarm", "Retaliate (1).\n"
+                                               "Hive Mind - Each Termagant token you control at this planet gains "
+                                               "Retaliate (1).", "Creature. Leviathan.",
+                             2, "Tyranids", "Common", 2, 3, 0, False, retaliate=1, hive_mind=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "
