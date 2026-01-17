@@ -2154,9 +2154,11 @@ class Player:
                 card.get_name() == "Missile Pod":
             if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
                 return False
-        elif card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
-                card.get_name() == "Missile Pod":
-            if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+        elif card.get_name() == "Krak Grenade":
+            if not target_card.check_for_a_trait("Soldier") and not target_card.check_for_a_trait("Warrior"):
+                return False
+        elif card.get_name() == "Extra Munitions":
+            if not target_card.area_effect > 0 or self.get_blanked_given_pos(planet, position):
                 return False
         elif card.required_traits not in target_card.get_traits():
             print("Wrong traits.")

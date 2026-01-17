@@ -685,6 +685,10 @@ def blackstone_project_cards_init():
                                                    "an Elite unit, sacrifice this attachment to set attached unit's "
                                                    "attack to 5 for the remainder of the attack.",
                                    "Wargear. Weapon.", 0, "Neutral", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.AttachmentCard("Extra Munitions", "Attach to an army unit with a printed Area Effect keyword.\n"
+                                                      "Attached unit gains Area Effect (1).", "Wargear. Weapon.",
+                                   1, "Neutral", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army")
     ]
     return blackstone_project_cards

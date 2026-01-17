@@ -990,6 +990,8 @@ class UnitCard(Card):
                 area_effect += 2
             if self.attachments[i].get_ability() == "Predatory Instinct":
                 area_effect += 1
+            if self.attachments[i].get_ability() == "Extra Munitions":
+                area_effect += 1
         if self.get_ability() == "Sa'cea XV88 Broadside":
             if self.attachments:
                 area_effect += 2
