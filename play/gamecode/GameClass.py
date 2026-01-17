@@ -1220,6 +1220,7 @@ class Game:
                         secondary_player.add_resources(resources)
                         await self.send_update_message("Gained " + str(resources) + " resources for unrevealed cards.")
                         self.misc_misc = None
+                        primary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
@@ -1228,8 +1229,18 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Whirling Death":
                         await self.send_update_message("Stopping Whirling Death")
+                        secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                     elif self.action_chosen == "Force Reallocation":
+                        secondary_player.create_enemy_played_event_reactions()
+                        self.action_cleanup()
+                    elif self.action_chosen == "Boast of Strength":
+                        if not self.chosen_first_card:
+                            secondary_player.create_enemy_played_event_reactions()
+                        else:
+                            secondary_player.draw_card()
+                            secondary_player.add_resources(2)
+                            primary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
                     elif self.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")

@@ -2009,6 +2009,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.position_of_actioned_card = (og_pla, og_pos)
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+    elif self.action_chosen == "Boast of Strength":
+        if primary_player.get_number() == player_owning_card.get_number():
+            if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                self.player_with_action = secondary_player.name_player
+                self.chosen_first_card = not self.chosen_first_card
+                await self.send_update_message(self.player_with_action + " may sacrifice a unit.")
     elif self.action_chosen == "Guided Fire":
         if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Kroot"):
             if primary_player.search_trait_at_planet(planet_pos, "Shas'la"):

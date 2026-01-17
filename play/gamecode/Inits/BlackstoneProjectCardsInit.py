@@ -674,6 +674,11 @@ def blackstone_project_cards_init():
                               0, "Neutral", "Common", 1, False),
         CardClasses.ArmyCard("Scavenger Corps", "This planet has +1 Resource and +1 Card bonuses.",
                              "Ally. Scavenger.", 3, "Neutral", "Common", 1, 3, 1, False,
-                             additional_cards_command_struggle=1, additional_resources_command_struggle=1)
+                             additional_cards_command_struggle=1, additional_resources_command_struggle=1),
+        CardClasses.EventCard("Boast of Strength", "Action: You may sacrifice an army unit. Then your opponent may "
+                                                   "sacrifice an army unit. Repeat until 1 player declines to "
+                                                   "sacrifice a unit. Gain 2 Resources and draw 1 card if your "
+                                                   "opponent declines.", "Gambit.",
+                              0, "Neutral", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
     ]
     return blackstone_project_cards
