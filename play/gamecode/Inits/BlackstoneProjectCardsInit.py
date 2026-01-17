@@ -529,6 +529,12 @@ def blackstone_project_cards_init():
                                                        "an attack, exhaust this support to remove up to 3 damage "
                                                        "tokens from the attacker.", "Location.",
                                 1, "Tyranids", "Signature", False),
+        CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
+                                                       "Attached unit gets +2 HP.\n"
+                                                       "Reaction: After attached unit is declared as a defender, "
+                                                       "discard this attachment to cancel the attack.", "Biomorph.",
+                                   1, "Tyranids", "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
+                                   must_be_own_unit=True, extra_health=2),
         CardClasses.ArmyCard("Manipulative Venomthrope", "While you are the only player to control a unit named "
                                                          "\"Manipulative Venomthrope\" at this planet, the printed "
                                                          "textbox of each damaged enemy army unit at this planet "
@@ -544,12 +550,13 @@ def blackstone_project_cards_init():
                                                   "This unit is considered to be a Termagant token for the purpose of "
                                                   "the Hive Mind specialization.", "Creature. Termagant.",
                              1, "Tyranids", "Common", 1, 1, 1, False, deepstrike=1),
-        CardClasses.AttachmentCard("Dripping Scythes", "Attach to your Warlord.\n"
-                                                       "Attached unit gets +2 HP.\n"
-                                                       "Reaction: After attached unit is declared as a defender, "
-                                                       "discard this attachment to cancel the attack.", "Biomorph.",
-                                   1, "Tyranids", "Signature", 3, False, type_of_units_allowed_for_attachment="Warlord",
-                                   must_be_own_unit=True, extra_health=2),
+        CardClasses.AttachmentCard("Acidic Venom Cannon", "Attach to an army unit you control. \n"
+                                                          "Attached unit gets +3 ATK while it is attacking a unit "
+                                                          "that has at least one attachment. \n"
+                                                          "Reaction: After attached unit resolves an attack against a "
+                                                          "non-warlord unit, discard an attachment from the defender.",
+                                   "Wargear. Biomorph.", 1, "Tyranids", "Common", 1, False,
+                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True),
         CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
                                                   "at this planet.\n"
                                                   "Reaction: After an enemy Psyker unit enters play at this planet, "

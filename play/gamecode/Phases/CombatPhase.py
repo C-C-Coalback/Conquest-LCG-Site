@@ -1456,6 +1456,22 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             == "Roghrax Bloodhand":
                                         if self.bloodthirst_active[self.attacker_planet]:
                                             attack_value = attack_value * 2
+                                if secondary_player.get_all_attachments_at_pos(
+                                        self.defender_planet, self.defender_position):
+                                    for i in range(len(primary_player.get_all_attachments_at_pos(
+                                            self.attacker_planet, self.attacker_position))):
+                                        if primary_player.get_attachment_at_pos(
+                                            self.attacker_planet, self.attacker_position, i
+                                        ).get_ability() == "Acidic Venom Cannon":
+                                            attack_value += 3
+                                            if secondary_player.get_card_type_given_pos(
+                                                    self.defender_planet, self.defender_position
+                                            ) != "Warlord":
+                                                self.create_delayed_reaction(
+                                                    "Acidic Venom Cannon", primary_player.name_player,
+                                                    (int(secondary_player.number), self.defender_planet,
+                                                     self.defender_position)
+                                                )
                                 if secondary_player.get_damage_given_pos(self.defender_planet,
                                                                          self.defender_position) > 0:
                                     if primary_player.get_ability_given_pos(self.attacker_planet,

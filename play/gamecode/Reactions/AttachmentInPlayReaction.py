@@ -31,6 +31,12 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
                     self.delete_reaction()
+    elif current_reaction == "Acidic Venom Cannon":
+        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        if secondary_player.get_number() == game_update_string[2]:
+            if planet_pos == og_pla and og_pos == unit_pos:
+                secondary_player.discard_attachment_at_pos(planet_pos, unit_pos, attachment_pos)
+                self.delete_reaction()
     elif current_reaction == "Shadowseer":
         _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
         if game_update_string[2] == primary_player.get_number():

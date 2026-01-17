@@ -5268,6 +5268,7 @@ class Player:
             attack_value += self.count_exhausted_units_at_planet(planet_id) + \
                             other_player.count_exhausted_units_at_planet(planet_id)
         if card.get_name() == "Termagant" or ability == "Lurking Termagant":
+            self.get_attachment_at_pos()
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.cards_in_play[planet_id + 1][i].get_ability() == "Strangler Brood":
                     attack_value += 1
