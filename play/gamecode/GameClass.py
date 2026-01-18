@@ -1184,6 +1184,13 @@ class Game:
                     elif self.action_chosen == "Daring Assault" and not self.chosen_first_card:
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                    elif self.action_chosen == "Pattern IX Immolator":
+                        if not self.chosen_first_card:
+                            self.chosen_first_card = True
+                            self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
+                            await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+                        else:
+                            self.action_cleanup()
                     elif self.action_chosen == "Indiscriminate Bombing":
                         if not self.chosen_second_card:
                             self.chosen_second_card = True
