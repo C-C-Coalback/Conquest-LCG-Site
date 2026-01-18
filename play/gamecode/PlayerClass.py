@@ -1321,6 +1321,16 @@ class Player:
                         return True
         return False
 
+    def count_reactions_of_position(self, reaction_name, pla, pos):
+        count = 0
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    num, og_pla, og_pos = self.game.positions_of_unit_triggering_reaction[i]
+                    if num == int(self.number) and pla == og_pla and og_pos == pos:
+                        count += 1
+        return count
+
     def check_if_already_have_interrupt_of_position(self, interrupt_name, pla, pos):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
             if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
@@ -7014,6 +7024,20 @@ class Player:
                     if self.get_ability_given_pos(-2, i) == "Unearthed Crypt":
                         if self.get_ready_given_pos(-2, i):
                             self.game.create_interrupt("Unearthed Crypt", self.name_player, (int(self.number), -2, i))
+                if card.check_for_a_trait("Ecclesiarchy", self.etekh_trait) or \
+                        card.check_for_a_trait("Grey Knights", self.etekh_trait):
+                    for i in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, i) == "Zealous Cantus":
+                            if self.get_once_per_phase_used_given_pos(-2, i) + self.count_reactions_of_position(
+                                    "Zealous Cantus", -2, i) < 2:
+                                self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), -2, i))
+                    for i in range(7):
+                        for j in range(len(self.cards_in_play[i + 1])):
+                            if self.get_ability_given_pos(i, j) == "Zealous Cantus":
+                                if self.get_once_per_phase_used_given_pos(i, j) + self.count_reactions_of_position(
+                                        "Zealous Cantus", i, j) < 2:
+                                    self.game.create_reaction("Zealous Cantus", self.name_player,
+                                                              (int(self.number), i, j))
             if card_name == "Cardinal Agra Decree":
                 self.game.create_interrupt("Cardinal Agra Decree", self.name_player, (int(self.number), -1, -1))
             if card_name == "Medallion of Betrayal":
@@ -7588,15 +7612,6 @@ class Player:
                     dis_player = self.game.p2
                 dis_player.add_card_to_discard(card_name)
         if card.get_card_type() == "Army":
-            if self.check_for_trait_given_pos(planet_num, card_pos, "Ecclesiarchy") or \
-                    self.check_for_trait_given_pos(planet_num, card_pos, "Grey Knights"):
-                for i in range(len(self.headquarters)):
-                    if self.get_ability_given_pos(-2, i) == "Zealous Cantus":
-                        self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), -2, i))
-                for i in range(7):
-                    for j in range(len(self.cards_in_play[i + 1])):
-                        if self.get_ability_given_pos(i, j) == "Zealous Cantus":
-                            self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), i, j))
             if self.check_for_warlord(planet_num):
                 self.stored_targets_the_emperor_protects.append(card_name)
             if self.check_for_trait_given_pos(planet_num, card_pos, "Transport"):
@@ -7652,16 +7667,6 @@ class Player:
                     self.game.create_interrupt("The Shadow Suit", owner, (int(self.number), -1, -1))
                 if card.get_attachments()[i].get_ability() == "M35 Galaxy Lasgun":
                     self.game.create_interrupt("M35 Galaxy Lasgun", owner, (int(self.number), -1, -1))
-        if card.get_card_type() == "Army":
-            if self.check_for_trait_given_pos(-2, card_pos, "Ecclesiarchy") or \
-                    self.check_for_trait_given_pos(-2, card_pos, "Grey Knights"):
-                for i in range(len(self.headquarters)):
-                    if self.get_ability_given_pos(-2, i) == "Zealous Cantus":
-                        self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), -2, i))
-                for i in range(7):
-                    for j in range(len(self.cards_in_play[i + 1])):
-                        if self.get_ability_given_pos(i, j) == "Zealous Cantus":
-                            self.game.create_reaction("Zealous Cantus", self.name_player, (int(self.number), i, j))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "3rd Company Tactical Squad":
