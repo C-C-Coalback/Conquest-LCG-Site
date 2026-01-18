@@ -1279,6 +1279,24 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                        self.defender_position)
                             if can_continue and self.allow_damage_abilities_defender:
                                 if secondary_player.get_ability_given_pos(
+                                        self.defender_planet, self.defender_position) == "Trap Laying Hunter":
+                                    if not secondary_player.cards_in_play[self.defender_planet + 1][
+                                            self.defender_position].misc_ability_used:
+                                        can_continue = False
+                                        await self.send_update_message(
+                                            "Trap Laying Hunter must fire before the rest of the attack."
+                                        )
+                                        secondary_player.set_aiming_reticle_in_play(
+                                            self.defender_planet, self.defender_position, "blue"
+                                        )
+                                        self.create_interrupt("Trap Laying Hunter", secondary_player.name_player,
+                                                              (int(secondary_player.number), self.defender_planet,
+                                                               self.defender_position))
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
+                            if can_continue and self.allow_damage_abilities_defender:
+                                if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Neurotic Obliterator":
                                     ready_weapon = False
                                     for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][
@@ -1402,13 +1420,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               -1))
-                                if secondary_player.get_ability_given_pos(
-                                        self.defender_planet, self.defender_position) == "Trap Laying Hunter":
-                                    if not secondary_player.cards_in_play[self.defender_planet + 1][
-                                            self.defender_position].misc_ability_used:
-                                        self.create_interrupt("Trap Laying Hunter", secondary_player.name_player,
-                                                              (int(secondary_player.number), self.defender_planet,
-                                                               self.defender_position))
                                 if secondary_player.search_attachments_at_pos(
                                         self.defender_planet, self.defender_position, "The Black Sword"
                                 ):

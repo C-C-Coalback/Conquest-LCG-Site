@@ -3846,7 +3846,8 @@ class Game:
                                                            str(current_unit)]
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
-                            elif self.interrupts_waiting_on_resolution[0] == "Counterblow":
+                            elif self.interrupts_waiting_on_resolution[0] == "Counterblow" or \
+                                    self.interrupts_waiting_on_resolution[0] == "Trap Laying Hunter":
                                 self.allow_damage_abilities_defender = False
                                 self.shadow_thorns_body_allowed = False
                                 _, current_planet, current_unit = self.last_defender_position
