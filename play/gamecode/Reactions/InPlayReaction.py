@@ -673,7 +673,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Vow of Honor":
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor:
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
-                self.delete_reaction()
                 target_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                 await self.send_update_message(target_name + " got +3 ATK from Vow of Honor")
                 if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):

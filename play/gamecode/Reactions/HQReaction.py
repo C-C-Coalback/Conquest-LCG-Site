@@ -210,12 +210,12 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     elif current_reaction == "Vow of Honor":
         if primary_player.headquarters[unit_pos].valid_target_vow_of_honor:
             primary_player.increase_attack_of_unit_at_pos(-2, unit_pos, 3, expiration="NEXT")
-            self.delete_reaction()
             target_name = primary_player.get_name_given_pos(-2, unit_pos)
             await self.send_update_message(target_name + " got +3 ATK from Vow of Honor")
             if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):
                 self.create_reaction("Vow of Honor", primary_player.name_player,
                                      (int(primary_player.number), -1, -1))
+            self.delete_reaction()
     elif current_reaction == "Scavenging Kroot Rider":
         if not self.chosen_first_card:
             if game_update_string[1] == secondary_player.number:
