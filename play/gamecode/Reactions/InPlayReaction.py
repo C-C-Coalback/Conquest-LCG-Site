@@ -679,6 +679,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if primary_player.resources > 0 and primary_player.search_hand_for_card("Vow of Honor"):
                     self.create_reaction("Vow of Honor", primary_player.name_player,
                                          (int(primary_player.number), -1, -1))
+                self.delete_reaction()
         elif current_reaction == "Kabalite Harriers":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if game_update_string[1] == "1":
