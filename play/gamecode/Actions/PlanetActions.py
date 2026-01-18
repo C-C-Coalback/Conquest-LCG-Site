@@ -822,6 +822,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 temp = self.planet_array[chosen_planet]
                 self.planet_array[chosen_planet] = self.planet_array[self.misc_target_planet]
                 self.planet_array[self.misc_target_planet] = temp
+                temp = self.replaced_planets[chosen_planet]
+                self.replaced_planets[chosen_planet] = self.replaced_planets[self.misc_target_planet]
+                self.replaced_planets[self.misc_target_planet] = temp
+                temp = self.original_planet_array[chosen_planet]
+                self.original_planet_array[chosen_planet] = self.original_planet_array[self.misc_target_planet]
+                self.original_planet_array[self.misc_target_planet] = temp
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 secondary_player.create_enemy_played_event_reactions()
