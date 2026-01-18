@@ -1183,7 +1183,7 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Daring Assault" and not self.chosen_first_card:
                         secondary_player.create_enemy_played_event_reactions()
-                        self.action_cleaup()
+                        self.action_cleanup()
                     elif self.action_chosen == "Indiscriminate Bombing":
                         if not self.chosen_second_card:
                             self.chosen_second_card = True
