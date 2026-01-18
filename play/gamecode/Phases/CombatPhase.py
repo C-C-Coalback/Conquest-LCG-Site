@@ -429,8 +429,9 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         else:
                             card = self.preloaded_find_card(
                                 player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
-                        if (not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or \
-                                player_receiving_attachment.name_player != player.name_player:
+                        if ((not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or
+                                player_receiving_attachment.name_player != player.name_player) and \
+                                og_pla == chosen_planet:
                             if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
                                                                        not_own_attachment=not_own_att):
                                 if not player.idden_base_active:
