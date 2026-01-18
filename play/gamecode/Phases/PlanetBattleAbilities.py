@@ -921,7 +921,7 @@ async def manual_craftworld_lugath_ability(self, name, game_update_string, prima
 async def manual_baneful_veil_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
-            if abs(self.last_planet_checked_for_battle - int(game_update_string[1])):
+            if abs(self.last_planet_checked_for_battle - int(game_update_string[1])) == 1:
                 self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Resolve Battle Ability?"
