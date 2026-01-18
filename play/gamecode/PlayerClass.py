@@ -6764,6 +6764,44 @@ class Player:
                 if self.search_card_in_hq("Standard of Devastation"):
                     self.game.create_reaction("Standard of Devastation", self.name_player,
                                               (int(self.number), -1, -1))
+            if self.headquarters[card_pos].get_name() == "Snotlings":
+                self.enemy_has_wyrdboy_stikk = False
+                if self.search_for_card_everywhere("Wyrdboy Stikk", ready_relevant=True):
+                    if not self.check_if_already_have_reaction("Wyrdboy Stikk"):
+                        self.game.create_reaction("Wyrdboy Stikk", self.name_player,
+                                                  (int(self.number), -1, -1))
+                else:
+                    found_stikk = False
+                    for i in range(len(other_player.headquarters)):
+                        if other_player.headquarters[i].get_is_unit():
+                            for j in range(len(other_player.headquarters[i].get_attachments())):
+                                attach = other_player.headquarters[i].get_attachments()[j]
+                                if attach.get_ability() == "Wyrdboy Stikk":
+                                    if attach.get_ready() and attach.name_owner == self.name_player:
+                                        found_stikk = True
+                                        self.enemy_has_wyrdboy_stikk = True
+                                    elif attach.get_ready() and attach.name_owner == other_player.name_player:
+                                        if not other_player.check_if_already_have_reaction("Wyrdboy Stikk"):
+                                            self.game.create_reaction("Wyrdboy Stikk", other_player.name_player,
+                                                                      (int(other_player.number), -1, -1))
+                                            other_player.enemy_has_wyrdboy_stikk = True
+                    for h in range(7):
+                        for i in range(len(other_player.cards_in_play[h + 1])):
+                            if other_player.cards_in_play[h + 1][i].get_is_unit():
+                                for j in range(len(other_player.cards_in_play[h + 1][i].get_attachments())):
+                                    attach = other_player.cards_in_play[h + 1][i].get_attachments()[j]
+                                    if attach.get_ability() == "Wyrdboy Stikk":
+                                        if attach.get_ready() and attach.name_owner == self.name_player:
+                                            found_stikk = True
+                                            self.enemy_has_wyrdboy_stikk = True
+                                        elif attach.get_ready() and attach.name_owner == other_player.name_player:
+                                            if not other_player.check_if_already_have_reaction("Wyrdboy Stikk"):
+                                                self.game.create_reaction("Wyrdboy Stikk", other_player.name_player,
+                                                                          (int(other_player.number), -1, -1))
+                    if found_stikk:
+                        if not self.check_if_already_have_reaction("Wyrdboy Stikk"):
+                            self.game.create_reaction("Wyrdboy Stikk", self.name_player,
+                                                      (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
             self.game.queued_sound = "destroy"
@@ -7148,13 +7186,8 @@ class Player:
                                                       (int(self.number), planet_num, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Snotlings":
                 self.enemy_has_wyrdboy_stikk = False
-                already_weirdboy_stikk = False
                 if self.search_for_card_everywhere("Wyrdboy Stikk", ready_relevant=True):
-                    for i in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[i] == "Wyrdboy Stikk":
-                            if self.game.player_who_resolves_reaction[i] == self.name_player:
-                                already_weirdboy_stikk = True
-                    if not already_weirdboy_stikk:
+                    if not self.check_if_already_have_reaction("Wyrdboy Stikk"):
                         self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                   (int(self.number), -1, -1))
                 else:
@@ -7167,6 +7200,11 @@ class Player:
                                     if attach.get_ready() and attach.name_owner == self.name_player:
                                         found_stikk = True
                                         self.enemy_has_wyrdboy_stikk = True
+                                    elif attach.get_ready() and attach.name_owner == other_player.name_player:
+                                        if not other_player.check_if_already_have_reaction("Wyrdboy Stikk"):
+                                            self.game.create_reaction("Wyrdboy Stikk", other_player.name_player,
+                                                                      (int(other_player.number), -1, -1))
+                                            other_player.enemy_has_wyrdboy_stikk = True
                     for h in range(7):
                         for i in range(len(other_player.cards_in_play[h + 1])):
                             if other_player.cards_in_play[h + 1][i].get_is_unit():
@@ -7176,12 +7214,12 @@ class Player:
                                         if attach.get_ready() and attach.name_owner == self.name_player:
                                             found_stikk = True
                                             self.enemy_has_wyrdboy_stikk = True
+                                        elif attach.get_ready() and attach.name_owner == other_player.name_player:
+                                            if not other_player.check_if_already_have_reaction("Wyrdboy Stikk"):
+                                                self.game.create_reaction("Wyrdboy Stikk", other_player.name_player,
+                                                                          (int(other_player.number), -1, -1))
                     if found_stikk:
-                        for k in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[k] == "Wyrdboy Stikk":
-                                if self.game.player_who_resolves_reaction[k] == self.name_player:
-                                    already_weirdboy_stikk = True
-                        if not already_weirdboy_stikk:
+                        if not self.check_if_already_have_reaction("Wyrdboy Stikk"):
                             self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                       (int(self.number), -1, -1))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
