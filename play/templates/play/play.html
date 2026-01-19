@@ -222,6 +222,10 @@
     const cardback_1 = "{{cardback_1|escapejs}}";
     const cardback_2 = "{{cardback_2|escapejs}}";
 
+    var background = `background: #050505 url("{{ background|escapejs }}") no-repeat; background-size: 100% 100%;`;
+
+    document.body.style = background;
+
     console.log(cardback_1);
     console.log(cardback_2);
 
