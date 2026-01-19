@@ -144,6 +144,7 @@ class Game:
         self.p2_has_warlord = False
         self.allow_damage_abilities_defender = True
         self.damage_abilities_defender_active = False
+        self.debug_mode = None
         self.number_with_initiative = "1"
         self.player_with_initiative = self.name_1
         self.number_reset_combat_turn = "1"
@@ -9803,6 +9804,68 @@ class Game:
         self.deck_part_being_rearranged = []
         self.number_cards_to_rearrange = 0
 
+    async def debug_event(self, name, game_update_string):
+        try:
+            if len(game_update_string) == 2:
+                if game_update_string[0] == "PLANETS":
+                    chosen_planet = int(game_update_string[1])
+                    if self.debug_mode == "move-unit" and self.chosen_first_card:
+                        planet_pos, unit_pos = self.misc_target_unit
+                        primary_player = self.p2
+                        if self.misc_target_player == "1":
+                            primary_player = self.p1
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet, force=True)
+                        self.debug_mode = None
+            elif len(game_update_string) == 3:
+                if game_update_string[0] == "HQ":
+                    planet_pos = -2
+                    unit_pos = int(game_update_string[2])
+                    primary_player = self.p2
+                    if game_update_string[1] == "1":
+                        primary_player = self.p1
+                    if self.debug_mode == "exhaust-card":
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "ready-card":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "clear-reticle":
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "move-unit" and not self.chosen_first_card:
+                        if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.misc_target_player = game_update_string[1]
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            await self.send_update_message("Now select the planet to move to.")
+            elif len(game_update_string) == 4:
+                if game_update_string[0] == "IN_PLAY":
+                    planet_pos = int(game_update_string[2])
+                    unit_pos = int(game_update_string[3])
+                    primary_player = self.p2
+                    if game_update_string[1] == "1":
+                        primary_player = self.p1
+                    if self.debug_mode == "exhaust-card":
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "ready-card":
+                        primary_player.ready_given_pos(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "clear-reticle":
+                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "move-unit" and not self.chosen_first_card:
+                        if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                            self.chosen_first_card = True
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.misc_target_player = game_update_string[1]
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                            await self.send_update_message("Now select the planet to move to.")
+        except:
+            self.debug_mode = None
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -9813,7 +9876,9 @@ class Game:
             await self.send_update_message("Buttons can't be pressed in setup")
         elif self.validate_received_game_string(game_update_string):
             print("String validated as ok")
-            if self.choosing_unit_for_nullify:
+            if self.debug_mode is not None:
+                await self.debug_event(name, game_update_string)
+            elif self.choosing_unit_for_nullify:
                 await self.nullification_unit(name, game_update_string)
             elif self.intercept_active:
                 await self.resolve_intercept(name, game_update_string)
@@ -10315,6 +10380,17 @@ class Game:
                 if self.p2.castellan_crowe_relevant:
                     self.choice_context = "Use Psychic Ward?"
                     await self.send_update_message("Switched to offering Psychic Ward")
+        await self.send_everything()
+        if not same_thread:
+            await self.update_game_event("", [], same_thread=True)
+        if not same_thread:
+            self.condition_main_game.notify_all()
+            self.condition_main_game.release()
+
+    def cancel_debug_mode(self):
+        self.debug_mode = None
+
+    async def send_everything(self):
         await self.send_search()
         await self.send_info_box()
         await self.send_decks()
@@ -10334,11 +10410,6 @@ class Game:
         await self.send_initiative()
         await self.send_queued_sound()
         await self.send_queued_message()
-        if not same_thread:
-            await self.update_game_event("", [], same_thread=True)
-        if not same_thread:
-            self.condition_main_game.notify_all()
-            self.condition_main_game.release()
 
     def get_name_interrupts_of_players_interrupts(self, name):
         interrupts_positions_list = []
