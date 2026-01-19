@@ -416,6 +416,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.misc_target_choice = ""
+                            self.misc_target_unit = (-1, -1)
+                            self.chosen_first_card = False
                     elif ability == "Lekor Blight-Tongue":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
