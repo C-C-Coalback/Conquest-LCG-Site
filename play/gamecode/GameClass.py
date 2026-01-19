@@ -6763,6 +6763,8 @@ class Game:
     async def change_phase(self, new_val, refresh_abilities=True):
         last_phase = self.phase
         self.phase = new_val
+        self.p1.reset_card_name_misc_ability("Torquemada Coteaz")
+        self.p2.reset_card_name_misc_ability("Torquemada Coteaz")
         if self.p1.command_struggles_won_this_phase < self.p2.command_struggles_won_this_phase:
             pla, pos = self.p1.get_location_of_warlord()
             if self.p1.get_ability_given_pos(pla, pos, bloodied_relevant=True) == "Mephiston" \
