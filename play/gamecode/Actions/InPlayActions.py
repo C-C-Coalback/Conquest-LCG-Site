@@ -54,6 +54,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     elif ability == "Captain Markis":
                         if self.apoka:
                             if not card_chosen.get_once_per_round_used():
+                                self.misc_target_planet = planet_pos
                                 card_chosen.set_once_per_round_used(True)
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -2500,7 +2501,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.chosen_first_card = True
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
     elif self.action_chosen == "Captain Markis":
-        if planet_pos == self.position_of_actioned_card[0]:
+        if planet_pos == self.misc_target_planet:
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
                     if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_faction() == "Astra Militarum" \
