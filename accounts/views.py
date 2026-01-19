@@ -12,7 +12,8 @@ from django.shortcuts import redirect
 import os
 
 
-valid_cardbacks = ["Cardback", "Space_Marines_Cardback", "Necrons_Cardback", "Chaos_Cardback", "Tyranids_Cardback"]
+valid_cardbacks = ["Cardback", "Space_Marines_Cardback", "Necrons_Cardback", "Chaos_Cardback", "Tyranids_Cardback",
+                   "Orks_Cardback"]
 valid_backgrounds = ["Imperial Aquila"]
 if not os.path.exists(os.path.join(os.getcwd(), "user_preferences_storage/")):
     os.mkdir(os.path.join(os.getcwd(), "user_preferences_storage/"))
