@@ -28,7 +28,7 @@ def create_planets(planet_array_objects):
 
 
 class Game:
-    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, apoka,
+    def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, errata,
                  apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None):
         self.game_sockets = []
         self.card_array = card_array
@@ -38,7 +38,13 @@ class Game:
         for i in range(len(self.apoka_errata_cards)):
             self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())
         self.planet_cards_array = planet_array
-        self.apoka = apoka
+        self.apoka = False
+        self.blackstone = False
+        if errata == "Apoka":
+            self.apoka = True
+        elif errata == "Blackstone":
+            self.blackstone = True
+        print("\n\nerrata text\n\n" + errata)
         self.battle_in_progress = False
         self.game_id = game_id
         self.name_1 = player_one_name

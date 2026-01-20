@@ -17,6 +17,7 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
+blackstone_errata_cards_array = Initfunctions.init_blackstone_errata_cards()
 
 active_lobbies = [[], [], [], [], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
@@ -156,10 +157,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 active_lobbies[2].append("Public")
             else:
                 active_lobbies[2].append("Private")
-            if split_message[2] == "false":
+            if split_message[2] == "None":
                 active_lobbies[3].append("No Errata")
-            else:
+            elif split_message[2] == "Apoka":
                 active_lobbies[3].append("Apoka")
+            else:
+                active_lobbies[3].append("Blackstone")
             active_lobbies[4].append(split_message[3])
             active_lobbies[5].append(split_message[4])
             active_lobbies[6].append("")
@@ -243,13 +246,11 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         first_name = active_lobbies[0][i]
                         second_name = active_lobbies[1][i]
                         game_num = i
-                apoka = False
-                if active_lobbies[3][game_num] == "Apoka":
-                    apoka = True
+                errata = active_lobbies[3][game_num]
                 sector = active_lobbies[4][game_num]
                 deck_1 = active_lobbies[5][game_num]
                 deck_2 = active_lobbies[6][game_num]
-                game_id = self.create_game(first_name, second_name, game_id, apoka, sector=sector,
+                game_id = self.create_game(first_name, second_name, game_id, errata, sector=sector,
                                            deck_1=deck_1, deck_2=deck_2)
                 if active_lobbies[2][game_num] == "Public":
                     current_time = datetime.datetime.now()
@@ -303,7 +304,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    def create_game(self, name_1, name_2, game_id, apoka, sector="Traxis", deck_1="", deck_2=""):
+    def create_game(self, name_1, name_2, game_id, errata, sector="Traxis", deck_1="", deck_2=""):
         global active_games
         global card_array
         global planet_array
@@ -312,12 +313,14 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         for i in range(len(active_games)):
             if active_games[i].game_id == game_id:
                 new_game_id = game_id + random.choice('0123456789ABCDEF')
-                return self.create_game(name_1, name_2, new_game_id, apoka, sector=sector)
+                return self.create_game(name_1, name_2, new_game_id, errata, sector=sector)
         card_errata = []
-        if apoka:
+        if errata == "Apoka":
             card_errata = apoka_errata_cards_array
+        elif errata == "Blackstone":
+            card_errata = blackstone_errata_cards_array
         active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict,
-                                           apoka, card_errata, sector=sector, deck_1=deck_1, deck_2=deck_2))
+                                           errata, card_errata, sector=sector, deck_1=deck_1, deck_2=deck_2))
         return game_id
 
 

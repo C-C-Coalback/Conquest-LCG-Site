@@ -423,6 +423,8 @@ class Player:
             self.game.phase = "DEPLOY"
             if self.game.apoka:
                 await self.game.send_update_message("Apoka Errata is active")
+            elif self.game.blackstone:
+                await self.game.send_update_message("Blackstone Errata is active")
             else:
                 await self.game.send_update_message("No Errata is active")
             await self.game.send_update_message("The " + self.game.sector + " sector is active")
@@ -515,7 +517,10 @@ class Player:
             card_array = self.cards.copy()
             for i in range(len(card_array)):
                 if card_array[i] in self.cards_that_have_errata:
-                    card_array[i] = card_array[i] + "_apoka"
+                    if self.game.apoka:
+                        card_array[i] = card_array[i] + "_apoka"
+                    elif self.game.blackstone:
+                        card_array[i] = card_array[i] + "_blackstone"
                 card_array[i] = card_array[i] + "|"
                 if self.aiming_reticle_color is not None:
                     if self.aiming_reticle_coords_hand == i or self.aiming_reticle_coords_hand_2 == i:
@@ -579,7 +584,10 @@ class Player:
                 if current_card.actually_a_deepstrike:
                     single_card_string = current_card.deepstrike_card_name
                 if single_card_string in self.cards_that_have_errata:
-                    single_card_string += "_apoka"
+                    if self.game.apoka:
+                        single_card_string += "_apoka"
+                    elif self.game.blackstone:
+                        single_card_string += "_blackstone"
                 single_card_string = single_card_string + "|"
                 if current_card.ready:
                     if current_card.check_for_a_trait("Pledge"):
@@ -633,7 +641,10 @@ class Player:
                     single_card_string += "|"
                     single_card_string += attachments_list[a].get_name()
                     if attachments_list[a].get_name() in self.cards_that_have_errata:
-                        single_card_string += "_apoka"
+                        if self.game.apoka:
+                            single_card_string += "_apoka"
+                        elif self.game.blackstone:
+                            single_card_string += "_blackstone"
                     single_card_string += "+"
                     if attachments_list[a].get_ready():
                         single_card_string += "R"
@@ -649,7 +660,10 @@ class Player:
                 current_card = self.cards_in_reserve_hq[i]
                 single_card_string = current_card.get_name()
                 if single_card_string in self.cards_that_have_errata:
-                    single_card_string += "_apoka"
+                    if self.game.apoka:
+                        single_card_string += "_apoka"
+                    elif self.game.blackstone:
+                        single_card_string += "_blackstone"
                 single_card_string = single_card_string + "|"
                 if current_card.ready:
                     single_card_string += "R|"
@@ -675,7 +689,10 @@ class Player:
                     single_card_string += "|"
                     single_card_string += attachments_list[a].get_name()
                     if attachments_list[a].get_name() in self.cards_that_have_errata:
-                        single_card_string += "_apoka"
+                        if self.game.apoka:
+                            card_array[i] = card_array[i] + "_apoka"
+                        elif self.game.blackstone:
+                            card_array[i] = card_array[i] + "_blackstone"
                     single_card_string += "+"
                     if attachments_list[a].get_ready():
                         single_card_string += "R"
@@ -903,7 +920,10 @@ class Player:
                         if current_card.actually_a_deepstrike:
                             single_card_string = current_card.deepstrike_card_name
                         if single_card_string in self.cards_that_have_errata:
-                            single_card_string += "_apoka"
+                            if self.game.apoka:
+                                card_array[i] = card_array[i] + "_apoka"
+                            elif self.game.blackstone:
+                                card_array[i] = card_array[i] + "_blackstone"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"
@@ -934,7 +954,10 @@ class Player:
                             single_card_string += "|"
                             single_card_string += attachments_list[a].get_name()
                             if attachments_list[a].get_name() in self.cards_that_have_errata:
-                                single_card_string += "_apoka"
+                                if self.game.apoka:
+                                    card_array[i] = card_array[i] + "_apoka"
+                                elif self.game.blackstone:
+                                    card_array[i] = card_array[i] + "_blackstone"
                             single_card_string += "+"
                             if attachments_list[a].get_ready():
                                 single_card_string += "R"
@@ -950,7 +973,10 @@ class Player:
                         current_card = self.cards_in_reserve[planet_id][i]
                         single_card_string = current_card.get_name()
                         if single_card_string in self.cards_that_have_errata:
-                            single_card_string += "_apoka"
+                            if self.game.apoka:
+                                card_array[i] = card_array[i] + "_apoka"
+                            elif self.game.blackstone:
+                                card_array[i] = card_array[i] + "_blackstone"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"

@@ -137,6 +137,12 @@
                 <div style="margin-left: 25px; text-align: left;">
                  Apoka Errata
                 </div>
+                <br>
+                <input id="blackstonecb" type="checkbox" style="float: left; margin-top: 5px;">
+                <div style="margin-left: 25px; text-align: left;">
+                 Custom Errata
+                </div>
+                <br>
             </div>
         </div>
         <div id="decks-container-container">
@@ -250,9 +256,17 @@
         document.querySelector('#create-lobby-submit').onclick = function(e) {
             const private = document.getElementById("cb").checked;
             const apoka = document.getElementById("apokacb").checked;
+            const blackstone = document.getElementById("blackstonecb").checked;
+            var errata_string = "None";
+            if (apoka) {
+                errata_string = "Apoka";
+            }
+            if (blackstone) {
+                errata_string = "Blackstone";
+            }
             const sector = document.getElementById("sector").value;
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby" + "/" + private.toString() + "/" + apoka.toString() + "/" + sector + "/" + deck_name
+                'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name
             }));
         };
 
@@ -330,6 +344,8 @@
             stringToAdd += "<br>";
             if (apoka === "Apoka") {
                 stringToAdd += "Apoka Errata";
+            } else if (apoka === "Blackstone") {
+                stringToAdd += "Blackstone Errata";
             } else {
                 stringToAdd += "No Errata";
             }
