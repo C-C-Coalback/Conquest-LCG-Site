@@ -76,21 +76,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 else:
                     player_receiving_attachment = secondary_player
                     own_attachment = False
-                card = FindCard.find_card(self.name_attachment_discard_shadowsun, self.card_array,
-                                          self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(self.name_attachment_discard_shadowsun)
                 army_unit_as_attachment = False
                 if card.get_name() == "Shadowsun's Stealth Cadre":
                     army_unit_as_attachment = True
-                if player_receiving_attachment.play_attachment_card_to_in_play(
-                        card, planet_pos, unit_pos, discounts=card.get_cost(),
-                        not_own_attachment=own_attachment,
-                        army_unit_as_attachment=army_unit_as_attachment):
+                not_own_attachment = not own_attachment
+                if player_receiving_attachment.attach_card(card, planet_pos, unit_pos,
+                                                           not_own_attachment=not_own_attachment,
+                                                           army_unit_as_attachment=army_unit_as_attachment):
                     i = 0
                     removed_card = False
-                    while i < len(primary_player.discard) and not removed_card:
-                        if primary_player.discard[i] == self.name_attachment_discard_shadowsun:
-                            removed_card = True
-                            del primary_player.discard[i]
+                    if card.get_name() in primary_player.discard:
+                        primary_player.discard.remove(card.get_name())
                     self.name_attachment_discard_shadowsun = ""
                     self.resolving_search_box = False
                     self.delete_reaction()
