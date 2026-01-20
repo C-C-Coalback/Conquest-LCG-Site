@@ -258,7 +258,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if player_owning_card.attach_card(attachment, planet_pos, unit_pos,
                                                           not_own_attachment=not_own_attachment):
                             del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
-                            player_owning_card.assign_damage_to_pos(og_pla, og_pos, 2, rickety_warbuggy=True)
+                            player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Order of the Crimson Oath":
