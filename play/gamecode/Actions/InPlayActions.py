@@ -96,24 +96,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
                     elif ability == "Canoness Vardina":
-                        if not card_chosen.bloodied:
-                            if not card_chosen.get_once_per_round_used():
-                                card_chosen.set_once_per_round_used(True)
-                                self.position_of_actioned_card = (planet_pos, unit_pos)
-                                self.action_chosen = ability
-                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                                self.misc_counter = 2
-                                if secondary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
-                                    self.misc_counter = 3
-                                await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
-                        else:
-                            if not card_chosen.get_once_per_game_used():
-                                card_chosen.set_once_per_game_used(True)
-                                self.position_of_actioned_card = (planet_pos, unit_pos)
-                                self.action_chosen = ability + " BLD"
-                                player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                                self.misc_counter = 2
-                                await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                        if not card_chosen.get_once_per_round_used():
+                            card_chosen.set_once_per_round_used(True)
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.misc_counter = 2
+                            if secondary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
+                                self.misc_counter = 3
+                            await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                    elif ability == "Canoness Vardina BLOODIED":
+                        if not card_chosen.get_once_per_game_used():
+                            card_chosen.set_once_per_game_used(True)
+                            self.position_of_actioned_card = (planet_pos, unit_pos)
+                            self.action_chosen = ability
+                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            self.misc_counter = 2
+                            await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
                     elif ability == "Vaulting Harlequin":
                         if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -1634,7 +1633,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.action_cleanup()
-    elif self.action_chosen == "Canoness Vardina BLD":
+    elif self.action_chosen == "Canoness Vardina BLOODIED":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Ecclesiarchy"):
                 if planet_pos == self.position_of_actioned_card[0]:
