@@ -691,6 +691,8 @@ class Game:
             return False
         elif self.attacker_position != -1:
             return False
+        elif self.start_battle_deepstrike:
+            return False
         return True
 
     async def joined_requests_graphics(self, name):
