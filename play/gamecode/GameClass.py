@@ -1112,15 +1112,6 @@ class Game:
                                             rickety_warbuggy=rickety_warbuggy, actual_area_effect=True)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
-        if self.number_of_units_left_to_suffer_damage > 0:
-            for i in range(1, self.number_of_units_left_to_suffer_damage):
-                genestealer_hybrids_relevant = False
-                if actual_aoe:
-                    for j in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                        if secondary_player.get_ability_given_pos(chosen_planet, j) == "Genestealer Hybrids" and i != j:
-                            genestealer_hybrids_relevant = True
-                if not genestealer_hybrids_relevant:
-                    secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.player_with_action:
