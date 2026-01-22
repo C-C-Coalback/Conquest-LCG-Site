@@ -9051,9 +9051,11 @@ class Game:
                             self.create_delayed_reaction("Salvaged Battlewagon", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
                         if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Goliath Rockgrinder":
-                            self.create_delayed_reaction("Goliath Rockgrinder", secondary_player.name_player,
-                                                         (int(secondary_player.number), planet_pos, unit_pos))
-                            self.goliath_rockgrinder_value = primary_player.cards_in_play[def_pla + 1][def_pos].health
+                            if not secondary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                                self.create_delayed_reaction("Goliath Rockgrinder", secondary_player.name_player,
+                                                             (int(secondary_player.number), planet_pos, unit_pos))
+                                self.goliath_rockgrinder_value = primary_player.cards_in_play[
+                                    def_pla + 1][def_pos].health
                         if secondary_player.search_card_in_hq("Restorative Tunnels", ready_relevant=True):
                             if secondary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
                                 self.create_delayed_reaction("Restorative Tunnels", secondary_player.name_player,
