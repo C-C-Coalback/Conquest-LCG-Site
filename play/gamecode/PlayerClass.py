@@ -4791,7 +4791,9 @@ class Player:
                 self.exhaust_given_pos(-2, pos)
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
-                if faction_of_card == "Astra Militarum":
+                if faction_of_card == "Astra Militarum" or name_of_card == "Gue'vesa Overseer":
+                    self.guardsman_tracker_apf += 1
+                elif name_of_card == "Ardent Auxiliaries" and (self.game.apoka or self.game.blackstone):
                     self.guardsman_tracker_apf += 1
         if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
