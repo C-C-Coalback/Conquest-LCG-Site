@@ -314,7 +314,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":
-                if name == self.player_with_deploy_turn:
+                if name == self.player_with_deploy_turn and not self.deepstrike_deployment_active:
                     await deploy_card_routine_attachment(self, name, game_update_string)
             elif self.mode == "DISCOUNT":
                 if game_update_string[1] == self.number_with_deploy_turn:
