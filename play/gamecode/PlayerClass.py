@@ -2546,31 +2546,31 @@ class Player:
             if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
                 self.game.create_reaction("Swordwind Farseer", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Mighty Wraithknight":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Mighty Wraithknight":
                 self.game.create_reaction("Mighty Wraithknight", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
                 self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
                                                                                 last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Vale Tenndrac":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Vale Tenndrac":
                 self.game.create_reaction("Vale Tenndrac", self.name_player, (int(self.number), position,
                                                                               last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Standard Bearer":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Standard Bearer":
                 self.game.create_reaction("Standard Bearer", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
                 self.game.create_reaction("Coliseum Fighters", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
                 self.game.create_reaction("Sicarius's Chosen", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
                 self.game.create_reaction("Weirdboy Maniak", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Inquisitor Caius Wroth":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Inquisitor Caius Wroth":
                 self.game.create_reaction("Inquisitor Caius Wroth", self.name_player,
                                           (int(self.number), position, last_element_index))
-            elif self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
+            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
                 self.game.create_reaction("Earth Caste Technician", self.name_player,
                                           (int(self.number), position, last_element_index))
             if card.check_for_a_trait("Kabalite", self.etekh_trait) or card.check_for_a_trait("Raider", self.etekh_trait):
