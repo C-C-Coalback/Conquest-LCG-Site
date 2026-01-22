@@ -304,6 +304,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.card_pos_to_deploy = -1
                                     self.planet_pos_to_deploy = -1
                                     player.aiming_reticle_coords_hand = None
+                                    self.queued_sound = "onplay"
                                     self.action_cleanup()
                                     if player.extra_deploy_turn_active:
                                         player.extra_deploy_turn_active = False
